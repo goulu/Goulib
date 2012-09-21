@@ -1,0 +1,14 @@
+*.class
+*.pyc
+*.pyo
+.svn
+_svn
+_build
+_build/doctrees
+_build
+_update.bat
+*.class
+*.pyc
+*.pyo
+.svn
+_svn
