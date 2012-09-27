@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-useful math functions
+additions to math standard library
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
-__credits__ = []
+__credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
 import operator
@@ -15,6 +15,9 @@ from itertools import combinations, permutations, product as cartesian_product
 
 from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
 from decorators import memoize
+
+import fractions
+def lcm(a,b): return abs(a * b) / fractions.gcd(a,b) if a and b else 0
 
 #vector operations
 

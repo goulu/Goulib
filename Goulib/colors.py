@@ -1,3 +1,13 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+dictionary of colors
+"""
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2012, Philippe Guglielmetti"
+__credits__ = []
+__license__ = "LGPL"
+
 color = {'aqua': '#00ffff',
     'black': '#000000',
     'blue': '#0000ff',

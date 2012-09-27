@@ -1,7 +1,15 @@
-#functional toolset from http://pyeuler.wikidot.com/toolset
-#https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
-#tools from http://docs.python.org/dev/py3k/library/itertools.html
-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+additions to itertools standard library
+"""
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2012, Philippe Guglielmetti"
+__credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
+               "algos from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
+               "tools from http://docs.python.org/dev/py3k/library/itertools.html",
+               ]
+__license__ = "LGPL"
 
 #!/usr/bin/python
 from itertools import ifilter, islice, repeat, groupby

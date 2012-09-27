@@ -1,6 +1,8 @@
 eclipse.preferences.version=1
+encoding//Goulib/colors.py=utf-8
 encoding//Goulib/datetime2.py=utf-8
 encoding//Goulib/interval.py=utf-8
+encoding//Goulib/itertools2.py=utf-8
 encoding//Goulib/markup.py=utf-8
 encoding//Goulib/math2.py=utf-8
 encoding//Goulib/piecewise.py=utf-8

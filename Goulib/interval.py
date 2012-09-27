@@ -1,10 +1,41 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-:Id: interval.py
-:Author: Philippe Guglielmetti <drgoulu@gmail.com>
-:Copyright:  2012- , Free for non comercial use
-:Description: Classes for handling Intervals
+operations on [x..y[ intervals
 """
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2012, Philippe Guglielmetti"
+__credits__ = []
+__license__ = "LGPL"
+
+def in_interval(interval,x):
+    ''' True if x is in interval [a,b] or [b,a] (tuple)'''
+    a,b = interval[0], interval[1]
+    return (a <= x <= b) or (b <= x <= a)
+
+def intersect(t1, t2):
+    ''' True if sorted tuples intervals [t1[ [t2[ intersect'''
+    '''http://stackoverflow.com/questions/3721249/python-date-interval-intersection'''
+    t1start, t1end = t1[0], t1[1]
+    t2start, t2end = t2[0], t2[1]
+    return (t1start <= t2start < t1end) or (t2start <= t1start < t2end)
+
+def intersection(t1, t2):
+    '''returns intersection between 2 intervals (tuples), 
+    or (None,None) if intervals don't intersect'''
+    t1start, t1end = t1[0], t1[1]
+    t2start, t2end = t2[0], t2[1]
+    start=max(t1start,t2start)
+    end=min(t1end,t2end)
+    if start>end: #no intersection
+        return (None,None)
+    return (start,end)
+
+def intersectlen(t1, t2, none=0):
+    '''returns len of intersection between 2 intervals (tuples), 
+    or none if intervals don't intersect'''
+    (start,end)=intersection(t1,t2)
+    return end-start if start else none
 
 class Interval(object):
     """

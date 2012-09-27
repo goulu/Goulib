@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Table
+Table class with CSV I/O, easy access to columns, HTML output
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -13,6 +13,7 @@ from datetime import datetime
 import logging
     
 class Table(list):
+    """Table class with CSV I/O, easy access to columns, HTML output"""
     def __init__(self,filename=None,titles=[],init=[],**kwargs):
         """inits a table either from data or csv file"""
         list.__init__(self, init)
@@ -163,14 +164,14 @@ class Table(list):
             else: # will fail if any problem occurs 
                 row[i]=f(row[i])
             
-    def to_datetime(self,by,fmt='%d.%m.%Y'):
+    def to_datetime(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to datetime'''
-        self.applyf(by,lambda x:datetime.strptime(x,fmt))
+        self.applyf(by,lambda x:datetime.strptime(x,fmt),safe)
         
-    def to_date(self,by,fmt='%d.%m.%Y'):
+    def to_date(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to date'''
-        self.to_datetime(by,fmt)
-        self.applyf(by,lambda x:x.date())
+        self.to_datetime(by,fmt,safe)
+        self.applyf(by,lambda x:x.date(),safe)
             
     def __str__(self):
         res=''
