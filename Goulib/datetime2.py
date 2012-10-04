@@ -52,6 +52,13 @@ def timef(t,fmt='%Y-%m-%d'):
         return datetime(t,fmt=fmt).time()
     return time(t)
 
+def hhmm(v):
+    """ return a timedelta formated as hh:mm"""
+    hours, remainder = divmod(v.total_seconds(), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    if seconds>30: minutes+=1
+    return '%d:%02d' % (hours, minutes)
+
 def daysgen(start,length,step=oneday):
     '''returns a range of dates or datetimes'''
     i=0
@@ -62,6 +69,10 @@ def daysgen(start,length,step=oneday):
         
 def days(start,length,step=oneday):
     return [x for x in daysgen(start,length,step)]
+
+def timedelta_sum(timedeltas):
+    ''' because sum(timedeltas) doesn't work...'''
+    return sum(timedeltas, timedelta0)
 
 def timedelta_div(t1,t2):
     '''divides a timedelta by a timedelta or a number. 

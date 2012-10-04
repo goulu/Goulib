@@ -370,6 +370,58 @@ class page(object):
                 self.script( '', src=src, type='text/%s' % type )
         else:
             raise TypeError( "Script should be given a dictionary of src:type pairs." )
+        
+    """Some generic HTML output functions for tables by PhG"""
+
+    def TD(self,data,align=None,fmt=None,tag=None):
+        """outputs table cells in HTML"""
+        from datetime import timedelta
+        from datetime2 import hhmm
+        if not tag:
+            tag=self.td
+        try:
+            data[0]
+        except: #we need an iterable
+            data=[data]
+        for i,v in enumerate(data):
+            a=align
+            if (a is None) and isinstance(v,(int,float)):
+                a="right" #default alignement for numbers
+            if isinstance(v,timedelta):
+                v=hhmm(v)
+                a="right" #align time right
+            if not v or v=='':
+                text="&nbsp;" #for IE8
+            else:
+                try:
+                    text=fmt[i]%v
+                except:
+                    text=str(v)
+            if a:
+                tag(text,align=a)
+            else:
+                tag(text)
+            
+    def TR(self,data,align=None,fmt=None,tag=None):
+        """outputs table row(s) in HTML"""
+        if not isinstance(data[0],list):
+            data=[data]
+        for line in data:
+            self.tr()
+            self.TD(data=line,align=align,fmt=fmt,tag=tag)
+            self.tr.close()
+        
+    def THEAD(self,data,fmt=None):
+        """outputs table header in HTML"""
+        self.thead.open()
+        self.TR(data=data,fmt=fmt,tag=self.th)
+        self.thead.close()
+        
+    def TFOOT(self,data,fmt=None):
+        """outputs table header in HTML"""
+        self.tfoot.open()
+        self.TR(data=data,fmt=fmt,tag=self.th)
+        self.tfoot.close()
 
 
 class _oneliner:

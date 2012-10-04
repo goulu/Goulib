@@ -9,7 +9,7 @@ __credits__ = []
 __license__ = "LGPL"
 
 import csv, itertools, operator, string
-from datetime import datetime
+import datetime
 import logging
     
 class Table(list):
@@ -76,6 +76,14 @@ class Table(list):
             if self.titles: writer.writerow(self.titles)
             for line in self:
                 writer.writerow(line)
+                
+    def find_col(self,title):
+        """finds a column from a part of the title"""
+        title=title.lower()
+        for i,c in enumerate(self.titles):
+            if c.lower().find(title)>=0:
+                return i
+        return None
 
     def _i(self,by):
         '''column index'''
@@ -83,15 +91,16 @@ class Table(list):
             return self.titles.index(by)
         return by
     
-    def col(self,by):
-        '''return column'''
-        res=[]
+    def icol(self,by):
+        '''iterates column'''
         for row in self:
             try:
-                res.append(row[self._i(by)])
+                yield row[self._i(by)]
             except: #empty cell
-                res.append(None)
-        return res
+                yield None
+                
+    def col(self,by):
+        return [x for x in self.icol(by)]
     
     def set(self,row,col,value):
         if row>=len(self): 
@@ -166,7 +175,7 @@ class Table(list):
             
     def to_datetime(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to datetime'''
-        self.applyf(by,lambda x:datetime.strptime(x,fmt),safe)
+        self.applyf(by,lambda x:datetime.datetime.strptime(x,fmt),safe)
         
     def to_date(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to date'''
@@ -181,8 +190,32 @@ class Table(list):
             res+=str(line)+'\n'
         return res
     
-    def html(self):
-        return HTML.Table(self)
+    def total(self,funcs):
+        """builds a list by appling f functions to corresponding columns"""
+        funcs=funcs+[None]*(len(self.titles)-len(funcs))
+        res=[]
+        for i,f in enumerate(funcs):
+            try:
+                res.append(f(self.col(i)))
+            except:
+                res.append(f)
+        return res
+    
+    def html(self,page,total=None,total_top=False):
+        """output page as HTML, optionally generating a "total" line by mapping functions to columns"""
+        import markup
+        page.table()
+        if total:
+            footer=self.total(total)
+        if total and total_top:
+            page.THEAD([self.titles,footer])
+        else:
+            page.THEAD(self.titles)
+        for row in self:
+            page.TR(row)  
+        if total and not total_top:
+            page.TFOOT(footer)             
+        page.table.close()
     
 if __name__ == '__main__':
     t=Table(titles=['A','B','C'])
