@@ -28,14 +28,17 @@ def intersection(t1, t2):
     start=max(t1start,t2start)
     end=min(t1end,t2end)
     if start>end: #no intersection
-        return (None,None)
+        return None
     return (start,end)
 
 def intersectlen(t1, t2, none=0):
     '''returns len of intersection between 2 intervals (tuples), 
     or none if intervals don't intersect'''
-    (start,end)=intersection(t1,t2)
-    return end-start if start else none
+    try:
+        (start,end)=intersection(t1,t2)
+        return end-start
+    except:
+        return None
 
 class Interval(object):
     """

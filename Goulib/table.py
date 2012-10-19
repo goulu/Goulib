@@ -96,7 +96,7 @@ class Table(list):
         for row in self:
             try:
                 yield row[self._i(by)]
-            except: #empty cell
+            except:
                 yield None
                 
     def col(self,by):
@@ -111,8 +111,9 @@ class Table(list):
     
     def setcol(self,by,val,i=0):
         '''set column'''
+        j=self._i(by)
         for v in val:
-            self.set(i,self._i(by),v)
+            self.set(i,j,v)
             i+=1
     def addcol(self,title,val,i=0):
         '''add column to the right'''
@@ -201,20 +202,18 @@ class Table(list):
                 res.append(f)
         return res
     
-    def html(self,page,total=None,total_top=False):
+    def html(self,page,head=None,foot=None,width=None):
         """output page as HTML, optionally generating a "total" line by mapping functions to columns"""
-        import markup
         page.table()
-        if total:
-            footer=self.total(total)
-        if total and total_top:
-            page.THEAD([self.titles,footer])
+        if head:
+            head=[self.titles,head]
         else:
-            page.THEAD(self.titles)
+            head=self.titles
+        page.THEAD(head,width=width)
         for row in self:
             page.TR(row)  
-        if total and not total_top:
-            page.TFOOT(footer)             
+        if foot:
+            page.TFOOT(foot)             
         page.table.close()
     
 if __name__ == '__main__':

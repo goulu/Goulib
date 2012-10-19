@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='Goulib',
-    version='1.1.2',
+    version='1.1.4',
     author='Philippe Guglielmetti',
     author_email='goulib@goulu.net',
     packages=['Goulib'],

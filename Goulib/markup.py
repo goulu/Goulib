@@ -373,7 +373,7 @@ class page(object):
         
     """Some generic HTML output functions for tables by PhG"""
 
-    def TD(self,data,align=None,fmt=None,tag=None):
+    def TD(self,data,align=None,fmt=None,tag=None,width=None):
         """outputs table cells in HTML"""
         from datetime import timedelta
         from datetime2 import hhmm
@@ -383,13 +383,24 @@ class page(object):
             data[0]
         except: #we need an iterable
             data=[data]
+        kwargs={}
         for i,v in enumerate(data):
-            a=align
-            if (a is None) and isinstance(v,(int,float)):
-                a="right" #default alignement for numbers
-            if isinstance(v,timedelta):
-                v=hhmm(v)
-                a="right" #align time right
+            if align:
+                kwargs["align"]=align
+            else:
+                if isinstance(v,(int,float)):
+                    kwargs["align"]="right" #default alignement for numbers
+                elif isinstance(v,timedelta):
+                    v=hhmm(v)
+                    kwargs["align"]="right" #align time right
+                else:
+                    kwargs["align"]=None
+            try:
+                if width[i]:
+                    kwargs["width"]=width[i]
+            except:
+                pass
+                
             if not v or v=='':
                 text="&nbsp;" #for IE8
             else:
@@ -397,24 +408,21 @@ class page(object):
                     text=fmt[i]%v
                 except:
                     text=str(v)
-            if a:
-                tag(text,align=a)
-            else:
-                tag(text)
+            tag(text,**kwargs)
             
-    def TR(self,data,align=None,fmt=None,tag=None):
+    def TR(self,data,align=None,fmt=None,tag=None,width=None):
         """outputs table row(s) in HTML"""
         if not isinstance(data[0],list):
             data=[data]
         for line in data:
             self.tr()
-            self.TD(data=line,align=align,fmt=fmt,tag=tag)
+            self.TD(data=line,align=align,fmt=fmt,tag=tag,width=width)
             self.tr.close()
         
-    def THEAD(self,data,fmt=None):
+    def THEAD(self,data,fmt=None,width=None):
         """outputs table header in HTML"""
         self.thead.open()
-        self.TR(data=data,fmt=fmt,tag=self.th)
+        self.TR(data=data,fmt=fmt,tag=self.th,width=width)
         self.thead.close()
         
     def TFOOT(self,data,fmt=None):
