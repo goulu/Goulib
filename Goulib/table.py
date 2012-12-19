@@ -22,6 +22,32 @@ class Table(list):
             if titles: #were specified
                 kwargs['titles_line']=0 
             self.read_csv(filename,**kwargs)
+            
+    def __repr__(self):
+        return 'Table(%s,%s)'%(self.titles,self[:5])
+    
+    def __str__(self):
+        res=''
+        if self.titles:
+            res+=str(self.titles)+'\n'
+        for line in self:
+            res+=str(line)+'\n'
+        return res
+    
+    def html(self,page,head=None,foot=None,width=None,**kwargs):
+        """output HTML on a markup.page"""
+        page.table(**kwargs)
+        if head:
+            head=[self.titles,head]
+        else:
+            head=self.titles
+        page.THEAD(head,width=width)
+        for row in self:
+            page.TR(row)  
+        if foot:
+            page.TFOOT(foot)             
+        page.table.close()
+    
         
     def read_csv(self, filename, **kwargs):
         """appends a .csv or similar file to the table"""
@@ -183,14 +209,7 @@ class Table(list):
         self.to_datetime(by,fmt,safe)
         self.applyf(by,lambda x:x.date(),safe)
             
-    def __str__(self):
-        res=''
-        if self.titles:
-            res+=str(self.titles)+'\n'
-        for line in self:
-            res+=str(line)+'\n'
-        return res
-    
+
     def total(self,funcs):
         """builds a list by appling f functions to corresponding columns"""
         funcs=funcs+[None]*(len(self.titles)-len(funcs))
@@ -201,20 +220,6 @@ class Table(list):
             except:
                 res.append(f)
         return res
-    
-    def html(self,page,head=None,foot=None,width=None):
-        """output page as HTML, optionally generating a "total" line by mapping functions to columns"""
-        page.table()
-        if head:
-            head=[self.titles,head]
-        else:
-            head=self.titles
-        page.THEAD(head,width=width)
-        for row in self:
-            page.TR(row)  
-        if foot:
-            page.TFOOT(foot)             
-        page.table.close()
     
 if __name__ == '__main__':
     t=Table(titles=['A','B','C'])

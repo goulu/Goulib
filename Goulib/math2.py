@@ -37,12 +37,8 @@ def _longer(a,b,fillvalue=0):
         
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    if fillvalue==0:
-        return map(sum, izip_longest(a,b,fillvalue=fillvalue))
-    #the line above doesn't work for complex types (why?)
-    _longer(a,b,fillvalue)
-    _longer(b,a,fillvalue)
-    return [a[i]+b[i] for i in range(len(a))]
+    args=izip_longest(a,b,fillvalue=fillvalue)
+    return [a+b for a,b in args]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
@@ -100,6 +96,13 @@ def stats(l):
         avg=None
         var=None
     return lo,hi,sum,sum2,avg,var
+
+def arange(start,stop,step=1.):
+    """range for floats"""
+    r = start
+    while r < stop:
+        yield r
+        r += step
 
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
@@ -263,6 +266,33 @@ def is_pandigital(digits, through=range(1, 10)):
     """Return True if digits form a pandigital number"""
     return (sorted(digits) == through)
 
+#norms and distances
+def sets_dist(a,b):
+    """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
+    c = a.intersection(b)
+    return sqrt(len(a-c)*2 + len(b-c)*2)
+
+def sets_levenshtein(a,b):
+    """levenshtein distance on sets
+    @see: http://en.wikipedia.org/wiki/Levenshtein_distance
+    """
+    c = a.intersection(b)
+    return len(a-c)+len(b-c)
+
+def levenshtein(seq1, seq2):
+    """return http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
+    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python """
+    oneago = None
+    thisrow = range(1, len(seq2) + 1) + [0]
+    for x in xrange(len(seq1)):
+        twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
+        for y in xrange(len(seq2)):
+            delcost = oneago[y] + 1
+            addcost = thisrow[y - 1] + 1
+            subcost = oneago[y - 1] + (seq1[x] != seq2[y])
+            thisrow[y] = min(delcost, addcost, subcost)
+    return thisrow[len(seq2) - 1]
+        
 #combinatorics
 
 def ncombinations(n, k):

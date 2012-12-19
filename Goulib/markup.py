@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 # This code is in the public domain, it comes
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.
-__date__ = '29 February 2012'
-__version__ = '1.8'
+
+__date__ = '1 October 2012'
+__version__ = '1.9'
 __doc__= """
 This is markup.py - a Python module that attempts to
 make it easier to generate HTML/XML from a Python program
@@ -28,6 +28,27 @@ except:
     # python 3
     basestring = str
     string = str
+    
+import sys
+    
+#from http://www.voidspace.org.uk/python/cgiutils.html
+def cgiprint(inline='', unbuff=True, line_end='\r\n'):
+    """
+    Print to the ``stdout``.
+    
+    Set ``unbuff=True`` to flush the buffer after every write.
+    
+    It prints the inline you send it, followed by the ``line_end``. By default this 
+    is ``\r\n`` - which is the standard specified by the RFC for http headers.
+    """
+    sys.stdout.write(inline)
+    sys.stdout.write(line_end)
+    if unbuff:
+        sys.stdout.flush()
+
+# tags which are reserved python keywords will be referred 
+# to by a leading underscore otherwise we end up with a syntax error
+import keyword
 
 class element:
     """This class handles the addition of a new element."""
@@ -43,12 +64,6 @@ class element:
             self.tag = tag
         else:
             self.tag = tag
-            
-    def _page(self):
-        """Return the top level page"""
-        if isinstance(self.parent,element):
-            return self.parent._page()
-        return self.parent
     
     def __call__( self, *args, **kwargs ):
         if len( args ) > 1:
@@ -79,7 +94,6 @@ class element:
             raise DeprecationError( self.tag )
         else:
             raise InvalidElementError( self.tag, self.parent.mode )
-        return self._page() # so that we can chain tags
     
     def render( self, tag, single, between, kwargs ):
         """Append the actual tags to content."""
@@ -102,6 +116,8 @@ class element:
                 out = "%s />" % out
             else:
                 out = "%s>" % out
+        cgiprint(out)
+        return
         if self.parent is not None:
             self.parent.content.append( out )
         else:
@@ -109,30 +125,24 @@ class element:
     
     def close( self ):
         """Append a closing tag unless element has only opening tag."""
-        if not self.parent:
-            return "</%s>" % self.tag
+
         if self.tag in self.parent.twotags:
-            self.parent.content.append( "</%s>" % self.tag )
+            cgiprint("</%s>" % self.tag)
+            # self.parent.content.append( "</%s>" % self.tag )
         elif self.tag in self.parent.onetags:
             raise ClosingError( self.tag )
         elif self.parent.mode == 'strict_html' and self.tag in self.parent.deptags:
             raise DeprecationError( self.tag )
-        return self.parent # so that we can chain tags
 
     def open( self, **kwargs ):
         """Append an opening tag."""
 
-        if (not self.parent) or self.tag in self.parent.twotags or self.tag in self.parent.onetags:
-            return self.render( self.tag, False, None, kwargs )
+        if self.tag in self.parent.twotags or self.tag in self.parent.onetags:
+            self.render( self.tag, False, None, kwargs )
         elif self.mode == 'strict_html' and self.tag in self.parent.deptags:
             raise DeprecationError( self.tag )
-        
-""" some elements used in tables """
-td=element('td')
-th=element('th')
-tr=element('tr')
 
-class page(object):
+class page:
     """This is our main class representing a document. Elements are added
     as attributes of an instance of this class."""
 
@@ -158,10 +168,6 @@ class page(object):
         
         class_ --               a class that will be added to every element if defined"""
         
-        
-        super(page,self).__init__()
-        self._direct=True
-        
         valid_onetags = [ "AREA", "BASE", "BR", "COL", "FRAME", "HR", "IMG", "INPUT", "LINK", "META", "PARAM" ]
         valid_twotags = [ "A", "ABBR", "ACRONYM", "ADDRESS", "B", "BDO", "BIG", "BLOCKQUOTE", "BODY", "BUTTON",
                 "CAPTION", "CITE", "CODE", "COLGROUP", "DD", "DEL", "DFN", "DIV", "DL", "DT", "EM", "FIELDSET",
@@ -170,6 +176,7 @@ class page(object):
                 "OPTION", "P", "PRE", "Q", "SAMP", "SCRIPT", "SELECT", "SMALL", "SPAN", "STRONG", "STYLE",
                 "SUB", "SUP", "TABLE", "TBODY", "TD", "TEXTAREA", "TFOOT", "TH", "THEAD", "TITLE", "TR",
                 "TT", "UL", "VAR" ]
+        dont_wait = ["HTML","BODY"]
         deprecated_onetags = [ "BASEFONT", "ISINDEX" ]
         deprecated_twotags = [ "APPLET", "CENTER", "DIR", "FONT", "MENU", "S", "STRIKE", "U" ]
 
@@ -211,8 +218,16 @@ class page(object):
             raise ModeError( mode )
 
     def __getattr__( self, attr ):
+
+        # tags should start with double underscore
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError( attr )
+        # tag with single underscore should be a reserved keyword
+        if attr.startswith( '_' ):
+            attr = attr.lstrip( '_' ) 
+            if attr not in keyword.kwlist:
+                raise AttributeError( attr )
+
         return element( attr, case=self.case, parent=self )
 
     def __str__( self ):
@@ -221,7 +236,9 @@ class page(object):
             end = [ '</body>', '</html>' ]
         else:
             end = [ ]
-        return self.separator.join( ([] if self._direct else self.header) + self.content + self.footer + end )
+
+        return self.separator.join( self.footer + end )
+        return self.separator.join( self.header + self.content + self.footer + end )
 
     def __call__( self, escape=False ):
         """Return the document as a string.
@@ -237,7 +254,7 @@ class page(object):
 
     def add( self, text ):
         """This is an alias to addcontent."""
-        self.addcontent( text )
+        self.addcontent(str(text))
 
     def addfooter( self, text ):
         """Add some text to the bottom of the document"""
@@ -245,17 +262,21 @@ class page(object):
 
     def addheader( self, text ):
         """Add some text to the top of the document"""
+        cgiprint(text)
+        return
         self.header.append( text )
 
     def addcontent( self, text ):
         """Add some text to the main part of the document"""
+        cgiprint(text)
+        return
         self.content.append( text )
 
 
     def init( self, lang='en', css=None, metainfo=None, title=None, header=None,
-              footer=None, charset=None, encoding=None, doctype=None, bodyattrs=None, script=None ):
+              footer=None, charset=None, encoding=None, doctype=None, bodyattrs=None, script=None, base=None ):
         """This method is used for complete documents with appropriate
-        doctype, encoding, title, etc information. For an HTML/XML snippet
+        doctype, encoding, title, etc information. For an /XML snippet
         omit this method.
 
         lang --     language, usually a two character string, will appear
@@ -267,12 +288,15 @@ class page(object):
         metainfo -- a dictionary in the form { 'name':'content' } to be inserted
                     into meta element(s) as <meta name='name' content='content'>
                     (ignored in xml mode)
-
+        
+        base     -- set the <base href="..."> tag in <head>
+        
         bodyattrs --a dictionary in the form { 'key':'value', ... } which will be added
                     as attributes of the <body> element as <body key='value' ... >
                     (ignored in xml mode)
 
         script --   dictionary containing src:type pairs, <script type='text/type' src=src></script>
+                    or a list of [ 'src1', 'src2', ... ] in which case 'javascript' is assumed for all
 
         title --    the title of the document as a string to be inserted into
                     a title element as <title>my title</title> (ignored in xml mode)
@@ -299,13 +323,10 @@ class page(object):
 
         if self.mode == 'strict_html' or self.mode == 'loose_html':
             if doctype is None:
-                doctype = "Content-Type: text/html; charset=utf-8\r\n\r\n<!DOCTYPE html>"
-            if self._direct:
-                print doctype
-            else:
-                self.header.append( doctype )
-            if lang:
-                self.html( lang=lang )
+                doctype = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'>"
+            self.header.append( doctype )
+            cgiprint(self.separator.join(self.header))
+            self.html( lang=lang )
             self.head( )
             if charset is not None:
                 self.meta( http_equiv='Content-Type', content="text/html; charset=%s" % charset )
@@ -317,18 +338,15 @@ class page(object):
                 self.title( title )
             if script is not None:
                 self.scripts( script )
-            if self._direct:
-                print self.separator.join(self.header)
+            if base is not None:
+                self.base( href='%s' % base )
             self.head.close()
             if bodyattrs is not None:
                 self.body( **bodyattrs )
             else:
                 self.body( )
-            if header is not None:                
-                if self._direct:
-                    print header
-                else:
-                    self.content.append( header )
+            if header is not None:
+                self.content.append( header )
             if footer is not None:
                 self.footer.append( footer )
 
@@ -362,74 +380,19 @@ class page(object):
             raise TypeError( "Metainfo should be called with a dictionary argument of name:content pairs." )
 
     def scripts( self, mydict ):
-        """Only useful in html, mydict is dictionary of src:type pairs will
-        be rendered as <script type='text/type' src=src></script>"""
+        """Only useful in html, mydict is dictionary of src:type pairs or a list
+        of script sources [ 'src1', 'src2', ... ] in which case 'javascript' is assumed for type.
+        Will be rendered as <script type='text/type' src=src></script>"""
 
         if isinstance( mydict, dict ):
             for src, type in list( mydict.items( ) ):
                 self.script( '', src=src, type='text/%s' % type )
         else:
-            raise TypeError( "Script should be given a dictionary of src:type pairs." )
-        
-    """Some generic HTML output functions for tables by PhG"""
-
-    def TD(self,data,align=None,fmt=None,tag=None,width=None):
-        """outputs table cells in HTML"""
-        from datetime import timedelta
-        from datetime2 import hhmm
-        if not tag:
-            tag=self.td
-        try:
-            data[0]
-        except: #we need an iterable
-            data=[data]
-        kwargs={}
-        for i,v in enumerate(data):
-            if align:
-                kwargs["align"]=align
-            else:
-                if isinstance(v,(int,float)):
-                    kwargs["align"]="right" #default alignement for numbers
-                elif isinstance(v,timedelta):
-                    v=hhmm(v)
-                    kwargs["align"]="right" #align time right
-                else:
-                    kwargs["align"]=None
             try:
-                if width[i]:
-                    kwargs["width"]=width[i]
+                for src in mydict:
+                    self.script( '', src=src, type='text/javascript' )
             except:
-                pass
-                
-            if not v or v=='':
-                text="&nbsp;" #for IE8
-            else:
-                try:
-                    text=fmt[i]%v
-                except:
-                    text=str(v)
-            tag(text,**kwargs)
-            
-    def TR(self,data,align=None,fmt=None,tag=None,width=None):
-        """outputs table row(s) in HTML"""
-        if not isinstance(data[0],list):
-            data=[data]
-        for line in data:
-            self.tr()
-            self.TD(data=line,align=align,fmt=fmt,tag=tag,width=width)
-            self.tr.close()
-        
-    def THEAD(self,data,fmt=None,width=None):
-        """outputs table header in HTML"""
-        self.thead.open()
-        self.TR(data=data,fmt=fmt,tag=self.th,width=width)
-        self.thead.close()
-        
-    def TFOOT(self,data,fmt=None):
-        """outputs table header in HTML"""
-        self.tfoot.open()
-        self.TR(data=data,fmt=fmt,tag=self.th)
-        self.tfoot.close()
+                raise TypeError( "Script should be given a dictionary of src:type pairs or a list of javascript src's." )
 
 
 class _oneliner:
@@ -441,8 +404,16 @@ class _oneliner:
         self.case = case
     
     def __getattr__( self, attr ):
+        
+        # tags should start with double underscore
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError( attr )
+        # tag with single underscore should be a reserved keyword
+        if attr.startswith( '_' ):
+            attr = attr.lstrip( '_' ) 
+            if attr not in keyword.kwlist:
+                raise AttributeError( attr )
+        
         return element( attr, case=self.case, parent=None )
 
 oneliner = _oneliner( case='lower' )
@@ -479,11 +450,11 @@ def _argsdicts( args, mydict ):
         yield thisarg, thisdict
 
 def _totuple( x ):
-    """Utility stuff to convert string, int, float, None or anything to a usable tuple."""
+    """Utility stuff to convert string, int, long, float, None or anything to a usable tuple."""
 
     if isinstance( x, basestring ):
         out = x,
-    elif isinstance( x, ( int, float ) ):
+    elif isinstance( x, ( int, long, float ) ):
         out = str( x ),
     elif x is None:
         out = None,
@@ -572,28 +543,12 @@ class DeprecationError( MarkupError ):
 
 class ModeError( MarkupError ):
     def __init__( self, mode ):
-        self.message = "Mode '%s' is invalid, possible values: strict_html, loose_html, xml." % mode
+        self.message = "Mode '%s' is invalid, possible values: strict_html, html (alias for strict_html), loose_html, xml." % mode
 
 class CustomizationError( MarkupError ):
     def __init__( self ):
         self.message = "If you customize the allowed elements, you must define both types 'onetags' and 'twotags'."
-        
-import unittest
-class TestCase(unittest.TestCase):
-    def runTest(self):
-        assert element('br')()=='<br />'
-        assert element('p')('text')=='<p>text</p>'
-        assert element('td')(1.234,align='right')=='<td align="right">1.234</td>'
-        t=element('tr')
-        assert t.open()+"text"+t.close()=='<tr>text</tr>'
-        p=page()
-        p.init()
-        p.table()
-        print tr.open()
-        print tr.close()
-        p.table.close()
-        print p
-        
+
 if __name__ == '__main__':
     import sys
     sys.stdout.write( __doc__ )

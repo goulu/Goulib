@@ -1,1 +1,17 @@
-v<version>, <date> -- Initial release.
+v1.3.0, 2012-12-18
++ nvd3.py added to generate JavaScript charts using http://nvd3.org/
+          outputs strings to inline in HTML : no fancy JSON or server dependent stuff
++ markup.py now (again) prints page while generated
++ itertools 2 added rand_seq, all_pairs, split
+
+v1.2.0, 2012-11-08
++ optim.py added 
++ math2.py added levenshtein distances for iterables and sets
++ table.py attributes can be passed to table.html + other small changes
+
+v1.1.4, 2012-10-19 -- changes not recorded
+v1.1.3, 2012-10-09 -- changes not recorded
+v1.1.2 2012-10-04 -- changes not recorded
+v1.1.1, 2012-09-27 -- changes not recorded
+v1.1.0, 2012-09-27 -- changes not recorded
+v1.0.0, 2012-09-21 -- initial release

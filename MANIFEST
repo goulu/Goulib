@@ -3,6 +3,7 @@ CHANGES.txt
 README.txt
 setup.py
 Goulib\__init__.py
+Goulib\cbook.py
 Goulib\colors.py
 Goulib\datetime2.py
 Goulib\decorators.py
@@ -10,6 +11,8 @@ Goulib\interval.py
 Goulib\itertools2.py
 Goulib\markup.py
 Goulib\math2.py
+Goulib\nvd3.py
+Goulib\optim.py
 Goulib\piecewise.py
 Goulib\table.py
 Goulib\workdays.py

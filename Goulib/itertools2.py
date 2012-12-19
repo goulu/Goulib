@@ -15,6 +15,8 @@ __license__ = "LGPL"
 from itertools import ifilter, islice, repeat, groupby
 from itertools import count, imap, takewhile, tee, izip
 from itertools import chain, starmap, cycle, dropwhile
+import random
+import logging
 
 def take(n, iterable):
     """Take first n elements from iterable"""
@@ -181,6 +183,35 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return izip(a, b)
+
+def rand_seq(size):
+    '''generates values in random order
+    equivalent to using shuffle in random,
+    without generating all values at once'''
+    values=range(size)
+    for i in xrange(size):
+        # pick a random index into remaining values
+        j=i+int(random.random()*(size-i))
+        # swap the values
+        values[j],values[i]=values[i],values[j]
+        # return the swapped value
+        yield values[i] 
+
+def all_pairs(size):
+    '''generates all i,j pairs for i,j from 0-size'''
+    for i in rand_seq(size):
+        for j in rand_seq(size):
+            yield (i,j)
+            
+def split(iterable,condition):
+    """@return list of elements in iterable that satisfy condition, and those that don't"""
+    yes,no=[],[]
+    for x in iterable:
+        if condition(x): 
+            yes.append(x)
+        else:
+            no.append(x)
+    return yes,no
 
 def next_permutation(seq, pred=cmp):
     """Like C++ std::next_permutation() but implemented as
