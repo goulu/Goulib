@@ -1,3 +1,13 @@
+v1.4.0, 2013-01-21
++ piecewise.py piecewise continuous functions
++ colors.py added color_range
++ nvd3.py added multiBarHorizontal
+		  div/svg size can now be set correctly
+		  more attributes supported
+		  uses colors_range for nicer graphics
++ itertools2.py : added ilinear
+				  moved arange from math2
+
 v1.3.0, 2012-12-18
 + nvd3.py added to generate JavaScript charts using http://nvd3.org/
           outputs strings to inline in HTML : no fancy JSON or server dependent stuff

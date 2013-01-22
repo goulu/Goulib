@@ -54,6 +54,31 @@ def irange(start_or_end, optional_end=None):
         start, end = start_or_end, optional_end
     return take(max(end - start + 1, 0), count(start))
 
+def arange(start,stop,step=1.):
+    """range for floats or other types"""
+    r = start
+    step=abs(step)
+    if stop<start : 
+        while r > stop:
+            yield r
+            r -= step
+    else:
+        while r < stop:
+            yield r
+            r += step
+        
+def ilinear(start,end,n):
+    """return iterator over n values linearly interpolated between (and including) start and end"""
+    if isinstance(start,(int,float)):
+        if start==end: #generate n times the same value for consistency
+            return repeat(start,n)
+        else: #make sure we generate n values including start and end
+            step=float(end-start)/(n-1)
+            return arange(start,end+step/2,step)
+    else: #suppose start and end are tuples or lists of the same size
+        res=(ilinear(s,e,n) for s,e in zip(start,end))
+        return izip(*res)
+
 def flatten(lstlsts):
     """Flatten a list of lists"""
     return (b for a in lstlsts for b in a)

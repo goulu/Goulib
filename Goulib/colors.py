@@ -1,12 +1,40 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-dictionary of colors
+hex RGB colors and related functions
 """
 __author__ = "Philippe Guglielmetti"
-__copyright__ = "Copyright 2012, Philippe Guglielmetti"
-__credits__ = []
+__copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
+
+import colorsys
+
+# http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
+
+def rgb_to_hex(rgb):
+    return '#%02x%02x%02x' % rgb
+
+def hex_to_rgb(value,scale=1):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(scale*int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+
+#http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
+    
+def color_range(n,start='red',end='blue'):
+    from itertools2 import ilinear
+    if start in color: start=color[start]
+    start=hex_to_rgb(start,1./255)
+    start=colorsys.rgb_to_hsv(*start)
+    if end in color: end=color[end]
+    end=hex_to_rgb(end,1./255)
+    end=colorsys.rgb_to_hsv(*end)
+    res=[]
+    for hsv in ilinear(start,end,n):
+        rgb=colorsys.hsv_to_rgb(*hsv)
+        hex=rgb_to_hex(tuple(int(255*x) for x in rgb))
+        res.append(hex)
+    return res
 
 color = {'aqua': '#00ffff',
     'black': '#000000',
@@ -173,3 +201,6 @@ color = {'aqua': '#00ffff',
     'yellowgreen': '#9acd32'}
 
 hexcolor=dict([(i,'0x'+v[1:]) for i,v in color.iteritems()])
+
+if __name__ == '__main__':
+    print color_range(4)

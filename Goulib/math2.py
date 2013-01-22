@@ -25,6 +25,8 @@ def accsum(it):
     """Yield accumulated sums of iterable: accsum(count(1)) -> 1,3,6,10,..."""
     return drop(1, ireduce(operator.add, it, 0))
 
+cumsum=accsum #numpy alias
+
 def product(nums):
     """Product of nums"""
     return reduce(operator.mul, nums, 1)
@@ -96,13 +98,6 @@ def stats(l):
         avg=None
         var=None
     return lo,hi,sum,sum2,avg,var
-
-def arange(start,stop,step=1.):
-    """range for floats"""
-    r = start
-    while r < stop:
-        yield r
-        r += step
 
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
