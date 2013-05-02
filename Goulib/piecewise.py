@@ -126,7 +126,17 @@ class Piecewise(object):
             else:
                 i+=1
         return
-        
+    
+    def applx(self,f):
+        """ apply a function to each x value """
+        self.x=[f(x) for x in self.x]
+        return self
+    
+    def __lshift__(self,dx):
+        return Piecewise(self).applx(lambda x:x-dx)
+    
+    def __rshift__(self,dx):
+        return Piecewise(self).applx(lambda x:x+dx)
     
     def lines(self,min=0,max=None,eps=0):
         """@return x and y for a line plot"""
@@ -183,14 +193,15 @@ class TestCase(unittest.TestCase):
         add(p1/p2,'p1/p2',disabled=True)
         self.page.add(str(fig))
         
+        dx=0.05 #small shift to see curves better
         fig=LineChart(colors=fig.colors)
         b1=Piecewise([(2,True)],False)
         add(b1,'b1')
         b2=Piecewise([(1,True),(2,False),(3,True)],False)
-        add(b2,'b2')
-        add(b1 | b2,'b1 or b2',disabled=True)
-        add(b1 & b2,'b1 and b2',disabled=True)
-        add(b1 ^ b2,'b1 xor b2',disabled=True)
+        add(b2<<dx,'b2')
+        add((b1 | b2)>>dx,'b1 or b2',disabled=True)
+        add((b1 & b2)>>2*dx,'b1 and b2',disabled=True)
+        add((b1 ^ b2)<<3*dx,'b1 xor b2',disabled=True)
         self.page.add(str(fig))
 
         return

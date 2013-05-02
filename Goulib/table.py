@@ -21,7 +21,10 @@ class Table(list):
         if filename:
             if titles: #were specified
                 kwargs['titles_line']=0 
-            self.read_csv(filename,**kwargs)
+            if filename[-4:].lower()=='.xls':
+                self.read_xls(filename,**kwargs)
+            else:
+                self.read_csv(filename,**kwargs)
             
     def __repr__(self):
         return 'Table(%s,%s)'%(self.titles,self[:5])
@@ -34,30 +37,50 @@ class Table(list):
             res+=str(line)+'\n'
         return res
     
-    def html(self,page,head=None,foot=None,width=None,**kwargs):
+    def html(self,page,head=None,foot=None,colstyle=None,**kwargs):
         """output HTML on a markup.page"""
-        page.table(**kwargs)
-        if head:
-            head=[self.titles,head]
-        else:
+        page.table(**kwargs) #if style is defined, it's applied to the table here
+        if not head:
             head=self.titles
-        page.THEAD(head,width=width)
+        if head:
+            page.THEAD(head)
         for row in self:
-            page.TR(row)  
+            page.TR(row,style=colstyle)  
         if foot:
             page.TFOOT(foot)             
         page.table.close()
     
+    def read_xls(self, filename, **kwargs):
+        """appends an Excel table"""
+        titles_line=kwargs.get('titles_line',1)-1
+        data_line=kwargs.get('data_line',2)-1
+        
+        from xlrd import open_workbook
+        wb = open_workbook(filename)
+        for s in wb.sheets():
+            for i in range(s.nrows):
+                line = []
+                for j in range(s.ncols):
+                    x=s.cell(i,j).value
+                    try:
+                        xf=float(x)
+                        xi=int(x)
+                        x=xi if xi==xf else xf
+                    except:
+                        if x=='': x=None
+                    line.append(x)
+                if i==titles_line:
+                    self.titles=line
+                elif i>=data_line:
+                    self.append(line)
         
     def read_csv(self, filename, **kwargs):
         """appends a .csv or similar file to the table"""
-        titles_line=kwargs.get('titles_line',1)
-        data_line=kwargs.get('data_line',2)
+        titles_line=kwargs.get('titles_line',1)-1
+        data_line=kwargs.get('data_line',2)-1
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
-        encoding=kwargs.get('encoding','iso-8859-1')
-        titles_line-=1 #0 base
-        data_line-=1 #0 base
+        encoding=kwargs.get('encoding','iso-8859-15')
         #reader = csv.reader(open(filename, 'rb'), dialect=dialect, delimiter=delimiter)
         reader = open(filename,'rb') 
         for i,row in enumerate(reader):
@@ -66,29 +89,27 @@ class Table(list):
             
             row=row.split(delimiter)
             if encoding:
-                res=[]
-                for x in row:
-                    try:
-                        x.decode('ascii')
-                    except UnicodeDecodeError:
-                        x=x.decode(encoding)
-                    res.append(x)
-                row=res
+                row=[x.decode(encoding) for x in row]
             if i==titles_line: #titles can have no left/right spaces
                 self.titles=[x.lstrip().rstrip() for x in row]
             elif i>=data_line:
                 line=[]
                 for x in row:
                     try:
-                        x=float(x) if '.' in x else int(x)
+                        xf=float(x)
+                        xi=int(x)
+                        x=xi if xi==xf else xf
                     except:
                         if x=='': x=None
                     line.append(x)
                 if line!=[None]: #strange last line ...
                     self.append(line)
             
-    def write_csv(self,filename, dialect='excel', delimiter=';', transpose=False):
+    def write_csv(self,filename, transpose=False, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
+        dialect=kwargs.get('dialect','excel')
+        delimiter=kwargs.get('delimiter',';')
+        encoding=kwargs.get('encoding','iso-8859-15')
         writer=csv.writer(open(filename, 'wb'), dialect=dialect, delimiter=delimiter)
         if transpose:
             i=0
@@ -102,6 +123,10 @@ class Table(list):
             if self.titles: writer.writerow(self.titles)
             for line in self:
                 writer.writerow(line)
+    
+    def ncols(self):
+        """return number of columns, ignoring title"""
+        return reduce(max,map(len,self))
                 
     def find_col(self,title):
         """finds a column from a part of the title"""
@@ -128,7 +153,12 @@ class Table(list):
     def col(self,by):
         return [x for x in self.icol(by)]
     
+    def get(self,row,col):
+        col=self._i(col)
+        return self[row][col]
+    
     def set(self,row,col,value):
+        col=self._i(col)
         if row>=len(self): 
             self.extend([list()]*(1+row-len(self)))
         if col>=len(self[row]):
@@ -141,10 +171,13 @@ class Table(list):
         for v in val:
             self.set(i,j,v)
             i+=1
-    def addcol(self,title,val,i=0):
+            
+    def addcol(self,title,val=None,i=0):
         '''add column to the right'''
         col=len(self.titles)
         self.titles.append(title)
+        if not isinstance(val,list):
+            val=[val]*len(self)
         for v in val:
             self.set(i,col,v)
             i+=1
@@ -157,6 +190,11 @@ class Table(list):
         else:
             list.sort(i,reverse=reverse)
             
+    
+    def rowasdict(self,i):
+        ''' returns a line as a dict '''
+        return dict(zip(self.titles,self[i]))
+        
     def groupby(self,by):
         '''dictionary of subtables grouped by a column'''
         i=self._i(by)
@@ -164,8 +202,7 @@ class Table(list):
         t=self.titles[:i]+self.titles[i+1:]
         res={}
         for k, g in itertools.groupby(self, key=lambda x:x[i]):
-            res[k]=Table([a[:i]+a[i+1:] for a in list(g)])
-            res[k].titles=t
+            res[k]=Table(None,titles=t,init=[a[:i]+a[i+1:] for a in list(g)])
         return res
     
     def hierarchy(self,by='Level',
@@ -202,7 +239,7 @@ class Table(list):
             
     def to_datetime(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to datetime'''
-        self.applyf(by,lambda x:datetime.datetime.strptime(x,fmt),safe)
+        self.applyf(by,lambda x:x if isinstance(x,datetime.datetime) else datetime.datetime.strptime(str(x),fmt),safe)
         
     def to_date(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to date'''
@@ -220,6 +257,17 @@ class Table(list):
             except:
                 res.append(f)
         return res
+    
+    def remove_lines_where(self,filter):
+        """remove lines on a condition, returns the number of lines removed"""
+        res=0
+        if len(self)>0:
+            for line in reversed(self):
+                if filter(line):
+                    self.remove(line)
+                    res+=1
+        return res
+                
     
 if __name__ == '__main__':
     t=Table(titles=['A','B','C'])

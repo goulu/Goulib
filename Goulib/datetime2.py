@@ -52,12 +52,19 @@ def timef(t,fmt='%Y-%m-%d'):
         return datetime(t,fmt=fmt).time()
     return time(t)
 
-def hhmm(v):
-    """ return a timedelta formated as hh:mm"""
-    hours, remainder = divmod(v.total_seconds(), 3600)
+def hms(v):
+    """ return a timedelta as hours,minutes,seconds"""
+    t=v.total_seconds()
+    hours, remainder = divmod(t, 3600)
     minutes, seconds = divmod(remainder, 60)
-    if seconds>30: minutes+=1
-    return '%d:%02d' % (hours, minutes)
+    if hours:
+        return '%d:%02d:%02d' % (hours, minutes, seconds)
+    else:
+        return '%d:%02d' % (minutes, seconds)
+
+def tdround(td,s=1):
+    """ return timedelta rounded to s seconds """
+    return timedelta(seconds=s*round(td.total_seconds()/s))
 
 def daysgen(start,length,step=oneday):
     '''returns a range of dates or datetimes'''

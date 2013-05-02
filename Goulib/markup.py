@@ -1,3 +1,5 @@
+#!/usr/bin/python -u
+# -*- coding: utf-8 -*-
 # This code is in the public domain, it comes
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.
@@ -41,6 +43,8 @@ def cgiprint(inline='', unbuff=True, line_end='\r\n'):
     It prints the inline you send it, followed by the ``line_end``. By default this 
     is ``\r\n`` - which is the standard specified by the RFC for http headers.
     """
+    print inline,line_end
+    return
     sys.stdout.write(inline)
     sys.stdout.write(line_end)
     if unbuff:

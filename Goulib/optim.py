@@ -174,7 +174,7 @@ def tsp(points,dist,max_iterations=100,start_temp=None,alpha=None,close=True,ran
     import optim, random
     n=len(points)
     def init_function():
-        tour=range(1,n-1)
+        tour=range(1,n)
         if rand:
             random.shuffle(tour)
         return [0]+tour
