@@ -302,17 +302,16 @@ def next_permutation(seq, pred=cmp):
     raise StopIteration
 
 class iter2(object):
-    '''Takes in an object that is iterable.  
+    """Takes in an object that is iterable.  
     http://code.activestate.com/recipes/578092-flattening-an-arbitrarily-deep-list-or-any-iterato/
     Allows for the following method calls (that should be built into iterators anyway...)
     calls:
-        - append - appends another iterable onto the iterator.
-        - insert - only accepts inserting at the 0 place, inserts an iterable
-         before other iterables.
-        - adding.  an iter2 object can be added to another object that is
-         iterable.  i.e. iter2 + iter (not iter + iter2).  It's best to make
-         all objects iter2 objects to avoid syntax errors.  :D
-    '''
+    - append - appends another iterable onto the iterator.
+    - insert - only accepts inserting at the 0 place, inserts an iterable before other iterables.
+    - adding.  an iter2 object can be added to another object that is
+    iterable.  i.e. iter2 + iter (not iter + iter2). 
+    It's best to make all objects iter2 objects to avoid syntax errors.  :D
+    """
     def __init__(self, iterable):
         self._iter = iter(iterable)
     

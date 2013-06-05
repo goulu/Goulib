@@ -201,7 +201,7 @@ def least_common_multiple(a, b):
     return (a * b) / greatest_common_divisor(a, b)
 
 def triangle(x):
-    """The nth triangle number is defined as the sum of [1,n] values."""
+    """The nth triangle number is defined as the sum of [1,n] values. http://en.wikipedia.org/wiki/Triangular_number"""
     return (x*(x+1))/2
 
 def is_triangle(x):
@@ -227,25 +227,25 @@ def get_cardinal_name(num):
         50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety",
       }
     def _get_tens(n):
-      a, b = divmod(n, 10)
-      return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))    
+        a, b = divmod(n, 10)
+        return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))    
     def _get_hundreds(n):
-      tens = n % 100
-      hundreds = (n / 100) % 10
-      return list(compact([
-        hundreds > 0 and numbers[hundreds], 
-        hundreds > 0 and "hundred", 
-        hundreds > 0 and tens and "and", 
-        (not hundreds or tens > 0) and _get_tens(tens),
-      ]))
+        tens = n % 100
+        hundreds = (n / 100) % 10
+        return list(compact([
+            hundreds > 0 and numbers[hundreds], 
+            hundreds > 0 and "hundred", 
+            hundreds > 0 and tens and "and", 
+            (not hundreds or tens > 0) and _get_tens(tens),
+          ]))
 
     # This needs some refactoring
     if not (0 <= num < 1e6):
-      raise ValueError, "value not supported: %s" % num      
+        raise ValueError, "value not supported: %s" % num      
     thousands = (num / 1000) % 1000
     strings = compact([
-      thousands and (_get_hundreds(thousands) + ["thousand"]),
-      (num % 1000 or not thousands) and _get_hundreds(num % 1000),
+        thousands and (_get_hundreds(thousands) + ["thousand"]),
+        (num % 1000 or not thousands) and _get_hundreds(num % 1000),
     ])
     return " ".join(flatten(strings))
 

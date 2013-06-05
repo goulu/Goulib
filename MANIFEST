@@ -15,4 +15,5 @@ Goulib\nvd3.py
 Goulib\optim.py
 Goulib\piecewise.py
 Goulib\table.py
+Goulib\tank.py
 Goulib\workdays.py

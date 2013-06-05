@@ -1,11 +1,26 @@
 #!/usr/bin/python
 # https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-from itertools import tee, islice
+import functools
 # Decorators
 
+#http://wiki.python.org/moin/PythonDecoratorLibrary
+def memoize(obj):
+    def reset():
+        obj.cache = {}
+    obj._reset=reset
+    obj._reset()
+    cache=obj.cache
+    @functools.wraps(obj)
+    def memoizer(*args, **kwargs):
+        if args not in cache:
+            cache[args] = obj(*args, **kwargs)
+        return cache[args]
+    return memoizer
+
+"""
 def memoize(f, maxcache=None, cache={}):
-    """Decorator to keep a cache of input/output for a given function"""
+    '''Decorator to keep a cache of input/output for a given function'''
     cachelen = [0]
     def g(*args, **kwargs):
         key = (f, tuple(args), frozenset(kwargs.items()))
@@ -16,11 +31,12 @@ def memoize(f, maxcache=None, cache={}):
             cachelen[0] += 1
         return cache[key]
     return g
+"""
 
 class tail_recursive(object):
     """Tail recursive decorator."""
     # Michele Simionato's version 
-    CONTINUE = object() # sentinel
+    CONTINUE = object()  # sentinel
 
     def __init__(self, func):
         self.func = func
@@ -28,21 +44,21 @@ class tail_recursive(object):
 
     def __call__(self, *args, **kwd):
         try:
-            if self.firstcall: # start looping
+            if self.firstcall:  # start looping
                 self.firstcall = False
                 while True:
                     result = self.func(*args, **kwd)
-                    if result is self.CONTINUE: # update arguments
+                    if result is self.CONTINUE:  # update arguments
                         args, kwd = self.argskwd
-                    else: # last call
+                    else:  # last call
                         break
-            else: # return the arguments of the tail call
+            else:  # return the arguments of the tail call
                 self.argskwd = args, kwd
                 return self.CONTINUE
-        except: # reset and re-raise
+        except:  # reset and re-raise
             self.firstcall = True
             raise
-        else: # reset and exit
+        else:  # reset and exit
             self.firstcall = True
             return result
         
@@ -55,7 +71,7 @@ class persistent(object):
         if type(x) is slice:
             return list(islice(temp, x.start, x.stop, x.step))
         else:
-            return islice(temp, x, x+1).next()
+            return islice(temp, x, x + 1).next()
         
     def __iter__(self):
         self.it, temp = tee(self.it)

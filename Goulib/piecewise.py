@@ -2,8 +2,9 @@
 """
 :Id: piecewise.py
 :Author: Philippe Guglielmetti <drgoulu@gmail.com>
-:Copyright:  2012- , Free for non comercial use
-:Description: Piecewise defined function
+:Copyright: 2013 Philippe Guglielmetti
+:Licence:  GNU Lesser General Public Licence (LGPL)
+:Synposis: Piecewise defined function
 """
 
 import bisect  

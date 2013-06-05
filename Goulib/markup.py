@@ -153,24 +153,29 @@ class page:
     def __init__( self, mode='strict_html', case='lower', onetags=None, twotags=None, separator='\n', class_=None ):
         """Stuff that effects the whole document.
 
-        mode -- 'strict_html'   for HTML 4.01 (default)
-                'html'          alias for 'strict_html'
-                'loose_html'    to allow some deprecated elements
-                'xml'           to allow arbitrary elements
+        :param mode:
+        *'strict_html'   for HTML 4.01 (default)
+        *'html'          alias for 'strict_html'
+        *'loose_html'    to allow some deprecated elements
+        *'xml'           to allow arbitrary elements
 
-        case -- 'lower'         element names will be printed in lower case (default)
-                'upper'         they will be printed in upper case
-                'given'         element names will be printed as they are given
+        :param case:
+        *'lower'         element names will be printed in lower case (default)
+        *'upper'         they will be printed in upper case
+        *'given'         element names will be printed as they are given
 
-        onetags --              list or tuple of valid elements with opening tags only
-        twotags --              list or tuple of valid elements with both opening and closing tags
-                                these two keyword arguments may be used to select
-                                the set of valid elements in 'xml' mode
-                                invalid elements will raise appropriate exceptions
+        :param onetags:  list or tuple of valid elements with opening tags only
+        :param twotags:
+          list or tuple of valid elements with both opening and closing tags
+          these two keyword arguments may be used to select
+          the set of valid elements in 'xml' mode
+          invalid elements will raise appropriate exceptions
         
-        separator --            string to place between added elements, defaults to newline
+        :param separator: string to place between added elements, defaults to newline
         
-        class_ --               a class that will be added to every element if defined"""
+        :param class_:    a class that will be added to every element if defined
+        
+        """
         
         valid_onetags = [ "AREA", "BASE", "BR", "COL", "FRAME", "HR", "IMG", "INPUT", "LINK", "META", "PARAM" ]
         valid_twotags = [ "A", "ABBR", "ACRONYM", "ADDRESS", "B", "BDO", "BIG", "BLOCKQUOTE", "BODY", "BUTTON",

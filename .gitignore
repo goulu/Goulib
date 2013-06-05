@@ -12,3 +12,5 @@ _update.bat
 *.pyo
 .svn
 _svn
+build
+dist

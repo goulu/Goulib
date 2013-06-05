@@ -52,15 +52,19 @@ def timef(t,fmt='%Y-%m-%d'):
         return datetime(t,fmt=fmt).time()
     return time(t)
 
-def hms(v):
-    """ return a timedelta as hours,minutes,seconds"""
+def strftimedelta(v,fmt=None):
+    """ formats a timedelta"""
+    if not fmt:
+        fmt='%H:%M:%S'
     t=v.total_seconds()
     hours, remainder = divmod(t, 3600)
     minutes, seconds = divmod(remainder, 60)
-    if hours:
-        return '%d:%02d:%02d' % (hours, minutes, seconds)
-    else:
-        return '%d:%02d' % (minutes, seconds)
+    res=fmt.replace('%H','%d'%hours)
+    res=res.replace('%h','%d'%hours if hours else '')
+    res=res.replace('%M','%02d'%minutes)
+    res=res.replace('%m','%d'%minutes if minutes else '')
+    res=res.replace('%S','%02d'%seconds)
+    return res
 
 def tdround(td,s=1):
     """ return timedelta rounded to s seconds """
@@ -78,8 +82,7 @@ def days(start,length,step=oneday):
     return [x for x in daysgen(start,length,step)]
 
 def timedelta_sum(timedeltas):
-    ''' because sum(timedeltas) doesn't work...'''
-    return sum(timedeltas, timedelta0)
+    return sum((d for d in timedeltas if d), timedelta0)
 
 def timedelta_div(t1,t2):
     '''divides a timedelta by a timedelta or a number. 

@@ -195,14 +195,18 @@ class Table(list):
         ''' returns a line as a dict '''
         return dict(zip(self.titles,self[i]))
         
-    def groupby(self,by):
+    def groupby(self,by,sort=True,removecol=True):
         '''dictionary of subtables grouped by a column'''
         i=self._i(by)
-        self.sort(i)
-        t=self.titles[:i]+self.titles[i+1:]
+        t=self.titles
+        if removecol: t=t[:i]+t[i+1:]
         res={}
+        if sort: 
+            self.sort(i) 
+        else:
+            pass #groupby will group CONSECUTIVE lines with same i, so entries at bottom of table will replace the earlier entries in dict
         for k, g in itertools.groupby(self, key=lambda x:x[i]):
-            res[k]=Table(None,titles=t,init=[a[:i]+a[i+1:] for a in list(g)])
+            res[k]=Table(None,titles=t,init=[a[:i]+a[i+1:] if removecol else a for a in g])
         return res
     
     def hierarchy(self,by='Level',
@@ -233,7 +237,8 @@ class Table(list):
                 try:
                     row[i]=f(row[i])
                 except:
-                    logging.warning('applyf could not process %s'%row[i])
+                    pass
+                    # logging.debug('applyf could not process %s'%row[i]) #might cause another error
             else: # will fail if any problem occurs 
                 row[i]=f(row[i])
             
