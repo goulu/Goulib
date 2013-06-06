@@ -1,4 +1,4 @@
-.. include:: ../README.txt
+.. include:: ..\README.rst
 
 .. toctree::
    :hidden:
@@ -7,12 +7,12 @@
    modules/*
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
 History
-=======
-.. include:: ../CHANGES.txt
+-------
+.. include:: ..\CHANGES.rst
