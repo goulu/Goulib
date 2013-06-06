@@ -12,25 +12,25 @@ My Python library of useful code found and written for various projects
 
 Modules
 -------
-- :mod:`datetime2` : additions to :py:mod:`datetime`
-- :mod:`itertools2` : additions to :py:mod:`itertools`
-- :mod:`math2` : additions to :py:mod:`math` standard library
+- `datetime2` : additions to `datetime`
+- `itertools2` : additions to `itertools`
+- `math2` : additions to `math` standard library
 
-- :mod:`interval` : operations on [x..y[ intervals
-- :mod:`optim` : Optimization algorithms
+- `interval` : operations on [x..y[ intervals
+- `optim` : Optimization algorithms
 
   Travelling Salesman Problem (TSP) hill climbing + simulated annealing 
 
-- :mod:`markup` : simple HTML output (branch of `markup <http://pypi.python.org/pypi/markup/>`_ )
-- :mod:`nvd3` : generates Javascript charts using http://nvd3.org and http://d3js.org
+- `markup` : simple HTML output (branch of `markup <http://pypi.python.org/pypi/markup/>`_ )
+- `nvd3` : generates Javascript charts using http://nvd3.org and http://d3js.org
 
   Obsolete. use `python-nvd3 <http://pypi.python.org/pypi/python-nvd3/>`_ which is derived from this module.
 
-- :mod:`table` : Table class with CSV I/O, easy access to columns, HTML output
-- :mod:`workdays` : WorkCalendar class with datetime operations on working hours
+- `table` : Table class with CSV I/O, easy access to columns, HTML output
+- `workdays` : WorkCalendar class with datetime operations on working hours
 
   merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
-- :mod:`colors` : web (hex) colors dictionary and related functions
+- `colors` : web (hex) colors dictionary and related functions
 
 Resources
 ---------

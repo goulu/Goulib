@@ -31,9 +31,9 @@ setup(
     install_requires=[
         'setuptools',
     ],
-    extras_requires=[
-        'xlrd',
-    ],
+    extras_require = {
+        'Excel':  ["xlrd"],
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -42,7 +42,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
+        'Topic :: Scientific/Engineering',
         'Topic :: Multimedia :: Graphics :: Presentation',
-        'Topic :: Scientific/Engineering'
     ],
 )
