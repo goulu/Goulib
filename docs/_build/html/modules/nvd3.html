@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nvd3 &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="optim" href="optim.html" />
+    <link rel="prev" title="math2" href="math2.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="optim.html" title="optim"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="math2.html" title="math2"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="math2.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">math2</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="optim.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">optim</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/nvd3.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-nvd3">
+<span id="nvd3"></span><h1><a class="reference internal" href="#module-nvd3" title="nvd3"><tt class="xref py py-mod docutils literal"><span class="pre">nvd3</span></tt></a><a class="headerlink" href="#module-nvd3" title="Permalink to this headline">¶</a></h1>
+<p>generate JavaScript charts using <a class="reference external" href="http://nvd3.org/">http://nvd3.org/</a>
+outputs strings to inline in HTML : no fancy JSON or server dependent stuff</p>
+<dl class="function">
+<dt id="nvd3.generate">
+<tt class="descclassname">nvd3.</tt><tt class="descname">generate</tt><big>(</big><em>y</em>, <em>x=None</em>, <em>length=100</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of values y(x), where x and y can be
+iterable, functions or generators</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.TestCase">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">TestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#TestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.TestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="nvd3.TestCase.runTest">
+<tt class="descname">runTest</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/nvd3.html#TestCase.runTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.TestCase.runTest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.Chart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">Chart</tt><big>(</big><em>model</em>, <em>name=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Chart" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class. should not be used directly</p>
+<dl class="method">
+<dt id="nvd3.Chart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>model</em>, <em>name=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Chart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Chart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nvd3.Chart.add">
+<tt class="descname">add</tt><big>(</big><em>y</em>, <em>name=None</em>, <em>x=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Chart.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Chart.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a curve</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nvd3.Chart.axis">
+<tt class="descname">axis</tt><big>(</big><em>name</em>, <em>label=None</em>, <em>format='.2f'</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Chart.axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Chart.axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nvd3.Chart.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Chart.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Chart.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.LineChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">LineChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LineChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LineChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.LineChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LineChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LineChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.ScatterChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">ScatterChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#ScatterChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.ScatterChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.ScatterChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#ScatterChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.ScatterChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.LineWithFocusChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">LineWithFocusChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LineWithFocusChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LineWithFocusChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.LineWithFocusChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LineWithFocusChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LineWithFocusChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.MultiBarChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">MultiBarChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiBarChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiBarChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.MultiBarChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiBarChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiBarChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.MultiBarHorizontalChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">MultiBarHorizontalChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiBarHorizontalChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiBarHorizontalChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.MultiBarHorizontalChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiBarHorizontalChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiBarHorizontalChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.CumulativeLineChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">CumulativeLineChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#CumulativeLineChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.CumulativeLineChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.CumulativeLineChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#CumulativeLineChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.CumulativeLineChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.StackedAreaChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">StackedAreaChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#StackedAreaChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.StackedAreaChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.StackedAreaChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#StackedAreaChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.StackedAreaChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.LinePlusBarChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">LinePlusBarChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LinePlusBarChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LinePlusBarChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.LinePlusBarChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#LinePlusBarChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.LinePlusBarChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.MultiChart">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">MultiChart</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiChart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiChart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.Chart" title="nvd3.Chart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.Chart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.MultiChart.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#MultiChart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.MultiChart.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nvd3.Pareto">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">Pareto</tt><big>(</big><em>values</em>, <em>norm=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Pareto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Pareto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.MultiChart" title="nvd3.MultiChart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.MultiChart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.Pareto.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>values</em>, <em>norm=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Pareto.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Pareto.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nvd3.hist">
+<tt class="descclassname">nvd3.</tt><tt class="descname">hist</tt><big>(</big><em>values</em>, <em>bins=None</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#hist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="nvd3.Histogram">
+<em class="property">class </em><tt class="descclassname">nvd3.</tt><tt class="descname">Histogram</tt><big>(</big><em>values</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nvd3.MultiChart" title="nvd3.MultiChart"><tt class="xref py py-class docutils literal"><span class="pre">nvd3.MultiChart</span></tt></a></p>
+<dl class="method">
+<dt id="nvd3.Histogram.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>values</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#Histogram.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.Histogram.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nvd3.bump">
+<tt class="descclassname">nvd3.</tt><tt class="descname">bump</tt><big>(</big><em>n</em>, <em>w=5</em><big>)</big><a class="reference internal" href="../_modules/nvd3.html#bump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nvd3.bump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nvd3.random">
+<tt class="descclassname">nvd3.</tt><tt class="descname">random</tt><big>(</big><big>)</big> &rarr; x in the interval [0, 1).<a class="headerlink" href="#nvd3.random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="optim.html" title="optim"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="math2.html" title="math2"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

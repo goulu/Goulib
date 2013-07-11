@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>itertools2 &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for itertools2</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">additions to itertools standard library</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;functional toolset from http://pyeuler.wikidot.com/toolset&quot;</span><span class="p">,</span>
+               <span class="s">&quot;algos from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py&quot;</span><span class="p">,</span>
+               <span class="s">&quot;tools from http://docs.python.org/dev/py3k/library/itertools.html&quot;</span><span class="p">,</span>
+               <span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="c">#!/usr/bin/python</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">ifilter</span><span class="p">,</span> <span class="n">islice</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">groupby</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">count</span><span class="p">,</span> <span class="n">imap</span><span class="p">,</span> <span class="n">takewhile</span><span class="p">,</span> <span class="n">tee</span><span class="p">,</span> <span class="n">izip</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">starmap</span><span class="p">,</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">dropwhile</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<div class="viewcode-block" id="take"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.take">[docs]</a><span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take first n elements from iterable&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.index">[docs]</a><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="s">&quot;Returns the nth item&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="first"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.first">[docs]</a><span class="k">def</span> <span class="nf">first</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take first element in the iterable&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">iterable</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="last"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.last">[docs]</a><span class="k">def</span> <span class="nf">last</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take last element in the iterable&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="n">iterable</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="take_every"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.take_every">[docs]</a><span class="k">def</span> <span class="nf">take_every</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take an element from iterator every n elements&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="drop"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.drop">[docs]</a><span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Drop n elements from iterable and return the rest&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ilen"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.ilen">[docs]</a><span class="k">def</span> <span class="nf">ilen</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return length exhausing an iterator&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">it</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="irange"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.irange">[docs]</a><span class="k">def</span> <span class="nf">irange</span><span class="p">(</span><span class="n">start_or_end</span><span class="p">,</span> <span class="n">optional_end</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return iterable that counts from start to end (both included).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">optional_end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">start_or_end</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">start_or_end</span><span class="p">,</span> <span class="n">optional_end</span>
+    <span class="k">return</span> <span class="n">take</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">count</span><span class="p">(</span><span class="n">start</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="arange"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.arange">[docs]</a><span class="k">def</span> <span class="nf">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">,</span><span class="n">step</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;range for floats or other types&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">step</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">stop</span><span class="o">&lt;</span><span class="n">start</span> <span class="p">:</span> 
+        <span class="k">while</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">stop</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">r</span>
+            <span class="n">r</span> <span class="o">-=</span> <span class="n">step</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">stop</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">r</span>
+            <span class="n">r</span> <span class="o">+=</span> <span class="n">step</span>
+        </div>
+<div class="viewcode-block" id="ilinear"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.ilinear">[docs]</a><span class="k">def</span> <span class="nf">ilinear</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;return iterator over n values linearly interpolated between (and including) start and end&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,(</span><span class="nb">int</span><span class="p">,</span><span class="nb">float</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">start</span><span class="o">==</span><span class="n">end</span><span class="p">:</span> <span class="c">#generate n times the same value for consistency</span>
+            <span class="k">return</span> <span class="n">repeat</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c">#make sure we generate n values including start and end</span>
+            <span class="n">step</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="o">+</span><span class="n">step</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">step</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c">#suppose start and end are tuples or lists of the same size</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">(</span><span class="n">ilinear</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">izip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="flatten"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.flatten">[docs]</a><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">lstlsts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flatten a list of lists&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">lstlsts</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">a</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="compact"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.compact">[docs]</a><span class="k">def</span> <span class="nf">compact</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter None values from iterator&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ifilter</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">it</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="groups"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.groups">[docs]</a><span class="k">def</span> <span class="nf">groups</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make groups of &#39;n&#39; elements from the iterable advancing</span>
+<span class="sd">    &#39;step&#39; elements on each iteration&quot;&quot;&quot;</span>
+    <span class="n">itlist</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">onestepit</span> <span class="o">=</span> <span class="n">izip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">drop</span><span class="p">,</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itlist</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">take_every</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">onestepit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="compose"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.compose">[docs]</a><span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compose two functions -&gt; compose(f, g)(x) -&gt; f(g(x))&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">g</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_wrapper</span>
+  </div>
+<div class="viewcode-block" id="iterate"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iterate">[docs]</a><span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;After Haskell&#39;s iterate: apply function repeatedly.&quot;&quot;&quot;</span>
+    <span class="c"># not functional</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">arg</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>                
+</div>
+<div class="viewcode-block" id="tails"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.tails">[docs]</a><span class="k">def</span> <span class="nf">tails</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get tails of a sequence: tails([1,2,3]) -&gt; [1,2,3], [2,3], [3], [].&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">seq</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
+     </div>
+<div class="viewcode-block" id="ireduce"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.ireduce">[docs]</a><span class="k">def</span> <span class="nf">ireduce</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Like reduce() but using iterators (a.k.a scanl)&quot;&quot;&quot;</span>
+    <span class="c"># not functional</span>
+    <span class="k">if</span> <span class="n">init</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">iterable</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">init</span>
+        <span class="k">yield</span> <span class="n">init</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">curr</span>
+</div>
+<div class="viewcode-block" id="unique"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.unique">[docs]</a><span class="k">def</span> <span class="nf">unique</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">&quot;List unique elements, preserving order. Remember all elements ever seen.&quot;</span>
+    <span class="c"># unique(&#39;AAAABBBCCDAABBB&#39;) --&gt; A B C D</span>
+    <span class="c"># unique(&#39;ABBCcAD&#39;, str.lower) --&gt; A B C D</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">seen_add</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">element</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">seen_add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">element</span>
+        </div>
+<div class="viewcode-block" id="identity"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.identity">[docs]</a><span class="k">def</span> <span class="nf">identity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Do nothing and return the variable untouched&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span>
+</div>
+<div class="viewcode-block" id="occurrences"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.occurrences">[docs]</a><span class="k">def</span> <span class="nf">occurrences</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">exchange</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return dictionary with occurrences from iterable&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">occur</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">occur</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">occur</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}),</span> <span class="n">it</span><span class="p">,</span> <span class="p">{})</span>
+</div>
+<div class="viewcode-block" id="product"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.product">[docs]</a><span class="k">def</span> <span class="nf">product</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iterables</span> <span class="o">=</span> <span class="n">iterables</span> <span class="o">*</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;repeat&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="n">iterables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">it</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">else</span> <span class="nb">iter</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">)</span> <span class="o">+</span> <span class="n">items</span>
+
+<span class="c"># my functions added</span>
+</div>
+<div class="viewcode-block" id="any"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.any">[docs]</a><span class="k">def</span> <span class="nf">any</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">bool</span><span class="p">):</span>
+    <span class="s">&quot;Return True if pred(x) is True for at least one element in the iterable&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">True</span> <span class="ow">in</span> <span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="all"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.all">[docs]</a><span class="k">def</span> <span class="nf">all</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">bool</span><span class="p">):</span>
+    <span class="s">&quot;Return True if pred(x) is True for all elements in the iterable&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">False</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="no"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.no">[docs]</a><span class="k">def</span> <span class="nf">no</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">bool</span><span class="p">):</span>
+    <span class="s">&quot;Returns True if pred(x) is False for every element in the iterable&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">True</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="takenth"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.takenth">[docs]</a><span class="k">def</span> <span class="nf">takenth</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="s">&quot;Returns the nth item&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="takeevery"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.takeevery">[docs]</a><span class="k">def</span> <span class="nf">takeevery</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take an element from iterator every n elements&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="icross"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.icross">[docs]</a><span class="k">def</span> <span class="nf">icross</span><span class="p">(</span><span class="o">*</span><span class="n">sequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cartesian product of sequences (recursive version)&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sequences</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">icross</span><span class="p">(</span><span class="o">*</span><span class="n">sequences</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">x</span><span class="p">,)</span><span class="o">+</span><span class="n">y</span>
+    <span class="k">else</span><span class="p">:</span> <span class="k">yield</span> <span class="p">()</span>
+</div>
+<div class="viewcode-block" id="get_groups"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.get_groups">[docs]</a><span class="k">def</span> <span class="nf">get_groups</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make groups of &#39;n&#39; elements from the iterable advancing</span>
+<span class="sd">    &#39;step&#39; elements each iteration&quot;&quot;&quot;</span>
+    <span class="n">itlist</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">onestepit</span> <span class="o">=</span> <span class="n">izip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">drop</span><span class="p">,</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itlist</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">takeevery</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">onestepit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="quantify"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.quantify">[docs]</a><span class="k">def</span> <span class="nf">quantify</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">bool</span><span class="p">):</span>
+    <span class="s">&quot;Count how many times the predicate is true&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">iterable</span><span class="p">))</span>
+                </div>
+<div class="viewcode-block" id="pairwise"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.pairwise">[docs]</a><span class="k">def</span> <span class="nf">pairwise</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+    <span class="s">&quot;s -&gt; (s0,s1), (s1,s2), (s2, s3), ...&quot;</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">izip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="rand_seq"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.rand_seq">[docs]</a><span class="k">def</span> <span class="nf">rand_seq</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;generates values in random order</span>
+<span class="sd">    equivalent to using shuffle in random,</span>
+<span class="sd">    without generating all values at once&#39;&#39;&#39;</span>
+    <span class="n">values</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="c"># pick a random index into remaining values</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span><span class="o">*</span><span class="p">(</span><span class="n">size</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+        <span class="c"># swap the values</span>
+        <span class="n">values</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="c"># return the swapped value</span>
+        <span class="k">yield</span> <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> 
+</div>
+<div class="viewcode-block" id="all_pairs"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.all_pairs">[docs]</a><span class="k">def</span> <span class="nf">all_pairs</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;generates all i,j pairs for i,j from 0-size&#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rand_seq</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">rand_seq</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="split"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.split">[docs]</a><span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span><span class="n">condition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;@return list of elements in iterable that satisfy condition, and those that don&#39;t&quot;&quot;&quot;</span>
+    <span class="n">yes</span><span class="p">,</span><span class="n">no</span><span class="o">=</span><span class="p">[],[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">condition</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> 
+            <span class="n">yes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">no</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yes</span><span class="p">,</span><span class="n">no</span>
+</div>
+<div class="viewcode-block" id="next_permutation"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.next_permutation">[docs]</a><span class="k">def</span> <span class="nf">next_permutation</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">cmp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Like C++ std::next_permutation() but implemented as</span>
+<span class="sd">    generator. Yields copies of seq.</span>
+<span class="sd">    see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="c"># seq = seq[:start] + reversed(seq[start:end]) + \</span>
+        <span class="c">#       seq[end:]</span>
+        <span class="n">end</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">&lt;=</span> <span class="n">start</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">seq</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[</span><span class="n">end</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">start</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="n">end</span> <span class="ow">or</span> <span class="n">start</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="n">end</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">start</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">end</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seq</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;seq must allow random access.&quot;</span><span class="p">)</span>
+
+    <span class="n">first</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[:]</span>
+
+    <span class="c"># Yield input sequence as the STL version is often</span>
+    <span class="c"># used inside do {} while.</span>
+    <span class="k">yield</span> <span class="n">seq</span>
+
+    <span class="k">if</span> <span class="n">last</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="n">last</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="c"># Step 1.</span>
+            <span class="n">next1</span> <span class="o">=</span> <span class="nb">next</span>
+            <span class="nb">next</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">pred</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="nb">next</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">next1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># Step 2.</span>
+                <span class="n">mid</span> <span class="o">=</span> <span class="n">last</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pred</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="nb">next</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">mid</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">mid</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">seq</span><span class="p">[</span><span class="nb">next</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[</span><span class="n">mid</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span>
+
+                <span class="c"># Step 3.</span>
+                <span class="n">reverse</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">next1</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
+
+                <span class="c"># Change to yield references to get rid of</span>
+                <span class="c"># (at worst) |seq|! copy operations.</span>
+                <span class="k">yield</span> <span class="n">seq</span><span class="p">[:]</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">next</span> <span class="o">==</span> <span class="n">first</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StopIteration</span>
+    <span class="k">raise</span> <span class="ne">StopIteration</span>
+</div>
+<div class="viewcode-block" id="iter2"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2">[docs]</a><span class="k">class</span> <span class="nc">iter2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Takes in an object that is iterable.  </span>
+<span class="sd">    http://code.activestate.com/recipes/578092-flattening-an-arbitrarily-deep-list-or-any-iterato/</span>
+<span class="sd">    Allows for the following method calls (that should be built into iterators anyway...)</span>
+<span class="sd">    calls:</span>
+<span class="sd">    - append - appends another iterable onto the iterator.</span>
+<span class="sd">    - insert - only accepts inserting at the 0 place, inserts an iterable before other iterables.</span>
+<span class="sd">    - adding.  an iter2 object can be added to another object that is</span>
+<span class="sd">    iterable.  i.e. iter2 + iter (not iter + iter2). </span>
+<span class="sd">    It&#39;s best to make all objects iter2 objects to avoid syntax errors.  :D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="iter2.__init__"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="iter2.append"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">,</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">))</span>
+        </div>
+<div class="viewcode-block" id="iter2.insert"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">place</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can only insert at index of 0&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="iter2.__add__"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">,</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">))</span>
+        </div>
+<div class="viewcode-block" id="iter2.next"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="iter2.__iter__"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iter2.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</div></div>
+<div class="viewcode-block" id="iflatten"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.iflatten">[docs]</a><span class="k">def</span> <span class="nf">iflatten</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;flatten a list of any depth&#39;&#39;&#39;</span>
+    <span class="n">iterable</span> <span class="o">=</span> <span class="n">iter2</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">):</span>
+            <span class="n">iterable</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">e</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

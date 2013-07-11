@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>optim &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for optim</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">optimization algorithms</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;http://www.psychicorigami.com/category/tsp/&quot;</span><span class="p">,]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">itertools2</span>
+
+<div class="viewcode-block" id="hillclimb"><a class="viewcode-back" href="../modules/optim.html#optim.hillclimb">[docs]</a><span class="k">def</span> <span class="nf">hillclimb</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">move_operator</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">max_evaluations</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    hillclimb until either max_evaluations is reached or we are at a local optima</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">best</span><span class="o">=</span><span class="n">init_function</span><span class="p">()</span>
+    <span class="n">best_score</span><span class="o">=</span><span class="n">objective_function</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
+    
+    <span class="n">num_evaluations</span><span class="o">=</span><span class="mi">1</span>
+    
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;hillclimb started: score=</span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="n">best_score</span><span class="p">)</span>
+    
+    <span class="k">while</span> <span class="n">num_evaluations</span> <span class="o">&lt;</span> <span class="n">max_evaluations</span><span class="p">:</span>
+        <span class="c"># examine moves around our current position</span>
+        <span class="n">move_made</span><span class="o">=</span><span class="bp">False</span>
+        <span class="k">for</span> <span class="nb">next</span> <span class="ow">in</span> <span class="n">move_operator</span><span class="p">(</span><span class="n">best</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">num_evaluations</span> <span class="o">&gt;=</span> <span class="n">max_evaluations</span><span class="p">:</span>
+                <span class="k">break</span>
+            
+            <span class="c"># see if this move is better than the current</span>
+            <span class="n">next_score</span><span class="o">=</span><span class="n">objective_function</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+            <span class="n">num_evaluations</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">next_score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+                <span class="n">best</span><span class="o">=</span><span class="nb">next</span>
+                <span class="n">best_score</span><span class="o">=</span><span class="n">next_score</span>
+                <span class="n">move_made</span><span class="o">=</span><span class="bp">True</span>
+                <span class="k">break</span> <span class="c"># depth first search</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">move_made</span><span class="p">:</span>
+            <span class="k">break</span> <span class="c"># we couldn&#39;t find a better move (must be at a local maximum)</span>
+    
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;hillclimb finished: num_evaluations=</span><span class="si">%d</span><span class="s">, best_score=</span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="n">num_evaluations</span><span class="p">,</span><span class="n">best_score</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">num_evaluations</span><span class="p">,</span><span class="n">best_score</span><span class="p">,</span><span class="n">best</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="hillclimb_and_restart"><a class="viewcode-back" href="../modules/optim.html#optim.hillclimb_and_restart">[docs]</a><span class="k">def</span> <span class="nf">hillclimb_and_restart</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">move_operator</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">max_evaluations</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    repeatedly hillclimb until max_evaluations is reached</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">best</span><span class="o">=</span><span class="bp">None</span>
+    <span class="n">best_score</span><span class="o">=</span><span class="mi">0</span>
+    
+    <span class="n">num_evaluations</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">num_evaluations</span> <span class="o">&lt;</span> <span class="n">max_evaluations</span><span class="p">:</span>
+        <span class="n">remaining_evaluations</span><span class="o">=</span><span class="n">max_evaluations</span><span class="o">-</span><span class="n">num_evaluations</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;(re)starting hillclimb </span><span class="si">%d</span><span class="s">/</span><span class="si">%d</span><span class="s"> remaining&#39;</span><span class="p">,</span><span class="n">remaining_evaluations</span><span class="p">,</span><span class="n">max_evaluations</span><span class="p">)</span>
+        <span class="n">evaluated</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">found</span><span class="o">=</span><span class="n">hillclimb</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">move_operator</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">remaining_evaluations</span><span class="p">)</span>
+        
+        <span class="n">num_evaluations</span><span class="o">+=</span><span class="n">evaluated</span>
+        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">best_score</span> <span class="ow">or</span> <span class="n">best</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">best_score</span><span class="o">=</span><span class="n">score</span>
+            <span class="n">best</span><span class="o">=</span><span class="n">found</span>
+        
+    <span class="k">return</span> <span class="p">(</span><span class="n">num_evaluations</span><span class="p">,</span><span class="n">best_score</span><span class="p">,</span><span class="n">best</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="P"><a class="viewcode-back" href="../modules/optim.html#optim.P">[docs]</a><span class="k">def</span> <span class="nf">P</span><span class="p">(</span><span class="n">prev_score</span><span class="p">,</span><span class="n">next_score</span><span class="p">,</span><span class="n">temperature</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">next_score</span> <span class="o">&gt;</span> <span class="n">prev_score</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">next_score</span><span class="o">-</span><span class="n">prev_score</span><span class="p">)</span><span class="o">/</span><span class="n">temperature</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ObjectiveFunction"><a class="viewcode-back" href="../modules/optim.html#optim.ObjectiveFunction">[docs]</a><span class="k">class</span> <span class="nc">ObjectiveFunction</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;class to wrap an objective function and </span>
+<span class="sd">    keep track of the best solution evaluated&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="ObjectiveFunction.__init__"><a class="viewcode-back" href="../modules/optim.html#optim.ObjectiveFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">objective_function</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="o">=</span><span class="n">objective_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span><span class="o">=</span><span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="ObjectiveFunction.__call__"><a class="viewcode-back" href="../modules/optim.html#optim.ObjectiveFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">solution</span><span class="p">):</span>
+        <span class="n">score</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span><span class="o">=</span><span class="n">score</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="o">=</span><span class="n">solution</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;new best score: </span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">best_score</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">score</span>
+</div></div>
+<div class="viewcode-block" id="kirkpatrick_cooling"><a class="viewcode-back" href="../modules/optim.html#optim.kirkpatrick_cooling">[docs]</a><span class="k">def</span> <span class="nf">kirkpatrick_cooling</span><span class="p">(</span><span class="n">start_temp</span><span class="p">,</span><span class="n">alpha</span><span class="p">):</span>
+    <span class="n">T</span><span class="o">=</span><span class="n">start_temp</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">T</span>
+        <span class="n">T</span><span class="o">=</span><span class="n">alpha</span><span class="o">*</span><span class="n">T</span>
+</div>
+<div class="viewcode-block" id="anneal"><a class="viewcode-back" href="../modules/optim.html#optim.anneal">[docs]</a><span class="k">def</span> <span class="nf">anneal</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">move_operator</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">max_evaluations</span><span class="p">,</span><span class="n">start_temp</span><span class="p">,</span><span class="n">alpha</span><span class="p">):</span>
+    
+    <span class="c"># wrap the objective function (so we record the best)</span>
+    <span class="n">objective_function</span><span class="o">=</span><span class="n">ObjectiveFunction</span><span class="p">(</span><span class="n">objective_function</span><span class="p">)</span>
+    
+    <span class="n">current</span><span class="o">=</span><span class="n">init_function</span><span class="p">()</span>
+    <span class="n">current_score</span><span class="o">=</span><span class="n">objective_function</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+    <span class="n">num_evaluations</span><span class="o">=</span><span class="mi">1</span>
+    
+    <span class="n">cooling_schedule</span><span class="o">=</span><span class="n">kirkpatrick_cooling</span><span class="p">(</span><span class="n">start_temp</span><span class="p">,</span><span class="n">alpha</span><span class="p">)</span>
+    
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;anneal started: score=</span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="n">current_score</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="n">cooling_schedule</span><span class="p">:</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># examine moves around our current position</span>
+        <span class="k">for</span> <span class="nb">next</span> <span class="ow">in</span> <span class="n">move_operator</span><span class="p">(</span><span class="n">current</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">num_evaluations</span> <span class="o">&gt;=</span> <span class="n">max_evaluations</span><span class="p">:</span>
+                <span class="n">done</span><span class="o">=</span><span class="bp">True</span>
+                <span class="k">break</span>
+            
+            <span class="n">next_score</span><span class="o">=</span><span class="n">objective_function</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+            <span class="n">num_evaluations</span><span class="o">+=</span><span class="mi">1</span>
+            
+            <span class="c"># probablistically accept this solution</span>
+            <span class="c"># always accepting better solutions</span>
+            <span class="n">p</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="n">current_score</span><span class="p">,</span><span class="n">next_score</span><span class="p">,</span><span class="n">temperature</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+                <span class="n">current</span><span class="o">=</span><span class="nb">next</span>
+                <span class="n">current_score</span><span class="o">=</span><span class="n">next_score</span>
+                <span class="k">break</span>
+        <span class="c"># see if completely finished</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span> <span class="k">break</span>
+    
+    <span class="n">best_score</span><span class="o">=</span><span class="n">objective_function</span><span class="o">.</span><span class="n">best_score</span>
+    <span class="n">best</span><span class="o">=</span><span class="n">objective_function</span><span class="o">.</span><span class="n">best</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;final temperature: </span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="n">temperature</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;anneal finished: num_evaluations=</span><span class="si">%d</span><span class="s">, best_score=</span><span class="si">%f</span><span class="s">&#39;</span><span class="p">,</span><span class="n">num_evaluations</span><span class="p">,</span><span class="n">best_score</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">num_evaluations</span><span class="p">,</span><span class="n">best_score</span><span class="p">,</span><span class="n">best</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="reversed_sections"><a class="viewcode-back" href="../modules/optim.html#optim.reversed_sections">[docs]</a><span class="k">def</span> <span class="nf">reversed_sections</span><span class="p">(</span><span class="n">tour</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;generator to return all possible variations where the section between two cities are swapped&#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">itertools2</span><span class="o">.</span><span class="n">all_pairs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tour</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">:</span>
+            <span class="n">copy</span><span class="o">=</span><span class="n">tour</span><span class="p">[:]</span>
+            <span class="n">copy</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="nb">reversed</span><span class="p">(</span><span class="n">tour</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">yield</span> <span class="n">copy</span>
+</div>
+<div class="viewcode-block" id="swapped_cities"><a class="viewcode-back" href="../modules/optim.html#optim.swapped_cities">[docs]</a><span class="k">def</span> <span class="nf">swapped_cities</span><span class="p">(</span><span class="n">tour</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;generator to create all possible variations where two cities have been swapped&#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">itertools2</span><span class="o">.</span><span class="n">all_pairs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tour</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">:</span>
+            <span class="n">copy</span><span class="o">=</span><span class="n">tour</span><span class="p">[:]</span>
+            <span class="n">copy</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">copy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="n">tour</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">tour</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="n">copy</span>
+            </div>
+<div class="viewcode-block" id="tour_length"><a class="viewcode-back" href="../modules/optim.html#optim.tour_length">[docs]</a><span class="k">def</span> <span class="nf">tour_length</span><span class="p">(</span><span class="n">points</span><span class="p">,</span><span class="n">dist</span><span class="p">,</span><span class="n">tour</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generator of point-to-point distances along a tour&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tour</span><span class="p">:</span><span class="n">tour</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))</span> <span class="c">#will generate the closed tour length</span>
+    <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tour</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">j</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">n</span>
+        <span class="k">yield</span> <span class="n">dist</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">tour</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="n">points</span><span class="p">[</span><span class="n">tour</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span>
+</div>
+<div class="viewcode-block" id="tsp"><a class="viewcode-back" href="../modules/optim.html#optim.tsp">[docs]</a><span class="k">def</span> <span class="nf">tsp</span><span class="p">(</span><span class="n">points</span><span class="p">,</span><span class="n">dist</span><span class="p">,</span><span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">start_temp</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">close</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">rand</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Travelling Salesman Problem </span>
+<span class="sd">    @see http://en.wikipedia.org/wiki/Travelling_salesman_problem</span>
+<span class="sd">    @param points : iterable containing all points</span>
+<span class="sd">    @param dist : function returning the distance between 2 points : def dist(a,b):</span>
+<span class="sd">    @param max_iterations :max number of optimization steps</span>
+<span class="sd">    @param start_temp, alpha : params for the simulated annealing algorithm. if None, hill climbing is used</span>
+<span class="sd">    @param close : computes closed TSP. if False, open TSP starting at points[0]</span>
+<span class="sd">    @return iterations,score,best : number of iterations used, minimal length found, best path as list of indexes of points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">optim</span><span class="o">,</span> <span class="nn">random</span>
+    <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">init_function</span><span class="p">():</span>
+        <span class="n">tour</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rand</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">tour</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">tour</span>
+    <span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">tour</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;total up the total length of the tour based on the dist ance function&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">tour_length</span><span class="p">(</span><span class="n">points</span><span class="p">,</span><span class="n">dist</span><span class="p">,</span><span class="n">tour</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="n">tour</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">start_temp</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">hillclimb_and_restart</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">reversed_sections</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">max_iterations</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">anneal</span><span class="p">(</span><span class="n">init_function</span><span class="p">,</span><span class="n">reversed_sections</span><span class="p">,</span><span class="n">objective_function</span><span class="p">,</span><span class="n">max_iterations</span><span class="p">,</span><span class="n">start_temp</span><span class="p">,</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="c">#logging.basicConfig(level=logging.INFO)</span>
+    <span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;geneva&#39;</span><span class="p">,</span><span class="s">&#39;london&#39;</span><span class="p">,</span><span class="s">&#39;new-york&#39;</span><span class="p">,</span><span class="s">&#39;paris&#39;</span><span class="p">,</span><span class="s">&#39;tokyo&#39;</span><span class="p">,</span><span class="s">&#39;rome&#39;</span><span class="p">,</span><span class="s">&#39;zurich&#39;</span><span class="p">,</span><span class="s">&#39;bern&#39;</span><span class="p">,</span><span class="s">&#39;berlin&#39;</span><span class="p">,</span><span class="s">&#39;mokba&#39;</span><span class="p">,</span><span class="s">&#39;washington&#39;</span><span class="p">,</span><span class="s">&#39;wien&#39;</span><span class="p">,</span><span class="s">&#39;biel&#39;</span><span class="p">]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">2000</span>
+    <span class="kn">from</span> <span class="nn">math2</span> <span class="kn">import</span> <span class="n">levenshtein</span> 
+    <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">tsp</span><span class="p">(</span><span class="n">words</span><span class="p">,</span><span class="n">levenshtein</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;TSP hill climbing closed score=</span><span class="si">%d</span><span class="s">, best=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">score</span><span class="p">,[</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">best</span><span class="p">]))</span>
+    <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">tsp</span><span class="p">(</span><span class="n">words</span><span class="p">,</span><span class="n">levenshtein</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">9</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;TSP annealing closed score=</span><span class="si">%d</span><span class="s">, best=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">score</span><span class="p">,[</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">best</span><span class="p">]))</span>
+    <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">tsp</span><span class="p">(</span><span class="n">words</span><span class="p">,</span><span class="n">levenshtein</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">close</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;TSP hill climbing open score=</span><span class="si">%d</span><span class="s">, best=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">score</span><span class="p">,[</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">best</span><span class="p">]))</span>
+    <span class="n">iterations</span><span class="p">,</span><span class="n">score</span><span class="p">,</span><span class="n">best</span><span class="o">=</span><span class="n">tsp</span><span class="p">(</span><span class="n">words</span><span class="p">,</span><span class="n">levenshtein</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span><span class="n">close</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;TSP annealing open score=</span><span class="si">%d</span><span class="s">, best=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">score</span><span class="p">,[</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">best</span><span class="p">]))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>interval &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for interval</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">operations on [x..y[ intervals</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<div class="viewcode-block" id="in_interval"><a class="viewcode-back" href="../modules/interval.html#interval.in_interval">[docs]</a><span class="k">def</span> <span class="nf">in_interval</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; True if x is in interval [a,b] or [b,a] (tuple)&#39;&#39;&#39;</span>
+    <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">b</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">a</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="intersect"><a class="viewcode-back" href="../modules/interval.html#interval.intersect">[docs]</a><span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; True if sorted tuples intervals [t1[ [t2[ intersect&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;http://stackoverflow.com/questions/3721249/python-date-interval-intersection&#39;&#39;&#39;</span>
+    <span class="n">t1start</span><span class="p">,</span> <span class="n">t1end</span> <span class="o">=</span> <span class="n">t1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">t2start</span><span class="p">,</span> <span class="n">t2end</span> <span class="o">=</span> <span class="n">t2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">t1start</span> <span class="o">&lt;=</span> <span class="n">t2start</span> <span class="o">&lt;</span> <span class="n">t1end</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">t2start</span> <span class="o">&lt;=</span> <span class="n">t1start</span> <span class="o">&lt;</span> <span class="n">t2end</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="intersection"><a class="viewcode-back" href="../modules/interval.html#interval.intersection">[docs]</a><span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;returns intersection between 2 intervals (tuples), </span>
+<span class="sd">    or (None,None) if intervals don&#39;t intersect&#39;&#39;&#39;</span>
+    <span class="n">t1start</span><span class="p">,</span> <span class="n">t1end</span> <span class="o">=</span> <span class="n">t1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">t2start</span><span class="p">,</span> <span class="n">t2end</span> <span class="o">=</span> <span class="n">t2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">start</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">t1start</span><span class="p">,</span><span class="n">t2start</span><span class="p">)</span>
+    <span class="n">end</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">t1end</span><span class="p">,</span><span class="n">t2end</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">start</span><span class="o">&gt;</span><span class="n">end</span><span class="p">:</span> <span class="c">#no intersection</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="intersectlen"><a class="viewcode-back" href="../modules/interval.html#interval.intersectlen">[docs]</a><span class="k">def</span> <span class="nf">intersectlen</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">none</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;returns len of intersection between 2 intervals (tuples), </span>
+<span class="sd">    or none if intervals don&#39;t intersect&#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span><span class="o">=</span><span class="n">intersection</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">end</span><span class="o">-</span><span class="n">start</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Interval"><a class="viewcode-back" href="../modules/interval.html#interval.Interval">[docs]</a><span class="k">class</span> <span class="nc">Interval</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents an interval. </span>
+<span class="sd">    Defined as half-open interval [start,end), which includes the start position but not the end.</span>
+<span class="sd">    Start and end do not have to be numeric types. </span>
+<span class="sd">    </span>
+<span class="sd">    http://code.activestate.com/recipes/576816-interval/</span>
+<span class="sd">    alternative could be http://pypi.python.org/pypi/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="Interval.__init__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="s">&quot;Construct, start must be &lt;= end.&quot;</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Start (</span><span class="si">%s</span><span class="s">) must not be greater than end (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span> <span class="o">=</span> <span class="n">end</span>
+        </div>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;The interval&#39;s start&quot;</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;The interval&#39;s end&quot;</span><span class="p">)</span>
+     
+<div class="viewcode-block" id="Interval.__str__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;As string.&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Interval.__repr__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;String representation.&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Interval.__cmp__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__cmp__">[docs]</a>    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;Compare.&quot;</span>
+        <span class="k">if</span> <span class="bp">None</span> <span class="o">==</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">start_cmp</span> <span class="o">=</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">start_cmp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">start_cmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Interval.__hash__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__hash__">[docs]</a>    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;Hash.&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">^</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Interval.intersection"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.intersection">[docs]</a>    <span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;Intersection. @return: None if no intersection.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">other</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">Interval</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Interval.hull"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.hull">[docs]</a>    <span class="k">def</span> <span class="nf">hull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;@return: Interval containing both self and other.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">other</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="n">Interval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Interval.overlap"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.overlap">[docs]</a>    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff self intersects other.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">other</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span>
+         </div>
+<div class="viewcode-block" id="Interval.__contains__"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff item in self.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;=</span> <span class="n">item</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span>
+         </div>
+<div class="viewcode-block" id="Interval.contains"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff 0 in self.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span>
+</div>
+<div class="viewcode-block" id="Interval.subset"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff self is subset of other.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span>
+         </div>
+<div class="viewcode-block" id="Interval.proper_subset"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.proper_subset">[docs]</a>    <span class="k">def</span> <span class="nf">proper_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff self is proper subset of other.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span>
+</div>
+<div class="viewcode-block" id="Interval.empty"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff self is empty.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span>
+         </div>
+<div class="viewcode-block" id="Interval.singleton"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.singleton">[docs]</a>    <span class="k">def</span> <span class="nf">singleton</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;@return: True iff self.end - self.start == 1.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="mi">1</span>
+    </div>
+<div class="viewcode-block" id="Interval.separation"><a class="viewcode-back" href="../modules/interval.html#interval.Interval.separation">[docs]</a>    <span class="k">def</span> <span class="nf">separation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="s">&quot;@return: The distance between self and other.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">other</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span>
+  </div></div>
+<span class="kn">import</span> <span class="nn">bisect</span>      
+<div class="viewcode-block" id="Intervals"><a class="viewcode-back" href="../modules/interval.html#interval.Intervals">[docs]</a><span class="k">class</span> <span class="nc">Intervals</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;a list of intevals kept in ascending order&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Intervals.__init__"><a class="viewcode-back" href="../modules/interval.html#interval.Intervals.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Intervals</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="Intervals.extend"><a class="viewcode-back" href="../modules/interval.html#interval.Intervals.extend">[docs]</a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">iterable</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Intervals.append"><a class="viewcode-back" href="../modules/interval.html#interval.Intervals.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Intervals</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">item</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="Intervals.__call__"><a class="viewcode-back" href="../modules/interval.html#interval.Intervals.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; returns list of intervals containing x&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+    </div></div>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<div class="viewcode-block" id="TestCase"><a class="viewcode-back" href="../modules/interval.html#interval.TestCase">[docs]</a><span class="k">class</span> <span class="nc">TestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCase.setUp"><a class="viewcode-back" href="../modules/interval.html#interval.TestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i12</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i13</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i24</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="o">=</span><span class="n">Intervals</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">i24</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">i13</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">i12</span><span class="p">])</span>
+        
+        </div>
+<div class="viewcode-block" id="TestCase.runTest"><a class="viewcode-back" href="../modules/interval.html#interval.TestCase.runTest">[docs]</a>    <span class="k">def</span> <span class="nf">runTest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">),</span><span class="s">&#39;[[1,2), [1,3), [2,4)]&#39;</span><span class="p">)</span>
+        
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+            
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

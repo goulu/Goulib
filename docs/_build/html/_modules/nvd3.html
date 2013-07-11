@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nvd3 &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for nvd3</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">generate JavaScript charts using http://nvd3.org/</span>
+<span class="sd">outputs strings to inline in HTML : no fancy JSON or server dependent stuff</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;http://d3js.org/&quot;</span><span class="p">,</span><span class="s">&quot;http://nvd3.org/&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">colors</span>
+
+<span class="n">_count</span><span class="o">=</span><span class="mi">0</span> <span class="c">#Chart counter for unique ids</span>
+
+<div class="viewcode-block" id="generate"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.generate">[docs]</a><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;return a list of values y(x), where x and y can be</span>
+<span class="sd">    iterable, functions or generators&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c">#y already iterable ?</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">y</span><span class="p">[:])</span>
+    <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="bp">None</span><span class="p">,</span><span class="n">length</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">x</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c"># y is f(x) ?</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">y</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+    </div>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<div class="viewcode-block" id="TestCase"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.TestCase">[docs]</a><span class="k">class</span> <span class="nc">TestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCase.runTest"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.TestCase.runTest">[docs]</a>    <span class="k">def</span> <span class="nf">runTest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">generate</span><span class="p">(</span><span class="n">y</span><span class="p">),</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">generate</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">generate</span><span class="p">(</span><span class="n">sin</span><span class="p">,</span><span class="n">cos</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="Chart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Chart">[docs]</a><span class="k">class</span> <span class="nc">Chart</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;base class. should not be used directly&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Chart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Chart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">=</span><span class="n">model</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">global</span> <span class="n">_count</span>
+            <span class="n">_count</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">name</span><span class="o">=</span><span class="s">&quot;chart</span><span class="si">%d</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">_count</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">=</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c">#no data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="bp">None</span>
+            
+        <span class="k">try</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;date format : see https://github.com/mbostock/d3/wiki/Time-Formatting&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dateformat</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;dateformat&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;dateformat&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dateformat</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%x</span><span class="s">&#39;</span>
+            
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;colors&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;colors&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="o">.</span><span class="n">color_range</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">v</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c">#no data</span>
+            <span class="k">pass</span>
+            </div>
+<div class="viewcode-block" id="Chart.add"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Chart.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;adds a curve&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="bp">None</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="p">:</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Stream </span><span class="si">%d</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span> <span class="n">color</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;color&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;xAxis&#39;</span><span class="p">][</span><span class="s">&quot;tickFormat&quot;</span><span class="p">]</span><span class="o">=</span><span class="s">&quot;function(d) { return d3.time.format(&#39;</span><span class="si">%s</span><span class="s">&#39;)(new Date(d)) }</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">dateformat</span> 
+                <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>   
+            
+        <span class="n">y</span><span class="o">=</span><span class="p">[{</span><span class="s">&quot;x&quot;</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">&quot;y&quot;</span><span class="p">:</span><span class="n">y</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;values&quot;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span><span class="s">&quot;key&quot;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span><span class="s">&quot;color&quot;</span><span class="p">:</span><span class="n">color</span><span class="p">}</span>
+        <span class="c">#multiChart</span>
+        <span class="k">try</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        
+        <span class="k">try</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;yAxis&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;axis&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;yAxis&quot;</span><span class="p">]</span><span class="o">=</span><span class="s">&quot;1&quot;</span>
+        
+        <span class="k">try</span> <span class="p">:</span> 
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;bar&quot;</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;bar&quot;</span><span class="p">]</span><span class="o">=</span><span class="s">&#39;true&#39;</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        
+        <span class="k">try</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;disabled&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;disabled&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">:</span> <span class="k">pass</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="Chart.axis"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Chart.axis">[docs]</a>    <span class="k">def</span> <span class="nf">axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&quot;.2f&quot;</span><span class="p">):</span>
+        <span class="n">axe</span><span class="o">=</span><span class="p">{}</span>
+        <span class="n">axe</span><span class="p">[</span><span class="s">&quot;tickFormat&quot;</span><span class="p">]</span><span class="o">=</span><span class="s">&quot;d3.format(&#39;,</span><span class="si">%s</span><span class="s">&#39;)&quot;</span><span class="o">%</span><span class="n">format</span>
+        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+            <span class="n">axe</span><span class="p">[</span><span class="s">&quot;axisLabel&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">=</span><span class="n">axe</span>
+        </div>
+<div class="viewcode-block" id="Chart.__str__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Chart.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#generate HTML div</span>
+        <span class="n">style</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">style</span><span class="o">+=</span><span class="s">&#39; width:</span><span class="si">%s</span><span class="s">px;&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">style</span><span class="o">+=</span><span class="s">&#39; height:</span><span class="si">%s</span><span class="s">px;&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&quot;height&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
+            <span class="n">style</span><span class="o">=</span><span class="s">&#39; style=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span><span class="o">%</span><span class="n">style</span>
+        <span class="n">out</span><span class="o">=</span><span class="s">&#39;&lt;div id=&quot;</span><span class="si">%s</span><span class="s">&quot;&gt;&lt;svg</span><span class="si">%s</span><span class="s">&gt;&lt;/svg&gt;&lt;/div&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">style</span><span class="p">)</span>
+        
+        <span class="c">#generate Javascript</span>
+        <span class="n">out</span><span class="o">+=</span><span class="s">&quot;&quot;&quot;&lt;script type=&quot;text/javascript&quot;&gt;</span>
+<span class="s">            nv.addGraph(function() {</span>
+<span class="s">                var chart = nv.models.</span><span class="si">%s</span><span class="s">();</span><span class="se">\n</span><span class="s">&quot;&quot;&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+                
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&quot;stacked&quot;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="o">+=</span><span class="s">&quot;chart.stacked(true);&quot;</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+                               
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">out</span><span class="o">+=</span><span class="s">&quot;chart.</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="n">k</span>
+            <span class="k">for</span> <span class="n">attr</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">out</span><span class="o">+=</span><span class="s">&quot;    .</span><span class="si">%s</span><span class="s">(</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">+=</span><span class="s">&quot;&quot;&quot;d3.select(&#39;#</span><span class="si">%s</span><span class="s"> svg&#39;)</span>
+<span class="s">                .datum(data_</span><span class="si">%s</span><span class="s">)</span>
+<span class="s">                .transition().duration(500).call(chart);</span>
+<span class="s">        &quot;&quot;&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="c">#for some reason the data get mixed...</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&quot;resize&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">resize</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">if</span> <span class="n">resize</span><span class="p">:</span> <span class="n">out</span><span class="o">+=</span><span class="s">&quot;nv.utils.windowResize(chart.update);</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">out</span><span class="o">+=</span><span class="s">&quot;return chart;</span><span class="se">\n</span><span class="s">});</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="n">out</span><span class="o">+=</span><span class="s">&quot;&quot;&quot;data_</span><span class="si">%s</span><span class="s">=</span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">&lt;/script&gt;&quot;&quot;&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div></div>
+<span class="sd">&quot;&quot;&quot;the following classes correspond to those defined in nv.d3.js&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LineChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LineChart">[docs]</a><span class="k">class</span> <span class="nc">LineChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="LineChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LineChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;lineChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="ScatterChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.ScatterChart">[docs]</a><span class="k">class</span> <span class="nc">ScatterChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatterChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.ScatterChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;scatterChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="LineWithFocusChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LineWithFocusChart">[docs]</a><span class="k">class</span> <span class="nc">LineWithFocusChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="LineWithFocusChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LineWithFocusChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> <span class="c"># must have a specified height, otherwise it superimposes both chars</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">250</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;lineWithFocusChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;y2Axis&#39;</span><span class="p">)</span>
+
+        </div></div>
+<div class="viewcode-block" id="MultiBarChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiBarChart">[docs]</a><span class="k">class</span> <span class="nc">MultiBarChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiBarChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiBarChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;multiBarChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="MultiBarHorizontalChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiBarHorizontalChart">[docs]</a><span class="k">class</span> <span class="nc">MultiBarHorizontalChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiBarHorizontalChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiBarHorizontalChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;multiBarHorizontalChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="CumulativeLineChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.CumulativeLineChart">[docs]</a><span class="k">class</span> <span class="nc">CumulativeLineChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="CumulativeLineChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.CumulativeLineChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;cumulativeLineChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="StackedAreaChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.StackedAreaChart">[docs]</a><span class="k">class</span> <span class="nc">StackedAreaChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="StackedAreaChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.StackedAreaChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;stackedAreaChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="LinePlusBarChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LinePlusBarChart">[docs]</a><span class="k">class</span> <span class="nc">LinePlusBarChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="LinePlusBarChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.LinePlusBarChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;linePlusBarChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;y1Axis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;y2Axis&#39;</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="MultiChart"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiChart">[docs]</a><span class="k">class</span> <span class="nc">MultiChart</span><span class="p">(</span><span class="n">Chart</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChart.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.MultiChart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Chart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;multiChart&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;xAxis&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;yAxis2&#39;</span><span class="p">)</span>
+    
+        </div></div>
+<span class="sd">&quot;&quot;&quot;additional useful classes&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Pareto"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Pareto">[docs]</a><span class="k">class</span> <span class="nc">Pareto</span><span class="p">(</span><span class="n">MultiChart</span><span class="p">):</span>
+<div class="viewcode-block" id="Pareto.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Pareto.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">values</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">MultiChart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">values</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">math2</span> <span class="kn">import</span> <span class="n">cumsum</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">norm</span><span class="p">:</span><span class="n">norm</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">([</span><span class="n">x</span><span class="o">/</span><span class="n">norm</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cumsum</span><span class="p">(</span><span class="n">values</span><span class="p">)],</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;line&quot;</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;CumSum&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;Histo&quot;</span><span class="p">)</span> <span class="c"># second, only for nicer colors</span>
+        </div></div>
+<div class="viewcode-block" id="hist"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.hist">[docs]</a><span class="k">def</span> <span class="nf">hist</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">bins</span><span class="p">:</span>
+        <span class="n">bins</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sbins</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span>
+    <span class="n">hist</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">while</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">hist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">values</span> <span class="ow">and</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> 
+            <span class="n">hist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">del</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">hist</span><span class="p">,</span><span class="n">sbins</span>
+</div>
+<div class="viewcode-block" id="Histogram"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Histogram">[docs]</a><span class="k">class</span> <span class="nc">Histogram</span><span class="p">(</span><span class="n">MultiChart</span><span class="p">):</span>
+<div class="viewcode-block" id="Histogram.__init__"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.Histogram.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">values</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">MultiChart</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;bins&#39;</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;bins&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c">#no data</span>
+            <span class="n">bins</span><span class="o">=</span><span class="bp">None</span>
+        <span class="n">values</span><span class="o">=</span><span class="n">generate</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">values</span><span class="p">,</span><span class="n">bins</span><span class="o">=</span><span class="n">hist</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">bins</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">)</span>
+        </div></div>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Test data generators inspired by Lee Byron&#39;s used in http://leebyron.com/else/streamgraph/</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">exp</span>
+
+<div class="viewcode-block" id="bump"><a class="viewcode-back" href="../modules/nvd3.html#nvd3.bump">[docs]</a><span class="k">def</span> <span class="nf">bump</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="o">.</span><span class="mi">1</span> <span class="o">+</span> <span class="n">random</span><span class="p">())</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">random</span><span class="p">()</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="p">(</span><span class="o">.</span><span class="mi">1</span> <span class="o">+</span> <span class="n">random</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span><span class="p">;</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">w</span> <span class="o">*</span> <span class="n">w</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">if</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">a</span><span class="p">]</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span> <span class="c">#tests</span>
+    <span class="kn">import</span> <span class="nn">markup</span>
+    <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span><span class="n">cos</span>
+    <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">gauss</span>
+    <span class="kn">from</span> <span class="nn">itertools2</span> <span class="kn">import</span> <span class="n">arange</span>
+    
+    <span class="n">page</span><span class="o">=</span><span class="n">markup</span><span class="o">.</span><span class="n">page</span><span class="p">()</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
+            <span class="n">doctype</span><span class="o">=</span><span class="s">&quot;Content-Type: text/html; charset=utf-8</span><span class="se">\r\n\r\n</span><span class="s">&lt;!DOCTYPE html&gt;&quot;</span><span class="p">,</span>
+            <span class="n">script</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;http://nvd3.org/lib/d3.v2.js&quot;</span><span class="p">,</span><span class="s">&quot;http://nvd3.org/nv.d3.js&quot;</span><span class="p">],</span> <span class="c">#must be a list to preserve order</span>
+            <span class="n">css</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;http://nvd3.org/src/nv.d3.css&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+    <span class="c">#generate some data</span>
+    <span class="n">X</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span><span class="n">pi</span><span class="o">/</span><span class="mi">50</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">Uniform</span><span class="p">():</span><span class="k">return</span> <span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">Gauss</span><span class="p">():</span><span class="k">return</span> <span class="n">gauss</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Waves</span><span class="o">=</span><span class="p">[</span><span class="n">bump</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+
+    <span class="c"># a simple linechart</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;lineChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">LineChart</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">Waves</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;lineWithFocusChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">LineWithFocusChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">Waves</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="kn">from</span> <span class="nn">datetime2</span> <span class="kn">import</span> <span class="n">days</span>
+    <span class="n">Date</span><span class="o">=</span><span class="n">days</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;multiBarHorizontal&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">MultiBarHorizontalChart</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">Waves</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;multiBarChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">MultiBarChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">dateformat</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> %b %y&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">Waves</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">Date</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;cumulativeLineChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">CumulativeLineChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">Waves</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;stackedAreaChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">StackedAreaChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">Waves</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;linePlusBarChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">LinePlusBarChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">)</span> <span class="c"># TODO : Date not supported ?</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s">&quot;Wave 1&quot;</span><span class="p">,</span><span class="n">bar</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s">&quot;Wave 2&quot;</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;Pareto&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">Pareto</span><span class="p">(</span><span class="n">Gauss</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;multiChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">MultiChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>  <span class="c"># TODO : Date not supported ?</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s">&quot;Wave 1&quot;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s">&quot;Wave 2&quot;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;line&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="s">&quot;Wave 3&quot;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;area&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Waves</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&quot;Wave 0&quot;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    
+    <span class="nb">type</span><span class="o">=</span><span class="s">&quot;scatterChart&quot;</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">ScatterChart</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">cos</span><span class="p">,</span><span class="n">X</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">sin</span><span class="p">,</span><span class="n">X</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Circle&quot;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s">&quot;line&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">Gauss</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">Uniform</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Noise&quot;</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    <span class="k">print</span> <span class="n">page</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

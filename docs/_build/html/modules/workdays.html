@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>workdays &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="prev" title="tank" href="tank.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tank.html" title="tank"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tank.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">tank</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/workdays.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-workdays">
+<span id="workdays"></span><h1><a class="reference internal" href="#module-workdays" title="workdays"><tt class="xref py py-mod docutils literal"><span class="pre">workdays</span></tt></a><a class="headerlink" href="#module-workdays" title="Permalink to this headline">¶</a></h1>
+<p>WorkCalendar class with datetime operations on working hours</p>
+<dl class="class">
+<dt id="workdays.WorkCalendar">
+<em class="property">class </em><tt class="descclassname">workdays.</tt><tt class="descname">WorkCalendar</tt><big>(</big><em>worktime=[datetime.time(0, 0), datetime.time(23, 59, 59, 999999)], parent=[], weekends=(5, 6), holidays=set([])</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar" title="Permalink to this definition">¶</a></dt>
+<dd><p>WorkCalendar class with datetime operations on working hours</p>
+<dl class="method">
+<dt id="workdays.WorkCalendar.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>worktime=[datetime.time(0, 0), datetime.time(23, 59, 59, 999999)], parent=[], weekends=(5, 6), holidays=set([])</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.start">
+<tt class="descname">start</tt><a class="headerlink" href="#workdays.WorkCalendar.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.end">
+<tt class="descname">end</tt><a class="headerlink" href="#workdays.WorkCalendar.end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.setworktime">
+<tt class="descname">setworktime</tt><big>(</big><em>worktime</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.setworktime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.setworktime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.addholidays">
+<tt class="descname">addholidays</tt><big>(</big><em>days</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.addholidays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.addholidays" title="Permalink to this definition">¶</a></dt>
+<dd><p>add day(s) to to known holidays. dates with year==4 (to allow Feb 29th) apply every year
+note : holidays set may contain weekends too.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.isworkday">
+<tt class="descname">isworkday</tt><big>(</big><em>day</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.isworkday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.isworkday" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return True if day is a work day</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.isworktime">
+<tt class="descname">isworktime</tt><big>(</big><em>time</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.isworktime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.isworktime" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return True if you&#8217;re supposed to work at that time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.nextworkday">
+<tt class="descname">nextworkday</tt><big>(</big><em>day</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.nextworkday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.nextworkday" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return next work day</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.prevworkday">
+<tt class="descname">prevworkday</tt><big>(</big><em>day</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.prevworkday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.prevworkday" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return previous work day</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.range">
+<tt class="descname">range</tt><big>(</big><em>start</em>, <em>end</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>range of workdays between start (included) and end (not included)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.workdays">
+<tt class="descname">workdays</tt><big>(</big><em>start_date</em>, <em>ndays</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.workdays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.workdays" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of ndays workdays from start</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.workday">
+<tt class="descname">workday</tt><big>(</big><em>start_date</em>, <em>ndays</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.workday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.workday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as Excel WORKDAY function.
+Returns a date that is the indicated number of working days before or after the starting date. 
+Working days exclude weekends and any dates identified as holidays.
+Use WORKDAY to exclude weekends or holidays when you calculate invoice due dates, 
+expected delivery times, or the number of days of work performed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.cast">
+<tt class="descname">cast</tt><big>(</big><em>time</em>, <em>retro=False</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.cast" title="Permalink to this definition">¶</a></dt>
+<dd><p>force time to be in workhours</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.worktime">
+<tt class="descname">worktime</tt><big>(</big><em>day</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.worktime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.worktime" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return interval of time worked a given day</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.workdatetime">
+<tt class="descname">workdatetime</tt><big>(</big><em>day</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.workdatetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.workdatetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return interval of datetime worked a given day</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.diff">
+<tt class="descname">diff</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return timedelta worktime between t1 and t2 (= t2-t1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.gethours">
+<tt class="descname">gethours</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.gethours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.gethours" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return fractional work hours between t1 and t2 (= t2-t1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.plus">
+<tt class="descname">plus</tt><big>(</big><em>start</em>, <em>t</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.plus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.plus" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return start time + t work time (positive or negative)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.minus">
+<tt class="descname">minus</tt><big>(</big><em>start</em>, <em>t</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.minus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.minus" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return start time - t work time (positive or negative)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="workdays.WorkCalendar.networkdays">
+<tt class="descname">networkdays</tt><big>(</big><em>start_date</em>, <em>end_date</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#WorkCalendar.networkdays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.WorkCalendar.networkdays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as Excel NETWORKDAYS function.
+Returns the number of whole working days between 
+start_date and end_date (inclusive of both start_date and end_date). 
+Working days exclude weekends and any dates identified in holidays. 
+Use NETWORKDAYS to calculate employee benefits that accrue 
+based on the number of days worked during a specific term</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.FRI">
+<tt class="descname">FRI</tt><em class="property"> = 4</em><a class="headerlink" href="#workdays.WorkCalendar.FRI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.MON">
+<tt class="descname">MON</tt><em class="property"> = 0</em><a class="headerlink" href="#workdays.WorkCalendar.MON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.SAT">
+<tt class="descname">SAT</tt><em class="property"> = 5</em><a class="headerlink" href="#workdays.WorkCalendar.SAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.SUN">
+<tt class="descname">SUN</tt><em class="property"> = 6</em><a class="headerlink" href="#workdays.WorkCalendar.SUN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.THU">
+<tt class="descname">THU</tt><em class="property"> = 3</em><a class="headerlink" href="#workdays.WorkCalendar.THU" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.TUE">
+<tt class="descname">TUE</tt><em class="property"> = 1</em><a class="headerlink" href="#workdays.WorkCalendar.TUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="workdays.WorkCalendar.WED">
+<tt class="descname">WED</tt><em class="property"> = 2</em><a class="headerlink" href="#workdays.WorkCalendar.WED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="workdays.FullTime">
+<tt class="descclassname">workdays.</tt><tt class="descname">FullTime</tt><em class="property"> = &lt;workdays.WorkCalendar instance at 0x04769EB8&gt;</em><a class="headerlink" href="#workdays.FullTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>compatibility with <a class="reference external" href="http://pypi.python.org/pypi/BusinessHours">http://pypi.python.org/pypi/BusinessHours</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="workdays.workday">
+<tt class="descclassname">workdays.</tt><tt class="descname">workday</tt><big>(</big><em>start_date</em>, <em>ndays</em>, <em>holidays=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/workdays.html#workday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.workday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as Excel WORKDAY function.
+Returns a date that is the indicated number of working days before or after the starting date. 
+Working days exclude weekends and any dates identified as holidays.
+Use WORKDAY to exclude weekends or holidays when you calculate invoice due dates, 
+expected delivery times, or the number of days of work performed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="workdays.networkdays">
+<tt class="descclassname">workdays.</tt><tt class="descname">networkdays</tt><big>(</big><em>start_date</em>, <em>end_date</em>, <em>holidays=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/workdays.html#networkdays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.networkdays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as Excel NETWORKDAYS function.
+Returns the number of whole working days between 
+start_date and end_date (inclusive of both start_date and end_date). 
+Working days exclude weekends and any dates identified in holidays. 
+Use NETWORKDAYS to calculate employee benefits that accrue 
+based on the number of days worked during a specific term</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="workdays.TestCase">
+<em class="property">class </em><tt class="descclassname">workdays.</tt><tt class="descname">TestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/workdays.html#TestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.TestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="workdays.TestCase.runTest">
+<tt class="descname">runTest</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/workdays.html#TestCase.runTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#workdays.TestCase.runTest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tank.html" title="tank"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

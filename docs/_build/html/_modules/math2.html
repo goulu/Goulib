@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>math2 &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for math2</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">additions to math standard library</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py&quot;</span><span class="p">,]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">log10</span><span class="p">,</span> <span class="n">ceil</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">count</span><span class="p">,</span><span class="n">izip_longest</span><span class="p">,</span> <span class="n">ifilter</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">permutations</span><span class="p">,</span> <span class="n">product</span> <span class="k">as</span> <span class="n">cartesian_product</span>
+
+<span class="kn">from</span> <span class="nn">itertools2</span> <span class="kn">import</span> <span class="n">drop</span><span class="p">,</span> <span class="n">ireduce</span><span class="p">,</span> <span class="n">groupby</span><span class="p">,</span> <span class="n">ilen</span><span class="p">,</span> <span class="n">compact</span><span class="p">,</span> <span class="n">flatten</span>
+<span class="kn">from</span> <span class="nn">decorators</span> <span class="kn">import</span> <span class="n">memoize</span>
+
+<span class="kn">import</span> <span class="nn">fractions</span>
+
+<div class="viewcode-block" id="lcm"><a class="viewcode-back" href="../modules/math2.html#math2.lcm">[docs]</a><span class="k">def</span> <span class="nf">lcm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;least common multiple&quot;&quot;&quot;</span> 
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">fractions</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">b</span> <span class="k">else</span> <span class="mi">0</span>
+
+<span class="c">#vector operations</span>
+</div>
+<div class="viewcode-block" id="accsum"><a class="viewcode-back" href="../modules/math2.html#math2.accsum">[docs]</a><span class="k">def</span> <span class="nf">accsum</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yield accumulated sums of iterable: accsum(count(1)) -&gt; 1,3,6,10,...&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">drop</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ireduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</div>
+<span class="n">cumsum</span><span class="o">=</span><span class="n">accsum</span> <span class="c">#numpy alias</span>
+
+
+<div class="viewcode-block" id="dot"><a class="viewcode-back" href="../modules/math2.html#math2.dot">[docs]</a><span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;dot product&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c">#vector*vector</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c">#matrix*vector</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">dot</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">a</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="c">#matrix*matrix</span>
+    <span class="n">res</span><span class="o">=</span><span class="p">[</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">b</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="product"><a class="viewcode-back" href="../modules/math2.html#math2.product">[docs]</a><span class="k">def</span> <span class="nf">product</span><span class="p">(</span><span class="n">nums</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Product of nums&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">nums</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">_longer</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">fillvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;makes a as long as b by appending fillvalues&#39;&#39;&#39;</span>
+    <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">fillvalue</span><span class="p">]</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="vecadd"><a class="viewcode-back" href="../modules/math2.html#math2.vecadd">[docs]</a><span class="k">def</span> <span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">fillvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;addition of vectors of inequal lengths&quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">izip_longest</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">fillvalue</span><span class="o">=</span><span class="n">fillvalue</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="o">+</span><span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="vecsub"><a class="viewcode-back" href="../modules/math2.html#math2.vecsub">[docs]</a><span class="k">def</span> <span class="nf">vecsub</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">fillvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;substraction of vectors of inequal lengths&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">ai</span><span class="o">-</span><span class="n">bi</span> <span class="k">for</span> <span class="n">ai</span><span class="p">,</span><span class="n">bi</span> <span class="ow">in</span> <span class="n">izip_longest</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">fillvalue</span><span class="o">=</span><span class="n">fillvalue</span><span class="p">)]</span>
+</div>
+<div class="viewcode-block" id="vecmul"><a class="viewcode-back" href="../modules/math2.html#math2.vecmul">[docs]</a><span class="k">def</span> <span class="nf">vecmul</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;product of vectors of inequal lengths&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)]))]</span>
+</div>
+<div class="viewcode-block" id="vecdiv"><a class="viewcode-back" href="../modules/math2.html#math2.vecdiv">[docs]</a><span class="k">def</span> <span class="nf">vecdiv</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;quotient of vectors of inequal lengths&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)]))]</span>
+</div>
+<div class="viewcode-block" id="veccompare"><a class="viewcode-back" href="../modules/math2.html#math2.veccompare">[docs]</a><span class="k">def</span> <span class="nf">veccompare</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;compare values in 2 lists. returns triple number of paris where [a&lt;b, a==b, a==c]&quot;&quot;&quot;</span>
+    <span class="n">res</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)])):</span>
+        <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span><span class="n">res</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+<span class="c">#stats</span>
+</div>
+<div class="viewcode-block" id="mean"><a class="viewcode-back" href="../modules/math2.html#math2.mean">[docs]</a><span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;mean of data&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="variance"><a class="viewcode-back" href="../modules/math2.html#math2.variance">[docs]</a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">avg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;variance of data&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">avg</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+        <span class="n">avg</span><span class="o">=</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(((</span><span class="n">value</span> <span class="o">-</span> <span class="n">avg</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">var</span>
+</div>
+<div class="viewcode-block" id="stats"><a class="viewcode-back" href="../modules/math2.html#math2.stats">[docs]</a><span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;returns min,max,sum,sum2,avg,var of a list&quot;&quot;&quot;</span>
+    <span class="n">lo</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s">&quot;inf&quot;</span><span class="p">)</span>
+    <span class="n">hi</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s">&quot;-inf&quot;</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="nb">sum</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">sum2</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="nb">sum</span><span class="o">+=</span><span class="n">i</span>
+            <span class="n">sum2</span><span class="o">+=</span><span class="n">i</span><span class="o">*</span><span class="n">i</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">lo</span><span class="p">:</span><span class="n">lo</span><span class="o">=</span><span class="n">i</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="n">hi</span><span class="p">:</span><span class="n">hi</span><span class="o">=</span><span class="n">i</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">avg</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
+        <span class="n">var</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">sum2</span><span class="p">)</span><span class="o">/</span><span class="n">n</span><span class="o">-</span><span class="n">avg</span><span class="o">*</span><span class="n">avg</span> <span class="c">#mean of square minus square of mean</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">avg</span><span class="o">=</span><span class="bp">None</span>
+        <span class="n">var</span><span class="o">=</span><span class="bp">None</span>
+    <span class="k">return</span> <span class="n">lo</span><span class="p">,</span><span class="n">hi</span><span class="p">,</span><span class="nb">sum</span><span class="p">,</span><span class="n">sum2</span><span class="p">,</span><span class="n">avg</span><span class="p">,</span><span class="n">var</span>
+
+<span class="c"># numbers functions</span>
+<span class="c"># mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py</span>
+</div>
+<div class="viewcode-block" id="fibonacci"><a class="viewcode-back" href="../modules/math2.html#math2.fibonacci">[docs]</a><span class="k">def</span> <span class="nf">fibonacci</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate fibonnacci serie&quot;&quot;&quot;</span>
+    <span class="n">get_next</span> <span class="o">=</span> <span class="k">lambda</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ireduce</span><span class="p">(</span><span class="n">get_next</span><span class="p">,</span> <span class="n">count</span><span class="p">(),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="factorial"><a class="viewcode-back" href="../modules/math2.html#math2.factorial">[docs]</a><span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return factorial value of num (num!)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">product</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="is_integer"><a class="viewcode-back" href="../modules/math2.html#math2.is_integer">[docs]</a><span class="k">def</span> <span class="nf">is_integer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if the float x &quot;seems&quot; an integer&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="int_or_float"><a class="viewcode-back" href="../modules/math2.html#math2.int_or_float">[docs]</a><span class="k">def</span> <span class="nf">int_or_float</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_integer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+</div>
+<div class="viewcode-block" id="divisors"><a class="viewcode-back" href="../modules/math2.html#math2.divisors">[docs]</a><span class="k">def</span> <span class="nf">divisors</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return all divisors of n: divisors(12) -&gt; 1,2,3,6,12&quot;&quot;&quot;</span>
+    <span class="n">all_factors</span> <span class="o">=</span> <span class="p">[[</span><span class="n">f</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fp</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="k">for</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span> <span class="ow">in</span> <span class="n">factorize</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span> <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">cartesian_product</span><span class="p">(</span><span class="o">*</span><span class="n">all_factors</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="proper_divisors"><a class="viewcode-back" href="../modules/math2.html#math2.proper_divisors">[docs]</a><span class="k">def</span> <span class="nf">proper_divisors</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return all divisors of n except n itself.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">divisor</span> <span class="k">for</span> <span class="n">divisor</span> <span class="ow">in</span> <span class="n">divisors</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">divisor</span> <span class="o">!=</span> <span class="n">n</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_prime"><a class="viewcode-back" href="../modules/math2.html#math2.is_prime">[docs]</a><span class="k">def</span> <span class="nf">is_prime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if n is a prime number (1 is not considered prime).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(((</span><span class="n">n</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="get_primes"><a class="viewcode-back" href="../modules/math2.html#math2.get_primes">[docs]</a><span class="k">def</span> <span class="nf">get_primes</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">memoized</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yield prime numbers from &#39;start&#39;&quot;&quot;&quot;</span>
+    <span class="n">is_prime_fun</span> <span class="o">=</span> <span class="p">(</span><span class="n">memoize</span><span class="p">(</span><span class="n">is_prime</span><span class="p">)</span> <span class="k">if</span> <span class="n">memoized</span> <span class="k">else</span> <span class="n">is_prime</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ifilter</span><span class="p">(</span><span class="n">is_prime_fun</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">start</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="digits_from_num_fast"><a class="viewcode-back" href="../modules/math2.html#math2.digits_from_num_fast">[docs]</a><span class="k">def</span> <span class="nf">digits_from_num_fast</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get digits from num in base 10 (fast implementation)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="digits_from_num"><a class="viewcode-back" href="../modules/math2.html#math2.digits_from_num">[docs]</a><span class="k">def</span> <span class="nf">digits_from_num</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get digits from num in base &#39;base&#39;&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">recursive</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">current</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="n">base</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">current</span><span class="o">+</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">recursive</span><span class="p">(</span><span class="n">num</span><span class="o">/</span><span class="n">base</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">current</span> <span class="o">+</span> <span class="p">[</span><span class="n">num</span><span class="o">%</span><span class="n">base</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">recursive</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="p">[])))</span>
+</div>
+<div class="viewcode-block" id="str_base"><a class="viewcode-back" href="../modules/math2.html#math2.str_base">[docs]</a><span class="k">def</span> <span class="nf">str_base</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">numerals</span> <span class="o">=</span> <span class="s">&#39;0123456789abcdefghijklmnopqrstuvwxyz&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;string representation of an ordinal in given base&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">base</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">base</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">numerals</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;str_base: base must be between 2 and </span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">numerals</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;0&#39;</span>
+
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="s">&#39;-&#39;</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="o">-</span><span class="n">num</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">while</span> <span class="n">num</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">numerals</span><span class="p">[</span><span class="n">num</span> <span class="o">%</span> <span class="p">(</span><span class="n">base</span><span class="p">)]</span> <span class="o">+</span> <span class="n">result</span>
+        <span class="n">num</span> <span class="o">//=</span> <span class="n">base</span>
+
+    <span class="k">return</span> <span class="n">sign</span> <span class="o">+</span> <span class="n">result</span>
+</div>
+<div class="viewcode-block" id="num_from_digits"><a class="viewcode-back" href="../modules/math2.html#math2.num_from_digits">[docs]</a><span class="k">def</span> <span class="nf">num_from_digits</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get digits from num in base &#39;base&#39;&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">base</span><span class="o">**</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">digits</span><span class="p">)))</span> <span class="k">if</span> <span class="n">x</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_palindromic"><a class="viewcode-back" href="../modules/math2.html#math2.is_palindromic">[docs]</a><span class="k">def</span> <span class="nf">is_palindromic</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if &#39;num&#39; in base &#39;base&#39; is a palindrome, that&#39;s it, if it can be</span>
+<span class="sd">    read equally from left to right and right to left.&quot;&quot;&quot;</span>
+    <span class="n">digitslst</span> <span class="o">=</span> <span class="n">digits_from_num</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">digitslst</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">digitslst</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="prime_factors"><a class="viewcode-back" href="../modules/math2.html#math2.prime_factors">[docs]</a><span class="k">def</span> <span class="nf">prime_factors</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return all prime factors (ordered) of num in a list&quot;&quot;&quot;</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">num</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="o">%</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)),</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">([</span><span class="n">factor</span><span class="p">]</span> <span class="o">+</span> <span class="n">prime_factors</span><span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="n">factor</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="k">if</span> <span class="n">factor</span> <span class="k">else</span> <span class="p">[</span><span class="n">num</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="factorize"><a class="viewcode-back" href="../modules/math2.html#math2.factorize">[docs]</a><span class="k">def</span> <span class="nf">factorize</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Factorize a number returning occurrences of its prime factors&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">factor</span><span class="p">,</span> <span class="n">ilen</span><span class="p">(</span><span class="n">fs</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">prime_factors</span><span class="p">(</span><span class="n">num</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="greatest_common_divisor"><a class="viewcode-back" href="../modules/math2.html#math2.greatest_common_divisor">[docs]</a><span class="k">def</span> <span class="nf">greatest_common_divisor</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return greatest common divisor of a and b&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">greatest_common_divisor</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span> <span class="k">else</span> <span class="n">a</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="least_common_multiple"><a class="viewcode-back" href="../modules/math2.html#math2.least_common_multiple">[docs]</a><span class="k">def</span> <span class="nf">least_common_multiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Return least common multiples of a and b&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">greatest_common_divisor</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="triangle"><a class="viewcode-back" href="../modules/math2.html#math2.triangle">[docs]</a><span class="k">def</span> <span class="nf">triangle</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The nth triangle number is defined as the sum of [1,n] values. http://en.wikipedia.org/wiki/Triangular_number&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+</div>
+<div class="viewcode-block" id="is_triangle"><a class="viewcode-back" href="../modules/math2.html#math2.is_triangle">[docs]</a><span class="k">def</span> <span class="nf">is_triangle</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">is_integer</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="n">x</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="pentagonal"><a class="viewcode-back" href="../modules/math2.html#math2.pentagonal">[docs]</a><span class="k">def</span> <span class="nf">pentagonal</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+</div>
+<div class="viewcode-block" id="is_pentagonal"><a class="viewcode-back" href="../modules/math2.html#math2.is_pentagonal">[docs]</a><span class="k">def</span> <span class="nf">is_pentagonal</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_integer</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">24</span><span class="o">*</span><span class="n">n</span><span class="p">))</span><span class="o">/</span><span class="mf">6.0</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="hexagonal"><a class="viewcode-back" href="../modules/math2.html#math2.hexagonal">[docs]</a><span class="k">def</span> <span class="nf">hexagonal</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+       </div>
+<div class="viewcode-block" id="get_cardinal_name"><a class="viewcode-back" href="../modules/math2.html#math2.get_cardinal_name">[docs]</a><span class="k">def</span> <span class="nf">get_cardinal_name</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get cardinal name for number (0 to 1 million)&quot;&quot;&quot;</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s">&quot;zero&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s">&quot;one&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s">&quot;two&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s">&quot;three&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s">&quot;four&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s">&quot;five&quot;</span><span class="p">,</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="s">&quot;six&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="s">&quot;seven&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="s">&quot;eight&quot;</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="s">&quot;nine&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="s">&quot;ten&quot;</span><span class="p">,</span>
+        <span class="mi">11</span><span class="p">:</span> <span class="s">&quot;eleven&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="s">&quot;twelve&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="s">&quot;thirteen&quot;</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="s">&quot;fourteen&quot;</span><span class="p">,</span>
+        <span class="mi">15</span><span class="p">:</span> <span class="s">&quot;fifteen&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="s">&quot;sixteen&quot;</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="s">&quot;seventeen&quot;</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="s">&quot;eighteen&quot;</span><span class="p">,</span>
+        <span class="mi">19</span><span class="p">:</span> <span class="s">&quot;nineteen&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span> <span class="s">&quot;twenty&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="s">&quot;thirty&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="s">&quot;forty&quot;</span><span class="p">,</span>
+        <span class="mi">50</span><span class="p">:</span> <span class="s">&quot;fifty&quot;</span><span class="p">,</span> <span class="mi">60</span><span class="p">:</span> <span class="s">&quot;sixty&quot;</span><span class="p">,</span> <span class="mi">70</span><span class="p">:</span> <span class="s">&quot;seventy&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">:</span> <span class="s">&quot;eighty&quot;</span><span class="p">,</span> <span class="mi">90</span><span class="p">:</span> <span class="s">&quot;ninety&quot;</span><span class="p">,</span>
+      <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">_get_tens</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">)</span> <span class="k">else</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="mi">10</span><span class="o">*</span><span class="n">a</span><span class="p">],</span> <span class="n">numbers</span><span class="p">[</span><span class="n">b</span><span class="p">]))</span>    
+    <span class="k">def</span> <span class="nf">_get_hundreds</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">tens</span> <span class="o">=</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">100</span>
+        <span class="n">hundreds</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">compact</span><span class="p">([</span>
+            <span class="n">hundreds</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">numbers</span><span class="p">[</span><span class="n">hundreds</span><span class="p">],</span> 
+            <span class="n">hundreds</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s">&quot;hundred&quot;</span><span class="p">,</span> 
+            <span class="n">hundreds</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">tens</span> <span class="ow">and</span> <span class="s">&quot;and&quot;</span><span class="p">,</span> 
+            <span class="p">(</span><span class="ow">not</span> <span class="n">hundreds</span> <span class="ow">or</span> <span class="n">tens</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_get_tens</span><span class="p">(</span><span class="n">tens</span><span class="p">),</span>
+          <span class="p">]))</span>
+
+    <span class="c"># This needs some refactoring</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mf">1e6</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&quot;value not supported: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">num</span>      
+    <span class="n">thousands</span> <span class="o">=</span> <span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span>
+    <span class="n">strings</span> <span class="o">=</span> <span class="n">compact</span><span class="p">([</span>
+        <span class="n">thousands</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_get_hundreds</span><span class="p">(</span><span class="n">thousands</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;thousand&quot;</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">num</span> <span class="o">%</span> <span class="mi">1000</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">thousands</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_get_hundreds</span><span class="p">(</span><span class="n">num</span> <span class="o">%</span> <span class="mi">1000</span><span class="p">),</span>
+    <span class="p">])</span>
+    <span class="k">return</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">strings</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="is_perfect"><a class="viewcode-back" href="../modules/math2.html#math2.is_perfect">[docs]</a><span class="k">def</span> <span class="nf">is_perfect</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return -1 if num is deficient, 0 if perfect, 1 if abundant&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">proper_divisors</span><span class="p">(</span><span class="n">num</span><span class="p">)),</span> <span class="n">num</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="number_of_digits"><a class="viewcode-back" href="../modules/math2.html#math2.number_of_digits">[docs]</a><span class="k">def</span> <span class="nf">number_of_digits</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return number of digits of num (expressed in base &#39;base&#39;)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="o">/</span><span class="n">log</span><span class="p">(</span><span class="n">base</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="is_pandigital"><a class="viewcode-back" href="../modules/math2.html#math2.is_pandigital">[docs]</a><span class="k">def</span> <span class="nf">is_pandigital</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if digits form a pandigital number&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="o">==</span> <span class="n">through</span><span class="p">)</span>
+
+<span class="c">#norms and distances</span></div>
+<div class="viewcode-block" id="sets_dist"><a class="viewcode-back" href="../modules/math2.html#math2.sets_dist">[docs]</a><span class="k">def</span> <span class="nf">sets_dist</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets&quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="sets_levenshtein"><a class="viewcode-back" href="../modules/math2.html#math2.sets_levenshtein">[docs]</a><span class="k">def</span> <span class="nf">sets_levenshtein</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;levenshtein distance on sets</span>
+<span class="sd">    @see: http://en.wikipedia.org/wiki/Levenshtein_distance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">c</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="levenshtein"><a class="viewcode-back" href="../modules/math2.html#math2.levenshtein">[docs]</a><span class="k">def</span> <span class="nf">levenshtein</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;return http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables</span>
+<span class="sd">    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python &quot;&quot;&quot;</span>
+    <span class="n">oneago</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">thisrow</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">)):</span>
+        <span class="n">twoago</span><span class="p">,</span> <span class="n">oneago</span><span class="p">,</span> <span class="n">thisrow</span> <span class="o">=</span> <span class="n">oneago</span><span class="p">,</span> <span class="n">thisrow</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)):</span>
+            <span class="n">delcost</span> <span class="o">=</span> <span class="n">oneago</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">addcost</span> <span class="o">=</span> <span class="n">thisrow</span><span class="p">[</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">subcost</span> <span class="o">=</span> <span class="n">oneago</span><span class="p">[</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">seq1</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">!=</span> <span class="n">seq2</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+            <span class="n">thisrow</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delcost</span><span class="p">,</span> <span class="n">addcost</span><span class="p">,</span> <span class="n">subcost</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">thisrow</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        
+<span class="c">#combinatorics</span>
+</div>
+<div class="viewcode-block" id="ncombinations"><a class="viewcode-back" href="../modules/math2.html#math2.ncombinations">[docs]</a><span class="k">def</span> <span class="nf">ncombinations</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combinations of k elements from a group of n&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cartesian_product</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="combinations_with_replacement"><a class="viewcode-back" href="../modules/math2.html#math2.combinations_with_replacement">[docs]</a><span class="k">def</span> <span class="nf">combinations_with_replacement</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;combinations_with_replacement(&#39;ABC&#39;, 2) --&gt; AA AB AC BB BC CC&quot;&quot;&quot;</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">indices</span> <span class="ow">in</span> <span class="n">cartesian_product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="n">r</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pool</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

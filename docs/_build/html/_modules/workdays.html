@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>workdays &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for workdays</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">WorkCalendar class with datetime operations on working hours</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;http://pypi.python.org/pypi/BusinessHours&quot;</span><span class="p">,</span>
+               <span class="s">&quot;http://pypi.python.org/pypi/workdays/&quot;</span><span class="p">,</span>
+               <span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">datetime2</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="WorkCalendar"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar">[docs]</a><span class="k">class</span> <span class="nc">WorkCalendar</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;WorkCalendar class with datetime operations on working hours&quot;&quot;&quot;</span>
+    
+    <span class="c"># Define the weekday mnemonics to match the date.weekday function</span>
+    <span class="p">(</span><span class="n">MON</span><span class="p">,</span> <span class="n">TUE</span><span class="p">,</span> <span class="n">WED</span><span class="p">,</span> <span class="n">THU</span><span class="p">,</span> <span class="n">FRI</span><span class="p">,</span> <span class="n">SAT</span><span class="p">,</span> <span class="n">SUN</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+ 
+<div class="viewcode-block" id="WorkCalendar.__init__"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">worktime</span><span class="o">=</span><span class="p">[</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">],</span><span class="n">parent</span><span class="o">=</span><span class="p">[],</span> <span class="n">weekends</span><span class="o">=</span><span class="p">(</span><span class="n">SAT</span><span class="p">,</span><span class="n">SUN</span><span class="p">),</span> <span class="n">holidays</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weekends</span><span class="o">=</span><span class="n">weekends</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">holidays</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">holidays</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="o">=</span><span class="n">parent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setworktime</span><span class="p">(</span><span class="n">worktime</span><span class="p">)</span></div>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_worktime</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_worktime</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+<div class="viewcode-block" id="WorkCalendar.setworktime"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.setworktime">[docs]</a>    <span class="k">def</span> <span class="nf">setworktime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">worktime</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_worktime</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">timef</span><span class="p">,</span><span class="n">worktime</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_worktime</span><span class="o">=</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worktime</span><span class="p">,</span><span class="n">p</span><span class="o">.</span><span class="n">_worktime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">hour</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span><span class="o">*</span><span class="mi">60</span><span class="o">+</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">minute</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">minute</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">==</span><span class="n">time</span><span class="o">.</span><span class="n">min</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">==</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">:</span> <span class="c">#we have a microsecond delay</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span> <span class="c">#make it perfect</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.addholidays"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.addholidays">[docs]</a>    <span class="k">def</span> <span class="nf">addholidays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">days</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;add day(s) to to known holidays. dates with year==4 (to allow Feb 29th) apply every year</span>
+<span class="sd">        note : holidays set may contain weekends too.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> <span class="c">#iterable</span>
+            <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="n">days</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">holidays</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">holidays</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">days</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        </div>
+<div class="viewcode-block" id="WorkCalendar.isworkday"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.isworkday">[docs]</a>    <span class="k">def</span> <span class="nf">isworkday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;@return True if day is a work day&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">day</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">weekends</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">month</span><span class="o">=</span><span class="n">day</span><span class="o">.</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="o">=</span><span class="n">day</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">holidays</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">datef</span><span class="p">(</span><span class="n">day</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">holidays</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">day</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.isworktime"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.isworktime">[docs]</a>    <span class="k">def</span> <span class="nf">isworktime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;@return True if you&#39;re supposed to work at that time&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">time</span><span class="p">):</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">in_interval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdatetime</span><span class="p">(</span><span class="n">time</span><span class="p">),</span><span class="n">time</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.nextworkday"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.nextworkday">[docs]</a>    <span class="k">def</span> <span class="nf">nextworkday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;@return next work day&quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">day</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="o">+</span><span class="n">oneday</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">res</span><span class="p">):</span> <span class="k">break</span>
+        <span class="k">return</span> <span class="n">res</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.prevworkday"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.prevworkday">[docs]</a>    <span class="k">def</span> <span class="nf">prevworkday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;@return previous work day&quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">day</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="o">-</span><span class="n">oneday</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">res</span><span class="p">):</span> <span class="k">break</span>
+        <span class="k">return</span> <span class="n">res</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.range"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.range">[docs]</a>    <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;range of workdays between start (included) and end (not included)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start</span><span class="o">&gt;</span><span class="n">end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">day</span><span class="o">=</span><span class="n">start</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">day</span><span class="p">):</span>
+            <span class="n">day</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">day</span><span class="o">&lt;</span><span class="n">end</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+            <span class="n">day</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.workdays"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.workdays">[docs]</a>    <span class="k">def</span> <span class="nf">workdays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;list of ndays workdays from start&quot;&quot;&quot;</span>
+        <span class="n">day</span><span class="o">=</span><span class="n">start_date</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">[</span><span class="n">day</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">ndays</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">day</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+            <span class="n">ndays</span><span class="o">=</span><span class="n">ndays</span><span class="o">-</span><span class="mi">1</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">ndays</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">day</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prevworkday</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+            <span class="n">ndays</span><span class="o">=</span><span class="n">ndays</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.workday"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.workday">[docs]</a>    <span class="k">def</span> <span class="nf">workday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Same as Excel WORKDAY function.</span>
+<span class="sd">        Returns a date that is the indicated number of working days before or after the starting date. </span>
+<span class="sd">        Working days exclude weekends and any dates identified as holidays.</span>
+<span class="sd">        Use WORKDAY to exclude weekends or holidays when you calculate invoice due dates, </span>
+<span class="sd">        expected delivery times, or the number of days of work performed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">ndays</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdays</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdays</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.cast"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.cast">[docs]</a>    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">,</span><span class="n">retro</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;force time to be in workhours&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworktime</span><span class="p">(</span><span class="n">time</span><span class="p">):</span> 
+            <span class="k">return</span> <span class="n">time</span> <span class="c">#ok</span>
+        <span class="k">if</span> <span class="n">retro</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">datetimef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prevworkday</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">date</span><span class="p">()),</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+            <span class="c">#only remaining case is time&gt;self.end on a work day</span>
+            <span class="k">return</span> <span class="n">datetimef</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">datetimef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">date</span><span class="p">()),</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+            <span class="c">#only remaining case is time&lt;self.start on a work day</span>
+            <span class="k">return</span> <span class="n">datetimef</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.worktime"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.worktime">[docs]</a>    <span class="k">def</span> <span class="nf">worktime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return interval of time worked a given day&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">day</span><span class="p">):</span> <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.workdatetime"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.workdatetime">[docs]</a>    <span class="k">def</span> <span class="nf">workdatetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return interval of datetime worked a given day&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">day</span><span class="p">):</span> <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">day</span><span class="o">=</span><span class="n">datef</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">datetimef</span><span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">),</span><span class="n">datetimef</span><span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">))</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.diff"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return timedelta worktime between t1 and t2 (= t2-t1)&#39;&#39;&#39;</span>
+        <span class="n">t1</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">t2</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t1</span><span class="o">&gt;</span><span class="n">t2</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">fulldays</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">timedelta_mul</span><span class="p">(</span><span class="n">fulldays</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">w1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workdatetime</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">w1</span><span class="p">:</span> <span class="n">res</span><span class="o">+=</span><span class="n">intersectlen</span><span class="p">(</span><span class="n">w1</span><span class="p">,(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">),</span><span class="n">timedelta0</span><span class="p">)</span>
+        <span class="n">w2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workdatetime</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">w2</span><span class="p">:</span> <span class="n">res</span><span class="o">+=</span><span class="n">intersectlen</span><span class="p">(</span><span class="n">w2</span><span class="p">,(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">),</span><span class="n">timedelta0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+        </div>
+<div class="viewcode-block" id="WorkCalendar.gethours"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.gethours">[docs]</a>    <span class="k">def</span> <span class="nf">gethours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return fractional work hours between t1 and t2 (= t2-t1)&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mf">3600.</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.plus"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.plus">[docs]</a>    <span class="k">def</span> <span class="nf">plus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return start time + t work time (positive or negative)&#39;&#39;&#39;</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworktime</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is not in worktime&#39;</span><span class="o">%</span><span class="n">start</span><span class="p">)</span>     
+            <span class="k">raise</span>   
+        <span class="n">days</span><span class="o">=</span><span class="n">timedelta_div</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">start</span>
+        <span class="k">while</span> <span class="n">days</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">days</span><span class="o">=</span><span class="n">days</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">while</span> <span class="n">days</span><span class="o">&lt;=-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prevworkday</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">days</span><span class="o">=</span><span class="n">days</span><span class="o">+</span><span class="mi">1</span>
+        
+        <span class="n">remaining</span><span class="o">=</span><span class="n">timedelta_mul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span><span class="n">days</span><span class="p">)</span> <span class="c">#less than one day of work</span>
+        <span class="n">day</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">+</span><span class="n">remaining</span><span class="p">)</span><span class="o">&lt;</span><span class="n">start</span><span class="p">:</span> <span class="c"># skip to previous day</span>
+            <span class="n">remaining</span><span class="o">=</span><span class="p">(</span><span class="n">res</span><span class="o">+</span><span class="n">remaining</span><span class="p">)</span><span class="o">-</span><span class="n">start</span> <span class="c">#in full time</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prevworkday</span><span class="p">(</span><span class="n">day</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">+</span><span class="n">remaining</span><span class="p">)</span><span class="o">&gt;</span><span class="n">end</span><span class="p">:</span> <span class="c"># skip to next day</span>
+            <span class="n">remaining</span><span class="o">=</span><span class="p">(</span><span class="n">res</span><span class="o">+</span><span class="n">remaining</span><span class="p">)</span><span class="o">-</span><span class="n">end</span> <span class="c">#in full time</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">datetimef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nextworkday</span><span class="p">(</span><span class="n">day</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">+</span><span class="n">remaining</span>
+    </div>
+<div class="viewcode-block" id="WorkCalendar.minus"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.minus">[docs]</a>    <span class="k">def</span> <span class="nf">minus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;@return start time - t work time (positive or negative)&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plus</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="o">-</span><span class="n">t</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WorkCalendar.networkdays"><a class="viewcode-back" href="../modules/workdays.html#workdays.WorkCalendar.networkdays">[docs]</a>    <span class="k">def</span> <span class="nf">networkdays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Same as Excel NETWORKDAYS function.</span>
+<span class="sd">        Returns the number of whole working days between </span>
+<span class="sd">        start_date and end_date (inclusive of both start_date and end_date). </span>
+<span class="sd">        Working days exclude weekends and any dates identified in holidays. </span>
+<span class="sd">        Use NETWORKDAYS to calculate employee benefits that accrue </span>
+<span class="sd">        based on the number of days worked during a specific term&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">end_date</span><span class="o">&lt;</span><span class="n">start_date</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">end_date</span><span class="p">,</span><span class="n">start_date</span><span class="p">)</span>
+        <span class="n">end_date</span><span class="o">=</span><span class="n">datef</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">datef</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">end_date</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isworkday</span><span class="p">(</span><span class="n">i</span><span class="p">):</span><span class="n">res</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">i</span><span class="o">=</span><span class="n">datef</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">oneday</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    </div></div>
+<span class="sd">&#39;&#39;&#39; a 24/24 7/7 calendar is useful&#39;&#39;&#39;</span>
+<span class="n">FullTime</span><span class="o">=</span><span class="n">WorkCalendar</span><span class="p">([</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">],</span><span class="n">holidays</span><span class="o">=</span><span class="p">[],</span><span class="n">weekends</span><span class="o">=</span><span class="p">[])</span> 
+
+<span class="sd">&#39;&#39;&#39; compatibility with http://pypi.python.org/pypi/BusinessHours&#39;&#39;&#39;</span>
+   
+<div class="viewcode-block" id="workday"><a class="viewcode-back" href="../modules/workdays.html#workdays.workday">[docs]</a><span class="k">def</span> <span class="nf">workday</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">,</span><span class="n">holidays</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&#39;&#39;&#39;Same as Excel WORKDAY function.</span>
+<span class="sd">    Returns a date that is the indicated number of working days before or after the starting date. </span>
+<span class="sd">    Working days exclude weekends and any dates identified as holidays.</span>
+<span class="sd">    Use WORKDAY to exclude weekends or holidays when you calculate invoice due dates, </span>
+<span class="sd">    expected delivery times, or the number of days of work performed.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">WorkCalendar</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">],</span><span class="n">holidays</span><span class="p">)</span><span class="o">.</span><span class="n">workday</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span><span class="n">ndays</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="networkdays"><a class="viewcode-back" href="../modules/workdays.html#workdays.networkdays">[docs]</a><span class="k">def</span> <span class="nf">networkdays</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span><span class="n">holidays</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&#39;&#39;&#39;Same as Excel NETWORKDAYS function.</span>
+<span class="sd">    Returns the number of whole working days between </span>
+<span class="sd">    start_date and end_date (inclusive of both start_date and end_date). </span>
+<span class="sd">    Working days exclude weekends and any dates identified in holidays. </span>
+<span class="sd">    Use NETWORKDAYS to calculate employee benefits that accrue </span>
+<span class="sd">    based on the number of days worked during a specific term&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">WorkCalendar</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">],</span><span class="n">holidays</span><span class="p">)</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span><span class="n">end_date</span><span class="p">)</span>
+                        </div>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<div class="viewcode-block" id="TestCase"><a class="viewcode-back" href="../modules/workdays.html#workdays.TestCase">[docs]</a><span class="k">class</span> <span class="nc">TestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCase.runTest"><a class="viewcode-back" href="../modules/workdays.html#workdays.TestCase.runTest">[docs]</a>    <span class="k">def</span> <span class="nf">runTest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cal</span><span class="o">=</span><span class="n">WorkCalendar</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">])</span>
+        <span class="n">date1</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span> <span class="c"># a FRI close to year end and holidays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date1</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">17</span><span class="p">)),</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">18</span><span class="p">)),</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">19</span><span class="p">)),</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="n">date2</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span> <span class="c"># a MON close to next year begin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mi">17</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">addholidays</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">25</span><span class="p">))</span> <span class="c">#Christmas was a SUN in 2011</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mi">17</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">addholidays</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="c">#NewYear was also a SUN in 2012...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mi">17</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">addholidays</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="c">#...so the 2th was holiday</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mi">16</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">addholidays</span><span class="p">(</span><span class="n">days</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">19</span><span class="p">),</span><span class="mi">21</span><span class="p">))</span> <span class="c">#in fact, the company was closed 3 weeks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">networkdays</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;networkdays&#39;</span><span class="p">)</span>
+        
+                
+        <span class="k">print</span> <span class="n">cal</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">19</span><span class="p">))</span>
+        <span class="k">print</span> <span class="n">cal</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="k">print</span> <span class="n">cal</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">17</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span><span class="s">&#39;diff&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">date2</span><span class="p">,</span><span class="n">date1</span><span class="p">),</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=-</span><span class="mi">8</span><span class="p">),</span><span class="s">&#39;diff&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">gethours</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="n">date2</span><span class="p">),</span><span class="mf">8.</span><span class="p">,</span><span class="s">&#39;gethours&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">workday</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">date2</span><span class="p">,</span> <span class="s">&#39;workday&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">workday</span><span class="p">(</span><span class="n">date2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">date1</span><span class="p">,</span> <span class="s">&#39;workday </span><span class="si">%s</span><span class="s"> != </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">workday</span><span class="p">(</span><span class="n">date2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">date1</span><span class="p">))</span>
+        </div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

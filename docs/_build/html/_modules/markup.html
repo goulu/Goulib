@@ -1,0 +1,655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>markup &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for markup</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python -u</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># This code is in the public domain, it comes</span>
+<span class="c"># with absolutely no warranty and you can do</span>
+<span class="c"># absolutely whatever you want with it.</span>
+
+<span class="n">__date__</span> <span class="o">=</span> <span class="s">&#39;1 October 2012&#39;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;1.9&#39;</span>
+<span class="n">__doc__</span><span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">This is markup.py - a Python module that attempts to</span>
+<span class="s">make it easier to generate HTML/XML from a Python program</span>
+<span class="s">in an intuitive, lightweight, customizable and pythonic way.</span>
+
+<span class="s">The code is in the public domain.</span>
+
+<span class="s">Version: </span><span class="si">%s</span><span class="s"> as of </span><span class="si">%s</span><span class="s">.</span>
+
+<span class="s">Documentation and further info is at http://markup.sourceforge.net/</span>
+
+<span class="s">Please send bug reports, feature requests, enhancement</span>
+<span class="s">ideas or questions to nogradi at gmail dot com.</span>
+
+<span class="s">Installation: drop markup.py somewhere into your Python path.</span>
+<span class="s">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">__date__</span> <span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">basestring</span>
+    <span class="kn">import</span> <span class="nn">string</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="c"># python 3</span>
+    <span class="nb">basestring</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="nb">str</span>
+    
+<span class="kn">import</span> <span class="nn">sys</span>
+    
+<span class="c">#from http://www.voidspace.org.uk/python/cgiutils.html</span>
+<div class="viewcode-block" id="cgiprint"><a class="viewcode-back" href="../modules/markup.html#markup.cgiprint">[docs]</a><span class="k">def</span> <span class="nf">cgiprint</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">unbuff</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">line_end</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\r\n</span><span class="s">&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print to the ``stdout``.</span>
+<span class="sd">    </span>
+<span class="sd">    Set ``unbuff=True`` to flush the buffer after every write.</span>
+<span class="sd">    </span>
+<span class="sd">    It prints the inline you send it, followed by the ``line_end``. By default this </span>
+<span class="sd">    is ``\r\n`` - which is the standard specified by the RFC for http headers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span> <span class="n">inline</span><span class="p">,</span><span class="n">line_end</span>
+    <span class="k">return</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">inline</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line_end</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unbuff</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+<span class="c"># tags which are reserved python keywords will be referred </span>
+<span class="c"># to by a leading underscore otherwise we end up with a syntax error</span></div>
+<span class="kn">import</span> <span class="nn">keyword</span>
+
+<div class="viewcode-block" id="element"><a class="viewcode-back" href="../modules/markup.html#markup.element">[docs]</a><span class="k">class</span> <span class="nc">element</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class handles the addition of a new element.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="element.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.element.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;lower&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+
+        <span class="k">if</span> <span class="n">case</span> <span class="o">==</span> <span class="s">&#39;upper&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s">&#39;lower&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span><span class="s">&#39;given&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+    </div>
+<div class="viewcode-block" id="element.__call__"><a class="viewcode-back" href="../modules/markup.html#markup.element.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="c"># if class_ was defined in parent it should be added to every element</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">class_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;class_&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;class_&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">class_</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">twotags</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">onetags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span>    <span class="c"># here myarg is always None, because len( args ) = 0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ClosingError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deptags</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DeprecationError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidElementError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mode</span> <span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="element.render"><a class="viewcode-back" href="../modules/markup.html#markup.element.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">single</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append the actual tags to content.&quot;&quot;&quot;</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>               <span class="c"># when value is None that means stuff like &lt;... checked&gt;</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>            <span class="c"># strip this so class_ will mean class, etc.</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;http_equiv&#39;</span><span class="p">:</span>         <span class="c"># special cases, maybe change _ to - overall?</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;http-equiv&#39;</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;accept_charset&#39;</span><span class="p">:</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;accept-charset&#39;</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">escape</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">between</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;</span><span class="si">%s</span><span class="s">&lt;/</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="n">tag</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> /&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
+        <span class="n">cgiprint</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">out</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
+    </div>
+<div class="viewcode-block" id="element.close"><a class="viewcode-back" href="../modules/markup.html#markup.element.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append a closing tag unless element has only opening tag.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">twotags</span><span class="p">:</span>
+            <span class="n">cgiprint</span><span class="p">(</span><span class="s">&quot;&lt;/</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="c"># self.parent.content.append( &quot;&lt;/%s&gt;&quot; % self.tag )</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">onetags</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClosingError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deptags</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DeprecationError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="element.open"><a class="viewcode-back" href="../modules/markup.html#markup.element.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append an opening tag.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">twotags</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">onetags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deptags</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DeprecationError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="page"><a class="viewcode-back" href="../modules/markup.html#markup.page">[docs]</a><span class="k">class</span> <span class="nc">page</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is our main class representing a document. Elements are added</span>
+<span class="sd">    as attributes of an instance of this class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="page.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.page.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;strict_html&#39;</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;lower&#39;</span><span class="p">,</span> <span class="n">onetags</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">twotags</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stuff that effects the whole document.</span>
+
+<span class="sd">        :param mode:</span>
+<span class="sd">        *&#39;strict_html&#39;   for HTML 4.01 (default)</span>
+<span class="sd">        *&#39;html&#39;          alias for &#39;strict_html&#39;</span>
+<span class="sd">        *&#39;loose_html&#39;    to allow some deprecated elements</span>
+<span class="sd">        *&#39;xml&#39;           to allow arbitrary elements</span>
+
+<span class="sd">        :param case:</span>
+<span class="sd">        *&#39;lower&#39;         element names will be printed in lower case (default)</span>
+<span class="sd">        *&#39;upper&#39;         they will be printed in upper case</span>
+<span class="sd">        *&#39;given&#39;         element names will be printed as they are given</span>
+
+<span class="sd">        :param onetags:  list or tuple of valid elements with opening tags only</span>
+<span class="sd">        :param twotags:</span>
+<span class="sd">          list or tuple of valid elements with both opening and closing tags</span>
+<span class="sd">          these two keyword arguments may be used to select</span>
+<span class="sd">          the set of valid elements in &#39;xml&#39; mode</span>
+<span class="sd">          invalid elements will raise appropriate exceptions</span>
+<span class="sd">        </span>
+<span class="sd">        :param separator: string to place between added elements, defaults to newline</span>
+<span class="sd">        </span>
+<span class="sd">        :param class_:    a class that will be added to every element if defined</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">valid_onetags</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;AREA&quot;</span><span class="p">,</span> <span class="s">&quot;BASE&quot;</span><span class="p">,</span> <span class="s">&quot;BR&quot;</span><span class="p">,</span> <span class="s">&quot;COL&quot;</span><span class="p">,</span> <span class="s">&quot;FRAME&quot;</span><span class="p">,</span> <span class="s">&quot;HR&quot;</span><span class="p">,</span> <span class="s">&quot;IMG&quot;</span><span class="p">,</span> <span class="s">&quot;INPUT&quot;</span><span class="p">,</span> <span class="s">&quot;LINK&quot;</span><span class="p">,</span> <span class="s">&quot;META&quot;</span><span class="p">,</span> <span class="s">&quot;PARAM&quot;</span> <span class="p">]</span>
+        <span class="n">valid_twotags</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;ABBR&quot;</span><span class="p">,</span> <span class="s">&quot;ACRONYM&quot;</span><span class="p">,</span> <span class="s">&quot;ADDRESS&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;BDO&quot;</span><span class="p">,</span> <span class="s">&quot;BIG&quot;</span><span class="p">,</span> <span class="s">&quot;BLOCKQUOTE&quot;</span><span class="p">,</span> <span class="s">&quot;BODY&quot;</span><span class="p">,</span> <span class="s">&quot;BUTTON&quot;</span><span class="p">,</span>
+                <span class="s">&quot;CAPTION&quot;</span><span class="p">,</span> <span class="s">&quot;CITE&quot;</span><span class="p">,</span> <span class="s">&quot;CODE&quot;</span><span class="p">,</span> <span class="s">&quot;COLGROUP&quot;</span><span class="p">,</span> <span class="s">&quot;DD&quot;</span><span class="p">,</span> <span class="s">&quot;DEL&quot;</span><span class="p">,</span> <span class="s">&quot;DFN&quot;</span><span class="p">,</span> <span class="s">&quot;DIV&quot;</span><span class="p">,</span> <span class="s">&quot;DL&quot;</span><span class="p">,</span> <span class="s">&quot;DT&quot;</span><span class="p">,</span> <span class="s">&quot;EM&quot;</span><span class="p">,</span> <span class="s">&quot;FIELDSET&quot;</span><span class="p">,</span>
+                <span class="s">&quot;FORM&quot;</span><span class="p">,</span> <span class="s">&quot;FRAMESET&quot;</span><span class="p">,</span> <span class="s">&quot;H1&quot;</span><span class="p">,</span> <span class="s">&quot;H2&quot;</span><span class="p">,</span> <span class="s">&quot;H3&quot;</span><span class="p">,</span> <span class="s">&quot;H4&quot;</span><span class="p">,</span> <span class="s">&quot;H5&quot;</span><span class="p">,</span> <span class="s">&quot;H6&quot;</span><span class="p">,</span> <span class="s">&quot;HEAD&quot;</span><span class="p">,</span> <span class="s">&quot;HTML&quot;</span><span class="p">,</span> <span class="s">&quot;I&quot;</span><span class="p">,</span> <span class="s">&quot;IFRAME&quot;</span><span class="p">,</span> <span class="s">&quot;INS&quot;</span><span class="p">,</span>
+                <span class="s">&quot;KBD&quot;</span><span class="p">,</span> <span class="s">&quot;LABEL&quot;</span><span class="p">,</span> <span class="s">&quot;LEGEND&quot;</span><span class="p">,</span> <span class="s">&quot;LI&quot;</span><span class="p">,</span> <span class="s">&quot;MAP&quot;</span><span class="p">,</span> <span class="s">&quot;NOFRAMES&quot;</span><span class="p">,</span> <span class="s">&quot;NOSCRIPT&quot;</span><span class="p">,</span> <span class="s">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="s">&quot;OL&quot;</span><span class="p">,</span> <span class="s">&quot;OPTGROUP&quot;</span><span class="p">,</span>
+                <span class="s">&quot;OPTION&quot;</span><span class="p">,</span> <span class="s">&quot;P&quot;</span><span class="p">,</span> <span class="s">&quot;PRE&quot;</span><span class="p">,</span> <span class="s">&quot;Q&quot;</span><span class="p">,</span> <span class="s">&quot;SAMP&quot;</span><span class="p">,</span> <span class="s">&quot;SCRIPT&quot;</span><span class="p">,</span> <span class="s">&quot;SELECT&quot;</span><span class="p">,</span> <span class="s">&quot;SMALL&quot;</span><span class="p">,</span> <span class="s">&quot;SPAN&quot;</span><span class="p">,</span> <span class="s">&quot;STRONG&quot;</span><span class="p">,</span> <span class="s">&quot;STYLE&quot;</span><span class="p">,</span>
+                <span class="s">&quot;SUB&quot;</span><span class="p">,</span> <span class="s">&quot;SUP&quot;</span><span class="p">,</span> <span class="s">&quot;TABLE&quot;</span><span class="p">,</span> <span class="s">&quot;TBODY&quot;</span><span class="p">,</span> <span class="s">&quot;TD&quot;</span><span class="p">,</span> <span class="s">&quot;TEXTAREA&quot;</span><span class="p">,</span> <span class="s">&quot;TFOOT&quot;</span><span class="p">,</span> <span class="s">&quot;TH&quot;</span><span class="p">,</span> <span class="s">&quot;THEAD&quot;</span><span class="p">,</span> <span class="s">&quot;TITLE&quot;</span><span class="p">,</span> <span class="s">&quot;TR&quot;</span><span class="p">,</span>
+                <span class="s">&quot;TT&quot;</span><span class="p">,</span> <span class="s">&quot;UL&quot;</span><span class="p">,</span> <span class="s">&quot;VAR&quot;</span> <span class="p">]</span>
+        <span class="n">dont_wait</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;HTML&quot;</span><span class="p">,</span><span class="s">&quot;BODY&quot;</span><span class="p">]</span>
+        <span class="n">deprecated_onetags</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;BASEFONT&quot;</span><span class="p">,</span> <span class="s">&quot;ISINDEX&quot;</span> <span class="p">]</span>
+        <span class="n">deprecated_twotags</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;APPLET&quot;</span><span class="p">,</span> <span class="s">&quot;CENTER&quot;</span><span class="p">,</span> <span class="s">&quot;DIR&quot;</span><span class="p">,</span> <span class="s">&quot;FONT&quot;</span><span class="p">,</span> <span class="s">&quot;MENU&quot;</span><span class="p">,</span> <span class="s">&quot;S&quot;</span><span class="p">,</span> <span class="s">&quot;STRIKE&quot;</span><span class="p">,</span> <span class="s">&quot;U&quot;</span> <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">footer</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">case</span> <span class="o">=</span> <span class="n">case</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator</span> <span class="o">=</span> <span class="n">separator</span>
+
+        <span class="c"># init( ) sets it to True so we know that &lt;/body&gt;&lt;/html&gt; has to be printed at the end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="o">=</span> <span class="n">class_</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;html&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">=</span> <span class="n">valid_onetags</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">=</span> <span class="n">valid_twotags</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deptags</span> <span class="o">=</span> <span class="n">deprecated_onetags</span> <span class="o">+</span> <span class="n">deprecated_twotags</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deptags</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deptags</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s">&#39;strict_html&#39;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;loose_html&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">=</span> <span class="n">valid_onetags</span> <span class="o">+</span> <span class="n">deprecated_onetags</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">=</span> <span class="n">valid_twotags</span> <span class="o">+</span> <span class="n">deprecated_twotags</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;xml&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">onetags</span> <span class="ow">and</span> <span class="n">twotags</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">=</span> <span class="n">onetags</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">=</span> <span class="n">twotags</span>
+            <span class="k">elif</span> <span class="p">(</span> <span class="n">onetags</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">twotags</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">twotags</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">onetags</span> <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">CustomizationError</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">onetags</span> <span class="o">=</span> <span class="n">russell</span><span class="p">(</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">twotags</span> <span class="o">=</span> <span class="n">russell</span><span class="p">(</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ModeError</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.__getattr__"><a class="viewcode-back" href="../modules/markup.html#markup.page.__getattr__">[docs]</a>    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="p">):</span>
+
+        <span class="c"># tags should start with double underscore</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;__&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="n">attr</span> <span class="p">)</span>
+        <span class="c"># tag with single underscore should be a reserved keyword</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span> <span class="s">&#39;_&#39;</span> <span class="p">):</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span> <span class="s">&#39;_&#39;</span> <span class="p">)</span> 
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keyword</span><span class="o">.</span><span class="n">kwlist</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="n">attr</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">element</span><span class="p">(</span> <span class="n">attr</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">case</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.__str__"><a class="viewcode-back" href="../modules/markup.html#markup.page.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;loose_html&#39;</span> <span class="p">):</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;&lt;/body&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;/html&gt;&#39;</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">footer</span> <span class="o">+</span> <span class="n">end</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">footer</span> <span class="o">+</span> <span class="n">end</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.__call__"><a class="viewcode-back" href="../modules/markup.html#markup.page.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="bp">False</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the document as a string.</span>
+
+<span class="sd">        escape --   False   print normally</span>
+<span class="sd">                    True    replace &lt; and &gt; by &amp;lt; and &amp;gt;</span>
+<span class="sd">                            the default escape sequences in most browsers&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">escape</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_escape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.add"><a class="viewcode-back" href="../modules/markup.html#markup.page.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This is an alias to addcontent.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addcontent</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="page.addfooter"><a class="viewcode-back" href="../modules/markup.html#markup.page.addfooter">[docs]</a>    <span class="k">def</span> <span class="nf">addfooter</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add some text to the bottom of the document&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.addheader"><a class="viewcode-back" href="../modules/markup.html#markup.page.addheader">[docs]</a>    <span class="k">def</span> <span class="nf">addheader</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add some text to the top of the document&quot;&quot;&quot;</span>
+        <span class="n">cgiprint</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.addcontent"><a class="viewcode-back" href="../modules/markup.html#markup.page.addcontent">[docs]</a>    <span class="k">def</span> <span class="nf">addcontent</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add some text to the main part of the document&quot;&quot;&quot;</span>
+        <span class="n">cgiprint</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="page.init"><a class="viewcode-back" href="../modules/markup.html#markup.page.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="n">css</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metainfo</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">footer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">charset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">doctype</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bodyattrs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method is used for complete documents with appropriate</span>
+<span class="sd">        doctype, encoding, title, etc information. For an /XML snippet</span>
+<span class="sd">        omit this method.</span>
+
+<span class="sd">        lang --     language, usually a two character string, will appear</span>
+<span class="sd">                    as &lt;html lang=&#39;en&#39;&gt; in html mode (ignored in xml mode)</span>
+<span class="sd">        </span>
+<span class="sd">        css --      Cascading Style Sheet filename as a string or a list of</span>
+<span class="sd">                    strings for multiple css files (ignored in xml mode)</span>
+
+<span class="sd">        metainfo -- a dictionary in the form { &#39;name&#39;:&#39;content&#39; } to be inserted</span>
+<span class="sd">                    into meta element(s) as &lt;meta name=&#39;name&#39; content=&#39;content&#39;&gt;</span>
+<span class="sd">                    (ignored in xml mode)</span>
+<span class="sd">        </span>
+<span class="sd">        base     -- set the &lt;base href=&quot;...&quot;&gt; tag in &lt;head&gt;</span>
+<span class="sd">        </span>
+<span class="sd">        bodyattrs --a dictionary in the form { &#39;key&#39;:&#39;value&#39;, ... } which will be added</span>
+<span class="sd">                    as attributes of the &lt;body&gt; element as &lt;body key=&#39;value&#39; ... &gt;</span>
+<span class="sd">                    (ignored in xml mode)</span>
+
+<span class="sd">        script --   dictionary containing src:type pairs, &lt;script type=&#39;text/type&#39; src=src&gt;&lt;/script&gt;</span>
+<span class="sd">                    or a list of [ &#39;src1&#39;, &#39;src2&#39;, ... ] in which case &#39;javascript&#39; is assumed for all</span>
+
+<span class="sd">        title --    the title of the document as a string to be inserted into</span>
+<span class="sd">                    a title element as &lt;title&gt;my title&lt;/title&gt; (ignored in xml mode)</span>
+
+<span class="sd">        header --   some text to be inserted right after the &lt;body&gt; element</span>
+<span class="sd">                    (ignored in xml mode)</span>
+
+<span class="sd">        footer --   some text to be inserted right before the &lt;/body&gt; element</span>
+<span class="sd">                    (ignored in xml mode)</span>
+
+<span class="sd">        charset --  a string defining the character set, will be inserted into a</span>
+<span class="sd">                    &lt;meta http-equiv=&#39;Content-Type&#39; content=&#39;text/html; charset=myset&#39;&gt;</span>
+<span class="sd">                    element (ignored in xml mode)</span>
+
+<span class="sd">        encoding -- a string defining the encoding, will be put into to first line of</span>
+<span class="sd">                    the document as &lt;?xml version=&#39;1.0&#39; encoding=&#39;myencoding&#39; ?&gt; in</span>
+<span class="sd">                    xml mode (ignored in html mode)</span>
+
+<span class="sd">        doctype --  the document type string, defaults to</span>
+<span class="sd">                    &lt;!DOCTYPE HTML PUBLIC &#39;-//W3C//DTD HTML 4.01 Transitional//EN&#39;&gt;</span>
+<span class="sd">                    in html mode (ignored in xml mode)&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;loose_html&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">doctype</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">doctype</span> <span class="o">=</span> <span class="s">&quot;&lt;!DOCTYPE HTML PUBLIC &#39;-//W3C//DTD HTML 4.01 Transitional//EN&#39;&gt;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">doctype</span> <span class="p">)</span>
+            <span class="n">cgiprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">(</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">charset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span> <span class="n">http_equiv</span><span class="o">=</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">charset</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">metainfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metainfo</span><span class="p">(</span> <span class="n">metainfo</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">css</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">css</span><span class="p">(</span> <span class="n">css</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">(</span> <span class="n">title</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">script</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scripts</span><span class="p">(</span> <span class="n">script</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">(</span> <span class="n">href</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">base</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">bodyattrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">(</span> <span class="o">**</span><span class="n">bodyattrs</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">header</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">footer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">footer</span> <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;xml&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">doctype</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">doctype</span> <span class="o">=</span> <span class="s">&quot;&lt;?xml version=&#39;1.0&#39; encoding=&#39;</span><span class="si">%s</span><span class="s">&#39; ?&gt;&quot;</span> <span class="o">%</span> <span class="n">encoding</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">doctype</span> <span class="o">=</span> <span class="s">&quot;&lt;?xml version=&#39;1.0&#39; ?&gt;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">doctype</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.css"><a class="viewcode-back" href="../modules/markup.html#markup.page.css">[docs]</a>    <span class="k">def</span> <span class="nf">css</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">filelist</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This convenience function is only useful for html.</span>
+<span class="sd">        It adds css stylesheet(s) to the document via the &lt;link&gt; element.&quot;&quot;&quot;</span>
+      
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">filelist</span><span class="p">,</span> <span class="nb">basestring</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">(</span> <span class="n">href</span><span class="o">=</span><span class="n">filelist</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="s">&#39;stylesheet&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;text/css&#39;</span><span class="p">,</span> <span class="n">media</span><span class="o">=</span><span class="s">&#39;all&#39;</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">(</span> <span class="n">href</span><span class="o">=</span><span class="nb">file</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="s">&#39;stylesheet&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;text/css&#39;</span><span class="p">,</span> <span class="n">media</span><span class="o">=</span><span class="s">&#39;all&#39;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.metainfo"><a class="viewcode-back" href="../modules/markup.html#markup.page.metainfo">[docs]</a>    <span class="k">def</span> <span class="nf">metainfo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This convenience function is only useful for html.</span>
+<span class="sd">        It adds meta information via the &lt;meta&gt; element, the argument is</span>
+<span class="sd">        a dictionary of the form { &#39;name&#39;:&#39;content&#39; }.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">mydict</span><span class="p">,</span> <span class="nb">dict</span> <span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">mydict</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s">&quot;Metainfo should be called with a dictionary argument of name:content pairs.&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="page.scripts"><a class="viewcode-back" href="../modules/markup.html#markup.page.scripts">[docs]</a>    <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Only useful in html, mydict is dictionary of src:type pairs or a list</span>
+<span class="sd">        of script sources [ &#39;src1&#39;, &#39;src2&#39;, ... ] in which case &#39;javascript&#39; is assumed for type.</span>
+<span class="sd">        Will be rendered as &lt;script type=&#39;text/type&#39; src=src&gt;&lt;/script&gt;&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">mydict</span><span class="p">,</span> <span class="nb">dict</span> <span class="p">):</span>
+            <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="nb">type</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">mydict</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">script</span><span class="p">(</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;text/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">type</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">mydict</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">script</span><span class="p">(</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;text/javascript&#39;</span> <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s">&quot;Script should be given a dictionary of src:type pairs or a list of javascript src&#39;s.&quot;</span> <span class="p">)</span>
+
+</div></div>
+<span class="k">class</span> <span class="nc">_oneliner</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;An instance of oneliner returns a string corresponding to one element.</span>
+<span class="sd">    This class can be used to write &#39;oneliners&#39; that return a string</span>
+<span class="sd">    immediately so there is no need to instantiate the page class.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;lower&#39;</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">case</span> <span class="o">=</span> <span class="n">case</span>
+    
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="p">):</span>
+        
+        <span class="c"># tags should start with double underscore</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;__&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="n">attr</span> <span class="p">)</span>
+        <span class="c"># tag with single underscore should be a reserved keyword</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span> <span class="s">&#39;_&#39;</span> <span class="p">):</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span> <span class="s">&#39;_&#39;</span> <span class="p">)</span> 
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keyword</span><span class="o">.</span><span class="n">kwlist</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span> <span class="n">attr</span> <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">element</span><span class="p">(</span> <span class="n">attr</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">case</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span> <span class="p">)</span>
+
+<span class="n">oneliner</span> <span class="o">=</span> <span class="n">_oneliner</span><span class="p">(</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;lower&#39;</span> <span class="p">)</span>
+<span class="n">upper_oneliner</span> <span class="o">=</span> <span class="n">_oneliner</span><span class="p">(</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;upper&#39;</span> <span class="p">)</span>
+<span class="n">given_oneliner</span> <span class="o">=</span> <span class="n">_oneliner</span><span class="p">(</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;given&#39;</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A utility generator that pads argument list and dictionary values, will only be called with len( args ) = 0, 1.&quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> 
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">_totuple</span><span class="p">(</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;We should have never gotten here.&quot;</span> <span class="p">)</span>
+
+    <span class="n">mykeys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">mydict</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">myvalues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">_totuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="n">mydict</span><span class="o">.</span><span class="n">values</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="n">maxlength</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="nb">len</span><span class="p">,</span> <span class="p">[</span> <span class="n">args</span> <span class="p">]</span> <span class="o">+</span> <span class="n">myvalues</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">maxlength</span> <span class="p">):</span>
+        <span class="n">thisdict</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">mykeys</span><span class="p">,</span> <span class="n">myvalues</span> <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">thisdict</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">thisdict</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">thisarg</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">thisarg</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">yield</span> <span class="n">thisarg</span><span class="p">,</span> <span class="n">thisdict</span>
+
+<span class="k">def</span> <span class="nf">_totuple</span><span class="p">(</span> <span class="n">x</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility stuff to convert string, int, long, float, None or anything to a usable tuple.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="nb">basestring</span> <span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="p">(</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">x</span> <span class="p">),</span>
+    <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="escape"><a class="viewcode-back" href="../modules/markup.html#markup.escape">[docs]</a><span class="k">def</span> <span class="nf">escape</span><span class="p">(</span> <span class="n">text</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">False</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Escape special html characters.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">text</span><span class="p">,</span> <span class="nb">basestring</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;&amp;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;amp;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;&gt;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;gt;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;&lt;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;quot;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;quot;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">newline</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;br&gt;&#39;</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text</span>
+</div>
+<span class="n">_escape</span> <span class="o">=</span> <span class="n">escape</span>
+
+<div class="viewcode-block" id="unescape"><a class="viewcode-back" href="../modules/markup.html#markup.unescape">[docs]</a><span class="k">def</span> <span class="nf">unescape</span><span class="p">(</span> <span class="n">text</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inverse of escape.&quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">text</span><span class="p">,</span> <span class="nb">basestring</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;&amp;amp;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&amp;amp;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;&amp;gt;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&amp;gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&gt;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;&amp;lt;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;&amp;quot;&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s">&#39;</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text</span>
+</div>
+<div class="viewcode-block" id="dummy"><a class="viewcode-back" href="../modules/markup.html#markup.dummy">[docs]</a><span class="k">class</span> <span class="nc">dummy</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A dummy class for attaching attributes.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</div>
+<span class="n">doctype</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span> <span class="p">)</span>
+<span class="n">doctype</span><span class="o">.</span><span class="n">frameset</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot; &quot;http://www.w3.org/TR/html4/frameset.dtd&quot;&gt;&quot;&quot;&quot;</span>
+<span class="n">doctype</span><span class="o">.</span><span class="n">strict</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot; &quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;&quot;&quot;&quot;</span>
+<span class="n">doctype</span><span class="o">.</span><span class="n">loose</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="russell"><a class="viewcode-back" href="../modules/markup.html#markup.russell">[docs]</a><span class="k">class</span> <span class="nc">russell</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A dummy class that contains anything.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="russell.__contains__"><a class="viewcode-back" href="../modules/markup.html#markup.russell.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+</div></div>
+<div class="viewcode-block" id="MarkupError"><a class="viewcode-back" href="../modules/markup.html#markup.MarkupError">[docs]</a><span class="k">class</span> <span class="nc">MarkupError</span><span class="p">(</span> <span class="ne">Exception</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;All our exceptions subclass this.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MarkupError.__str__"><a class="viewcode-back" href="../modules/markup.html#markup.MarkupError.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+</div></div>
+<div class="viewcode-block" id="ClosingError"><a class="viewcode-back" href="../modules/markup.html#markup.ClosingError">[docs]</a><span class="k">class</span> <span class="nc">ClosingError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="ClosingError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.ClosingError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;The element &#39;</span><span class="si">%s</span><span class="s">&#39; does not accept non-keyword arguments (has no closing tag).&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+</div></div>
+<div class="viewcode-block" id="OpeningError"><a class="viewcode-back" href="../modules/markup.html#markup.OpeningError">[docs]</a><span class="k">class</span> <span class="nc">OpeningError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="OpeningError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.OpeningError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;The element &#39;</span><span class="si">%s</span><span class="s">&#39; can not be opened.&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+</div></div>
+<div class="viewcode-block" id="ArgumentError"><a class="viewcode-back" href="../modules/markup.html#markup.ArgumentError">[docs]</a><span class="k">class</span> <span class="nc">ArgumentError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="ArgumentError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.ArgumentError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;The element &#39;</span><span class="si">%s</span><span class="s">&#39; was called with more than one non-keyword argument.&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+</div></div>
+<div class="viewcode-block" id="InvalidElementError"><a class="viewcode-back" href="../modules/markup.html#markup.InvalidElementError">[docs]</a><span class="k">class</span> <span class="nc">InvalidElementError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="InvalidElementError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.InvalidElementError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">mode</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;The element &#39;</span><span class="si">%s</span><span class="s">&#39; is not valid for your mode &#39;</span><span class="si">%s</span><span class="s">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">tag</span><span class="p">,</span> <span class="n">mode</span> <span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="DeprecationError"><a class="viewcode-back" href="../modules/markup.html#markup.DeprecationError">[docs]</a><span class="k">class</span> <span class="nc">DeprecationError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="DeprecationError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.DeprecationError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;The element &#39;</span><span class="si">%s</span><span class="s">&#39; is deprecated, instantiate markup.page with mode=&#39;loose_html&#39; to allow it.&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+</div></div>
+<div class="viewcode-block" id="ModeError"><a class="viewcode-back" href="../modules/markup.html#markup.ModeError">[docs]</a><span class="k">class</span> <span class="nc">ModeError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="ModeError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.ModeError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mode</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;Mode &#39;</span><span class="si">%s</span><span class="s">&#39; is invalid, possible values: strict_html, html (alias for strict_html), loose_html, xml.&quot;</span> <span class="o">%</span> <span class="n">mode</span>
+</div></div>
+<div class="viewcode-block" id="CustomizationError"><a class="viewcode-back" href="../modules/markup.html#markup.CustomizationError">[docs]</a><span class="k">class</span> <span class="nc">CustomizationError</span><span class="p">(</span> <span class="n">MarkupError</span> <span class="p">):</span>
+<div class="viewcode-block" id="CustomizationError.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.CustomizationError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;If you customize the allowed elements, you must define both types &#39;onetags&#39; and &#39;twotags&#39;.&quot;</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">__doc__</span> <span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

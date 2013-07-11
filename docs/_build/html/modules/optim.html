@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>optim &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="piecewise" href="piecewise.html" />
+    <link rel="prev" title="nvd3" href="nvd3.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="piecewise.html" title="piecewise"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nvd3.html" title="nvd3"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nvd3.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">nvd3</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="piecewise.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">piecewise</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/optim.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-optim">
+<span id="optim"></span><h1><a class="reference internal" href="#module-optim" title="optim"><tt class="xref py py-mod docutils literal"><span class="pre">optim</span></tt></a><a class="headerlink" href="#module-optim" title="Permalink to this headline">¶</a></h1>
+<p>optimization algorithms</p>
+<dl class="function">
+<dt id="optim.hillclimb">
+<tt class="descclassname">optim.</tt><tt class="descname">hillclimb</tt><big>(</big><em>init_function</em>, <em>move_operator</em>, <em>objective_function</em>, <em>max_evaluations</em><big>)</big><a class="reference internal" href="../_modules/optim.html#hillclimb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.hillclimb" title="Permalink to this definition">¶</a></dt>
+<dd><p>hillclimb until either max_evaluations is reached or we are at a local optima</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.hillclimb_and_restart">
+<tt class="descclassname">optim.</tt><tt class="descname">hillclimb_and_restart</tt><big>(</big><em>init_function</em>, <em>move_operator</em>, <em>objective_function</em>, <em>max_evaluations</em><big>)</big><a class="reference internal" href="../_modules/optim.html#hillclimb_and_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.hillclimb_and_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>repeatedly hillclimb until max_evaluations is reached</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.P">
+<tt class="descclassname">optim.</tt><tt class="descname">P</tt><big>(</big><em>prev_score</em>, <em>next_score</em>, <em>temperature</em><big>)</big><a class="reference internal" href="../_modules/optim.html#P"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.P" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="optim.ObjectiveFunction">
+<em class="property">class </em><tt class="descclassname">optim.</tt><tt class="descname">ObjectiveFunction</tt><big>(</big><em>objective_function</em><big>)</big><a class="reference internal" href="../_modules/optim.html#ObjectiveFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.ObjectiveFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>class to wrap an objective function and 
+keep track of the best solution evaluated</p>
+<dl class="method">
+<dt id="optim.ObjectiveFunction.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>objective_function</em><big>)</big><a class="reference internal" href="../_modules/optim.html#ObjectiveFunction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.ObjectiveFunction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optim.ObjectiveFunction.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>solution</em><big>)</big><a class="reference internal" href="../_modules/optim.html#ObjectiveFunction.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.ObjectiveFunction.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.kirkpatrick_cooling">
+<tt class="descclassname">optim.</tt><tt class="descname">kirkpatrick_cooling</tt><big>(</big><em>start_temp</em>, <em>alpha</em><big>)</big><a class="reference internal" href="../_modules/optim.html#kirkpatrick_cooling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.kirkpatrick_cooling" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="optim.anneal">
+<tt class="descclassname">optim.</tt><tt class="descname">anneal</tt><big>(</big><em>init_function</em>, <em>move_operator</em>, <em>objective_function</em>, <em>max_evaluations</em>, <em>start_temp</em>, <em>alpha</em><big>)</big><a class="reference internal" href="../_modules/optim.html#anneal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.anneal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="optim.reversed_sections">
+<tt class="descclassname">optim.</tt><tt class="descname">reversed_sections</tt><big>(</big><em>tour</em><big>)</big><a class="reference internal" href="../_modules/optim.html#reversed_sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.reversed_sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>generator to return all possible variations where the section between two cities are swapped</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.swapped_cities">
+<tt class="descclassname">optim.</tt><tt class="descname">swapped_cities</tt><big>(</big><em>tour</em><big>)</big><a class="reference internal" href="../_modules/optim.html#swapped_cities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.swapped_cities" title="Permalink to this definition">¶</a></dt>
+<dd><p>generator to create all possible variations where two cities have been swapped</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.tour_length">
+<tt class="descclassname">optim.</tt><tt class="descname">tour_length</tt><big>(</big><em>points</em>, <em>dist</em>, <em>tour=None</em><big>)</big><a class="reference internal" href="../_modules/optim.html#tour_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.tour_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>generator of point-to-point distances along a tour</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="optim.tsp">
+<tt class="descclassname">optim.</tt><tt class="descname">tsp</tt><big>(</big><em>points</em>, <em>dist</em>, <em>max_iterations=100</em>, <em>start_temp=None</em>, <em>alpha=None</em>, <em>close=True</em>, <em>rand=True</em><big>)</big><a class="reference internal" href="../_modules/optim.html#tsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optim.tsp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Travelling Salesman Problem 
+&#64;see <a class="reference external" href="http://en.wikipedia.org/wiki/Travelling_salesman_problem">http://en.wikipedia.org/wiki/Travelling_salesman_problem</a>
+&#64;param points : iterable containing all points
+&#64;param dist : function returning the distance between 2 points : def dist(a,b):
+&#64;param max_iterations :max number of optimization steps
+&#64;param start_temp, alpha : params for the simulated annealing algorithm. if None, hill climbing is used
+&#64;param close : computes closed TSP. if False, open TSP starting at points[0]
+&#64;return iterations,score,best : number of iterations used, minimal length found, best path as list of indexes of points</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="piecewise.html" title="piecewise"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nvd3.html" title="nvd3"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

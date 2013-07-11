@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dxf2img &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for dxf2img</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rasters (simple) .dxf files to bitmap images</span>
+<span class="sd">:requires: `dxfgrabber &lt;http://pypi.python.org/pypi/dxfgrabber/&gt;`_ and `pil &lt;http://pypi.python.org/pypi/pil/&gt;`_</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;http://effbot.org/imagingbook/imagedraw.htm&#39;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
+
+<span class="kn">import</span> <span class="nn">StringIO</span><span class="o">,</span> <span class="nn">base64</span><span class="o">,</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">operator</span>
+
+<span class="kn">import</span> <span class="nn">dxfgrabber</span>
+<span class="kn">import</span> <span class="nn">Image</span><span class="o">,</span> <span class="nn">ImageDraw</span><span class="o">,</span> <span class="nn">ImageFont</span> <span class="c">#PIL</span>
+
+<span class="kn">from</span> <span class="nn">homcoord</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="rint"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.rint">[docs]</a><span class="k">def</span> <span class="nf">rint</span><span class="p">(</span><span class="n">x</span><span class="p">):</span><span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="BBox"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox">[docs]</a><span class="k">class</span> <span class="nc">BBox</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;bounding box&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BBox.__init__"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pt1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">pt2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">=</span><span class="bp">None</span>
+        <span class="k">if</span> <span class="n">pt1</span><span class="p">:</span> <span class="bp">self</span><span class="o">+=</span><span class="n">pt1</span>
+        <span class="k">if</span> <span class="n">pt2</span><span class="p">:</span> <span class="bp">self</span><span class="o">+=</span><span class="n">pt2</span>
+        </div>
+<div class="viewcode-block" id="BBox.__iadd__"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.__iadd__">[docs]</a>    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span><span class="n">BBox</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">+=</span><span class="n">pt</span><span class="o">.</span><span class="n">_corner1</span>
+            <span class="bp">self</span><span class="o">+=</span><span class="n">pt</span><span class="o">.</span><span class="n">_corner2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="o">=</span><span class="n">pt</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">pt</span><span class="o">.</span><span class="n">xy</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">=</span><span class="n">pt</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">pt</span><span class="o">.</span><span class="n">xy</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        </div>
+<div class="viewcode-block" id="BBox.__repr__"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;BBox(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="BBox.__call__"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: list of flatten corners&quot;&quot;&quot;</span>
+        <span class="n">l</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">.</span><span class="n">xy</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">l</span>
+    </div>
+<div class="viewcode-block" id="BBox.size"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: Pt with xy sizes&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span>
+    </div>
+<div class="viewcode-block" id="BBox.center"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.center">[docs]</a>    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: Pt center&quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">/</span><span class="mi">2</span>
+        </div>
+<div class="viewcode-block" id="BBox.trans"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.BBox.trans">[docs]</a>    <span class="k">def</span> <span class="nf">trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">trans</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param trans: Xform</span>
+<span class="sd">        :return: BBox = self transformed by trans</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">BBox</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner1</span><span class="p">),</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_corner2</span><span class="p">))</span>
+</div></div>
+<div class="viewcode-block" id="cbox"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.cbox">[docs]</a><span class="k">def</span> <span class="nf">cbox</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">r</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; bounding box of a circle</span>
+<span class="sd">    :param c: Pt center</span>
+<span class="sd">    :param r: float radius</span>
+<span class="sd">    :return: BBox</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rr</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">BBox</span><span class="p">(</span><span class="n">c</span><span class="o">+</span><span class="n">rr</span><span class="p">,</span><span class="n">c</span><span class="o">-</span><span class="n">rr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Trans"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.Trans">[docs]</a><span class="k">def</span> <span class="nf">Trans</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">res</span><span class="o">=</span><span class="n">Xform</span><span class="p">([[</span><span class="n">scale</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]],[</span><span class="mi">0</span><span class="p">,</span><span class="n">scale</span><span class="p">,</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="k">if</span> <span class="n">rotation</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">Xrotate</span><span class="p">(</span><span class="n">rotation</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.</span><span class="p">)</span><span class="o">*</span><span class="n">res</span>
+    <span class="k">return</span> <span class="n">res</span>
+</div>
+<div class="viewcode-block" id="DXF"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.DXF">[docs]</a><span class="k">class</span> <span class="nc">DXF</span><span class="p">:</span>
+<div class="viewcode-block" id="DXF.__init__"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.DXF.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;reads a .dxf file</span>
+<span class="sd">        :param file: string path to .dxf file to read</span>
+<span class="sd">        :param layers: list or dictionary of layers to handle. Empty = all layers</span>
+<span class="sd">        :param ignore: list of strings of entity types to ignore</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dxf</span><span class="o">=</span><span class="n">dxfgrabber</span><span class="o">.</span><span class="n">readfile</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">=</span><span class="n">layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore</span><span class="o">=</span><span class="n">ignore</span>
+        </div>
+<div class="viewcode-block" id="DXF.entities"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.DXF.entities">[docs]</a>    <span class="k">def</span> <span class="nf">entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;iterator over dxf or block entities&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ent</span><span class="p">:</span>
+            <span class="n">ent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">entities</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="k">yield</span> <span class="n">e</span>
+        </div>
+<div class="viewcode-block" id="DXF.bbox"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.DXF.bbox">[docs]</a>    <span class="k">def</span> <span class="nf">bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: :class:BBox dwg enclosing bounding box&quot;&quot;&quot;</span>
+        <span class="n">box</span><span class="o">=</span><span class="n">BBox</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;LINE&#39;</span><span class="p">:</span>
+                <span class="n">box</span><span class="o">+=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">start</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">box</span><span class="o">+=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">end</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span> <span class="o">==</span> <span class="s">&#39;CIRCLE&#39;</span><span class="p">:</span>
+                <span class="n">box</span><span class="o">+=</span><span class="n">cbox</span><span class="p">(</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">center</span><span class="p">[:</span><span class="mi">2</span><span class="p">]),</span><span class="n">e</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span> <span class="o">==</span> <span class="s">&#39;ARC&#39;</span><span class="p">:</span>
+                <span class="n">c</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">center</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">endangle</span><span class="o">-</span><span class="n">e</span><span class="o">.</span><span class="n">startangle</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">startangle</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c">#arc goes clockwise (step will be negative)</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">endangle</span>
+                <span class="n">n</span><span class="o">=</span><span class="n">rint</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mf">10.</span><span class="p">)</span> <span class="c"># number of points each 10° approximately</span>
+                <span class="n">n</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">step</span><span class="o">=</span><span class="n">a</span><span class="o">/</span><span class="n">n</span> <span class="c">#angle between 2 points, might be negative</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">box</span><span class="o">+=</span><span class="n">c</span><span class="o">.</span><span class="n">radial</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span><span class="n">radians</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="n">step</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;POLYLINE&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+                    <span class="n">box</span><span class="o">+=</span><span class="n">Pt</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">location</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;BLOCK&#39;</span><span class="p">:</span> 
+                <span class="k">pass</span> <span class="c">#TODO ...</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;TEXT&#39;</span><span class="p">,</span><span class="s">&#39;INSERT&#39;</span><span class="p">]:</span>
+                <span class="n">box</span><span class="o">+=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">insert</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Unknown entity </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">box</span>
+    </div>
+    <span class="k">def</span> <span class="nf">_draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">draw</span><span class="p">,</span><span class="n">entities</span><span class="p">,</span><span class="n">trans</span><span class="p">,</span><span class="n">pen</span><span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;LINE&#39;</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">start</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">end</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">xy</span><span class="p">))</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">fill</span><span class="o">=</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;CIRCLE&#39;</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">cbox</span><span class="p">(</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">center</span><span class="p">[:</span><span class="mi">2</span><span class="p">]),</span><span class="n">e</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">b</span><span class="p">(),</span><span class="n">outline</span><span class="o">=</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;ARC&#39;</span><span class="p">:</span>
+                <span class="n">c</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">center</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">cbox</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">rint</span><span class="p">,</span><span class="n">b</span><span class="p">())</span>
+                <span class="n">startangle</span><span class="o">=</span><span class="n">degrees</span><span class="p">(</span><span class="n">trans</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">startangle</span><span class="p">)))</span>
+                <span class="n">endangle</span><span class="o">=</span><span class="n">degrees</span><span class="p">(</span><span class="n">trans</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">endangle</span><span class="p">)))</span>
+                <span class="n">startangle</span><span class="p">,</span><span class="n">endangle</span><span class="o">=</span><span class="n">endangle</span><span class="p">,</span><span class="n">startangle</span> <span class="c">#swap start/end because of Y symmetry</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">arc</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">startangle</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">endangle</span><span class="p">),</span><span class="n">fill</span><span class="o">=</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;POLYLINE&#39;</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="p">[]</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="n">Pt</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">location</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">xy</span><span class="p">))</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">fill</span><span class="o">=</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;TEXT&#39;</span><span class="p">:</span>
+                <span class="n">h</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">height</span><span class="o">*</span><span class="n">trans</span><span class="o">.</span><span class="n">mag</span><span class="p">()</span>
+                <span class="n">pt</span><span class="o">=</span><span class="n">Pt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">insert</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="n">Pt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="c">#ACAD places texts by top left point...</span>
+                <span class="n">font</span><span class="o">=</span><span class="bp">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">font</span> <span class="o">=</span> <span class="n">ImageFont</span><span class="o">.</span><span class="n">truetype</span><span class="p">(</span><span class="s">&quot;c:/windows/fonts/Courier New.ttf&quot;</span><span class="p">,</span> <span class="n">rint</span><span class="p">(</span><span class="n">h</span><span class="p">))</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">font</span><span class="p">:</span>
+                    <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="o">*</span><span class="mf">1.4</span> <span class="c">#magic factor ...</span>
+                    <span class="n">fh</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">24</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">36</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="mi">60</span><span class="p">]</span>
+                    <span class="n">i</span><span class="p">,</span><span class="n">h</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">fh</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">h</span><span class="p">))</span> <span class="c">#http://stackoverflow.com/questions/9706041/finding-index-of-an-item-closest-to-the-value-in-a-list-thats-not-entirely-sort</span>
+                    <span class="kn">import</span> <span class="nn">os</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="n">font</span> <span class="o">=</span> <span class="n">ImageFont</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">base_pil</span><span class="se">\\</span><span class="s">72</span><span class="se">\\</span><span class="s">Courier New_</span><span class="si">%s</span><span class="s">_72.pil&#39;</span><span class="o">%</span><span class="n">h</span><span class="p">)</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="p">,</span><span class="n">fill</span><span class="o">=</span><span class="n">pen</span><span class="p">)</span> 
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;INSERT&#39;</span><span class="p">:</span> 
+                <span class="n">t2</span><span class="o">=</span><span class="n">Trans</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">insert</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+                    
+                <span class="bp">self</span><span class="o">.</span><span class="n">_draw</span><span class="p">(</span><span class="n">draw</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">_entities</span><span class="p">),</span><span class="n">t2</span><span class="p">,</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">dxftype</span><span class="o">==</span><span class="s">&#39;BLOCK&#39;</span><span class="p">:</span> 
+                <span class="k">pass</span> <span class="c"># block definition is automatically stored in dxf.blocks dictionary</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Unknown entity </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="DXF.img"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.DXF.img">[docs]</a>    <span class="k">def</span> <span class="nf">img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="mi">256</span><span class="p">,</span><span class="mi">256</span><span class="p">],</span><span class="n">back</span><span class="o">=</span><span class="s">&quot;white&quot;</span><span class="p">,</span><span class="n">pen</span><span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span><span class="n">border</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">antialias</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:result: :class:`PIL:Image` rasterized image&quot;&quot;&quot;</span>
+        <span class="n">box</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox</span><span class="p">()</span>
+        <span class="kn">from</span> <span class="nn">Goulib.math2</span> <span class="kn">import</span> <span class="n">product</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">xy</span><span class="p">):</span> <span class="c"># either x or y ==0</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        
+        <span class="n">s</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">div</span><span class="p">,[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">border</span><span class="p">)</span><span class="o">*</span><span class="n">antialias</span> <span class="k">if</span> <span class="n">x</span> <span class="k">else</span> <span class="mf">1E9</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">size</span> <span class="p">],</span><span class="n">box</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+        <span class="n">trans</span><span class="o">=</span><span class="n">Trans</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">trans</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">+</span><span class="n">Pt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">antialias</span><span class="o">*</span><span class="n">border</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">antialias</span><span class="o">*</span><span class="n">border</span><span class="p">)</span> <span class="c">#add borders as an offset</span>
+        <span class="n">offset</span><span class="o">=</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="n">trans</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">center</span><span class="p">())</span> <span class="c">#offset in pixel coordinates</span>
+        <span class="n">trans</span><span class="o">=</span><span class="n">trans</span><span class="o">*</span><span class="n">Trans</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+        <span class="n">trans</span><span class="o">=</span><span class="n">trans</span><span class="o">*</span><span class="n">Xscale</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c">#invert y axis</span>
+        <span class="n">trans</span><span class="o">=</span><span class="n">trans</span><span class="o">*</span><span class="n">Xlate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">size</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="c">#origin is lower left corner</span>
+        
+        <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;RGB&quot;</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">rint</span><span class="p">,</span><span class="n">size</span><span class="o">.</span><span class="n">xy</span><span class="p">),</span> <span class="n">back</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_draw</span><span class="p">(</span><span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">(),</span> <span class="n">trans</span><span class="p">,</span> <span class="n">pen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">antialias</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="o">/</span><span class="n">antialias</span>
+            <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">rint</span><span class="p">,</span><span class="n">size</span><span class="o">.</span><span class="n">xy</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img</span>
+</div></div>
+<div class="viewcode-block" id="img2base64"><a class="viewcode-back" href="../modules/dxf2img.html#dxf2img.img2base64">[docs]</a><span class="k">def</span> <span class="nf">img2base64</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;PNG&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param img: :class:`PIL:Image`</span>
+<span class="sd">    :result: string base64 encoded image content in specified format</span>
+<span class="sd">    :see: http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">output_s</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">output_s</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">dxf</span><span class="o">=</span><span class="n">DXF</span><span class="p">(</span><span class="s">&quot;..</span><span class="se">\\</span><span class="s">tests</span><span class="se">\\</span><span class="s">FERRO_01.DXF&quot;</span><span class="p">)</span>
+    <span class="n">img</span><span class="o">=</span><span class="n">dxf</span><span class="o">.</span><span class="n">img</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="mi">1280</span><span class="p">,</span><span class="bp">None</span><span class="p">],</span><span class="n">border</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">img2base64</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;..</span><span class="se">\\</span><span class="s">tests</span><span class="se">\\</span><span class="s">out.png&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

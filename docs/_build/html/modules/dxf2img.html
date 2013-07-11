@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dxf2img &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="homcoord" href="homcoord.html" />
+    <link rel="prev" title="decorators" href="decorators.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="homcoord.html" title="homcoord"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="decorators.html" title="decorators"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="decorators.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">decorators</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="homcoord.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">homcoord</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/dxf2img.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-dxf2img">
+<span id="dxf2img"></span><h1><a class="reference internal" href="#module-dxf2img" title="dxf2img"><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt></a><a class="headerlink" href="#module-dxf2img" title="Permalink to this headline">¶</a></h1>
+<p>Rasters (simple) .dxf files to bitmap images
+:requires: <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and <a class="reference external" href="http://pypi.python.org/pypi/pil/">pil</a></p>
+<dl class="function">
+<dt id="dxf2img.rint">
+<tt class="descclassname">dxf2img.</tt><tt class="descname">rint</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#rint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.rint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="dxf2img.BBox">
+<em class="property">class </em><tt class="descclassname">dxf2img.</tt><tt class="descname">BBox</tt><big>(</big><em>pt1=None</em>, <em>pt2=None</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>bounding box</p>
+<dl class="method">
+<dt id="dxf2img.BBox.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>pt1=None</em>, <em>pt2=None</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.__iadd__">
+<tt class="descname">__iadd__</tt><big>(</big><em>pt</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.__iadd__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.__iadd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of flatten corners</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.size">
+<tt class="descname">size</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.size" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Pt with xy sizes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.center">
+<tt class="descname">center</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.center" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Pt center</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.BBox.trans">
+<tt class="descname">trans</tt><big>(</big><em>trans</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#BBox.trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.BBox.trans" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trans</strong> &#8211; Xform</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">BBox = self transformed by trans</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dxf2img.cbox">
+<tt class="descclassname">dxf2img.</tt><tt class="descname">cbox</tt><big>(</big><em>c</em>, <em>r</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#cbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.cbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>bounding box of a circle
+:param c: Pt center
+:param r: float radius
+:return: BBox</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dxf2img.Trans">
+<tt class="descclassname">dxf2img.</tt><tt class="descname">Trans</tt><big>(</big><em>scale=1, offset=[0, 0], rotation=0</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#Trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.Trans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="dxf2img.DXF">
+<em class="property">class </em><tt class="descclassname">dxf2img.</tt><tt class="descname">DXF</tt><big>(</big><em>file</em>, <em>layers=None</em>, <em>ignore=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#DXF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.DXF" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a .dxf file
+:param file: string path to .dxf file to read
+:param layers: list or dictionary of layers to handle. Empty = all layers
+:param ignore: list of strings of entity types to ignore</p>
+<dl class="method">
+<dt id="dxf2img.DXF.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>file</em>, <em>layers=None</em>, <em>ignore=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#DXF.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.DXF.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a .dxf file
+:param file: string path to .dxf file to read
+:param layers: list or dictionary of layers to handle. Empty = all layers
+:param ignore: list of strings of entity types to ignore</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.DXF.entities">
+<tt class="descname">entities</tt><big>(</big><em>ent=None</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#DXF.entities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.DXF.entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterator over dxf or block entities</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.DXF.bbox">
+<tt class="descname">bbox</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#DXF.bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.DXF.bbox" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">:class:BBox dwg enclosing bounding box</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dxf2img.DXF.img">
+<tt class="descname">img</tt><big>(</big><em>size=[256, 256], back='white', pen='black', border=5, antialias=1</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#DXF.img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.DXF.img" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Result :</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">PIL:Image</span></tt> rasterized image</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dxf2img.img2base64">
+<tt class="descclassname">dxf2img.</tt><tt class="descname">img2base64</tt><big>(</big><em>img</em>, <em>fmt='PNG'</em><big>)</big><a class="reference internal" href="../_modules/dxf2img.html#img2base64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dxf2img.img2base64" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>img</strong> &#8211; <tt class="xref py py-class docutils literal"><span class="pre">PIL:Image</span></tt></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Result :</th><td class="field-body">string base64 encoded image content in specified format</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">See :</th><td class="field-body"><a class="reference external" href="http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template">http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="homcoord.html" title="homcoord"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="decorators.html" title="decorators"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

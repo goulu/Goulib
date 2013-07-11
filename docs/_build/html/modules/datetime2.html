@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>datetime2 &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="decorators" href="decorators.html" />
+    <link rel="prev" title="colors" href="colors.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="decorators.html" title="decorators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="colors.html" title="colors"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="colors.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">colors</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="decorators.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">decorators</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/datetime2.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-datetime2">
+<span id="datetime2"></span><h1><a class="reference internal" href="#module-datetime2" title="datetime2"><tt class="xref py py-mod docutils literal"><span class="pre">datetime2</span></tt></a><a class="headerlink" href="#module-datetime2" title="Permalink to this headline">¶</a></h1>
+<p>additions to datetime standard library</p>
+<dl class="function">
+<dt id="datetime2.datetimef">
+<tt class="descclassname">datetime2.</tt><tt class="descname">datetimef</tt><big>(</big><em>d</em>, <em>t=datetime.time(0</em>, <em>0)</em>, <em>fmt='%Y-%m-%d'</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#datetimef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.datetimef" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts something to a datetime</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.datef">
+<tt class="descclassname">datetime2.</tt><tt class="descname">datef</tt><big>(</big><em>d</em>, <em>fmt='%Y-%m-%d'</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#datef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.datef" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts something to a date</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.timef">
+<tt class="descclassname">datetime2.</tt><tt class="descname">timef</tt><big>(</big><em>t</em>, <em>fmt='%Y-%m-%d'</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#timef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.timef" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts something to a time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.strftimedelta">
+<tt class="descclassname">datetime2.</tt><tt class="descname">strftimedelta</tt><big>(</big><em>v</em>, <em>fmt=None</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#strftimedelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.strftimedelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>formats a timedelta</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.tdround">
+<tt class="descclassname">datetime2.</tt><tt class="descname">tdround</tt><big>(</big><em>td</em>, <em>s=1</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#tdround"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.tdround" title="Permalink to this definition">¶</a></dt>
+<dd><p>return timedelta rounded to s seconds</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.daysgen">
+<tt class="descclassname">datetime2.</tt><tt class="descname">daysgen</tt><big>(</big><em>start</em>, <em>length</em>, <em>step=datetime.timedelta(1)</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#daysgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.daysgen" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a range of dates or datetimes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.days">
+<tt class="descclassname">datetime2.</tt><tt class="descname">days</tt><big>(</big><em>start</em>, <em>length</em>, <em>step=datetime.timedelta(1)</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#days"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.days" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datetime2.timedelta_sum">
+<tt class="descclassname">datetime2.</tt><tt class="descname">timedelta_sum</tt><big>(</big><em>timedeltas</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#timedelta_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.timedelta_sum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datetime2.timedelta_div">
+<tt class="descclassname">datetime2.</tt><tt class="descname">timedelta_div</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#timedelta_div"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.timedelta_div" title="Permalink to this definition">¶</a></dt>
+<dd><p>divides a timedelta by a timedelta or a number. 
+should be a method of timedelta...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.timedelta_mul">
+<tt class="descclassname">datetime2.</tt><tt class="descname">timedelta_mul</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#timedelta_mul"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.timedelta_mul" title="Permalink to this definition">¶</a></dt>
+<dd><p>multiplies a timedelta. should be a method of timedelta...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.time_sub">
+<tt class="descclassname">datetime2.</tt><tt class="descname">time_sub</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#time_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.time_sub" title="Permalink to this definition">¶</a></dt>
+<dd><p>substracts 2 time. should be a method of time...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.time_add">
+<tt class="descclassname">datetime2.</tt><tt class="descname">time_add</tt><big>(</big><em>t</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#time_add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.time_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds delta to time. should be a method of time...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.datetime_intersect">
+<tt class="descclassname">datetime2.</tt><tt class="descname">datetime_intersect</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#datetime_intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.datetime_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns timedelta overlap between 2 intervals (tuples) of datetime</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="datetime2.time_intersect">
+<tt class="descclassname">datetime2.</tt><tt class="descname">time_intersect</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#time_intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.time_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns timedelta overlap between 2 intervals (tuples) of time</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="datetime2.TestCase">
+<em class="property">class </em><tt class="descclassname">datetime2.</tt><tt class="descname">TestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/datetime2.html#TestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.TestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="datetime2.TestCase.runTest">
+<tt class="descname">runTest</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/datetime2.html#TestCase.runTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datetime2.TestCase.runTest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="decorators.html" title="decorators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="colors.html" title="colors"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>markup &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="math2" href="math2.html" />
+    <link rel="prev" title="itertools2" href="itertools2.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="math2.html" title="math2"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="itertools2.html" title="itertools2"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="itertools2.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">itertools2</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="math2.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">math2</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/markup.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-markup">
+<span id="markup"></span><h1><a class="reference internal" href="#module-markup" title="markup"><tt class="xref py py-mod docutils literal"><span class="pre">markup</span></tt></a><a class="headerlink" href="#module-markup" title="Permalink to this headline">¶</a></h1>
+<p>This is markup.py - a Python module that attempts to
+make it easier to generate HTML/XML from a Python program
+in an intuitive, lightweight, customizable and pythonic way.</p>
+<p>The code is in the public domain.</p>
+<p>Version: 1.9 as of 1 October 2012.</p>
+<p>Documentation and further info is at <a class="reference external" href="http://markup.sourceforge.net/">http://markup.sourceforge.net/</a></p>
+<p>Please send bug reports, feature requests, enhancement
+ideas or questions to nogradi at gmail dot com.</p>
+<p>Installation: drop markup.py somewhere into your Python path.</p>
+<dl class="function">
+<dt id="markup.cgiprint">
+<tt class="descclassname">markup.</tt><tt class="descname">cgiprint</tt><big>(</big><em>inline=''</em>, <em>unbuff=True</em>, <em>line_end='\r\n'</em><big>)</big><a class="reference internal" href="../_modules/markup.html#cgiprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.cgiprint" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Print to the <tt class="docutils literal"><span class="pre">stdout</span></tt>.</p>
+<p>Set <tt class="docutils literal"><span class="pre">unbuff=True</span></tt> to flush the buffer after every write.</p>
+<p>It prints the inline you send it, followed by the <tt class="docutils literal"><span class="pre">line_end</span></tt>. By default this 
+is ``</p>
+</div></blockquote>
+<p>`` - which is the standard specified by the RFC for http headers.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="markup.element">
+<em class="property">class </em><tt class="descclassname">markup.</tt><tt class="descname">element</tt><big>(</big><em>tag</em>, <em>case='lower'</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/markup.html#element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class handles the addition of a new element.</p>
+<dl class="method">
+<dt id="markup.element.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em>, <em>case='lower'</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/markup.html#element.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="markup.element.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/markup.html#element.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="markup.element.render">
+<tt class="descname">render</tt><big>(</big><em>tag</em>, <em>single</em>, <em>between</em>, <em>kwargs</em><big>)</big><a class="reference internal" href="../_modules/markup.html#element.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the actual tags to content.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.element.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/markup.html#element.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a closing tag unless element has only opening tag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.element.open">
+<tt class="descname">open</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/markup.html#element.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.element.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append an opening tag.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="markup.page">
+<em class="property">class </em><tt class="descclassname">markup.</tt><tt class="descname">page</tt><big>(</big><em>mode='strict_html'</em>, <em>case='lower'</em>, <em>onetags=None</em>, <em>twotags=None</em>, <em>separator='n'</em>, <em>class_=None</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is our main class representing a document. Elements are added
+as attributes of an instance of this class.</p>
+<p>Stuff that effects the whole document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>&#8216;strict_html&#8217;   for HTML 4.01 (default)
+<a href="#id3"><span class="problematic" id="id4">*</span></a>&#8216;html&#8217;          alias for &#8216;strict_html&#8217;
+<a href="#id5"><span class="problematic" id="id6">*</span></a>&#8216;loose_html&#8217;    to allow some deprecated elements
+<a href="#id7"><span class="problematic" id="id8">*</span></a>&#8216;xml&#8217;           to allow arbitrary elements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p><a href="#id9"><span class="problematic" id="id10">*</span></a>&#8216;lower&#8217;         element names will be printed in lower case (default)
+<a href="#id11"><span class="problematic" id="id12">*</span></a>&#8216;upper&#8217;         they will be printed in upper case
+<a href="#id13"><span class="problematic" id="id14">*</span></a>&#8216;given&#8217;         element names will be printed as they are given</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>onetags</strong> &#8211; list or tuple of valid elements with opening tags only</li>
+<li><strong>twotags</strong> &#8211; list or tuple of valid elements with both opening and closing tags
+these two keyword arguments may be used to select
+the set of valid elements in &#8216;xml&#8217; mode
+invalid elements will raise appropriate exceptions</li>
+<li><strong>separator</strong> &#8211; string to place between added elements, defaults to newline</li>
+<li><strong>class</strong> &#8211; a class that will be added to every element if defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="markup.page.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>mode='strict_html'</em>, <em>case='lower'</em>, <em>onetags=None</em>, <em>twotags=None</em>, <em>separator='n'</em>, <em>class_=None</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stuff that effects the whole document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p><a href="#id15"><span class="problematic" id="id16">*</span></a>&#8216;strict_html&#8217;   for HTML 4.01 (default)
+<a href="#id17"><span class="problematic" id="id18">*</span></a>&#8216;html&#8217;          alias for &#8216;strict_html&#8217;
+<a href="#id19"><span class="problematic" id="id20">*</span></a>&#8216;loose_html&#8217;    to allow some deprecated elements
+<a href="#id21"><span class="problematic" id="id22">*</span></a>&#8216;xml&#8217;           to allow arbitrary elements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p><a href="#id23"><span class="problematic" id="id24">*</span></a>&#8216;lower&#8217;         element names will be printed in lower case (default)
+<a href="#id25"><span class="problematic" id="id26">*</span></a>&#8216;upper&#8217;         they will be printed in upper case
+<a href="#id27"><span class="problematic" id="id28">*</span></a>&#8216;given&#8217;         element names will be printed as they are given</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>onetags</strong> &#8211; list or tuple of valid elements with opening tags only</li>
+<li><strong>twotags</strong> &#8211; list or tuple of valid elements with both opening and closing tags
+these two keyword arguments may be used to select
+the set of valid elements in &#8216;xml&#8217; mode
+invalid elements will raise appropriate exceptions</li>
+<li><strong>separator</strong> &#8211; string to place between added elements, defaults to newline</li>
+<li><strong>class</strong> &#8211; a class that will be added to every element if defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.__getattr__">
+<tt class="descname">__getattr__</tt><big>(</big><em>attr</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.__getattr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.__getattr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="markup.page.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/markup.html#page.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="markup.page.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>escape=False</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the document as a string.</p>
+<dl class="docutils">
+<dt>escape &#8211;   False   print normally</dt>
+<dd><dl class="first last docutils">
+<dt>True    replace &lt; and &gt; by &amp;lt; and &amp;gt;</dt>
+<dd>the default escape sequences in most browsers</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.add">
+<tt class="descname">add</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an alias to addcontent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.addfooter">
+<tt class="descname">addfooter</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.addfooter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.addfooter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some text to the bottom of the document</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.addheader">
+<tt class="descname">addheader</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.addheader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.addheader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some text to the top of the document</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.addcontent">
+<tt class="descname">addcontent</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.addcontent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.addcontent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some text to the main part of the document</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.init">
+<tt class="descname">init</tt><big>(</big><em>lang='en'</em>, <em>css=None</em>, <em>metainfo=None</em>, <em>title=None</em>, <em>header=None</em>, <em>footer=None</em>, <em>charset=None</em>, <em>encoding=None</em>, <em>doctype=None</em>, <em>bodyattrs=None</em>, <em>script=None</em>, <em>base=None</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used for complete documents with appropriate
+doctype, encoding, title, etc information. For an /XML snippet
+omit this method.</p>
+<dl class="docutils">
+<dt>lang &#8211;     language, usually a two character string, will appear</dt>
+<dd>as &lt;html lang=&#8217;en&#8217;&gt; in html mode (ignored in xml mode)</dd>
+<dt>css &#8211;      Cascading Style Sheet filename as a string or a list of</dt>
+<dd>strings for multiple css files (ignored in xml mode)</dd>
+<dt>metainfo &#8211; a dictionary in the form { &#8216;name&#8217;:&#8217;content&#8217; } to be inserted</dt>
+<dd>into meta element(s) as &lt;meta name=&#8217;name&#8217; content=&#8217;content&#8217;&gt;
+(ignored in xml mode)</dd>
+</dl>
+<p>base     &#8211; set the &lt;base href=&#8221;...&#8221;&gt; tag in &lt;head&gt;</p>
+<dl class="docutils">
+<dt>bodyattrs &#8211;a dictionary in the form { &#8216;key&#8217;:&#8217;value&#8217;, ... } which will be added</dt>
+<dd>as attributes of the &lt;body&gt; element as &lt;body key=&#8217;value&#8217; ... &gt;
+(ignored in xml mode)</dd>
+<dt>script &#8211;   dictionary containing src:type pairs, &lt;script type=&#8217;text/type&#8217; src=src&gt;&lt;/script&gt;</dt>
+<dd>or a list of [ &#8216;src1&#8217;, &#8216;src2&#8217;, ... ] in which case &#8216;javascript&#8217; is assumed for all</dd>
+<dt>title &#8211;    the title of the document as a string to be inserted into</dt>
+<dd>a title element as &lt;title&gt;my title&lt;/title&gt; (ignored in xml mode)</dd>
+<dt>header &#8211;   some text to be inserted right after the &lt;body&gt; element</dt>
+<dd>(ignored in xml mode)</dd>
+<dt>footer &#8211;   some text to be inserted right before the &lt;/body&gt; element</dt>
+<dd>(ignored in xml mode)</dd>
+<dt>charset &#8211;  a string defining the character set, will be inserted into a</dt>
+<dd>&lt;meta http-equiv=&#8217;Content-Type&#8217; content=&#8217;text/html; charset=myset&#8217;&gt;
+element (ignored in xml mode)</dd>
+<dt>encoding &#8211; a string defining the encoding, will be put into to first line of</dt>
+<dd>the document as &lt;?xml version=&#8216;1.0&#8217; encoding=&#8217;myencoding&#8217; ?&gt; in
+xml mode (ignored in html mode)</dd>
+<dt>doctype &#8211;  the document type string, defaults to</dt>
+<dd>&lt;!DOCTYPE HTML PUBLIC &#8216;-//W3C//DTD HTML 4.01 Transitional//EN&#8217;&gt;
+in html mode (ignored in xml mode)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.css">
+<tt class="descname">css</tt><big>(</big><em>filelist</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.css"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.css" title="Permalink to this definition">¶</a></dt>
+<dd><p>This convenience function is only useful for html.
+It adds css stylesheet(s) to the document via the &lt;link&gt; element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.metainfo">
+<tt class="descname">metainfo</tt><big>(</big><em>mydict</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.metainfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.metainfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>This convenience function is only useful for html.
+It adds meta information via the &lt;meta&gt; element, the argument is
+a dictionary of the form { &#8216;name&#8217;:&#8217;content&#8217; }.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="markup.page.scripts">
+<tt class="descname">scripts</tt><big>(</big><em>mydict</em><big>)</big><a class="reference internal" href="../_modules/markup.html#page.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.page.scripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only useful in html, mydict is dictionary of src:type pairs or a list
+of script sources [ &#8216;src1&#8217;, &#8216;src2&#8217;, ... ] in which case &#8216;javascript&#8217; is assumed for type.
+Will be rendered as &lt;script type=&#8217;text/type&#8217; src=src&gt;&lt;/script&gt;</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="markup.escape">
+<tt class="descclassname">markup.</tt><tt class="descname">escape</tt><big>(</big><em>text</em>, <em>newline=False</em><big>)</big><a class="reference internal" href="../_modules/markup.html#escape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.escape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Escape special html characters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="markup.unescape">
+<tt class="descclassname">markup.</tt><tt class="descname">unescape</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/markup.html#unescape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.unescape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse of escape.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="markup.dummy">
+<em class="property">class </em><tt class="descclassname">markup.</tt><tt class="descname">dummy</tt><a class="reference internal" href="../_modules/markup.html#dummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.dummy" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dummy class for attaching attributes.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="markup.russell">
+<em class="property">class </em><tt class="descclassname">markup.</tt><tt class="descname">russell</tt><a class="reference internal" href="../_modules/markup.html#russell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.russell" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dummy class that contains anything.</p>
+<dl class="method">
+<dt id="markup.russell.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/markup.html#russell.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.russell.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.MarkupError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">MarkupError</tt><a class="reference internal" href="../_modules/markup.html#MarkupError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.MarkupError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>All our exceptions subclass this.</p>
+<dl class="method">
+<dt id="markup.MarkupError.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/markup.html#MarkupError.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.MarkupError.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="markup.MarkupError.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#markup.MarkupError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.ClosingError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">ClosingError</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ClosingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ClosingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.ClosingError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ClosingError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ClosingError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.OpeningError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">OpeningError</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#OpeningError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.OpeningError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.OpeningError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#OpeningError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.OpeningError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.ArgumentError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">ArgumentError</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ArgumentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ArgumentError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.ArgumentError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ArgumentError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ArgumentError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.InvalidElementError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">InvalidElementError</tt><big>(</big><em>tag</em>, <em>mode</em><big>)</big><a class="reference internal" href="../_modules/markup.html#InvalidElementError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.InvalidElementError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.InvalidElementError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em>, <em>mode</em><big>)</big><a class="reference internal" href="../_modules/markup.html#InvalidElementError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.InvalidElementError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.DeprecationError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">DeprecationError</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#DeprecationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.DeprecationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.DeprecationError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/markup.html#DeprecationError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.DeprecationError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.ModeError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">ModeError</tt><big>(</big><em>mode</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ModeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ModeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.ModeError.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>mode</em><big>)</big><a class="reference internal" href="../_modules/markup.html#ModeError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.ModeError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="markup.CustomizationError">
+<em class="property">exception </em><tt class="descclassname">markup.</tt><tt class="descname">CustomizationError</tt><a class="reference internal" href="../_modules/markup.html#CustomizationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.CustomizationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#markup.MarkupError" title="markup.MarkupError"><tt class="xref py py-class docutils literal"><span class="pre">markup.MarkupError</span></tt></a></p>
+<dl class="method">
+<dt id="markup.CustomizationError.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/markup.html#CustomizationError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.CustomizationError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="math2.html" title="math2"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="itertools2.html" title="itertools2"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

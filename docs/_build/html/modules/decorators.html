@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>decorators &mdash; Goulib 1.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.0 documentation" href="../index.html" />
+    <link rel="next" title="dxf2img" href="dxf2img.html" />
+    <link rel="prev" title="datetime2" href="datetime2.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dxf2img.html" title="dxf2img"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="datetime2.html" title="datetime2"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="datetime2.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">datetime2</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dxf2img.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">dxf2img</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/decorators.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-decorators">
+<span id="decorators"></span><h1><a class="reference internal" href="#module-decorators" title="decorators"><tt class="xref py py-mod docutils literal"><span class="pre">decorators</span></tt></a><a class="headerlink" href="#module-decorators" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="decorators.memoize">
+<tt class="descclassname">decorators.</tt><tt class="descname">memoize</tt><big>(</big><em>f</em>, <em>maxcache=None</em>, <em>cache={}</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#memoize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.memoize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to keep a cache of input/output for a given function</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decorators.tail_recursive">
+<em class="property">class </em><tt class="descclassname">decorators.</tt><tt class="descname">tail_recursive</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#tail_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.tail_recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Tail recursive decorator.</p>
+<dl class="attribute">
+<dt id="decorators.tail_recursive.CONTINUE">
+<tt class="descname">CONTINUE</tt><em class="property"> = &lt;object object at 0x03BDA358&gt;</em><a class="headerlink" href="#decorators.tail_recursive.CONTINUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="decorators.tail_recursive.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#tail_recursive.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.tail_recursive.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="decorators.tail_recursive.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>*args</em>, <em>**kwd</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#tail_recursive.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.tail_recursive.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="decorators.tail_recursive.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#decorators.tail_recursive.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="decorators.persistent">
+<em class="property">class </em><tt class="descclassname">decorators.</tt><tt class="descname">persistent</tt><big>(</big><em>it</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#persistent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.persistent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="decorators.persistent.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>it</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#persistent.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.persistent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="decorators.persistent.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/decorators.html#persistent.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.persistent.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="decorators.persistent.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/decorators.html#persistent.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decorators.persistent.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="decorators.persistent.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#decorators.persistent.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dxf2img.html" title="dxf2img"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="datetime2.html" title="datetime2"
+             >previous</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
