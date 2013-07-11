@@ -35,7 +35,7 @@ setup(
         'Excel':  ['xlrd'],
         'dxf2img': ['PIL','dxfgrabber'],
     },
-    test_suite="tests",       
+    test_suite="nose.collector",       
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

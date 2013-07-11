@@ -11,3 +11,5 @@ _build/doctrees
 _svn
 dist
 .pythoscope
+_update.bat
+docs/_build/doctrees

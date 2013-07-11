@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Table class with CSV I/O, easy access to columns, HTML output
+Table class with Excel + CSV I/O, easy access to columns, HTML output
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
