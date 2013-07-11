@@ -14,3 +14,4 @@ _update.bat
 _svn
 build
 dist
+.pythoscope

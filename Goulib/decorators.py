@@ -4,6 +4,8 @@
 import functools
 # Decorators
 
+"""
+#doen't work as expected...
 #http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):
     def reset():
@@ -17,8 +19,8 @@ def memoize(obj):
             cache[args] = obj(*args, **kwargs)
         return cache[args]
     return memoizer
-
 """
+
 def memoize(f, maxcache=None, cache={}):
     '''Decorator to keep a cache of input/output for a given function'''
     cachelen = [0]
@@ -31,7 +33,6 @@ def memoize(f, maxcache=None, cache={}):
             cachelen[0] += 1
         return cache[key]
     return g
-"""
 
 class tail_recursive(object):
     """Tail recursive decorator."""

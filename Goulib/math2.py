@@ -17,7 +17,10 @@ from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
 from decorators import memoize
 
 import fractions
-def lcm(a,b): return abs(a * b) / fractions.gcd(a,b) if a and b else 0
+
+def lcm(a,b):
+    """least common multiple""" 
+    return abs(a * b) / fractions.gcd(a,b) if a and b else 0
 
 #vector operations
 
@@ -26,6 +29,21 @@ def accsum(it):
     return drop(1, ireduce(operator.add, it, 0))
 
 cumsum=accsum #numpy alias
+
+
+def dot(a,b):
+    """dot product"""
+    try: #vector*vector
+        return sum(map( operator.mul, a, b))
+    except:
+        pass
+    try: #matrix*vector
+        return [dot(line,b) for line in a]
+    except:
+        pass
+    #matrix*matrix
+    res=[dot(a,col) for col in zip(*b)]
+    return map(list,zip(*res))
 
 def product(nums):
     """Product of nums"""
@@ -114,6 +132,9 @@ def factorial(num):
 def is_integer(x, epsilon=1e-6):
     """Return True if the float x "seems" an integer"""
     return (abs(round(x) - x) < epsilon)
+
+def int_or_float(x, epsilon=1e-6):
+    return int(x) if is_integer(x, epsilon) else x
 
 def divisors(n):
     """Return all divisors of n: divisors(12) -> 1,2,3,6,12"""

@@ -3,7 +3,7 @@ Goulib
 
 My Python library of useful code found and written for various projects
 
-:author: Philippe Guglielmetti <drgoulu@gmail.com> |endorse|
+:author: Philippe Guglielmetti goulib@goulu.net |endorse|
 :copyright: Copyright 2013 Philippe Guglielmetti
 :license: LGPL (see LICENSE.TXT)
 

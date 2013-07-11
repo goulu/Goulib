@@ -1,7 +1,7 @@
-:mod:`__init__`
-===============
+:mod:`dxf2img`
+==============
 
-.. automodule:: __init__
+.. automodule:: dxf2img
     :show-inheritance:
     :members:
     :undoc-members:

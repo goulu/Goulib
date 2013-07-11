@@ -32,8 +32,10 @@ setup(
         'setuptools',
     ],
     extras_require = {
-        'Excel':  ["xlrd"],
+        'Excel':  ['xlrd'],
+        'dxf2img': ['PIL','dxfgrabber'],
     },
+    test_suite="tests",       
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -43,6 +45,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Topic :: Scientific/Engineering',
-        'Topic :: Multimedia :: Graphics :: Presentation',
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )

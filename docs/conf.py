@@ -28,7 +28,7 @@ def get_version():
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..\Goulib'))
+sys.path.insert(0, os.path.abspath('../Goulib'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -112,7 +112,7 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-intersphinx_mapping = {'python': ('http://docs.python.org/2.7', 'objects.inv')}
+intersphinx_mapping = {'python': ('http://docs.python.org/2.7', 'python.inv')}
 import urllib2
 proxy_info = {
 'user' : 'guglie0p ',
