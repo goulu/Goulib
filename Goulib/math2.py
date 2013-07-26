@@ -17,10 +17,23 @@ from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
 from decorators import memoize
 
 import fractions
-
 def lcm(a,b):
     """least common multiple""" 
     return abs(a * b) / fractions.gcd(a,b) if a and b else 0
+
+def quad(a, b, c):
+    """ solves quadratic equations 
+        form aX^2+bX+c, inputs a,b,c,
+        works for all roots(real or complex)
+    """
+    discriminant = (b ** 2) -  4  * a * c
+    return (-b + sqrt(discriminant)) / (2 * a), (-b - sqrt(discriminant)) / (2 * a)
+
+def equal(a,b,epsilon=1e-6):
+    """approximately equal. Use this instead of a==b
+    :return: True if a and b are less than epsilon apart
+    """
+    return abs(a-b)<epsilon
 
 #vector operations
 
@@ -100,8 +113,8 @@ def stats(l):
     lo=float("inf")
     hi=float("-inf")
     n=0
-    sum=0
-    sum2=0
+    sum=0. #must be float
+    sum2=0. #must be float
     for i in l:
         if i is not None:
             n+=1
@@ -110,8 +123,8 @@ def stats(l):
             if i<lo:lo=i
             if i>hi:hi=i
     if n>0:
-        avg=float(sum)/n
-        var=float(sum2)/n-avg*avg #mean of square minus square of mean
+        avg=sum/n
+        var=sum2/n-avg*avg #mean of square minus square of mean
     else:
         avg=None
         var=None

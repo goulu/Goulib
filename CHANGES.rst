@@ -1,3 +1,9 @@
+v1.5.2, 2013-07-28
+
+* added :mod:`motion`and :mod:`polynomial`
+* created first demo IPython notebooks
+* :mod:`dxf2img` improved
+
 v1.5.1, 2013-07-11
 
 * updated module description and distribution details 
