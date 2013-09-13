@@ -3,6 +3,8 @@
 """
 define "motion laws", functions of time which return (position, velocity, acceleration, jerk) tuples
 """
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
@@ -102,7 +104,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
     p1,v1,a1=_pva(end)
     if a0 is None: a0=a1
     #to handle the many possible cases, we evaluate missing information in a loop
-    for retries in range(5):   
+    for retries in range(2): #two loops are enough to solve all cases , according to tests   
         dt=_delta(t0,t1)
         dp=_delta(p0,p1)
         dv=_delta(v0,v1)
@@ -121,15 +123,15 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
             return res
 
         if dt is None: #try to determine it from available params
-            try: dt=float(dv)/a0
+            try: dt=dv/a0 #needs truediv
             except:
                 try: dt=2.*dp/(v0+v1)
                 except: 
-                    try: # solve at^2/2+v0t+dp=0
-                        dt=quad(a0/2.,v0,dp) #max to avoid negative
+                    try: # solve a.t^2/2+v0.t + p0 = p1
+                        dt=quad(a0/2.,v0,-dp) 
                     except: 
-                        try: # solve at^2/2-v1t+dp=0
-                            dt=quad(a0/2.,-v1,dp) #max to avoid negative
+                        try: # solve p1- a.t^2/2-v1.t = p0
+                            dt=quad(a0/2.,-v1, dp) 
                         except: pass
                     try:
                         if min(dt)>0 : 
@@ -169,11 +171,11 @@ def Segment4thDegree(t0,t1,start,end):
     p1,v1,a1=_pva(end)
     
     if t1<=t0:
-        dt=float(p1-p0)/((v1-v0)/2. + v0)
+        dt=(p1-p0)/((v1-v0)/2. + v0) #truediv
         t1=t0+dt
     else:
-        dt=float(t1-t0)
-    return SegmentPoly(t0,t1,[p0,v0,0,(v1-v0)/(dt*dt),-(v1-v0)/(2*dt*dt*dt)])
+        dt=t1-t0
+    return SegmentPoly(t0,t1,[p0,v0,0,(v1-v0)/(dt*dt),-(v1-v0)/(2*dt*dt*dt)]) #truediv
 
 def SegmentTrapezoidalSpeed(t0,p0,p1,a,T=0,vmax=float('inf')):
     """

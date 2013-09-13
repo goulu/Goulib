@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>homcoord &mdash; Goulib 1.5.1 documentation</title>
+    <title>homcoord &mdash; Goulib 1.5.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.1',
+        VERSION:     '1.5.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.1 documentation" href="../index.html" />
-    <link rel="next" title="interval" href="interval.html" />
-    <link rel="prev" title="dxf2img" href="dxf2img.html" /> 
+    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,23 +37,11 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="interval.html" title="interval"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="dxf2img.html" title="dxf2img"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="dxf2img.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">dxf2img</span></tt></a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="interval.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">interval</span></tt></a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/modules/homcoord.txt"
@@ -87,107 +75,53 @@
 <dt id="homcoord.Pt">
 <em class="property">class </em><tt class="descclassname">homcoord.</tt><tt class="descname">Pt</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Represents a homogeneous coordinate in 2-space.</p>
-<dl class="docutils">
-<dt>Exports:</dt>
-<dd><dl class="first docutils">
-<dt>Pt(<a href="#id1"><span class="problematic" id="id2">*</span></a>coords):</dt>
-<dd><dl class="first last docutils">
-<dt>[ coords is a 2-sequence or a 1-sequence containing a</dt>
-<dd><dl class="first last docutils">
-<dt>2-sequence -&gt;</dt>
-<dd>return a new Pt instance representing those two
-values as x and y, respectively</dd>
-<dt>coords is a 1-sequence containing a 3-sequence -&gt;</dt>
-<dd>return a new Pt instance representing those values
-as x, y, and w, respectively ]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-<dt>.xy:</dt>
-<dd>[ return a 2-tuple with the homogenized x and y values ]</dd>
-</dl>
-<p>.x:    [ return the homogenized x coordinate ]
-.y:    [ return the homogenized y coordinate ]
-.dist(other):</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>[ other is a Pt instance -&gt;</dt>
-<dd>return the distance between self and other ]</dd>
-</dl>
-</div></blockquote>
-<dl class="docutils">
-<dt>.bearing(p):</dt>
-<dd><dl class="first last docutils">
-<dt>[ p is a Pt instance -&gt;</dt>
-<dd>return the Cartesian angle in radians from self to p ]</dd>
-</dl>
-</dd>
-<dt>.radial(d, bearing):</dt>
-<dd><dl class="first last docutils">
-<dt>[ (d is a distance) and (bearing is an angle in radians) -&gt;</dt>
-<dd>return the location at that distance and bearing as
-a Pt instance ]</dd>
-</dl>
-</dd>
-<dt>.toPolar():</dt>
-<dd>[ return self in polar coordinates as a Polar instance ]</dd>
-</dl>
-<p>.__str__():  [ return self as a string ]
-.__add__(self, other):</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>[ other is a Pt instance -&gt;</dt>
-<dd>return a new Pt instance whose coordinates are the
-sum of self&#8217;s and other&#8217;s ]</dd>
-</dl>
-</div></blockquote>
-<dl class="last docutils">
-<dt>.__sub__(self, other):</dt>
-<dd><dl class="first last docutils">
-<dt>[ other is a Pt instance -&gt;</dt>
-<dd>return a new Pt instance whose coordinates are the
-self&#8217;s minus other&#8217;s ]</dd>
-</dl>
-</dd>
-<dt>.__cmp__(self, other):</dt>
-<dd><dl class="first last docutils">
-<dt>[ if self and other are the same point -&gt;</dt>
-<dd><blockquote class="first">
-<div>return 0</div></blockquote>
-<p class="last">else -&gt; return a nonzero value ]</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-<dt>State/Invariants:</dt>
-<dd>.v     [ a numpy 3-element vector [x, y, W] ]</dd>
-</dl>
-<p>Constructor.</p>
+<p>A homogeneous coordinate in 2D-space.</p>
+<p>Constructor.
+:param <a href="#id1"><span class="problematic" id="id2">*</span></a>args: x,y (,w=1) values</p>
 <dl class="method">
 <dt id="homcoord.Pt.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructor.</p>
+<dd><p>Constructor.
+:param <a href="#id3"><span class="problematic" id="id4">*</span></a>args: x,y (,w=1) values</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="homcoord.Pt.xy">
 <tt class="descname">xy</tt><a class="reference internal" href="../_modules/homcoord.html#Pt.xy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.xy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return (x,y)</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (x,y)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="homcoord.Pt.x">
 <tt class="descname">x</tt><a class="reference internal" href="../_modules/homcoord.html#Pt.x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.x" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the abscissa.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float abscissa</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="homcoord.Pt.y">
 <tt class="descname">y</tt><a class="reference internal" href="../_modules/homcoord.html#Pt.y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.y" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the ordinate.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float ordinate</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -206,25 +140,53 @@ self&#8217;s minus other&#8217;s ]</dd>
 <dl class="method">
 <dt id="homcoord.Pt.dist">
 <tt class="descname">dist</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt.dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.dist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the distance between self and other.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float distance between self and other.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="homcoord.Pt.bearing">
 <tt class="descname">bearing</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt.bearing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.bearing" title="Permalink to this definition">¶</a></dt>
-<dd><p>What is the bearing angle from self to p?</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float bearing angle in radian from self to p</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="homcoord.Pt.radial">
 <tt class="descname">radial</tt><big>(</big><em>d</em>, <em>bearing</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt.radial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.radial" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the point at a given distance and bearing.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#homcoord.Pt" title="homcoord.Pt"><tt class="xref py py-class docutils literal"><span class="pre">Pt</span></tt></a> at distance d and bearing (in radians)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="homcoord.Pt.toPolar">
 <tt class="descname">toPolar</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Pt.toPolar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Pt.toPolar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert to polar coordinates.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#homcoord.Polar" title="homcoord.Polar"><tt class="xref py py-class docutils literal"><span class="pre">Polar</span></tt></a> at distance d and bearing (in radians)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -281,86 +243,6 @@ self&#8217;s minus other&#8217;s ]</dd>
 <em class="property">class </em><tt class="descclassname">homcoord.</tt><tt class="descname">Xform</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Xform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Xform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Represents an arbitrary homogeneous coordinate transform.</p>
-<dl class="docutils">
-<dt>Exports:</dt>
-<dd><dl class="first last docutils">
-<dt>Xform(m):</dt>
-<dd><dl class="first last docutils">
-<dt>[ m is a 3x3 transform matrix as a array, or</dt>
-<dd><p class="first">a sequence that array() will accept as a 3x3
-array -&gt;</p>
-<blockquote class="last">
-<div>return a new Xform instance representing that
-transform ]</div></blockquote>
-</dd>
-</dl>
-</dd>
-<dt>.apply(p):</dt>
-<dd><dl class="first last docutils">
-<dt>[ p is a Pt instance -&gt;</dt>
-<dd>return a new Pt instance representing p transformed
-by self ]</dd>
-</dl>
-</dd>
-<dt>.invert(p):</dt>
-<dd><dl class="first last docutils">
-<dt>[ p is a Pt instance -&gt;</dt>
-<dd>return a new Pt instance pp such that
-self.apply(pp) == p ]</dd>
-</dl>
-</dd>
-<dt>.inverse():</dt>
-<dd>[ return the inverse of self as an Xform instance ]</dd>
-<dt>.compose(t):</dt>
-<dd><dl class="first last docutils">
-<dt>[ t is an Xform instance -&gt;</dt>
-<dd>return a new Xform representing the composition of
-self followed by t ]</dd>
-</dl>
-</dd>
-<dt>.offset():</dt>
-<dd><dl class="first last docutils">
-<dt>[ return the net offset that self will shift the origin,</dt>
-<dd>as a Pt instance ]</dd>
-</dl>
-</dd>
-<dt>.angle():</dt>
-<dd><dl class="first last docutils">
-<dt>[ return the net angle that self will rotate the unit</dt>
-<dd>vector from (0,0) to (1,1) ]</dd>
-</dl>
-</dd>
-<dt>.mag():</dt>
-<dd><dl class="first last docutils">
-<dt>[ return the net magnification that self will apply to the</dt>
-<dd>unit vector ]</dd>
-</dl>
-</dd>
-<dt>.__str__(self):</dt>
-<dd>[ return a string representation of self ]</dd>
-</dl>
-</dd>
-<dt>State/Invariants:</dt>
-<dd><dl class="first docutils">
-<dt>self._m:</dt>
-<dd><dl class="first last docutils">
-<dt>[ a 3x3 array representing the argument passed</dt>
-<dd>to the constructor ]</dd>
-</dl>
-</dd>
-<dt>self._mInverse:</dt>
-<dd>[ the inverse of self._m or None ]</dd>
-<dt>self.__offset:</dt>
-<dd>[ the net translation of self or None ]</dd>
-<dt>self.__angle:</dt>
-<dd>[ the net rotation of self or None ]</dd>
-<dt>self._mag:</dt>
-<dd>[ the net uniform scaling of self or None ]</dd>
-</dl>
-<p class="last">ORIGIN:      [ the origin as a Pt instance ]
-UNIT:        [ a point 1.0 along the line x=y ]</p>
-</dd>
-</dl>
 <p>Constructor.</p>
 <dl class="attribute">
 <dt id="homcoord.Xform.ORIGIN">
@@ -482,27 +364,6 @@ UNIT:        [ a point 1.0 along the line x=y ]</p>
 <em class="property">class </em><tt class="descclassname">homcoord.</tt><tt class="descname">Polar</tt><big>(</big><em>*p</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Polar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Polar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Represents a point in polar coordinates.</p>
-<dl class="docutils">
-<dt>Exports:</dt>
-<dd><dl class="first docutils">
-<dt>Polar(r, theta):</dt>
-<dd><dl class="first last docutils">
-<dt>[ r and theta are numbers -&gt;</dt>
-<dd>return a new Polar instance representing radius r
-and angle theta ]</dd>
-</dl>
-</dd>
-</dl>
-<p>.r, .theta:  [ as passed to constructor ]
-.toCartesian():</p>
-<blockquote>
-<div>[ return self in Cartesian coordinates as a Pt instance ]</div></blockquote>
-<dl class="last docutils">
-<dt>.__str__():</dt>
-<dd>[ return self as a string &#8220;(r, theta)&#8221; ]</dd>
-</dl>
-</dd>
-</dl>
 <p>Constructor</p>
 <dl class="method">
 <dt id="homcoord.Polar.__init__">
@@ -535,56 +396,6 @@ and angle theta ]</dd>
 <em class="property">class </em><tt class="descclassname">homcoord.</tt><tt class="descname">Line</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em><big>)</big><a class="reference internal" href="../_modules/homcoord.html#Line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#homcoord.Line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Represents a geometric line.</p>
-<dl class="docutils">
-<dt>Exports:</dt>
-<dd><dl class="first docutils">
-<dt>Line(a, b, c):</dt>
-<dd><dl class="first last docutils">
-<dt>[ a, b, and c are floats -&gt;</dt>
-<dd>return a Line instance representing ax+by+c=0 ]</dd>
-</dl>
-</dd>
-</dl>
-<p>.a, .b, .c:  [ as passed to constructor, read-only ]
-.__str__(self):   [ return self as a string ]
-.intersect(other):</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>[ other is a Line instance -&gt;</dt>
-<dd><dl class="first docutils">
-<dt>if self and other intersect -&gt;</dt>
-<dd>return the intersection as a Pt</dd>
-</dl>
-<p class="last">else -&gt; raise ValueError ]</p>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="last docutils">
-<dt>Line.twoPoint(p1, p2):       # Static method</dt>
-<dd><dl class="first last docutils">
-<dt>[ p1 and p2 are Pt instances -&gt;</dt>
-<dd><dl class="first docutils">
-<dt>if p1 and p2 are distinct -&gt;</dt>
-<dd>return a Line instance representing the line that
-intersects p1 and p2</dd>
-</dl>
-<p class="last">else -&gt; raise ValueError ]</p>
-</dd>
-</dl>
-</dd>
-<dt>Line.pointBearing(p, bears):   # Static method</dt>
-<dd><dl class="first last docutils">
-<dt>[ (p is a Pt instance) and</dt>
-<dd><dl class="first last docutils">
-<dt>(bears is a Cartesian bearing in radians) -&gt;</dt>
-<dd>return the line through p at bearing (bears) ]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
 <p>Constructor.</p>
 <dl class="method">
 <dt id="homcoord.Line.__init__">
@@ -667,18 +478,12 @@ intersects p1 and p2</dd>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="interval.html" title="interval"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="dxf2img.html" title="dxf2img"
-             >previous</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

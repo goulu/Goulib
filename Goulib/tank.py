@@ -45,8 +45,7 @@ class Tank:
         if isinstance(value,(int,float)):
             return tot-value
         if isinstance(value,set):
-            import op
-            return map(op.or)
+            raise(NotImplementedError)
         return map(self._sub,enumerate(zip(value,tot)))
         
     

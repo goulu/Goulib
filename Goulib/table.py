@@ -1,16 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Table class with Excel + CSV I/O, easy access to columns, HTML output
+Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
 """
 __author__ = "Philippe Guglielmetti"
-__copyright__ = "Copyright 2012, Philippe Guglielmetti"
+__copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
 import csv, itertools, operator, string
-import datetime
+from datetime import datetime, date, timedelta
 import logging
+
+from Goulib.datetime2 import datef, datetimef
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
@@ -25,11 +27,24 @@ class Table(list):
                 self.read_xls(filename,**kwargs)
             else:
                 self.read_csv(filename,**kwargs)
+                
+    def __eq__(self,other):
+        """compare 2 Tables contents, mainly for tests"""
+        if self.titles!=other.titles:
+            return False
+        if len(self)!=len(other):
+            return False
+        for i in range(len(self)):
+            if self[i]!=other[i]:
+                return False
+        return True
             
     def __repr__(self):
+        """:return: repr string of titles+5 first lines"""
         return 'Table(%s,%s)'%(self.titles,self[:5])
     
     def __str__(self):
+        """:return: string of full tables with linefeeds"""
         res=''
         if self.titles:
             res+=str(self.titles)+'\n'
@@ -97,7 +112,7 @@ class Table(list):
                 for x in row:
                     try:
                         xf=float(x)
-                        xi=int(x)
+                        xi=int(xf)
                         x=xi if xi==xf else xf
                     except:
                         if x=='': x=None
@@ -110,7 +125,8 @@ class Table(list):
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
         encoding=kwargs.get('encoding','iso-8859-15')
-        writer=csv.writer(open(filename, 'wb'), dialect=dialect, delimiter=delimiter)
+        f=open(filename, 'wb')
+        writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if transpose:
             i=0
             while self.col(i)[0]:
@@ -123,6 +139,7 @@ class Table(list):
             if self.titles: writer.writerow(self.titles)
             for line in self:
                 writer.writerow(line)
+        f.close()
     
     def ncols(self):
         """return number of columns, ignoring title"""
@@ -243,13 +260,12 @@ class Table(list):
                 row[i]=f(row[i])
             
     def to_datetime(self,by,fmt='%d.%m.%Y',safe=True):
-        '''convert a column to datetime'''
-        self.applyf(by,lambda x:x if isinstance(x,datetime.datetime) else datetime.datetime.strptime(str(x),fmt),safe)
+        '''convert a column to datetime'''    
+        self.applyf(by,lambda x: datetimef(x,fmt=fmt),safe)
         
     def to_date(self,by,fmt='%d.%m.%Y',safe=True):
         '''convert a column to date'''
-        self.to_datetime(by,fmt,safe)
-        self.applyf(by,lambda x:x.date(),safe)
+        self.applyf(by,lambda x: datef(x,fmt=fmt),safe)
             
 
     def total(self,funcs):

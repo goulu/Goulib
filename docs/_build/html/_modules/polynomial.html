@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>polynomial &mdash; Goulib 1.5.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for polynomial</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd"> Polynomial.py - A set of utilities to manipulate polynomials. This consists</span>
+<span class="sd"> of a set of simple functions to convert polynomials to a Python list, and</span>
+<span class="sd"> manipulate the resulting lists for multiplication, addition, and</span>
+<span class="sd"> power functions. There is also a class that wraps these functions</span>
+<span class="sd"> to make their use a little more natural.</span>
+
+<span class="sd"> This can also evaluate the polynomials at a value, and take integrals</span>
+<span class="sd"> and derivatives of the polynomials.</span>
+
+<span class="sd"> Written by Rick Muller.</span>
+<span class="sd"> http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c"># Define some classes for some syntactic surgar:</span>
+<div class="viewcode-block" id="Polynomial"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial">[docs]</a><span class="k">class</span> <span class="nc">Polynomial</span><span class="p">:</span>
+<div class="viewcode-block" id="Polynomial.__init__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">([]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plist</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plist</span> <span class="o">=</span> <span class="n">parse_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="s">&quot;Unknown argument to Polynomial: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">val</span>
+        <span class="k">return</span>
+    </div>
+<div class="viewcode-block" id="Polynomial.__add__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__radd__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__radd__">[docs]</a>    <span class="k">def</span> <span class="nf">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__sub__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__sub__">[docs]</a>    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>  <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__rsub__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__rsub__">[docs]</a>    <span class="k">def</span> <span class="nf">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="o">-</span><span class="n">Polynomial</span><span class="p">(</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__mul__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__mul__">[docs]</a>    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span>
+                                                        <span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__rmul__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__rmul__">[docs]</a>    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span>
+                                                        <span class="n">plist</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span></div>
+<div class="viewcode-block" id="Polynomial.__neg__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__neg__">[docs]</a>    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span></div>
+<div class="viewcode-block" id="Polynomial.__pow__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__pow__">[docs]</a>    <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">e</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">e</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Polynomial.__repr__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">tostring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Polynomial.__call__"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span> <span class="k">return</span> <span class="n">peval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Polynomial.integral"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.integral">[docs]</a>    <span class="k">def</span> <span class="nf">integral</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">integral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Polynomial.derivative"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.Polynomial.derivative">[docs]</a>    <span class="k">def</span> <span class="nf">derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">derivative</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plist</span><span class="p">))</span>
+
+<span class="c"># Define some simple utility functions. These manipulate &quot;plists&quot;, polynomials</span>
+<span class="c">#  that are stored as python lists. Thus, 3x^2 + 2x + 1 would be stored</span>
+<span class="c">#  as [1,2,3] (lowest to highest power of x, even though polynomials</span>
+<span class="c">#  are typically written from highest to lowest power).</span>
+</div></div>
+<div class="viewcode-block" id="plist"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.plist">[docs]</a><span class="k">def</span> <span class="nf">plist</span><span class="p">(</span><span class="n">term</span><span class="p">):</span>
+    <span class="s">&quot;Force term to have the form of a polynomial list&quot;</span>
+    <span class="c"># First see if this is already a Polynomial object</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pl</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">plist</span>
+        <span class="k">return</span> <span class="n">pl</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c"># It isn&#39;t. Try to force coercion from an integer or a float</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">term</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">term</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">term</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">term</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">parse_string</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+    <span class="c"># We ultimately want to be able to parse a string here</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="s">&quot;Unsupported term can&#39;t be corced into a plist: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">term</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="peval"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.peval">[docs]</a><span class="k">def</span> <span class="nf">peval</span><span class="p">(</span><span class="n">plist</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Eval the plist at value x. If two values are given, the</span>
+<span class="sd">    difference between the second and the first is returned. This</span>
+<span class="sd">    latter feature is included for the purpose of evaluating</span>
+<span class="sd">    definite integrals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">x2</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">)):</span> <span class="n">val</span> <span class="o">+=</span> <span class="n">plist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">)):</span> <span class="n">val</span> <span class="o">+=</span> <span class="n">plist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span>
+</div>
+<div class="viewcode-block" id="integral"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.integral">[docs]</a><span class="k">def</span> <span class="nf">integral</span><span class="p">(</span><span class="n">plist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Return a new plist corresponding to the integral of the input plist.</span>
+<span class="sd">    This function uses zero as the constant term, which is okay when</span>
+<span class="sd">    evaluating a definite integral, for example, but is otherwise</span>
+<span class="sd">    ambiguous.</span>
+
+<span class="sd">    The math forces the coefficients to be turned into floats.</span>
+<span class="sd">    Consider importing __future__ division to simplify this.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">plist</span><span class="p">:</span> <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">)):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">plist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">):</span> <span class="n">c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="c"># attempt to cast back to int</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="derivative"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.derivative">[docs]</a><span class="k">def</span> <span class="nf">derivative</span><span class="p">(</span><span class="n">plist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Return a new plist corresponding to the derivative of the input plist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">)):</span> <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">plist</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new</span><span class="p">:</span> <span class="n">new</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+    <span class="s">&quot;Return a new plist corresponding to the sum of the two input plists.&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">p2</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p2</span><span class="p">)):</span> <span class="n">new</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">p2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p2</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)):</span> <span class="n">new</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="sub"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.sub">[docs]</a><span class="k">def</span> <span class="nf">sub</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span> <span class="k">return</span> <span class="n">add</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">mult_const</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="mult_const"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.mult_const">[docs]</a><span class="k">def</span> <span class="nf">mult_const</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">c</span><span class="p">):</span>
+    <span class="s">&quot;Return a new plist corresponding to the input plist multplied by a const&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">*</span><span class="n">pi</span> <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="n">p</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="multiply"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.multiply">[docs]</a><span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+    <span class="s">&quot;Return a new plist corresponding to the product of the two input plists&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">p2</span><span class="p">):</span> <span class="n">short</span><span class="p">,</span><span class="nb">long</span> <span class="o">=</span> <span class="n">p2</span><span class="p">,</span><span class="n">p1</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">short</span><span class="p">,</span><span class="nb">long</span> <span class="o">=</span> <span class="n">p1</span><span class="p">,</span><span class="n">p2</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">short</span><span class="p">)):</span> <span class="n">new</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">new</span><span class="p">,</span><span class="n">mult_one</span><span class="p">(</span><span class="nb">long</span><span class="p">,</span><span class="n">short</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="mult_one"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.mult_one">[docs]</a><span class="k">def</span> <span class="nf">mult_one</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">i</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Return a new plist corresponding to the product of the input plist p</span>
+<span class="sd">    with the single term c*x^i</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">i</span> <span class="c"># increment the list with i zeros</span>
+    <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pi</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="power"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.power">[docs]</a><span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">e</span><span class="p">):</span>
+    <span class="s">&quot;Return a new plist corresponding to the e-th power of the input plist p&quot;</span>
+    <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="n">e</span><span class="p">,</span> <span class="s">&quot;Can only take integral power of a plist&quot;</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">e</span><span class="p">):</span> <span class="n">new</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">new</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new</span>
+</div>
+<div class="viewcode-block" id="parse_string"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.parse_string">[docs]</a><span class="k">def</span> <span class="nf">parse_string</span><span class="p">(</span><span class="nb">str</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Do very, very primitive parsing of a string into a plist.</span>
+<span class="sd">    &#39;x&#39; is the only term considered for the polynomial, and this</span>
+<span class="sd">    routine can only handle terms of the form:</span>
+<span class="sd">    7x^2 + 6x - 5</span>
+<span class="sd">    and will choke on seemingly simple forms such as</span>
+<span class="sd">    x^2*7 - 1</span>
+<span class="sd">    or</span>
+<span class="sd">    x**2 - 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">termpat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;([-+]?\s*\d*\.?\d*)(x?\^?\d?)&#39;</span><span class="p">)</span>
+    <span class="c">#print &quot;Parsing string: &quot;,str</span>
+    <span class="c">#print termpat.findall(str)</span>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="n">termpat</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+        <span class="n">n</span><span class="p">,</span><span class="n">p</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span><span class="n">p</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="p">:</span> <span class="k">continue</span>
+        <span class="n">n</span><span class="p">,</span><span class="n">p</span> <span class="o">=</span> <span class="n">parse_n</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">parse_p</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res_dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">p</span><span class="p">):</span> <span class="n">res_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+=</span> <span class="n">n</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">res_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="n">highest_order</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">highest_order</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> <span class="n">res</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">res</span>
+</div>
+<div class="viewcode-block" id="parse_n"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.parse_n">[docs]</a><span class="k">def</span> <span class="nf">parse_n</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="s">&quot;Parse the number part of a polynomial string term&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">str</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">str</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="parse_p"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.parse_p">[docs]</a><span class="k">def</span> <span class="nf">parse_p</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="s">&quot;Parse the power part of a polynomial string term&quot;</span>
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;x\^?(\d)?&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pat</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">str</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="strip_leading_zeros"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.strip_leading_zeros">[docs]</a><span class="k">def</span> <span class="nf">strip_leading_zeros</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="s">&quot;Remove the leading (in terms of high orders of x) zeros in the polynomial&quot;</span>
+    <span class="c"># compute the highest nonzero element of the list</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="k">break</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="tostring"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.tostring">[docs]</a><span class="k">def</span> <span class="nf">tostring</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Convert a plist into a string. This looks overly complex at first,</span>
+<span class="sd">    but most of the complexity is caused by special cases.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">strip_leading_zeros</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="nb">str</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="nb">str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span> <span class="nb">str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tostring_term</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span><span class="n">i</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tostring_term</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span> <span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s">&#39;0&#39;</span>
+    <span class="k">return</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="tostring_term"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.tostring_term">[docs]</a><span class="k">def</span> <span class="nf">tostring_term</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">i</span><span class="p">):</span>
+    <span class="s">&quot;Convert a single coefficient c and power e to a string cx^i&quot;</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;x&#39;</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;-x&#39;</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">x&quot;</span> <span class="o">%</span> <span class="n">c</span>
+    <span class="k">elif</span> <span class="n">i</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="s">&quot;x^</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="s">&quot;-x^</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">x^</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">c</span>
+</div>
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../modules/polynomial.html#polynomial.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mf">2.</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span> <span class="c"># testing floats</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span> <span class="c"># can we handle - signs</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>  <span class="c"># are we smart enough to exclude 0 terms?</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="c"># testing leading zero stripping</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">])</span> <span class="c"># testing whether 1.0 == 1: risky</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">(</span><span class="n">add</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>  <span class="c"># test addition</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">(</span><span class="n">multiply</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span> <span class="c"># test multiplication</span>
+    <span class="k">print</span> <span class="n">tostring</span><span class="p">(</span><span class="n">power</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))</span>         <span class="c"># test power</span>
+
+    <span class="c"># Some cases using the polynomial objects:</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span> <span class="c"># add</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>                 <span class="c"># add</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span>                   <span class="c"># sub</span>
+    <span class="k">print</span> <span class="mi">1</span><span class="o">-</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>                   <span class="c"># rsub</span>
+    <span class="k">print</span> <span class="mi">1</span><span class="o">+</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>                   <span class="c"># radd</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*-</span><span class="mi">1</span>                  <span class="c"># mul</span>
+    <span class="k">print</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>                  <span class="c"># rmul</span>
+    <span class="k">print</span> <span class="o">-</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>                    <span class="c"># neg</span>
+    <span class="k">print</span> <span class="s">&#39;&#39;</span>
+    <span class="c"># Work out Niklasson&#39;s raising and lowering operators:</span>
+    <span class="c">#  tests putting constants into the polynomial.</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;P^a_</span><span class="si">%d</span><span class="s"> = &#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">,</span>\
+              <span class="mi">1</span> <span class="o">-</span> <span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="n">m</span><span class="o">*</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="n">m</span><span class="p">])</span>
+        <span class="k">print</span> <span class="s">&#39;P^b_</span><span class="si">%d</span><span class="s"> = &#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">,</span>\
+              <span class="n">Polynomial</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="n">m</span><span class="o">*</span><span class="n">Polynomial</span><span class="p">([</span><span class="mi">1</span><span class="o">+</span><span class="n">m</span><span class="p">,</span><span class="o">-</span><span class="n">m</span><span class="p">])</span>
+    <span class="k">print</span> <span class="s">&#39;&#39;</span>
+
+    <span class="c"># Test string parsing</span>
+    <span class="k">print</span> <span class="n">parse_string</span><span class="p">(</span><span class="s">&#39;+3x - 4x^2 + 7x^5-x+1&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">parse_string</span><span class="p">(</span><span class="s">&#39;+3x - 4x^2 + 7x^5-x+1&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">(</span><span class="s">&#39;+3x - 4x^2 + 7x^5-x+1&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">(</span><span class="s">&#39;+3x -4x^2+7x^5-x+1&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">7</span>
+    <span class="k">print</span> <span class="n">Polynomial</span><span class="p">(</span><span class="s">&#39;5x+x^2&#39;</span><span class="p">)</span>
+
+    <span class="c"># Test the integral and derivatives</span>
+    <span class="k">print</span> <span class="n">integral</span><span class="p">([])</span>
+    <span class="k">print</span> <span class="n">integral</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">print</span> <span class="n">integral</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">print</span> <span class="n">derivative</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">integral</span><span class="p">()</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">derivative</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">ip</span><span class="p">,</span><span class="n">dp</span>
+    <span class="k">print</span> <span class="n">ip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="c"># integral of y=x from (0,1)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span> <span class="n">test</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

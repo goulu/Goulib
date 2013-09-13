@@ -201,3 +201,13 @@ class TestIflatten:
         # assert_equal(expected, iflatten(iterable))
         raise SkipTest # TODO: implement your test here
 
+class TestProduct:
+    def test_product(self):
+        # assert_equal(expected, product(*iterables, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestCountUnique:
+    def test_count_unique(self):
+        # assert_equal(expected, count_unique(iterable, key))
+        raise SkipTest # TODO: implement your test here
+

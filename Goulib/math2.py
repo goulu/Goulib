@@ -3,31 +3,39 @@
 """
 additions to math standard library
 """
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
-import operator
+
+
+import operator,cmath
 from math import sqrt, log, log10, ceil
 from itertools import count,izip_longest, ifilter
 from itertools import combinations, permutations, product as cartesian_product
 
 from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
-from decorators import memoize
+
 
 import fractions
 def lcm(a,b):
     """least common multiple""" 
     return abs(a * b) / fractions.gcd(a,b) if a and b else 0
 
-def quad(a, b, c):
+def quad(a, b, c, complex=False):
     """ solves quadratic equations 
         form aX^2+bX+c, inputs a,b,c,
         works for all roots(real or complex)
     """
     discriminant = (b ** 2) -  4  * a * c
-    return (-b + sqrt(discriminant)) / (2 * a), (-b - sqrt(discriminant)) / (2 * a)
+    if complex:
+        d=cmath.sqrt(discriminant)
+    else:
+        d=sqrt(discriminant)
+    return (-b + d) / (2 * a), (-b - d) / (2 * a)
 
 def equal(a,b,epsilon=1e-6):
     """approximately equal. Use this instead of a==b
@@ -86,13 +94,20 @@ def vecdiv(a,b):
     return [a[i]/b[i] for i in range(min([len(a),len(b)]))]
 
 def veccompare(a,b):
-    """compare values in 2 lists. returns triple number of paris where [a<b, a==b, a==c]"""
+    """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
     res=[0,0,0]
     for i in range(min([len(a),len(b)])):
-        if a[i]<b[i]:res[0]+=1
-        elif a[i]==b[i]:res[1]+=1
-        else:res[2]+=1
+        if a[i]<b[i]:
+            res[0]+=1
+        elif a[i]==b[i]:
+            res[1]+=1
+        else:
+            res[2]+=1
     return res
+
+def transpose(m):
+    """:return: matrix m transposed"""
+    return zip(*m) #trivially simple once you know it
 
 #stats
 

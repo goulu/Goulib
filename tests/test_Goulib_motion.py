@@ -1,9 +1,34 @@
-from nose.tools import assert_equal, assert_almost_equal
+from __future__ import division #"true division" everywhere
+
+from nose.tools import assert_equal,assert_almost_equal
 from nose import SkipTest
 from Goulib.motion import *
 
-def assert_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
-    map(lambda x:nose.tools.assert_almost_equal(x[0],x[1],precision),zip(a,b))
+def pva_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
+    map(lambda x:assert_almost_equal(x[0],x[1],precision),zip(a,b))
+    
+class TestPVA:
+    def test___init__(self):
+        pass # tested below
+    
+    def test___call__(self):
+        pass # tested below
+    
+class TestSegment:
+    def test___init__(self):
+        pass # tested below
+    
+    def test___call__(self):
+        pass # tested below
+
+    def test_dt(self):
+        pass # tested below
+
+    def test_end(self):
+        pass # tested below
+
+    def test_start(self):
+        pass # tested below
     
 class TestSegmentPoly:
     def setup(self):
@@ -20,9 +45,13 @@ class TestSegmentPoly:
     def test___call__(self):
         assert_equal(self.seg(.9),(0,0,0,0))
         assert_equal(self.seg(1),(1,2,6,0))
-        assert_almost_equal(self.seg(2-1e-12),(6,8,6,0))
+        pva_almost_equal(self.seg(2-1e-12),(6,8,6,0))
         assert_equal(self.seg(2),(0,0,0,0))
         
+    def test___init__(self):
+        # segment_poly = SegmentPoly(t0, t1, p)
+        raise SkipTest # TODO: implement your test here
+
 class TestSegment2ndDegree:
     def setup(self):
         self.t0, self.t1 = 1,2      
@@ -67,20 +96,62 @@ class TestSegment2ndDegree:
         assert_equal(seg.start(),self.start)
         assert_equal(seg.end(),self.end)
         
+    def test7(self):
+        t1,v0,p1,v1,a = self.t1,self.v0,self.p1,self.v1,self.a
+        seg=Segment2ndDegree(None,t1,(None,v0),(p1,v1,a)) # end pva + start velocity
+        assert_equal(seg.start(),self.start)
+        assert_equal(seg.end(),self.end)
+        
+    def test8(self):
+        t0,p0,p1,v0,a = self.t0,self.p0,self.p1,self.v0,self.a
+        seg=Segment2ndDegree(t0,None,(p0,v0,a),p1) # start pva + end position
+        assert_equal(seg.start(),self.start)
+        assert_equal(seg.end(),self.end)
+        
     def testover1(self):
         t0,t1,p0,v0,p1, a = self.t0,self.t1,self.p0,self.v0,self.p1, self.a*2 #double acceleration
         seg=Segment2ndDegree(t0,t1,(p0,v0,a),p1) # time interval, start pva, end position => adjust t1
         assert_equal(seg.start(),(p0,v0,a,0))
         assert_equal(seg.end()[0],self.p1)
-        assert_equal(seg.dt(),(self.t1-self.t0)/2.0) # double acceleration => half dt
         
-    def testover2(self):
+    def testover2(self): #acceleration ramp
         t0,t1,p0,v0,v1, a = self.t0,self.t1,self.p0,self.v0,self.v1, self.a*2 #double acceleration
-        seg=Segment2ndDegree(t0,t1,(p0,v0,a),(None,v1)) # time interval, start pva, max vel => adjust t1
+        seg=Segment2ndDegree(t0,t1,(p0,v0,a),(None,v1)) # time interval, start pva, v1= max vel => adjust t1
         assert_equal(seg.start(),(p0,v0,a,0))
         assert_equal(seg.end()[1],self.v1)
-        assert_equal(seg.dt(),(self.t1-self.t0)/2.0) # double acceleration => half dt
+        assert_equal(seg.dt(),(self.t1-self.t0)/2) # double acceleration => half dt
         
+    def test_segment2nd_degree(self):
+        # assert_equal(expected, Segment2ndDegree(t0, t1, start, end))
+        raise SkipTest # TODO: implement your test here
+
+class TestSegmentTrapezoidalSpeed:
+    def setup(self):
+        self.t0, self.t1 = 1,2      
+        self.p0, self.v0, self.a = -1,1,2
+        self.start=(self.p0, self.v0, self.a, 0)
+        self.p1, self.v1, self.a1 = 1,3,self.a
+        self.end=(self.p1, self.v1, self.a1, 0)
+    def test_segment_trapezoidal_speed(self):
+        # assert_equal(expected, SegmentTrapezoidalSpeed(t0, p0, p1, a, T, vmax))
+        raise SkipTest # TODO: implement your test here
+
+class TestSegment4thDegree:
+    def setup(self):
+        self.t0, self.t1 = 1,2      
+        self.p0, self.v0, self.a0 = -1,1,0
+        self.start=(self.p0, self.v0, self.a0, 0)
+        self.p1, self.v1, self.a1 = 1,3,0
+        self.end=(self.p1, self.v1, self.a1, 0)
+        
+    def test_segment4th_degree(self):
+        seg=Segment4thDegree(self.t0, self.t1, self.start, self.end)
+        assert_equal(seg.start()[:3],self.start[:3])  #ignore jerk
+        assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
+        assert_equal(seg((self.t0+self.t1)/2),(-0.3125, 2.0, 3.0, 0.0)) #truediv
+
+
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

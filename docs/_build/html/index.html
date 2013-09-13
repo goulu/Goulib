@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,15 +8,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Goulib &mdash; Goulib 1.5.1 documentation</title>
+    <title>Goulib &mdash; Goulib 1.5.2 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.5.1',
+        URL_ROOT:    '',
+        VERSION:     '1.5.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.1 documentation" href="#" />
-    <link rel="next" title="__init__" href="modules/__init__.html" /> 
+    <link rel="top" title="Goulib 1.5.2 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -36,10 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="modules/__init__.html" title="__init__"
-             accesskey="N">next</a> |</li>
-        <li><a href="#">Goulib 1.5.1 documentation</a> &raquo;</li> 
+        <li><a href="#">Goulib 1.5.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -47,20 +45,16 @@
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Goulib</a><ul>
-<li><a class="reference internal" href="#modules">Modules</a><ul>
-</ul>
-</li>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#modules">Modules</a></li>
+<li><a class="reference internal" href="#ipython-notebooks">IPython Notebooks</a></li>
 <li><a class="reference internal" href="#resources">Resources</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#history">History</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="modules/__init__.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">__init__</span></tt></a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -104,8 +98,6 @@
 </table>
 <div class="section" id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-</div>
 <ul>
 <li><p class="first"><a class="reference internal" href="modules/datetime2.html#module-datetime2" title="datetime2"><tt class="xref py py-mod docutils literal"><span class="pre">datetime2</span></tt></a> : additions to <a class="reference external" href="http://docs.python.org/2.7/library/datetime.html#datetime" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">datetime</span></tt></a></p>
 </li>
@@ -113,35 +105,41 @@
 </li>
 <li><p class="first"><a class="reference internal" href="modules/math2.html#module-math2" title="math2"><tt class="xref py py-mod docutils literal"><span class="pre">math2</span></tt></a> : additions to <a class="reference external" href="http://docs.python.org/2.7/library/math.html#math" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">math</span></tt></a> standard library</p>
 </li>
-<li><p class="first"><a class="reference internal" href="modules/interval.html#module-interval" title="interval"><tt class="xref py py-mod docutils literal"><span class="pre">interval</span></tt></a> : operations on [x..y[ intervals</p>
-</li>
-<li><p class="first"><a class="reference internal" href="modules/optim.html#module-optim" title="optim"><tt class="xref py py-mod docutils literal"><span class="pre">optim</span></tt></a> : Optimization algorithms</p>
-<p>Travelling Salesman Problem (TSP) hill climbing + simulated annealing</p>
-</li>
-<li><p class="first"><a class="reference internal" href="modules/dxf2img.html#module-dxf2img" title="dxf2img"><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt></a> : rasters (simple) .dxf files to bitmap images</p>
-</li>
-<li><p class="first"><a class="reference internal" href="modules/markup.html#module-markup" title="markup"><tt class="xref py py-mod docutils literal"><span class="pre">markup</span></tt></a> : simple HTML output (branch of <a class="reference external" href="http://pypi.python.org/pypi/markup/">markup</a> )</p>
-</li>
-<li><p class="first"><a class="reference internal" href="modules/nvd3.html#module-nvd3" title="nvd3"><tt class="xref py py-mod docutils literal"><span class="pre">nvd3</span></tt></a> : generates Javascript charts using <a class="reference external" href="http://nvd3.org">http://nvd3.org</a> and <a class="reference external" href="http://d3js.org">http://d3js.org</a></p>
-<p>Obsolete. use <a class="reference external" href="http://pypi.python.org/pypi/python-nvd3/">python-nvd3</a> which is derived from this module.</p>
-</li>
-<li><p class="first"><a class="reference internal" href="modules/table.html#module-table" title="table"><tt class="xref py py-mod docutils literal"><span class="pre">table</span></tt></a> : Table class with CSV I/O, easy access to columns, HTML output</p>
+<li><p class="first"><a class="reference internal" href="modules/table.html#module-table" title="table"><tt class="xref py py-mod docutils literal"><span class="pre">table</span></tt></a> : Table class with Excel + CSV I/O, easy access to columns, HTML output</p>
 </li>
 <li><p class="first"><a class="reference internal" href="modules/workdays.html#module-workdays" title="workdays"><tt class="xref py py-mod docutils literal"><span class="pre">workdays</span></tt></a> : WorkCalendar class with datetime operations on working hours</p>
 <p>merges and improves <a class="reference external" href="http://pypi.python.org/pypi/BusinessHours/">BusinessHours</a> and <a class="reference external" href="http://pypi.python.org/pypi/workdays/">workdays</a> packages</p>
 </li>
 <li><p class="first"><a class="reference internal" href="modules/colors.html#module-colors" title="colors"><tt class="xref py py-mod docutils literal"><span class="pre">colors</span></tt></a> : web (hex) colors dictionary and related functions</p>
 </li>
+<li><p class="first"><a class="reference internal" href="modules/homcoord.html#module-homcoord" title="homcoord"><tt class="xref py py-mod docutils literal"><span class="pre">homcoord</span></tt></a> : 2D homogeneous coordinates and transformations</p>
+</li>
+<li><p class="first"><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt> : Rasters (simple) .dxf (Autocad) files to bitmap images</p>
+<p>(requires <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and <a class="reference external" href="http://pypi.python.org/pypi/pil/">pil</a> )</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/optim.html#module-optim" title="optim"><tt class="xref py py-mod docutils literal"><span class="pre">optim</span></tt></a> : Optimization algorithms</p>
+<p>Travelling Salesman Problem (TSP) hill climbing + simulated annealing</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/interval.html#module-interval" title="interval"><tt class="xref py py-mod docutils literal"><span class="pre">interval</span></tt></a> : operations on [x..y[ intervals</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/piecewise.html#module-piecewise" title="piecewise"><tt class="xref py py-mod docutils literal"><span class="pre">piecewise</span></tt></a>: piecewise-defined functions</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/polynomial.html#module-polynomial" title="polynomial"><tt class="xref py py-mod docutils literal"><span class="pre">polynomial</span></tt></a>: polynomials (branch of <a class="reference external" href="http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/">Rick Muller&#8217;s reciepe</a>)</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/motion.html#module-motion" title="motion"><tt class="xref py py-mod docutils literal"><span class="pre">motion</span></tt></a> : generation of motion laws</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/markup.html#module-markup" title="markup"><tt class="xref py py-mod docutils literal"><span class="pre">markup</span></tt></a> : simple HTML output (branch of <a class="reference external" href="http://pypi.python.org/pypi/markup/">markup</a> )</p>
+</li>
+<li><p class="first"><a class="reference internal" href="modules/nvd3.html#module-nvd3" title="nvd3"><tt class="xref py py-mod docutils literal"><span class="pre">nvd3</span></tt></a> : generates Javascript charts using <a class="reference external" href="http://nvd3.org">http://nvd3.org</a> and <a class="reference external" href="http://d3js.org">http://d3js.org</a></p>
+<p>Obsolete. use <a class="reference external" href="http://pypi.python.org/pypi/python-nvd3/">python-nvd3</a> which is derived from this module.</p>
+</li>
 </ul>
 </div>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>Goulib uses only standard Python libs, except:</p>
+<div class="section" id="ipython-notebooks">
+<h2>IPython Notebooks<a class="headerlink" href="#ipython-notebooks" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="modules/dxf2img.html#module-dxf2img" title="dxf2img"><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt></a> needs <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and <a class="reference external" href="http://pypi.python.org/pypi/pil/">pil</a></li>
-<li><a class="reference internal" href="modules/table.html#table.Table.read_xls" title="table.Table.read_xls"><tt class="xref py py-meth docutils literal"><span class="pre">read_xls()</span></tt></a> needs <a class="reference external" href="http://pypi.python.org/pypi/xlrd/">xlrd</a></li>
+<li>Motion.ipynb demonstrates <a class="reference internal" href="modules/motion.html#module-motion" title="motion"><tt class="xref py py-mod docutils literal"><span class="pre">motion</span></tt></a></li>
 </ul>
-<p>automated <a class="reference external" href="http://pypi.python.org/pypi/nose/">nose</a> tests generated by <a class="reference external" href="http://pypi.python.org/pypi/pythoscope/">pythoscope</a></p>
 </div>
 <div class="section" id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
@@ -159,8 +157,19 @@
 </tr>
 <tr class="field-odd field"><th class="field-name">changelog:</th><td class="field-body"><a class="reference external" href="https://github.com/goulu/goulib/blob/master/CHANGES.rst">https://github.com/goulu/goulib/blob/master/CHANGES.rst</a></td>
 </tr>
+<tr class="field-even field"><th class="field-name">tests status:</th><td class="field-body"><a class="reference external" href="https://travis-ci.org/goulu/Goulib"><img alt="travis" src="https://travis-ci.org/goulu/Goulib.png?branch=master" /></a></td>
+</tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Goulib uses only standard Python libs, except:</p>
+<ul class="simple">
+<li><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt> needs <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and <a class="reference external" href="http://pypi.python.org/pypi/pil/">pil</a></li>
+<li><a class="reference internal" href="modules/table.html#table.Table.read_xls" title="table.Table.read_xls"><tt class="xref py py-meth docutils literal"><span class="pre">read_xls()</span></tt></a> needs <a class="reference external" href="http://pypi.python.org/pypi/xlrd/">xlrd</a></li>
+</ul>
+<p>automated <a class="reference external" href="http://pypi.python.org/pypi/nose/">nose</a> tests generated by <a class="reference external" href="http://pypi.python.org/pypi/pythoscope/">pythoscope</a></p>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
@@ -172,6 +181,12 @@
 </div>
 <div class="section" id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
+<p>v1.5.2, 2013-07-28</p>
+<ul class="simple">
+<li>added <tt class="xref py py-mod docutils literal"><span class="pre">motion`and</span> <span class="pre">:mod:`polynomial</span></tt></li>
+<li>created first demo IPython notebooks</li>
+<li><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt> improved</li>
+</ul>
 <p>v1.5.1, 2013-07-11</p>
 <ul class="simple">
 <li>updated module description and distribution details</li>
@@ -179,7 +194,7 @@
 <p>v1.5.0, 2013-07-11</p>
 <ul class="simple">
 <li>first version with automated <a class="reference external" href="http://pypi.python.org/pypi/nose/">nose</a> tests generated by <a class="reference external" href="http://pypi.python.org/pypi/pythoscope/">pythoscope</a></li>
-<li>added <a class="reference internal" href="modules/dxf2img.html#module-dxf2img" title="dxf2img"><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt></a> to raster .dxf files (Autocad) to bitmap images</li>
+<li>added <tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt> to raster .dxf files (Autocad) to bitmap images</li>
 <li>added <a class="reference internal" href="modules/math2.html#math2.int_or_float" title="math2.int_or_float"><tt class="xref py py-meth docutils literal"><span class="pre">math2.int_or_float()</span></tt></a></li>
 </ul>
 <p>v1.4.3 and 1.4.4, 2013-06-05</p>
@@ -260,15 +275,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="modules/__init__.html" title="__init__"
-             >next</a> |</li>
-        <li><a href="#">Goulib 1.5.1 documentation</a> &raquo;</li> 
+        <li><a href="#">Goulib 1.5.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

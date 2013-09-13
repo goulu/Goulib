@@ -12,6 +12,8 @@
  Written by Rick Muller.
  http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/
 """
+from __future__ import division #"true division" everywhere
+
 import re
 
 # Define some classes for some syntactic surgar:
@@ -25,6 +27,13 @@ class Polynomial:
             raise "Unknown argument to Polynomial: %s" % val
         return
     
+    def __cmp__(self,other): 
+        if isinstance(other,Polynomial):
+            return cmp(self.plist,other.plist)
+        elif isinstance(other,basestring):
+            return cmp(str(self),other)
+        return cmp(self.plist,other)
+            
     def __add__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __radd__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __sub__(self,other):  return Polynomial(sub(self.plist,plist(other)))
@@ -164,7 +173,7 @@ def parse_string(str=None):
     for n,p in termpat.findall(str):
         n,p = n.strip(),p.strip()
         if not n and not p: continue
-        n,p = parse_n(n),parse_p(p)
+        n,p = _parse_n(n),_parse_p(p)
         if res_dict.has_key(p): res_dict[p] += n
         else: res_dict[p] = n
     highest_order = max(res_dict.keys())
@@ -172,14 +181,14 @@ def parse_string(str=None):
     for key,value in res_dict.items(): res[key] = value
     return res
 
-def parse_n(str):
+def _parse_n(str):
     "Parse the number part of a polynomial string term"
     if not str: return 1
     elif str == '-': return -1
     elif str == '+': return 1
     return eval(str)
 
-def parse_p(str):
+def _parse_p(str):
     "Parse the power part of a polynomial string term"
     pat = re.compile('x\^?(\d)?')
     if not str: return 0
@@ -187,7 +196,7 @@ def parse_p(str):
     if not res: return 1
     return int(res)
 
-def strip_leading_zeros(p):
+def _strip_leading_zeros(p):
     "Remove the leading (in terms of high orders of x) zeros in the polynomial"
     # compute the highest nonzero element of the list
     for i in range(len(p)-1,-1,-1):
@@ -199,20 +208,20 @@ def tostring(p):
     Convert a plist into a string. This looks overly complex at first,
     but most of the complexity is caused by special cases.
     """
-    p = strip_leading_zeros(p)
+    p = _strip_leading_zeros(p)
     str = []
     for i in range(len(p)-1,-1,-1):
         if p[i]:
             if i < len(p)-1:
                 if p[i] >= 0: str.append('+')
                 else: str.append('-')
-                str.append(tostring_term(abs(p[i]),i))
+                str.append(_tostring_term(abs(p[i]),i))
             else:
-                str.append(tostring_term(p[i],i))
+                str.append(_tostring_term(p[i],i))
     if not str : str='0'
     return ' '.join(str)
 
-def tostring_term(c,i):
+def _tostring_term(c,i):
     "Convert a single coefficient c and power e to a string cx^i"
     if i == 1:
         if c == 1: return 'x'
@@ -223,54 +232,3 @@ def tostring_term(c,i):
         elif c == -1: return "-x^%d" % i
         return "%sx^%d" % (c,i)
     return "%s" % c
-
-def test():
-    print tostring([1,2.,3]) # testing floats
-    print tostring([1,2,-3]) # can we handle - signs
-    print tostring([1,-2,3])
-    print tostring([0,1,2])  # are we smart enough to exclude 0 terms?
-    print tostring([0,1,2,0]) # testing leading zero stripping
-    print tostring([0,1])
-    print tostring([0,1.0]) # testing whether 1.0 == 1: risky
-    print tostring(add([1,2,3],[1,-2,3]))  # test addition
-    print tostring(multiply([1,1],[-1,1])) # test multiplication
-    print tostring(power([1,1],2))         # test power
-
-    # Some cases using the polynomial objects:
-    print Polynomial([1,2,3]) + Polynomial([1,2]) # add
-    print Polynomial([1,2,3]) + 1                 # add
-    print Polynomial([1,2,3])-1                   # sub
-    print 1-Polynomial([1,2,3])                   # rsub
-    print 1+Polynomial([1,2,3])                   # radd
-    print Polynomial([1,2,3])*-1                  # mul
-    print -1*Polynomial([1,2,3])                  # rmul
-    print -Polynomial([1,2,3])                    # neg
-    print ''
-    # Work out Niklasson's raising and lowering operators:
-    #  tests putting constants into the polynomial.
-    for m in range(1,4):
-        print 'P^a_%d = ' % m,\
-              1 - Polynomial([1,-1])**m*Polynomial([1,m])
-        print 'P^b_%d = ' % m,\
-              Polynomial([0,1])**m*Polynomial([1+m,-m])
-    print ''
-
-    # Test string parsing
-    print parse_string('+3x - 4x^2 + 7x^5-x+1')
-    print Polynomial(parse_string('+3x - 4x^2 + 7x^5-x+1'))
-    print Polynomial('+3x - 4x^2 + 7x^5-x+1')
-    print Polynomial('+3x -4x^2+7x^5-x+1') - 7
-    print Polynomial('5x+x^2')
-
-    # Test the integral and derivatives
-    print integral([])
-    print integral([1])
-    print integral([0,1])
-    print derivative([0,0,0.5])
-    p = Polynomial('x')
-    ip = p.integral()
-    dp = p.derivative()
-    print ip,dp
-    print ip(0,1) # integral of y=x from (0,1)
-
-if __name__ == '__main__': test()

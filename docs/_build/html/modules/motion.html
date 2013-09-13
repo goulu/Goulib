@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>motion &mdash; Goulib 1.5.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/motion.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-motion">
+<span id="motion"></span><h1><a class="reference internal" href="#module-motion" title="motion"><tt class="xref py py-mod docutils literal"><span class="pre">motion</span></tt></a><a class="headerlink" href="#module-motion" title="Permalink to this headline">¶</a></h1>
+<p>define &#8220;motion laws&#8221;, functions of time which return (position, velocity, acceleration, jerk) tuples</p>
+<dl class="class">
+<dt id="motion.PVA">
+<em class="property">class </em><tt class="descclassname">motion.</tt><tt class="descname">PVA</tt><big>(</big><em>funcs</em><big>)</big><a class="reference internal" href="../_modules/motion.html#PVA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.PVA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>represents a function of time returning position, velocity, and acceleration</p>
+<dl class="method">
+<dt id="motion.PVA.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>funcs</em><big>)</big><a class="reference internal" href="../_modules/motion.html#PVA.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.PVA.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motion.PVA.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>t</em>, <em>t0=0</em><big>)</big><a class="reference internal" href="../_modules/motion.html#PVA.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.PVA.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motion.PVA.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#motion.PVA.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="motion.Segment">
+<em class="property">class </em><tt class="descclassname">motion.</tt><tt class="descname">Segment</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>funcs</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#motion.PVA" title="motion.PVA"><tt class="xref py py-class docutils literal"><span class="pre">motion.PVA</span></tt></a></p>
+<p>a PVA defined between 2 times, null elsewhere</p>
+<dl class="method">
+<dt id="motion.Segment.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>funcs</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motion.Segment.dt">
+<tt class="descname">dt</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment.dt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment.dt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motion.Segment.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motion.Segment.end">
+<tt class="descname">end</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment.end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motion.Segment.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="motion.SegmentPoly">
+<em class="property">class </em><tt class="descclassname">motion.</tt><tt class="descname">SegmentPoly</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>p</em><big>)</big><a class="reference internal" href="../_modules/motion.html#SegmentPoly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.SegmentPoly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#motion.Segment" title="motion.Segment"><tt class="xref py py-class docutils literal"><span class="pre">motion.Segment</span></tt></a></p>
+<p>a segment defined by a polynomial position law</p>
+<dl class="method">
+<dt id="motion.SegmentPoly.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>p</em><big>)</big><a class="reference internal" href="../_modules/motion.html#SegmentPoly.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.SegmentPoly.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="motion.Segment2ndDegree">
+<tt class="descclassname">motion.</tt><tt class="descname">Segment2ndDegree</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>start</em>, <em>end=None</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment2ndDegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment2ndDegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates a constant acceleration Segment between start and end</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>t0,t1</strong> &#8211; float start,end time. one of both may be None for undefined</li>
+<li><strong>start</strong> &#8211; (position, velocity, acceleration) float tuple. some values may be None for undefined</li>
+<li><strong>end</strong> &#8211; (position, velocity, acceleration) float tuple. some values may be None for undefined</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#motion.SegmentPoly" title="motion.SegmentPoly"><tt class="xref py py-class docutils literal"><span class="pre">SegmentPoly</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>the function can cope with almost any combination of defined/undefined parameters,
+among others (see tests):</p>
+<ul class="simple">
+<li>Segment2ndDegree(t0,t1,(p0,v0),p1) # time interval and start + end positions  + initial speed</li>
+<li>Segment2ndDegree(t0,t1,(p0,v0,a)) # time interval and start with acceleration</li>
+<li>Segment2ndDegree(t0,t1,None,(p1,v1,a)) # time interval and end pva</li>
+<li>Segment2ndDegree(t0,None,(p0,v0),(p1,v1)) # start + end positions + velocities</li>
+<li>Segment2ndDegree(t0,None,(p0,v0,a),(None,v1)) # start pva + end velocity</li>
+<li>Segment2ndDegree(None,t1,p0,(p1,v1,a)) # end pva + start position</li>
+</ul>
+<p>the function also accepts some combinations of overconstraining parameters:</p>
+<ul class="simple">
+<li>Segment2ndDegree(t0,t1,(p0,v0,a),p1) # time interval, start pva, end position =&gt; adjust t1</li>
+<li>Segment2ndDegree(t0,t1,(p0,v0,a),(None,v1)) # time interval, start pva, v1=max vel =&gt; adjust t1</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">when not enough parameters are specified to define the Segment univoquely</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="motion.Segment4thDegree">
+<tt class="descclassname">motion.</tt><tt class="descname">Segment4thDegree</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>start</em>, <em>end</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment4thDegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment4thDegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>smooth trajectory from an initial position and initial speed (p0,v0) to a final position and speed (p1,v1)
+* if t1&lt;=t0, t1 is calculated</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="motion.SegmentTrapezoidalSpeed">
+<tt class="descclassname">motion.</tt><tt class="descname">SegmentTrapezoidalSpeed</tt><big>(</big><em>t0</em>, <em>p0</em>, <em>p1</em>, <em>a</em>, <em>T=0</em>, <em>vmax=inf</em><big>)</big><a class="reference internal" href="../_modules/motion.html#SegmentTrapezoidalSpeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.SegmentTrapezoidalSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t0</strong> &#8211; float start time</li>
+<li><strong>p0</strong> &#8211; float start position</li>
+<li><strong>p1</strong> &#8211; float end position</li>
+<li><strong>a</strong> &#8211; float specified acceleration. if =0, use specified time</li>
+<li><strong>T</strong> &#8211; float specified time. if =0 (default), use specified acceleration</li>
+<li><strong>vmax</strong> &#8211; float max speed. default is infinity (i.e. triangular speed)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

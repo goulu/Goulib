@@ -71,7 +71,7 @@ class Chart:
             self.colors=kwargs['colors']
             del kwargs['colors']
         except: 
-            self.colors=colors.color_range(6)
+            self.colors=colors.color_range(6,'red','blue')
         
         try:
             y=kwargs['y']

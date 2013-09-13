@@ -126,22 +126,26 @@ def ireduce(func, iterable, init=None):
         yield curr
 
 def unique(iterable, key=None):
-    "List unique elements, preserving order. Remember all elements ever seen."
+    """List unique elements, preserving order. Remember all elements ever seen.
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
+    """
     seen = set()
-    seen_add = seen.add
-    if key is None:
-        for element in iterable:
-            if element not in seen:
-                seen_add(element)
-                yield element
-    else:
-        for element in iterable:
-            k = key(element)
-            if k not in seen:
-                seen_add(k)
-                yield element
+    for element in iterable:
+        k = key(element) if key else element
+        if k not in seen:
+            seen.add(k)
+            yield element
+            
+def count_unique(iterable, key=None):
+    """Count unique elements
+    # unique('AAAABBBCCDAABBB') --> 4
+    # unique('ABBCcAD', str.lower) --> 4
+    """
+    seen = set()
+    for element in iterable:
+        seen.add(key(element) if key else element)
+    return len(seen)
         
 def identity(x):
     """Do nothing and return the variable untouched"""

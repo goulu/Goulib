@@ -1,61 +1,105 @@
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true, assert_false, assert_almost_equal, assert_raises
 from nose import SkipTest
+from random import random
 from Goulib.math2 import *
+
+class TestQuad:
+    def test_quad(self):
+        import cmath
+        assert_equal(quad(1,3,2),(-1,-2)) 
+        assert_raises(ValueError,quad,1,2,3) #complex results
+        assert_equal(sum(quad(1,2,3,complex=True)),-2) #complex results
+
+class TestEqual:
+    def test_equal(self):
+        a=1E6
+        d=0.99e-6
+        assert_true(equal(a, a+d))
+        assert_false(equal(a, a+2*d))
 
 class TestLcm:
     def test_lcm(self):
-        # assert_equal(expected, lcm(a, b))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(lcm(101, -3),-303)
 
 class TestAccsum:
     def test_accsum(self):
-        # assert_equal(expected, accsum(it))
-        raise SkipTest # TODO: implement your test here
+        for s in accsum(range(10)): pass
+        assert_equal(s,45)
 
-class TestProduct:
-    def test_product(self):
-        # assert_equal(expected, product(nums))
-        raise SkipTest # TODO: implement your test here
+class TestTranspose:
+    def test_transpose(self):
+        v1=range(3)
+        v2=list(accsum(v1))
+        m1=[v1,v2,vecsub(v2,v1)]
+        assert_equal(transpose(m1),[(0, 0, 0), (1, 1, 0), (2, 3, 1)])
+        
+class TestDot:
+    def test_dot(self):
+        v1=range(3)
+        v2=list(accsum(v1))
+        assert_equal(dot(v1, v2),7)
+        m1=[v1,v2,vecsub(v2,v1)]
+        assert_equal(dot(m1,v1),[5,7,2])
+        m2=transpose(m1)
+        assert_equal(dot(m1,m2),[[5, 7, 2], [7, 10, 3], [2, 3, 1]])
 
 class TestVecadd:
     def test_vecadd(self):
-        # assert_equal(expected, vecadd(a, b, fillvalue))
-        raise SkipTest # TODO: implement your test here
+        v1=range(4)
+        v2=list(accsum(v1))
+        assert_equal(vecadd(v1,v2),[0,2,5,9])
+        v1=v1[1:]
+        assert_equal(vecadd(v1,v2),[1,3,6,6])
+        assert_equal(vecadd(v1,v2,-1),[1,3,6,5])
 
 class TestVecsub:
     def test_vecsub(self):
-        # assert_equal(expected, vecsub(a, b, fillvalue))
-        raise SkipTest # TODO: implement your test here
+        v1=range(4)
+        v2=list(accsum(v1))
+        assert_equal(vecsub(v1,v2),[0,0,-1,-3])
+        v1=v1[1:]
+        assert_equal(vecsub(v1,v2),[1,1,0,-6])
+        assert_equal(vecsub(v1,v2,-1),[1,1,0,-7])
 
 class TestVecmul:
     def test_vecmul(self):
-        # assert_equal(expected, vecmul(a, b))
-        raise SkipTest # TODO: implement your test here
+        v1=range(4)
+        v2=list(accsum(v1))
+        assert_equal(vecmul(v1,v2),[0,1,6,18])
 
 class TestVecdiv:
     def test_vecdiv(self):
-        # assert_equal(expected, vecdiv(a, b))
-        raise SkipTest # TODO: implement your test here
+        v1=range(5)[1:]
+        v2=list(accsum(v1))
+        assert_equal(vecdiv(v1,v2),[1,2./3,1./2,2./5])
 
 class TestVeccompare:
     def test_veccompare(self):
-        # assert_equal(expected, veccompare(a, b))
-        raise SkipTest # TODO: implement your test here
+        v1=range(5)[1:]
+        v2=list(accsum(v1))
+        assert_equal(veccompare(v1,v2),[3,1,0])
 
 class TestMean:
     def test_mean(self):
-        # assert_equal(expected, mean(data))
-        raise SkipTest # TODO: implement your test here
+        r=[random() for _ in range(5000)]
+        assert_almost_equal(mean(r),0.5,1) # significant difference is unlikely
 
 class TestVariance:
     def test_variance(self):
-        # assert_equal(expected, variance(data, avg))
-        raise SkipTest # TODO: implement your test here
+        r=[random() for _ in range(5000)]
+        assert_almost_equal(variance(r),0.082,2) # significant difference is unlikely
 
 class TestStats:
     def test_stats(self):
-        # assert_equal(expected, stats(l))
-        raise SkipTest # TODO: implement your test here
+        n=10000
+        r=[float(_)/n for _ in range(n+1)]
+        min,max,sum,sum2,avg,var=stats(r)
+        assert_almost_equal(min,0.,1) # significant difference is unlikely
+        assert_almost_equal(max,1.,1) # significant difference is unlikely
+        assert_almost_equal(sum,(n+1)/2.,2) # significant difference is unlikely
+        assert_almost_equal(sum2,(n+2)/3.,0) # significant difference is unlikely
+        assert_almost_equal(avg,0.5,4) # significant difference is unlikely
+        assert_almost_equal(var,1./12,4) # significant difference is unlikely
 
 class TestFibonacci:
     def test_fibonacci(self):
@@ -211,14 +255,6 @@ class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         # assert_equal(expected, combinations_with_replacement(iterable, r))
         raise SkipTest # TODO: implement your test here
-
-class TestDot:
-    def test_dot(self):
-        #test matrix*matrix, which uses matrix*vector and vector*vector
-        a=[[1,2,3],[4,5,6]]
-        b=[[7,8],[9,10],[11,12]]
-        expected=[[58,64],[139,154]]
-        assert_equal(expected, dot(a, b))
 
 if __name__ == "__main__":
     import nose

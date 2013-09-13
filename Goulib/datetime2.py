@@ -22,35 +22,53 @@ oneday=timedelta(days=1)
 oneweek=timedelta(weeks=1)
 datemin=date(year=dt.MINYEAR,month=1,day=1)
 
-def datetimef(d,t=time(0),fmt='%Y-%m-%d'):
-    '''converts something to a datetime'''
+def datetimef(d,t=None,fmt='%Y-%m-%d'):
+    '''converts something to a datetime
+    :param d: can be:
+    - datetime : result is a copy of d with time optionaly replaced
+    - date : result is date at time t, (00:00AM by default)
+    - int or float : if fmt is None, d is considered as Excel date numeric format 
+      (see #Excel format http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/ )
+    - string or speciefied format: result is datetime parsed using specified format string
+    :param fmt: format string. See http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
+    :param t: optional time. replaces the time of the datetime obtained from d. Allows datetimef(date,time)
+    :return: datetime
+    '''
     if isinstance(d,datetime):
-        return d
-    if isinstance(d,basestring):
-        return datetime.strptime(d,fmt)
-        
-    return datetime(year=d.year,month = d.month,day=d.day,
-                     hour=t.hour,minute=t.minute,second=t.second)
+        d=d
+    elif isinstance(d,date):
+        d=datetime(year=d.year, month=d.month, day=d.day)
+    elif fmt:
+        d=datetime.strptime(str(d),fmt)
+    elif isinstance(d,(int,float)) : 
+        d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
+    else:
+        raise ValueError("Unsupported parameters")
+    if t:
+        d=d.replace(hour=t.hour,minute=t.minute,second=t.second)
+    return d
     
 def datef(d,fmt='%Y-%m-%d'):
-    '''converts something to a date'''
+    '''converts something to a date. See datetimef'''
     if isinstance(d,datetime):
         return d.date()
     if isinstance(d,date):
         return d
-    if isinstance(d,basestring):
+    if isinstance(d,(basestring,int,float)):
         return datetimef(d,fmt=fmt).date()
-    return date(d)
+    return date(d)  #last chance...
     
-def timef(t,fmt='%Y-%m-%d'):
-    '''converts something to a time'''
+def timef(t,fmt='%H:%M:%S'):
+    '''converts something to a time. See datetimef'''
     if isinstance(t,datetime):
         return t.time()
     if isinstance(t,time):
         return t
-    if isinstance(t,basestring):
-        return datetime(t,fmt=fmt).time()
-    return time(t)
+    try:
+        return time(t)
+    except:
+        return datetimef(t,fmt=fmt).time()
+    
 
 def strftimedelta(v,fmt=None):
     """ formats a timedelta"""
@@ -70,13 +88,28 @@ def tdround(td,s=1):
     """ return timedelta rounded to s seconds """
     return timedelta(seconds=s*round(td.total_seconds()/s))
 
+def minutes(td):
+    """
+    :param td: timedelta
+    :return: float timedelta in minutes
+    """
+    return td.total_seconds()/60.
+
+def hours(td):
+    """
+    :param td: timedelta
+    :return: float timedelta in hours
+    """
+    return td.total_seconds()/3600.
+
 def daysgen(start,length,step=oneday):
     '''returns a range of dates or datetimes'''
-    i=0
-    while i<length:
-        i+=1
+    for i in range(length):
         yield start
-        start=start+step
+        try:
+            start=start+step
+        except:
+            start=time_add(start,step)
         
 def days(start,length,step=oneday):
     return [x for x in daysgen(start,length,step)]
@@ -107,6 +140,16 @@ def time_add(t,d):
     '''adds delta to time. should be a method of time...'''
     return (datetimef(datemin,t)+d).time()
 
+def equal(a,b,epsilon=timedelta(seconds=0.5)):
+    """approximately equal. Use this instead of a==b
+    :return: True if a and b are less than seconds apart
+    """
+    try:
+        d=abs(a-b)
+    except:
+        d=abs(time_sub(a,b))
+    return d<epsilon
+
 def datetime_intersect(t1,t2):
     '''returns timedelta overlap between 2 intervals (tuples) of datetime'''
     a,b=intersection(t1, t2)
@@ -119,11 +162,3 @@ def time_intersect(t1,t2):
     if not a:return timedelta0
     return time_sub(b,a)
         
-import unittest
-class TestCase(unittest.TestCase):
-    def runTest(self):
-        r=days(datetime.today(),21)
-        self.assertEqual(len(r), 21, "incorrect days length")
-        
-if __name__ == '__main__':
-    unittest.main()

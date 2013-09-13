@@ -12,16 +12,26 @@ import colorsys
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
 def rgb_to_hex(rgb):
-    return '#%02x%02x%02x' % rgb
+    """:param rgb: tuple (r,g,b) of 3 ints 0-255
+    :result: string "#rrggbb" in hex suitable for HTML color"""
+    return '#%02x%02x%02x' % tuple(rgb)
 
 def hex_to_rgb(value,scale=1):
+    """:param value: string "#rrggbb" in hex suitable for HTML color
+    :param scale: float optional 1./255 to scale output to [0,1] floats
+    :result: tuple (r,g,b) of 3 ints 0-255"""
     value = value.lstrip('#')
     lv = len(value)
     return tuple(scale*int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
 
 #http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
     
-def color_range(n,start='red',end='blue'):
+def color_range(n,start,end):
+    """:param n: int number of colors to generate
+    :param start: string hex color or color name
+    :param end: string hex color or color name
+    :result: list of n hexcolors interpolated between start and end, included
+    """
     from itertools2 import ilinear
     if start in color: start=color[start]
     start=hex_to_rgb(start,1./255)
