@@ -20,6 +20,8 @@ __revision__ = '$Revision$'
 import operator,types
 from math import *
 
+precision = 1e-9 #for equality comparizons
+
 class Vector2(object):
 
     def __init__ ( self, *args ):
@@ -39,16 +41,16 @@ class Vector2(object):
     copy = __copy__
 
     def __repr__(self):
-        return 'Vector2(%.2f, %.2f)' % self.xy
+        return '%s%s' % (self.__class__.__name__,self.xy)
 
     def __eq__(self, other):
-        if isinstance(other, Vector2):
-            return self.xy == other.xy
-        else:
-            try:
-                return self.x == other[0] and self.y == other[1]
-            except:
-                return False
+        try: #quick
+            if self.xy == other.xy : return True
+        except: pass
+        try:
+            if self.x == other[0] and self.y == other[1]: return True
+        except: pass
+        return (self-Vector2(other)).mag()<precision
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -204,7 +206,10 @@ class Vector2(object):
 
     def angle(self, other):
         """Return the angle to the vector other"""
-        return acos(self.dot(other) / (self.mag()*other.mag()))
+        if other:
+            return acos(self.dot(other) / (self.mag()*other.mag()))
+        else:
+            return atan2(self.y,self.x)
 
     def project(self, other):
         """Return one vector projected on the vector other"""
@@ -238,7 +243,7 @@ class Vector3(object):
     copy = __copy__
 
     def __repr__(self):
-        return 'Vector3(%.2f, %.2f, %.2f)' % self.xyz
+        return '%s%s' % (self.__class__.__name__,self.xyz)
 
     def __eq__(self, other):
         if isinstance(other, Vector3):
@@ -491,10 +496,10 @@ class Matrix3(object):
 
     copy = __copy__
     def __repr__(self):
-        return ('Matrix3([% 8.2f % 8.2f % 8.2f\n'  \
-                '         % 8.2f % 8.2f % 8.2f\n'  \
-                '         % 8.2f % 8.2f % 8.2f])') \
-                % (self.a, self.b, self.c,
+        return ('%s([%g %g %g\n'  \
+                '         %g %g %g\n'  \
+                '         %g %g %g])') \
+                % (self.__class__.__name__,self.a, self.b, self.c,
                    self.e, self.f, self.g,
                    self.i, self.j, self.k)
 
@@ -700,7 +705,6 @@ class Matrix3(object):
 # m n o p
 
 class Matrix4(object):
-    __slots__ = list('abcdefghijklmnop')
 
     def __init__(self):
         self.identity()
@@ -729,11 +733,11 @@ class Matrix4(object):
 
 
     def __repr__(self):
-        return ('Matrix4([% 8.2f % 8.2f % 8.2f % 8.2f\n'  \
-                '         % 8.2f % 8.2f % 8.2f % 8.2f\n'  \
-                '         % 8.2f % 8.2f % 8.2f % 8.2f\n'  \
-                '         % 8.2f % 8.2f % 8.2f % 8.2f])') \
-                % (self.a, self.b, self.c, self.d,
+        return ('%s([%g %g %g %g\n'  \
+                '         %g %g %g %g\n'  \
+                '         %g %g %g %g\n'  \
+                '         %g %g %g %g])') \
+                % (self.__class__.__name__,self.a, self.b, self.c, self.d,
                    self.e, self.f, self.g, self.h,
                    self.i, self.j, self.k, self.l,
                    self.m, self.n, self.o, self.p)
@@ -1140,7 +1144,6 @@ class Quaternion:
     # http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
 
     # w is the real part, (x, y, z) are the imaginary parts
-    __slots__ = ['w', 'x', 'y', 'z']
 
     def __init__(self, w=1, x=0, y=0, z=0):
         self.w = w
@@ -1159,8 +1162,7 @@ class Quaternion:
     copy = __copy__
 
     def __repr__(self):
-        return 'Quaternion(real=%.2f, imag=<%.2f, %.2f, %.2f>)' % \
-            (self.w, self.x, self.y, self.z)
+        return '%s(%g,%g,%g,%g)' % (self.__class__.__name__,self.w, self.x, self.y, self.z)
 
     def __mul__(self, other):
         if isinstance(other, Quaternion):
@@ -1465,7 +1467,10 @@ class Quaternion:
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
 # ---------------------------------------------------------------------------
 
+from abc import ABCMeta #Abstract Base Class
+    
 class Geometry(object):
+    __metaclass__ = ABCMeta
     def _connect_unimplemented(self, other):
         raise AttributeError, 'Cannot connect %s to %s' % \
             (self.__class__, other.__class__)
@@ -1489,18 +1494,31 @@ class Geometry(object):
     _connect_line3 = _connect_unimplemented
     _connect_sphere = _connect_unimplemented
     _connect_plane = _connect_unimplemented
+    
+    def point(self, u):
+        ":return: Point2 or Point3 at parameter u"
+        raise NotImplementedError
+    
+    def tangent(self, u):
+        ":return: Vector2 or Vector3 tangent at parameter u"
+        raise NotImplementedError
+    
+    def intersect(self, other):
+        raise NotImplementedError
 
     def intersect(self, other):
         raise NotImplementedError
 
     def connect(self, other):
+        ":return: Geometry shortest (Segment2 or Segment3) that connects self to other"
         raise NotImplementedError
 
     def distance(self, other):
         c = self.connect(other)
         if c:
             return c.length
-        return 0.0
+        else:
+            return None
 
 def _intersect_point2_circle(P, C):
     return abs(P - C.c) <= C.r
@@ -1572,7 +1590,7 @@ def _connect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
     if d == 0:
         # Parallel, connect an endpoint with a line
-        if isinstance(B, Ray2) or isinstance(B, Segment2):
+        if isinstance(B, (Ray2,Segment2)):
             p1, p2 = _connect_point2_line2(B.p, A)
             return p2, p1
         # No endpoint (or endpoint is on A), possibly choose arbitrary point
@@ -1620,8 +1638,6 @@ def _connect_circle_circle(A, B):
 
 
 class Point2(Vector2, Geometry):
-    def __repr__(self):
-        return 'Point2(%.2f, %.2f)' % (self.x, self.y)
     
     def dist(self,other):
         return (self-other).mag()
@@ -1652,35 +1668,29 @@ def Polar(mag,angle):
     return Vector2(mag*cos(angle),mag*sin(angle))
 
 class Line2(Geometry):
-    __slots__ = ['p', 'v']
 
     def __init__(self, *args):
-        if len(args) == 3:
-            assert isinstance(args[0], Point2) and \
-                   isinstance(args[1], Vector2) and \
-                   type(args[2]) == float
-            self.p = args[0].copy()
-            self.v = args[1] * args[2] / abs(args[1])
-        elif len(args) == 2:
-            if isinstance(args[0], Point2) and isinstance(args[1], Point2):
-                self.p = args[0].copy()
-                self.v = args[1] - args[0]
-            elif isinstance(args[0], Point2) and isinstance(args[1], Vector2):
-                self.p = args[0].copy()
-                self.v = args[1].copy()
-            else:
-                raise AttributeError, '%r' % (args,)
-        elif len(args) == 1:
-            if isinstance(args[0], Line2):
-                self.p = args[0].p.copy()
-                self.v = args[0].v.copy()
-            else:
-                raise AttributeError, '%r' % (args,)
+        if len(args) == 1: # Line2 or derived class
+            self.p = args[0].p.copy()
+            self.v = args[0].v.copy()
         else:
-            raise AttributeError, '%r' % (args,)
+            self.p = Point2(args[0])
+            if isinstance(args[1], Point2):
+                self.v = args[1] - args[0]
+            else:
+                self.v = Vector2(args[1])
+            
+            if len(args) == 3:
+                self.v=self.v*args[2]/abs(self.v)
         
-        if not self.v:
-            raise AttributeError, 'Line has zero-length vector'
+    def __eq__(self, other):
+        """lines are "equal" only if base points and vector are strictly equal.
+        to compare if lines are "same", use line1.distance(line2)==0
+        """
+        try:
+            return self.p==other.p and self.v==other.v
+        except:
+            return False
 
     def __copy__(self):
         return self.__class__(self.p, self.v)
@@ -1688,19 +1698,28 @@ class Line2(Geometry):
     copy = __copy__
 
     def __repr__(self):
-        return 'Line2(<%.2f, %.2f> + u<%.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.v.x, self.v.y)
-
-    p1 = property(lambda self: self.p)
-    p2 = property(lambda self: Point2(self.p.x + self.v.x, 
-                                      self.p.y + self.v.y))
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
+            
+    def _u_in(self, u):
+        return True
+    
+    def point(self, u):
+        ":return: Point2 at parameter u"
+        if self._u_in(u):
+            return self.p+u*self.v
+        else:
+            return None
+    
+    def tangent(self, u):
+        ":return: Vector2 tangent at parameter u. Warning : tangent is generally not a unit vector"
+        if self._u_in(u):
+            return self.v
+        else:
+            return None
 
     def _apply_transform(self, t):
         self.p = t * self.p
         self.v = t * self.v
-
-    def _u_in(self, u):
-        return True
 
     def intersect(self, other):
         return other._intersect_line2(self)
@@ -1726,17 +1745,17 @@ class Line2(Geometry):
 
 
 class Ray2(Line2):
-    def __repr__(self):
-        return 'Ray2(<%.2f, %.2f> + u<%.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.v.x, self.v.y)
 
     def _u_in(self, u):
         return u >= 0.0
 
 class Segment2(Line2):
+    p1 = property(lambda self: self.p)
+    p2 = property(lambda self: Point2(self.p.x + self.v.x, 
+                                      self.p.y + self.v.y))
+    
     def __repr__(self):
-        return 'Segment2(<%.2f, %.2f> to <%.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.p.x + self.v.x, self.p.y + self.v.y)
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
 
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
@@ -1747,32 +1766,56 @@ class Segment2(Line2):
     def mag2(self):
         return self.v.mag2()
 
+    length = property(lambda self: abs(self.v))
+    
     def _swap(self):
         # used by connect methods to switch order of points
         self.p = self.p2
         self.v *= -1
         return self
 
-    length = property(lambda self: abs(self.v))
-
 class Circle(Geometry):
 
     def __init__(self, center, radius):
-        assert isinstance(center, Vector2) and type(radius) == float
-        self.c = center.copy()
-        self.r = radius
+        self.c = Point2(center) if not isinstance(center,Point2) else center
+        if type(radius) == float:
+            self.r = radius
+            self.p = center+Vector2(radius,0) #for coherency + transform
+        else:
+            self.p=radius #one point on circle
+            self.r=abs(self.p-self.c)
 
+    def point(self, u):
+        ":return: Point2 at angle u radians"
+        return self.c+Polar(self.r,u)
+    
+    def tangent(self, u):
+        ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
+        return Polar(self.r,u+pi/2.)
+        
     def __copy__(self):
         return self.__class__(self.c, self.r)
+    
+    def __eq__(self, other):
+        if not isinstance(other,Circle):
+            return False
+        return self.c==other.c and self.r==other.r
 
     copy = __copy__
 
     def __repr__(self):
-        return 'Circle(<%.2f, %.2f>, radius=%.2f)' % \
-            (self.c.x, self.c.y, self.r)
+        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
 
     def _apply_transform(self, t):
         self.c = t * self.c
+        self.p = t * self.p
+        self.r=abs(self.p-self.c)
+        
+    def __abs__(self):
+        """:return: float perimeter"""
+        return 2.0*pi*self.r
+    
+    length = property(lambda self: abs(self))
 
     def intersect(self, other):
         return other._intersect_circle(self)
@@ -1796,6 +1839,76 @@ class Circle(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_circle(other, self)
+    
+class Arc2(Circle):
+    def __init__(self, center, p1,p2,r=0):
+        c=Point2(center) if not isinstance(center,Point2) else center
+        if isinstance(p1,(int,float)):
+            p=c+Polar(r,p1)
+        else:
+            p=Point2(p1)
+        super(Arc2,self).__init__(c,p)
+        if isinstance(p2,(int,float)):
+            self.p2=c+Polar(r,p2)
+        else:
+            self.p2=Point2(p2)
+            
+        self._apply_transform(None) #to set start/end angles
+        
+    def angle(self):
+        """:return: float arc angle"""
+        l=self.b-self.a
+        if l<0 :
+            l=2.*pi+l
+        return l
+        
+    def __abs__(self):
+        """:return: float arc length"""
+        return self.r*self.angle()
+        
+    def _u_in(self, u): #unlike Circle, Arc2 is parametrized on [0,1] for coherency with Segment2
+        return u >= 0.0 and u <= 1.0
+    
+    def point(self, u):
+        ":return: Point2 at parameter u"
+        if self._u_in(u):
+            return self.p+u*self.v
+        else:
+            return None
+    
+    def tangent(self, u):
+        ":return: Vector2 tangent at parameter u. Warning : tangent not a unit vector"
+        if self._u_in(u):
+            return self.v
+        else:
+            return None
+            
+    def _apply_transform(self, t):
+        if t:
+            super(Arc2,self)._apply_transform(t)
+            self.p2 = t * self.p2
+        self.a=(self.p-self.c).angle(None) #start angle
+        self.b=(self.p2-self.c).angle(None) #end angle
+        
+    def __copy__(self):
+        return self.__class__(self.c, self.p, self.p2)
+
+    copy = __copy__
+    
+    def __eq__(self, other):
+        if not super(Arc2,self).__eq__(other): #support Circles must be the same
+            return False
+        return self.p==other.p and self.p2==other.p2
+        
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.c,self.r,self.p,self.p2)
+
+    def _swap(self):
+        # used by connect methods to switch order of points
+        self.p,self.p2 = self.p2,self.p
+        self.a,self.b = self.b,self.a
+        return self
+
 
 # 3D Geometry
 # -------------------------------------------------------------------------
@@ -1978,8 +2091,6 @@ def _intersect_plane_plane(A, B):
                  A.n.cross(B.n))
 
 class Point3(Vector3, Geometry):
-    def __repr__(self):
-        return 'Point3(%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
 
     def intersect(self, other):
         return other._intersect_point3(self)
@@ -2010,8 +2121,7 @@ class Point3(Vector3, Geometry):
         if c:
             return c._swap()
 
-class Line3:
-    __slots__ = ['p', 'v']
+class Line3(Geometry):
 
     def __init__(self, *args):
         if len(args) == 3:
@@ -2048,8 +2158,7 @@ class Line3:
     copy = __copy__
 
     def __repr__(self):
-        return 'Line3(<%.2f, %.2f, %.2f> + u<%.2f, %.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.p.z, self.v.x, self.v.y, self.v.z)
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
 
     p1 = property(lambda self: self.p)
     p2 = property(lambda self: Point3(self.p.x + self.v.x, 
@@ -2090,18 +2199,12 @@ class Line3:
             return c
 
 class Ray3(Line3):
-    def __repr__(self):
-        return 'Ray3(<%.2f, %.2f, %.2f> + u<%.2f, %.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.p.z, self.v.x, self.v.y, self.v.z)
-
     def _u_in(self, u):
         return u >= 0.0
 
 class Segment3(Line3):
     def __repr__(self):
-        return 'Segment3(<%.2f, %.2f, %.2f> to <%.2f, %.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.p.z,
-             self.p.x + self.v.x, self.p.y + self.v.y, self.p.z + self.v.z)
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
 
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
@@ -2120,8 +2223,7 @@ class Segment3(Line3):
 
     length = property(lambda self: abs(self.v))
 
-class Sphere:
-    __slots__ = ['c', 'r']
+class Sphere(Geometry):
 
     def __init__(self, center, radius):
         assert isinstance(center, Vector3) and type(radius) == float
@@ -2134,8 +2236,7 @@ class Sphere:
     copy = __copy__
 
     def __repr__(self):
-        return 'Sphere(<%.2f, %.2f, %.2f>, radius=%.2f)' % \
-            (self.c.x, self.c.y, self.c.z, self.r)
+        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
 
     def _apply_transform(self, t):
         self.c = t * self.c
@@ -2170,7 +2271,6 @@ class Sphere:
 
 class Plane:
     # n.p = k, where n is normal, p is point on plane, k is constant scalar
-    __slots__ = ['n', 'k']
 
     def __init__(self, *args):
         if len(args) == 3:

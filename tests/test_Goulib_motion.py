@@ -1,6 +1,6 @@
 from __future__ import division #"true division" everywhere
 
-from nose.tools import assert_equal,assert_almost_equal
+from nose.tools import assert_equal,assert_almost_equal,assert_true
 from nose import SkipTest
 from Goulib.motion import *
 
@@ -124,6 +124,17 @@ class TestSegment2ndDegree:
     def test_segment2nd_degree(self):
         # assert_equal(expected, Segment2ndDegree(t0, t1, start, end))
         raise SkipTest # TODO: implement your test here
+    
+class TestRamp:
+    def test_ramp(self):
+        pass #tested above and below
+
+class TestTrapeze:
+    def test_trapeze(self):
+        assert_equal(trapeze(1,1,1),(1.0, 0.5, 1.0, 1.0, 0.5, 2.0))
+        assert_equal(trapeze(2,1,1),(1.0, 0.5, 1.0, 2.0, 1.5, 3.0))
+        assert_true(trapeze(0.1,12,10000)[-1]>trapeze(0.1,25,10000)[-1])
+
 
 class TestSegmentTrapezoidalSpeed:
     def setup(self):
@@ -149,7 +160,6 @@ class TestSegment4thDegree:
         assert_equal(seg.start()[:3],self.start[:3])  #ignore jerk
         assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
         assert_equal(seg((self.t0+self.t1)/2),(-0.3125, 2.0, 3.0, 0.0)) #truediv
-
 
 
 if __name__ == "__main__":

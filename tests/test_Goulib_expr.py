@@ -11,7 +11,8 @@ class TestExpr:
         self.fx=Expr(lambda x:x,name='x')
         self.fs=Expr(sin)
         
-        self.fb=Expr(lambda x:x<1,name='x<1')
+        self.fb1=Expr(lambda x:x>1,name='x>1')
+        self.fb2=Expr(lambda x:x>2,name='x>2')
         
     def test___init__(self):
         pass #teste in setup
@@ -19,13 +20,13 @@ class TestExpr:
     def test___call__(self):
         assert_equal(self.f1(0),1) # constant function
         assert_equal(self.fx([-1,0,1]),[-1,0,1])
-        assert_equal(self.fb([0,1,2]),[True,False,False])
+        assert_equal(self.fb1([0,1,2]),[False,False,True])
 
     def test___repr__(self):
         assert_equal(repr(self.f1),'1')     
         assert_equal(repr(self.fx),'x')    
         assert_equal(repr(self.fs),'sin')    
-        assert_equal(repr(self.fb),'x<1')      
+        assert_equal(repr(self.fb1),'x>1')      
 
     def test___add__(self):
         f=self.fx+self.f1
@@ -68,22 +69,39 @@ class TestExpr:
         assert_equal(f2([-1,0,1]),[sin(-1),0,sin(1)])
     
     def test___invert__(self):
-        fb=~self.fb
-        assert_equal(fb([0,1,2]),[False,True,True])
+        fb=~self.fb1
+        assert_equal(fb([0,1,2]),[True,True,False])
 
     def test___and__(self):
-        # expr = Expr(f, left, right)
-        # assert_equal(expected, expr.__and__(other))
-        raise SkipTest # TODO: implement your test here
+        fb=self.fb1 & self.fb2
+        assert_equal(fb([1,2,3]),[False,False,True])
 
     def test___or__(self):
-        # expr = Expr(f, left, right)
-        # assert_equal(expected, expr.__or__(other))
-        raise SkipTest # TODO: implement your test here
+        fb=self.fb1 | self.fb2
+        assert_equal(fb([1,2,3]),[False,True,True])
 
     def test___xor__(self):
-        # expr = Expr(f, left, right)
-        # assert_equal(expected, expr.__xor__(other))
+        fb=self.fb1 ^ self.fb2
+        assert_equal(fb([1,2,3]),[False,True,False])
+
+    def test___cmp__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__cmp__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___lshift__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__lshift__(dx))
+        raise SkipTest # TODO: implement your test here
+
+    def test___rshift__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__rshift__(dx))
+        raise SkipTest # TODO: implement your test here
+
+    def test_applx(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.applx(f, name))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

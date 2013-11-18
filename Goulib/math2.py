@@ -10,15 +10,12 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
-
-
 import operator,cmath
 from math import sqrt, log, log10, ceil
 from itertools import count,izip_longest, ifilter
 from itertools import combinations, permutations, product as cartesian_product
 
 from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
-
 
 import fractions
 def lcm(a,b):
@@ -38,10 +35,11 @@ def quad(a, b, c, complex=False):
     return (-b + d) / (2 * a), (-b - d) / (2 * a)
 
 def equal(a,b,epsilon=1e-6):
-    """approximately equal. Use this instead of a==b
+    """approximately equal. Use this instead of a==b in floating point ops
     :return: True if a and b are less than epsilon apart
     """
     return abs(a-b)<epsilon
+    
 
 #vector operations
 
@@ -350,3 +348,25 @@ def combinations_with_replacement(iterable, r):
     for indices in cartesian_product(range(n), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
+            
+#misc
+def proportional(nseats,votes):
+    """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
+    :param nseats: int number of seats to assign
+    :param votes: iterable of int or float weighting each party
+    :result: list of ints seats allocated to each party
+    """
+    quota=sum(votes)/(1.+nseats) #force float
+    frac=[vote/quota for vote in votes]
+    res=[int(f) for f in frac]
+    n=nseats-sum(res) #number of seats remaining to allocate
+    if n==0: return res #done
+    #give the remaining seats to the n parties with the largest remainder
+    remainders=vecsub(frac,res)
+    limit=sorted(remainders,reverse=True)[n-1]
+    for i,r in enumerate(remainders):
+        if r>=limit:
+            res[i]+=1
+            n-=1 # attempt to handle perfect equality
+            if n==0: return res #done
+    raise #should never happen

@@ -54,9 +54,11 @@ class TestCbox:
         raise SkipTest # TODO: implement your test here
 
 class TestDXF:
+    def setup(self):
+        self.dxf= DXF("test.dxf")
+        
     def test___init__(self):
-        # d_x_f = DXF(filename, options)
-        raise SkipTest # TODO: implement your test here
+        pass #tested in setup
 
     def test_bbox(self):
         # d_x_f = DXF(filename, options)
@@ -64,9 +66,8 @@ class TestDXF:
         raise SkipTest # TODO: implement your test here
 
     def test_img(self):
-        # d_x_f = DXF(filename, options)
-        # assert_equal(expected, d_x_f.img(size, border, box, layers, ignore, forcelayercolor, antialias))
-        raise SkipTest # TODO: implement your test here
+        img = self.dxf.img(size=[512, None], border=5,forcelayercolor=True)
+        img.save('test.png') #todo add a test
 
     def test_iter(self):
         # d_x_f = DXF(filename, options)
@@ -78,8 +79,7 @@ class TestImg2base64:
         # assert_equal(expected, img2base64(img, fmt))
         raise SkipTest # TODO: implement your test here
 
-if __name__ == '__main__':
-    dxf = DXF("test.dxf")
-    # for i,l in enumerate(dxf.layers): l.color=i #recolor layers
-    img = dxf.img(size=[128, None], border=5,forcelayercolor=True)
-    img.save('test.png')
+if __name__ == "__main__":
+    import nose
+    nose.runmodule()
+

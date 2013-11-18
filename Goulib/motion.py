@@ -74,6 +74,50 @@ def _delta(x0,x1):
     except:
         return None
     
+def ramp(dp,v0,v1,a):
+    """
+    :param dp: float delta position or None if unknown
+    :param v0: float initial velocity or None if unknown
+    :param v1: float final velocity or None if unknown
+    :param a: float acceleration
+    :return: float shortest time to accelerate between constraints
+    """
+    dt=[]
+    dv=_delta(v0,v1)
+    if dv:
+        dt.append(dv/a) #time to accelerate
+    try: # solve a.t^2/2+v0.t == dp
+        dt.extend(list(quad(a/2,v0,-dp)))
+    except: 
+        try: # solve v1.t-a.t^2/2 == dp
+            dt.extend(list(quad(-a/2,v1, -dp)))
+        except: pass
+    return min(t for t in dt if t > 0) #return smallest positive
+
+def trapeze(dp,vmax,a,v0=0,v2=0):
+    """
+    :param dp: float delta position
+    :param vmax: float maximal velocity
+    :param a: float acceleration
+    :param v0: float initial velocity, 0 by default 
+    :param v2: float final velocity, 0 by default 
+    :return: tuple of 6 values:
+    * time at end of acceleration
+    * position at end of acceleration
+    * velocity at end of acceleration
+    * time at begin of deceleration
+    * position at begin of deceleration
+    * total time
+    
+    """
+    t1=ramp(dp/2,v0,vmax,a) #acceleration time
+    v1=v0+a*t1 #speed reached
+    p1=t1*(v0+v1)/2 #position at end of acceleration
+    t3=ramp(dp/2,v1,v2,-a) #deceleration time
+    p2=t3*(v1+v2)/2 #distance to decelerate
+    t2=(dp-p1-p2)/v1 #time at constant velocity
+    return t1,p1,v1,t1+t2,dp-p2,t1+t2+t3
+    
 def Segment2ndDegree(t0,t1,start,end=(None)):
     """calculates a constant acceleration Segment between start and end
     
@@ -123,25 +167,13 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
             return res
 
         if dt is None: #try to determine it from available params
-            try: dt=dv/a0 #needs truediv
-            except:
-                try: dt=2.*dp/(v0+v1)
-                except: 
-                    try: # solve a.t^2/2+v0.t + p0 = p1
-                        dt=quad(a0/2.,v0,-dp) 
-                    except: 
-                        try: # solve p1- a.t^2/2-v1.t = p0
-                            dt=quad(a0/2.,-v1, dp) 
-                        except: pass
-                    try:
-                        if min(dt)>0 : 
-                            dt=min(dt)
-                        elif max(dt)>0:
-                            dt=max(dt)
-                        else:
-                            dt=None
-                    except:
-                        dt=None
+            if a0:
+                dt=ramp(dp,v0,v1,a0)
+            else:
+                try:
+                    dt=2*dp/(v0+v1) #time to reach the position
+                except: pass
+
         if t0 is None:
             try: t0=t1-dt
             except: pass
@@ -152,7 +184,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
         if a0 is None:
             try: a0=dv/dt
             except:
-                try: a0=2.*(dp-v0*dt)/dt*dt
+                try: a0=2*(dp-v0*dt)/dt*dt
                 except: pass
         if v0 is None:
             try: v0=v1-a0*dt
@@ -176,6 +208,7 @@ def Segment4thDegree(t0,t1,start,end):
     else:
         dt=t1-t0
     return SegmentPoly(t0,t1,[p0,v0,0,(v1-v0)/(dt*dt),-(v1-v0)/(2*dt*dt*dt)]) #truediv
+
 
 def SegmentTrapezoidalSpeed(t0,p0,p1,a,T=0,vmax=float('inf')):
     """

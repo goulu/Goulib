@@ -3,7 +3,7 @@
 
 import os
 from nose import SkipTest
-from nose.tools import assert_equal
+from nose.tools import assert_equal,assert_true
 
 from Goulib.table import *
 
@@ -14,6 +14,7 @@ class TestTable:
         self.t=Table(self.path+'\\test.xls') # from http://www.contextures.com/xlSampleData01.html
         
     def test___init__(self):
+        pass #in setup above
         assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
     
     def test_read_xls(self):
@@ -29,11 +30,15 @@ class TestTable:
         
     def test___repr__(self):
         t2=Table(self.path+'\\test.csv')
-        assert_equal(repr(self.t), repr(t2))
+        s1=repr(self.t)
+        s2=repr(t2)
+        assert_equal(s1,s2)
 
     def test___str__(self):
         t2=Table(self.path+'\\test.csv')
-        assert_equal(str(self.t), str(t2))
+        s1=str(self.t)
+        s2=str(t2)
+        assert_equal(s1,s2)
         
     def test_applyf(self):
         pass #tested by test_to_datetime
@@ -47,6 +52,13 @@ class TestTable:
         self.t.to_date('OrderDate',fmt='',safe=False) #converts Excel numeric format
         assert_equal(self.t[0][0],datetime.date(2012, 6, 1))
         assert_equal(self.t[1][0],datetime.date(2012, 1,23))
+        
+    def test_append(self):
+        ta = Table(None)
+        ta.append({'col1':1,'col2':2})
+        assert_true(len(ta)==1 and ta.ncols()==2)
+        ta.append([3,4])
+        assert_true(len(ta)==2 and ta.ncols()==2)
         
     def test_col(self):
         pass #tested by test_sort
@@ -118,12 +130,11 @@ class TestTable:
         # assert_equal(expected, table.icol(by))
         raise SkipTest # TODO: implement your test here
 
-
-
     def test___eq__(self):
         # table = Table(filename, titles, init, **kwargs)
         # assert_equal(expected, table.__eq__(other))
         raise SkipTest # TODO: implement your test here
+
 
 if __name__ == "__main__":
     import nose

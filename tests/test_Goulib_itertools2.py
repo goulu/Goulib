@@ -1,60 +1,57 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 
+from Goulib.itertools2 import *
+
+def iterable(n=10):
+    for i in range(n):
+        yield i+1
+
 class TestTake:
     def test_take(self):
-        # assert_equal(expected, take(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(take(3, iterable())),[1,2,3])
 
 class TestIndex:
     def test_index(self):
-        # assert_equal(expected, index(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(index(4, iterable()),5)
+        assert_equal(index(9, iterable()),10) # index=-1 doesn't work
 
 class TestFirst:
     def test_first(self):
-        # assert_equal(expected, first(iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(first(iterable()),1)
 
 class TestLast:
     def test_last(self):
-        # assert_equal(expected, last(iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(last(iterable()),10)
 
 class TestTakeEvery:
     def test_take_every(self):
-        # assert_equal(expected, take_every(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(take_every(2, iterable())),[1,3,5,7,9])
 
 class TestDrop:
     def test_drop(self):
-        # assert_equal(expected, drop(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(drop(5, iterable())),[6,7,8,9,10])
 
 class TestIlen:
     def test_ilen(self):
-        # assert_equal(expected, ilen(it))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(ilen(iterable(0)),0)
+        assert_equal(ilen(iterable(10)),10)
 
 class TestIrange:
     def test_irange(self):
-        # assert_equal(expected, irange(start_or_end, optional_end))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(irange(1,5)),[1,2,3,4,5])
 
 class TestArange:
     def test_arange(self):
-        # assert_equal(expected, arange(start, stop, step))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(arange(-1,2.5,.5)),[-1,-0.5,0,0.5,1,1.5,2])
 
 class TestIlinear:
     def test_ilinear(self):
-        # assert_equal(expected, ilinear(start, end, n))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(ilinear(-1,2,7)),[-1,-0.5,0,0.5,1,1.5,2])
 
 class TestFlatten:
     def test_flatten(self):
-        # assert_equal(expected, flatten(lstlsts))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(flatten([[1,2],[3]])),[1,2,3])
 
 class TestCompact:
     def test_compact(self):
@@ -145,6 +142,12 @@ class TestPairwise:
     def test_pairwise(self):
         # assert_equal(expected, pairwise(iterable))
         raise SkipTest # TODO: implement your test here
+    
+class TestInterleave:
+    def test_interleave(self):
+        assert_equal(interleave([0,2,4],[1,3,5]),[0,1,2,3,4,5])
+        assert_equal(interleave([0,2,4],[1,3]),[0,1,2,3,4])
+        assert_equal(interleave([0],[]),[0])
 
 class TestRandSeq:
     def test_rand_seq(self):
@@ -168,7 +171,7 @@ class TestNextPermutation:
 
 class TestIter2:
     def test___add__(self):
-        # iter2 = iter2(iterable)
+        iter2 = iter2(iterable)
         # assert_equal(expected, iter2.__add__(iterable))
         raise SkipTest # TODO: implement your test here
 
@@ -211,3 +214,6 @@ class TestCountUnique:
         # assert_equal(expected, count_unique(iterable, key))
         raise SkipTest # TODO: implement your test here
 
+if __name__ == "__main__":
+    import nose
+    nose.runmodule()

@@ -208,10 +208,22 @@ def quantify(iterable, pred=bool):
     return sum(imap(pred, iterable))
                 
 def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = tee(iterable)
     next(b, None)
     return izip(a, b)
+
+def interleave(l1,l2):
+    """
+    :param l1: iterable
+    :param l2: iterable of same length, or 1 less than l1
+    :result: iterable interleaving elements from l1 and l2, starting by l1[0]
+    http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2
+    """
+    res=l1+l2
+    res[::2]=l1
+    res[1::2]=l2
+    return res
 
 def rand_seq(size):
     '''generates values in random order

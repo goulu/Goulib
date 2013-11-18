@@ -88,6 +88,7 @@ class Table(list):
                     self.titles=line
                 elif i>=data_line:
                     self.append(line)
+        return self
         
     def read_csv(self, filename, **kwargs):
         """appends a .csv or similar file to the table"""
@@ -119,6 +120,7 @@ class Table(list):
                     line.append(x)
                 if line!=[None]: #strange last line ...
                     self.append(line)
+        return self
             
     def write_csv(self,filename, transpose=False, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
@@ -156,7 +158,10 @@ class Table(list):
     def _i(self,by):
         '''column index'''
         if isinstance(by, basestring):
-            return self.titles.index(by)
+            try:
+                return self.titles.index(by)
+            except ValueError:
+                return None
         return by
     
     def icol(self,by):
@@ -188,6 +193,23 @@ class Table(list):
         for v in val:
             self.set(i,j,v)
             i+=1
+            
+    def append(self,line):
+        ''' appends a line to table
+        :param line: can be either:
+        * a list
+        * a dict or column names:values
+        '''
+        if isinstance(line,dict):
+            r=len(self) #row number
+            for k,v in line.iteritems():
+                i=self._i(k)
+                if i is None: #column doesn't exist:
+                    i=len(self.titles)
+                    self.titles.append(k)
+                self.set(r,i,v)
+        else:
+            list.append(self,line)
             
     def addcol(self,title,val=None,i=0):
         '''add column to the right'''
@@ -289,11 +311,6 @@ class Table(list):
                     res+=1
         return res
                 
-    
-if __name__ == '__main__':
-    t=Table(titles=['A','B','C'])
-    t.append([1,2.0,3.3])
-    t.append(['one','two','three'])
-    t.append([None,['a','b','c'],0])
-    print t
-    print t.html()
+if __name__ == "__main__":
+    import nose
+    nose.runmodule()

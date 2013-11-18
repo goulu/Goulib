@@ -1,1 +1,0 @@
-ipython notebook --pylab inline

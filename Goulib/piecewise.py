@@ -6,10 +6,10 @@ piecewise-defined Exprs
 from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
-__copyright__ = "Copyright 2013, Philippe Guglielmetti"
+__cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-from Goulib import Expr
+from Goulib.expr import Expr
 import bisect
     
 inf=float('Inf')
@@ -23,6 +23,7 @@ class Piecewise(Expr):
         # the value is taken into account in sort order by bisect
         # so instead of defining one more class with a __cmp__ method, I split both lists
         super(Piecewise, self).__init__(default)
+        self.isconstant=False #just to be coherent
         try: #copy constructor ?
             self.x=list(init.x)
             self.y=list(init.y)
@@ -34,6 +35,9 @@ class Piecewise(Expr):
             
     def __call__(self,x):
         """returns value of Expr at point x """
+        try: #is x iterable ?
+            return [self(x) for x in x]
+        except: pass
         i=bisect.bisect_right(self.x,x)-1
         if i<1 : #ignore the first x value
             return self.y[0](x) #this is the default, leftmost value
@@ -44,7 +48,7 @@ class Piecewise(Expr):
         i=bisect.bisect_left(self.x,x)
         if i<len(self) and x==self.x[i]:
             return i
-        #insert either the v value, or copy the current value at x
+        #insert either the v value, or cfy the current value at x
         #note : we might have consecutive tuples with the same y value
         self.y.insert(i,v if v is not None else self.y[i-1])
         self.x.insert(i,x)
@@ -85,34 +89,38 @@ class Piecewise(Expr):
     def __str__(self):
         return str(list(self))
 
-    def _op(self,op,other):
-        if isinstance(other,Piecewise):
-            for i,p in enumerate(other):
+    def _apply(self,f,right,name=None):
+        if not right:
+            self.y=[v.apply(f,name=name) for v in self.y]
+        elif isinstance(right,Piecewise):
+            for i,p in enumerate(right):
                 try:
-                    self._op(op,(p[0],p[1],other[i+1][0]))
+                    self._apply(f,(p[0],p[1],right[i+1][0]),name)
                 except:
-                    self._op(op,(p[0],p[1]))
+                    self._apply(f,(p[0],p[1]),name)
         else: #assume a triplet (start,value,end) as called above
-            i=self.index(other[0])
+            i=self.index(right[0])
             try:
-                j=self.index(other[2])
+                j=self.index(right[2])
                 if j<i:
                     i,j=j,i
             except:
                 j=len(self)
     
             for k in range(i,j):
-                self.y[k]=op(self.y[k],other[1])
+                self.y[k]=self.y[k].apply(f,right[1],name) #calls Expr.apply
         return self
     
-    def apply(self,f):
-        """ apply a function to each piece """
-        self.y=[f(v) for v in self.y]
-        return self
+    def apply(self,f,right,name=None):
+        """ overloads Expr.apply
+        :return:
+        """
+        return Piecewise(self)._apply(f,right,name)
     
-    def applx(self,f):
+    def applx(self,f,name=None):
         """ apply a funtion to each x value """
         self.x=[f(x) for x in self.x]
+        self.y=[y.applx(f,name) for y in self.y]
         return self
     
     def __lshift__(self,dx):
@@ -132,10 +140,12 @@ class Piecewise(Expr):
                 resy.append(self(min))
         except: pass
         for i in range(1,len(self.x)):
-            resx.append(self.x[i]-eps)
-            resy.append(self.y[i-1])
-            resx.append(self.x[i])
-            resy.append(self.y[i])
+            x=self.x[i]-eps
+            resx.append(x)
+            resy.append(self.y[i-1](x))
+            x=self.x[i]
+            resx.append(x)
+            resy.append(self.y[i](x))
         if max and max>self.x[-1]:
             resx.append(max)
             resy.append(self(max))

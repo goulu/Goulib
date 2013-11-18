@@ -2,7 +2,9 @@ from nose.tools import assert_equal, assert_almost_equal
 from nose import SkipTest
 
 from Goulib.piecewise import *
+from Goulib.itertools2 import arange
 from math import *
+
 class TestPiecewise:
     def setup(self):
         #piecewise continuous
@@ -16,14 +18,24 @@ class TestPiecewise:
         self.b1=Piecewise([(2,True)],False)
         self.b2=Piecewise([(1,True),(2,False),(3,True)],False)
         
-        return 
         #simple function
         self.f=Piecewise()
-        self.f+=(0,lambda x:x*x,1)
         self.f+=(0,cos,1)
+        self.f+=(0,lambda x:x*x,1)
         
     def test___init__(self):
         pass #tested above
+    
+    def test___call__(self):
+        y=[self.p1(x) for x in range(6)]
+        assert_equal(y,[0,1,1,3,4,0])
+        y=self.f(arange(0.,2.,.1))
+        assert_equal(y,[0,1,1,3,4,0])
+    
+    def test_points(self):
+        assert_equal(self.p1.points(),([0, 1, 1, 3, 3, 4, 4, 5, 5], [0, 0, 1, 1, 3.0, 3.0, 4, 4, 0]))
+        assert_equal(self.p1.points(0,5),([0, 1, 1, 3, 3, 4, 4, 5, 5], [0, 0, 1, 1, 3.0, 3.0, 4, 4, 0]))
+        assert_equal(self.b2.points(), ([0, 1, 1, 2, 2, 3, 3], [False, False, True, True, False, False, True]))
     
     def test_append(self):
         pass #tested by most other tests
@@ -39,19 +51,13 @@ class TestPiecewise:
 
     def test___len__(self):
         pass #tested by most other tests
-    
-    def test___call__(self):
-        y=[self.p1(x) for x in range(6)]
-        assert_equal(y,[0,1,1,3,4,0])
         
     def test___add__(self):
         pass # += tested in setup
-        y=[self.p2(x) for x in range(8)]
-        assert_equal(y,[1, 1, 2, 3, 2, 2, 2, 1])
+        assert_equal(self.p2(range(8)),[1, 1, 2, 3, 2, 2, 2, 1])
         
         p=self.p1+self.p2
-        y=[p(x) for x in range(8)]
-        assert_equal(y,[1, 2, 3, 6, 6, 2, 2, 1])
+        assert_equal(p(range(8)),[1, 2, 3, 6, 6, 2, 2, 1])
         
     def test___sub__(self):
         p=self.p1-self.p2
@@ -105,10 +111,6 @@ class TestPiecewise:
     def test_apply(self):
         pass #tested in most operators
 
-    def test_points(self):
-        # piecewise = Piecewise(init, default, start)
-        # assert_equal(expected, piecewise.points(min, max, eps))
-        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     import nose

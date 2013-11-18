@@ -256,6 +256,14 @@ class TestCombinationsWithReplacement:
         # assert_equal(expected, combinations_with_replacement(iterable, r))
         raise SkipTest # TODO: implement your test here
 
+class TestProportional:
+    def test_proportional(self):
+        votes=[10,20,30,40]
+        assert_equal(proportional(100, votes),votes)
+        assert_equal(proportional(10, votes),[1,2,3,4])
+        assert_equal(sum(proportional(37, votes)),37)
+        assert_equal(proportional(37, votes),[4,7,11,15])
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

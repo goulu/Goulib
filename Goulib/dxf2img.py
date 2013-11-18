@@ -51,19 +51,23 @@ class BBox:
         if isinstance(pt, BBox):
             self +=pt._corner1
             self +=pt._corner2
+        elif isinstance(pt,Pt):
+            self+= pt.xy
         else:
             if not self._corner1:
-                self._corner1 = pt
+                self._corner1 = Pt(pt)
             else:
-                self._corner1 = Pt(map(min, zip(self._corner1.xy, pt.xy)))
+                p=map(min, zip(self._corner1.xy, pt))
+                self._corner1 = Pt(p)
             if not self._corner2:
-                self._corner2 = pt
+                self._corner2 = Pt(pt)
             else:
-                self._corner2 = Pt(map(max, zip(self._corner2.xy, pt.xy)))
+                p=map(max, zip(self._corner2.xy, pt))
+                self._corner2 = Pt(p)
         return self
         
     def __repr__(self):
-        return "BBox(%s,%s)" % (self._corner1, self._corner2)
+        return "%s(%s,%s)" % (self.__class__.__name__,self._corner1, self._corner2)
     
     def __call__(self):
         """:return: list of flatten corners"""
@@ -76,7 +80,7 @@ class BBox:
         try:
             return self._corner2 - self._corner1
         except:
-            return Pt(0, 0)
+            return geom.Vector2(0, 0)
     
     def center(self):
         """:return: Pt center"""
@@ -151,7 +155,7 @@ class DXF(Drawing):
             elif e.dxftype in ignore:
                 continue
             elif recurse and e.dxftype == 'INSERT':
-                t2 = Trans(1, e.insert[:2], e.rotation) * trans
+                t2 = trans*Trans(1, e.insert[:2], e.rotation)
                 for e2, t3 in self.iter(self.blocks[e.name]._entities, layers=None, ignore=ignore, trans=t2, recurse=recurse):
                     yield e2, t3
             else: 
@@ -163,12 +167,12 @@ class DXF(Drawing):
         :param ignore: list of strings of entity types to ignore
         :return: :class:`BBox` bounding box of corresponding entities"""
         box = BBox()
-        for e, _ in self.iter(layers=layers, ignore=ignore, recurse=False):
+        for e, trans in self.iter(layers=layers, ignore=ignore, recurse=True):
             if e.dxftype == 'LINE':
-                box += Pt(e.start[:2])
-                box += Pt(e.end[:2])
+                box += trans(Pt(e.start[:2]))
+                box += trans(Pt(e.end[:2]))
             elif e.dxftype == 'CIRCLE':
-                box += cbox(Pt(e.center[:2]), e.radius)
+                box += cbox(trans(Pt(e.center[:2])), e.radius)
             elif e.dxftype == 'ARC':
                 c = Pt(e.center[:2])
                 a = e.endangle - e.startangle
@@ -180,14 +184,17 @@ class DXF(Drawing):
                 n = max(n, 1)
                 step = a / n  # angle between 2 points, might be negative
                 for i in range(n + 1):
-                    box += c + geom.Polar(e.radius, radians(start + i * step))
+                    box += trans(c + geom.Polar(e.radius, radians(start + i * step)))
             elif e.dxftype == 'POLYLINE':
                 for v in e.vertices:
-                    box += Pt(v.location[:2])
+                    box += trans(Pt(v.location[:2]))
+            elif e.dxftype == 'SPLINE':
+                for v in e.controlpoints:
+                    box += trans(Pt(v.location[:2]))
             elif e.dxftype == 'BLOCK': 
                 pass
             elif e.dxftype in ['TEXT', 'INSERT']:
-                box += Pt(e.insert[:2])
+                box += trans(Pt(e.insert[:2]))
             else:
                 logging.warning('Unknown entity %s' % e)
         return box
@@ -235,12 +242,18 @@ class DXF(Drawing):
                     for v in e.vertices:
                         b.extend(list(trans(Pt(v.location[:2])).xy))
                     draw.line(b, fill=pen)
+                elif e.dxftype == 'SPLINE':
+                    b = []
+                    for v in e.controlpoints:
+                        b.extend(list(trans(Pt(v[:2])).xy))
+                    draw.line(b, fill=pen) # splines are drawn as lines for now...
                 elif e.dxftype == 'TEXT':
                     h = e.height * trans.mag()  # [pixels]
                     if h < 4: continue  # too small
                     font = None
                     try:
                         font = ImageFont.truetype("c:/windows/fonts/Courier New.ttf", h)
+                        print "font loaded !"
                     except:
                         pass
                     if not font:
@@ -252,7 +265,8 @@ class DXF(Drawing):
                         path = os.path.dirname(path)
                         font = ImageFont.load(path + '\\base_pil\\72\\Courier New_%s_72.pil' % h)
                     pt = Pt(e.insert[0], e.insert[1] + e.height)  # ACAD places texts by top left point...
-                    draw.text(trans(pt).xy, e.text, font=font, fill=pen) 
+                    draw.text(trans(pt).xy, e.text, font=font, fill=pen)
+                     
                 elif e.dxftype == 'INSERT': 
                     t2 = trans * Trans(1, e.insert[:2], e.rotation)
                     _draw(self.iter(self.blocks[e.name]._entities, layers=None, ignore=ignore, trans=t2))

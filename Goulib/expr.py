@@ -52,13 +52,14 @@ class Expr(object):
         if self.isconstant:
             return self.y  
         elif self.right:
-            return self.y(self.left(x),self.right(x))
+            l=self.left(x)
+            r=self.right(x)
+            return self.y(l,r)
         elif self.left:
             return self.y(self.left(x))
         else:
             return self.y(x)
         
-    
     def __repr__(self):
         if self.isconstant:
             return repr(self.y)
@@ -67,6 +68,15 @@ class Expr(object):
         if self.left: 
             return '%s(%s)'%(self.name,self.left)
         return '%s'%self.name
+    
+    def __cmp__(self,other):
+        if self.isconstant:
+            try:
+                if other.isconstant:
+                    return cmp(self.y,other.y)
+            except:
+                return cmp(self.y,other)
+        raise NotImplementedError #TODO : implement for general expressions...
     
     def apply(self,f,right=None,name=None):
         """function composition self o f = f(self(x)) or f(self,right)"""
