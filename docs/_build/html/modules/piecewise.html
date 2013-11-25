@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>piecewise &mdash; Goulib 1.5.2 documentation</title>
+    <title>piecewise &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -70,12 +70,12 @@
             
   <div class="section" id="module-piecewise">
 <span id="piecewise"></span><h1><a class="reference internal" href="#module-piecewise" title="piecewise"><tt class="xref py py-mod docutils literal"><span class="pre">piecewise</span></tt></a><a class="headerlink" href="#module-piecewise" title="Permalink to this headline">¶</a></h1>
-<p>piecewise-defined functions</p>
+<p>piecewise-defined Exprs</p>
 <dl class="class">
 <dt id="piecewise.Piecewise">
 <em class="property">class </em><tt class="descclassname">piecewise.</tt><tt class="descname">Piecewise</tt><big>(</big><em>init=</em><span class="optional">[</span><span class="optional">]</span>, <em>default=0</em>, <em>start=-inf</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>piecewise function defined by a sorted list of (startpoint,value)</p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">Goulib.expr.Expr</span></tt></p>
+<p>piecewise function defined by a sorted list of (startx, Expr)</p>
 <dl class="method">
 <dt id="piecewise.Piecewise.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>init=</em><span class="optional">[</span><span class="optional">]</span>, <em>default=0</em>, <em>start=-inf</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__init__" title="Permalink to this definition">¶</a></dt>
@@ -84,13 +84,24 @@
 <dl class="method">
 <dt id="piecewise.Piecewise.__call__">
 <tt class="descname">__call__</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns value of function at point x</p>
+<dd><p>returns value of Expr at point x</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="piecewise.Piecewise.index">
 <tt class="descname">index</tt><big>(</big><em>x</em>, <em>v=None</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>finds an existing point or insert one and returns index</p>
+<dd><p>finds an existing point or insert one and returns its index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="piecewise.Piecewise.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="piecewise.Piecewise.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterators through disconuities. take the opportunity to delete redundant tuples</p>
 </dd></dl>
 
 <dl class="method">
@@ -106,23 +117,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="piecewise.Piecewise.__len__">
-<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__len__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="piecewise.Piecewise.__getitem__">
 <tt class="descname">__getitem__</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__iter__">
-<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__iter__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.list">
-<tt class="descname">list</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -131,60 +127,16 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="piecewise.Piecewise.__add__">
-<tt class="descname">__add__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__add__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__add__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__sub__">
-<tt class="descname">__sub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__sub__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__mul__">
-<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__mul__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__div__">
-<tt class="descname">__div__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__div__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__div__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__and__">
-<tt class="descname">__and__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__and__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__and__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__or__">
-<tt class="descname">__or__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__or__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__or__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__xor__">
-<tt class="descname">__xor__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__xor__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__xor__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="piecewise.Piecewise.apply">
-<tt class="descname">apply</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.apply" title="Permalink to this definition">¶</a></dt>
-<dd><p>apply a function to each piece</p>
+<tt class="descname">apply</tt><big>(</big><em>f</em>, <em>right</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>overloads Expr.apply
+:return:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="piecewise.Piecewise.__neg__">
-<tt class="descname">__neg__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__neg__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__neg__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="piecewise.Piecewise.__not__">
-<tt class="descname">__not__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__not__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__not__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="piecewise.Piecewise.applx">
-<tt class="descname">applx</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.applx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.applx" title="Permalink to this definition">¶</a></dt>
-<dd><p>apply a function to each x value</p>
+<tt class="descname">applx</tt><big>(</big><em>f</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.applx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.applx" title="Permalink to this definition">¶</a></dt>
+<dd><p>apply a funtion to each x value</p>
 </dd></dl>
 
 <dl class="method">
@@ -196,12 +148,6 @@
 <dt id="piecewise.Piecewise.__rshift__">
 <tt class="descname">__rshift__</tt><big>(</big><em>dx</em><big>)</big><a class="reference internal" href="../_modules/piecewise.html#Piecewise.__rshift__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#piecewise.Piecewise.__rshift__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="attribute">
-<dt id="piecewise.Piecewise.__weakref__">
-<tt class="descname">__weakref__</tt><a class="headerlink" href="#piecewise.Piecewise.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="piecewise.Piecewise.points">
@@ -228,7 +174,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

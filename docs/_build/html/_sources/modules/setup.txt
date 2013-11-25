@@ -1,7 +1,7 @@
-:mod:`homcoord`
-===============
+:mod:`setup`
+============
 
-.. automodule:: homcoord
+.. automodule:: setup
     :show-inheritance:
     :members:
     :undoc-members:

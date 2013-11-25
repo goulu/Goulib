@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>colors &mdash; Goulib 1.5.2 documentation</title>
+    <title>colors &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -80,16 +80,26 @@
 <span class="c"># http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa</span>
 
 <div class="viewcode-block" id="rgb_to_hex"><a class="viewcode-back" href="../modules/colors.html#colors.rgb_to_hex">[docs]</a><span class="k">def</span> <span class="nf">rgb_to_hex</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rgb</span>
+    <span class="sd">&quot;&quot;&quot;:param rgb: tuple (r,g,b) of 3 ints 0-255</span>
+<span class="sd">    :result: string &quot;#rrggbb&quot; in hex suitable for HTML color&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="hex_to_rgb"><a class="viewcode-back" href="../modules/colors.html#colors.hex_to_rgb">[docs]</a><span class="k">def</span> <span class="nf">hex_to_rgb</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;:param value: string &quot;#rrggbb&quot; in hex suitable for HTML color</span>
+<span class="sd">    :param scale: float optional 1./255 to scale output to [0,1] floats</span>
+<span class="sd">    :result: tuple (r,g,b) of 3 ints 0-255&quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)</span>
     <span class="n">lv</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">scale</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">lv</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lv</span><span class="p">,</span> <span class="n">lv</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
 
 <span class="c">#http://stackoverflow.com/questions/876853/generating-color-ranges-in-python</span>
     </div>
-<div class="viewcode-block" id="color_range"><a class="viewcode-back" href="../modules/colors.html#colors.color_range">[docs]</a><span class="k">def</span> <span class="nf">color_range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="s">&#39;red&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="color_range"><a class="viewcode-back" href="../modules/colors.html#colors.color_range">[docs]</a><span class="k">def</span> <span class="nf">color_range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;:param n: int number of colors to generate</span>
+<span class="sd">    :param start: string hex color or color name</span>
+<span class="sd">    :param end: string hex color or color name</span>
+<span class="sd">    :result: list of n hexcolors interpolated between start and end, included</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">itertools2</span> <span class="kn">import</span> <span class="n">ilinear</span>
     <span class="k">if</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">color</span><span class="p">:</span> <span class="n">start</span><span class="o">=</span><span class="n">color</span><span class="p">[</span><span class="n">start</span><span class="p">]</span>
     <span class="n">start</span><span class="o">=</span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="mf">1.</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
@@ -288,7 +298,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

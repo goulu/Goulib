@@ -1,3 +1,7 @@
+v1.6.0, 2013-11-25
+* added :mod:`geom`
+* :mod:`dxf2img` improved and added factory method to generate geom objects from dxf
+
 v1.5.2, 2013-07-28
 
 * added :mod:`motion`and :mod:`polynomial`

@@ -23,17 +23,19 @@ oneweek=timedelta(weeks=1)
 datemin=date(year=dt.MINYEAR,month=1,day=1)
 
 def datetimef(d,t=None,fmt='%Y-%m-%d'):
-    '''converts something to a datetime
+    """"converts something to a datetime
     :param d: can be:
-    - datetime : result is a copy of d with time optionaly replaced
-    - date : result is date at time t, (00:00AM by default)
-    - int or float : if fmt is None, d is considered as Excel date numeric format 
-      (see #Excel format http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/ )
-    - string or speciefied format: result is datetime parsed using specified format string
+    
+    * datetime : result is a copy of d with time optionaly replaced
+    * date : result is date at time t, (00:00AM by default)
+    * int or float : if fmt is None, d is considered as Excel date numeric format 
+      (see http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/ )
+    * string or speciefied format: result is datetime parsed using specified format string
+    
     :param fmt: format string. See http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
     :param t: optional time. replaces the time of the datetime obtained from d. Allows datetimef(date,time)
     :return: datetime
-    '''
+    """
     if isinstance(d,datetime):
         d=d
     elif isinstance(d,date):

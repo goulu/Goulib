@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>motion &mdash; Goulib 1.5.2 documentation</title>
+    <title>motion &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -71,6 +71,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">define &quot;motion laws&quot;, functions of time which return (position, velocity, acceleration, jerk) tuples</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span> <span class="c">#&quot;true division&quot; everywhere</span>
+
 <span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Philippe Guglielmetti&quot;</span>
 <span class="n">__credits__</span><span class="o">=</span> <span class="p">[</span><span class="s">&quot;http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam&quot;</span><span class="p">]</span>
@@ -140,6 +142,50 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">None</span>
     
+<div class="viewcode-block" id="ramp"><a class="viewcode-back" href="../modules/motion.html#motion.ramp">[docs]</a><span class="k">def</span> <span class="nf">ramp</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param dp: float delta position or None if unknown</span>
+<span class="sd">    :param v0: float initial velocity or None if unknown</span>
+<span class="sd">    :param v1: float final velocity or None if unknown</span>
+<span class="sd">    :param a: float acceleration</span>
+<span class="sd">    :return: float shortest time to accelerate between constraints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dt</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">dv</span><span class="o">=</span><span class="n">_delta</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span><span class="n">v1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dv</span><span class="p">:</span>
+        <span class="n">dt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dv</span><span class="o">/</span><span class="n">a</span><span class="p">)</span> <span class="c">#time to accelerate</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c"># solve a.t^2/2+v0.t == dp</span>
+        <span class="n">dt</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">quad</span><span class="p">(</span><span class="n">a</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="o">-</span><span class="n">dp</span><span class="p">)))</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="k">try</span><span class="p">:</span> <span class="c"># solve v1.t-a.t^2/2 == dp</span>
+            <span class="n">dt</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">quad</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span> <span class="o">-</span><span class="n">dp</span><span class="p">)))</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dt</span> <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c">#return smallest positive</span>
+</div>
+<div class="viewcode-block" id="trapeze"><a class="viewcode-back" href="../modules/motion.html#motion.trapeze">[docs]</a><span class="k">def</span> <span class="nf">trapeze</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span><span class="n">vmax</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">v0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">v2</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param dp: float delta position</span>
+<span class="sd">    :param vmax: float maximal velocity</span>
+<span class="sd">    :param a: float acceleration</span>
+<span class="sd">    :param v0: float initial velocity, 0 by default </span>
+<span class="sd">    :param v2: float final velocity, 0 by default </span>
+<span class="sd">    :return: tuple of 6 values:</span>
+<span class="sd">    * time at end of acceleration</span>
+<span class="sd">    * position at end of acceleration</span>
+<span class="sd">    * velocity at end of acceleration</span>
+<span class="sd">    * time at begin of deceleration</span>
+<span class="sd">    * position at begin of deceleration</span>
+<span class="sd">    * total time</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t1</span><span class="o">=</span><span class="n">ramp</span><span class="p">(</span><span class="n">dp</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">vmax</span><span class="p">,</span><span class="n">a</span><span class="p">)</span> <span class="c">#acceleration time</span>
+    <span class="n">v1</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="n">a</span><span class="o">*</span><span class="n">t1</span> <span class="c">#speed reached</span>
+    <span class="n">p1</span><span class="o">=</span><span class="n">t1</span><span class="o">*</span><span class="p">(</span><span class="n">v0</span><span class="o">+</span><span class="n">v1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="c">#position at end of acceleration</span>
+    <span class="n">t3</span><span class="o">=</span><span class="n">ramp</span><span class="p">(</span><span class="n">dp</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">,</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="c">#deceleration time</span>
+    <span class="n">p2</span><span class="o">=</span><span class="n">t3</span><span class="o">*</span><span class="p">(</span><span class="n">v1</span><span class="o">+</span><span class="n">v2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="c">#distance to decelerate</span>
+    <span class="n">t2</span><span class="o">=</span><span class="p">(</span><span class="n">dp</span><span class="o">-</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span><span class="o">/</span><span class="n">v1</span> <span class="c">#time at constant velocity</span>
+    <span class="k">return</span> <span class="n">t1</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">t1</span><span class="o">+</span><span class="n">t2</span><span class="p">,</span><span class="n">dp</span><span class="o">-</span><span class="n">p2</span><span class="p">,</span><span class="n">t1</span><span class="o">+</span><span class="n">t2</span><span class="o">+</span><span class="n">t3</span>
+    </div>
 <div class="viewcode-block" id="Segment2ndDegree"><a class="viewcode-back" href="../modules/motion.html#motion.Segment2ndDegree">[docs]</a><span class="k">def</span> <span class="nf">Segment2ndDegree</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">t1</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;calculates a constant acceleration Segment between start and end</span>
 <span class="sd">    </span>
@@ -170,7 +216,7 @@
     <span class="n">p1</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">a1</span><span class="o">=</span><span class="n">_pva</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">a0</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">a0</span><span class="o">=</span><span class="n">a1</span>
     <span class="c">#to handle the many possible cases, we evaluate missing information in a loop</span>
-    <span class="k">for</span> <span class="n">retries</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>   
+    <span class="k">for</span> <span class="n">retries</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span> <span class="c">#two loops are enough to solve all cases , according to tests   </span>
         <span class="n">dt</span><span class="o">=</span><span class="n">_delta</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">t1</span><span class="p">)</span>
         <span class="n">dp</span><span class="o">=</span><span class="n">_delta</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span><span class="n">p1</span><span class="p">)</span>
         <span class="n">dv</span><span class="o">=</span><span class="n">_delta</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span><span class="n">v1</span><span class="p">)</span>
@@ -189,25 +235,13 @@
             <span class="k">return</span> <span class="n">res</span>
 
         <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="c">#try to determine it from available params</span>
-            <span class="k">try</span><span class="p">:</span> <span class="n">dt</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">dv</span><span class="p">)</span><span class="o">/</span><span class="n">a0</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span> <span class="n">dt</span><span class="o">=</span><span class="mf">2.</span><span class="o">*</span><span class="n">dp</span><span class="o">/</span><span class="p">(</span><span class="n">v0</span><span class="o">+</span><span class="n">v1</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span> 
-                    <span class="k">try</span><span class="p">:</span> <span class="c"># solve at^2/2+v0t+dp=0</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="n">quad</span><span class="p">(</span><span class="n">a0</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">dp</span><span class="p">)</span> <span class="c">#max to avoid negative</span>
-                    <span class="k">except</span><span class="p">:</span> 
-                        <span class="k">try</span><span class="p">:</span> <span class="c"># solve at^2/2-v1t+dp=0</span>
-                            <span class="n">dt</span><span class="o">=</span><span class="n">quad</span><span class="p">(</span><span class="n">a0</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span><span class="o">-</span><span class="n">v1</span><span class="p">,</span><span class="n">dp</span><span class="p">)</span> <span class="c">#max to avoid negative</span>
-                        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">:</span> 
-                            <span class="n">dt</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-                        <span class="k">elif</span> <span class="nb">max</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-                            <span class="n">dt</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dt</span><span class="o">=</span><span class="bp">None</span>
-                    <span class="k">except</span><span class="p">:</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span>
+            <span class="k">if</span> <span class="n">a0</span><span class="p">:</span>
+                <span class="n">dt</span><span class="o">=</span><span class="n">ramp</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">a0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">dt</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">dp</span><span class="o">/</span><span class="p">(</span><span class="n">v0</span><span class="o">+</span><span class="n">v1</span><span class="p">)</span> <span class="c">#time to reach the position</span>
+                <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+
         <span class="k">if</span> <span class="n">t0</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span> <span class="n">t0</span><span class="o">=</span><span class="n">t1</span><span class="o">-</span><span class="n">dt</span>
             <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
@@ -218,7 +252,7 @@
         <span class="k">if</span> <span class="n">a0</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span> <span class="n">a0</span><span class="o">=</span><span class="n">dv</span><span class="o">/</span><span class="n">dt</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span> <span class="n">a0</span><span class="o">=</span><span class="mf">2.</span><span class="o">*</span><span class="p">(</span><span class="n">dp</span><span class="o">-</span><span class="n">v0</span><span class="o">*</span><span class="n">dt</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span>
+                <span class="k">try</span><span class="p">:</span> <span class="n">a0</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">dp</span><span class="o">-</span><span class="n">v0</span><span class="o">*</span><span class="n">dt</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span>
                 <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
         <span class="k">if</span> <span class="n">v0</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span> <span class="n">v0</span><span class="o">=</span><span class="n">v1</span><span class="o">-</span><span class="n">a0</span><span class="o">*</span><span class="n">dt</span>
@@ -237,11 +271,12 @@
     <span class="n">p1</span><span class="p">,</span><span class="n">v1</span><span class="p">,</span><span class="n">a1</span><span class="o">=</span><span class="n">_pva</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
     
     <span class="k">if</span> <span class="n">t1</span><span class="o">&lt;=</span><span class="n">t0</span><span class="p">:</span>
-        <span class="n">dt</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p0</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="n">v0</span><span class="p">)</span>
+        <span class="n">dt</span><span class="o">=</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p0</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="n">v0</span><span class="p">)</span> <span class="c">#truediv</span>
         <span class="n">t1</span><span class="o">=</span><span class="n">t0</span><span class="o">+</span><span class="n">dt</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">dt</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">SegmentPoly</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">t1</span><span class="p">,[</span><span class="n">p0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="mi">0</span><span class="p">,(</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="p">),</span><span class="o">-</span><span class="p">(</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="p">)])</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span>
+    <span class="k">return</span> <span class="n">SegmentPoly</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">t1</span><span class="p">,[</span><span class="n">p0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="mi">0</span><span class="p">,(</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="p">),</span><span class="o">-</span><span class="p">(</span><span class="n">v1</span><span class="o">-</span><span class="n">v0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="p">)])</span> <span class="c">#truediv</span>
+
 </div>
 <div class="viewcode-block" id="SegmentTrapezoidalSpeed"><a class="viewcode-back" href="../modules/motion.html#motion.SegmentTrapezoidalSpeed">[docs]</a><span class="k">def</span> <span class="nf">SegmentTrapezoidalSpeed</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">p0</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -269,7 +304,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

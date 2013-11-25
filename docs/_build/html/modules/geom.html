@@ -1,0 +1,2415 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>geom &mdash; Goulib 1.6.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.6.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/geom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-geom">
+<span id="geom"></span><h1><a class="reference internal" href="#module-geom" title="geom"><tt class="xref py py-mod docutils literal"><span class="pre">geom</span></tt></a><a class="headerlink" href="#module-geom" title="Permalink to this headline">¶</a></h1>
+<p>A module providing vector, matrix and quaternion operations for use in 2D and 3D graphics applications.</p>
+<p>based on euclid <a class="reference external" href="http://code.google.com/p/pyeuclid">http://code.google.com/p/pyeuclid</a></p>
+<dl class="class">
+<dt id="geom.Vector2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Vector2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Two mutable vector types are available: <em>Vector2</em> and <em>Vector3</em>,
+for 2D and 3D vectors, respectively.  Vectors are assumed to hold
+floats, but most operations will also work if you use ints or longs
+instead.  Construct a vector in the obvious way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Vector2</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Vector2(1.50, 2.00)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Vector3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+<span class="go">Vector3(1.00, 2.00, 3.00)</span>
+</pre></div>
+</div>
+<p><strong>Element access</strong></p>
+<p>Components may be accessed as attributes (examples that follow use
+<em>Vector3</em>, but all results are similar for <em>Vector2</em>, using only the <em>x</em>
+and <em>y</em> components):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">x</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">y</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">z</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>Vectors support the list interface via slicing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">[:]</span>
+<span class="go">(1, 2, 3)</span>
+</pre></div>
+</div>
+<p>You can also &#8220;swizzle&#8221; the components (<em>a la</em> GLSL or Cg):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">xyz</span>
+<span class="go">(1, 2, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">zx</span>
+<span class="go">(3, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">zzzz</span>
+<span class="go">(3, 3, 3, 3)</span>
+</pre></div>
+</div>
+<p>All of the above accessors are also mutators[1]:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Vector3(5.00, 2.00, 3.00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Vector3(5.00, 10.00, 20.00)</span>
+</pre></div>
+</div>
+<p>[1] assignment via a swizzle (e.g., <tt class="docutils literal"><span class="pre">v.xyz</span> <span class="pre">=</span> <span class="pre">(1,</span> <span class="pre">2,</span> <span class="pre">3)</span></tt>) is supported
+only if the <tt class="docutils literal"><span class="pre">_enable_swizzle_set</span></tt> variable is set.  This is disabled
+by default, as it impacts on the performance of ordinary attribute
+setting, and is slower than setting components sequentially anyway.</p>
+<p><strong>Operators</strong></p>
+<p>Addition and subtraction are supported via operator overloading (note 
+that in-place operators perform faster than those that create a new object):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span>
+<span class="go">Vector3(5.00, 7.00, 9.00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">-=</span> <span class="n">v2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span>
+<span class="go">Vector3(-3.00, -3.00, -3.00)</span>
+</pre></div>
+</div>
+<p>Multiplication and division can be performed with a scalar only:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="go">Vector3(2.00, 4.00, 6.00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">/=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span>
+<span class="go">Vector3(0.50, 1.00, 1.50)</span>
+</pre></div>
+</div>
+<p>The magnitude of a vector can be found with <tt class="docutils literal"><span class="pre">abs</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="go">3.7416573867739413</span>
+</pre></div>
+</div>
+<p>A vector can be normalized in-place (note that the in-place method also
+returns <tt class="docutils literal"><span class="pre">self</span></tt>, so you can chain it with further operators):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="go">Vector3(0.27, 0.53, 0.80)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Vector3(0.27, 0.53, 0.80)</span>
+</pre></div>
+</div>
+<p>The following methods do <em>not</em> alter the original vector or their arguments:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">copy()</span></tt></dt>
+<dd>Returns a copy of the vector.  <tt class="docutils literal"><span class="pre">__copy__</span></tt> is also implemented.</dd>
+<dt><tt class="docutils literal"><span class="pre">magnitude()</span></tt></dt>
+<dd><p class="first">Returns the magnitude of the vector; equivalent to <tt class="docutils literal"><span class="pre">abs(v)</span></tt>.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">magnitude</span><span class="p">()</span>
+<span class="go">3.7416573867739413</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">magnitude_squared()</span></tt></dt>
+<dd><p class="first">Returns the sum of the squares of each component.  Useful for comparing
+the length of two vectors without the expensive square root operation.
+Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">magnitude_squared</span><span class="p">()</span>
+<span class="go">14.0</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">normalized()</span></tt></dt>
+<dd><p class="first">Return a unit length vector in the same direction.  Note that this
+method differs from <tt class="docutils literal"><span class="pre">normalize</span></tt> in that it does not modify the
+vector in-place.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
+<span class="go">Vector3(0.27, 0.53, 0.80)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Vector3(1.00, 2.00, 3.00)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">dot(other)</span></tt></dt>
+<dd><p class="first">Return the scalar &#8220;dot&#8221; product of two vectors.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+<span class="go">32.0</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">cross()</span></tt> and <tt class="docutils literal"><span class="pre">cross(other)</span></tt></dt>
+<dd><p class="first">Return the cross product of a vector (for <strong>Vector2</strong>), or the cross
+product of two vectors (for <strong>Vector3</strong>).  The return type is a
+vector.  Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+<span class="go">Vector3(-3.00, 6.00, -3.00)</span>
+</pre></div>
+</div>
+<p>In two dimensions there can be no argument to <tt class="docutils literal"><span class="pre">cross</span></tt>:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">()</span>
+<span class="go">Vector2(2.00, -1.00)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">reflect(normal)</span></tt></dt>
+<dd><p class="first">Return the vector reflected about the given normal.  In two dimensions,
+<em>normal</em> is the normal to a line, in three dimensions it is the normal
+to a plane.  The normal must have unit length.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">Vector3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">Vector3(1.00, -2.00, 3.00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">Vector2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">Vector2(-1.00, 2.00)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">rotate_around(axes,</span> <span class="pre">theta)</span></tt></dt>
+<dd><p class="first">For 3D vectors, return the vector rotated around axis by the angle theta.</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">axes</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">rotate_around</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">Vector3(2.65, 0.35, 2.62)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">angle(other)</span></tt></dt>
+<dd>Return the angle between two vectors.</dd>
+<dt><tt class="docutils literal"><span class="pre">project(other)</span></tt></dt>
+<dd>Return the projection (the component) of the vector on other.</dd>
+</dl>
+<p>Tests for equality include comparing against other sequences:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Vector2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">==</span> <span class="n">Vector2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">!=</span> <span class="n">Vector2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">True</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v3</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v3</span> <span class="o">==</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v3</span> <span class="o">!=</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v3</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Vectors are not hashable, and hence cannot be put in sets nor used as
+dictionary keys:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">Vector2</span><span class="p">():</span> <span class="mi">0</span><span class="p">}</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">TypeError</span>: <span class="n">unhashable type: &#39;Vector2&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">Vector3</span><span class="p">():</span> <span class="mi">0</span><span class="p">}</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">TypeError</span>: <span class="n">unhashable type: &#39;Vector3&#39;</span>
+</pre></div>
+</div>
+<p>Constructor.
+:param <a href="#id1"><span class="problematic" id="id2">*</span></a>args: x,y values</p>
+<dl class="method">
+<dt id="geom.Vector2.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.
+:param <a href="#id3"><span class="problematic" id="id4">*</span></a>args: x,y values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Vector2.xy">
+<tt class="descname">xy</tt><a class="reference internal" href="../_modules/geom.html#Vector2.xy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.xy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (x,y)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector2.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__nonzero__">
+<tt class="descname">__nonzero__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__nonzero__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__nonzero__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__add__">
+<tt class="descname">__add__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__add__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__add__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__radd__">
+<tt class="descname">__radd__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#geom.Vector2.__radd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__iadd__">
+<tt class="descname">__iadd__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__iadd__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__iadd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__sub__">
+<tt class="descname">__sub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__rsub__">
+<tt class="descname">__rsub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__rsub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__rsub__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__mul__">
+<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__rmul__">
+<tt class="descname">__rmul__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#geom.Vector2.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__div__">
+<tt class="descname">__div__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__div__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__div__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__rdiv__">
+<tt class="descname">__rdiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__rdiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__rdiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__floordiv__">
+<tt class="descname">__floordiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__floordiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__floordiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__rfloordiv__">
+<tt class="descname">__rfloordiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__rfloordiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__rfloordiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__truediv__">
+<tt class="descname">__truediv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__truediv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__truediv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__rtruediv__">
+<tt class="descname">__rtruediv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__rtruediv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__rtruediv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__neg__">
+<tt class="descname">__neg__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__neg__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__neg__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__pos__">
+<tt class="descname">__pos__</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector2.__pos__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.mag">
+<tt class="descname">mag</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector2.mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.mag2">
+<tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.mag2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.normalized">
+<tt class="descname">normalized</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.normalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.normalized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.dot">
+<tt class="descname">dot</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.cross">
+<tt class="descname">cross</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.reflect">
+<tt class="descname">reflect</tt><big>(</big><em>normal</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.reflect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.reflect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.angle">
+<tt class="descname">angle</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the angle to the vector other</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector2.project">
+<tt class="descname">project</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector2.project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector2.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return one vector projected on the vector other</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Vector2.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#geom.Vector2.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Vector3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Vector3</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Constructor.
+:param <a href="#id5"><span class="problematic" id="id6">*</span></a>args: x,y,z values</p>
+<dl class="method">
+<dt id="geom.Vector3.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.
+:param <a href="#id7"><span class="problematic" id="id8">*</span></a>args: x,y,z values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Vector3.xyz">
+<tt class="descname">xyz</tt><a class="reference internal" href="../_modules/geom.html#Vector3.xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.xyz" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (x,y,z)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector3.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__nonzero__">
+<tt class="descname">__nonzero__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__nonzero__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__nonzero__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__add__">
+<tt class="descname">__add__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__add__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__add__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__radd__">
+<tt class="descname">__radd__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#geom.Vector3.__radd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__iadd__">
+<tt class="descname">__iadd__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__iadd__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__iadd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__sub__">
+<tt class="descname">__sub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__rsub__">
+<tt class="descname">__rsub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__rsub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__rsub__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__mul__">
+<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__rmul__">
+<tt class="descname">__rmul__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#geom.Vector3.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__div__">
+<tt class="descname">__div__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__div__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__div__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__rdiv__">
+<tt class="descname">__rdiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__rdiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__rdiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__floordiv__">
+<tt class="descname">__floordiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__floordiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__floordiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__rfloordiv__">
+<tt class="descname">__rfloordiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__rfloordiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__rfloordiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__truediv__">
+<tt class="descname">__truediv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__truediv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__truediv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__rtruediv__">
+<tt class="descname">__rtruediv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__rtruediv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__rtruediv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__neg__">
+<tt class="descname">__neg__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__neg__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__neg__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__pos__">
+<tt class="descname">__pos__</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector3.__pos__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.mag">
+<tt class="descname">mag</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector3.mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.mag2">
+<tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.mag2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.normalized">
+<tt class="descname">normalized</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.normalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.normalized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.dot">
+<tt class="descname">dot</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.cross">
+<tt class="descname">cross</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.reflect">
+<tt class="descname">reflect</tt><big>(</big><em>normal</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.reflect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.reflect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.rotate_around">
+<tt class="descname">rotate_around</tt><big>(</big><em>axis</em>, <em>theta</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.rotate_around"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.rotate_around" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the vector rotated around axis through angle theta. Right hand rule applies</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.angle">
+<tt class="descname">angle</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the angle to the vector other</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Vector3.project">
+<tt class="descname">project</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Vector3.project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Vector3.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return one vector projected on the vector other</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Vector3.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#geom.Vector3.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Matrix3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Matrix3</tt><a class="reference internal" href="../_modules/geom.html#Matrix3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Two matrix classes are supplied, <em>Matrix3</em>, a 3x3 matrix for working with 2D
+affine transformations, and <em>Matrix4</em>, a 4x4 matrix for working with 3D
+affine transformations.</p>
+<p>The default constructor intializes the matrix to the identity:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Matrix3</span><span class="p">()</span>
+<span class="go">Matrix3([    1.00     0.00     0.00</span>
+<span class="go">             0.00     1.00     0.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Matrix4</span><span class="p">()</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     1.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p><strong>Element access</strong></p>
+<p>Internally each matrix is stored as a set of attributes named <tt class="docutils literal"><span class="pre">a</span></tt> to <tt class="docutils literal"><span class="pre">p</span></tt>.
+The layout for Matrix3 is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># a b c </span>
+<span class="c"># e f g </span>
+<span class="c"># i j k </span>
+</pre></div>
+</div>
+<p>and for Matrix4:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># a b c d</span>
+<span class="c"># e f g h</span>
+<span class="c"># i j k l</span>
+<span class="c"># m n o p</span>
+</pre></div>
+</div>
+<p>If you wish to set or retrieve a number of elements at once, you can
+do so with a slice:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[:]</span>
+<span class="go">[1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     5.00</span>
+<span class="go">             0.00     1.00     0.00     5.00</span>
+<span class="go">             0.00     0.00     1.00     5.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>Note that slices operate in column-major order, which makes them
+suitable for working directly with OpenGL&#8217;s <tt class="docutils literal"><span class="pre">glLoadMatrix</span></tt> and
+<tt class="docutils literal"><span class="pre">glGetFloatv</span></tt> functions.</p>
+<p><strong>Class constructors</strong></p>
+<p>There are class constructors for the most common types of transform.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">new_identity</span></tt></dt>
+<dd><p class="first">Equivalent to the default constructor.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_identity</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     1.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_scale(x,</span> <span class="pre">y)</span></tt> and <tt class="docutils literal"><span class="pre">new_scale(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></tt></dt>
+<dd><p class="first">The former is defined on <strong>Matrix3</strong>, the latter on <strong>Matrix4</strong>.
+Equivalent to the OpenGL call <tt class="docutils literal"><span class="pre">glScalef</span></tt>.
+Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_scale</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    2.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     3.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     4.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_translate(x,</span> <span class="pre">y)</span></tt> and <tt class="docutils literal"><span class="pre">new_translate(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></tt></dt>
+<dd><p class="first">The former is defined on <strong>Matrix3</strong>, the latter on <strong>Matrix4</strong>.
+Equivalent to the OpenGL call <tt class="docutils literal"><span class="pre">glTranslatef</span></tt>.
+Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_translate</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     3.00</span>
+<span class="go">             0.00     1.00     0.00     4.00</span>
+<span class="go">             0.00     0.00     1.00     5.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotate(angle)</span></tt></dt>
+<dd><p class="first">Create a <strong>Matrix3</strong> for a rotation around the origin.  <em>angle</em> is
+specified in radians, anti-clockwise.  This is not implemented in
+<strong>Matrix4</strong> (see below for equivalent methods).
+Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">math</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_rotate</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix3([    0.00    -1.00     0.00</span>
+<span class="go">             1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>The following constructors are defined for <strong>Matrix4</strong> only.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">new</span></tt></dt>
+<dd>Construct a matrix with 16 values in column-major order.</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotatex(angle)</span></tt>, <tt class="docutils literal"><span class="pre">new_rotatey(angle)</span></tt>, <tt class="docutils literal"><span class="pre">new_rotatez(angle)</span></tt></dt>
+<dd><p class="first">Create a <strong>Matrix4</strong> for a rotation around the X, Y or Z axis, respectively.
+<em>angle</em> is specified in radians.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_rotatex</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     0.00    -1.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotate_axis(angle,</span> <span class="pre">axis)</span></tt></dt>
+<dd><p class="first">Create a <strong>Matrix4</strong> for a rotation around the given axis.  <em>angle</em>
+is specified in radians, and <em>axis</em> must be an instance of <strong>Vector3</strong>.
+It is not necessary to normalize the axis.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>        
+<span class="go">Matrix4([    1.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     0.00    -1.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotate_euler(heading,</span> <span class="pre">attitude,</span> <span class="pre">bank)</span></tt></dt>
+<dd><p class="first">Create a <strong>Matrix4</strong> for the given Euler rotation.  <em>heading</em> is a rotation
+around the Y axis, <em>attitude</em> around the X axis and <em>bank</em> around the Z
+axis.  All rotations are performed simultaneously, so this method avoids
+&#8220;gimbal lock&#8221; and is the usual method for implemented 3D rotations in a
+game.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_rotate_euler</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    0.00    -0.00     1.00     0.00</span>
+<span class="go">             1.00     0.00    -0.00     0.00</span>
+<span class="go">            -0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_perspective(fov_y,</span> <span class="pre">aspect,</span> <span class="pre">near,</span> <span class="pre">far)</span></tt></dt>
+<dd><p class="first">Create a <strong>Matrix4</strong> for projection onto the 2D viewing plane.  This
+method is equivalent to the OpenGL call <tt class="docutils literal"><span class="pre">gluPerspective</span></tt>.  <em>fov_y</em> is
+the view angle in the Y direction, in radians.  <em>aspect</em> is the aspect
+ration <em>width</em> / <em>height</em> of the viewing plane.  <em>near</em> and <em>far</em> are
+the distance to the near and far clipping planes.  They must be
+positive and non-zero.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix4</span><span class="o">.</span><span class="n">new_perspective</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1024.0</span> <span class="o">/</span> <span class="mi">768</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix4([    0.75     0.00     0.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00    -1.02    -2.02</span>
+<span class="go">             0.00     0.00    -1.00     0.00])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p><strong>Operators</strong></p>
+<p>Matrices of the same dimension may be multiplied to give a new matrix.
+For example, to create a transform which translates and scales:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_translate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m2</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_scale</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*</span> <span class="n">m2</span>
+<span class="go">Matrix3([    1.00     0.00     5.00</span>
+<span class="go">             0.00     2.00     6.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>Note that multiplication is not commutative (the order that you apply
+transforms matters):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m2</span> <span class="o">*</span> <span class="n">m1</span>
+<span class="go">Matrix3([    1.00     0.00     5.00</span>
+<span class="go">             0.00     2.00    12.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>In-place multiplication is also permitted (and optimised):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*=</span> <span class="n">m2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span>
+<span class="go">Matrix3([    1.00     0.00     5.00</span>
+<span class="go">             0.00     2.00     6.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>Multiplying a matrix by a vector returns a vector, and is used to
+transform a vector:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_rotate</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="go">Vector2(-1.00, 1.00)</span>
+</pre></div>
+</div>
+<p>Note that translations have no effect on vectors.  They do affect
+points, however:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_translate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Vector2(1.00, 2.00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*</span> <span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Point2(6.00, 8.00)</span>
+</pre></div>
+</div>
+<p>Multiplication is currently incorrect between matrices and vectors &#8211; the
+projection component is ignored.  Use the <strong>Matrix4.transform</strong> method
+instead.</p>
+<p>Matrix4 also defines <strong>transpose</strong> (in-place), <strong>transposed</strong> (functional),
+<strong>determinant</strong> and <strong>inverse</strong> (functional) methods.</p>
+<p>A <strong>Matrix3</strong> can be multiplied with a <strong>Vector2</strong> or any of the 2D geometry
+objects (<strong>Point2</strong>, <strong>Line2</strong>, <strong>Circle</strong>, etc).</p>
+<p>A <strong>Matrix4</strong> can be multiplied with a <strong>Vector3</strong> or any of the 3D geometry
+objects (<strong>Point3</strong>, <strong>Line3</strong>, <strong>Sphere</strong>, etc).</p>
+<p>For convenience, each of the matrix constructors are also available as
+in-place operators.  For example, instead of writing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_translate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m2</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_scale</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">*=</span> <span class="n">m2</span>
+</pre></div>
+</div>
+<p>you can apply the scale directly to <em>m1</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">Matrix3</span><span class="o">.</span><span class="n">new_translate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Matrix3([    1.00     0.00     5.00</span>
+<span class="go">             0.00     2.00     6.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span>
+<span class="go">Matrix3([    1.00     0.00     5.00</span>
+<span class="go">             0.00     2.00     6.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>Note that these methods operate in-place (they modify the original matrix),
+and they also return themselves as a result.  This allows you to chain
+transforms together directly:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Matrix3</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+<span class="go">Matrix3([    0.00    -4.00     1.00</span>
+<span class="go">             4.00     0.00     2.00</span>
+<span class="go">             0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+<p>All constructors have an equivalent in-place method.  For <strong>Matrix3</strong>, they
+are <tt class="docutils literal"><span class="pre">identity</span></tt>, <tt class="docutils literal"><span class="pre">translate</span></tt>, <tt class="docutils literal"><span class="pre">scale</span></tt> and <tt class="docutils literal"><span class="pre">rotate</span></tt>.  For <strong>Matrix4</strong>,
+they are <tt class="docutils literal"><span class="pre">identity</span></tt>, <tt class="docutils literal"><span class="pre">translate</span></tt>, <tt class="docutils literal"><span class="pre">scale</span></tt>, <tt class="docutils literal"><span class="pre">rotatex</span></tt>, <tt class="docutils literal"><span class="pre">rotatey</span></tt>, 
+<tt class="docutils literal"><span class="pre">rotatez</span></tt>, <tt class="docutils literal"><span class="pre">rotate_axis</span></tt> and <tt class="docutils literal"><span class="pre">rotate_euler</span></tt>.  Both <strong>Matrix3</strong> and
+<strong>Matrix4</strong> also have an in-place <tt class="docutils literal"><span class="pre">transpose</span></tt> method.</p>
+<p>The <tt class="docutils literal"><span class="pre">copy</span></tt> method is also implemented in both matrix classes and
+behaves in the obvious way.</p>
+<dl class="method">
+<dt id="geom.Matrix3.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Matrix3.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__mul__">
+<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.identity">
+<tt class="descname">identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.scale">
+<tt class="descname">scale</tt><big>(</big><em>x</em>, <em>y=None</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.offset">
+<tt class="descname">offset</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.angle">
+<tt class="descname">angle</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.angle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>angle</strong> &#8211; angle in radians of a unit vector starting at origin</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float bearing in radians of the transformed vector</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.mag">
+<tt class="descname">mag</tt><big>(</big><em>v=None</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.mag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.mag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the net (uniform) scaling of this transform.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.translate">
+<tt class="descname">translate</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.translate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; <p>x,y values</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.rotate">
+<tt class="descname">rotate</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.rotate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix3.new_identity">
+<em class="property">classmethod </em><tt class="descname">new_identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.new_identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.new_identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix3.new_scale">
+<em class="property">classmethod </em><tt class="descname">new_scale</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.new_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.new_scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix3.new_translate">
+<em class="property">classmethod </em><tt class="descname">new_translate</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.new_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.new_translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix3.new_rotate">
+<em class="property">classmethod </em><tt class="descname">new_rotate</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.new_rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.new_rotate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.determinant">
+<tt class="descname">determinant</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.determinant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.determinant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix3.inverse">
+<tt class="descname">inverse</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix3.inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix3.inverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Matrix3.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#geom.Matrix3.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Matrix4">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Matrix4</tt><a class="reference internal" href="../_modules/geom.html#Matrix4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="geom.Matrix4.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Matrix4.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__mul__">
+<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.transform">
+<tt class="descname">transform</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.identity">
+<tt class="descname">identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.scale">
+<tt class="descname">scale</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.translate">
+<tt class="descname">translate</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotatex">
+<tt class="descname">rotatex</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotatex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotatex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotatey">
+<tt class="descname">rotatey</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotatey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotatey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotatez">
+<tt class="descname">rotatez</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotatez"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotatez" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotate_axis">
+<tt class="descname">rotate_axis</tt><big>(</big><em>angle</em>, <em>axis</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotate_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotate_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotate_euler">
+<tt class="descname">rotate_euler</tt><big>(</big><em>heading</em>, <em>attitude</em>, <em>bank</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotate_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotate_euler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.rotate_triple_axis">
+<tt class="descname">rotate_triple_axis</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.rotate_triple_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.rotate_triple_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.transpose">
+<tt class="descname">transpose</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.transpose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.transposed">
+<tt class="descname">transposed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.transposed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.transposed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new">
+<em class="property">classmethod </em><tt class="descname">new</tt><big>(</big><em>*values</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_identity">
+<em class="property">classmethod </em><tt class="descname">new_identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_scale">
+<em class="property">classmethod </em><tt class="descname">new_scale</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_translate">
+<em class="property">classmethod </em><tt class="descname">new_translate</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotatex">
+<em class="property">classmethod </em><tt class="descname">new_rotatex</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotatex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotatex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotatey">
+<em class="property">classmethod </em><tt class="descname">new_rotatey</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotatey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotatey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotatez">
+<em class="property">classmethod </em><tt class="descname">new_rotatez</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotatez"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotatez" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotate_axis">
+<em class="property">classmethod </em><tt class="descname">new_rotate_axis</tt><big>(</big><em>angle</em>, <em>axis</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotate_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotate_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotate_euler">
+<em class="property">classmethod </em><tt class="descname">new_rotate_euler</tt><big>(</big><em>heading</em>, <em>attitude</em>, <em>bank</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotate_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotate_euler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_rotate_triple_axis">
+<em class="property">classmethod </em><tt class="descname">new_rotate_triple_axis</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_rotate_triple_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_rotate_triple_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_look_at">
+<em class="property">classmethod </em><tt class="descname">new_look_at</tt><big>(</big><em>eye</em>, <em>at</em>, <em>up</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_look_at"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_look_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Matrix4.new_perspective">
+<em class="property">classmethod </em><tt class="descname">new_perspective</tt><big>(</big><em>fov_y</em>, <em>aspect</em>, <em>near</em>, <em>far</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.new_perspective"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.new_perspective" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.determinant">
+<tt class="descname">determinant</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.determinant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.determinant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Matrix4.inverse">
+<tt class="descname">inverse</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Matrix4.inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Matrix4.inverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Matrix4.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#geom.Matrix4.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Quaternion">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Quaternion</tt><big>(</big><em>w=1</em>, <em>x=0</em>, <em>y=0</em>, <em>z=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>A quaternion represents a three-dimensional rotation or reflection
+transformation.  They are the preferred way to store and manipulate
+rotations in 3D applications, as they do not suffer the same numerical
+degredation that matrices do.</p>
+<p>The quaternion constructor initializes to the identity transform:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span>
+<span class="go">Quaternion(real=1.00, imag=&lt;0.00, 0.00, 0.00&gt;)</span>
+</pre></div>
+</div>
+<p><strong>Element access</strong></p>
+<p>Internally, the quaternion is stored as four attributes: <tt class="docutils literal"><span class="pre">x</span></tt>, <tt class="docutils literal"><span class="pre">y</span></tt> and
+<tt class="docutils literal"><span class="pre">z</span></tt> forming the imaginary vector, and <tt class="docutils literal"><span class="pre">w</span></tt> the real component.</p>
+<p><strong>Constructors</strong></p>
+<p>Rotations can be formed using the constructors:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">new_identity()</span></tt></dt>
+<dd>Equivalent to the default constructor.</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotate_axis(angle,</span> <span class="pre">axis)</span></tt></dt>
+<dd><p class="first">Equivalent to the Matrix4 constructor of the same name.  <em>angle</em> is
+specified in radians, <em>axis</em> is an instance of <strong>Vector3</strong>.  It is
+not necessary to normalize the axis.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span>
+<span class="go">Quaternion(real=0.71, imag=&lt;0.71, 0.00, 0.00&gt;)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_rotate_euler(heading,</span> <span class="pre">attitude,</span> <span class="pre">bank)</span></tt></dt>
+<dd><p class="first">Equivalent to the Matrix4 constructor of the same name.  <em>heading</em>
+is a rotation around the Y axis, <em>attitude</em> around the X axis and
+<em>bank</em> around the Z axis.  All angles are given in radians.  Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_euler</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span>
+<span class="go">Quaternion(real=0.50, imag=&lt;0.50, 0.50, 0.50&gt;)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">new_interpolate(q1,</span> <span class="pre">q2,</span> <span class="pre">t)</span></tt></dt>
+<dd><p class="first">Create a quaternion which gives a (SLERP) interpolated rotation
+between <em>q1</em> and <em>q2</em>.  <em>q1</em> and <em>q2</em> are instances of <strong>Quaternion</strong>,
+and <em>t</em> is a value between 0.0 and 1.0.  For example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q2</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_interpolate</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Quaternion(real=0.71, imag=&lt;0.71, 0.00, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.75, imag=&lt;0.66, 0.09, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.78, imag=&lt;0.61, 0.17, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.80, imag=&lt;0.55, 0.25, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.81, imag=&lt;0.48, 0.33, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.82, imag=&lt;0.41, 0.41, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.81, imag=&lt;0.33, 0.48, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.80, imag=&lt;0.25, 0.55, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.78, imag=&lt;0.17, 0.61, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.75, imag=&lt;0.09, 0.66, 0.00&gt;)</span>
+<span class="go">Quaternion(real=0.71, imag=&lt;0.00, 0.71, 0.00&gt;)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p><strong>Operators</strong></p>
+<p>Quaternions may be multiplied to compound rotations.  For example, to
+rotate 90 degrees around the X axis and then 90 degrees around the Y axis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q2</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">*</span> <span class="n">q2</span>
+<span class="go">Quaternion(real=0.50, imag=&lt;0.50, 0.50, 0.50&gt;)</span>
+</pre></div>
+</div>
+<p>Multiplying a quaternion by a vector gives a vector, transformed
+appropriately:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">*</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">Vector3(0.00, 0.00, -1.00)</span>
+</pre></div>
+</div>
+<p>Similarly, any 3D object can be multiplied (e.g., <strong>Point3</strong>, <strong>Line3</strong>,
+<strong>Sphere</strong>, etc):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">*</span> <span class="n">Ray3</span><span class="p">(</span><span class="n">Point3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+<span class="go">Ray3(&lt;1.00, 1.00, -1.00&gt; + u&lt;1.00, 1.00, -1.00&gt;)</span>
+</pre></div>
+</div>
+<p>As with the matrix classes, the constructors are also available as in-place
+operators.  These are named <tt class="docutils literal"><span class="pre">identity</span></tt>, <tt class="docutils literal"><span class="pre">rotate_euler</span></tt> and
+<tt class="docutils literal"><span class="pre">rotate_axis</span></tt>.  For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span><span class="o">.</span><span class="n">rotate_euler</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">Quaternion(real=0.50, imag=&lt;0.50, 0.50, 0.50&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span>
+<span class="go">Quaternion(real=0.50, imag=&lt;0.50, 0.50, 0.50&gt;)</span>
+</pre></div>
+</div>
+<p>Quaternions are usually unit length, but you may wish to use sized
+quaternions.  In this case, you can find the magnitude using <tt class="docutils literal"><span class="pre">abs</span></tt>,
+<tt class="docutils literal"><span class="pre">magnitude</span></tt> and <tt class="docutils literal"><span class="pre">magnitude_squared</span></tt>, as with the vector classes.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span><span class="o">.</span><span class="n">magnitude</span><span class="p">()</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<p>Similarly, the class implements <tt class="docutils literal"><span class="pre">normalize</span></tt> and <tt class="docutils literal"><span class="pre">normalized</span></tt> in the
+same way as the vectors.</p>
+<p>The following methods do not alter the quaternion:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">conjugated()</span></tt></dt>
+<dd><p class="first">Returns a quaternion that is the conjugate of the instance.  For
+example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span><span class="o">.</span><span class="n">conjugated</span><span class="p">()</span>
+<span class="go">Quaternion(real=0.71, imag=&lt;-0.71, -0.00, -0.00&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span>
+<span class="go">Quaternion(real=0.71, imag=&lt;0.71, 0.00, 0.00&gt;)</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">get_angle_axis()</span></tt></dt>
+<dd><p class="first">Returns a tuple (angle, axis), giving the angle to rotate around an
+axis equivalent to the quaternion.  For example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span><span class="o">.</span><span class="n">get_angle_axis</span><span class="p">()</span>
+<span class="go">(1.5707963267948966, Vector3(1.00, 0.00, 0.00))</span>
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">get_matrix()</span></tt></dt>
+<dd><p class="first">Returns a <strong>Matrix4</strong> implementing the transformation of the quaternion.
+For example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="o">.</span><span class="n">new_rotate_axis</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Vector3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q1</span><span class="o">.</span><span class="n">get_matrix</span><span class="p">()</span>
+<span class="go">Matrix4([    1.00     0.00     0.00     0.00</span>
+<span class="go">             0.00     0.00    -1.00     0.00</span>
+<span class="go">             0.00     1.00     0.00     0.00</span>
+<span class="go">             0.00     0.00     0.00     1.00])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="geom.Quaternion.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>w=1</em>, <em>x=0</em>, <em>y=0</em>, <em>z=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Quaternion.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.__mul__">
+<tt class="descname">__mul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.mag">
+<tt class="descname">mag</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Quaternion.mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.mag2">
+<tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.mag2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.identity">
+<tt class="descname">identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.rotate_axis">
+<tt class="descname">rotate_axis</tt><big>(</big><em>angle</em>, <em>axis</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.rotate_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.rotate_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.rotate_euler">
+<tt class="descname">rotate_euler</tt><big>(</big><em>heading</em>, <em>attitude</em>, <em>bank</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.rotate_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.rotate_euler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.rotate_matrix">
+<tt class="descname">rotate_matrix</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.rotate_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.rotate_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.conjugated">
+<tt class="descname">conjugated</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.conjugated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.conjugated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.normalized">
+<tt class="descname">normalized</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.normalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.normalized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.get_angle_axis">
+<tt class="descname">get_angle_axis</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.get_angle_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.get_angle_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.get_euler">
+<tt class="descname">get_euler</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.get_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.get_euler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Quaternion.get_matrix">
+<tt class="descname">get_matrix</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.get_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.get_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Quaternion.new_identity">
+<em class="property">classmethod </em><tt class="descname">new_identity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.new_identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.new_identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Quaternion.new_rotate_axis">
+<em class="property">classmethod </em><tt class="descname">new_rotate_axis</tt><big>(</big><em>angle</em>, <em>axis</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.new_rotate_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.new_rotate_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Quaternion.new_rotate_euler">
+<em class="property">classmethod </em><tt class="descname">new_rotate_euler</tt><big>(</big><em>heading</em>, <em>attitude</em>, <em>bank</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.new_rotate_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.new_rotate_euler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Quaternion.new_rotate_matrix">
+<em class="property">classmethod </em><tt class="descname">new_rotate_matrix</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.new_rotate_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.new_rotate_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="geom.Quaternion.new_interpolate">
+<em class="property">classmethod </em><tt class="descname">new_interpolate</tt><big>(</big><em>q1</em>, <em>q2</em>, <em>t</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Quaternion.new_interpolate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Quaternion.new_interpolate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Geometry">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Geometry</tt><a class="reference internal" href="../_modules/geom.html#Geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>The following classes are available for dealing with simple 2D geometry.
+The interface to each shape is similar; in particular, the <tt class="docutils literal"><span class="pre">connect</span></tt>
+and <tt class="docutils literal"><span class="pre">distance</span></tt> methods are defined identically for each.</p>
+<p>For example, to find the closest point on a line to a circle:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">circ</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">),</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">Line2</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span> <span class="n">Point2</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">circ</span><span class="p">)</span><span class="o">.</span><span class="n">p1</span>
+<span class="go">Point2(0.50, -0.50)</span>
+</pre></div>
+</div>
+<p>To find the corresponding closest point on the circle to the line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">circ</span><span class="p">)</span><span class="o">.</span><span class="n">p2</span>
+<span class="go">Point2(1.59, 0.59)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="geom.Geometry.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#geom.Geometry.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Geometry.point">
+<tt class="descname">point</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Geometry.point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry.point" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Point2 or Point3 at parameter u</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Geometry.tangent">
+<tt class="descname">tangent</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Geometry.tangent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry.tangent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vector2 or Vector3 tangent at parameter u</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Geometry.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Geometry.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Geometry.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Geometry.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry.connect" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Geometry shortest (Segment2 or Segment3) that connects self to other</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Geometry.distance">
+<tt class="descname">distance</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Geometry.distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Geometry.distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Geometry.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Geometry.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Geometry.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#geom.Geometry.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Point2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Point2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Vector2" title="geom.Vector2"><tt class="xref py py-class docutils literal"><span class="pre">geom.Vector2</span></tt></a>, <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>A point on a 2D plane.  Construct in the obvious way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
+</pre></div>
+</div>
+<p>Point2(1.00, 2.00)</p>
+<p><strong>Point2</strong> subclasses <strong>Vector2</strong>, so all of <strong>Vector2</strong> operators and
+methods apply.  In particular, subtracting two points gives a vector:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Point2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">-</span> <span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Vector2(1.00, 3.00)</p>
+<p>The following methods are also defined:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment2</strong> which is the minimum length line segment
+that can connect the two shapes.  <em>other</em> may be a <strong>Point2</strong>, <strong>Line2</strong>,
+<strong>Ray2</strong>, <strong>LineSegment2</strong> or <strong>Circle</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<p>Constructor.
+:param <a href="#id11"><span class="problematic" id="id12">*</span></a>args: x,y values</p>
+<dl class="method">
+<dt id="geom.Point2.dist">
+<tt class="descname">dist</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point2.dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point2.dist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Point2.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point2.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point2.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Point2.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point2.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point2.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Point2.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Point2.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="geom.Polar">
+<tt class="descclassname">geom.</tt><tt class="descname">Polar</tt><big>(</big><em>mag</em>, <em>angle</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Polar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Polar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="geom.Line2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Line2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>A <strong>Line2</strong> is a line on a 2D plane extending to infinity in both directions;
+a <strong>Ray2</strong> has a finite end-point and extends to infinity in a single
+direction; a <strong>LineSegment2</strong> joins two points.</p>
+<p>All three classes support the same constructors, operators and methods,
+but may behave differently when calculating intersections etc.</p>
+<p>You may construct a line, ray or line segment using any of:</p>
+<ul class="simple">
+<li>another line, ray or line segment</li>
+<li>two points</li>
+<li>a point and a vector</li>
+<li>a point, a vector and a length</li>
+</ul>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Line2</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Point2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
+<span class="go">Line2(&lt;1.00, 1.00&gt; + u&lt;1.00, 2.00&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Line2</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+<span class="go">Line2(&lt;1.00, 1.00&gt; + u&lt;1.00, 2.00&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ray2</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Vector2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="go">Ray2(&lt;1.00, 1.00&gt; + u&lt;0.45, 0.89&gt;)</span>
+</pre></div>
+</div>
+<p>Internally, lines, rays and line segments store a Point2 <em>p</em> and a
+Vector2 <em>v</em>.  You can also access (but not set) the two endpoints
+<em>p1</em> and <em>p2</em>.  These may or may not be meaningful for all types of lines.</p>
+<p>The following methods are supported by all three classes:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt></dt>
+<dd><p class="first">If <em>other</em> is a <strong>Line2</strong>, <strong>Ray2</strong> or <strong>LineSegment2</strong>, returns
+a <strong>Point2</strong> of intersection, or None if the lines are parallel.</p>
+<p class="last">If <em>other</em> is a <strong>Circle</strong>, returns a <strong>LineSegment2</strong> or <strong>Point2</strong> giving
+the part of the line that intersects the circle, or None if there
+is no intersection.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment2</strong> which is the minimum length line segment
+that can connect the two shapes.  For two parallel lines, this
+line segment may be in an arbitrary position.  <em>other</em> may be
+a <strong>Point2</strong>, <strong>Line2</strong>, <strong>Ray2</strong>, <strong>LineSegment2</strong> or <strong>Circle</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<p><strong>LineSegment2</strong> also has a <em>length</em> property which is read-only.</p>
+<dl class="method">
+<dt id="geom.Line2.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>lines are &#8220;equal&#8221; only if base points and vector are strictly equal.
+to compare if lines are &#8220;same&#8221;, use line1.distance(line2)==0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Line2.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.point">
+<tt class="descname">point</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.point" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Point2 at parameter u</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.tangent">
+<tt class="descname">tangent</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.tangent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.tangent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vector2 tangent at parameter u. Warning : tangent is generally not a unit vector</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line2.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line2.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line2.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Line2.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Line2.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Ray2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Ray2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Ray2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Ray2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Line2" title="geom.Line2"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line2</span></tt></a></p>
+<dl class="attribute">
+<dt id="geom.Ray2.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Ray2.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Segment2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Segment2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Line2" title="geom.Line2"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line2</span></tt></a></p>
+<dl class="attribute">
+<dt id="geom.Segment2.p1">
+<tt class="descname">p1</tt><a class="headerlink" href="#geom.Segment2.p1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Segment2.p2">
+<tt class="descname">p2</tt><a class="headerlink" href="#geom.Segment2.p2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment2.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment2.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment2.mag2">
+<tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2.mag2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Segment2.length">
+<tt class="descname">length</tt><a class="headerlink" href="#geom.Segment2.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Segment2.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Segment2.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Circle">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Circle</tt><big>(</big><em>center</em>, <em>radius</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>Circles are constructed with a center <strong>Point2</strong> and a radius:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="n">Point2</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span>
+</pre></div>
+</div>
+<p>Circle(&lt;1.00, 1.00&gt;, radius=0.50)</p>
+<p>Internally there are two attributes: <em>c</em>, giving the center point and
+<em>r</em>, giving the radius.</p>
+<p>The following methods are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt></dt>
+<dd>If <em>other</em> is a <strong>Line2</strong>, <strong>Ray2</strong> or <strong>LineSegment2</strong>, returns
+a <strong>LineSegment2</strong> giving the part of the line that intersects the
+circle, or None if there is no intersection.</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment2</strong> which is the minimum length line segment
+that can connect the two shapes. <em>other</em> may be a <strong>Point2</strong>, <strong>Line2</strong>,
+<strong>Ray2</strong>, <strong>LineSegment2</strong> or <strong>Circle</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<dl class="method">
+<dt id="geom.Circle.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>center</em>, <em>radius</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.point">
+<tt class="descname">point</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.point" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Point2 at angle u radians</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.tangent">
+<tt class="descname">tangent</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.tangent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.tangent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vector2 tangent at angle u. Warning : tangent has magnitude r != 1</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Circle.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float perimeter</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Circle.length">
+<tt class="descname">length</tt><a class="headerlink" href="#geom.Circle.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Circle.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Circle.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Circle.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Circle.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Circle.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Arc2">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Arc2</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Circle" title="geom.Circle"><tt class="xref py py-class docutils literal"><span class="pre">geom.Circle</span></tt></a></p>
+<dl class="method">
+<dt id="geom.Arc2.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.angle">
+<tt class="descname">angle</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.angle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float arc angle</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float arc length</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.point">
+<tt class="descname">point</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.point" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Point2 at parameter u</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.tangent">
+<tt class="descname">tangent</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.tangent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.tangent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vector2 tangent at parameter u. Warning : tangent not a unit vector</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Arc2.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Arc2.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Arc2.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Point3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Point3</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Vector3" title="geom.Vector3"><tt class="xref py py-class docutils literal"><span class="pre">geom.Vector3</span></tt></a>, <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>A point on a 3D plane.  Construct in the obvious way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
+<span class="go">Point3(1.00, 2.00, 3.00)</span>
+</pre></div>
+</div>
+<p><strong>Point3</strong> subclasses <strong>Vector3</strong>, so all of <strong>Vector3</strong> operators and
+methods apply.  In particular, subtracting two points gives a vector:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">-</span> <span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Vector3(0.00, 2.00, 5.00)</span>
+</pre></div>
+</div>
+<p>The following methods are also defined:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt></dt>
+<dd>If <em>other</em> is a <strong>Sphere</strong>, returns <tt class="docutils literal"><span class="pre">True</span></tt> iff the point lies within
+the sphere.</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment3</strong> which is the minimum length line segment
+that can connect the two shapes.  <em>other</em> may be a <strong>Point3</strong>, <strong>Line3</strong>,
+<strong>Ray3</strong>, <strong>LineSegment3</strong>, <strong>Sphere</strong> or <strong>Plane</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<p>Constructor.
+:param <a href="#id13"><span class="problematic" id="id14">*</span></a>args: x,y,z values</p>
+<dl class="method">
+<dt id="geom.Point3.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point3.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point3.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Point3.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Point3.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Point3.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Point3.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Point3.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Line3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Line3</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>A <strong>Line3</strong> is a line on a 3D plane extending to infinity in both directions;
+a <strong>Ray3</strong> has a finite end-point and extends to infinity in a single
+direction; a <strong>LineSegment3</strong> joins two points.</p>
+<p>All three classes support the same constructors, operators and methods,
+but may behave differently when calculating intersections etc.</p>
+<p>You may construct a line, ray or line segment using any of:</p>
+<ul class="simple">
+<li>another line, ray or line segment</li>
+<li>two points</li>
+<li>a point and a vector</li>
+<li>a point, a vector and a length</li>
+</ul>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Line3</span><span class="p">(</span><span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
+<span class="go">Line3(&lt;1.00, 1.00, 1.00&gt; + u&lt;0.00, 1.00, 2.00&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Line3</span><span class="p">(</span><span class="n">Point3</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+<span class="go">Line3(&lt;0.00, 1.00, 1.00&gt; + u&lt;1.00, 1.00, 2.00&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ray3</span><span class="p">(</span><span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Vector3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="go">Ray3(&lt;1.00, 1.00, 1.00&gt; + u&lt;0.41, 0.41, 0.82&gt;)</span>
+</pre></div>
+</div>
+<p>Internally, lines, rays and line segments store a Point3 <em>p</em> and a
+Vector3 <em>v</em>.  You can also access (but not set) the two endpoints
+<em>p1</em> and <em>p2</em>.  These may or may not be meaningful for all types of lines.</p>
+<p>The following methods are supported by all three classes:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt></dt>
+<dd><p class="first">If <em>other</em> is a <strong>Sphere</strong>, returns a <strong>LineSegment3</strong> which is the
+intersection of the sphere and line, or <tt class="docutils literal"><span class="pre">None</span></tt> if there is no
+intersection.</p>
+<p class="last">If <em>other</em> is a <strong>Plane</strong>, returns a <strong>Point3</strong> of intersection, or
+<tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment3</strong> which is the minimum length line segment
+that can connect the two shapes.  For two parallel lines, this
+line segment may be in an arbitrary position.  <em>other</em> may be
+a <strong>Point3</strong>, <strong>Line3</strong>, <strong>Ray3</strong>, <strong>LineSegment3</strong>, <strong>Sphere</strong> or
+<strong>Plane</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<p><strong>LineSegment3</strong> also has a <em>length</em> property which is read-only.</p>
+<dl class="method">
+<dt id="geom.Line3.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line3.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line3.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Line3.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line3.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Line3.p1">
+<tt class="descname">p1</tt><a class="headerlink" href="#geom.Line3.p1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Line3.p2">
+<tt class="descname">p2</tt><a class="headerlink" href="#geom.Line3.p2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line3.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Line3.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Line3.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Line3.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Line3.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Line3.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Ray3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Ray3</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Ray3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Ray3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Line3" title="geom.Line3"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line3</span></tt></a></p>
+<dl class="attribute">
+<dt id="geom.Ray3.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Ray3.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Segment3">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Segment3</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Line3" title="geom.Line3"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line3</span></tt></a></p>
+<dl class="method">
+<dt id="geom.Segment3.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment3.__abs__">
+<tt class="descname">__abs__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3.__abs__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment3.mag2">
+<tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3.mag2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Segment3.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Segment3.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Segment3.length">
+<tt class="descname">length</tt><a class="headerlink" href="#geom.Segment3.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Sphere">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Sphere</tt><big>(</big><em>center</em>, <em>radius</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Geometry" title="geom.Geometry"><tt class="xref py py-class docutils literal"><span class="pre">geom.Geometry</span></tt></a></p>
+<p>Spheres are constructed with a center <strong>Point3</strong> and a radius:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">Point3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span>
+</pre></div>
+</div>
+<p>Sphere(&lt;1.00, 1.00, 1.00&gt;, radius=0.50)</p>
+<p>Internally there are two attributes: <em>c</em>, giving the center point and
+<em>r</em>, giving the radius.</p>
+<p>The following methods are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt>:</dt>
+<dd><p class="first">If <em>other</em> is a <strong>Point3</strong>, returns <tt class="docutils literal"><span class="pre">True</span></tt> iff the point lies
+within the sphere.</p>
+<p class="last">If <em>other</em> is a <strong>Line3</strong>, <strong>Ray3</strong> or <strong>LineSegment3</strong>, returns
+a <strong>LineSegment3</strong> giving the intersection, or <tt class="docutils literal"><span class="pre">None</span></tt> if the
+line does not intersect the sphere.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment3</strong> which is the minimum length line segment
+that can connect the two shapes. <em>other</em> may be a <strong>Point3</strong>, <strong>Line3</strong>,
+<strong>Ray3</strong>, <strong>LineSegment3</strong>, <strong>Sphere</strong> or <strong>Plane</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<dl class="attribute">
+<dt id="geom.Sphere.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Sphere.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>center</em>, <em>radius</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Sphere.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Sphere.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Sphere.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Sphere.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geom.Plane">
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Plane</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Planes can be constructed with any of:</p>
+<ul class="simple">
+<li>three <strong>Point3</strong>&#8216;s lying on the plane</li>
+<li>a <strong>Point3</strong> on the plane and the <strong>Vector3</strong> normal</li>
+<li>a <strong>Vector3</strong> normal and <em>k</em>, described below.</li>
+</ul>
+<p>Internally, planes are stored with the normal <em>n</em> and constant <em>k</em> such
+that <em>n.p</em> = <em>k</em> for any point on the plane <em>p</em>.</p>
+<p>The following methods are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">intersect(other)</span></tt></dt>
+<dd><p class="first">If <em>other</em> is a <strong>Line3</strong>, <strong>Ray3</strong> or <strong>LineSegment3</strong>, returns a
+<strong>Point3</strong> of intersection, or <tt class="docutils literal"><span class="pre">None</span></tt> if there is no intersection.</p>
+<p class="last">If <em>other</em> is a <strong>Plane</strong>, returns the <strong>Line3</strong> of intersection.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">connect(other)</span></tt></dt>
+<dd>Returns a <strong>LineSegment3</strong> which is the minimum length line segment
+that can connect the two shapes. <em>other</em> may be a <strong>Point3</strong>, <strong>Line3</strong>,
+<strong>Ray3</strong>, <strong>LineSegment3</strong>, <strong>Sphere</strong> or <strong>Plane</strong>.</dd>
+<dt><tt class="docutils literal"><span class="pre">distance(other)</span></tt></dt>
+<dd>Returns the absolute minimum distance to <em>other</em>.  Internally this
+simply returns the length of the result of <tt class="docutils literal"><span class="pre">connect</span></tt>.</dd>
+</dl>
+<dl class="method">
+<dt id="geom.Plane.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Plane.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Plane.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Plane.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Plane.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Plane.intersect">
+<tt class="descname">intersect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Plane.connect">
+<tt class="descname">connect</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Plane.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Plane.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="geom.argPair">
+<tt class="descclassname">geom.</tt><tt class="descname">argPair</tt><big>(</big><em>*p</em><big>)</big><a class="reference internal" href="../_modules/geom.html#argPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.argPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a pair of values passed in various ways.</p>
+<dl class="docutils">
+<dt>[ if len(p) is 2 -&gt;</dt>
+<dd><blockquote class="first">
+<div>return (p[0], p[1])</div></blockquote>
+<dl class="last docutils">
+<dt>else if p is a single non-iterable -&gt;</dt>
+<dd>return (p[0], p[0])</dd>
+<dt>else if p is an iterable with two values -&gt;</dt>
+<dd>return (p[0][0], p[0][1])</dd>
+<dt>else if p is an iterable with one value -&gt;</dt>
+<dd>return (p[0][0], p[0][0])</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>itertools2 &mdash; Goulib 1.5.2 documentation</title>
+    <title>itertools2 &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -194,22 +194,26 @@
         <span class="k">yield</span> <span class="n">curr</span>
 </div>
 <div class="viewcode-block" id="unique"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.unique">[docs]</a><span class="k">def</span> <span class="nf">unique</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="s">&quot;List unique elements, preserving order. Remember all elements ever seen.&quot;</span>
-    <span class="c"># unique(&#39;AAAABBBCCDAABBB&#39;) --&gt; A B C D</span>
-    <span class="c"># unique(&#39;ABBCcAD&#39;, str.lower) --&gt; A B C D</span>
+    <span class="sd">&quot;&quot;&quot;List unique elements, preserving order. Remember all elements ever seen.</span>
+<span class="sd">    # unique(&#39;AAAABBBCCDAABBB&#39;) --&gt; A B C D</span>
+<span class="sd">    # unique(&#39;ABBCcAD&#39;, str.lower) --&gt; A B C D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-                <span class="n">seen_add</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
-                <span class="k">yield</span> <span class="n">element</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-                <span class="n">seen_add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="k">yield</span> <span class="n">element</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="k">else</span> <span class="n">element</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">element</span>
+            </div>
+<div class="viewcode-block" id="count_unique"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.count_unique">[docs]</a><span class="k">def</span> <span class="nf">count_unique</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count unique elements</span>
+<span class="sd">    # unique(&#39;AAAABBBCCDAABBB&#39;) --&gt; 4</span>
+<span class="sd">    # unique(&#39;ABBCcAD&#39;, str.lower) --&gt; 4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="k">else</span> <span class="n">element</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">seen</span><span class="p">)</span>
         </div>
 <div class="viewcode-block" id="identity"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.identity">[docs]</a><span class="k">def</span> <span class="nf">identity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Do nothing and return the variable untouched&quot;&quot;&quot;</span>
@@ -272,10 +276,22 @@
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">iterable</span><span class="p">))</span>
                 </div>
 <div class="viewcode-block" id="pairwise"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.pairwise">[docs]</a><span class="k">def</span> <span class="nf">pairwise</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
-    <span class="s">&quot;s -&gt; (s0,s1), (s1,s2), (s2, s3), ...&quot;</span>
+    <span class="sd">&quot;&quot;&quot;s -&gt; (s0,s1), (s1,s2), (s2, s3), ...&quot;&quot;&quot;</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
     <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">izip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="interleave"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.interleave">[docs]</a><span class="k">def</span> <span class="nf">interleave</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span><span class="n">l2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param l1: iterable</span>
+<span class="sd">    :param l2: iterable of same length, or 1 less than l1</span>
+<span class="sd">    :result: iterable interleaving elements from l1 and l2, starting by l1[0]</span>
+<span class="sd">    http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span><span class="o">=</span><span class="n">l1</span><span class="o">+</span><span class="n">l2</span>
+    <span class="n">res</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">l1</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">l2</span>
+    <span class="k">return</span> <span class="n">res</span>
 </div>
 <div class="viewcode-block" id="rand_seq"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.rand_seq">[docs]</a><span class="k">def</span> <span class="nf">rand_seq</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;generates values in random order</span>
@@ -424,7 +440,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

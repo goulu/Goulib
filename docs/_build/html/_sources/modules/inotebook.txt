@@ -1,7 +1,7 @@
-:mod:`geom`
-===========
+:mod:`inotebook`
+================
 
-.. automodule:: geom
+.. automodule:: inotebook
     :show-inheritance:
     :members:
     :undoc-members:

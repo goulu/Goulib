@@ -66,7 +66,7 @@ class TestDXF:
         raise SkipTest # TODO: implement your test here
 
     def test_img(self):
-        img = self.dxf.img(size=[512, None], border=5,forcelayercolor=True)
+        img = self.dxf.img(size=[512, None], border=5,forcelayercolor=False, background='white')
         img.save('test.png') #todo add a test
 
     def test_iter(self):

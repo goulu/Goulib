@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>motion &mdash; Goulib 1.5.2 documentation</title>
+    <title>motion &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -139,6 +139,59 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="motion.ramp">
+<tt class="descclassname">motion.</tt><tt class="descname">ramp</tt><big>(</big><em>dp</em>, <em>v0</em>, <em>v1</em>, <em>a</em><big>)</big><a class="reference internal" href="../_modules/motion.html#ramp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.ramp" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dp</strong> &#8211; float delta position or None if unknown</li>
+<li><strong>v0</strong> &#8211; float initial velocity or None if unknown</li>
+<li><strong>v1</strong> &#8211; float final velocity or None if unknown</li>
+<li><strong>a</strong> &#8211; float acceleration</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float shortest time to accelerate between constraints</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="motion.trapeze">
+<tt class="descclassname">motion.</tt><tt class="descname">trapeze</tt><big>(</big><em>dp</em>, <em>vmax</em>, <em>a</em>, <em>v0=0</em>, <em>v2=0</em><big>)</big><a class="reference internal" href="../_modules/motion.html#trapeze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.trapeze" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dp</strong> &#8211; float delta position</li>
+<li><strong>vmax</strong> &#8211; float maximal velocity</li>
+<li><strong>a</strong> &#8211; float acceleration</li>
+<li><strong>v0</strong> &#8211; float initial velocity, 0 by default</li>
+<li><strong>v2</strong> &#8211; float final velocity, 0 by default</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple of 6 values:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>time at end of acceleration</li>
+<li>position at end of acceleration</li>
+<li>velocity at end of acceleration</li>
+<li>time at begin of deceleration</li>
+<li>position at begin of deceleration</li>
+<li>total time</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
 <dt id="motion.Segment2ndDegree">
 <tt class="descclassname">motion.</tt><tt class="descname">Segment2ndDegree</tt><big>(</big><em>t0</em>, <em>t1</em>, <em>start</em>, <em>end=None</em><big>)</big><a class="reference internal" href="../_modules/motion.html#Segment2ndDegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motion.Segment2ndDegree" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculates a constant acceleration Segment between start and end</p>
@@ -229,7 +282,7 @@ among others (see tests):</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

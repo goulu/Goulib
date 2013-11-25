@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>markup &mdash; Goulib 1.5.2 documentation</title>
+    <title>markup &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -104,12 +104,12 @@
 <span class="c">#from http://www.voidspace.org.uk/python/cgiutils.html</span>
 <div class="viewcode-block" id="cgiprint"><a class="viewcode-back" href="../modules/markup.html#markup.cgiprint">[docs]</a><span class="k">def</span> <span class="nf">cgiprint</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">unbuff</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">line_end</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\r\n</span><span class="s">&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Print to the ``stdout``.</span>
+<span class="sd">    Print to the stdout.</span>
 <span class="sd">    </span>
-<span class="sd">    Set ``unbuff=True`` to flush the buffer after every write.</span>
+<span class="sd">    Set unbuff=True to flush the buffer after every write.</span>
 <span class="sd">    </span>
-<span class="sd">    It prints the inline you send it, followed by the ``line_end``. By default this </span>
-<span class="sd">    is ``\r\n`` - which is the standard specified by the RFC for http headers.</span>
+<span class="sd">    It prints the inline you send it, followed by the line_end. By default this </span>
+<span class="sd">    is \r\n - which is the standard specified by the RFC for http headers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span> <span class="n">inline</span><span class="p">,</span><span class="n">line_end</span>
     <span class="k">return</span>
@@ -215,29 +215,33 @@
             <span class="k">raise</span> <span class="n">DeprecationError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 </div></div>
 <div class="viewcode-block" id="page"><a class="viewcode-back" href="../modules/markup.html#markup.page">[docs]</a><span class="k">class</span> <span class="nc">page</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;This is our main class representing a document. Elements are added</span>
-<span class="sd">    as attributes of an instance of this class.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is our main class representing a document. Elements are added</span>
+<span class="sd">    as attributes of an instance of this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="page.__init__"><a class="viewcode-back" href="../modules/markup.html#markup.page.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;strict_html&#39;</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s">&#39;lower&#39;</span><span class="p">,</span> <span class="n">onetags</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">twotags</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stuff that effects the whole document.</span>
 
-<span class="sd">        :param mode:</span>
+<span class="sd">        :param mode: string. can be either:</span>
+<span class="sd">        </span>
 <span class="sd">        *&#39;strict_html&#39;   for HTML 4.01 (default)</span>
 <span class="sd">        *&#39;html&#39;          alias for &#39;strict_html&#39;</span>
 <span class="sd">        *&#39;loose_html&#39;    to allow some deprecated elements</span>
 <span class="sd">        *&#39;xml&#39;           to allow arbitrary elements</span>
 
-<span class="sd">        :param case:</span>
+<span class="sd">        :param case:  string. can be either:</span>
+<span class="sd">        </span>
 <span class="sd">        *&#39;lower&#39;         element names will be printed in lower case (default)</span>
 <span class="sd">        *&#39;upper&#39;         they will be printed in upper case</span>
 <span class="sd">        *&#39;given&#39;         element names will be printed as they are given</span>
 
 <span class="sd">        :param onetags:  list or tuple of valid elements with opening tags only</span>
 <span class="sd">        :param twotags:</span>
-<span class="sd">          list or tuple of valid elements with both opening and closing tags</span>
-<span class="sd">          these two keyword arguments may be used to select</span>
-<span class="sd">          the set of valid elements in &#39;xml&#39; mode</span>
-<span class="sd">          invalid elements will raise appropriate exceptions</span>
+<span class="sd">        </span>
+<span class="sd">        list or tuple of valid elements with both opening and closing tags</span>
+<span class="sd">        these two keyword arguments may be used to select the set of valid elements in &#39;xml&#39; mode</span>
+<span class="sd">        invalid elements will raise appropriate exceptions</span>
 <span class="sd">        </span>
 <span class="sd">        :param separator: string to place between added elements, defaults to newline</span>
 <span class="sd">        </span>
@@ -645,7 +649,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

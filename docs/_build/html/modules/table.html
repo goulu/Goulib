@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>table &mdash; Goulib 1.5.2 documentation</title>
+    <title>table &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -70,7 +70,7 @@
             
   <div class="section" id="module-table">
 <span id="table"></span><h1><a class="reference internal" href="#module-table" title="table"><tt class="xref py py-mod docutils literal"><span class="pre">table</span></tt></a><a class="headerlink" href="#module-table" title="Permalink to this headline">¶</a></h1>
-<p>Table class with Excel + CSV I/O, easy access to columns, HTML output</p>
+<p>Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.</p>
 <dl class="class">
 <dt id="table.Table">
 <em class="property">class </em><tt class="descclassname">table.</tt><tt class="descname">Table</tt><big>(</big><em>filename=None</em>, <em>titles=</em><span class="optional">[</span><span class="optional">]</span>, <em>init=</em><span class="optional">[</span><span class="optional">]</span>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table" title="Permalink to this definition">¶</a></dt>
@@ -84,14 +84,36 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="table.Table.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>compare 2 Tables contents, mainly for tests</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="table.Table.__repr__">
 <tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/table.html#Table.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">repr string of titles+5 first lines</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="table.Table.__str__">
 <tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/table.html#Table.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.__str__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string of full tables with linefeeds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="table.Table.html">
@@ -157,6 +179,15 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="table.Table.append">
+<tt class="descname">append</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>appends a line to table
+:param line: can be either:
+* a list
+* a dict or column names:values</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="table.Table.addcol">
 <tt class="descname">addcol</tt><big>(</big><em>title</em>, <em>val=None</em>, <em>i=0</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.addcol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.addcol" title="Permalink to this definition">¶</a></dt>
 <dd><p>add column to the right</p>
@@ -182,7 +213,7 @@
 
 <dl class="method">
 <dt id="table.Table.hierarchy">
-<tt class="descname">hierarchy</tt><big>(</big><em>by='Level'</em>, <em>factory=&lt;function &lt;lambda&gt; at 0x044BD570&gt;</em>, <em>linkfct=&lt;function &lt;lambda&gt; at 0x044BD5B0&gt;</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.hierarchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.hierarchy" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hierarchy</tt><big>(</big><em>by='Level'</em>, <em>factory=&lt;function &lt;lambda&gt; at 0x04591DF0&gt;</em>, <em>linkfct=&lt;function &lt;lambda&gt; at 0x04591E30&gt;</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.hierarchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.hierarchy" title="Permalink to this definition">¶</a></dt>
 <dd><p>builds a structure from a table containing a &#8220;level&#8221; column</p>
 </dd></dl>
 
@@ -241,7 +272,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

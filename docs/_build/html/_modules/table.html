@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>table &mdash; Goulib 1.5.2 documentation</title>
+    <title>table &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -69,16 +69,18 @@
 <span class="c">#!/usr/bin/python</span>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Table class with Excel + CSV I/O, easy access to columns, HTML output</span>
+<span class="sd">Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Philippe Guglielmetti&quot;</span>
 <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
 
 <span class="kn">import</span> <span class="nn">csv</span><span class="o">,</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">operator</span><span class="o">,</span> <span class="nn">string</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">Goulib.datetime2</span> <span class="kn">import</span> <span class="n">datef</span><span class="p">,</span> <span class="n">datetimef</span>
     
 <div class="viewcode-block" id="Table"><a class="viewcode-back" href="../modules/table.html#table.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Table class with CSV I/O, easy access to columns, HTML output&quot;&quot;&quot;</span>
@@ -93,11 +95,24 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_xls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                </div>
+<div class="viewcode-block" id="Table.__eq__"><a class="viewcode-back" href="../modules/table.html#table.Table.__eq__">[docs]</a>    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;compare 2 Tables contents, mainly for tests&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">!=</span><span class="n">other</span><span class="o">.</span><span class="n">titles</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">!=</span><span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
             </div>
 <div class="viewcode-block" id="Table.__repr__"><a class="viewcode-back" href="../modules/table.html#table.Table.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: repr string of titles+5 first lines&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s">&#39;Table(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">,</span><span class="bp">self</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
     </div>
 <div class="viewcode-block" id="Table.__str__"><a class="viewcode-back" href="../modules/table.html#table.Table.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:return: string of full tables with linefeeds&quot;&quot;&quot;</span>
         <span class="n">res</span><span class="o">=</span><span class="s">&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">:</span>
             <span class="n">res</span><span class="o">+=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
@@ -141,6 +156,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">=</span><span class="n">line</span>
                 <span class="k">elif</span> <span class="n">i</span><span class="o">&gt;=</span><span class="n">data_line</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
         </div>
 <div class="viewcode-block" id="Table.read_csv"><a class="viewcode-back" href="../modules/table.html#table.Table.read_csv">[docs]</a>    <span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;appends a .csv or similar file to the table&quot;&quot;&quot;</span>
@@ -165,20 +181,22 @@
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">xf</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                        <span class="n">xi</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                        <span class="n">xi</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span>
                         <span class="n">x</span><span class="o">=</span><span class="n">xi</span> <span class="k">if</span> <span class="n">xi</span><span class="o">==</span><span class="n">xf</span> <span class="k">else</span> <span class="n">xf</span>
                     <span class="k">except</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">:</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span>
                     <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">line</span><span class="o">!=</span><span class="p">[</span><span class="bp">None</span><span class="p">]:</span> <span class="c">#strange last line ...</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
             </div>
 <div class="viewcode-block" id="Table.write_csv"><a class="viewcode-back" href="../modules/table.html#table.Table.write_csv">[docs]</a>    <span class="k">def</span> <span class="nf">write_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; write the table in Excel csv format, optionally transposed&quot;&quot;&quot;</span>
         <span class="n">dialect</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;dialect&#39;</span><span class="p">,</span><span class="s">&#39;excel&#39;</span><span class="p">)</span>
         <span class="n">delimiter</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;delimiter&#39;</span><span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">)</span>
         <span class="n">encoding</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;encoding&#39;</span><span class="p">,</span><span class="s">&#39;iso-8859-15&#39;</span><span class="p">)</span>
-        <span class="n">writer</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">),</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">transpose</span><span class="p">:</span>
             <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
@@ -191,6 +209,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">:</span> <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     </div>
 <div class="viewcode-block" id="Table.ncols"><a class="viewcode-back" href="../modules/table.html#table.Table.ncols">[docs]</a>    <span class="k">def</span> <span class="nf">ncols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;return number of columns, ignoring title&quot;&quot;&quot;</span>
@@ -207,7 +226,10 @@
     <span class="k">def</span> <span class="nf">_i</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;column index&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">None</span>
         <span class="k">return</span> <span class="n">by</span>
     
 <div class="viewcode-block" id="Table.icol"><a class="viewcode-back" href="../modules/table.html#table.Table.icol">[docs]</a>    <span class="k">def</span> <span class="nf">icol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">):</span>
@@ -239,6 +261,23 @@
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
             <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            </div>
+<div class="viewcode-block" id="Table.append"><a class="viewcode-back" href="../modules/table.html#table.Table.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; appends a line to table</span>
+<span class="sd">        :param line: can be either:</span>
+<span class="sd">        * a list</span>
+<span class="sd">        * a dict or column names:values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="n">r</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c">#row number</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">i</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_i</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="c">#column doesn&#39;t exist:</span>
+                    <span class="n">i</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">)</span>
             </div>
 <div class="viewcode-block" id="Table.addcol"><a class="viewcode-back" href="../modules/table.html#table.Table.addcol">[docs]</a>    <span class="k">def</span> <span class="nf">addcol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">title</span><span class="p">,</span><span class="n">val</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;add column to the right&#39;&#39;&#39;</span>
@@ -311,13 +350,12 @@
                 <span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">f</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             </div>
 <div class="viewcode-block" id="Table.to_datetime"><a class="viewcode-back" href="../modules/table.html#table.Table.to_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">.%m.%Y&#39;</span><span class="p">,</span><span class="n">safe</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;convert a column to datetime&#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">fmt</span><span class="p">),</span><span class="n">safe</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;convert a column to datetime&#39;&#39;&#39;</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetimef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">safe</span><span class="p">)</span>
         </div>
 <div class="viewcode-block" id="Table.to_date"><a class="viewcode-back" href="../modules/table.html#table.Table.to_date">[docs]</a>    <span class="k">def</span> <span class="nf">to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">.%m.%Y&#39;</span><span class="p">,</span><span class="n">safe</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;convert a column to date&#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="n">fmt</span><span class="p">,</span><span class="n">safe</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span><span class="n">safe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">safe</span><span class="p">)</span>
             
 </div>
 <div class="viewcode-block" id="Table.total"><a class="viewcode-back" href="../modules/table.html#table.Table.total">[docs]</a>    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">funcs</span><span class="p">):</span>
@@ -340,15 +378,10 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
                     <span class="n">res</span><span class="o">+=</span><span class="mi">1</span>
         <span class="k">return</span> <span class="n">res</span>
-                
-    </div></div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">t</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
-    <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.3</span><span class="p">])</span>
-    <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s">&#39;one&#39;</span><span class="p">,</span><span class="s">&#39;two&#39;</span><span class="p">,</span><span class="s">&#39;three&#39;</span><span class="p">])</span>
-    <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">None</span><span class="p">,[</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">],</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">print</span> <span class="n">t</span>
-    <span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">html</span><span class="p">()</span>
+                </div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">nose</span>
+    <span class="n">nose</span><span class="o">.</span><span class="n">runmodule</span><span class="p">()</span>
 </pre></div>
 
           </div>
@@ -365,7 +398,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

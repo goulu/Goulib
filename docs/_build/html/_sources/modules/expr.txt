@@ -1,7 +1,7 @@
-:mod:`geom`
+:mod:`expr`
 ===========
 
-.. automodule:: geom
+.. automodule:: expr
     :show-inheritance:
     :members:
     :undoc-members:

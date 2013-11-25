@@ -82,26 +82,3 @@ class Tank:
         self._base.remove(item)
         self.total-=self._f(item)
         return self
-
-import unittest
-class TestCase(unittest.TestCase):
-    def setUp(self):
-        self.tank=Tank(['hello'],len)
-        
-    def runTest(self):
-        self.tank.append(' ')
-        print self.tank
-        self.tank.append('world !')
-        print self.tank
-        self.tank[0]='Bonjour'
-        print self.tank
-        self.tank.insert(2,'tout le' )
-        print self.tank
-        self.tank.pop()
-        print self.tank
-        self.tank.append('monde')
-        print self.tank
-        
-
-if __name__ == '__main__':
-    unittest.main()

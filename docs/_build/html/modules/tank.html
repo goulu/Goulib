@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>tank &mdash; Goulib 1.5.2 documentation</title>
+    <title>tank &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -68,8 +68,89 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="tank">
-<h1><tt class="xref py py-mod docutils literal"><span class="pre">tank</span></tt><a class="headerlink" href="#tank" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-tank">
+<span id="tank"></span><h1><a class="reference internal" href="#module-tank" title="tank"><tt class="xref py py-mod docutils literal"><span class="pre">tank</span></tt></a><a class="headerlink" href="#module-tank" title="Permalink to this headline">¶</a></h1>
+<p>a Tank is a container that caches sums of its content</p>
+<dl class="class">
+<dt id="tank.Tank">
+<em class="property">class </em><tt class="descclassname">tank.</tt><tt class="descname">Tank</tt><big>(</big><em>base</em>, <em>f</em>, <em>sum=&lt;built-in function sum&gt;</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tank.Tank.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>base</em>, <em>f</em>, <em>sum=&lt;built-in function sum&gt;</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.count">
+<tt class="descname">count</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.index">
+<tt class="descname">index</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.reverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.reverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.sort">
+<tt class="descname">sort</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>item</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.insert">
+<tt class="descname">insert</tt><big>(</big><em>i</em>, <em>item</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.append">
+<tt class="descname">append</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.extend">
+<tt class="descname">extend</tt><big>(</big><em>more</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.pop">
+<tt class="descname">pop</tt><big>(</big><em>i=-1</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tank.Tank.remove">
+<tt class="descname">remove</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/tank.html#Tank.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tank.Tank.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -87,7 +168,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

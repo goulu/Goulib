@@ -30,10 +30,8 @@ Modules
   merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
 - :mod:`colors` : web (hex) colors dictionary and related functions
 
-- :mod:`homcoord` : 2D homogeneous coordinates and transformations
+- :mod:`geom` : 2D geometry
 - :mod:`dxf2img` : Rasters (simple) .dxf (Autocad) files to bitmap images
-
-  (requires `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ and `pil <http://pypi.python.org/pypi/pil/>`_ )
 
 - :mod:`optim` : Optimization algorithms
 

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>polynomial &mdash; Goulib 1.5.2 documentation</title>
+    <title>polynomial &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -85,6 +85,11 @@ and derivatives of the polynomials.</p>
 <dd><dl class="method">
 <dt id="polynomial.Polynomial.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#Polynomial.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.Polynomial.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="polynomial.Polynomial.__cmp__">
+<tt class="descname">__cmp__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#Polynomial.__cmp__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.Polynomial.__cmp__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -231,40 +236,11 @@ x**2 - 1</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="polynomial.parse_n">
-<tt class="descclassname">polynomial.</tt><tt class="descname">parse_n</tt><big>(</big><em>str</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#parse_n"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.parse_n" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse the number part of a polynomial string term</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="polynomial.parse_p">
-<tt class="descclassname">polynomial.</tt><tt class="descname">parse_p</tt><big>(</big><em>str</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#parse_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.parse_p" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse the power part of a polynomial string term</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="polynomial.strip_leading_zeros">
-<tt class="descclassname">polynomial.</tt><tt class="descname">strip_leading_zeros</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#strip_leading_zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.strip_leading_zeros" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the leading (in terms of high orders of x) zeros in the polynomial</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="polynomial.tostring">
 <tt class="descclassname">polynomial.</tt><tt class="descname">tostring</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#tostring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.tostring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a plist into a string. This looks overly complex at first,
 but most of the complexity is caused by special cases.</p>
 </dd></dl>
-
-<dl class="function">
-<dt id="polynomial.tostring_term">
-<tt class="descclassname">polynomial.</tt><tt class="descname">tostring_term</tt><big>(</big><em>c</em>, <em>i</em><big>)</big><a class="reference internal" href="../_modules/polynomial.html#tostring_term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.tostring_term" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a single coefficient c and power e to a string cx^i</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="polynomial.test">
-<tt class="descclassname">polynomial.</tt><tt class="descname">test</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/polynomial.html#test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#polynomial.test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 
@@ -283,7 +259,7 @@ but most of the complexity is caused by special cases.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

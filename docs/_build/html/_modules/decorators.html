@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>decorators &mdash; Goulib 1.5.2 documentation</title>
+    <title>decorators &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -67,6 +67,7 @@
             
   <h1>Source code for decorators</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
 <span class="c"># https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
@@ -101,51 +102,7 @@
             <span class="n">cachelen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">g</span>
-</div>
-<div class="viewcode-block" id="tail_recursive"><a class="viewcode-back" href="../modules/decorators.html#decorators.tail_recursive">[docs]</a><span class="k">class</span> <span class="nc">tail_recursive</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Tail recursive decorator.&quot;&quot;&quot;</span>
-    <span class="c"># Michele Simionato&#39;s version </span>
-    <span class="n">CONTINUE</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>  <span class="c"># sentinel</span>
-
-<div class="viewcode-block" id="tail_recursive.__init__"><a class="viewcode-back" href="../modules/decorators.html#decorators.tail_recursive.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">firstcall</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
-<div class="viewcode-block" id="tail_recursive.__call__"><a class="viewcode-back" href="../modules/decorators.html#decorators.tail_recursive.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwd</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstcall</span><span class="p">:</span>  <span class="c"># start looping</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">firstcall</span> <span class="o">=</span> <span class="bp">False</span>
-                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwd</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONTINUE</span><span class="p">:</span>  <span class="c"># update arguments</span>
-                        <span class="n">args</span><span class="p">,</span> <span class="n">kwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">argskwd</span>
-                    <span class="k">else</span><span class="p">:</span>  <span class="c"># last call</span>
-                        <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c"># return the arguments of the tail call</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">argskwd</span> <span class="o">=</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwd</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONTINUE</span>
-        <span class="k">except</span><span class="p">:</span>  <span class="c"># reset and re-raise</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">firstcall</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="k">raise</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c"># reset and exit</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">firstcall</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="k">return</span> <span class="n">result</span>
-        </div></div>
-<div class="viewcode-block" id="persistent"><a class="viewcode-back" href="../modules/decorators.html#decorators.persistent">[docs]</a><span class="k">class</span> <span class="nc">persistent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<div class="viewcode-block" id="persistent.__init__"><a class="viewcode-back" href="../modules/decorators.html#decorators.persistent.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">it</span> <span class="o">=</span> <span class="n">it</span>
-        </div>
-<div class="viewcode-block" id="persistent.__getitem__"><a class="viewcode-back" href="../modules/decorators.html#decorators.persistent.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">it</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">it</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">slice</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">step</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">islice</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-        </div>
-<div class="viewcode-block" id="persistent.__iter__"><a class="viewcode-back" href="../modules/decorators.html#decorators.persistent.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">it</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">it</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">temp</span></div></div>
-</pre></div>
+</pre></div></div>
 
           </div>
         </div>
@@ -161,7 +118,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

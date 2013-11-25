@@ -38,53 +38,73 @@ class BBox:
         :param pt1: :class:`Pt` first corner (any)
         :param pt2: :class:`Pt` opposite corner (any)
         """
-        self._corner1 = None
-        self._corner2 = None
+        self._pt1 = None
+        self._pt2 = None
         if pt1: self +=pt1
         if pt2: self +=pt2
+    
+    @property
+    def xmin(self): return self._pt1.x
+    
+    @property
+    def ymin(self): return self._pt1.y
+    
+    @property
+    def xmax(self): return self._pt2.x
+    
+    @property
+    def ymax(self): return self._pt2.y
         
     def __iadd__(self, pt):
         """
         enlarge box if required to contain specified point
         :param pt1: :class:`Pt` point to add
         """
+        if not pt:
+            return self
         if isinstance(pt, BBox):
-            self +=pt._corner1
-            self +=pt._corner2
+            self +=pt._pt1
+            self +=pt._pt2
         elif isinstance(pt,Pt):
             self+= pt.xy
         else:
-            if not self._corner1:
-                self._corner1 = Pt(pt)
+            if not self._pt1:
+                self._pt1 = Pt(pt)
             else:
-                p=map(min, zip(self._corner1.xy, pt))
-                self._corner1 = Pt(p)
-            if not self._corner2:
-                self._corner2 = Pt(pt)
+                p=map(min, zip(self._pt1.xy, pt))
+                self._pt1 = Pt(p)
+            if not self._pt2:
+                self._pt2 = Pt(pt)
             else:
-                p=map(max, zip(self._corner2.xy, pt))
-                self._corner2 = Pt(p)
+                p=map(max, zip(self._pt2.xy, pt))
+                self._pt2 = Pt(p)
         return self
+    
+    def __add__(self,other):
+        res=BBox()
+        res+=self
+        res+=other
+        return res
         
     def __repr__(self):
-        return "%s(%s,%s)" % (self.__class__.__name__,self._corner1, self._corner2)
+        return "%s(%s,%s)" % (self.__class__.__name__,self._pt1, self._pt2)
     
     def __call__(self):
         """:return: list of flatten corners"""
-        l = list(self._corner1.xy)
-        l.extend(list(self._corner2.xy))
+        l = list(self._pt1.xy)
+        l.extend(list(self._pt2.xy))
         return l
     
     def size(self):
         """:return: Pt with xy sizes"""
         try:
-            return self._corner2 - self._corner1
+            return self._pt2 - self._pt1
         except:
             return geom.Vector2(0, 0)
     
     def center(self):
         """:return: Pt center"""
-        res = self._corner2 + self._corner1
+        res = self._pt2 + self._pt1
         return res / 2
         
     def trans(self, trans):
@@ -92,10 +112,10 @@ class BBox:
         :param trans: Xform
         :return: BBox = self transformed by trans
         """
-        res = BBox(trans(self._corner1), trans(self._corner2))
+        res = BBox(trans(self._pt1), trans(self._pt2))
         # add 2 more corners as they matter if we rotate the box
-        res += trans(Pt(self._corner1.x, self._corner2.y))
-        res += trans(Pt(self._corner2.x, self._corner1.y))
+        res += trans(Pt(self._pt1.x, self._pt2.y))
+        res += trans(Pt(self._pt2.x, self._pt1.y))
         return res
 
 def cbox(c, r):
@@ -106,6 +126,9 @@ def cbox(c, r):
     """
     rr = Pt(r, r)
     return BBox(c + rr, c - rr)
+
+# http://sub-atomic.com/~moses/acadcolors.html
+acadcolors = ['black','red','yellow','green','cyan','blue','magenta','white']
 
 from dxfgrabber.drawing import Drawing
 class DXF(Drawing):
@@ -123,20 +146,6 @@ class DXF(Drawing):
         with io.open(filename, encoding=get_encoding(), errors='strict') as fp:
             super(DXF, self).__init__(fp, options)
         self.filename = filename
-        
-        # http://sub-atomic.com/~moses/acadcolors.html
-        self.colors = [
-            '#ffffff',  # white : inverted with 7: black
-            '#ff0000',  # red
-            '#ffff00',  # yellow
-            '#00ff00',  # green
-            '#00ffff',  # cyan
-            '#0000ff',  # blue
-            '#ff00ff',  # magenta
-            '#000000',  # black : inverted with 0:white
-            ]
-        
-        self.background = 0  # we draw on white by default
         
     def iter(self, ent=None, layers=None, only=[], ignore=[], trans=None, recurse=False):
         """iterator over dxf or block entities"""
@@ -199,7 +208,9 @@ class DXF(Drawing):
                 logging.warning('Unknown entity %s' % e)
         return box
     
-    def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1):
+    
+    
+    def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
         """
         :param size: [x,y] max size of image in pixels. if one coord is None, the other one will be enforced
         :param border: int border width in pixels
@@ -219,7 +230,8 @@ class DXF(Drawing):
                         i = self.layers[e.layer].color
                     except:
                         pass  # no layer
-                pen = self.colors[i % len(self.colors)]
+                pen = acadcolors[i % len(acadcolors)]
+                if pen==background: pen=acadcolors[(len(acadcolors)-i) % len(acadcolors)]
                 if e.dxftype == 'LINE':
                     b = list((trans * Pt(e.start[:2])).xy)
                     b.extend(list(trans(Pt(e.end[:2])).xy))
@@ -290,13 +302,40 @@ class DXF(Drawing):
         trans = trans.scale(1, -1)  # invert y axis
         trans = trans.translate(0, size.y)  # origin is lower left corner
         
-        img = Image.new("RGB", map(rint, size.xy), self.colors[self.background])
+        img = Image.new("RGB", map(rint, size.xy), background)
         draw = ImageDraw.Draw(img)
         _draw(self.iter(layers=layers, ignore=ignore, trans=trans, recurse=False))
         if antialias > 1:
             size = size / antialias
             img = img.resize(map(rint, size.xy), Image.ANTIALIAS)
         return img
+    
+def factory(e,trans):
+    """
+    :param e: dxf.entity
+    :param trans: geom.Matrix3 transform
+    :return: geom entity
+    """
+    if not e: return
+    if e.dxftype=='LINE':
+        start=trans(Pt(e.start[:2]))
+        end=trans(Pt(e.end[:2]))
+        res=geom.Segment2(start,end)
+    elif e.dxftype == 'ARC':
+        c=Pt(e.center[:2])
+        startangle=radians(e.startangle)
+        start=c+geom.Polar(e.radius,startangle)
+        endangle=radians(e.endangle)
+        end=c+geom.Polar(e.radius,endangle)
+        res=geom.Arc2(trans(c),trans(start),trans(end))
+    elif e.dxftype == 'CIRCLE':
+        c=Pt(e.center[:2])
+        res=geom.Circle(trans(c), e.radius)
+    else:
+        logging.warning('unhandled entity type %s'%e.dxftype)
+        return None
+    res.color=acadcolors[e.color % len(acadcolors)]
+    return res
 
 def img2base64(img, fmt='PNG'):
     """

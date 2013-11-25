@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>markup &mdash; Goulib 1.5.2 documentation</title>
+    <title>markup &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -82,13 +82,15 @@ ideas or questions to nogradi at gmail dot com.</p>
 <dl class="function">
 <dt id="markup.cgiprint">
 <tt class="descclassname">markup.</tt><tt class="descname">cgiprint</tt><big>(</big><em>inline=''</em>, <em>unbuff=True</em>, <em>line_end='\r\n'</em><big>)</big><a class="reference internal" href="../_modules/markup.html#cgiprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#markup.cgiprint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print to the <tt class="docutils literal"><span class="pre">stdout</span></tt>.</p>
+<dd><p>Print to the stdout.</p>
 <blockquote>
-<div><p>Set <tt class="docutils literal"><span class="pre">unbuff=True</span></tt> to flush the buffer after every write.</p>
-<p>It prints the inline you send it, followed by the <tt class="docutils literal"><span class="pre">line_end</span></tt>. By default this 
-is ``</p>
+<div><p>Set unbuff=True to flush the buffer after every write.</p>
+<p>It prints the inline you send it, followed by the line_end. By default this 
+is</p>
 </div></blockquote>
-<p>`` - which is the standard specified by the RFC for http headers.</p>
+<ul class="simple">
+<li>which is the standard specified by the RFC for http headers.</li>
+</ul>
 </dd></dl>
 
 <dl class="class">
@@ -135,7 +137,7 @@ as attributes of an instance of this class.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; string. can be either:</td>
 </tr>
 </tbody>
 </table>
@@ -147,7 +149,7 @@ as attributes of an instance of this class.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; string. can be either:</td>
 </tr>
 </tbody>
 </table>
@@ -160,10 +162,20 @@ as attributes of an instance of this class.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>onetags</strong> &#8211; list or tuple of valid elements with opening tags only</li>
-<li><strong>twotags</strong> &#8211; list or tuple of valid elements with both opening and closing tags
-these two keyword arguments may be used to select
-the set of valid elements in &#8216;xml&#8217; mode
-invalid elements will raise appropriate exceptions</li>
+<li><strong>twotags</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>list or tuple of valid elements with both opening and closing tags
+these two keyword arguments may be used to select the set of valid elements in &#8216;xml&#8217; mode
+invalid elements will raise appropriate exceptions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>separator</strong> &#8211; string to place between added elements, defaults to newline</li>
 <li><strong>class</strong> &#8211; a class that will be added to every element if defined</li>
 </ul>
@@ -179,7 +191,7 @@ invalid elements will raise appropriate exceptions</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> &#8211; string. can be either:</td>
 </tr>
 </tbody>
 </table>
@@ -191,7 +203,7 @@ invalid elements will raise appropriate exceptions</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>case</strong> &#8211; string. can be either:</td>
 </tr>
 </tbody>
 </table>
@@ -204,10 +216,20 @@ invalid elements will raise appropriate exceptions</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>onetags</strong> &#8211; list or tuple of valid elements with opening tags only</li>
-<li><strong>twotags</strong> &#8211; list or tuple of valid elements with both opening and closing tags
-these two keyword arguments may be used to select
-the set of valid elements in &#8216;xml&#8217; mode
-invalid elements will raise appropriate exceptions</li>
+<li><strong>twotags</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>list or tuple of valid elements with both opening and closing tags
+these two keyword arguments may be used to select the set of valid elements in &#8216;xml&#8217; mode
+invalid elements will raise appropriate exceptions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>separator</strong> &#8211; string to place between added elements, defaults to newline</li>
 <li><strong>class</strong> &#8211; a class that will be added to every element if defined</li>
 </ul>
@@ -471,7 +493,7 @@ Will be rendered as &lt;script type=&#8217;text/type&#8217; src=src&gt;&lt;/scri
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

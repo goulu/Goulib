@@ -1,25 +1,23 @@
 from nose.tools import assert_equal
 from nose import SkipTest
+from Goulib.tank import *
 
 class TestTank:
+
+    def setup(self):
+        self.tank=Tank(['hello'],len)
+      
     def test___call__(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.__call__())
-        raise SkipTest # TODO: implement your test here
+        pass #tested below
 
     def test___delitem__(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.__delitem__(key))
-        raise SkipTest # TODO: implement your test here
+        pass #tested below
 
     def test___getitem__(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.__getitem__(key))
-        raise SkipTest # TODO: implement your test here
+        pass #tested below
 
     def test___init__(self):
-        # tank = Tank(base, f, sum)
-        raise SkipTest # TODO: implement your test here
+        pass #tested below
 
     def test___repr__(self):
         # tank = Tank(base, f, sum)
@@ -27,14 +25,23 @@ class TestTank:
         raise SkipTest # TODO: implement your test here
 
     def test___setitem__(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.__setitem__(key, item))
-        raise SkipTest # TODO: implement your test here
+        pass #tested below
+    
+    def test_insert(self):
+        pass #tested below
+
+    def test_pop(self):
+        pass #tested below
 
     def test_append(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.append(item))
-        raise SkipTest # TODO: implement your test here
+        self.tank.append(' ')
+        self.tank.append('world !')
+        self.tank[0]='Bonjour'
+        self.tank.insert(2,'tout le' )
+        self.tank.pop()
+        self.tank.append(' monde')
+        assert_equal(''.join(self.tank),"Bonjour tout le monde")
+        assert_equal(self.tank(),21)
 
     def test_count(self):
         # tank = Tank(base, f, sum)
@@ -49,16 +56,6 @@ class TestTank:
     def test_index(self):
         # tank = Tank(base, f, sum)
         # assert_equal(expected, tank.index(item))
-        raise SkipTest # TODO: implement your test here
-
-    def test_insert(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.insert(i, item))
-        raise SkipTest # TODO: implement your test here
-
-    def test_pop(self):
-        # tank = Tank(base, f, sum)
-        # assert_equal(expected, tank.pop(i))
         raise SkipTest # TODO: implement your test here
 
     def test_remove(self):
@@ -76,3 +73,6 @@ class TestTank:
         # assert_equal(expected, tank.sort(**kwargs))
         raise SkipTest # TODO: implement your test here
 
+if __name__ == "__main__":
+    import nose
+    nose.runmodule()

@@ -36,12 +36,12 @@ import sys
 #from http://www.voidspace.org.uk/python/cgiutils.html
 def cgiprint(inline='', unbuff=True, line_end='\r\n'):
     """
-    Print to the ``stdout``.
+    Print to the stdout.
     
-    Set ``unbuff=True`` to flush the buffer after every write.
+    Set unbuff=True to flush the buffer after every write.
     
-    It prints the inline you send it, followed by the ``line_end``. By default this 
-    is ``\r\n`` - which is the standard specified by the RFC for http headers.
+    It prints the inline you send it, followed by the line_end. By default this 
+    is \r\n - which is the standard specified by the RFC for http headers.
     """
     print inline,line_end
     return
@@ -147,29 +147,33 @@ class element:
             raise DeprecationError( self.tag )
 
 class page:
-    """This is our main class representing a document. Elements are added
-    as attributes of an instance of this class."""
+    """
+    This is our main class representing a document. Elements are added
+    as attributes of an instance of this class.
+    """
 
     def __init__( self, mode='strict_html', case='lower', onetags=None, twotags=None, separator='\n', class_=None ):
         """Stuff that effects the whole document.
 
-        :param mode:
+        :param mode: string. can be either:
+        
         *'strict_html'   for HTML 4.01 (default)
         *'html'          alias for 'strict_html'
         *'loose_html'    to allow some deprecated elements
         *'xml'           to allow arbitrary elements
 
-        :param case:
+        :param case:  string. can be either:
+        
         *'lower'         element names will be printed in lower case (default)
         *'upper'         they will be printed in upper case
         *'given'         element names will be printed as they are given
 
         :param onetags:  list or tuple of valid elements with opening tags only
         :param twotags:
-          list or tuple of valid elements with both opening and closing tags
-          these two keyword arguments may be used to select
-          the set of valid elements in 'xml' mode
-          invalid elements will raise appropriate exceptions
+        
+        list or tuple of valid elements with both opening and closing tags
+        these two keyword arguments may be used to select the set of valid elements in 'xml' mode
+        invalid elements will raise appropriate exceptions
         
         :param separator: string to place between added elements, defaults to newline
         

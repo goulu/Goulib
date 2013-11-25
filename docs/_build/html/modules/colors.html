@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>colors &mdash; Goulib 1.5.2 documentation</title>
+    <title>colors &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -74,17 +74,58 @@
 <dl class="function">
 <dt id="colors.rgb_to_hex">
 <tt class="descclassname">colors.</tt><tt class="descname">rgb_to_hex</tt><big>(</big><em>rgb</em><big>)</big><a class="reference internal" href="../_modules/colors.html#rgb_to_hex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#colors.rgb_to_hex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rgb</strong> &#8211; tuple (r,g,b) of 3 ints 0-255</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Result :</th><td class="field-body">string &#8220;#rrggbb&#8221; in hex suitable for HTML color</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="colors.hex_to_rgb">
 <tt class="descclassname">colors.</tt><tt class="descname">hex_to_rgb</tt><big>(</big><em>value</em>, <em>scale=1</em><big>)</big><a class="reference internal" href="../_modules/colors.html#hex_to_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#colors.hex_to_rgb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> &#8211; string &#8220;#rrggbb&#8221; in hex suitable for HTML color</li>
+<li><strong>scale</strong> &#8211; float optional 1./255 to scale output to [0,1] floats</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Result :</th><td class="field-body"><p class="first last">tuple (r,g,b) of 3 ints 0-255</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="colors.color_range">
-<tt class="descclassname">colors.</tt><tt class="descname">color_range</tt><big>(</big><em>n</em>, <em>start='red'</em>, <em>end='blue'</em><big>)</big><a class="reference internal" href="../_modules/colors.html#color_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#colors.color_range" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descclassname">colors.</tt><tt class="descname">color_range</tt><big>(</big><em>n</em>, <em>start</em>, <em>end</em><big>)</big><a class="reference internal" href="../_modules/colors.html#color_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#colors.color_range" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> &#8211; int number of colors to generate</li>
+<li><strong>start</strong> &#8211; string hex color or color name</li>
+<li><strong>end</strong> &#8211; string hex color or color name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Result :</th><td class="field-body"><p class="first last">list of n hexcolors interpolated between start and end, included</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 
@@ -103,7 +144,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

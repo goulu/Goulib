@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>itertools2 &mdash; Goulib 1.5.2 documentation</title>
+    <title>itertools2 &mdash; Goulib 1.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.5.2',
+        VERSION:     '1.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.5.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -177,7 +177,17 @@
 <dl class="function">
 <dt id="itertools2.unique">
 <tt class="descclassname">itertools2.</tt><tt class="descname">unique</tt><big>(</big><em>iterable</em>, <em>key=None</em><big>)</big><a class="reference internal" href="../_modules/itertools2.html#unique"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#itertools2.unique" title="Permalink to this definition">¶</a></dt>
-<dd><p>List unique elements, preserving order. Remember all elements ever seen.</p>
+<dd><p>List unique elements, preserving order. Remember all elements ever seen.
+# unique(&#8216;AAAABBBCCDAABBB&#8217;) &#8211;&gt; A B C D
+# unique(&#8216;ABBCcAD&#8217;, str.lower) &#8211;&gt; A B C D</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="itertools2.count_unique">
+<tt class="descclassname">itertools2.</tt><tt class="descname">count_unique</tt><big>(</big><em>iterable</em>, <em>key=None</em><big>)</big><a class="reference internal" href="../_modules/itertools2.html#count_unique"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#itertools2.count_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count unique elements
+# unique(&#8216;AAAABBBCCDAABBB&#8217;) &#8211;&gt; 4
+# unique(&#8216;ABBCcAD&#8217;, str.lower) &#8211;&gt; 4</p>
 </dd></dl>
 
 <dl class="function">
@@ -251,6 +261,27 @@
 <dt id="itertools2.pairwise">
 <tt class="descclassname">itertools2.</tt><tt class="descname">pairwise</tt><big>(</big><em>iterable</em><big>)</big><a class="reference internal" href="../_modules/itertools2.html#pairwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#itertools2.pairwise" title="Permalink to this definition">¶</a></dt>
 <dd><p>s -&gt; (s0,s1), (s1,s2), (s2, s3), ...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="itertools2.interleave">
+<tt class="descclassname">itertools2.</tt><tt class="descname">interleave</tt><big>(</big><em>l1</em>, <em>l2</em><big>)</big><a class="reference internal" href="../_modules/itertools2.html#interleave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#itertools2.interleave" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l1</strong> &#8211; iterable</li>
+<li><strong>l2</strong> &#8211; iterable of same length, or 1 less than l1</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Result :</th><td class="field-body"><p class="first last">iterable interleaving elements from l1 and l2, starting by l1[0]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference external" href="http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2">http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2</a></p>
 </dd></dl>
 
 <dl class="function">
@@ -355,7 +386,7 @@ It&#8217;s best to make all objects iter2 objects to avoid syntax errors.  :D</p
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.5.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
