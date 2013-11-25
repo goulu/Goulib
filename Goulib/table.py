@@ -216,7 +216,7 @@ class Table(list):
         col=len(self.titles)
         self.titles.append(title)
         if not isinstance(val,list):
-            val=[val]*len(self)
+            val=[val]*(len(self)-i)
         for v in val:
             self.set(i,col,v)
             i+=1

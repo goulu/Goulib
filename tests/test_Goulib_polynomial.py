@@ -4,8 +4,9 @@ from nose import SkipTest
 from Goulib.polynomial import *
 
 class TestPolynomial:
+    @classmethod
+    def setup_class(self):
     
-    def setup(self):
         self.p=Polynomial([1,2,3])
         self.p2=Polynomial([1,2])
         self.p3=Polynomial('+3x - 4x^2 + 7x^5-x+1')

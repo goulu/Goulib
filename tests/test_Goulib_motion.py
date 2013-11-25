@@ -31,7 +31,8 @@ class TestSegment:
         pass # tested below
     
 class TestSegmentPoly:
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.seg=SegmentPoly(1,2,[1,2,3])
         
     def test_start(self):
@@ -53,7 +54,8 @@ class TestSegmentPoly:
         raise SkipTest # TODO: implement your test here
 
 class TestSegment2ndDegree:
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.t0, self.t1 = 1,2      
         self.p0, self.v0, self.a = -1,1,2
         self.start=(self.p0, self.v0, self.a, 0)

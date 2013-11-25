@@ -3,9 +3,9 @@ from nose import SkipTest
 
 from Goulib.itertools2 import *
 
-def iterable(n=10):
-    for i in range(n):
-        yield i+1
+def iterable(n=10,s=1):
+    for i in range(s,n+1):
+        yield i
 
 class TestTake:
     def test_take(self):
@@ -171,9 +171,9 @@ class TestNextPermutation:
 
 class TestIter2:
     def test___add__(self):
-        iter2 = iter2(iterable)
-        # assert_equal(expected, iter2.__add__(iterable))
-        raise SkipTest # TODO: implement your test here
+        i1 = iter2(iterable(5))
+        i2 = iter2(iterable(10,6))
+        assert_equal(list(i1+i2),range(1,11))
 
     def test___init__(self):
         # iter2 = iter2(iterable)

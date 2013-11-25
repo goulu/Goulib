@@ -1,4 +1,4 @@
-col2;col1
+OrderDate;Region;Rep;Item;Units;Cost;Total
 41061;East;Jones;Pencil;95;1.99;189.05
 1/23/2012;Central;Kivell;Binder;50;19.99;999.5
 41154;Central;Jardine;Pencil;36;4.99;179.64

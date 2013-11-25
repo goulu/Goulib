@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator,types
+import operator, types
 from math import *
 
 precision = 1e-9 #for equality comparizons
@@ -489,7 +489,6 @@ class Vector3(object):
                           self.y + other.y,
                           self.z + other.z)
         else:
-            assert hasattr(other, '__len__') and len(other) == 3
             return Vector3(self.x + other[0],
                            self.y + other[1],
                            self.z + other[2])
@@ -1518,23 +1517,24 @@ class Matrix4(object):
     new_rotate_euler = classmethod(new_rotate_euler)
 
     def new_rotate_triple_axis(cls, x, y, z):
-      m = cls()
-      
-      m.a, m.b, m.c = x.x, y.x, z.x
-      m.e, m.f, m.g = x.y, y.y, z.y
-      m.i, m.j, m.k = x.z, y.z, z.z
-      
-      return m
+        m = cls()
+        
+        m.a, m.b, m.c = x.x, y.x, z.x
+        m.e, m.f, m.g = x.y, y.y, z.y
+        m.i, m.j, m.k = x.z, y.z, z.z
+        
+        return m
     new_rotate_triple_axis = classmethod(new_rotate_triple_axis)
 
     def new_look_at(cls, eye, at, up):
-      z = (eye - at).normalized()
-      x = up.cross(z).normalized()
-      y = z.cross(x)
-      
-      m = cls.new_rotate_triple_axis(x, y, z)
-      m.d, m.h, m.l = eye.x, eye.y, eye.z
-      return m
+        z = (eye - at).normalized()
+        x = up.cross(z).normalized()
+        y = z.cross(x)
+        
+        m = cls.new_rotate_triple_axis(x, y, z)
+        m.d, m.h, m.l = eye.x, eye.y, eye.z
+        return m
+    
     new_look_at = classmethod(new_look_at)
     
     def new_perspective(cls, fov_y, aspect, near, far):
@@ -2121,9 +2121,6 @@ class Geometry(object):
         ":return: Vector2 or Vector3 tangent at parameter u"
         raise NotImplementedError
     
-    def intersect(self, other):
-        raise NotImplementedError
-
     def intersect(self, other):
         raise NotImplementedError
 

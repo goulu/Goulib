@@ -16,7 +16,8 @@ class TestArgPair:
 
 class TestVector2:
     
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.v00=Vector2(0,0)
         self.v10=Vector2(1,0)
         self.v01=Vector2(0,1)
@@ -104,29 +105,19 @@ class TestVector2:
         assert_equal(self.v11/2.,Vector2(0.5))
 
     def test___floordiv__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__floordiv__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.v11//2.,Vector2(0))
 
     def test___rdiv__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__rdiv__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(2./self.v11,Vector2(2))
 
     def test___rfloordiv__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__rfloordiv__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___rtruediv__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__rtruediv__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(2.//self.v11,Vector2(2))
 
     def test___truediv__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__truediv__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(operator.truediv(self.v11,3),Vector2(1/3.))
+        
+    def test___rtruediv__(self):
+        assert_equal(operator.truediv(3,self.v11),Vector2(3.0))
 
     def test_dot(self):
         assert_equal(self.v10.dot(self.v01),0)
@@ -143,172 +134,144 @@ class TestVector2:
         assert_almost_equal(self.v10.project(self.v11),Vector2(.5,.5))
 
     def test_reflect(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.reflect(normal))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.v11.reflect(self.v10),Vector2(-1,1))
 
 
 class TestVector3:
-    def test___abs__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__abs__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___add__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__add__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___copy__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__copy__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___div__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__div__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___eq__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__eq__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___floordiv__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__floordiv__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___iadd__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__iadd__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___imul__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__imul__(other))
-        raise SkipTest # TODO: implement your test here
-
+    @classmethod
+    def setup_class(self):
+        self.v00=Vector3(0,0,0)
+        self.v10=Vector3(1,0,0)
+        self.v01=Vector3(0,1,0)
+        self.v11=Vector3(1,1,1)
+        self.v011=Vector3(0,1,1)
+        self.v110=Vector3(1,1,0)
+        self.v123=Vector3(1,2,3)
+        self.v456=Vector3(4,5,6)
+        
     def test___init__(self):
-        # vector3 = Vector3(*args)
-        raise SkipTest # TODO: implement your test here
-
-    def test___iter__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__iter__())
-        raise SkipTest # TODO: implement your test here
-
+        pass #tested above
+    
+    def test___repr__(self):
+        assert_equal(repr(self.v10),'Vector3(1, 0, 0)')
+    
     def test___len__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__len__())
-        raise SkipTest # TODO: implement your test here
+        assert_equal(len(self.v11),3)
+    
+    def test___iter__(self):
+        v= [v for v in self.v11]
+        assert_equal(v,[1]*len(self.v11))
 
-    def test___mul__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__mul__(other))
-        raise SkipTest # TODO: implement your test here
-
+    def test_xyz(self):
+        assert_equal(self.v11.xyz,(1,1,1))
+    
+    def test___eq__(self):
+        assert_true(self.v11 == self.v11)
+        assert_false(self.v11 == self.v01)
+        #more tests embedded below
+        
     def test___ne__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__ne__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___neg__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__neg__())
-        raise SkipTest # TODO: implement your test here
+        assert_false(self.v11 != self.v11)
+        assert_true(self.v11 != self.v01)
 
     def test___nonzero__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__nonzero__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___rdiv__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__rdiv__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___repr__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__repr__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___rfloordiv__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__rfloordiv__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___rsub__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__rsub__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___rtruediv__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__rtruediv__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_true(self.v11)
+        assert_false(self.v00)
+        
+    def test___copy__(self):
+        assert_true(self.v10.copy()==self.v10)
+        assert_false(self.v10.copy()==self.v01)
+        
+    def test_mag2(self):
+        assert_equal(self.v11.mag2(), 3)
+    
+    def test___abs__(self):
+        assert_equal(abs(self.v11), sqrt(3))
+        
+    def test_normalized(self):
+        assert_true(self.v10.normalized())
+        assert_almost_equal(abs(self.v11.normalized()),1)
+        
+    def test_normalize(self):
+        v=self.v11.copy()
+        v.normalize()
+        assert_almost_equal(abs(v),1)
+        
+    def test___add__(self):
+        assert_equal(self.v10+self.v01, self.v110) # Vector + Vector -> Vector
+        assert_equal(self.v10+Point3(0,1,1),Point3(1,1,1))# Vector + Point -> Point
+        assert_equal(Point3(1,0,0.5)+Point3(0,1,0.5),self.v11)# Point + Point -> Vector
+        
+    def test___iadd__(self):
+        v=self.v10.copy()
+        v+=self.v01
+        assert_equal(v, self.v110)
+        
+    def test___neg__(self):
+        assert_equal(-self.v11,Vector3(-1,-1,-1))
 
     def test___sub__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__sub__(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.v11-self.v10,self.v011) # Vector - Vector -> Vector
+        assert_equal(self.v11-Point3(1,0,0),Point3(0,1,1)) # Vector - Point -> Point
+        assert_equal(Point3(1,1,1)-Point3(1,0,1),self.v01) # Point - Point -> Vector
+        
+    def test___rsub__(self):
+        assert_equal(Point3(1,1,1)-self.v10,Point3(0,1,1)) # Point - Vector -> Point
+        
+    def test___mul__(self):
+        assert_equal(2*self.v11,Vector3(2,2,2))
+        assert_equal(self.v11*2,Vector3(2,2,2))
+        
+    def test___imul__(self):
+        v=self.v10.copy()
+        v*=2
+        assert_equal(v,Vector3(2,0,0))
+
+    def test___div__(self):
+        assert_equal(self.v11/2.,Vector3(0.5,0.5,0.5))
+
+    def test___floordiv__(self):
+        assert_equal(self.v11//2.,self.v00)
+
+    def test___rdiv__(self):
+        assert_equal(2./self.v11,Vector3(2,2,2))
+
+    def test___rfloordiv__(self):
+        assert_equal(2.//self.v11,Vector3(2,2,2))
 
     def test___truediv__(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.__truediv__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_angle(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.angle(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_cross(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.cross(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(operator.truediv(self.v11,3),Vector3(1/3.,1/3.,1/3.))
+        
+    def test___rtruediv__(self):
+        assert_equal(operator.truediv(3,self.v11),Vector3(3,3,3))
 
     def test_dot(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.dot(other))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.v10.dot(self.v01),0)
+        assert_equal(self.v11.dot(self.v01),1)
+    
+    def test_angle(self):
+        assert_almost_equal(self.v10.angle(self.v01),pi/2.)
+        assert_almost_equal(self.v11.angle(self.v01),acos(1/sqrt(3)))
 
-    def test_mag2(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.mag2())
-        raise SkipTest # TODO: implement your test here
-
-    def test_normalize(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.normalize())
-        raise SkipTest # TODO: implement your test here
-
-    def test_normalized(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.normalized())
-        raise SkipTest # TODO: implement your test here
+    def test_cross(self):
+        assert_equal(self.v123.cross(self.v456),Vector3(-3.00, 6.00, -3.00))
 
     def test_project(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.project(other))
-        raise SkipTest # TODO: implement your test here
+        assert_almost_equal(self.v10.project(self.v11),Vector3(1/3.,1/3.,1/3.))
 
     def test_reflect(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.reflect(normal))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.v11.reflect(self.v10),Vector3(-1,1,1))
 
     def test_rotate_around(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.rotate_around(axis, theta))
         raise SkipTest # TODO: implement your test here
 
-    def test_xyz(self):
-        # vector3 = Vector3(*args)
-        # assert_equal(expected, vector3.xyz())
-        raise SkipTest # TODO: implement your test here
-
 class TestMatrix3:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___call__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__call__(other))
@@ -414,6 +377,10 @@ class TestMatrix3:
         raise SkipTest # TODO: implement your test here
 
 class TestMatrix4:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___call__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__call__(other))
@@ -584,6 +551,10 @@ class TestMatrix4:
         raise SkipTest # TODO: implement your test here
 
 class TestQuaternion:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___abs__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__abs__())
@@ -721,8 +692,8 @@ class TestGeometry:
         raise SkipTest # TODO: implement your test here
 
 class TestPoint2:
-    
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.p00=Point2(0,0)
         self.p10=Point2(1,0)
         self.p01=Point2(0,1)
@@ -755,7 +726,8 @@ class TestPolar:
         raise SkipTest # TODO: implement your test here
 
 class TestLine2:
-    def setup(self):
+    @classmethod
+    def setup_class(self):   
         self.l1=Line2((1,1),(1,1))
         self.l2=Line2((2,2),Point2(-1,-1)) #parallel to l1
         self.l3=Line2((-1,-1),(-1,1),1) #perpendicular to l1 and l2, normalized
@@ -804,6 +776,10 @@ class TestRay2:
         raise SkipTest # TODO: implement your test here
 
 class TestSegment2:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___abs__(self):
         # segment2 = Segment2()
         # assert_equal(expected, segment2.__abs__())
@@ -820,6 +796,10 @@ class TestSegment2:
         raise SkipTest # TODO: implement your test here
 
 class TestCircle:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___copy__(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.__copy__())
@@ -865,7 +845,8 @@ class TestCircle:
         raise SkipTest # TODO: implement your test here
 
 class TestArc2:
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.a1=Arc2((0,0),(1,0),(0,1))
         self.a2=Arc2((0,0),0,pi/2.,1) #same as a1
         
@@ -906,6 +887,10 @@ class TestArc2:
         raise SkipTest # TODO: implement your test here
 
 class TestPoint3:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___repr__(self):
         # point3 = Point3()
         # assert_equal(expected, point3.__repr__())
@@ -922,6 +907,10 @@ class TestPoint3:
         raise SkipTest # TODO: implement your test here
 
 class TestLine3:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___copy__(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.__copy__())
@@ -953,6 +942,10 @@ class TestRay3:
         raise SkipTest # TODO: implement your test here
 
 class TestSegment3:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___abs__(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.__abs__())
@@ -969,6 +962,10 @@ class TestSegment3:
         raise SkipTest # TODO: implement your test here
 
 class TestSphere:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___copy__(self):
         # sphere = Sphere(center, radius)
         # assert_equal(expected, sphere.__copy__())
@@ -994,6 +991,10 @@ class TestSphere:
         raise SkipTest # TODO: implement your test here
 
 class TestPlane:
+    @classmethod
+    def setup_class(self):
+        pass
+    
     def test___copy__(self):
         # plane = Plane(*args)
         # assert_equal(expected, plane.__copy__())

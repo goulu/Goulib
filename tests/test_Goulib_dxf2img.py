@@ -1,6 +1,8 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 
+import os
+
 from Goulib.dxf2img import *
 
 class TestTrans:
@@ -48,14 +50,41 @@ class TestBBox:
         # assert_equal(expected, b_box.trans(trans))
         raise SkipTest # TODO: implement your test here
 
+    def test___add__(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.__add__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_xmax(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.xmax())
+        raise SkipTest # TODO: implement your test here
+
+    def test_xmin(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.xmin())
+        raise SkipTest # TODO: implement your test here
+
+    def test_ymax(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.ymax())
+        raise SkipTest # TODO: implement your test here
+
+    def test_ymin(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.ymin())
+        raise SkipTest # TODO: implement your test here
+
 class TestCbox:
     def test_cbox(self):
         # assert_equal(expected, cbox(c, r))
         raise SkipTest # TODO: implement your test here
 
 class TestDXF:
-    def setup(self):
-        self.dxf= DXF("test.dxf")
+    @classmethod
+    def setup_class(self):
+        self.path=os.path.dirname(os.path.abspath(__file__))
+        self.dxf= DXF(self.path+'\\test.dxf')
         
     def test___init__(self):
         pass #tested in setup
@@ -77,6 +106,11 @@ class TestDXF:
 class TestImg2base64:
     def test_img2base64(self):
         # assert_equal(expected, img2base64(img, fmt))
+        raise SkipTest # TODO: implement your test here
+
+class TestFactory:
+    def test_factory(self):
+        # assert_equal(expected, factory(e, trans))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

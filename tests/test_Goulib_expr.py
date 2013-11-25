@@ -6,7 +6,8 @@ from math import *
 
 class TestExpr:
     
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.f1=Expr(1)
         self.fx=Expr(lambda x:x,name='x')
         self.fs=Expr(sin)

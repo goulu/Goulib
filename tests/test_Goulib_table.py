@@ -9,35 +9,36 @@ from Goulib.table import *
 
 class TestTable:
     
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
         self.t=Table(self.path+'\\test.xls') # from http://www.contextures.com/xlSampleData01.html
+        assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
+        self.t.write_csv(self.path+'\\test.csv')
+        self.t2=Table(None) #empty table
+        self.t2.read_csv(self.path+'\\test.csv')
+        #do not modify t in tests. use t2 for changes
         
     def test___init__(self):
         pass #in setup above
-        assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
     
     def test_read_xls(self):
         pass #tested in setup
     
     def test_write_csv(self):
-        self.t.write_csv(self.path+'\\test.csv')
+        pass #tested in setup
         
     def test_read_csv(self):
-        t2=Table(None) #empty table
-        t2.read_csv(self.path+'\\test.csv')
-        assert_equal(self.t, t2)
+        pass #tested in setup 
         
     def test___repr__(self):
-        t2=Table(self.path+'\\test.csv')
         s1=repr(self.t)
-        s2=repr(t2)
+        s2=repr(self.t2)
         assert_equal(s1,s2)
 
     def test___str__(self):
-        t2=Table(self.path+'\\test.csv')
         s1=str(self.t)
-        s2=str(t2)
+        s2=str(self.t2)
         assert_equal(s1,s2)
         
     def test_applyf(self):
@@ -64,8 +65,8 @@ class TestTable:
         pass #tested by test_sort
         
     def test_sort(self):
-        self.t.sort('Cost')
-        col=self.t.col('Cost')
+        self.t2.sort('Cost')
+        col=self.t2.col('Cost')
         assert_equal(col[0],1.29)
         assert_equal(col[-1],275)
         
@@ -76,8 +77,10 @@ class TestTable:
         pass #tested by test_addcol
 
     def test_addcol(self):
-        self.t.addcol('Discount', 0.15, 4)
-        assert_equal(self.t.ncols(),8)    
+        n=len(self.t2)
+        self.t2.addcol('Discount', 0.15, 4)
+        assert_equal(len(self.t2),n)  #check we don't change the lines
+        assert_equal(self.t2.ncols(),8)  
 
     def test_find_col(self):
         # table = Table(filename, titles, init, **kwargs)
