@@ -1,6 +1,7 @@
 #! /usr/local/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 from nose import SkipTest
 from nose.tools import assert_equal,assert_true
 
@@ -10,11 +11,12 @@ class TestTable:
     
     @classmethod
     def setup_class(self):
+        self.path=os.path.dirname(os.path.abspath(__file__))
         self.t=Table('test.xls') # from http://www.contextures.com/xlSampleData01.html
         assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
-        self.t.write_csv('test.csv')
+        self.t.write_csv(self.path+'/test.csv')
         self.t2=Table(None) #empty table
-        self.t2.read_csv('test.csv')
+        self.t2.read_csv(self.path+'/test.csv')
         #do not modify t in tests. use t2 for changes
         
     def test___init__(self):

@@ -273,9 +273,8 @@ class DXF(Drawing):
                         fh = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 36, 40, 48, 60]
                         i, h = min(enumerate(fh), key=lambda x: abs(x[1] - h))  # http://stackoverflow.com/questions/9706041/finding-index-of-an-item-closest-to-the-value-in-a-list-thats-not-entirely-sort
                         import os
-                        path = os.path.realpath(__file__)
-                        path = os.path.dirname(path)
-                        font = ImageFont.load(path + '\\base_pil\\72\\Courier New_%s_72.pil' % h)
+                        path=os.path.dirname(os.path.abspath(__file__))
+                        font = ImageFont.load(path + '/base_pil/72/Courier New_%s_72.pil' % h)
                     pt = Pt(e.insert[0], e.insert[1] + e.height)  # ACAD places texts by top left point...
                     draw.text(trans(pt).xy, e.text, font=font, fill=pen)
                      
