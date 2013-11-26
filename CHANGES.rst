@@ -1,6 +1,8 @@
 v1.6.0, 2013-11-25
 * added :mod:`geom`
 * :mod:`dxf2img` improved and added factory method to generate geom objects from dxf
+* Travis CI tests now handle local tests files. 
+  We had to use of `Pillow <http://pypi.python.org/pypi/pillow/>`_ rather than PIL for this
 
 v1.5.2, 2013-07-28
 

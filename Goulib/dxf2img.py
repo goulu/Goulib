@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Rasters (simple) .dxf files to bitmap images
-:requires: `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ and `pil <http://pypi.python.org/pypi/pil/>`_
+:requires: `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ and `pillow <http://pypi.python.org/pypi/pillow/>`_
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"

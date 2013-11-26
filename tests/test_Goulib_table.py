@@ -12,7 +12,7 @@ class TestTable:
     @classmethod
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
-        self.t=Table('test.xls') # from http://www.contextures.com/xlSampleData01.html
+        self.t=Table(self.path+'test.xls') # from http://www.contextures.com/xlSampleData01.html
         assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
         self.t.write_csv(self.path+'/test.csv')
         self.t2=Table(None) #empty table

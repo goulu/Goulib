@@ -83,7 +83,7 @@
 <span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;$Id$&#39;</span>
 <span class="n">__revision__</span> <span class="o">=</span> <span class="s">&#39;$Revision$&#39;</span>
 
-<span class="kn">import</span> <span class="nn">operator</span><span class="o">,</span><span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">operator</span><span class="o">,</span> <span class="nn">types</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">precision</span> <span class="o">=</span> <span class="mf">1e-9</span> <span class="c">#for equality comparizons</span>
@@ -557,7 +557,6 @@
                           <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
             <span class="k">return</span> <span class="n">Vector3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">other</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
@@ -1586,23 +1585,24 @@
     <span class="n">new_rotate_euler</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">new_rotate_euler</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Matrix4.new_rotate_triple_axis"><a class="viewcode-back" href="../modules/geom.html#geom.Matrix4.new_rotate_triple_axis">[docs]</a>    <span class="k">def</span> <span class="nf">new_rotate_triple_axis</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-      <span class="n">m</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
-      
-      <span class="n">m</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">x</span>
-      <span class="n">m</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">y</span>
-      <span class="n">m</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">z</span>
-      
-      <span class="k">return</span> <span class="n">m</span></div>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        
+        <span class="n">m</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">z</span>
+        
+        <span class="k">return</span> <span class="n">m</span></div>
     <span class="n">new_rotate_triple_axis</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">new_rotate_triple_axis</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Matrix4.new_look_at"><a class="viewcode-back" href="../modules/geom.html#geom.Matrix4.new_look_at">[docs]</a>    <span class="k">def</span> <span class="nf">new_look_at</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="n">up</span><span class="p">):</span>
-      <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">eye</span> <span class="o">-</span> <span class="n">at</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
-      <span class="n">x</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
-      <span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-      
-      <span class="n">m</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">new_rotate_triple_axis</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-      <span class="n">m</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">eye</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">eye</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">eye</span><span class="o">.</span><span class="n">z</span>
-      <span class="k">return</span> <span class="n">m</span></div>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">eye</span> <span class="o">-</span> <span class="n">at</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        
+        <span class="n">m</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">new_rotate_triple_axis</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">eye</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">eye</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">eye</span><span class="o">.</span><span class="n">z</span>
+        <span class="k">return</span> <span class="n">m</span>
+    </div>
     <span class="n">new_look_at</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">new_look_at</span><span class="p">)</span>
     
 <div class="viewcode-block" id="Matrix4.new_perspective"><a class="viewcode-back" href="../modules/geom.html#geom.Matrix4.new_perspective">[docs]</a>    <span class="k">def</span> <span class="nf">new_perspective</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fov_y</span><span class="p">,</span> <span class="n">aspect</span><span class="p">,</span> <span class="n">near</span><span class="p">,</span> <span class="n">far</span><span class="p">):</span>
@@ -2189,9 +2189,6 @@
         <span class="s">&quot;:return: Vector2 or Vector3 tangent at parameter u&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
     </div>
-    <span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
 <div class="viewcode-block" id="Geometry.intersect"><a class="viewcode-back" href="../modules/geom.html#geom.Geometry.intersect">[docs]</a>    <span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </div>
