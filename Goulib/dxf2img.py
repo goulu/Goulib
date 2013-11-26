@@ -220,7 +220,7 @@ class DXF(Drawing):
         :result: :class:`PIL:Image` rasterized image
         """
         
-        import Image, ImageDraw, ImageFont  # PIL
+        from PIL import Image, ImageDraw, ImageFont  # PIL or Pillow
         
         def _draw(entities):
             for e, trans in entities:
