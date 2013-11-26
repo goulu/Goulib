@@ -84,7 +84,7 @@ class TestDXF:
     @classmethod
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
-        self.dxf= DXF(self.path+'\\test.dxf')
+        self.dxf= DXF(self.path+'/test.dxf')
         
     def test___init__(self):
         pass #tested in setup
