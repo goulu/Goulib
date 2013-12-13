@@ -414,7 +414,7 @@ class Vector2(object):
         return Vector2(self.x - d * normal.x,
                        self.y - d * normal.y)
 
-    def angle(self, other):
+    def angle(self, other=None):
         """Return the angle to the vector other"""
         if other:
             return acos(self.dot(other) / (self.mag()*other.mag()))

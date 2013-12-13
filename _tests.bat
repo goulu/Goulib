@@ -1,2 +1,2 @@
 for %1 in (Goulib/*.py) do pythoscope -t nose %1
-nosetests
+nosetests --with-coverage --cover-package=Goulib

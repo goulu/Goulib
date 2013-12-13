@@ -1,3 +1,5 @@
 xlrd
+lxml
 dxfgrabber
+dxfwrite
 pillow

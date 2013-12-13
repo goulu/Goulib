@@ -6,53 +6,76 @@ from nose import SkipTest
 from nose.tools import assert_equal,assert_true
 
 from Goulib.table import *
+import datetime
 
 class TestTable:
     
     @classmethod
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
+        
+        #test reading an Excel file
         self.t=Table(self.path+'/test.xls') # from http://www.contextures.com/xlSampleData01.html
         assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
+        
+        #test that t can be written to csv, then re-read in t2 without loss
         self.t.write_csv(self.path+'/test.csv')
+        
         self.t2=Table(None) #empty table
         self.t2.read_csv(self.path+'/test.csv')
-        #do not modify t in tests. use t2 for changes
+        
+        assert_equal(repr(self.t),repr(self.t2))
+        assert_equal(str(self.t),str(self.t2))
+        
+        #format some columns
+        self.t2.applyf('Cost',float)
+        self.t2.applyf('Total',lambda x:float(x) if isinstance(x,(int,float)) else float(x.replace(',','')))
+        
+        self.t2.to_date('OrderDate',fmt='%m/%d/%Y',skiperrors=True) #converts string format
+        self.t2.to_date('OrderDate',fmt='') #converts Excel numeric format
+        assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))
+        assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
+        
+        row=Row(self.t2[14])
+        assert_equal(row.html(),'<tr><td align="right">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td align="right">2</td><td align="right">125.00</td><td align="right">250.00</td></tr>')
         
     def test___init__(self):
-        pass #in setup above
-    
-    def test_read_xls(self):
         pass #tested in setup
-    
-    def test_write_csv(self):
-        pass #tested in setup
-        
-    def test_read_csv(self):
-        pass #tested in setup 
-        
+
     def test___repr__(self):
-        s1=repr(self.t)
-        s2=repr(self.t2)
-        assert_equal(s1,s2)
+        pass #tested in setup
 
     def test___str__(self):
-        s1=str(self.t)
-        s2=str(self.t2)
-        assert_equal(s1,s2)
-        
+        pass #tested in setup
+
     def test_applyf(self):
-        pass #tested by test_to_datetime
-        
-    def test_to_datetime(self):
-        pass #tested by test_to_date
+        pass #tested in setup
     
+    def test_read_csv(self):
+        pass #tested in setup
+
+    def test_read_xls(self):
+        pass #tested in setup
+
     def test_to_date(self):
-        import datetime
-        self.t.to_date('OrderDate',fmt='%m/%d/%Y') #converts string format
-        self.t.to_date('OrderDate',fmt='',safe=False) #converts Excel numeric format
-        assert_equal(self.t[0][0],datetime.date(2012, 6, 1))
-        assert_equal(self.t[1][0],datetime.date(2012, 1,23))
+        pass #tested in setup and test_html
+
+    def test_to_datetime(self):
+        pass #tested in setup
+
+    def test_write_csv(self):
+        pass #tested in setup
+
+    def test_html(self):
+        f = open(self.path+'/test.htm', 'w')
+        f.write(self.t2.html())
+        f.close()
+        
+        t=Table(self.path+'/test.htm')
+        assert_equal(t._i('OrderDate'),0) #check the colum exists
+        
+        t.to_date('OrderDate')
+        assert_equal(t,self.t2)
         
     def test_append(self):
         ta = Table(None)
@@ -102,11 +125,6 @@ class TestTable:
         # assert_equal(expected, table.hierarchy(by, factory, linkfct))
         raise SkipTest # TODO: implement your test here
 
-    def test_html(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.html(page, head, foot, colstyle, **kwargs))
-        raise SkipTest # TODO: implement your test here
-
     def test_remove_lines_where(self):
         # table = Table(filename, titles, init, **kwargs)
         # assert_equal(expected, table.remove_lines_where(filter))
@@ -138,6 +156,10 @@ class TestTable:
         # assert_equal(expected, table.__eq__(other))
         raise SkipTest # TODO: implement your test here
 
+class TestHtml:
+    def test_html(self):
+        # assert_equal(expected, html(self))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     import nose

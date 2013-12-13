@@ -8,23 +8,27 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-def in_interval(interval,x):
+def _order(interval):
+    """:return: (a,b) interval such that a<=b"""
+    return (interval[0], interval[1]) if interval[0]<interval[1] else (interval[1], interval[0])
+
+def in_interval(interval,x,closed=True):
     ''' True if x is in interval [a,b] or [b,a] (tuple)'''
-    a,b = interval[0], interval[1]
-    return (a <= x <= b) or (b <= x <= a)
+    a,b = _order(interval)
+    return (a <= x <= b) if closed else (a <= x < b)
 
 def intersect(t1, t2):
-    ''' True if sorted tuples intervals [t1[ [t2[ intersect'''
+    ''' True if intervals [t1[ [t2[ intersect'''
     '''http://stackoverflow.com/questions/3721249/python-date-interval-intersection'''
-    t1start, t1end = t1[0], t1[1]
-    t2start, t2end = t2[0], t2[1]
+    t1start, t1end = _order(t1)
+    t2start, t2end = _order(t2)
     return (t1start <= t2start < t1end) or (t2start <= t1start < t2end)
 
 def intersection(t1, t2):
     '''returns intersection between 2 intervals (tuples), 
-    or (None,None) if intervals don't intersect'''
-    t1start, t1end = t1[0], t1[1]
-    t2start, t2end = t2[0], t2[1]
+    or None if intervals don't intersect'''
+    t1start, t1end = _order(t1)
+    t2start, t2end = _order(t2)
     start=max(t1start,t2start)
     end=min(t1end,t2end)
     if start>end: #no intersection
@@ -38,7 +42,7 @@ def intersectlen(t1, t2, none=0):
         (start,end)=intersection(t1,t2)
         return end-start
     except:
-        return None
+        return none
 
 class Interval(object):
     """
@@ -47,15 +51,12 @@ class Interval(object):
     Start and end do not have to be numeric types. 
     
     http://code.activestate.com/recipes/576816-interval/
-    alternative could be http://pypi.python.org/pypi/
+    alternatives could be https://pypi.python.org/pypi/interval/ (outdated, no more doc) or https://pypi.python.org/pypi/pyinterval/
     """
     
     def __init__(self, start, end):
         "Construct, start must be <= end."
-        if start > end:
-            raise ValueError('Start (%s) must not be greater than end (%s)' % (start, end))
-        self._start = start
-        self._end = end
+        self._start, self._end = _order((start,end))
         
     start = property(fget=lambda self: self._start, doc="The interval's start")
     end = property(fget=lambda self: self._end, doc="The interval's end")
@@ -107,7 +108,7 @@ class Interval(object):
         return self.start <= item and item < self.end
          
     def contains(self,x):
-        "@return: True iff 0 in self."
+        "@return: True iff x in self."
         return self.start <= x and x < self.end
 
     def subset(self, other):
@@ -153,18 +154,6 @@ class Intervals(list):
     def __call__(self,x):
         """ returns list of intervals containing x"""
         return [i for i in self if i.contains(x)]
-    
-import unittest
-class TestCase(unittest.TestCase):
-    def setUp(self):
-        self.i12 = Interval(1,2)
-        self.i13 = Interval(1,3)
-        self.i24 = Interval(2,4)
-        self.intervals=Intervals([self.i24,self.i13,self.i12])
-        
-        
-    def runTest(self):
-        self.assertEqual(str(self.intervals),'[[1,2), [1,3), [2,4)]')
         
 
 if __name__ == '__main__':

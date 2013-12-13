@@ -42,10 +42,19 @@ class Expr(object):
         self.name=name
         self.y=f
         
+    def __repr__(self):
+        if self.isconstant:
+            return repr(self.y)
+        if self.right:
+            return '%s(%s,%s)'%(self.name,self.left,self.right)
+        if self.left: 
+            return '%s(%s)'%(self.name,self.left)
+        return '%s'%self.name
+        
     def __call__(self,x): 
         """evaluate the Expr at x OR compose self(x())"""
         if isinstance(x,Expr):
-            return self.apply(x)
+            return self.applx(x)
         try: #is x iterable ?
             return [self(x) for x in x]
         except: pass
@@ -59,15 +68,18 @@ class Expr(object):
             return self.y(self.left(x))
         else:
             return self.y(x)
-        
-    def __repr__(self):
-        if self.isconstant:
-            return repr(self.y)
-        if self.right:
-            return '%s(%s,%s)'%(self.name,self.left,self.right)
-        if self.left: 
-            return '%s(%s)'%(self.name,self.left)
-        return '%s'%self.name
+    
+    def apply(self,f,right=None,name=None):
+        """function composition self o f = f(self(x)) or f(self,right)"""
+        return Expr(f,self,right, name=name)
+    
+    def applx(self,f,name=None):
+        """function composition f o self = self(self(x))"""
+        res=Expr(self) #copy
+        res.left=Expr(f,res.left,name=name)
+        if res.right:
+            res.right=Expr(f,res.right,name=name)
+        return res
     
     def __cmp__(self,other):
         if self.isconstant:
@@ -77,10 +89,6 @@ class Expr(object):
             except:
                 return cmp(self.y,other)
         raise NotImplementedError #TODO : implement for general expressions...
-    
-    def apply(self,f,right=None,name=None):
-        """function composition self o f = f(self(x)) or f(self,right)"""
-        return Expr(f,self,right, name=name)
 
     def __add__(self,right):
         return self.apply(operator.add,right,'+')
@@ -115,17 +123,9 @@ class Expr(object):
     def __xor__(self,right):
         return self.apply(operator.xor,right,'^')
     
-    def applx(self,f,name=None):
-        """function composition f o self = self(self(x))"""
-        res=Expr(self) #copy
-        res.left=Expr(f,res.left,name=name)
-        if res.right:
-            res.right=Expr(f,res.right,name=name)
-        return res
-    
     def __lshift__(self,dx):
-        return self.applx(lambda x:x-dx,name='lshift')
+        return self.applx(lambda x:x+dx,name='lshift')
     
     def __rshift__(self,dx):
-        return self.applx(lambda x:x+dx,name='rshift')
+        return self.applx(lambda x:x-dx,name='rshift')
     

@@ -10,6 +10,7 @@ class TestExpr:
     def setup_class(self):
         self.f1=Expr(1)
         self.fx=Expr(lambda x:x,name='x')
+        self.fx2=Expr(lambda x:x*x,name='x')
         self.fs=Expr(sin)
         
         self.fb1=Expr(lambda x:x>1,name='x>1')
@@ -63,6 +64,12 @@ class TestExpr:
     def test___truediv__(self):
         pass # in fact we do only truedivs with Expr s
     
+    def test_applx(self):
+        e=self.fs.applx(self.fx2,name='sin(x^2)')
+        assert_equal(e(2),sin(4))
+        e=self.fs(self.fx2)
+        assert_equal(e(2),sin(4))
+    
     def test_apply(self):
         f1=self.fx.apply(self.fs)
         assert_equal(f1([-1,0,1]),[sin(-1),0,sin(1)])
@@ -86,24 +93,16 @@ class TestExpr:
         assert_equal(fb([1,2,3]),[False,True,False])
 
     def test___cmp__(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.__cmp__(other))
-        raise SkipTest # TODO: implement your test here
-
+        assert_equal(Expr(1)>Expr(2),False)
+        assert_equal(Expr(1)<Expr(2),True)
+        
     def test___lshift__(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.__lshift__(dx))
-        raise SkipTest # TODO: implement your test here
+        e=self.fx<<1
+        assert_equal(e(0),1)
 
     def test___rshift__(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.__rshift__(dx))
-        raise SkipTest # TODO: implement your test here
-
-    def test_applx(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.applx(f, name))
-        raise SkipTest # TODO: implement your test here
+        e=self.fx>>2
+        assert_equal(e(0),-2)
 
 if __name__ == "__main__":
     import nose

@@ -211,6 +211,3 @@ color = {'aqua': '#00ffff',
     'yellowgreen': '#9acd32'}
 
 hexcolor=dict([(i,'0x'+v[1:]) for i,v in color.iteritems()])
-
-if __name__ == '__main__':
-    print color_range(4)

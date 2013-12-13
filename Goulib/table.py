@@ -12,36 +12,180 @@ import csv, itertools, operator, string
 from datetime import datetime, date, timedelta
 import logging
 
-from Goulib.datetime2 import datef, datetimef
+try: # using http://lxml.de/
+    from lxml import etree as ElementTree
+    defaultparser=ElementTree.HTMLParser
+except: #ElementTree
+    logging.info('LXML unavailable : falling back to ElementTree')
+    from xml.etree import ElementTree
+    from HTMLParser import HTMLParser
+    defaultparser=HTMLParser
+    
+Element=ElementTree._Element
+
+from Goulib.datetime2 import datef, datetimef,strftimedelta
+
+def attr(args):
+    res=''
+    for key,val in args.iteritems():
+        k="class" if key=="_class" else key
+        res+=' %s="%s"'%(k,val)
+    return res
+
+class Cell():
+    """Table cell with HTML attributes"""
+    def __init__(self,data=None,align=None,fmt=None,tag=None,style=None):
+        """
+        :param data: cell value(s) of any type
+        :param align: string for HTML align attribute
+        :param fmt: format string applied applied to data
+        :param tag: called to build each cell. defaults to 'td'
+        :param style: string for HTML style attribute
+        """
+        
+        if isinstance(data,Element):
+            tag=data.tag
+            assert(tag in ('td','th'))
+            data=Cell.read(data.text)
+                    
+        self.data=data
+        self.align=align
+        self.fmt=fmt
+        self.tag=tag if tag else 'td'
+        self.style=style 
+        
+    def __repr__(self):
+        return str(self.data)
+    
+    @staticmethod
+    def read(x):
+        """interprets x as int, float, string or None"""
+        try:
+            x=float(x) #works for x in unicode
+            xi=int(x)  #does not work if x is floating point in unicode (?)
+            if xi==x: x=xi
+        except:
+            if x=='': x=None
+        return x
+    
+    def __repr__html(self):
+        return self.html()
+        
+    def html(self):
+        """:return: string HTML formatted cell
+        * if data is int, default align="right"
+        * if data is float, default align="right" and fmt='%0.2f'
+        * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
+        """
+        v=self.data
+        a=self.align
+        f=self.fmt
+        if isinstance(v,int):
+            if not a: a="right"
+        elif isinstance(v,float):
+            if not a: a="right"
+            if not f: f='%0.2f'
+            v=f%v
+            f=None #don't reformat below
+        elif isinstance(v,date):
+            if not a: a="right"
+            if not f: f='%Y-%m-%d'
+            v=v.strftime(f)
+            f=None #don't reformat below
+        elif isinstance(v,timedelta):
+            if not a: a="right"
+            if not f: f='%H:%M:%S'
+            v=strftimedelta(v,f)
+            f=None #don't reformat below
+            
+        attr='' #tag attributes
+        if a:
+            attr+=' align="%s"'%a
+            
+        if not v or v=='':
+            v="&nbsp;" #for IE8
+        else:
+            v=f%v if f else str(v)
+                    
+        if self.style: attr+=' style="%s"'%self.style
+        return '<%s%s>%s</%s>'%(self.tag,attr,v,self.tag)
+
+class Row():
+    """Table row with HTML attributes"""
+    def __init__(self,data,align=None,fmt=None,tag=None,style=None):
+        """
+        :param data: (list of) cell value(s) of any type
+        :param align: (list of) string for HTML align attribute
+        :param fmt: (list of) format string applied applied to data
+        :param tag: (list of) tags called to build each cell. defaults to 'td'
+        :param style: (list of) string for HTML style attribute
+        """
+        if isinstance(data,Element):
+            line=[]
+            for td in data:
+                cell=Cell(td)
+                line.append(cell.data)
+            data=line
+        
+        
+        if not isinstance(data,list) : data=list(data)
+        #ensure params have the same length as data
+        
+        if not isinstance(style,list): style=[style]
+        style=style+[None]*(len(data)-len(style))
+        
+        if not isinstance(align,list): align=[align]
+        align=align+[None]*(len(data)-len(align))
+        
+        if not isinstance(fmt,list)  : fmt=[fmt]
+        fmt=fmt+[None]*(len(data)-len(fmt))
+        
+        if not tag:tag='td'
+        if not isinstance(tag,list)  : 
+            tag=[tag]*(len(data)) #make a full row, in case it's a 'th'
+        tag=tag+[None]*(len(data)-len(fmt)) #fill the row with None, which will be 'td's
+            
+        self.data=data
+        self.align=align
+        self.fmt=fmt
+        self.tag=tag
+        self.style=style 
+        
+    def __repr__(self):
+        return str(self.data)
+    
+    def __repr__html(self):
+        return self.html()
+
+    def html(self):
+        """return in HTML format"""
+        res='<tr>'
+        for i,v in enumerate(self.data):
+            cell=Cell(v,self.align[i],self.fmt[i],self.tag[i],self.style[i])
+            res+=cell.html()
+        res+='</tr>'
+        return res
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
-    def __init__(self,filename=None,titles=[],init=[],**kwargs):
-        """inits a table either from data or csv file"""
-        list.__init__(self, init)
-        self.titles=titles
+    def __init__(self,filename=None,titles=None,data=[],**kwargs):
+        """inits a table, optionally by reading a Excel, csv or html file"""
+        list.__init__(self, data)
+        self.titles=titles if titles else []
         if filename:
             if titles: #were specified
                 kwargs['titles_line']=0 
-            if filename[-4:].lower()=='.xls':
+            ext=filename.split('.')[-1].lower()
+            if ext=='xls':
                 self.read_xls(filename,**kwargs)
-            else:
+            elif ext[:3]=='htm':
+                self.read_html(filename,**kwargs)
+            else: #try ...
                 self.read_csv(filename,**kwargs)
-                
-    def __eq__(self,other):
-        """compare 2 Tables contents, mainly for tests"""
-        if self.titles!=other.titles:
-            return False
-        if len(self)!=len(other):
-            return False
-        for i in range(len(self)):
-            if self[i]!=other[i]:
-                return False
-        return True
             
     def __repr__(self):
         """:return: repr string of titles+5 first lines"""
-        return 'Table(%s,%s)'%(self.titles,self[:5])
+        return 'Table(len=%d,titles=%s,data=%s)'%(len(self),self.titles,self[:5])
     
     def __str__(self):
         """:return: string of full tables with linefeeds"""
@@ -52,18 +196,74 @@ class Table(list):
             res+=str(line)+'\n'
         return res
     
-    def html(self,page,head=None,foot=None,colstyle=None,**kwargs):
-        """output HTML on a markup.page"""
-        page.table(**kwargs) #if style is defined, it's applied to the table here
-        if not head:
+    def __repr__html(self):
+        return self.html()
+    
+    def html(self,head=None,foot=None,colstyle=None,**kwargs):
+        """:return: string HTML representation of table"""
+                
+        def TR(data,align=None,fmt=None,tag=None,style=None):
+            if not isinstance(data[0],list):
+                data=[data]
+            res=''
+            for line in data:
+                row=Row(data=line,align=align,fmt=fmt,tag=tag,style=style)
+                res+=row.html()+'\n'
+            return res
+            
+        def THEAD(data,fmt=None,style=None):
+            res="<thead>\n"
+            res+=TR(data=data,fmt=fmt,tag='th',style=style)
+            res+="</thead>\n"
+            return res
+            
+        def TFOOT(data,fmt=None,style=None):
+            res="<tfoot>\n"
+            res+=TR(data=data,fmt=fmt,tag='th',style=style)
+            res+="</tfoot>\n"
+            return res
+        
+        res="<table%s>\n"%attr(kwargs)
+            
+        if head is None:
             head=self.titles
-        if head:
-            page.THEAD(head)
+        if head is not None:
+            res+=THEAD(head)
         for row in self:
-            page.TR(row,style=colstyle)  
-        if foot:
-            page.TFOOT(foot)             
-        page.table.close()
+            res+=TR(row,style=colstyle)  
+        if foot is not None:
+            res+=TFOOT(foot)             
+        
+        return res+"</table>\n"
+    
+    def read_element(self,element, **kwargs):
+        """read table from a DOM element"""
+        head=element.find('thead')
+        if head is not None:
+            self.titles=Row(head.find('tr')).data
+        body=element.find('tbody')
+        if body is None:
+            body=element
+        for row in body.findall('tr'):
+            line=Row(row).data
+            if not line: continue #skip empty lines
+            if not self.titles:
+                self.titles=line
+            else:
+                self.append(line)
+        return self
+    
+    def read_html(self,filename, **kwargs):
+        """read first table in HTML file
+        """
+        parser=kwargs.get('parser',defaultparser)
+        element = ElementTree.parse(filename,parser()).getroot()
+        if element.tag=='table': # file contains table as topmost tag
+            pass
+        else: #find first table
+            element = element.find('.//table')
+        self.read_element(element, **kwargs)
+        return self
     
     def read_xls(self, filename, **kwargs):
         """appends an Excel table"""
@@ -74,16 +274,7 @@ class Table(list):
         wb = open_workbook(filename)
         for s in wb.sheets():
             for i in range(s.nrows):
-                line = []
-                for j in range(s.ncols):
-                    x=s.cell(i,j).value
-                    try:
-                        xf=float(x)
-                        xi=int(x)
-                        x=xi if xi==xf else xf
-                    except:
-                        if x=='': x=None
-                    line.append(x)
+                line=[Cell.read(s.cell(i,j).value) for j in range(s.ncols)]
                 if i==titles_line:
                     self.titles=line
                 elif i>=data_line:
@@ -109,15 +300,7 @@ class Table(list):
             if i==titles_line: #titles can have no left/right spaces
                 self.titles=[x.lstrip().rstrip() for x in row]
             elif i>=data_line:
-                line=[]
-                for x in row:
-                    try:
-                        xf=float(x)
-                        xi=int(xf)
-                        x=xi if xi==xf else xf
-                    except:
-                        if x=='': x=None
-                    line.append(x)
+                line=[Cell.read(x) for x in row]
                 if line!=[None]: #strange last line ...
                     self.append(line)
         return self
@@ -228,7 +411,7 @@ class Table(list):
             list.sort(self,key=lambda x:x[i],reverse=reverse)
         else:
             list.sort(i,reverse=reverse)
-            
+        return self
     
     def rowasdict(self,i):
         ''' returns a line as a dict '''
@@ -245,7 +428,11 @@ class Table(list):
         else:
             pass #groupby will group CONSECUTIVE lines with same i, so entries at bottom of table will replace the earlier entries in dict
         for k, g in itertools.groupby(self, key=lambda x:x[i]):
-            res[k]=Table(None,titles=t,init=[a[:i]+a[i+1:] if removecol else a for a in g])
+            if removecol:
+                r=Table(titles=t,data=[a[:i]+a[i+1:] for a in g])
+            else:
+                r=Table(titles=t,data=list(g))
+            res[k]=r
         return res
     
     def hierarchy(self,by='Level',
@@ -268,11 +455,11 @@ class Table(list):
             stack.append(obj)
         return res
         
-    def applyf(self,by,f,safe=True):
+    def applyf(self,by,f,skiperrors=False):
         '''apply a function to a column'''
         i=self._i(by)
         for row in self:
-            if safe:
+            if skiperrors:
                 try:
                     row[i]=f(row[i])
                 except:
@@ -281,13 +468,13 @@ class Table(list):
             else: # will fail if any problem occurs 
                 row[i]=f(row[i])
             
-    def to_datetime(self,by,fmt='%d.%m.%Y',safe=True):
+    def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
         '''convert a column to datetime'''    
-        self.applyf(by,lambda x: datetimef(x,fmt=fmt),safe)
+        self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
         
-    def to_date(self,by,fmt='%d.%m.%Y',safe=True):
+    def to_date(self,by,fmt='%Y-%m-%d',skiperrors=False):
         '''convert a column to date'''
-        self.applyf(by,lambda x: datef(x,fmt=fmt),safe)
+        self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
             
 
     def total(self,funcs):
@@ -310,7 +497,15 @@ class Table(list):
                     self.remove(line)
                     res+=1
         return res
+    
+    def __eq__(self,other):
+        """compare 2 Tables contents, mainly for tests"""
+        if self.titles!=other.titles:
+            return False
+        if len(self)!=len(other):
+            return False
+        for i in range(len(self)):
+            if self[i]!=other[i]:
+                return False
+        return True
                 
-if __name__ == "__main__":
-    import nose
-    nose.runmodule()
