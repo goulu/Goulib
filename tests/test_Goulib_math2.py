@@ -33,6 +33,16 @@ class TestTranspose:
         m1=[v1,v2,vecsub(v2,v1)]
         assert_equal(transpose(m1),[(0, 0, 0), (1, 1, 0), (2, 3, 1)])
         
+class TestMaximum:
+    def test_maximum(self):
+        m=[(1,2,3),(1,-2,0),(4,0,0)]
+        assert_equal(maximum(m),[4,2,3])
+
+class TestMinimum:
+    def test_minimum(self):
+        m=[(1,2,3),(1,-2,0),(4,0,0)]
+        assert_equal(minimum(m),[1,-2,0])
+        
 class TestDot:
     def test_dot(self):
         v1=range(3)
@@ -55,7 +65,7 @@ class TestVecadd:
 class TestVecsub:
     def test_vecsub(self):
         v1=range(4)
-        v2=list(accsum(v1))
+        v2=tuple(accsum(v1))
         assert_equal(vecsub(v1,v2),[0,0,-1,-3])
         v1=v1[1:]
         assert_equal(vecsub(v1,v2),[1,1,0,-6])
@@ -121,21 +131,6 @@ class TestIntOrFloat:
         # assert_equal(expected, int_or_float(x, epsilon))
         raise SkipTest # TODO: implement your test here
 
-class TestDivisors:
-    def test_divisors(self):
-        # assert_equal(expected, divisors(n))
-        raise SkipTest # TODO: implement your test here
-
-class TestProperDivisors:
-    def test_proper_divisors(self):
-        # assert_equal(expected, proper_divisors(n))
-        raise SkipTest # TODO: implement your test here
-
-class TestIsPrime:
-    def test_is_prime(self):
-        # assert_equal(expected, is_prime(n))
-        raise SkipTest # TODO: implement your test here
-
 class TestGetPrimes:
     def test_get_primes(self):
         # assert_equal(expected, get_primes(start, memoized))
@@ -143,38 +138,58 @@ class TestGetPrimes:
 
 class TestDigitsFromNumFast:
     def test_digits_from_num_fast(self):
-        # assert_equal(expected, digits_from_num_fast(num))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(digits_from_num_fast(1234),[1,2,3,4])
+        
+class TestStrBase:
+    def test_str_base(self):
+        assert_equal(str_base(2014,2),"11111011110")
+        assert_equal(str_base(65535,16),"ffff")
 
 class TestDigitsFromNum:
     def test_digits_from_num(self):
-        # assert_equal(expected, digits_from_num(num, base))
-        raise SkipTest # TODO: implement your test here
-
-class TestStrBase:
-    def test_str_base(self):
-        # assert_equal(expected, str_base(num, base, numerals))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(digits_from_num(1234),[1,2,3,4])
+        assert_equal(digits_from_num(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
 
 class TestNumFromDigits:
     def test_num_from_digits(self):
-        # assert_equal(expected, num_from_digits(digits, base))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(num_from_digits([1,2,3,4]),1234)
+        assert_equal(num_from_digits([1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],2),2014)
+        
+class TestNumberOfDigits:
+    def test_number_of_digits(self):
+        assert_equal(number_of_digits(1234),4)
+        assert_equal(number_of_digits(2014,2),11)
+        assert_equal(number_of_digits(65535,16),4)
 
 class TestIsPalindromic:
     def test_is_palindromic(self):
         # assert_equal(expected, is_palindromic(num, base))
         raise SkipTest # TODO: implement your test here
 
+class TestIsPrime:
+    def test_is_prime(self):
+        assert_false(is_prime(2013))
+        assert_false(is_prime(20132013))
+        assert_false(is_prime(201420132013))
+        assert_true(is_prime(201420142013))
+        
 class TestPrimeFactors:
     def test_prime_factors(self):
-        # assert_equal(expected, prime_factors(num, start))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(prime_factors(2014),[2, 19, 53])
+        assert_equal(prime_factors(2048),[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 
 class TestFactorize:
     def test_factorize(self):
-        # assert_equal(expected, factorize(num))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(factorize(2014)),[(2, 1), (19, 1), (53, 1)])
+        assert_equal(list(factorize(2048)),[(2,11)])
+        
+class TestDivisors:
+    def test_divisors(self):
+        assert_equal(list(divisors(2014)),[1, 53, 19, 1007, 2, 106, 38, 2014])
+
+class TestProperDivisors:
+    def test_proper_divisors(self):
+        assert_equal(list(proper_divisors(2014)),[1, 53, 19, 1007, 2, 106, 38])
 
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
@@ -219,11 +234,6 @@ class TestGetCardinalName:
 class TestIsPerfect:
     def test_is_perfect(self):
         # assert_equal(expected, is_perfect(num))
-        raise SkipTest # TODO: implement your test here
-
-class TestNumberOfDigits:
-    def test_number_of_digits(self):
-        # assert_equal(expected, number_of_digits(num, base))
         raise SkipTest # TODO: implement your test here
 
 class TestIsPandigital:

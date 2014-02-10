@@ -156,9 +156,29 @@ class TestTable:
         # assert_equal(expected, table.__eq__(other))
         raise SkipTest # TODO: implement your test here
 
+    def test_read_element(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.read_element(element, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_read_html(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.read_html(filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestHtml:
     def test_html(self):
         # assert_equal(expected, html(self))
+        raise SkipTest # TODO: implement your test here
+
+class TestAttr:
+    def test_attr(self):
+        # assert_equal(expected, attr(args))
+        raise SkipTest # TODO: implement your test here
+
+class TestRead:
+    def test_read(self):
+        # assert_equal(expected, read(x))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

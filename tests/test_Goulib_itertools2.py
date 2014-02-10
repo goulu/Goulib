@@ -140,8 +140,8 @@ class TestQuantify:
 
 class TestPairwise:
     def test_pairwise(self):
-        # assert_equal(expected, pairwise(iterable))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(pairwise([1,2,3])),[(1,2),(2,3)])
+        # assert_equal(list(pairwise([1,2,3],True)),[(1,2),(2,3),(3,1)])
     
 class TestInterleave:
     def test_interleave(self):

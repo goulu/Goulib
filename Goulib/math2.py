@@ -68,6 +68,28 @@ def product(nums):
     """Product of nums"""
     return reduce(operator.mul, nums, 1)
 
+def transpose(m):
+    """:return: matrix m transposed"""
+    return zip(*m) #trivially simple once you know it
+
+def maximum(m):
+    """
+    Compare N arrays and returns a new array containing the element-wise maxima
+    http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html
+    :param m: list of arrays (matrix)
+    :return: list of maximal values found in each column of m
+    """
+    return [max(c) for c in transpose(m)]
+
+def minimum(m):
+    """
+    Compare N arrays and returns a new array containing the element-wise minima
+    http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html
+    :param m: list of arrays (matrix)
+    :return: list of minimal values found in each column of m
+    """
+    return [min(c) for c in transpose(m)]
+
 def _longer(a,b,fillvalue=0):
     '''makes a as long as b by appending fillvalues'''
     n=len(b)-len(a)
@@ -103,9 +125,52 @@ def veccompare(a,b):
             res[2]+=1
     return res
 
-def transpose(m):
-    """:return: matrix m transposed"""
-    return zip(*m) #trivially simple once you know it
+#norms and distances
+
+def norm_2(v):
+    """:return: "normal" euclidian norm of vector v"""
+    return sqrt(sum(x*x for x in v))
+
+def norm_1(v):
+    """:return: "manhattan" norm of vector v"""
+    return sum(abs(x) for x in v)
+
+def norm_inf(v):
+    """:return: infinite norm of vector v"""
+    return max(abs(x) for x in v)
+
+def norm(v,order=2):
+    """http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html"""
+    return sum(x**order for x in v)**(1./order)
+
+def dist(a,b,norm=norm_2):
+    return norm(vecsub(a,b))
+
+def sets_dist(a,b):
+    """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
+    c = a.intersection(b)
+    return sqrt(len(a-c)*2 + len(b-c)*2)
+
+def sets_levenshtein(a,b):
+    """levenshtein distance on sets
+    @see: http://en.wikipedia.org/wiki/Levenshtein_distance
+    """
+    c = a.intersection(b)
+    return len(a-c)+len(b-c)
+
+def levenshtein(seq1, seq2):
+    """return http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
+    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python """
+    oneago = None
+    thisrow = range(1, len(seq2) + 1) + [0]
+    for x in xrange(len(seq1)):
+        twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
+        for y in xrange(len(seq2)):
+            delcost = oneago[y] + 1
+            addcost = thisrow[y - 1] + 1
+            subcost = oneago[y - 1] + (seq1[x] != seq2[y])
+            thisrow[y] = min(delcost, addcost, subcost)
+    return thisrow[len(seq2) - 1]
 
 #stats
 
@@ -195,7 +260,7 @@ def digits_from_num(num, base=10):
     def recursive(num, base, current):
         if num < base:
             return current+[num]
-        return recursive(num/base, base, current + [num%base])
+        return recursive(num//base, base, current + [num%base])
     return list(reversed(recursive(num, base, [])))
 
 def str_base(num, base, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
@@ -233,7 +298,7 @@ def prime_factors(num, start=2):
     """Return all prime factors (ordered) of num in a list"""
     candidates = xrange(start, int(sqrt(num)) + 1)
     factor = next((x for x in candidates if (num % x == 0)), None)
-    return ([factor] + prime_factors(num / factor, factor) if factor else [num])
+    return ([factor] + prime_factors(num // factor, factor) if factor else [num])
 
 def factorize(num):
     """Factorize a number returning occurrences of its prime factors"""
@@ -307,33 +372,6 @@ def number_of_digits(num, base=10):
 def is_pandigital(digits, through=range(1, 10)):
     """Return True if digits form a pandigital number"""
     return (sorted(digits) == through)
-
-#norms and distances
-def sets_dist(a,b):
-    """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
-    c = a.intersection(b)
-    return sqrt(len(a-c)*2 + len(b-c)*2)
-
-def sets_levenshtein(a,b):
-    """levenshtein distance on sets
-    @see: http://en.wikipedia.org/wiki/Levenshtein_distance
-    """
-    c = a.intersection(b)
-    return len(a-c)+len(b-c)
-
-def levenshtein(seq1, seq2):
-    """return http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
-    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python """
-    oneago = None
-    thisrow = range(1, len(seq2) + 1) + [0]
-    for x in xrange(len(seq1)):
-        twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
-        for y in xrange(len(seq2)):
-            delcost = oneago[y] + 1
-            addcost = thisrow[y - 1] + 1
-            subcost = oneago[y - 1] + (seq1[x] != seq2[y])
-            thisrow[y] = min(delcost, addcost, subcost)
-    return thisrow[len(seq2) - 1]
         
 #combinatorics
 

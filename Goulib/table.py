@@ -47,6 +47,9 @@ class Cell():
             tag=data.tag
             assert(tag in ('td','th'))
             data=Cell.read(data.text)
+            
+        if isinstance(data,basestring):
+            data=data.lstrip().rstrip() #remove spaces, but also trailing \r\n
                     
         self.data=data
         self.align=align
@@ -258,10 +261,15 @@ class Table(list):
         """
         parser=kwargs.get('parser',defaultparser)
         element = ElementTree.parse(filename,parser()).getroot()
-        if element.tag=='table': # file contains table as topmost tag
+        try:
+            if element.tag!='table': # file contains table as topmost tag
+                element = element.find('.//table') #find first table
+        except: 
             pass
-        else: #find first table
-            element = element.find('.//table')
+        
+        if element is None:
+            raise LookupError('no table found in file')
+        
         self.read_element(element, **kwargs)
         return self
     
@@ -288,17 +296,16 @@ class Table(list):
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
         encoding=kwargs.get('encoding','iso-8859-15')
-        #reader = csv.reader(open(filename, 'rb'), dialect=dialect, delimiter=delimiter)
-        reader = open(filename,'rb') 
+        reader = csv.reader(open(filename, 'rb'), dialect=dialect, delimiter=delimiter)
+        #reader = open(filename,'rb') 
         for i,row in enumerate(reader):
-            row=row.replace('\x00', '') #avoid NULLS from .XLS saved as .CSV
-            row=row.rstrip('\r\n')
-            
-            row=row.split(delimiter)
+            # row=row.replace('\x00', '') #avoid NULLS from .XLS saved as .CSV
+            # row=row.rstrip('\r\n')
+            #row=row.split(delimiter)
             if encoding:
                 row=[x.decode(encoding) for x in row]
             if i==titles_line: #titles can have no left/right spaces
-                self.titles=[x.lstrip().rstrip() for x in row]
+                self.titles=[Cell.read(x) for x in row]
             elif i>=data_line:
                 line=[Cell.read(x) for x in row]
                 if line!=[None]: #strange last line ...
@@ -307,23 +314,26 @@ class Table(list):
             
     def write_csv(self,filename, transpose=False, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
+    
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
         encoding=kwargs.get('encoding','iso-8859-15')
+        empty=''.encode(encoding)
+        def encode(line): return [empty if s is None else str(s).encode(encoding) for s in line]
         f=open(filename, 'wb')
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if transpose:
             i=0
             while self.col(i)[0]:
-                line=['']
+                line=[empty]
                 if self.titles: line=[self.titles[i]]
                 line.extend(self.col(i))
-                writer.writerow(line)
+                writer.writerow(encode(line))
                 i+=1
         else:
-            if self.titles: writer.writerow(self.titles)
+            if self.titles: writer.writerow(encode(self.titles))
             for line in self:
-                writer.writerow(line)
+                writer.writerow(encode(line))
         f.close()
     
     def ncols(self):
@@ -459,14 +469,14 @@ class Table(list):
         '''apply a function to a column'''
         i=self._i(by)
         for row in self:
-            if skiperrors:
-                try:
-                    row[i]=f(row[i])
-                except:
-                    pass
-                    # logging.debug('applyf could not process %s'%row[i]) #might cause another error
-            else: # will fail if any problem occurs 
-                row[i]=f(row[i])
+            x=row[i]
+            try:
+                row[i]=f(x)
+            except:
+                if not skiperrors:
+                    logging.error('could not applyf to %s'%x)
+                    raise(ValueError)
+                pass
             
     def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
         '''convert a column to datetime'''    

@@ -5,23 +5,19 @@
 import functools
 # Decorators
 
-"""
-#doen't work as expected...
+
 #http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):
-    def reset():
-        obj.cache = {}
-    obj._reset=reset
-    obj._reset()
-    cache=obj.cache
+    cache = obj.cache = {}
     @functools.wraps(obj)
     def memoizer(*args, **kwargs):
-        if args not in cache:
-            cache[args] = obj(*args, **kwargs)
-        return cache[args]
+        key = str(args) + str(kwargs)
+        if key not in cache:
+            cache[key] = obj(*args, **kwargs)
+        return cache[key]
     return memoizer
-"""
 
+"""
 def memoize(f, maxcache=None, cache={}):
     '''Decorator to keep a cache of input/output for a given function'''
     cachelen = [0]
@@ -34,4 +30,4 @@ def memoize(f, maxcache=None, cache={}):
             cachelen[0] += 1
         return cache[key]
     return g
-
+"""

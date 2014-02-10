@@ -6,6 +6,8 @@ A module providing vector, matrix and quaternion operations for use in 2D and 3D
 based on euclid http://code.google.com/p/pyeuclid
 """
 
+from __future__ import division #"true division" everywhere
+
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
 __license__ = "LGPL"
@@ -382,6 +384,8 @@ class Vector2(object):
         return sqrt(self.x ** 2 + self.y ** 2)
 
     mag = __abs__
+    
+    length = property(lambda self: abs(self))
 
     def mag2(self):
         return self.x ** 2 + self.y ** 2
@@ -2140,8 +2144,11 @@ def _intersect_point2_circle(P, C):
     
 def _intersect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
-    if d == 0:
-        return None
+    if d == 0: #both lines are parallel
+        if A.distance(B.p)==0: #colinear
+            return A 
+        else:
+            return None
 
     dy = A.p.y - B.p.y
     dx = A.p.x - B.p.x
@@ -2295,12 +2302,12 @@ class Point2(Vector2, Geometry):
     def _connect_line2(self, other):
         c = _connect_point2_line2(self, other)
         if c:
-            return c._swap()
+            return c.swap()
 
     def _connect_circle(self, other):
         c = _connect_point2_circle(self, other)
         if c:
-            return c._swap()
+            return c.swap()
         
 def Polar(mag,angle):
     return Vector2(mag*cos(angle),mag*sin(angle))
@@ -2364,10 +2371,10 @@ class Line2(Geometry):
             self.v = args[0].v.copy()
         else:
             self.p = Point2(args[0])
-            if isinstance(args[1], Point2):
-                self.v = args[1] - args[0]
-            else:
+            if type(args[1]) is Vector2:
                 self.v = Vector2(args[1])
+            else:
+                self.v = Point2(args[1]) - self.p
             
             if len(args) == 3:
                 self.v=self.v*args[2]/abs(self.v)
@@ -2457,7 +2464,7 @@ class Segment2(Line2):
 
     length = property(lambda self: abs(self.v))
     
-    def _swap(self):
+    def swap(self):
         # used by connect methods to switch order of points
         self.p = self.p2
         self.v *= -1
@@ -2550,13 +2557,21 @@ class Circle(Geometry):
     def _connect_line2(self, other):
         c = _connect_circle_line2(self, other)
         if c:
-            return c._swap()
+            return c.swap()
 
     def _connect_circle(self, other):
         return _connect_circle_circle(other, self)
     
 class Arc2(Circle):
-    def __init__(self, center, p1,p2,r=0):
+    def __init__(self, center, p1,p2,r=None,dir=1):
+        """
+        :param center: Point2 or (x,y) tuple
+        :param p1: starting Point2 or angle in radians 
+        :param p2: ending Point2 or angle in radians 
+        :param r: float radius, needed onyl if p1 or p2 is an angle
+        .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
+        
+        """
         c=Point2(center) if not isinstance(center,Point2) else center
         if isinstance(p1,(int,float)):
             p=c+Polar(r,p1)
@@ -2567,19 +2582,17 @@ class Arc2(Circle):
             self.p2=c+Polar(r,p2)
         else:
             self.p2=Point2(p2)
+        self.dir=dir 
             
         self._apply_transform(None) #to set start/end angles
         
     def angle(self):
         """:return: float arc angle"""
-        l=self.b-self.a
-        if l<0 :
-            l=2.*pi+l
-        return l
+        return (self.b-self.a)*self.dir
         
     def __abs__(self):
         """:return: float arc length"""
-        return self.r*self.angle()
+        return abs(self.r*self.angle())
         
     def _u_in(self, u): #unlike Circle, Arc2 is parametrized on [0,1] for coherency with Segment2
         return u >= 0.0 and u <= 1.0
@@ -2613,15 +2626,16 @@ class Arc2(Circle):
     def __eq__(self, other):
         if not super(Arc2,self).__eq__(other): #support Circles must be the same
             return False
-        return self.p==other.p and self.p2==other.p2
+        return self.p==other.p and self.p2==other.p2 and self.dir==other.dir
         
     def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.c,self.r,self.p,self.p2)
+        return '%s(center=%s,p1=%s,p2=%s,r=%s)' % (self.__class__.__name__,self.c,self.p,self.p2,self.r)
 
-    def _swap(self):
+    def swap(self):
         # used by connect methods to switch order of points
         self.p,self.p2 = self.p2,self.p
         self.a,self.b = self.b,self.a
+        self.dir=-self.dir
         return self
 
 
@@ -2684,7 +2698,7 @@ def _connect_line3_line3(A, B):
     if denom == 0:
         # Parallel, connect an endpoint with a line
         if isinstance(B, Ray3) or isinstance(B, Segment3):
-            return _connect_point3_line3(B.p, A)._swap()
+            return _connect_point3_line3(B.p, A).swap()
         # No endpoint (or endpoint is on A), possibly choose arbitrary
         # point on line.
         return _connect_point3_line3(A.p, B)
@@ -2874,17 +2888,17 @@ class Point3(Vector3, Geometry):
     def _connect_line3(self, other):
         c = _connect_point3_line3(self, other)
         if c:
-            return c._swap()
+            return c.swap()
         
     def _connect_sphere(self, other):
         c = _connect_point3_sphere(self, other)
         if c:
-            return c._swap()
+            return c.swap()
 
     def _connect_plane(self, other):
         c = _connect_point3_plane(self, other)
         if c:
-            return c._swap()
+            return c.swap()
 
 class Line3(Geometry):
     """
@@ -3031,7 +3045,7 @@ class Segment3(Line3):
     def mag2(self):
         return self.v.mag2()
 
-    def _swap(self):
+    def swap(self):
         # used by connect methods to switch order of points
         self.p = self.p2
         self.v *= -1
@@ -3104,7 +3118,7 @@ class Sphere(Geometry):
     def _connect_line3(self, other):
         c = _connect_sphere_line3(self, other)
         if c:
-            return c._swap()
+            return c.swap()
 
     def _connect_sphere(self, other):
         return _connect_sphere_sphere(other, self)

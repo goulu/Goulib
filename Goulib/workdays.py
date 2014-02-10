@@ -202,10 +202,11 @@ class WorkCalendar:
         Working days exclude weekends and any dates identified in holidays. 
         Use NETWORKDAYS to calculate employee benefits that accrue 
         based on the number of days worked during a specific term'''
+        end_date=datef(end_date)
+        start_date=datef(start_date)
         if end_date<start_date:
             return -self.networkdays(end_date,start_date)
-        end_date=datef(end_date)
-        i=datef(start_date)
+        i=start_date
         res=0
         while i<=end_date:
             if self.isworkday(i):res+=1

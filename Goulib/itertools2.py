@@ -204,14 +204,20 @@ def get_groups(iterable, n, step):
     return takeevery(step, onestepit)
 
 def quantify(iterable, pred=bool):
-    "Count how many times the predicate is true"
-    return sum(imap(pred, iterable))
+    """:return: int count how many times the predicate is true"""
+    return sum(imap(pred, iterable),0)
                 
 def pairwise(iterable):
-    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = tee(iterable)
     next(b, None)
     return izip(a, b)
+
+def grouped(iterable, n=2):
+    """
+    s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ...
+    see http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
+    """
+    return izip(*[iter(iterable)]*n)
 
 def interleave(l1,l2):
     """

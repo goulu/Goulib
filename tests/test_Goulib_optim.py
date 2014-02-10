@@ -1,6 +1,8 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 
+from Goulib.optim import *
+
 class TestHillclimb:
     def test_hillclimb(self):
         # assert_equal(expected, hillclimb(init_function, move_operator, objective_function, max_evaluations))
@@ -55,4 +57,8 @@ class TestTsp:
     def test_tsp(self):
         # assert_equal(expected, tsp(points, dist, max_iterations, start_temp, alpha, close, rand))
         raise SkipTest # TODO: implement your test here
+    
+if __name__ == "__main__":
+    import nose
+    nose.runmodule()
 

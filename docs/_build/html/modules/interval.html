@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>interval &mdash; Goulib 1.6.0 documentation</title>
+    <title>interval &mdash; Goulib 1.6.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.0',
+        VERSION:     '1.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -73,21 +73,21 @@
 <p>operations on [x..y[ intervals</p>
 <dl class="function">
 <dt id="interval.in_interval">
-<tt class="descclassname">interval.</tt><tt class="descname">in_interval</tt><big>(</big><em>interval</em>, <em>x</em><big>)</big><a class="reference internal" href="../_modules/interval.html#in_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.in_interval" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">interval.</tt><tt class="descname">in_interval</tt><big>(</big><em>interval</em>, <em>x</em>, <em>closed=True</em><big>)</big><a class="reference internal" href="../_modules/interval.html#in_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.in_interval" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if x is in interval [a,b] or [b,a] (tuple)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="interval.intersect">
 <tt class="descclassname">interval.</tt><tt class="descname">intersect</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/interval.html#intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.intersect" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if sorted tuples intervals [t1[ [t2[ intersect</p>
+<dd><p>True if intervals [t1[ [t2[ intersect</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="interval.intersection">
 <tt class="descclassname">interval.</tt><tt class="descname">intersection</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/interval.html#intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.intersection" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns intersection between 2 intervals (tuples), 
-or (None,None) if intervals don&#8217;t intersect</p>
+or None if intervals don&#8217;t intersect</p>
 </dd></dl>
 
 <dl class="function">
@@ -105,7 +105,7 @@ or none if intervals don&#8217;t intersect</p>
 Defined as half-open interval [start,end), which includes the start position but not the end.
 Start and end do not have to be numeric types.</p>
 <p><a class="reference external" href="http://code.activestate.com/recipes/576816-interval/">http://code.activestate.com/recipes/576816-interval/</a>
-alternative could be <a class="reference external" href="http://pypi.python.org/pypi/">http://pypi.python.org/pypi/</a></p>
+alternatives could be <a class="reference external" href="https://pypi.python.org/pypi/interval/">https://pypi.python.org/pypi/interval/</a> (outdated, no more doc) or <a class="reference external" href="https://pypi.python.org/pypi/pyinterval/">https://pypi.python.org/pypi/pyinterval/</a></p>
 <p>Construct, start must be &lt;= end.</p>
 <dl class="method">
 <dt id="interval.Interval.__init__">
@@ -176,7 +176,7 @@ alternative could be <a class="reference external" href="http://pypi.python.org/
 <dl class="method">
 <dt id="interval.Interval.contains">
 <tt class="descname">contains</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/interval.html#Interval.contains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.Interval.contains" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#64;return: True iff 0 in self.</p>
+<dd><p>&#64;return: True iff x in self.</p>
 </dd></dl>
 
 <dl class="method">
@@ -251,25 +251,6 @@ alternative could be <a class="reference external" href="http://pypi.python.org/
 
 </dd></dl>
 
-<dl class="class">
-<dt id="interval.TestCase">
-<em class="property">class </em><tt class="descclassname">interval.</tt><tt class="descname">TestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/interval.html#TestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.TestCase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
-<p>Create an instance of the class that will use the named test
-method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p>
-<dl class="method">
-<dt id="interval.TestCase.setUp">
-<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/interval.html#TestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.TestCase.setUp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="interval.TestCase.runTest">
-<tt class="descname">runTest</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/interval.html#TestCase.runTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#interval.TestCase.runTest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 
 
@@ -287,7 +268,7 @@ not have a method with the specified name.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

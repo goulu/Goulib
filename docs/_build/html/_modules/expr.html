@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>expr &mdash; Goulib 1.6.0 documentation</title>
+    <title>expr &mdash; Goulib 1.6.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.0',
+        VERSION:     '1.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -110,10 +110,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">f</span>
         </div>
+<div class="viewcode-block" id="Expr.__repr__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isconstant</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">(</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        </div>
 <div class="viewcode-block" id="Expr.__call__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span> 
         <span class="sd">&quot;&quot;&quot;evaluate the Expr at x OR compose self(x())&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">Expr</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applx</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span> <span class="c">#is x iterable ?</span>
             <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
@@ -127,15 +136,18 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        </div>
-<div class="viewcode-block" id="Expr.__repr__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isconstant</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">:</span> 
-            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">(</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+    </div>
+<div class="viewcode-block" id="Expr.apply"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;function composition self o f = f(self(x)) or f(self,right)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">right</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Expr.applx"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.applx">[docs]</a>    <span class="k">def</span> <span class="nf">applx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;function composition f o self = self(self(x))&quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c">#copy</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">left</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">res</span><span class="o">.</span><span class="n">left</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
     </div>
 <div class="viewcode-block" id="Expr.__cmp__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__cmp__">[docs]</a>    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isconstant</span><span class="p">:</span>
@@ -145,10 +157,6 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="n">other</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="c">#TODO : implement for general expressions...</span>
-    </div>
-<div class="viewcode-block" id="Expr.apply"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;function composition self o f = f(self(x)) or f(self,right)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">right</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Expr.__add__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">right</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span><span class="n">right</span><span class="p">,</span><span class="s">&#39;+&#39;</span><span class="p">)</span>
@@ -183,19 +191,11 @@
 <div class="viewcode-block" id="Expr.__xor__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__xor__">[docs]</a>    <span class="k">def</span> <span class="nf">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">right</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">,</span><span class="n">right</span><span class="p">,</span><span class="s">&#39;^&#39;</span><span class="p">)</span>
     </div>
-<div class="viewcode-block" id="Expr.applx"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.applx">[docs]</a>    <span class="k">def</span> <span class="nf">applx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;function composition f o self = self(self(x))&quot;&quot;&quot;</span>
-        <span class="n">res</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c">#copy</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">left</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">res</span><span class="o">.</span><span class="n">left</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
-            <span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="o">=</span><span class="n">Expr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">res</span><span class="o">.</span><span class="n">right</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span>
-    </div>
 <div class="viewcode-block" id="Expr.__lshift__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__lshift__">[docs]</a>    <span class="k">def</span> <span class="nf">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applx</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">-</span><span class="n">dx</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;lshift&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applx</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;lshift&#39;</span><span class="p">)</span>
     </div>
 <div class="viewcode-block" id="Expr.__rshift__"><a class="viewcode-back" href="../modules/expr.html#expr.Expr.__rshift__">[docs]</a>    <span class="k">def</span> <span class="nf">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applx</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;rshift&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applx</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">-</span><span class="n">dx</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;rshift&#39;</span><span class="p">)</span>
     </div></div>
 </pre></div>
 
@@ -213,7 +213,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

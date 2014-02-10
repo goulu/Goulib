@@ -728,8 +728,9 @@ class TestPolar:
 class TestLine2:
     @classmethod
     def setup_class(self):   
-        self.l1=Line2((1,1),(1,1))
+        self.l1=Line2((1,1),Vector2(1,1))
         self.l2=Line2((2,2),Point2(-1,-1)) #parallel to l1
+        assert_equal(self.l1.distance(self.l2),0)
         self.l3=Line2((-1,-1),(-1,1),1) #perpendicular to l1 and l2, normalized
             
     def test___init__(self):
@@ -740,9 +741,7 @@ class TestLine2:
 
 
     def test___repr__(self):
-        # line2 = Line2(*args)
-        # assert_equal(expected, line2.__repr__())
-        raise SkipTest # TODO: implement your test here
+        assert_equal(repr(self.l3),"Line2(Point2(-1, -1),Vector2(0.0, 1.0))")
 
     def test_connect(self):
         # line2 = Line2(*args)
@@ -750,9 +749,13 @@ class TestLine2:
         raise SkipTest # TODO: implement your test here
 
     def test_intersect(self):
-        # line2 = Line2(*args)
-        # assert_equal(expected, line2.intersect(other))
-        raise SkipTest # TODO: implement your test here
+        inter=self.l1.intersect(self.l2)
+        assert_equal(self.l1.distance(inter),0)
+        assert_equal(self.l2.distance(inter),0)
+        inter=self.l2.intersect(self.l3)
+        assert_equal(inter,Point2(-1,-1))
+        inter=self.l1.intersect(self.l3)
+        assert_equal(inter,Point2(-1,-1))
 
     def test_point(self):
         # line2 = Line2(*args)
@@ -778,17 +781,31 @@ class TestRay2:
 class TestSegment2:
     @classmethod
     def setup_class(self):
-        pass
+        self.s1=Segment2((1,1),Vector2(1,1))
+        self.s2=Segment2((2,2),Point2(-1,-1)) #parallel to l1
+        self.s3=Segment2((-1,-1),(-1,1),1) #perpendicular to l1 and l2, normalized
     
     def test___abs__(self):
         # segment2 = Segment2()
         # assert_equal(expected, segment2.__abs__())
         raise SkipTest # TODO: implement your test here
+    
+    def test_intersect(self):
+        """TODO : implement intersect of colinear segments
+        inter=self.s1.intersect(self.s2)
+        assert_equal(self.s1.distance(inter),0)
+        assert_equal(self.s2.distance(inter),0)
+        """
+        inter=self.s1.intersect(self.s3)
+        assert_equal(inter,None)
+        inter=self.s2.intersect(self.s3)
+        assert_equal(inter,Point2(-1,-1))
+
 
     def test___repr__(self):
-        # segment2 = Segment2()
-        # assert_equal(expected, segment2.__repr__())
-        raise SkipTest # TODO: implement your test here
+        assert_equal(repr(self.s1),"Segment2(Point2(1, 1),Point2(2, 2))")
+        assert_equal(repr(self.s2),"Segment2(Point2(2, 2),Point2(-1, -1))")
+        assert_equal(repr(self.s3),"Segment2(Point2(-1, -1),Point2(-1.0, 0.0))")
 
     def test_mag2(self):
         # segment2 = Segment2()
@@ -849,6 +866,7 @@ class TestArc2:
     def setup_class(self):
         self.a1=Arc2((0,0),(1,0),(0,1))
         self.a2=Arc2((0,0),0,pi/2.,1) #same as a1
+        self.a3=Arc2((0,0),0,pi/2.,1,dir=-1) #same, inverted
         
     def test___init__(self):
         pass #tested above
@@ -856,6 +874,7 @@ class TestArc2:
         
     def test___eq__(self):
         assert_true(self.a1==self.a2)
+        assert_false(self.a1==self.a3)
         
     def test___abs__(self):
         assert_almost_equal(abs(self.a1),pi/2.)
@@ -872,9 +891,8 @@ class TestArc2:
         raise SkipTest # TODO: implement your test here
 
     def test_angle(self):
-        # arc2 = Arc2(center, p1, p2, r)
-        # assert_equal(expected, arc2.angle())
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.a1.angle(),self.a2.angle())
+        assert_equal(self.a1.angle(),-self.a3.angle())
 
     def test_point(self):
         # arc2 = Arc2(center, p1, p2, r)

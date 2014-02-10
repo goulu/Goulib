@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>expr &mdash; Goulib 1.6.0 documentation</title>
+    <title>expr &mdash; Goulib 1.6.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.0',
+        VERSION:     '1.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -82,26 +82,32 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expr.Expr.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expr.Expr.__call__">
 <tt class="descname">__call__</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>evaluate the Expr at x OR compose self(x())</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="expr.Expr.__repr__">
-<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="expr.Expr.apply">
+<tt class="descname">apply</tt><big>(</big><em>f</em>, <em>right=None</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>function composition self o f = f(self(x)) or f(self,right)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="expr.Expr.applx">
+<tt class="descname">applx</tt><big>(</big><em>f</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.applx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.applx" title="Permalink to this definition">¶</a></dt>
+<dd><p>function composition f o self = self(self(x))</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="expr.Expr.__cmp__">
 <tt class="descname">__cmp__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__cmp__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__cmp__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="expr.Expr.apply">
-<tt class="descname">apply</tt><big>(</big><em>f</em>, <em>right=None</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.apply" title="Permalink to this definition">¶</a></dt>
-<dd><p>function composition self o f = f(self(x)) or f(self,right)</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="expr.Expr.__add__">
@@ -113,16 +119,16 @@
 <tt class="descname">__sub__</tt><big>(</big><em>right</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__sub__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="expr.Expr.__neg__">
-<tt class="descname">__neg__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__neg__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__neg__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt id="expr.Expr.__weakref__">
 <tt class="descname">__weakref__</tt><a class="headerlink" href="#expr.Expr.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="expr.Expr.__neg__">
+<tt class="descname">__neg__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__neg__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__neg__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="expr.Expr.__mul__">
@@ -165,12 +171,6 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="expr.Expr.applx">
-<tt class="descname">applx</tt><big>(</big><em>f</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.applx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.applx" title="Permalink to this definition">¶</a></dt>
-<dd><p>function composition f o self = self(self(x))</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="expr.Expr.__lshift__">
 <tt class="descname">__lshift__</tt><big>(</big><em>dx</em><big>)</big><a class="reference internal" href="../_modules/expr.html#Expr.__lshift__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expr.Expr.__lshift__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -199,7 +199,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

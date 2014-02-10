@@ -10,7 +10,7 @@ __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.aut
 __license__ = "LGPL"
 
 import io, StringIO, base64, logging, operator
-from math import  radians, degrees
+from math import  radians, degrees, atan, pi, copysign
 import dxfgrabber
 import geom
 
@@ -319,21 +319,64 @@ def factory(e,trans):
     if e.dxftype=='LINE':
         start=trans(Pt(e.start[:2]))
         end=trans(Pt(e.end[:2]))
-        res=geom.Segment2(start,end)
+        res=[geom.Segment2(start,end)]
     elif e.dxftype == 'ARC':
         c=Pt(e.center[:2])
         startangle=radians(e.startangle)
         start=c+geom.Polar(e.radius,startangle)
         endangle=radians(e.endangle)
         end=c+geom.Polar(e.radius,endangle)
-        res=geom.Arc2(trans(c),trans(start),trans(end))
+        res=[geom.Arc2(trans(c),trans(start),trans(end))]
     elif e.dxftype == 'CIRCLE':
         c=Pt(e.center[:2])
-        res=geom.Circle(trans(c), e.radius)
+        res=[geom.Circle(trans(c), e.radius)]
+    elif e.dxftype == 'POLYLINE':
+        res=[]
+        for i in range(1,len(e.vertices)):
+            start=e.vertices[i-1].location[:2] #2D only
+            end=e.vertices[i].location[:2] #2D only
+            bulge=e.vertices[i-1].bulge
+            if bulge==0:
+                res.append(geom.Segment2(start,end))
+            else:
+                #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
+                theta=4*atan(bulge)
+                chord=geom.Segment2(start,end)
+                c=chord.length
+                s=bulge*c/2
+                r=(c*c/4+s*s)/(2*s) #radius (negative if clockwise)
+                gamma=(pi-theta)/2
+                angle=chord.v.angle()+copysign(gamma,bulge)
+                center=start+geom.Polar(r,angle)
+                res.append(geom.Arc2(center,start,end))
+        if e.is_closed:
+            res.append(geom.Segment2(e.vertices[-1].location[:2],e.vertices[0].location[:2]))
+    elif e.dxftype == 'LWPOLYLINE':
+        res=[]
+        for i in range(1,len(e.points)):
+            start=e.points[i-1]
+            end=e.points[i]
+            if len(end)==2:
+                res.append(geom.Segment2(start,end))
+            else:
+                bulge=end[2]
+                #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
+                theta=4*atan(bulge)
+                chord=geom.Segment2(start,end)
+                c=chord.length
+                s=bulge*c/2
+                r=(c*c/4+s*s)/(2*s) #radius (negative if clockwise)
+                gamma=(pi-theta)/2
+                angle=chord.v.angle()+copysign(gamma,bulge)
+                center=start+geom.Polar(r,angle)
+                res.append(geom.Arc2(center,start,end))
+        if e.is_closed:
+            res.append(geom.Segment2(e.points[-1],e.points[0]))
     else:
         logging.warning('unhandled entity type %s'%e.dxftype)
-        return None
-    res.color=acadcolors[e.color % len(acadcolors)]
+        return []
+    for g in res:
+        g.color=acadcolors[e.color % len(acadcolors)]
     return res
 
 def img2base64(img, fmt='PNG'):
