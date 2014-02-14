@@ -12,6 +12,10 @@ My Python library of useful code found and written for various projects
     
 .. |travis| image:: https://travis-ci.org/goulu/Goulib.png?branch=master
     :target: https://travis-ci.org/goulu/Goulib
+    
+.. toctree::
+	:glob:
+	*
 
 Modules
 -------
@@ -31,16 +35,13 @@ Modules
 - :mod:`colors` : web (hex) colors dictionary and related functions
 
 - :mod:`geom` : 2D geometry
-- :mod:`dxf2img` : Rasters (simple) .dxf (Autocad) files to bitmap images
+- :mod:`drawing` : Vector graphics with I/O from .dxf and .svg formats
 
 - :mod:`optim` : Optimization algorithms
 
   Travelling Salesman Problem (TSP) hill climbing + simulated annealing 
 
 - :mod:`markup` : simple HTML output (branch of `markup <http://pypi.python.org/pypi/markup/>`_ )
-- :mod:`nvd3` : generates Javascript charts using http://nvd3.org and http://d3js.org
-
-  Obsolete. use `python-nvd3 <http://pypi.python.org/pypi/python-nvd3/>`_ which is derived from this module.
 
 
 Resources

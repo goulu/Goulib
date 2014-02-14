@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>math2 &mdash; Goulib 1.6.1 documentation</title>
+    <title>math2 &mdash; Goulib 1.6.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.1',
+        VERSION:     '1.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -117,6 +115,37 @@ works for all roots(real or complex)</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="math2.transpose">
+<tt class="descclassname">math2.</tt><tt class="descname">transpose</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/math2.html#transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matrix m transposed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.maximum">
+<tt class="descclassname">math2.</tt><tt class="descname">maximum</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/math2.html#maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare N arrays and returns a new array containing the element-wise maxima
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html">http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html</a>
+:param m: list of arrays (matrix)
+:return: list of maximal values found in each column of m</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.minimum">
+<tt class="descclassname">math2.</tt><tt class="descname">minimum</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/math2.html#minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare N arrays and returns a new array containing the element-wise minima
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html">http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html</a>
+:param m: list of arrays (matrix)
+:return: list of minimal values found in each column of m</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="math2.vecadd">
 <tt class="descclassname">math2.</tt><tt class="descname">vecadd</tt><big>(</big><em>a</em>, <em>b</em>, <em>fillvalue=0</em><big>)</big><a class="reference internal" href="../_modules/math2.html#vecadd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.vecadd" title="Permalink to this definition">¶</a></dt>
 <dd><p>addition of vectors of inequal lengths</p>
@@ -147,16 +176,73 @@ works for all roots(real or complex)</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="math2.transpose">
-<tt class="descclassname">math2.</tt><tt class="descname">transpose</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="../_modules/math2.html#transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.transpose" title="Permalink to this definition">¶</a></dt>
+<dt id="math2.norm_2">
+<tt class="descclassname">math2.</tt><tt class="descname">norm_2</tt><big>(</big><em>v</em><big>)</big><a class="reference internal" href="../_modules/math2.html#norm_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.norm_2" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matrix m transposed</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">&#8220;normal&#8221; euclidian norm of vector v</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.norm_1">
+<tt class="descclassname">math2.</tt><tt class="descname">norm_1</tt><big>(</big><em>v</em><big>)</big><a class="reference internal" href="../_modules/math2.html#norm_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.norm_1" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">&#8220;manhattan&#8221; norm of vector v</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.norm_inf">
+<tt class="descclassname">math2.</tt><tt class="descname">norm_inf</tt><big>(</big><em>v</em><big>)</big><a class="reference internal" href="../_modules/math2.html#norm_inf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.norm_inf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">infinite norm of vector v</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.norm">
+<tt class="descclassname">math2.</tt><tt class="descname">norm</tt><big>(</big><em>v</em>, <em>order=2</em><big>)</big><a class="reference internal" href="../_modules/math2.html#norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html">http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.dist">
+<tt class="descclassname">math2.</tt><tt class="descname">dist</tt><big>(</big><em>a</em>, <em>b</em>, <em>norm=&lt;function norm_2 at 0x04A8D330&gt;</em><big>)</big><a class="reference internal" href="../_modules/math2.html#dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.dist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="math2.sets_dist">
+<tt class="descclassname">math2.</tt><tt class="descname">sets_dist</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/math2.html#sets_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.sets_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets">http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.sets_levenshtein">
+<tt class="descclassname">math2.</tt><tt class="descname">sets_levenshtein</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/math2.html#sets_levenshtein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.sets_levenshtein" title="Permalink to this definition">¶</a></dt>
+<dd><p>levenshtein distance on sets
+&#64;see: <a class="reference external" href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="math2.levenshtein">
+<tt class="descclassname">math2.</tt><tt class="descname">levenshtein</tt><big>(</big><em>seq1</em>, <em>seq2</em><big>)</big><a class="reference internal" href="../_modules/math2.html#levenshtein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.levenshtein" title="Permalink to this definition">¶</a></dt>
+<dd><p>return <a class="reference external" href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a> distance between 2 iterables
+<a class="reference external" href="http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python">http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python</a></p>
 </dd></dl>
 
 <dl class="function">
@@ -330,26 +416,6 @@ read equally from left to right and right to left.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="math2.sets_dist">
-<tt class="descclassname">math2.</tt><tt class="descname">sets_dist</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/math2.html#sets_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.sets_dist" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference external" href="http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets">http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets</a></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="math2.sets_levenshtein">
-<tt class="descclassname">math2.</tt><tt class="descname">sets_levenshtein</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/math2.html#sets_levenshtein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.sets_levenshtein" title="Permalink to this definition">¶</a></dt>
-<dd><p>levenshtein distance on sets
-&#64;see: <a class="reference external" href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="math2.levenshtein">
-<tt class="descclassname">math2.</tt><tt class="descname">levenshtein</tt><big>(</big><em>seq1</em>, <em>seq2</em><big>)</big><a class="reference internal" href="../_modules/math2.html#levenshtein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.levenshtein" title="Permalink to this definition">¶</a></dt>
-<dd><p>return <a class="reference external" href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a> distance between 2 iterables
-<a class="reference external" href="http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python">http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python</a></p>
-</dd></dl>
-
-<dl class="function">
 <dt id="math2.ncombinations">
 <tt class="descclassname">math2.</tt><tt class="descname">ncombinations</tt><big>(</big><em>n</em>, <em>k</em><big>)</big><a class="reference internal" href="../_modules/math2.html#ncombinations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#math2.ncombinations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combinations of k elements from a group of n</p>
@@ -387,12 +453,12 @@ read equally from left to right and right to left.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
   </body>
 </html>

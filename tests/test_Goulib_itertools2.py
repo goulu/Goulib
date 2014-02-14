@@ -214,6 +214,11 @@ class TestCountUnique:
         # assert_equal(expected, count_unique(iterable, key))
         raise SkipTest # TODO: implement your test here
 
+class TestGrouped:
+    def test_grouped(self):
+        # assert_equal(expected, grouped(iterable, n))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

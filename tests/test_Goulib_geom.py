@@ -270,8 +270,37 @@ class TestVector3:
 class TestMatrix3:
     @classmethod
     def setup_class(self):
-        pass
+        self.mat123=Matrix3.new(1,2,3,4,5,6,7,8,9)
+
+    def test___init__(self):
+        assert_equal(Matrix3(), Matrix3.new(1,0,0, 0,1,0, 0,0,1))
+        
+    def test___repr__(self):
+        assert_equal(repr(self.mat123), 'Matrix3(1, 4, 7, 2, 5, 8, 3, 6, 9)')
+        
+    def test_new_identity(self):
+        mat=Matrix3.new_identity()
+        assert_equal(mat,Matrix3())
+        return mat
+        
+    def test_new_scale(self): 
+        mat=Matrix3.new_scale(2,3)
+        assert_equal(mat,Matrix3.new(2,0,0, 0,3,0, 0,0,1))
+        return mat
+
+    def test_new_rotate(self):
+        mat=Matrix3.new_rotate(radians(60))
+        s32=sqrt(3)/2
+        res=Matrix3.new(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
+        assert_almost_equal(mat, res)
+        return mat
+
+    def test_new_translate(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.new_translate(x, y))
+        raise SkipTest # TODO: implement your test here
     
+
     def test___call__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__call__(other))
@@ -292,18 +321,9 @@ class TestMatrix3:
         # assert_equal(expected, matrix3.__imul__(other))
         raise SkipTest # TODO: implement your test here
 
-    def test___init__(self):
-        # matrix3 = Matrix3()
-        raise SkipTest # TODO: implement your test here
-
     def test___mul__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__mul__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___repr__(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.__repr__())
         raise SkipTest # TODO: implement your test here
 
     def test___setitem__(self):
@@ -336,26 +356,6 @@ class TestMatrix3:
         # assert_equal(expected, matrix3.mag(v))
         raise SkipTest # TODO: implement your test here
 
-    def test_new_identity(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.new_identity())
-        raise SkipTest # TODO: implement your test here
-
-    def test_new_rotate(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.new_rotate(angle))
-        raise SkipTest # TODO: implement your test here
-
-    def test_new_scale(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.new_scale(x, y))
-        raise SkipTest # TODO: implement your test here
-
-    def test_new_translate(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.new_translate(x, y))
-        raise SkipTest # TODO: implement your test here
-
     def test_offset(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.offset())
@@ -374,6 +374,41 @@ class TestMatrix3:
     def test_translate(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.translate(*args))
+        raise SkipTest # TODO: implement your test here
+
+    def test___abs__(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.__abs__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___eq__(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.__eq__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_mag2(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.mag2())
+        raise SkipTest # TODO: implement your test here
+
+    def test_new(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.new(*values))
+        raise SkipTest # TODO: implement your test here
+
+    def test_transpose(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.transpose())
+        raise SkipTest # TODO: implement your test here
+
+    def test_transposed(self):
+        # matrix3 = Matrix3()
+        # assert_equal(expected, matrix3.transposed())
         raise SkipTest # TODO: implement your test here
 
 class TestMatrix4:
@@ -812,6 +847,11 @@ class TestSegment2:
         # assert_equal(expected, segment2.mag2())
         raise SkipTest # TODO: implement your test here
 
+    def test_swap(self):
+        # segment2 = Segment2()
+        # assert_equal(expected, segment2.swap())
+        raise SkipTest # TODO: implement your test here
+
 class TestCircle:
     @classmethod
     def setup_class(self):
@@ -904,6 +944,11 @@ class TestArc2:
         # assert_equal(expected, arc2.tangent(u))
         raise SkipTest # TODO: implement your test here
 
+    def test_swap(self):
+        # arc2 = Arc2(center, p1, p2, r, dir)
+        # assert_equal(expected, arc2.swap())
+        raise SkipTest # TODO: implement your test here
+
 class TestPoint3:
     @classmethod
     def setup_class(self):
@@ -977,6 +1022,11 @@ class TestSegment3:
     def test_mag2(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.mag2())
+        raise SkipTest # TODO: implement your test here
+
+    def test_swap(self):
+        # segment3 = Segment3()
+        # assert_equal(expected, segment3.swap())
         raise SkipTest # TODO: implement your test here
 
 class TestSphere:

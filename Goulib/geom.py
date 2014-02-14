@@ -942,28 +942,14 @@ class Matrix3(object):
 
     def __init__(self):
         self.identity()
-
+        
     def __copy__(self):
-        M = Matrix3()
-        M.a = self.a
-        M.b = self.b
-        M.c = self.c
-        M.e = self.e 
-        M.f = self.f
-        M.g = self.g
-        M.i = self.i
-        M.j = self.j
-        M.k = self.k
-        return M
+        return Matrix3.new(*self[:])
 
     copy = __copy__
     def __repr__(self):
-        return ('%s([%g %g %g\n'  \
-                '         %g %g %g\n'  \
-                '         %g %g %g])') \
-                % (self.__class__.__name__,self.a, self.b, self.c,
-                   self.e, self.f, self.g,
-                   self.i, self.j, self.k)
+        t=self.transposed() #repr is by line while [:] is by column
+        return ('%s%s') % (self.__class__.__name__,tuple(t))
 
     def __getitem__(self, key):
         return [self.a, self.e, self.i,
@@ -976,6 +962,15 @@ class Matrix3(object):
         (self.a, self.e, self.i,
          self.b, self.f, self.j,
          self.c, self.g, self.k) = L
+         
+    def __eq__(self,other):
+        try:
+            return list(self)==list(other)
+        except:
+            return False
+    
+    def __sub__(self, other):
+        return Matrix3.new(*(ai-bi for ai,bi in zip(self[:],other[:])))
 
     def __mul__(self, other):
         if isinstance(other, Matrix3):
@@ -1101,26 +1096,31 @@ class Matrix3(object):
     def rotate(self, angle):
         return Matrix3.new_rotate(angle)*self
 
-    # Static constructors
+    @classmethod
+    def new(cls, *values):
+        M = cls()
+        M[:] = values
+        return M
+    
+    @classmethod
     def new_identity(cls):
         self = cls()
         return self
-    new_identity = classmethod(new_identity)
 
+    @classmethod
     def new_scale(cls, x, y):
         self = cls()
         self.a = x
         self.f = y
         return self
-    new_scale = classmethod(new_scale)
-
+    @classmethod
     def new_translate(cls, x, y):
         self = cls()
         self.c = x
         self.g = y
         return self
-    new_translate = classmethod(new_translate)
-
+    
+    @classmethod
     def new_rotate(cls, angle):
         self = cls()
         s = sin(angle)
@@ -1129,7 +1129,25 @@ class Matrix3(object):
         self.b = -s
         self.e = s
         return self
-    new_rotate = classmethod(new_rotate)
+    
+    def mag2(self):
+        return sum(x*x for x in self)
+
+    def __abs__(self):
+        return sqrt(self.mag2())
+    
+    def transpose(self):
+        (self.a, self.e, self.i,
+         self.b, self.f, self.j,
+         self.c, self.g, self.k) = \
+        (self.a, self.b, self.c,
+         self.e, self.f, self.g,
+         self.i, self.j, self.k)
+
+    def transposed(self):
+        M = self.copy()
+        M.transpose()
+        return M
 
     def determinant(self):
         return (self.a*self.f*self.k 
@@ -1416,33 +1434,34 @@ class Matrix4(object):
         return M
 
     # Static constructors
+    @classmethod
     def new(cls, *values):
         M = cls()
         M[:] = values
         return M
-    new = classmethod(new)
 
+    @classmethod
     def new_identity(cls):
         self = cls()
         return self
-    new_identity = classmethod(new_identity)
 
+    @classmethod
     def new_scale(cls, x, y, z):
         self = cls()
         self.a = x
         self.f = y
         self.k = z
         return self
-    new_scale = classmethod(new_scale)
 
+    classmethod
     def new_translate(cls, x, y, z):
         self = cls()
         self.d = x
         self.h = y
         self.l = z
         return self
-    new_translate = classmethod(new_translate)
 
+    @classmethod
     def new_rotatex(cls, angle):
         self = cls()
         s = sin(angle)
@@ -1451,8 +1470,8 @@ class Matrix4(object):
         self.g = -s
         self.j = s
         return self
-    new_rotatex = classmethod(new_rotatex)
-
+    
+    @classmethod
     def new_rotatey(cls, angle):
         self = cls()
         s = sin(angle)
@@ -1461,8 +1480,8 @@ class Matrix4(object):
         self.c = s
         self.i = -s
         return self    
-    new_rotatey = classmethod(new_rotatey)
     
+    @classmethod
     def new_rotatez(cls, angle):
         self = cls()
         s = sin(angle)
@@ -1471,8 +1490,8 @@ class Matrix4(object):
         self.b = -s
         self.e = s
         return self
-    new_rotatez = classmethod(new_rotatez)
-
+    
+    @classmethod
     def new_rotate_axis(cls, angle, axis):
         assert(isinstance(axis, Vector3))
         vector = axis.normalized()
@@ -1496,8 +1515,8 @@ class Matrix4(object):
         self.j = y * z * c1 + x * s
         self.k = z * z * c1 + c
         return self
-    new_rotate_axis = classmethod(new_rotate_axis)
-
+    
+    @classmethod
     def new_rotate_euler(cls, heading, attitude, bank):
         # from http://www.euclideanspace.com/
         ch = cos(heading)
@@ -1518,8 +1537,8 @@ class Matrix4(object):
         self.j = sh * sa * cb + ch * sb
         self.k = -sh * sa * sb + ch * cb
         return self
-    new_rotate_euler = classmethod(new_rotate_euler)
 
+    @classmethod
     def new_rotate_triple_axis(cls, x, y, z):
         m = cls()
         
@@ -1528,8 +1547,8 @@ class Matrix4(object):
         m.i, m.j, m.k = x.z, y.z, z.z
         
         return m
-    new_rotate_triple_axis = classmethod(new_rotate_triple_axis)
 
+    @classmethod
     def new_look_at(cls, eye, at, up):
         z = (eye - at).normalized()
         x = up.cross(z).normalized()
@@ -1539,8 +1558,7 @@ class Matrix4(object):
         m.d, m.h, m.l = eye.x, eye.y, eye.z
         return m
     
-    new_look_at = classmethod(new_look_at)
-    
+    @classmethod    
     def new_perspective(cls, fov_y, aspect, near, far):
         # from the gluPerspective man page
         f = 1 / tan(fov_y / 2)
@@ -1553,7 +1571,6 @@ class Matrix4(object):
         self.o = -1
         self.p = 0
         return self
-    new_perspective = classmethod(new_perspective)
 
     def determinant(self):
         return ((self.a * self.f - self.e * self.b)
@@ -1835,20 +1852,17 @@ class Quaternion:
         self.z =  Ax * By - Ay * Bx + Az * Bw + Aw * Bz
         self.w = -Ax * Bx - Ay * By - Az * Bz + Aw * Bw
         return self
-
-    def __abs__(self):
-        return sqrt(self.w ** 2 + \
-                         self.x ** 2 + \
-                         self.y ** 2 + \
-                         self.z ** 2)
-
-    mag = __abs__
+    
 
     def mag2(self):
-        return self.w ** 2 + \
-               self.x ** 2 + \
-               self.y ** 2 + \
-               self.z ** 2 
+        return self.w ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2 
+
+    def __abs__(self):
+        return sqrt(self.mag2())
+            
+    mag = __abs__
+
+
 
     def identity(self):
         self.w = 1
@@ -1952,10 +1966,11 @@ class Quaternion:
         return M
 
     # Static constructors
+    @classmethod
     def new_identity(cls):
         return cls()
-    new_identity = classmethod(new_identity)
 
+    @classmethod
     def new_rotate_axis(cls, angle, axis):
         assert(isinstance(axis, Vector3))
         axis = axis.normalized()
@@ -1966,8 +1981,8 @@ class Quaternion:
         Q.y = axis.y * s
         Q.z = axis.z * s
         return Q
-    new_rotate_axis = classmethod(new_rotate_axis)
 
+    @classmethod
     def new_rotate_euler(cls, heading, attitude, bank):
         Q = cls()
         c1 = cos(heading / 2)
@@ -1982,8 +1997,8 @@ class Quaternion:
         Q.y = s1 * c2 * c3 + c1 * s2 * s3
         Q.z = c1 * s2 * c3 - s1 * c2 * s3
         return Q
-    new_rotate_euler = classmethod(new_rotate_euler)
     
+    @classmethod
     def new_rotate_matrix(cls, m):
         if m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] > 0.00000001:
             t = m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] + 1.0
@@ -2028,9 +2043,7 @@ class Quaternion:
               (m[1*4 + 2] + m[2*4 + 1])*s,
               s*t
               )
-            
-    new_rotate_matrix = classmethod(new_rotate_matrix)
-    
+    @classmethod
     def new_interpolate(cls, q1, q2, t):
         assert isinstance(q1, Quaternion) and isinstance(q2, Quaternion)
         Q = cls()
@@ -2066,7 +2079,6 @@ class Quaternion:
         Q.y = q1.y * ratio1 + q2.y * ratio2
         Q.z = q1.z * ratio1 + q2.z * ratio2
         return Q
-    new_interpolate = classmethod(new_interpolate)
 
 # Geometry
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
@@ -2499,8 +2511,8 @@ class Circle(Geometry):
     """
 
     def __init__(self, center, radius):
-        self.c = Point2(center) if not isinstance(center,Point2) else center
-        if type(radius) == float:
+        self.c = Point2(center)
+        if isinstance(radius,(float,int)):
             self.r = radius
             self.p = center+Vector2(radius,0) #for coherency + transform
         else:
@@ -2577,6 +2589,7 @@ class Arc2(Circle):
             p=c+Polar(r,p1)
         else:
             p=Point2(p1)
+            r=c.dist(p)
         super(Arc2,self).__init__(c,p)
         if isinstance(p2,(int,float)):
             self.p2=c+Polar(r,p2)

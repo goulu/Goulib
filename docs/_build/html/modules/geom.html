@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>geom &mdash; Goulib 1.6.1 documentation</title>
+    <title>geom &mdash; Goulib 1.6.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.1',
+        VERSION:     '1.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -438,6 +436,11 @@ dictionary keys:</p>
 <dl class="method">
 <dt id="geom.Vector2.mag">
 <tt class="descname">mag</tt><big>(</big><big>)</big><a class="headerlink" href="#geom.Vector2.mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geom.Vector2.length">
+<tt class="descname">length</tt><a class="headerlink" href="#geom.Vector2.length" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1820,7 +1823,7 @@ to compare if lines are &#8220;same&#8221;, use line1.distance(line2)==0</p>
 <dl class="class">
 <dt id="geom.Segment2">
 <em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Segment2</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#geom.Line2" title="geom.Line2"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line2</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#geom.Line2" title="geom.Line2"><tt class="xref py py-class docutils literal"><span class="pre">geom.Line2</span></tt></a>, <a class="reference internal" href="drawing.html#drawing.Edge" title="drawing.Edge"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Edge</span></tt></a></p>
 <dl class="attribute">
 <dt id="geom.Segment2.p1">
 <tt class="descname">p1</tt><a class="headerlink" href="#geom.Segment2.p1" title="Permalink to this definition">¶</a></dt>
@@ -1849,6 +1852,11 @@ to compare if lines are &#8220;same&#8221;, use line1.distance(line2)==0</p>
 <dl class="attribute">
 <dt id="geom.Segment2.length">
 <tt class="descname">length</tt><a class="headerlink" href="#geom.Segment2.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Segment2.swap">
+<tt class="descname">swap</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment2.swap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment2.swap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1972,12 +1980,42 @@ simply returns the length of the result of <tt class="docutils literal"><span cl
 
 <dl class="class">
 <dt id="geom.Arc2">
-<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Arc2</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#geom.Circle" title="geom.Circle"><tt class="xref py py-class docutils literal"><span class="pre">geom.Circle</span></tt></a></p>
+<em class="property">class </em><tt class="descclassname">geom.</tt><tt class="descname">Arc2</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=None</em>, <em>dir=1</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#geom.Circle" title="geom.Circle"><tt class="xref py py-class docutils literal"><span class="pre">geom.Circle</span></tt></a>, <a class="reference internal" href="drawing.html#drawing.Edge" title="drawing.Edge"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Edge</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>center</strong> &#8211; Point2 or (x,y) tuple</li>
+<li><strong>p1</strong> &#8211; starting Point2 or angle in radians</li>
+<li><strong>p2</strong> &#8211; ending Point2 or angle in radians</li>
+<li><strong>r</strong> &#8211; float radius, needed onyl if p1 or p2 is an angle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>.param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise</p>
 <dl class="method">
 <dt id="geom.Arc2.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">__init__</tt><big>(</big><em>center</em>, <em>p1</em>, <em>p2</em>, <em>r=None</em>, <em>dir=1</em><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>center</strong> &#8211; Point2 or (x,y) tuple</li>
+<li><strong>p1</strong> &#8211; starting Point2 or angle in radians</li>
+<li><strong>p2</strong> &#8211; ending Point2 or angle in radians</li>
+<li><strong>r</strong> &#8211; float radius, needed onyl if p1 or p2 is an angle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>.param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="geom.Arc2.angle">
@@ -2049,6 +2087,11 @@ simply returns the length of the result of <tt class="docutils literal"><span cl
 <dl class="method">
 <dt id="geom.Arc2.__repr__">
 <tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="geom.Arc2.swap">
+<tt class="descname">swap</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Arc2.swap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Arc2.swap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2231,6 +2274,11 @@ simply returns the length of the result of <tt class="docutils literal"><span cl
 <tt class="descname">mag2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3.mag2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3.mag2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="geom.Segment3.swap">
+<tt class="descname">swap</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/geom.html#Segment3.swap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geom.Segment3.swap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="geom.Segment3.__abstractmethods__">
 <tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#geom.Segment3.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
@@ -2404,12 +2452,12 @@ simply returns the length of the result of <tt class="docutils literal"><span cl
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
   </body>
 </html>

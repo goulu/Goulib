@@ -274,6 +274,31 @@ class TestProportional:
         assert_equal(sum(proportional(37, votes)),37)
         assert_equal(proportional(37, votes),[4,7,11,15])
 
+class TestNorm2:
+    def test_norm_2(self):
+        # assert_equal(expected, norm_2(v))
+        raise SkipTest # TODO: implement your test here
+
+class TestNorm1:
+    def test_norm_1(self):
+        # assert_equal(expected, norm_1(v))
+        raise SkipTest # TODO: implement your test here
+
+class TestNormInf:
+    def test_norm_inf(self):
+        # assert_equal(expected, norm_inf(v))
+        raise SkipTest # TODO: implement your test here
+
+class TestNorm:
+    def test_norm(self):
+        # assert_equal(expected, norm(v, order))
+        raise SkipTest # TODO: implement your test here
+
+class TestDist:
+    def test_dist(self):
+        # assert_equal(expected, dist(a, b, norm))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

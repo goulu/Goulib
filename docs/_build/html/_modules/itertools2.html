@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>itertools2 &mdash; Goulib 1.6.1 documentation</title>
+    <title>itertools2 &mdash; Goulib 1.6.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.1',
+        VERSION:     '1.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.1 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -272,14 +270,20 @@
     <span class="k">return</span> <span class="n">takeevery</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">onestepit</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="quantify"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.quantify">[docs]</a><span class="k">def</span> <span class="nf">quantify</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="nb">bool</span><span class="p">):</span>
-    <span class="s">&quot;Count how many times the predicate is true&quot;</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">iterable</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;:return: int count how many times the predicate is true&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">imap</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">iterable</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span>
                 </div>
 <div class="viewcode-block" id="pairwise"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.pairwise">[docs]</a><span class="k">def</span> <span class="nf">pairwise</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;s -&gt; (s0,s1), (s1,s2), (s2, s3), ...&quot;&quot;&quot;</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">tee</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
     <span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">izip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="grouped"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.grouped">[docs]</a><span class="k">def</span> <span class="nf">grouped</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    s -&gt; (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ...</span>
+<span class="sd">    see http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">izip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)]</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="interleave"><a class="viewcode-back" href="../modules/itertools2.html#itertools2.interleave">[docs]</a><span class="k">def</span> <span class="nf">interleave</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span><span class="n">l2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -440,13 +444,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
   </body>
 </html>

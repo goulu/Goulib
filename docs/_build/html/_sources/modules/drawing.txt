@@ -1,7 +1,7 @@
-:mod:`dxf2img`
+:mod:`drawing`
 ==============
 
-.. automodule:: dxf2img
+.. automodule:: drawing
     :show-inheritance:
     :members:
     :undoc-members:
