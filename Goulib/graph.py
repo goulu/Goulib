@@ -37,13 +37,18 @@ class GeoGraph(nx.MultiGraph):
         
         super(GeoGraph,self).__init__(None,**kwargs)
         prop=index.Property()
-        if G:
-            n=G.node.iterkeys().next()
-            prop.set_dimension(len(n))
-        
+        try: #guess dimension from first node
+            n=len(G.node.iterkeys().next())
+        except:
+            n=2
+        prop.set_dimension(n)
         self.idx = index.Index(properties=prop)
         if G:
             self.add_edges_from(G.edges(data=True))
+            
+    def copy(self):
+        """does not use deepcopy because the rtree index must be rebuilt"""
+        return GeoGraph(self)
                 
     def __nonzero__(self):
         """:return: True if graph has at least one node
@@ -119,43 +124,25 @@ class GeoGraph(nx.MultiGraph):
                 res+=1
         return res
     
-    def closest_nodes(self,n,tol=0,mindegree=0,skip=False):
+    def closest_nodes(self,n,skip=False):
         """
         nodes closest to a given position
         :param n: (x,y) position tuple
-        :param shortest: optional upper bound of distance. points further will be ignored
-        :param tol: float optional tolerance on minimal distance.
-        :param mindegree: int minimal degree of considered nodes. mindegree=1 ensures node has at least one edge
-        :param skip_p1: optional bool to skip p1 if it is an existing node
-        :return: list of nodes and float minimal distance
+        :param skip: optional bool to skip n
+        :return: list of nodes
         """
 
-        #try to be quick if p1 is already in nodes
-        if not skip and not tol and n in self:
-            if not mindegree or self.degree(n)<mindegree:
-                return [n],0
-        
-        # search...
-        res=[]
-        shortest=None
-        tol=max(tol,1e-9) #tol=0 is not allowed
-        p1=_smallbox(n,tol)
-        for rect in self.idx.intersection(p1, objects=True):
-            p2=rect.object
-            if self.degree(p2)<mindegree: continue #ignore
+        res,d=[],None
+        for p2 in self.idx.nearest(n, num_results=2 if skip else 1, objects='raw'):
             d=self.dist(n, p2)
-            if d<=tol and skip: continue
-            if shortest is None: shortest=2*d
-            if d<shortest-tol: #better
-                shortest=d
-                res=[p2]
-            elif abs(d-shortest)<=tol: #almost same
-                res.append(p2)
-        return res,shortest
+            if skip and d<=self.tol: 
+                continue
+            res.append(p2)
+        return res, d
     
     def closest_edges(self,p,data=False):
         """:return: container of edges close to p and distance"""
-        nbunch,d=self.closest_nodes(p,mindegree=1)
+        nbunch,d=self.closest_nodes(p)
         return self.edges(nbunch=nbunch,data=data),d
         
     def _last(self,u,v):
@@ -174,10 +161,14 @@ class GeoGraph(nx.MultiGraph):
     def add_node(self, n, attr_dict=None, **attr):
         """add a node or return one already very close
         """
-        close,d=self.closest_nodes(n,self.tol) #all nodes within tolerance
-        if close:
-            self.max_merge=max(d,self.__dict__.get('max_merge',0))
+        close,d=self.closest_nodes(n)
+        try:
             node=close[0]
+        except: # point doesn't exist yet
+            node=None
+            
+        if node and d<self.tol:
+            self.max_merge=max(d,self.__dict__.get('max_merge',0))
         else:
             super(GeoGraph,self).add_node(n, attr_dict, **attr)
             node=n
@@ -205,8 +196,10 @@ class GeoGraph(nx.MultiGraph):
         #this is important because we want to handle the 
         #length parameter separately for each edge
         attr_dict={} 
-        if attr : attr_dict.update(attr)
-        if kwargs : attr_dict.update(**kwargs)
+        if attr : 
+            attr_dict.update(**attr)
+        if kwargs :
+            attr_dict.update(**kwargs)
         
         if not self.is_multigraph():
             a=self._last(u,v)

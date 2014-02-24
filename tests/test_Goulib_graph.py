@@ -144,7 +144,12 @@ class TestGeoGraph:
         # assert_equal(expected, geo_graph.__str__())
         raise SkipTest # TODO: implement your test here
 
-class TestDelauney:
+class TestRender:
+    def test_render(self):
+        # assert_equal(expected, render(g, pos, format, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestDelauneyTriangulation:
     def test_delauney_triangulation(self):
         n=25
         from random import random
@@ -157,20 +162,9 @@ class TestDelauney:
         graph=euclidean_minimum_spanning_tree(nodes)
         open('emst.png','wb').write(graph.render())
 
-class TestRender:
-    def test_render(self):
-        # assert_equal(expected, render(g, pos, format, **kwargs))
-        raise SkipTest # TODO: implement your test here
-
-class TestDelauneyTriangulation:
-    def test_delauney_triangulation(self):
-        # assert_equal(expected, delauney_triangulation(nodes, **kwargs))
-        raise SkipTest # TODO: implement your test here
-
 class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):
-        # assert_equal(expected, euclidean_minimum_spanning_tree(nodes, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        pass #tested together with Delauney triangulation
     
 if __name__ == "__main__":
     import nose
