@@ -13,16 +13,13 @@ __license__ = "LGPL"
 
 import logging
 
-import networkx as nx #http://networkx.github.io/
-from rtree import index #http://toblerity.org/rtree/
+import networkx as nx # http://networkx.github.io/
+from rtree import index # http://toblerity.org/rtree/
 
 import Goulib.math2 as math2
 import Goulib.itertools2 as itertools2
 
-def _smallbox(center,tol):
-    from itertools import chain
-    l=((c-tol for c in center),(c+tol for c in center))
-    return tuple(chain(*l))
+_nk=0 # node key
 
 class GeoGraph(nx.MultiGraph):
     """a Graph with nodes at specified positions.
@@ -48,7 +45,7 @@ class GeoGraph(nx.MultiGraph):
             
     def copy(self):
         """does not use deepcopy because the rtree index must be rebuilt"""
-        return GeoGraph(self)
+        return self.__class__(self,**self.graph)
                 
     def __nonzero__(self):
         """:return: True if graph has at least one node
@@ -124,17 +121,17 @@ class GeoGraph(nx.MultiGraph):
                 res+=1
         return res
     
-    def closest_nodes(self,n,skip=False):
+    def closest_nodes(self,p,n=1,skip=False):
         """
         nodes closest to a given position
-        :param n: (x,y) position tuple
+        :param p: (x,y) position tuple
         :param skip: optional bool to skip n
         :return: list of nodes
         """
-
+        if skip: n+=1
         res,d=[],None
-        for p2 in self.idx.nearest(n, num_results=2 if skip else 1, objects='raw'):
-            d=self.dist(n, p2)
+        for p2 in self.idx.nearest(p, num_results=n, objects='raw'):
+            d=self.dist(p, p2)
             if skip and d<=self.tol: 
                 continue
             res.append(p2)
@@ -142,21 +139,14 @@ class GeoGraph(nx.MultiGraph):
     
     def closest_edges(self,p,data=False):
         """:return: container of edges close to p and distance"""
-        nbunch,d=self.closest_nodes(p)
-        return self.edges(nbunch=nbunch,data=data),d
-        
-    def _last(self,u,v):
-        """since multigraphs can have several edges from u to v,
-        :return: dict of the edge added last
-        """
-        try:
-            edge=self[u][v]
-        except: # no edge between u and v yet
-            return None #not {}, to make a diff with existing empty dict
-        if len(edge)==1: #quick
-            return edge[0]
-        else:
-            return edge[max(edge.keys())]
+        edges=[]
+        n=0
+        while not edges and n<10:
+            n+=1 #handle more and more nodes untif we find one with edges
+            nbunch,d=self.closest_nodes(p,n)
+            edges=self.edges(nbunch=nbunch,data=data)
+            
+        return edges,d
         
     def add_node(self, n, attr_dict=None, **attr):
         """add a node or return one already very close
@@ -167,13 +157,16 @@ class GeoGraph(nx.MultiGraph):
         except: # point doesn't exist yet
             node=None
             
-        if node and d<self.tol:
+        if node and d<=self.tol:
             self.max_merge=max(d,self.__dict__.get('max_merge',0))
         else:
+            global _nk
+            _nk+=1
+            attr['key']=_nk
             super(GeoGraph,self).add_node(n, attr_dict, **attr)
             node=n
-            p=_smallbox(n,self.tol)
-            self.idx.insert(0,p,node)
+            #p=_smallbox(n,self.tol)
+            self.idx.insert(_nk,node,node)
         return node
     
     def add_nodes_from(self, nodes, **attr):
@@ -185,8 +178,37 @@ class GeoGraph(nx.MultiGraph):
             except:
                 nn=node
             self.add_node(nn,**attr)
-                
-    def add_edge(self, u, v, attr={}, **kwargs):
+            
+    def remove_node(self,n):
+        """
+        :param n: node tuple
+        remove node from graph and rtree
+        """
+        n1=self.number_of_nodes()
+        n2=self.idx.count(self.idx.bounds)
+        if n1!=n2:
+            logging.error('GeoGraph has %d!=%d'%(n1,n2))
+            raise RuntimeError('Nodes/Rtree mismatch')
+        nk=self.node[n]['key']
+        super(GeoGraph,self).remove_node(n)  
+        self.idx.delete(nk,n) 
+        
+        self.number_of_nodes() #debug check
+
+    def _last(self,u,v):
+        """since multigraphs can have several edges from u to v,
+        :return: dict of the edge added last
+        """
+        try:
+            edge=self[u][v]
+        except: # no edge between u and v yet
+            return None #not {}, to make a diff with existing empty dict
+        if len(edge)==1: #quick
+            return edge[0]
+        else:
+            return edge[max(edge.keys())]                
+
+    def add_edge(self, u, v, attr_dict={}, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         side effect: updates largest merge in self.max_merge
@@ -195,17 +217,17 @@ class GeoGraph(nx.MultiGraph):
         #attr and kwargs will be merged and copied here. 
         #this is important because we want to handle the 
         #length parameter separately for each edge
-        attr_dict={} 
-        if attr : 
-            attr_dict.update(**attr)
-        if kwargs :
-            attr_dict.update(**kwargs)
+        a={} 
+        if attr_dict : 
+            a.update(**attr_dict)
+        if attrs :
+            a.update(**attrs)
         
         if not self.is_multigraph():
-            a=self._last(u,v)
-            if a:
-                a.update(attr_dict)
-                return a #return existing edge data
+            data=self._last(u,v)
+            if data:
+                data.update(a)
+                return data #return existing edge data
             else:
                 pass #and add the edge normally below
             
@@ -215,8 +237,8 @@ class GeoGraph(nx.MultiGraph):
         
         #if no length is explicitely defined, we calculate it and set it as parameter
         #therefore all edges in a GeoGraph have a length attribute
-        attr_dict.setdefault('length',self.dist(u,v))
-        super(GeoGraph,self).add_edge(u, v, attr_dict=attr_dict) #doesn't return created data... what a pity ...
+        a.setdefault('length',self.dist(u,v))
+        super(GeoGraph,self).add_edge(u, v, attr_dict=a) #doesn't return created data... what a pity ...
         return self._last(u,v)
         
     def remove_edge(self,u,v=None,clean=False):
@@ -237,6 +259,14 @@ class GeoGraph(nx.MultiGraph):
                 self.remove_node(u)
             if self.degree(v)==0:
                 self.remove_node(v)
+                
+    def number_of_nodes(self):
+        #check that both structures are coherent at the same time
+        n1=super(GeoGraph,self).number_of_nodes()   
+        n2=self.idx.count(self.idx.bounds) if n1 else 0
+        if n1!=n2:
+            raise KeyError('%s %s number of nodes %d!=%d'%(self.__class__.__name__, self.name, n1,n2))
+        return n1
     
     def stats(self):
         """:return: dict of graph data to use in __repr__ or usable otherwise"""
@@ -298,7 +328,7 @@ def delauney_triangulation(nodes,**kwargs):
     import numpy as np
     from scipy.spatial import Delaunay
     points=np.array(nodes)
-    tri = Delaunay(points, qhull_options='QJ') #option ensures all points are connected
+    tri = Delaunay(points, qhull_options='Qt') #option ensures all points are connected
     kwargs['multi']=False #to avoid duplicating triangle edges below
     g=GeoGraph(None,**kwargs)
     triangles=points[tri.simplices]

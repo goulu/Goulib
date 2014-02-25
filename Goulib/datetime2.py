@@ -72,11 +72,16 @@ def timef(t,fmt='%H:%M:%S'):
         return datetimef(t,fmt=fmt).time()
     
 
-def strftimedelta(v,fmt=None):
-    """ formats a timedelta"""
+def strftimedelta(t,fmt=None):
+    """
+    :param t: float seconds or timedelta
+    """
     if not fmt:
         fmt='%H:%M:%S'
-    t=v.total_seconds()
+    try: #timedelta ?
+        t=t.total_seconds()
+    except: # float seconds ?
+        pass
     hours, remainder = divmod(t, 3600)
     minutes, seconds = divmod(remainder, 60)
     res=fmt.replace('%H','%d'%hours)
