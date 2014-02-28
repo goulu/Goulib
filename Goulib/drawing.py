@@ -15,6 +15,7 @@ __license__ = "LGPL"
 
 import logging, operator
 from math import  radians, degrees, atan, pi, copysign
+from math2 import rint
 from geom import *
 
 # http://sub-atomic.com/~moses/acadcolors.html
@@ -120,8 +121,6 @@ class BBox:
         res += trans(Point2(self._pt2.x, self._pt1.y))
         return res
 
-def rint(v): return int(round(v))
-
 def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
     return Point2(map(lambda x:round(x,decimals),pt.xy))
 
@@ -131,13 +130,13 @@ class Entity(object):
     def __init__(self):
         self.color='black' #default color
        
-    @property    
+    @property
     def start(self):
-        return rpoint(self.p)
+        return self.p
     
     @property
     def end(self):
-        return rpoint(self.p2)
+        return self.p2
     
     @property
     def center(self):
@@ -192,12 +191,14 @@ class Entity(object):
         return Chain.from_svg(path)
         
     @staticmethod
-    def from_dxf(e,trans):
+    def from_dxf(e,mat3):
         """
         :param e: dxf.entity
-        :param trans: Matrix3 transform
+        :param mat3: Matrix3 transform
         :return: Entity of correct subtype
         """
+        def trans(pt): return rpoint(mat3(Point2(pt)))
+        
         if e.dxftype=='LINE':
             start=trans(Point2(e.start[:2]))
             end=trans(Point2(e.end[:2]))
@@ -329,12 +330,14 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         return chain
     
     @staticmethod
-    def from_dxf(e,trans):
+    def from_dxf(e,mat3):
         """
         :param e: dxf.entity
-        :param trans: Matrix3 transform
+        :param mat3: Matrix3 transform
         :return: Entity of correct subtype
         """
+        def trans(pt): return rpoint(mat3(Point2(pt)))
+        
         if e.dxftype == 'POLYLINE':
             res=Chain()
             for i in range(1,len(e.vertices)):
@@ -342,7 +345,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
                 end=e.vertices[i].location[:2] #2D only
                 bulge=e.vertices[i-1].bulge
                 if bulge==0:
-                    res.append(Segment2(start,end))
+                    res.append(Segment2(trans(start),trans(end)))
                 else:
                     #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
                     theta=4*atan(bulge)
@@ -353,16 +356,16 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
                     gamma=(pi-theta)/2
                     angle=chord.v.angle()+copysign(gamma,bulge)
                     center=start+Polar(r,angle)
-                    res.append(Arc2(center,start,end))
+                    res.append(Arc2(trans(center),trans(start),trans(end)))
             if e.is_closed:
-                res.append(Segment2(e.vertices[-1].location[:2],e.vertices[0].location[:2]))
+                res.append(Segment2(trans(e.vertices[-1].location[:2]),trans(e.vertices[0].location[:2])))
         elif e.dxftype == 'LWPOLYLINE':
             res=Chain()
             for i in range(1,len(e.points)):
                 start=e.points[i-1]
                 end=e.points[i]
                 if len(end)==2:
-                    res.append(Segment2(start,end))
+                    res.append(Segment2(trans(start),trans(end)))
                 else:
                     bulge=end[2]
                     #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
@@ -374,9 +377,9 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
                     gamma=(pi-theta)/2
                     angle=chord.v.angle()+copysign(gamma,bulge)
                     center=start+Polar(r,angle)
-                    res.append(Arc2(center,start,end))
+                    res.append(Arc2(trans(center),trans(start),trans(end)))
             if e.is_closed:
-                res.append(Segment2(e.points[-1],e.points[0]))
+                res.append(Segment2(trans(e.points[-1]),trans(e.points[0])))
         else:
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None

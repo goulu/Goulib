@@ -75,143 +75,6 @@ reads geometry from .dxf and .svg files
 * <a class="reference external" href="http://pypi.python.org/pypi/dxfwrite/">dxfwrite</a> for dxf output
 * PIL or <a class="reference external" href="http://pypi.python.org/pypi/pillow/">pillow</a> for bitmap output</p>
 <dl class="function">
-<dt id="drawing.rpoint">
-<tt class="descclassname">drawing.</tt><tt class="descname">rpoint</tt><big>(</big><em>pt</em>, <em>decimals=3</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#rpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.rpoint" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="drawing.Edge">
-<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Edge</tt><a class="reference internal" href="../_modules/drawing.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Base class for all drawing entities</p>
-<dl class="method">
-<dt id="drawing.Edge.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="drawing.Edge.start">
-<tt class="descname">start</tt><a class="reference internal" href="../_modules/drawing.html#Edge.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="drawing.Edge.end">
-<tt class="descname">end</tt><a class="reference internal" href="../_modules/drawing.html#Edge.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.end" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.__repr__">
-<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.isclosed">
-<tt class="descname">isclosed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.isclosed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.isclosed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.isline">
-<tt class="descname">isline</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.isline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.isline" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.isvertical">
-<tt class="descname">isvertical</tt><big>(</big><em>tol=0.01</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.isvertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.isvertical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.ishorizontal">
-<tt class="descname">ishorizontal</tt><big>(</big><em>tol=0.01</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.ishorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.ishorizontal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Edge.to_dxf">
-<tt class="descname">to_dxf</tt><big>(</big><em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.to_dxf" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dxf entity Line or Arc</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="drawing.Edge.from_dxf">
-<em class="property">static </em><tt class="descname">from_dxf</tt><big>(</big><em>e</em>, <em>trans</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Edge.from_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Edge.from_dxf" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>e</strong> &#8211; dxf.entity</li>
-<li><strong>trans</strong> &#8211; Matrix3 transform</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Edge of correct subtype</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="drawing.Edge.__weakref__">
-<tt class="descname">__weakref__</tt><a class="headerlink" href="#drawing.Edge.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="drawing.Chain">
-<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Chain</tt><a class="reference internal" href="../_modules/drawing.html#Chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt>, <a class="reference internal" href="#drawing.Edge" title="drawing.Edge"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Edge</span></tt></a></p>
-<p>list of contiguous Edges that can be saved as a DXF Polyline</p>
-<dl class="attribute">
-<dt id="drawing.Chain.start">
-<tt class="descname">start</tt><a class="reference internal" href="../_modules/drawing.html#Chain.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="drawing.Chain.end">
-<tt class="descname">end</tt><a class="reference internal" href="../_modules/drawing.html#Chain.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.end" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Chain.__repr__">
-<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="drawing.Chain.append">
-<tt class="descname">append</tt><big>(</big><em>edge</em>, <em>tol=1000000.0</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.append" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self, or None if edge is not contiguous</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="drawing.Chain.to_dxf">
-<tt class="descname">to_dxf</tt><big>(</big><em>split=False</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.to_dxf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="drawing.Chain.__weakref__">
-<tt class="descname">__weakref__</tt><a class="headerlink" href="#drawing.Chain.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
 <dt id="drawing.Trans">
 <tt class="descclassname">drawing.</tt><tt class="descname">Trans</tt><big>(</big><em>scale=1</em>, <em>offset=None</em>, <em>rotation=None</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Trans" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -351,58 +214,271 @@ reads geometry from .dxf and .svg files
 </dd></dl>
 
 <dl class="function">
-<dt id="drawing.cbox">
-<tt class="descclassname">drawing.</tt><tt class="descname">cbox</tt><big>(</big><em>c</em>, <em>r</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#cbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.cbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>bounding box of a circle
-:param c: Pt center
-:param r: float radius
-:return: BBox</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="drawing.rint">
-<tt class="descclassname">drawing.</tt><tt class="descname">rint</tt><big>(</big><em>v</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#rint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.rint" title="Permalink to this definition">¶</a></dt>
+<dt id="drawing.rpoint">
+<tt class="descclassname">drawing.</tt><tt class="descname">rpoint</tt><big>(</big><em>pt</em>, <em>decimals=3</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#rpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.rpoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
-<dt id="drawing.Drawing">
-<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Drawing</tt><big>(</big><em>filename</em>, <em>options=None</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">dxfgrabber.drawing.Drawing</span></tt></p>
-<p>reads a .dxf file
-:param filename: string path to .dxf file to read
-:param options: passed to :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~dxfgrabber.drawing.Drawing`constructor</p>
+<dt id="drawing.Entity">
+<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Entity</tt><a class="reference internal" href="../_modules/drawing.html#Entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base class for all drawing entities</p>
 <dl class="method">
-<dt id="drawing.Drawing.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>filename</em>, <em>options=None</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>reads a .dxf file
-:param filename: string path to .dxf file to read
-:param options: passed to :class:<a href="#id3"><span class="problematic" id="id4">`</span></a>~dxfgrabber.drawing.Drawing`constructor</p>
-</dd></dl>
+<dt id="drawing.Entity.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Entity.start">
+<tt class="descname">start</tt><a class="reference internal" href="../_modules/drawing.html#Entity.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Entity.end">
+<tt class="descname">end</tt><a class="reference internal" href="../_modules/drawing.html#Entity.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Entity.center">
+<tt class="descname">center</tt><a class="reference internal" href="../_modules/drawing.html#Entity.center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.center" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
-<dt id="drawing.Drawing.iter">
-<tt class="descname">iter</tt><big>(</big><em>ent=None</em>, <em>layers=None</em>, <em>only=</em>, <span class="optional">[</span><span class="optional">]</span><em>ignore=</em>, <span class="optional">[</span><span class="optional">]</span><em>trans=None</em>, <em>recurse=False</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.iter" title="Permalink to this definition">¶</a></dt>
-<dd><p>iterator over dxf or block entities</p>
-</dd></dl>
+<dt id="drawing.Entity.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
-<dt id="drawing.Drawing.bbox">
-<tt class="descname">bbox</tt><big>(</big><em>layers=None</em>, <em>ignore=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.bbox" title="Permalink to this definition">¶</a></dt>
+<dt id="drawing.Entity.isclosed">
+<tt class="descname">isclosed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.isclosed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.isclosed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Entity.isline">
+<tt class="descname">isline</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.isline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.isline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Entity.isvertical">
+<tt class="descname">isvertical</tt><big>(</big><em>tol=0.01</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.isvertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.isvertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Entity.ishorizontal">
+<tt class="descname">ishorizontal</tt><big>(</big><em>tol=0.01</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.ishorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.ishorizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Entity.to_dxf">
+<tt class="descname">to_dxf</tt><big>(</big><em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.to_dxf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dxf entity Line or Arc</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="drawing.Entity.from_svg">
+<em class="property">static </em><tt class="descname">from_svg</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.from_svg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.from_svg" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; svg path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Entity of correct subtype</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="drawing.Entity.from_dxf">
+<em class="property">static </em><tt class="descname">from_dxf</tt><big>(</big><em>e</em>, <em>mat3</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.from_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.from_dxf" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>layers</strong> &#8211; list or dictionary of layers to draw. None = all layers</li>
-<li><strong>ignore</strong> &#8211; list of strings of entity types to ignore</li>
+<li><strong>e</strong> &#8211; dxf.entity</li>
+<li><strong>mat3</strong> &#8211; Matrix3 transform</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#drawing.BBox" title="drawing.BBox"><tt class="xref py py-class docutils literal"><span class="pre">BBox</span></tt></a> bounding box of corresponding entities</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Entity of correct subtype</p>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Entity.bbox">
+<tt class="descname">bbox</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.bbox" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#drawing.BBox" title="drawing.BBox"><tt class="xref py py-class docutils literal"><span class="pre">BBox</span></tt></a> bounding box of Entity</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Entity.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#drawing.Entity.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="drawing.Group">
+<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Group</tt><a class="reference internal" href="../_modules/drawing.html#Group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>group of Entities</p>
+<dl class="method">
+<dt id="drawing.Group.bbox">
+<tt class="descname">bbox</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.bbox" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#drawing.BBox" title="drawing.BBox"><tt class="xref py py-class docutils literal"><span class="pre">BBox</span></tt></a> bounding box of Entity</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Group.length">
+<tt class="descname">length</tt><a class="reference internal" href="../_modules/drawing.html#Group.length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Group.__copy__">
+<tt class="descname">__copy__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.__copy__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.__copy__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Group.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#drawing.Group.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Group.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#drawing.Group.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="drawing.Chain">
+<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Chain</tt><big>(</big><em>data=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#drawing.Group" title="drawing.Group"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Group</span></tt></a>, <a class="reference internal" href="#drawing.Entity" title="drawing.Entity"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Entity</span></tt></a></p>
+<p>group of contiguous Entities (Polyline or similar)</p>
+<dl class="method">
+<dt id="drawing.Chain.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>data=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Chain.start">
+<tt class="descname">start</tt><a class="reference internal" href="../_modules/drawing.html#Chain.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="drawing.Chain.end">
+<tt class="descname">end</tt><a class="reference internal" href="../_modules/drawing.html#Chain.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Chain.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Chain.append">
+<tt class="descname">append</tt><big>(</big><em>edge</em>, <em>tol=1000000.0</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.append" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self, or None if edge is not contiguous</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="drawing.Chain.from_svg">
+<em class="property">static </em><tt class="descname">from_svg</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.from_svg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.from_svg" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; svg path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Entity of correct subtype</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="drawing.Chain.from_dxf">
+<em class="property">static </em><tt class="descname">from_dxf</tt><big>(</big><em>e</em>, <em>mat3</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.from_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.from_dxf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>e</strong> &#8211; dxf.entity</li>
+<li><strong>mat3</strong> &#8211; Matrix3 transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Entity of correct subtype</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Chain.to_dxf">
+<tt class="descname">to_dxf</tt><big>(</big><em>split=False</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.to_dxf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="drawing.Drawing">
+<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Drawing</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#drawing.Group" title="drawing.Group"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Group</span></tt></a></p>
+<p>list of Entits representing a vector graphics drawing</p>
+<dl class="method">
+<dt id="drawing.Drawing.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.read_svg">
+<tt class="descname">read_svg</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.read_svg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.read_svg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.read_dxf">
+<tt class="descname">read_dxf</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.read_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.read_dxf" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a .dxf file
+:param filename: string path to .dxf file to read
+:param options: passed to :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~dxfgrabber.drawing.Drawing`constructor</p>
 </dd></dl>
 
 <dl class="method">

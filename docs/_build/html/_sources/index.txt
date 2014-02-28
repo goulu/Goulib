@@ -3,16 +3,22 @@ Goulib
 
 My Python library of useful code found and written for various projects
 
-:author: Philippe Guglielmetti goulib@goulu.net |endorse|
+:author: Philippe Guglielmetti goulib@goulu.net |ohloh|
 :copyright: Copyright 2013 Philippe Guglielmetti
 :license: LGPL (see LICENSE.TXT)
 
 .. |endorse| image:: https://api.coderwall.com/goulu/endorsecount.png
     :target: https://coderwall.com/goulu
     
+.. |ohloh| image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
+	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
+    
 .. |travis| image:: https://travis-ci.org/goulu/Goulib.png?branch=master
     :target: https://travis-ci.org/goulu/Goulib
     
+.. |coveralls| image:: https://coveralls.io/repos/goulu/Goulib/badge.png
+  :target: https://coveralls.io/r/goulu/Goulib
+
 .. toctree::
 	:glob:
 	*
@@ -37,6 +43,7 @@ Modules
 - :mod:`geom` : 2D geometry
 - :mod:`drawing` : Vector graphics with I/O from .dxf and .svg formats
 
+- :mod:`graph` : efficient Euclidian Graphs for NetworkX and related algorithms
 - :mod:`optim` : Optimization algorithms
 
   Travelling Salesman Problem (TSP) hill climbing + simulated annealing 
@@ -56,14 +63,18 @@ Resources
 
 :changelog: https://github.com/goulu/goulib/blob/master/CHANGES.rst
 
-:tests status: |travis|
+:tests status: |travis| |coveralls|
 
 Requirements
 ------------
 Goulib uses only standard Python libs, except:
+- :mod:`graph` needs `NetworkX <http://networkx.github.io/>`_ and `RTree <http://toblerity.org/rtree/>`_
+  + some algorithms need `SciPy <http://scipy.org/>`_ and `NumPy <http://numpy.org/>`_
 
-- :mod:`dxf2img` needs `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ and PIL or `pillow <http://pypi.python.org/pypi/pillow/>`_
-  (Pillow is prefered over PIL because of Travis CI tests)
+- :mod:`drawings` needs:
+  + `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ and `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_
+  + PIL or `pillow <http://pypi.python.org/pypi/pillow/>`_  for bitmap output (Pillow is prefered over PIL because of Travis CI tests)
+  
 - :meth:`~table.Table.read_xls` needs `xlrd <http://pypi.python.org/pypi/xlrd/>`_
 - :meth:`~table.Table.read_html` needs `lxml <http://pypi.python.org/pypi/lxml/>`_
 

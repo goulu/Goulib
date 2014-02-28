@@ -83,7 +83,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">author:</th><td class="field-body">Philippe Guglielmetti <a class="reference external" href="mailto:goulib&#37;&#52;&#48;goulu&#46;net">goulib<span>&#64;</span>goulu<span>&#46;</span>net</a> <a class="reference external" href="https://coderwall.com/goulu"><img alt="endorse" src="https://api.coderwall.com/goulu/endorsecount.png" /></a></td>
+<tr class="field-odd field"><th class="field-name">author:</th><td class="field-body">Philippe Guglielmetti <a class="reference external" href="mailto:goulib&#37;&#52;&#48;goulu&#46;net">goulib<span>&#64;</span>goulu<span>&#46;</span>net</a> <a class="reference external" href="https://www.ohloh.net/accounts/543923?ref=Tiny"><img alt="ohloh" src="https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif" /></a></td>
 </tr>
 <tr class="field-even field"><th class="field-name">copyright:</th><td class="field-body">Copyright 2013 Philippe Guglielmetti</td>
 </tr>
@@ -119,6 +119,8 @@
 </li>
 <li><p class="first"><a class="reference internal" href="modules/drawing.html#module-drawing" title="drawing"><tt class="xref py py-mod docutils literal"><span class="pre">drawing</span></tt></a> : Vector graphics with I/O from .dxf and .svg formats</p>
 </li>
+<li><p class="first"><a class="reference internal" href="modules/graph.html#module-graph" title="graph"><tt class="xref py py-mod docutils literal"><span class="pre">graph</span></tt></a> : efficient Euclidian Graphs for NetworkX and related algorithms</p>
+</li>
 <li><p class="first"><a class="reference internal" href="modules/optim.html#module-optim" title="optim"><tt class="xref py py-mod docutils literal"><span class="pre">optim</span></tt></a> : Optimization algorithms</p>
 <p>Travelling Salesman Problem (TSP) hill climbing + simulated annealing</p>
 </li>
@@ -142,17 +144,24 @@
 </tr>
 <tr class="field-odd field"><th class="field-name">changelog:</th><td class="field-body"><a class="reference external" href="https://github.com/goulu/goulib/blob/master/CHANGES.rst">https://github.com/goulu/goulib/blob/master/CHANGES.rst</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">tests status:</th><td class="field-body"><a class="reference external" href="https://travis-ci.org/goulu/Goulib"><img alt="travis" src="https://travis-ci.org/goulu/Goulib.png?branch=master" /></a></td>
+<tr class="field-even field"><th class="field-name">tests status:</th><td class="field-body"><a class="reference external" href="https://travis-ci.org/goulu/Goulib"><img alt="travis" src="https://travis-ci.org/goulu/Goulib.png?branch=master" /></a> <a class="reference external" href="https://coveralls.io/r/goulu/Goulib"><img alt="coveralls" src="https://coveralls.io/repos/goulu/Goulib/badge.png" /></a></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>Goulib uses only standard Python libs, except:</p>
+<p>Goulib uses only standard Python libs, except:
+- <a class="reference internal" href="modules/graph.html#module-graph" title="graph"><tt class="xref py py-mod docutils literal"><span class="pre">graph</span></tt></a> needs <a class="reference external" href="http://networkx.github.io/">NetworkX</a> and <a class="reference external" href="http://toblerity.org/rtree/">RTree</a></p>
+<blockquote>
+<div><ul class="simple">
+<li>some algorithms need <a class="reference external" href="http://scipy.org/">SciPy</a> and <a class="reference external" href="http://numpy.org/">NumPy</a></li>
+</ul>
+</div></blockquote>
 <ul class="simple">
-<li><tt class="xref py py-mod docutils literal"><span class="pre">dxf2img</span></tt> needs <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and PIL or <a class="reference external" href="http://pypi.python.org/pypi/pillow/">pillow</a>
-(Pillow is prefered over PIL because of Travis CI tests)</li>
+<li><tt class="xref py py-mod docutils literal"><span class="pre">drawings</span></tt> needs:
++ <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and <a class="reference external" href="http://pypi.python.org/pypi/dxfwrite/">dxfwrite</a>
++ PIL or <a class="reference external" href="http://pypi.python.org/pypi/pillow/">pillow</a>  for bitmap output (Pillow is prefered over PIL because of Travis CI tests)</li>
 <li><a class="reference internal" href="modules/table.html#table.Table.read_xls" title="table.Table.read_xls"><tt class="xref py py-meth docutils literal"><span class="pre">read_xls()</span></tt></a> needs <a class="reference external" href="http://pypi.python.org/pypi/xlrd/">xlrd</a></li>
 <li><a class="reference internal" href="modules/table.html#table.Table.read_html" title="table.Table.read_html"><tt class="xref py py-meth docutils literal"><span class="pre">read_html()</span></tt></a> needs <a class="reference external" href="http://pypi.python.org/pypi/lxml/">lxml</a></li>
 </ul>

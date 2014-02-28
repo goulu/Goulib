@@ -7,8 +7,6 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import colorsys
-
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
 def rgb_to_hex(rgb):
@@ -32,6 +30,7 @@ def color_range(n,start,end):
     :param end: string hex color or color name
     :result: list of n hexcolors interpolated between start and end, included
     """
+    import colorsys
     from itertools2 import ilinear
     if start in color: start=color[start]
     start=hex_to_rgb(start,1./255)
@@ -210,4 +209,45 @@ color = {'aqua': '#00ffff',
     'yellow': '#ffff00',
     'yellowgreen': '#9acd32'}
 
+color_lookup=dict([v,k] for k,v in color.iteritems()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
+
 hexcolor=dict([(i,'0x'+v[1:]) for i,v in color.iteritems()])
+
+from math2 import rint
+
+class Color(object):
+    '''class to allow simple math operations on colors'''
+    def __init__(self,c):
+        ''':param c: either color name, hex string, or (r,g,b) tuple in [0..255] int or [0,.1.] float range'''
+        if isinstance(c,basestring):
+            try: #is c a color name ?
+                c=color[c]
+            except: #assume it's a hex string
+                pass
+            self.rgb=hex_to_rgb(c,1./255)
+        else: # assume (r,g,b)
+            if max(c)>1:
+                c=[_/255. for _ in c]
+            self.rgb=c
+        
+        try: #to guess the color name
+            self.name=color_lookup[self.hex]
+        except:
+            self.name='unknown'
+            
+    @property
+    def hex(self):
+        return rgb_to_hex([rint(_*255) for _ in self.rgb])
+    
+    def __repr__(self):
+        if self.name!='unknown':
+            return self.name
+        else:
+            return self.hex
+        
+    def __eq__(self,other):
+        return str(self)==str(other)
+    
+    def __add__(self,other):
+        from Goulib.math2 import vecadd
+        return Color(vecadd(self.rgb,other.rgb))

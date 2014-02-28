@@ -3,3 +3,8 @@ lxml
 dxfgrabber
 dxfwrite
 pillow
+svg.path
+rtree
+matplotlib
+numpy
+scipy

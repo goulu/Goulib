@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Euclidian Graphs and additional NetworkX algosrithms
+efficient Euclidian Graphs for NetworkX and related algorithms
 """
 
 from __future__ import division #"true division" everywhere
@@ -191,9 +191,7 @@ class GeoGraph(nx.MultiGraph):
             raise RuntimeError('Nodes/Rtree mismatch')
         nk=self.node[n]['key']
         super(GeoGraph,self).remove_node(n)  
-        self.idx.delete(nk,n) 
-        
-        self.number_of_nodes() #debug check
+        self.idx.delete(nk,n) #in fact n is ignored, the nk key is used here
 
     def _last(self,u,v):
         """since multigraphs can have several edges from u to v,
@@ -284,25 +282,42 @@ class GeoGraph(nx.MultiGraph):
         """:returns: string representation, used mainly for logging and debugging"""
         return str(self.stats())
     
-    def render(self,format='png',**kwargs):
+    def render(self,format,**kwargs):
         kwargs.setdefault('with_labels',False)
         kwargs.setdefault('node_size',0)
         pos={} #dict of nodes positions
         for node in self.nodes_iter():
             pos[node]=node
-        return render(self,pos,format=format,**kwargs)
+        return render(self,format=format, pos=pos, **kwargs)
     
     # for IPython notebooks
     def _repr_svg_(self): return self.render('svg')
     def _repr_png_(self): return self.render('png')
     
-def render(g, pos=None,format='svg',**kwargs):
-    """return a matplotlib figure generated from a graph"""
+def render(g, format, pos=None, **kwargs):
+    """
+    draw a graph in bitmap or vector format
+    :param g: NetworkX Graph
+    :param format: output format . Supported are : png, svg(z), pdf, (e)ps, emf, rgba, raw
+    :param pos: optional iterable of (x,y) node positions. nx.draw_shell will be used if missing
+    :param **kwargs: passed to nx.draw method with one tweak:
+    
+    - if edge_color is a function of the form lambda data:color string, it is mapped over all edges
+   
+    :return: matplotlib figure stream
+    """
     import matplotlib.pyplot as plt
     from io import BytesIO
+    #make a figure with correct size (TODO : improve)
     size=g.box_size()
-
     fig=plt.figure(figsize=(24,16))
+    
+    try: #if edge_color is a function of the form lambda data:color string, it is mapped over all edges
+        kwargs['edge_color']=map(kwargs['edge_color'],(data for u,v,data in g.edges(data=True)))
+    except:
+        pass
+    
+    #draw it
     ax = fig.add_subplot(111)
     if not pos:
         kwargs['ax']=ax
@@ -310,6 +325,7 @@ def render(g, pos=None,format='svg',**kwargs):
     else:
         nx.draw_networkx(g, ax=ax, pos=pos, **kwargs)
     
+    #return it
     import pylab
     pylab.axis('off') # turn of axis
 

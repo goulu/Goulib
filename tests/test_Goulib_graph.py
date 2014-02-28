@@ -10,16 +10,20 @@ class TestGeoGraph:
     def setup_class(self):
         self.empty=GeoGraph()
         self.cube=GeoGraph(nx.hypercube_graph(3),multi=False)
+        
+        import os
+        path=os.path.dirname(os.path.abspath(__file__))
 
         self.logi=GeoGraph(multi=False)
         nodes={}
         from Goulib.table import Table
-        for line in Table('localisation.csv'):
+        for line in Table(path+'/localisation.csv'):
             name=line[0]
             pos=tuple([line[3],-line[4]]) #flip Y to keep North North ...
             nodes[name]=pos
 
-        mat=Table('matrice.csv')
+        
+        mat=Table(path+'/matrice.csv')
         for line in mat:
             end=nodes[line[0]]
             for i,v in enumerate(line[2:]):
@@ -36,19 +40,19 @@ class TestGeoGraph:
     def test_render(self):
         from Goulib.colors import hex_to_rgb
         import matplotlib.pyplot as plt
-        edge_color=[]
+        
+        #define a function that maps edge data to a color
         colors={'red':'#C3001E','green':'#1DC300','blue':'#265896','lightblue':'#6598CA','gray':'#585858'}
         map=plt.get_cmap('Greys')
-        for u,v,data in self.logi.edges(data=True):
+        def edge_color(data):
             c=data['weight']
             if c>100:
                 c=hex_to_rgb(colors['red'],scale=1./255)
             else:
                 c=map(float(c)/100)
-            edge_color.append(c)
-            
+            return c
         
-        open('logi.png','wb').write(self.logi.render(transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue']))
+        open('logi.png','wb').write(self.logi.render(format='png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue']))
         
     def test_is_multigraph(self):
         assert_false(self.cube.is_multigraph())
@@ -167,6 +171,26 @@ class TestGeoGraph:
         # assert_equal(expected, geo_graph.__str__())
         raise SkipTest # TODO: implement your test here
 
+    def test_add_node(self):
+        # geo_graph = GeoGraph(G, **kwargs)
+        # assert_equal(expected, geo_graph.add_node(n, attr_dict, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_nodes_from(self):
+        # geo_graph = GeoGraph(G, **kwargs)
+        # assert_equal(expected, geo_graph.add_nodes_from(nodes, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_copy(self):
+        # geo_graph = GeoGraph(G, **kwargs)
+        # assert_equal(expected, geo_graph.copy())
+        raise SkipTest # TODO: implement your test here
+
+    def test_number_of_nodes(self):
+        # geo_graph = GeoGraph(G, **kwargs)
+        # assert_equal(expected, geo_graph.number_of_nodes())
+        raise SkipTest # TODO: implement your test here
+
 class TestRender:
     def test_render(self):
         # assert_equal(expected, render(g, pos, format, **kwargs))
@@ -183,11 +207,11 @@ class TestDelauneyTriangulation:
         print('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
-        open('delauney.png','wb').write(graph.render())
+        open('delauney.png','wb').write(graph.render('png'))
         start=time.clock()
         graph=euclidean_minimum_spanning_tree(nodes)
         print('Spanning tree %d : %f'%(n,time.clock()-start))
-        open('emst.png','wb').write(graph.render())
+        open('emst.png','wb').write(graph.render('png'))
 
 class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):

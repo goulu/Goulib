@@ -20,6 +20,39 @@ class TestColorRange:
         assert_equal(c[3],color['aqua'])
         assert_equal(c[4],color['blue'])
 
+class TestColor:
+    def test___init__(self):
+        blue1=Color('blue')
+        blue2=Color('#0000ff')
+        assert_equal(blue1,blue2)
+        blue3=Color((0,0,1))
+        assert_equal(blue1,blue3)
+        blue4=Color((0,0,255))
+        assert_equal(blue1,blue4)
+    
+    def test___add__(self):
+        red=Color('red')
+        green=Color('lime') # 'green' has hex 80 value, not ff
+        blue=Color('blue')
+        assert_equal(red+green+blue,'white')
+
+
+
+    def test___eq__(self):
+        # color = Color(c)
+        # assert_equal(expected, color.__eq__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # color = Color(c)
+        # assert_equal(expected, color.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_hex(self):
+        # color = Color(c)
+        # assert_equal(expected, color.hex())
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

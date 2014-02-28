@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>graph &mdash; Goulib 1.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/graph.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-graph">
+<span id="graph"></span><h1><a class="reference internal" href="#module-graph" title="graph"><tt class="xref py py-mod docutils literal"><span class="pre">graph</span></tt></a><a class="headerlink" href="#module-graph" title="Permalink to this headline">¶</a></h1>
+<p>efficient Euclidian Graphs for NetworkX and related algorithms</p>
+<dl class="class">
+<dt id="graph.GeoGraph">
+<em class="property">class </em><tt class="descclassname">graph.</tt><tt class="descname">GeoGraph</tt><big>(</big><em>G=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">networkx.classes.multigraph.MultiGraph</span></tt></p>
+<p>a Graph with nodes at specified positions.
+if edges have a &#8220;length&#8221; attribute, it is used to compute distances,
+otherwise euclidian distance between nodes is used by default</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>multi</strong> &#8211; boolean to control if multiple edges between nodes are allowed (True) or not (False)</li>
+<li><strong>**kwargs</strong> &#8211; <p>other parameters will be copied as attributes</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="graph.GeoGraph.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>G=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>multi</strong> &#8211; boolean to control if multiple edges between nodes are allowed (True) or not (False)</li>
+<li><strong>**kwargs</strong> &#8211; <p>other parameters will be copied as attributes</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>does not use deepcopy because the rtree index must be rebuilt</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.__nonzero__">
+<tt class="descname">__nonzero__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.__nonzero__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.__nonzero__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if graph has at least one node</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="graph.GeoGraph.tol">
+<tt class="descname">tol</tt><a class="reference internal" href="../_modules/graph.html#GeoGraph.tol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.tol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="graph.GeoGraph.multi">
+<tt class="descname">multi</tt><a class="reference internal" href="../_modules/graph.html#GeoGraph.multi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.multi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.is_multigraph">
+<tt class="descname">is_multigraph</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.is_multigraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.is_multigraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>used internally in constructor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.dist">
+<tt class="descname">dist</tt><big>(</big><em>u</em>, <em>v</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.dist" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float distance between nodes u and v</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.length">
+<tt class="descname">length</tt><big>(</big><em>edges=None</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.length" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">sum of &#8216;length&#8217; attributes of edges</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.box">
+<tt class="descname">box</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.box" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">nodes bounding box as (xmin,ymin,...),(xmax,ymax,...)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.box_size">
+<tt class="descname">box_size</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.box_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.box_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.contiguity">
+<tt class="descname">contiguity</tt><big>(</big><em>pts</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.contiguity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.contiguity" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int number of points from pts already in graph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.closest_nodes">
+<tt class="descname">closest_nodes</tt><big>(</big><em>p</em>, <em>n=1</em>, <em>skip=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.closest_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.closest_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>nodes closest to a given position
+:param p: (x,y) position tuple
+:param skip: optional bool to skip n
+:return: list of nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.closest_edges">
+<tt class="descname">closest_edges</tt><big>(</big><em>p</em>, <em>data=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.closest_edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.closest_edges" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">container of edges close to p and distance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>n</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a node or return one already very close</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.add_nodes_from">
+<tt class="descname">add_nodes_from</tt><big>(</big><em>nodes</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.add_nodes_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.add_nodes_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>must be here because Graph.add_nodes_from doesn&#8217;t call add_node cleanly as it should...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.remove_node">
+<tt class="descname">remove_node</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.remove_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.remove_node" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> &#8211; node tuple</td>
+</tr>
+</tbody>
+</table>
+<p>remove node from graph and rtree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.add_edge">
+<tt class="descname">add_edge</tt><big>(</big><em>u</em>, <em>v</em>, <em>attr_dict={}</em>, <em>**attrs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.add_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>add an edge to graph
+:return: edge data from created or existing edge
+side effect: updates largest merge in self.max_merge</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.remove_edge">
+<tt class="descname">remove_edge</tt><big>(</big><em>u</em>, <em>v=None</em>, <em>clean=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.remove_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.remove_edge" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>u</strong> &#8211; Node or Edge (Nodes tuple)</li>
+<li><strong>v</strong> &#8211; Node if u is a single Node</li>
+<li><strong>clean</strong> &#8211; bool removes disconnected nodes. must be False for certain nx algos to work</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>remove edge from graph. NetworkX graphs do not remove unused nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.number_of_nodes">
+<tt class="descname">number_of_nodes</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.number_of_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.number_of_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.stats">
+<tt class="descname">stats</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.stats" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict of graph data to use in __repr__ or usable otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string representation, used mainly for logging and debugging</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.render">
+<tt class="descname">render</tt><big>(</big><em>format</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.render" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="graph.render">
+<tt class="descclassname">graph.</tt><tt class="descname">render</tt><big>(</big><em>g</em>, <em>format</em>, <em>pos=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>draw a graph in bitmap or vector format
+:param g: NetworkX Graph
+:param format: output format . Supported are : png, svg(z), pdf, (e)ps, emf, rgba, raw
+:param pos: optional iterable of (x,y) node positions. nx.draw_shell will be used if missing
+:param <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: passed to nx.draw method with one tweak:</p>
+<ul class="simple">
+<li>if edge_color is a function of the form lambda <a class="reference external" href="data:color">data:color</a> string, it is mapped over all edges</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matplotlib figure stream</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="graph.delauney_triangulation">
+<tt class="descclassname">graph.</tt><tt class="descname">delauney_triangulation</tt><big>(</big><em>nodes</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#delauney_triangulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.delauney_triangulation" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; list of (x,y) nodes positions</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">geograph with minimum spanning tree between  nodes</td>
+</tr>
+</tbody>
+</table>
+<p>see <a class="reference external" href="https://en.wikipedia.org/wiki/Delaunay_triangulation">https://en.wikipedia.org/wiki/Delaunay_triangulation</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graph.euclidean_minimum_spanning_tree">
+<tt class="descclassname">graph.</tt><tt class="descname">euclidean_minimum_spanning_tree</tt><big>(</big><em>nodes</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#euclidean_minimum_spanning_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.euclidean_minimum_spanning_tree" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; list of (x,y) nodes positions</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">geograph with minimum spanning tree between  nodes</td>
+</tr>
+</tbody>
+</table>
+<p>see <a class="reference external" href="https://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree">https://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree</a></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ph. Guglielmetti, https://github.com/goulu/Goulib.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

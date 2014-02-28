@@ -12,7 +12,7 @@ __license__ = "LGPL"
 
 import operator,cmath
 from math import sqrt, log, log10, ceil
-from itertools import count,izip_longest, ifilter
+from itertools import count, izip, izip_longest, ifilter
 from itertools import combinations, permutations, product as cartesian_product
 
 from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
@@ -98,20 +98,19 @@ def _longer(a,b,fillvalue=0):
         
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    args=izip_longest(a,b,fillvalue=fillvalue)
-    return [a+b for a,b in args]
+    return map(sum,izip_longest(a,b,fillvalue=fillvalue))
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [ai-bi for ai,bi in izip_longest(a,b,fillvalue=fillvalue)]
+    return [reduce(operator.sub,l) for l in izip_longest(a,b,fillvalue=fillvalue)]
 
 def vecmul(a,b):
     """product of vectors of inequal lengths"""
-    return [a[i]*b[i] for i in range(min([len(a),len(b)]))]
+    return [reduce(operator.mul,l) for l in izip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
-    return [a[i]/b[i] for i in range(min([len(a),len(b)]))]
+    return [reduce(operator.truediv,l) for l in izip(a,b)]
 
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
@@ -159,7 +158,7 @@ def sets_levenshtein(a,b):
     return len(a-c)+len(b-c)
 
 def levenshtein(seq1, seq2):
-    """return http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
+    """:return: http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
     http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python """
     oneago = None
     thisrow = range(1, len(seq2) + 1) + [0]
@@ -175,11 +174,11 @@ def levenshtein(seq1, seq2):
 #stats
 
 def mean(data):
-    """mean of data"""
+    """:return: mean of data"""
     return sum(data)/len(data)
 
 def variance(data,avg=None):
-    """variance of data"""
+    """:return: variance of data"""
     if avg==None:
         avg=mean(data)
     s = sum(((value - avg)**2) for value in data)
@@ -187,7 +186,7 @@ def variance(data,avg=None):
     return var
 
 def stats(l):
-    """returns min,max,sum,sum2,avg,var of a list"""
+    """:return: min,max,sum,sum2,avg,var of a list"""
     lo=float("inf")
     hi=float("-inf")
     n=0
@@ -217,27 +216,31 @@ def fibonacci():
     return (b for (a, b) in ireduce(get_next, count(), (0, 1)))
 
 def factorial(num):
-    """Return factorial value of num (num!)"""
+    """:return: factorial value of num (num!)"""
     return product(xrange(2, num+1))
 
 def is_integer(x, epsilon=1e-6):
-    """Return True if the float x "seems" an integer"""
+    """:return: True if the float x "seems" an integer"""
     return (abs(round(x) - x) < epsilon)
 
 def int_or_float(x, epsilon=1e-6):
     return int(x) if is_integer(x, epsilon) else x
 
+def rint(v): 
+    """:return: int value nearest to float v"""
+    return int(round(v))
+
 def divisors(n):
-    """Return all divisors of n: divisors(12) -> 1,2,3,6,12"""
+    """:return: all divisors of n: divisors(12) -> 1,2,3,6,12"""
     all_factors = [[f**p for p in range(fp+1)] for (f, fp) in factorize(n)]
     return (product(ns) for ns in cartesian_product(*all_factors))
 
 def proper_divisors(n):
-    """Return all divisors of n except n itself."""
+    """:return: all divisors of n except n itself."""
     return (divisor for divisor in divisors(n) if divisor != n)
 
 def is_prime(n):
-    """Return True if n is a prime number (1 is not considered prime)."""
+    """:return: True if n is a prime number (1 is not considered prime)."""
     if n < 3:
         return (n == 2)
     elif n % 2 == 0:
