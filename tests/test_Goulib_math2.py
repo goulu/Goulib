@@ -268,6 +268,7 @@ class TestCombinationsWithReplacement:
 
 class TestProportional:
     def test_proportional(self):
+        assert_equal(proportional(12,[0,0,1,0]),[0,0,12,0])
         votes=[10,20,30,40]
         assert_equal(proportional(100, votes),votes)
         assert_equal(proportional(10, votes),[1,2,3,4])

@@ -15,9 +15,11 @@ import logging
 
 import networkx as nx # http://networkx.github.io/
 from rtree import index # http://toblerity.org/rtree/
+import matplotlib.pyplot as plt
 
 import Goulib.math2 as math2
 import Goulib.itertools2 as itertools2
+
 
 _nk=0 # node key
 
@@ -100,10 +102,12 @@ class GeoGraph(nx.MultiGraph):
     
     def box(self):
         """:return: nodes bounding box as (xmin,ymin,...),(xmax,ymax,...)"""
-        n=self.nodes()
-        return tuple(math2.minimum(n)), tuple(math2.maximum(n))
+        minmax=self.idx.bounds
+        n=len(minmax)//2
+        return tuple(minmax[:n]),tuple(minmax[n:])
         
     def box_size(self):
+        """:return: (x,y) size"""
         min,max=self.box()
         try:
             min[0],max[0] #at least one dimension ?
@@ -282,57 +286,105 @@ class GeoGraph(nx.MultiGraph):
         """:returns: string representation, used mainly for logging and debugging"""
         return str(self.stats())
     
-    def render(self,format,**kwargs):
+    def draw(self,**kwargs):
+        """ draw graph with default params"""
         kwargs.setdefault('with_labels',False)
         kwargs.setdefault('node_size',0)
-        pos={} #dict of nodes positions
-        for node in self.nodes_iter():
-            pos[node]=node
-        return render(self,format=format, pos=pos, **kwargs)
+    
+        return draw_networkx(self, **kwargs)
+    
+    def render(self,format,**kwargs):
+        """ render graph to bitmap stream
+        :return: matplotlib figure as a byte stream in specified format
+        """
+        
+        fig=self.draw(**kwargs)['fig']
+        
+        from io import BytesIO
+        output = BytesIO()
+        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        plt.close(fig)
+        return output.getvalue()
     
     # for IPython notebooks
     def _repr_svg_(self): return self.render('svg')
     def _repr_png_(self): return self.render('png')
     
-def render(g, format, pos=None, **kwargs):
-    """
-    draw a graph in bitmap or vector format
+    def save(self,filename,**kwargs):
+        """ save graph in various formats"""
+        ext=filename.split('.')[-1].lower()
+        open(filename,'wb').write(self.render(ext,**kwargs))
+    
+def figure(g,**kwargs):
+    """:return: matplotlib axis suitable for drawing graph g"""
+    fig=plt.figure(**kwargs)
+    min,max=g.box()
+    plt.plot((min[0],max[0]),(min[1],max[1]),alpha=0) #draw a transparent diagonal to size everything
+    plt.axis('equal')
+    
+    import pylab
+    pylab.axis('off') # turn off axis
+    
+    return fig
+
+def draw_networkx(g, **kwargs):
+    """ improves draw_networkx 
     :param g: NetworkX Graph
-    :param format: output format . Supported are : png, svg(z), pdf, (e)ps, emf, rgba, raw
-    :param pos: optional iterable of (x,y) node positions. nx.draw_shell will be used if missing
+    :param pos: can be either :
+    
+    - optional dictionary of (x,y) node positions
+    - function of the form lambda node:(x,y) that maps node positions.
+    - None. in this case, nodes are directly used as positions if graph is a GeoGraph, otherwise nx.draw_shell is used
+    
+    :param fig: matplotlib figure. If None, figure(g) is used to obtain one
     :param **kwargs: passed to nx.draw method with one tweak:
     
     - if edge_color is a function of the form lambda data:color string, it is mapped over all edges
-   
-    :return: matplotlib figure stream
     """
-    import matplotlib.pyplot as plt
-    from io import BytesIO
-    #make a figure with correct size (TODO : improve)
-    size=g.box_size()
-    fig=plt.figure(figsize=(24,16))
     
-    try: #if edge_color is a function of the form lambda data:color string, it is mapped over all edges
-        kwargs['edge_color']=map(kwargs['edge_color'],(data for u,v,data in g.edges(data=True)))
-    except:
-        pass
-    
-    #draw it
-    ax = fig.add_subplot(111)
+    #build node positions
+    pos=kwargs.get('pos',None)
+    if pos is None and isinstance(g,GeoGraph):
+        pos={} #dict of nodes positions
+        for node in g.nodes_iter():
+            pos[node]=node
+    elif pos and callable(pos): #mapping function ?
+            pos=dict(((node,pos(node)) for node in g.nodes_iter()))
+            
     if not pos:
-        kwargs['ax']=ax
-        nx.draw_shell(g, **kwargs)
-    else:
-        nx.draw_networkx(g, ax=ax, pos=pos, **kwargs)
+        pos=nx.spring_layout(g) # default to spring layout
+        
+    edgelist=kwargs.setdefault('edgelist',g.edges(data=True))
     
-    #return it
-    import pylab
-    pylab.axis('off') # turn of axis
-
-    output = BytesIO()
-    fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
-    plt.close(fig)
-    return output.getvalue()
+    # build edge_colors
+    edge_color=kwargs.get('edge_color',None)
+    if edge_color:
+        if callable(edge_color): #mapping function ?
+            edge_color=map(edge_color,(data for u,v,data in edgelist))
+    else: #try to color the graph
+        edge_color=[]
+        for u,v,data in edgelist:
+            if 'color' in data:
+                edge_color.append(data['color'])
+            else:
+                try:
+                    edge_color.append(g.color)
+                except:
+                    pass
+    if edge_color: #not empty
+        kwargs['edge_color']=edge_color
+    
+    if not 'fig' in kwargs:
+        kwargs['fig']=figure(g)
+    
+    if kwargs.get('node_size',300)>0:
+        nx.draw_networkx_nodes(g, pos, **kwargs)
+        
+    nx.draw_networkx_edges(g, pos, **kwargs)
+    if kwargs.get('with_labels',False):
+        nx.draw_networkx_labels(g, pos, **kwargs)
+        
+    return kwargs
     
 def delauney_triangulation(nodes,**kwargs):
     """
@@ -341,9 +393,9 @@ def delauney_triangulation(nodes,**kwargs):
     see https://en.wikipedia.org/wiki/Delaunay_triangulation
     """
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
-    import numpy as np
+    import numpy
     from scipy.spatial import Delaunay
-    points=np.array(nodes)
+    points=numpy.array(nodes)
     tri = Delaunay(points, qhull_options='Qt') #option ensures all points are connected
     kwargs['multi']=False #to avoid duplicating triangle edges below
     g=GeoGraph(None,**kwargs)

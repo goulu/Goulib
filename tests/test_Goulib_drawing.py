@@ -158,6 +158,11 @@ class TestEntity:
         # assert_equal(expected, entity.from_svg())
         raise SkipTest # TODO: implement your test here
 
+    def test_artist(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.artist(ax, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     def test___repr__(self):
         # chain = Chain()

@@ -163,6 +163,27 @@ class Entity(object):
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
     
+    def artist(self, ax=None, **kwargs):
+        """:return: matplotlib.artist corresponding to entity"""
+        from matplotlib.lines import Line2D
+        from matplotlib.patches import Arc
+        import matplotlib.pyplot as plt
+        import numpy as np
+        if ax is None : ax=plt.gca()
+        if 'color' not in kwargs: #do not use setdefaut as self.color might be undefined (TODO find why)
+            kwargs['color']=self.color
+        if isinstance(self,Segment2):
+            x=np.array((self.start.x, self.end.x))
+            y=np.array((self.start.y, self.end.y))
+            return ax.add_line(Line2D(x,y,**kwargs))
+        if isinstance(self,Arc2):
+            theta1=degrees(self.a)
+            theta2=degrees(self.b)
+            if self.dir<1 : #swap
+                theta1,theta2=theta2,theta1
+            d=self.r*2
+            return ax.add_artist(Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs))
+    
     def to_dxf(self,**attr):
         """:return: dxf entity Line or Arc"""
         from dxfwrite.entities import Arc, Line

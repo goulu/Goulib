@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>table &mdash; Goulib 1.6.2 documentation</title>
+    <title>table &mdash; Goulib 1.6.5 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.2',
+        VERSION:     '1.6.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -357,26 +357,38 @@
 
 <dl class="method">
 <dt id="table.Table.hierarchy">
-<tt class="descname">hierarchy</tt><big>(</big><em>by='Level'</em>, <em>factory=&lt;function &lt;lambda&gt; at 0x0557B630&gt;</em>, <em>linkfct=&lt;function &lt;lambda&gt; at 0x0557B670&gt;</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.hierarchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.hierarchy" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hierarchy</tt><big>(</big><em>by='Level'</em>, <em>factory=&lt;function &lt;lambda&gt; at 0x08E9B6B0&gt;</em>, <em>linkfct=&lt;function &lt;lambda&gt; at 0x08E9B6F0&gt;</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.hierarchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.hierarchy" title="Permalink to this definition">¶</a></dt>
 <dd><p>builds a structure from a table containing a &#8220;level&#8221; column</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="table.Table.applyf">
 <tt class="descname">applyf</tt><big>(</big><em>by</em>, <em>f</em>, <em>skiperrors=False</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.applyf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.applyf" title="Permalink to this definition">¶</a></dt>
-<dd><p>apply a function to a column</p>
+<dd><p>apply a function to a column
+:param by: column name of number
+:param f: function of the form lambda cell:content
+:param skiperrors: bool. if True, errors while running f are ignored
+:return: bool True if ok, False if skiperrors==True and conversion failed</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="table.Table.to_datetime">
 <tt class="descname">to_datetime</tt><big>(</big><em>by</em>, <em>fmt='%Y-%m-%d'</em>, <em>skiperrors=False</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.to_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.to_datetime" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert a column to datetime</p>
+<dd><p>convert a column to datetime
+:param by: column name of number
+:param fmt: string defining datetime format
+:param skiperrors: bool. if True, conversion errors are ignored
+:return: bool True if ok, False if skiperrors==True and conversion failed</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="table.Table.to_date">
 <tt class="descname">to_date</tt><big>(</big><em>by</em>, <em>fmt='%Y-%m-%d'</em>, <em>skiperrors=False</em><big>)</big><a class="reference internal" href="../_modules/table.html#Table.to_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#table.Table.to_date" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert a column to date</p>
+<dd><p>convert a column to date
+:param by: column name of number
+:param fmt: string defining datetime format
+:param skiperrors: bool. if True, conversion errors are ignored
+:return: bool True if ok, False if skiperrors==True and conversion failed</p>
 </dd></dl>
 
 <dl class="method">
@@ -416,7 +428,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

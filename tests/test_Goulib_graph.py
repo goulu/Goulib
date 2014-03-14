@@ -37,7 +37,7 @@ class TestGeoGraph:
                         w=0
                     self.logi.add_edge(start,end,weight=v+w)
                     
-    def test_render(self):
+    def test_save(self):
         from Goulib.colors import hex_to_rgb
         import matplotlib.pyplot as plt
         
@@ -52,8 +52,11 @@ class TestGeoGraph:
                 c=map(float(c)/100)
             return c
         
-        open('logi.png','wb').write(self.logi.render(format='png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue']))
+        self.logi.save('logi.png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue'])
         
+    def test_render(self):
+        pass #tested above
+    
     def test_is_multigraph(self):
         assert_false(self.cube.is_multigraph())
         
@@ -149,7 +152,6 @@ class TestGeoGraph:
     
     def test_str(self):
         s=str(self.empty)
-        assert_true("'bbox': ((), ())" in s)
         assert_true("'nodes': 8" in str(self.cube))
 
     def test_dist(self):
@@ -191,10 +193,14 @@ class TestGeoGraph:
         # assert_equal(expected, geo_graph.number_of_nodes())
         raise SkipTest # TODO: implement your test here
 
+    def test_draw(self):
+        # geo_graph = GeoGraph(G, **kwargs)
+        # assert_equal(expected, geo_graph.draw(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestRender:
     def test_render(self):
-        # assert_equal(expected, render(g, pos, format, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        pass # tested in test_save TODO : more tests with attributes
 
 class TestDelauneyTriangulation:
     def test_delauney_triangulation(self):
@@ -207,11 +213,11 @@ class TestDelauneyTriangulation:
         print('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
-        open('delauney.png','wb').write(graph.render('png'))
+        graph.save('delauney.png')
         start=time.clock()
         graph=euclidean_minimum_spanning_tree(nodes)
         print('Spanning tree %d : %f'%(n,time.clock()-start))
-        open('emst.png','wb').write(graph.render('png'))
+        graph.save('emst.png')
 
 class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):
@@ -220,14 +226,27 @@ class TestEuclideanMinimumSpanningTree:
 import sys
 import nose
 from cStringIO import StringIO    
+class TestFigure:
+    def test_figure(self):
+        # assert_equal(expected, figure(g))
+        raise SkipTest # TODO: implement your test here
+
+class TestDraw:
+    def test_draw(self):
+        # assert_equal(expected, draw(g, pos, ax, hold, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+
+class TestDrawNetworkx:
+    def test_draw_networkx(self):
+        # assert_equal(expected, draw_networkx(g, **kwargs))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     module_name = sys.modules[__name__].__file__
 
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
-    result = nose.run(argv=[sys.argv[0],
-                            module_name,
-                            '-s'])
+    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
     sys.stdout = old_stdout
     print mystdout.getvalue()

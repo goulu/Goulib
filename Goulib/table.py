@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import csv, itertools, operator, string
+import csv, itertools, operator, string, codecs
 from datetime import datetime, date, timedelta
 import logging
 
@@ -296,12 +296,12 @@ class Table(list):
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
         encoding=kwargs.get('encoding','iso-8859-15')
-        reader = csv.reader(open(filename, 'rb'), dialect=dialect, delimiter=delimiter)
-        #reader = open(filename,'rb') 
+        #reader = csv.reader(codecs.open(filename, 'rb', encoding, errors='ignore'), dialect=dialect, delimiter=delimiter)
+        reader = open(filename,'rb') 
         for i,row in enumerate(reader):
-            # row=row.replace('\x00', '') #avoid NULLS from .XLS saved as .CSV
-            # row=row.rstrip('\r\n')
-            #row=row.split(delimiter)
+            row=row.replace('\x00', '') # avoid NULLs from from .XLS saved as .CSV
+            row=row.rstrip('\r\n')
+            row=row.split(delimiter)
             if encoding:
                 row=[x.decode(encoding) for x in row]
             if i==titles_line: #titles can have no left/right spaces
@@ -466,7 +466,13 @@ class Table(list):
         return res
         
     def applyf(self,by,f,skiperrors=False):
-        '''apply a function to a column'''
+        """ apply a function to a column
+        :param by: column name of number
+        :param f: function of the form lambda cell:content
+        :param skiperrors: bool. if True, errors while running f are ignored
+        :return: bool True if ok, False if skiperrors==True and conversion failed
+        """
+        res=True
         i=self._i(by)
         for row in self:
             x=row[i]
@@ -476,15 +482,27 @@ class Table(list):
                 if not skiperrors:
                     logging.error('could not applyf to %s'%x)
                     raise(ValueError)
-                pass
+                res=False
+        return res
             
     def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
-        '''convert a column to datetime'''    
-        self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
+        """convert a column to datetime
+        :param by: column name of number
+        :param fmt: string defining datetime format
+        :param skiperrors: bool. if True, conversion errors are ignored
+        :return: bool True if ok, False if skiperrors==True and conversion failed
+        """  
+        return self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
         
     def to_date(self,by,fmt='%Y-%m-%d',skiperrors=False):
-        '''convert a column to date'''
-        self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
+        """convert a column to date
+        :param by: column name of number
+        :param fmt: string defining datetime format
+        :param skiperrors: bool. if True, conversion errors are ignored
+        :return: bool True if ok, False if skiperrors==True and conversion failed
+        """  
+
+        return self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
             
 
     def total(self,funcs):

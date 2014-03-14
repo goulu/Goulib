@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>table &mdash; Goulib 1.6.2 documentation</title>
+    <title>table &mdash; Goulib 1.6.5 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.2',
+        VERSION:     '1.6.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -74,7 +74,7 @@
 <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
 
-<span class="kn">import</span> <span class="nn">csv</span><span class="o">,</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">operator</span><span class="o">,</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">csv</span><span class="o">,</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">operator</span><span class="o">,</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">codecs</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
@@ -362,12 +362,12 @@
         <span class="n">dialect</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;dialect&#39;</span><span class="p">,</span><span class="s">&#39;excel&#39;</span><span class="p">)</span>
         <span class="n">delimiter</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;delimiter&#39;</span><span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">)</span>
         <span class="n">encoding</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;encoding&#39;</span><span class="p">,</span><span class="s">&#39;iso-8859-15&#39;</span><span class="p">)</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">),</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
-        <span class="c">#reader = open(filename,&#39;rb&#39;) </span>
+        <span class="c">#reader = csv.reader(codecs.open(filename, &#39;rb&#39;, encoding, errors=&#39;ignore&#39;), dialect=dialect, delimiter=delimiter)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span> 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reader</span><span class="p">):</span>
-            <span class="c"># row=row.replace(&#39;\x00&#39;, &#39;&#39;) #avoid NULLS from .XLS saved as .CSV</span>
-            <span class="c"># row=row.rstrip(&#39;\r\n&#39;)</span>
-            <span class="c">#row=row.split(delimiter)</span>
+            <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="c"># avoid NULLs from from .XLS saved as .CSV</span>
+            <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\r\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">encoding</span><span class="p">:</span>
                 <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="n">titles_line</span><span class="p">:</span> <span class="c">#titles can have no left/right spaces</span>
@@ -532,7 +532,13 @@
         <span class="k">return</span> <span class="n">res</span>
         </div>
 <div class="viewcode-block" id="Table.applyf"><a class="viewcode-back" href="../modules/table.html#table.Table.applyf">[docs]</a>    <span class="k">def</span> <span class="nf">applyf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">skiperrors</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;apply a function to a column&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot; apply a function to a column</span>
+<span class="sd">        :param by: column name of number</span>
+<span class="sd">        :param f: function of the form lambda cell:content</span>
+<span class="sd">        :param skiperrors: bool. if True, errors while running f are ignored</span>
+<span class="sd">        :return: bool True if ok, False if skiperrors==True and conversion failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="o">=</span><span class="bp">True</span>
         <span class="n">i</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_i</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">x</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -542,15 +548,27 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">skiperrors</span><span class="p">:</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;could not applyf to </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">x</span><span class="p">)</span>
                     <span class="k">raise</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">)</span>
-                <span class="k">pass</span>
+                <span class="n">res</span><span class="o">=</span><span class="bp">False</span>
+        <span class="k">return</span> <span class="n">res</span>
             </div>
 <div class="viewcode-block" id="Table.to_datetime"><a class="viewcode-back" href="../modules/table.html#table.Table.to_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span><span class="n">skiperrors</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;convert a column to datetime&#39;&#39;&#39;</span>    
-        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetimef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">skiperrors</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;convert a column to datetime</span>
+<span class="sd">        :param by: column name of number</span>
+<span class="sd">        :param fmt: string defining datetime format</span>
+<span class="sd">        :param skiperrors: bool. if True, conversion errors are ignored</span>
+<span class="sd">        :return: bool True if ok, False if skiperrors==True and conversion failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetimef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">skiperrors</span><span class="p">)</span>
         </div>
 <div class="viewcode-block" id="Table.to_date"><a class="viewcode-back" href="../modules/table.html#table.Table.to_date">[docs]</a>    <span class="k">def</span> <span class="nf">to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span><span class="n">skiperrors</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;convert a column to date&#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">skiperrors</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;convert a column to date</span>
+<span class="sd">        :param by: column name of number</span>
+<span class="sd">        :param fmt: string defining datetime format</span>
+<span class="sd">        :param skiperrors: bool. if True, conversion errors are ignored</span>
+<span class="sd">        :return: bool True if ok, False if skiperrors==True and conversion failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">applyf</span><span class="p">(</span><span class="n">by</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">),</span><span class="n">skiperrors</span><span class="p">)</span>
             
 </div>
 <div class="viewcode-block" id="Table.total"><a class="viewcode-back" href="../modules/table.html#table.Table.total">[docs]</a>    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">funcs</span><span class="p">):</span>
@@ -601,7 +619,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

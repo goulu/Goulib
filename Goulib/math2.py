@@ -402,6 +402,7 @@ def proportional(nseats,votes):
     res=[int(f) for f in frac]
     n=nseats-sum(res) #number of seats remaining to allocate
     if n==0: return res #done
+    if n<0: return [min(x,nseats) for x in res] #to handle case where votes=[0,0,..,1,0,...,0]
     #give the remaining seats to the n parties with the largest remainder
     remainders=vecsub(frac,res)
     limit=sorted(remainders,reverse=True)[n-1]
@@ -410,4 +411,4 @@ def proportional(nseats,votes):
             res[i]+=1
             n-=1 # attempt to handle perfect equality
             if n==0: return res #done
-    raise #should never happen
+    raise

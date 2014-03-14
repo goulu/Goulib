@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>graph &mdash; Goulib 1.6.2 documentation</title>
+    <title>graph &mdash; Goulib 1.6.5 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.2',
+        VERSION:     '1.6.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.2 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -184,7 +184,15 @@ otherwise euclidian distance between nodes is used by default</p>
 <dl class="method">
 <dt id="graph.GeoGraph.box_size">
 <tt class="descname">box_size</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.box_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.box_size" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(x,y) size</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="graph.GeoGraph.contiguity">
@@ -306,31 +314,66 @@ side effect: updates largest merge in self.max_merge</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="graph.GeoGraph.draw">
+<tt class="descname">draw</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>draw graph with default params</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="graph.GeoGraph.render">
 <tt class="descname">render</tt><big>(</big><em>format</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.render" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>render graph to bitmap stream
+:return: matplotlib figure as a byte stream in specified format</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.save">
+<tt class="descname">save</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save graph in various formats</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="graph.render">
-<tt class="descclassname">graph.</tt><tt class="descname">render</tt><big>(</big><em>g</em>, <em>format</em>, <em>pos=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.render" title="Permalink to this definition">¶</a></dt>
-<dd><p>draw a graph in bitmap or vector format
+<dt id="graph.figure">
+<tt class="descclassname">graph.</tt><tt class="descname">figure</tt><big>(</big><em>g</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#figure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.figure" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matplotlib axis suitable for drawing graph g</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="graph.draw_networkx">
+<tt class="descclassname">graph.</tt><tt class="descname">draw_networkx</tt><big>(</big><em>g</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#draw_networkx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.draw_networkx" title="Permalink to this definition">¶</a></dt>
+<dd><p>improves draw_networkx 
 :param g: NetworkX Graph
-:param format: output format . Supported are : png, svg(z), pdf, (e)ps, emf, rgba, raw
-:param pos: optional iterable of (x,y) node positions. nx.draw_shell will be used if missing
-:param <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: passed to nx.draw method with one tweak:</p>
+:param pos: can be either :</p>
 <ul class="simple">
-<li>if edge_color is a function of the form lambda <a class="reference external" href="data:color">data:color</a> string, it is mapped over all edges</li>
+<li>optional dictionary of (x,y) node positions</li>
+<li>function of the form lambda node:(x,y) that maps node positions.</li>
+<li>None. in this case, nodes are directly used as positions if graph is a GeoGraph, otherwise nx.draw_shell is used</li>
 </ul>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matplotlib figure stream</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fig</strong> &#8211; matplotlib figure. If None, figure(g) is used to obtain one</li>
+<li><strong>**kwargs</strong> &#8211; <p>passed to nx.draw method with one tweak:</p>
+</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
+<ul class="simple">
+<li>if edge_color is a function of the form lambda <a class="reference external" href="data:color">data:color</a> string, it is mapped over all edges</li>
+</ul>
 </dd></dl>
 
 <dl class="function">
@@ -382,7 +425,7 @@ side effect: updates largest merge in self.max_merge</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.2 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
