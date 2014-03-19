@@ -906,8 +906,9 @@ class TestArc2:
     def setup_class(self):
         self.a1=Arc2((0,0),(1,0),(0,1))
         self.a2=Arc2((0,0),0,pi/2.,1) #same as a1
-        self.a3=Arc2((0,0),0,pi/2.,1,dir=-1) #same, inverted
-        
+        self.a3=Arc2((0,0),pi/2.,0,1,dir=-1) #same, inverted
+        self.ap=Arc2(center=Point2(454.80692478710336, 69.74749779176005),p1=Point2(74.67492478710335, 86.62949779176006),p2=Point2(74.48092478710339, 58.021497791760055),r=380.506687652)
+        self.ap2=Arc2(center=Point2(-454.80607521289664, -9.203502208239968),p1=Point2(-74.67307521289663, -26.08650220823995),p2=Point2(-74.47907521289662, 2.521497791760055),r=380.507731036)
     def test___init__(self):
         pass #tested above
         assert_equal(self.a1,self.a2)
@@ -916,9 +917,16 @@ class TestArc2:
         assert_true(self.a1==self.a2)
         assert_false(self.a1==self.a3)
         
+    def test_angle(self):
+        assert_equal(self.a1.angle(),self.a2.angle())
+        assert_equal(self.a1.angle(),-self.a3.angle())
+        assert_true(self.ap.angle()<radians(10)) # check the angle is not the complementary angle
+        assert_true(self.ap2.angle()<radians(10)) # check the angle is not the complementary angle
+        
     def test___abs__(self):
         assert_almost_equal(abs(self.a1),pi/2.)
-        raise SkipTest # TODO: implement your test here
+        assert_true(self.ap.length<50) # check the angle is not the complementary angle
+        assert_true(self.ap2.length<50) # check the angle is not the complementary angle
 
     def test___copy__(self):
         # arc2 = Arc2(center, p1, p2, r)
@@ -929,10 +937,6 @@ class TestArc2:
         # arc2 = Arc2(center, p1, p2, r)
         # assert_equal(expected, arc2.__repr__())
         raise SkipTest # TODO: implement your test here
-
-    def test_angle(self):
-        assert_equal(self.a1.angle(),self.a2.angle())
-        assert_equal(self.a1.angle(),-self.a3.angle())
 
     def test_point(self):
         # arc2 = Arc2(center, p1, p2, r)

@@ -2598,10 +2598,18 @@ class Arc2(Circle):
         self.dir=dir 
             
         self._apply_transform(None) #to set start/end angles
+        # self.a is now start angle in [-pi,pi]
+        # self.b is now end angle in [-pi,pi]
         
     def angle(self):
-        """:return: float arc angle"""
-        return (self.b-self.a)*self.dir
+        """:return: float signed arc angle"""
+        a=self.a
+        b=self.b
+        if b<a: b=b+2*pi # now b>a
+        res=b-a #positive angle
+        if cmp(b,a)!=self.dir: #complementary angle
+            res=2*pi-res
+        return res*self.dir
         
     def __abs__(self):
         """:return: float arc length"""
