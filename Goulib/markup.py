@@ -49,6 +49,29 @@ def cgiprint(inline='', unbuff=True, line_end='\r\n'):
     sys.stdout.write(line_end)
     if unbuff:
         sys.stdout.flush()
+        
+def tag( tag, between, **kwargs ):
+    """generate full tag."""
+    single=kwargs.pop('single',False)
+    out = "<%s" % tag
+    for key, value in kwargs.items():
+        if value is not None:               # when value is None that means stuff like <... checked>
+            key = key.strip('_')            # strip this so class_ will mean class, etc.
+            if key == 'http_equiv':         # special cases, maybe change _ to - overall?
+                key = 'http-equiv'
+            elif key == 'accept_charset':
+                key = 'accept-charset'
+            out = '%s %s="%s"' % ( out, key, escape( value ) )
+        else:
+            out = "%s %s" % ( out, key )
+    if between is not None:
+        out = "%s>%s</%s>" % ( out, between, tag )
+    else:
+        if single:
+            out = "%s />" % out
+        else:
+            out = "%s>" % out
+    return out
 
 # tags which are reserved python keywords will be referred 
 # to by a leading underscore otherwise we end up with a syntax error
@@ -70,8 +93,6 @@ class element:
             self.tag = tag
     
     def __call__( self, *args, **kwargs ):
-        if len( args ) > 1:
-            raise ArgumentError( self.tag )
 
         # if class_ was defined in parent it should be added to every element
         if self.parent is not None and self.parent.class_ is not None:
@@ -79,19 +100,19 @@ class element:
                 kwargs['class_'] = self.parent.class_
             
         if self.parent is None and len( args ) == 1:
-            x = [ self.render( self.tag, False, myarg, mydict ) for myarg, mydict in _argsdicts( args, kwargs ) ]
+            x = [ self.render( self.tag, False, myarg, **mydict ) for myarg, mydict in _argsdicts( args, kwargs ) ]
             return '\n'.join( x )
         elif self.parent is None and len( args ) == 0:
-            x = [ self.render( self.tag, True, myarg, mydict ) for myarg, mydict in _argsdicts( args, kwargs ) ]
+            x = [ self.render( self.tag, True, myarg, **mydict ) for myarg, mydict in _argsdicts( args, kwargs ) ]
             return '\n'.join( x )
             
         if self.tag in self.parent.twotags:
             for myarg, mydict in _argsdicts( args, kwargs ):
-                self.render( self.tag, False, myarg, mydict )
+                self.render( self.tag, False, myarg, **mydict )
         elif self.tag in self.parent.onetags:
             if len( args ) == 0:
                 for myarg, mydict in _argsdicts( args, kwargs ):
-                    self.render( self.tag, True, myarg, mydict )    # here myarg is always None, because len( args ) = 0
+                    self.render( self.tag, True, myarg, **mydict )    # here myarg is always None, because len( args ) = 0
             else:
                 raise ClosingError( self.tag )
         elif self.parent.mode == 'strict_html' and self.tag in self.parent.deptags:
@@ -99,27 +120,11 @@ class element:
         else:
             raise InvalidElementError( self.tag, self.parent.mode )
     
-    def render( self, tag, single, between, kwargs ):
+    def render( self, t, single, args, **kwargs ):
         """Append the actual tags to content."""
-
-        out = "<%s" % tag
-        for key, value in list( kwargs.items( ) ):
-            if value is not None:               # when value is None that means stuff like <... checked>
-                key = key.strip('_')            # strip this so class_ will mean class, etc.
-                if key == 'http_equiv':         # special cases, maybe change _ to - overall?
-                    key = 'http-equiv'
-                elif key == 'accept_charset':
-                    key = 'accept-charset'
-                out = "%s %s=\"%s\"" % ( out, key, escape( value ) )
-            else:
-                out = "%s %s" % ( out, key )
-        if between is not None:
-            out = "%s>%s</%s>" % ( out, between, tag )
-        else:
-            if single:
-                out = "%s />" % out
-            else:
-                out = "%s>" % out
+        if single:
+            kwargs['single']=True
+        out=tag(t, args, **kwargs)
         cgiprint(out)
         return
         if self.parent is not None:
@@ -142,7 +147,7 @@ class element:
         """Append an opening tag."""
 
         if self.tag in self.parent.twotags or self.tag in self.parent.onetags:
-            self.render( self.tag, False, None, kwargs )
+            self.render( self.tag, False, None, **kwargs )
         elif self.mode == 'strict_html' and self.tag in self.parent.deptags:
             raise DeprecationError( self.tag )
 

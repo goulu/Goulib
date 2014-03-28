@@ -98,7 +98,7 @@ def _longer(a,b,fillvalue=0):
         
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return map(sum,izip_longest(a,b,fillvalue=fillvalue))
+    return [reduce(operator.add,l) for l in izip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""

@@ -223,9 +223,7 @@ class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):
         pass #tested together with Delauney triangulation
     
-import sys
-import nose
-from cStringIO import StringIO    
+  
 class TestFigure:
     def test_figure(self):
         # assert_equal(expected, figure(g))
@@ -243,6 +241,10 @@ class TestDrawNetworkx:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
+    import sys
+    import nose
+    from cStringIO import StringIO  
+    
     module_name = sys.modules[__name__].__file__
 
     old_stdout = sys.stdout

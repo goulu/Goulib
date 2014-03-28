@@ -24,6 +24,7 @@ except: #ElementTree
 Element=ElementTree._Element
 
 from Goulib.datetime2 import datef, datetimef,strftimedelta
+from Goulib.markup import tag
 
 def attr(args):
     res=''
@@ -74,14 +75,16 @@ class Cell():
     def __repr__html(self):
         return self.html()
         
-    def html(self):
+    def html(self,**kwargs):
         """:return: string HTML formatted cell
         * if data is int, default align="right"
         * if data is float, default align="right" and fmt='%0.2f'
         * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
         """
+        args={}
+        args.update(kwargs) #copy needed to avoid side effects
         v=self.data
-        a=self.align
+        a=args.get('align',self.align)
         f=self.fmt
         if isinstance(v,int):
             if not a: a="right"
@@ -103,15 +106,15 @@ class Cell():
             
         attr='' #tag attributes
         if a:
-            attr+=' align="%s"'%a
+            args['align']=a #side effect warning
             
         if not v or v=='':
             v="&nbsp;" #for IE8
         else:
             v=f%v if f else str(v)
-                    
-        if self.style: attr+=' style="%s"'%self.style
-        return '<%s%s>%s</%s>'%(self.tag,attr,v,self.tag)
+        if self.style:
+            args.setdefault('style',self.style)
+        return tag(self.tag,v,**args)
 
 class Row():
     """Table row with HTML attributes"""
@@ -160,14 +163,13 @@ class Row():
     def __repr__html(self):
         return self.html()
 
-    def html(self):
+    def html(self,cell_args={},**kwargs):
         """return in HTML format"""
-        res='<tr>'
+        res=''
         for i,v in enumerate(self.data):
             cell=Cell(v,self.align[i],self.fmt[i],self.tag[i],self.style[i])
-            res+=cell.html()
-        res+='</tr>'
-        return res
+            res+=cell.html(**cell_args)
+        return tag('tr',res,**kwargs)
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
@@ -226,7 +228,7 @@ class Table(list):
             res+="</tfoot>\n"
             return res
         
-        res="<table%s>\n"%attr(kwargs)
+        res=''
             
         if head is None:
             head=self.titles
@@ -237,7 +239,7 @@ class Table(list):
         if foot is not None:
             res+=TFOOT(foot)             
         
-        return res+"</table>\n"
+        return tag('table',res,**kwargs)+'\n'
     
     def read_element(self,element, **kwargs):
         """read table from a DOM element"""

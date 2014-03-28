@@ -1,10 +1,17 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 
+from Goulib.markup import *
+
 class TestCgiprint:
     def test_cgiprint(self):
         # assert_equal(expected, cgiprint(inline, unbuff, line_end))
         raise SkipTest # TODO: implement your test here
+
+class TestTag:
+    def test_tag(self):
+        assert_equal(tag('tag', 'between', class_='class'),'<tag class="class">between</tag>')
+        
 
 class TestElement:
     def test___call__(self):
@@ -28,7 +35,7 @@ class TestElement:
 
     def test_render(self):
         # element = element(tag, case, parent)
-        # assert_equal(expected, element.render(tag, single, between, kwargs))
+        # assert_equal(expected, element.render(t, single, between, kwargs))
         raise SkipTest # TODO: implement your test here
 
 class TestPage:
@@ -152,7 +159,6 @@ class TestCustomizationError:
         # customization_error = CustomizationError()
         raise SkipTest # TODO: implement your test here
 
-
 class test__oneliner:
     def test___getattr__(self):
         # _oneliner = _oneliner(case)
@@ -163,3 +169,15 @@ class test__oneliner:
         # _oneliner = _oneliner(case)
         raise SkipTest # TODO: implement your test here
 
+if __name__=="__main__":
+    import sys
+    import nose
+    from cStringIO import StringIO  
+    
+    module_name = sys.modules[__name__].__file__
+
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
+    sys.stdout = old_stdout
+    print mystdout.getvalue()

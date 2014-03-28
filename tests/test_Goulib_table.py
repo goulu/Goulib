@@ -3,7 +3,7 @@
 
 import os
 from nose import SkipTest
-from nose.tools import assert_equal,assert_true
+from nose.tools import assert_equal, assert_true
 
 from Goulib.table import *
 import datetime
@@ -36,8 +36,8 @@ class TestTable:
         assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))
         assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
         
-        row=Row(self.t2[14])
-        assert_equal(row.html(),'<tr><td align="right">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td align="right">2</td><td align="right">125.00</td><td align="right">250.00</td></tr>')
+        ref='<tr><td align="right">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td align="right">2</td><td align="right">125.00</td><td align="right">250.00</td></tr>'
+        assert_equal(Row(self.t2[14]).html(),ref)
         
     def test___init__(self):
         pass #tested in setup
@@ -181,6 +181,14 @@ class TestRead:
         # assert_equal(expected, read(x))
         raise SkipTest # TODO: implement your test here
 
-if __name__ == "__main__":
+if __name__=="__main__":
+    import sys
     import nose
-    nose.runmodule()
+    from cStringIO import StringIO  
+    module_name = sys.modules[__name__].__file__
+
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
+    sys.stdout = old_stdout
+    print mystdout.getvalue()

@@ -11,8 +11,89 @@ __license__ = "LGPL"
 import random
 import math
 import logging
+import itertools, itertools2
 
-import itertools2
+class Bin(dict):
+    #http://docs.python.org/2/reference/datamodel.html#emulating-container-types
+    def __init__(self, capacity, items={}, f=lambda x:x):
+        """a container with a limited capacity
+        :param capacity: int,flot,tuple of whatever defines the capacity of the Bin
+        :param f: function f(x) returning the capacity used by item x. Must return the empty capacity when f(0) is called
+        :param items: iterable of initial content:
+        """
+        super(Bin,self).__init__()
+        self._capacity=capacity
+        self._f=f #functions that return the cached values of an item
+        self._used=f(0)
+    
+    def __repr__(self):
+        return '%s(%s/%s)'%(self.__class__.__name__,self._used,self._capacity)
+    
+    def _fits(self,value,cap=None):
+        """compare value to capacity"""
+        if cap is None : cap=self._capacity
+        if isinstance(value,(int,float)):
+            return value<=cap
+        if isinstance(value,set):
+            return len(value)<=cap
+        return all(itertools.imap(self._fits,zip(value,cap)))
+    
+    def fits(self,item):
+        """:return: bool True if item fits in bin without exceeding capacity"""
+        return self._fits(self._add(self._f(item)))
+    
+    def _add(self,value,tot=None):
+        """update total when item is added"""
+        if not tot : tot=self._used
+        if isinstance(value,(int,float)):
+            return tot+value
+        if isinstance(value,set):
+            return tot|value
+        return map(self._add,zip(value,tot))
+    
+    def _sub(self,value,tot=None):
+        """update total AFTER item is removed"""
+        if not tot : tot=self._used
+        if isinstance(value,(int,float)):
+            return tot-value
+        if isinstance(value,set):
+            raise(NotImplementedError)
+        return map(self._sub,zip(value,tot))
+        
+    def __delitem__(self,key):
+        self._used=self._sub(self._f(self[key]))
+        super(Bin,self).__delitem__(key)
+    
+    def __setitem__(self,key,item):
+        self._used-=self._f(self[key])
+        super(Bin,self).__setitem__(key,item)
+        self._used+=self._f(item)
+        
+    def insert(self,i,item):
+        super(Bin,self).insert(i,item)
+        self._used+=self._f(item)
+        return self
+        
+    def append(self,item):
+        super(Bin,self).append(item)
+        self._used+=self._f(item)
+        return self
+    
+    def extend(self,more):
+        for x in more:
+            self.append(x)
+        return self
+    
+    def pop(self,i=-1):
+        item=super(Bin,self).pop(i)
+        self._used-=self._f(item)
+        return self
+    
+    def remove(self,item):
+        super(Bin,self).remove(item)
+        self._used-=self._f(item)
+        return self
+
 
 def hillclimb(init_function,move_operator,objective_function,max_evaluations):
     '''
@@ -171,7 +252,7 @@ def tsp(points,dist,max_iterations=100,start_temp=None,alpha=None,close=True,ran
     @param close : computes closed TSP. if False, open TSP starting at points[0]
     @return iterations,score,best : number of iterations used, minimal length found, best path as list of indexes of points
     """
-    import optim, random
+    import random
     n=len(points)
     def init_function():
         tour=range(1,n)
@@ -182,22 +263,7 @@ def tsp(points,dist,max_iterations=100,start_temp=None,alpha=None,close=True,ran
         """total up the total length of the tour based on the dist ance function"""
         return -sum(tour_length(points,dist,tour if close else tour[:-1]))
     if start_temp is None or alpha is None:
-        iterations,score,best=optim.hillclimb_and_restart(init_function,reversed_sections,objective_function,max_iterations)
+        iterations,score,best=hillclimb_and_restart(init_function,reversed_sections,objective_function,max_iterations)
     else:
-        iterations,score,best=optim.anneal(init_function,reversed_sections,objective_function,max_iterations,start_temp,alpha)
+        iterations,score,best=anneal(init_function,reversed_sections,objective_function,max_iterations,start_temp,alpha)
     return iterations,score,best
-
-if __name__ == "__main__":
-    import logging
-    #logging.basicConfig(level=logging.INFO)
-    words=['geneva','london','new-york','paris','tokyo','rome','zurich','bern','berlin','mokba','washington','wien','biel']
-    n=2000
-    from math2 import levenshtein 
-    iterations,score,best=tsp(words,levenshtein,n)
-    print('TSP hill climbing closed score=%d, best=%s'%(score,[words[i] for i in best]))
-    iterations,score,best=tsp(words,levenshtein,n,2,.9)
-    print('TSP annealing closed score=%d, best=%s'%(score,[words[i] for i in best]))
-    iterations,score,best=tsp(words,levenshtein,n,close=False)
-    print('TSP hill climbing open score=%d, best=%s'%(score,[words[i] for i in best]))
-    iterations,score,best=tsp(words,levenshtein,n,2,.9,close=False)
-    print('TSP annealing open score=%d, best=%s'%(score,[words[i] for i in best]))

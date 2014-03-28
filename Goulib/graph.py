@@ -243,7 +243,7 @@ class GeoGraph(nx.MultiGraph):
         super(GeoGraph,self).add_edge(u, v, attr_dict=a) #doesn't return created data... what a pity ...
         return self._last(u,v)
         
-    def remove_edge(self,u,v=None,clean=False):
+    def remove_edge(self,u,v=None,key=None,clean=False):
         """
         :param u: Node or Edge (Nodes tuple)
         :param v: Node if u is a single Node
@@ -254,7 +254,7 @@ class GeoGraph(nx.MultiGraph):
         if v is None:
             u,v=u[0],u[1]
         
-        super(GeoGraph,self).remove_edge(u,v)   
+        super(GeoGraph,self).remove_edge(u,v,key)   
         
         if clean:
             if self.degree(u)==0:
@@ -386,17 +386,20 @@ def draw_networkx(g, **kwargs):
         
     return kwargs
     
-def delauney_triangulation(nodes,**kwargs):
+def delauney_triangulation(nodes, qhull_options='Qt', **kwargs):
     """
     :param nodes: list of (x,y) nodes positions
-    :return: geograph with minimum spanning tree between  nodes
+    :param qhull_options: string passed to scipy.spatial.Delaunay, which passes it to Qhull ( http://www.qhull.org/ )
+        'Qt' ensures all points are connected
+    :param **kwargs: passed to the GeoGraph constructor
+    :return: GeoGraph with minimum spanning tree between  nodes
     see https://en.wikipedia.org/wiki/Delaunay_triangulation
     """
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
     import numpy
     from scipy.spatial import Delaunay
     points=numpy.array(nodes)
-    tri = Delaunay(points, qhull_options='Qt') #option ensures all points are connected
+    tri = Delaunay(points, qhull_options=qhull_options) 
     kwargs['multi']=False #to avoid duplicating triangle edges below
     g=GeoGraph(None,**kwargs)
     triangles=points[tri.simplices]
