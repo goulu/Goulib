@@ -4,17 +4,26 @@
 Vector graphics
 reads geometry from .dxf and .svg files
 :requires: 
+* `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg output
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
-* PIL or `pillow <http://pypi.python.org/pypi/pillow/>`_ for bitmap output
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
-import logging, operator
+
 from math import  radians, degrees, atan, pi, copysign
+import logging, operator
+
+try:
+    import matplotlib
+    matplotlib.use("Agg") #don't know why, but looks useful
+    import matplotlib.pyplot as plt
+except:
+    logging.warning('matplotlib not imported : bitmap+svg export not available')
+    
 from math2 import rint
 from geom import *
 
@@ -136,7 +145,10 @@ class Entity(object):
     
     @property
     def end(self):
-        return self.p2
+        try:
+            return self.p2
+        except: #probably a Circle
+            return self.p
     
     @property
     def center(self):
@@ -183,13 +195,14 @@ class Entity(object):
                 theta1,theta2=theta2,theta1
             d=self.r*2
             return ax.add_artist(Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs))
+        raise NotImplementedError
     
     def to_dxf(self,**attr):
         """:return: dxf entity Line or Arc"""
-        from dxfwrite.entities import Arc, Line
+        import dxfwrite.entities as dxf
         if isinstance(self,Segment2):
-            return Line(start=self.start.xy,end=self.end.xy, **attr)
-        if isinstance(self,Arc2):
+            return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
+        elif isinstance(self,Arc2):
             center=self.c.xy
             v=Vector2(Point2(self.start)-self.c)
             startangle=degrees(v.angle())
@@ -201,8 +214,12 @@ class Entity(object):
                 center=(-center[0],center[1]) #negative extrusion on Z causes Y axis symmetry... strange...
             else:
                 extrusion_direction=None #default
-            return Arc(radius=self.r, center=center, startangle=startangle, endangle=endangle, extrusion_direction=extrusion_direction, **attr)
-
+            return dxf.Arc(radius=self.r, center=center, startangle=startangle, endangle=endangle, extrusion_direction=extrusion_direction, **attr)
+        elif isinstance(self,Circle):
+           return dxf.Circle(center=self.c.xy, radius=self.r, **attr)
+        else: 
+            raise NotImplementedError
+    
     @staticmethod
     def from_svg(path):
         """
@@ -210,6 +227,14 @@ class Entity(object):
         :return: Entity of correct subtype
         """
         return Chain.from_svg(path)
+    
+    @staticmethod
+    def from_pdf(path):
+        """
+        :param path: pdf path
+        :return: Entity of correct subtype
+        """
+        return Chain.from_pdf(path)
         
     @staticmethod
     def from_dxf(e,mat3):
@@ -267,6 +292,14 @@ Circle.__bases__ += (Entity,) # adds it also to Arc2
 
 class Group(list):
     """group of Entities"""
+    
+    def append(self,entity):
+        if isinstance(entity,Entity):
+            super(Group,self).append(entity)
+        else: #ignore invalid items
+            pass
+        return self
+    
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
@@ -285,6 +318,31 @@ class Group(list):
         for entity in self:
             entity._apply_transform(trans)
             
+    def swap(self):
+        """ swap start and end"""
+        super(Group,self).reverse() #reverse in place
+        for e in self:
+            e.swap()
+            
+    def artist(self, ax=None, **kwargs):
+        """:return: list of matplotlib.artist corresponding to all entities"""
+        res=[]
+        for e in self:
+            a=e.artist(ax,**kwargs)
+            if not isinstance(a,list): #flatten
+                a=[a]
+            res.extend(a)
+        return res
+    
+    def to_dxf(self, **attr):
+        """:return: flatten list of dxf entities"""
+        res=[]
+        for e in self:
+            r=e.to_dxf(**attr)
+            if not isinstance(r,list): #flatten
+                r=[r]
+            res.extend(r)
+        return res
 
 class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
     """ group of contiguous Entities (Polyline or similar)"""
@@ -311,29 +369,61 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         """
         
         if len(self)==0:
-            super(Chain,self).append(edge)
-            return self
+            return super(Chain,self).append(edge)
         if self.end.dist(edge.start)<=tol:
-            super(Chain,self).append(edge)
-            return self
+            return super(Chain,self).append(edge)
         if self.end.dist(edge.end)<=tol:
             edge.swap()
-            super(Chain,self).append(edge)
-            return self
+            return super(Chain,self).append(edge)
         if len(self)>1 : 
             return None
         else: #try to reverse the first edge
             pass
         if self.start.dist(edge.start)<=tol:
             self[0].swap()
-            super(Chain,self).append(edge)
-            return self
+            return super(Chain,self).append(edge)
         if self.start.dist(edge.end)<=tol:
             self[0].swap()
             edge.swap()
-            super(Chain,self).append(edge)
-            return self
+            return super(Chain,self).append(edge)
         return None
+    
+    @staticmethod
+    def from_pdf(path,color=None):
+        """
+        :param path: pdf path
+        :return: Entity of correct subtype
+        :see: http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/PDF32000_2008.pdf p. 132
+        
+        """
+        chain=Chain()
+        code,x,y=path.pop(0)
+        assert(code=='m')
+        home=(x,y)
+        start=home
+        while path:
+            code=path.pop(0)
+            if code[0]=='l':
+                end=code[1:2]
+                entity=Segment2(start,end)
+            elif code[0]=='h':
+                entity=Segment2(start,home)
+                entity.color=chain.color
+            elif code[0]=='c': #Bezier, not circle... 
+                x1,y1,x2,y2,x3,y3=code[1:]
+                #TODO read http://itc.ktu.lt/itc354/Riskus354.pdf and implement Arc...
+                entity=None
+                end=(x3,y3)
+            else:
+                logging.warning('unsupported path command %s'%code)
+            if color: entity.color=color
+            if entity: chain.append(entity)
+            start=end
+        if len(chain)==1:
+            return chain[0] #single entity
+        if len(chain)==0:
+            pass
+        return chain
     
     @staticmethod
     def from_svg(path):
@@ -414,53 +504,89 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         return res
 
         
-    def to_dxf(self,split=False,**attr):
+    def to_dxf(self,**attr):
+        """:return: polyline or list of entities along the chain"""
+        split=attr.get('split',False)
+        if split: #handle polylines as separate entities
+            return super(Chain,self).to_dxf(**attr)
     
-        split=split or len(self)<2
-
-        if split:
-            res=[]
-        else:
-            from dxfwrite.entities import Polyline
-            attr['flags']=1 if self.isclosed() else 0
-            res=Polyline(**attr)
+        from dxfwrite.entities import Polyline
+        attr['flags']=1 if self.isclosed() else 0
+        res=Polyline(**attr)
             
-        for edge in self:
-            if split:
-                res.append(edge.to_dxf(**attr))
-            else:    
-                if isinstance(edge, Arc2):
-                    bulge=tan(edge.angle()/4)
-                    res.add_vertex(edge.start.xy,bulge=bulge)
-                else: #assume it's a Line
-                    res.add_vertex(edge.start.xy)
-        
-        if not split and not self.isclosed():
+        for e in self:
+            if isinstance(e, Arc2):
+                bulge=tan(e.angle()/4)
+                res.add_vertex(e.start.xy,bulge=bulge)
+            else: #assume it's a Line
+                res.add_vertex(e.start.xy)
+        if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
 
 class Drawing(Group):
-    """list of Entits representing a vector graphics drawing"""
+    """list of Entities representing a vector graphics drawing"""
     
-    def __init__(self, filename, options=None, **kwargs):
+    def __init__(self, filename, **kwargs):
         if filename:
+            self.load(filename,**kwargs)
+            
+    def load(self,filename, **kwargs):
             ext=filename.split('.')[-1].lower()
             if ext=='dxf':
-                self.read_dxf(filename, options, **kwargs)
+                self.read_dxf(filename, **kwargs)
             elif ext=='svg':
-                self.read_svg(filename)
+                self.read_svg(filename, **kwargs)
+            elif ext=='pdf':
+                self.read_pdf(filename, **kwargs)
             else:
-                raise IOError("file format %s not yet supported"%ext)
+                raise IOError("file format .%s not (yet) supported"%ext)
     
+    def read_pdf(self,filename,**kwargs):
+        """ reads a vector graphics on a .pdf file
+        only the first page is parsed
+        """
+        from pdfminer.pdfparser import PDFParser
+        from pdfminer.pdfdocument import PDFDocument
+        from pdfminer.pdfpage import PDFPage
+        from pdfminer.pdfinterp import PDFResourceManager
+        from pdfminer.pdfinterp import PDFPageInterpreter
+        from pdfminer.pdfdevice import PDFDevice
+        # PDF's are fairly complex documents organized hierarchically
+        # PDFMiner parses them using a stack and calls a "Device" to process entities
+        # so here we define a Device that processes only "paths" one by one:
+        d=self
+        
+        class _Device(PDFDevice):
+            def paint_path(self, graphicstate, stroke, fill, evenodd, path):
+                e=Entity.from_pdf(path)
+                if e:
+                    d.append(e)
+                else:
+                    pass #sometimes the path is empty ... TODO find why
+                
+        #then all we have to do is to launch PDFMiner's parser on the file        
+        fp = open(filename, 'rb')
+        parser = PDFParser(fp)
+        document = PDFDocument(parser, '')
+        rsrcmgr = PDFResourceManager()
+        device = _Device(rsrcmgr)
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        page=PDFPage.create_pages(document).next() #process only first page
+        interpreter.process_page(page)
+            
     def read_svg(self,filename, options=None, **kwargs):
         import re
         from svg.path import parse_path
         file=open(filename,'r')
         for line in file:
-            d = re.search('d="(.*)"', line)
+            d = re.search('path d="(.*)"', line)
             if d:
-                path=parse_path(d.group(1))
-                self.append(Entity.from_svg(path))   
+                try:
+                    path=parse_path(d.group(1))
+                    self.append(Entity.from_svg(path))   
+                except:
+                    logging.warning('unknown svg %s'%d.group(1))
         
     def read_dxf(self, filename, options=None, **kwargs):
         """reads a .dxf file
@@ -594,6 +720,90 @@ class Drawing(Group):
             size = size / antialias
             img = img.resize(map(rint, size.xy), Image.ANTIALIAS)
         return img
+    
+    def figure(self,**kwargs):
+        """:return: matplotlib axis suitable for drawing """
+        
+        fig=plt.figure(**kwargs)
+        try:
+            box=self.bbox()
+            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax),alpha=0) #draw a transparent diagonal to size everything
+        except: #probably nothing to draw ...
+            pass
+        plt.axis('equal')
+
+        import pylab
+        pylab.axis('off') # turn off axis
+    
+        return fig
+    
+    def draw(self, fig=None, **kwargs):
+        """ draw  entities
+        :param fig: matplotlib figure where to draw. figure(g) is called if missing
+        :return: kwargs with 'artists' list of drawn matplotlib artists as returned by Goulib.drawing.Entity.artist 
+        """
+        
+        if fig is None: 
+            fig=self.figure()
+            
+        ax=plt.gca()
+            
+        artists=[]
+    
+        for e in self:
+            try:
+                a=e.artist(ax,**kwargs)
+            except:
+                continue
+            if not isinstance(a,list):
+                a=[a]
+            artists.extend(a)
+        return fig, artists
+    
+    def render(self,format,**kwargs):
+        """ render graph to bitmap stream
+        :return: matplotlib figure as a byte stream in specified format
+        """
+        
+        fig,_=self.draw(**kwargs)
+        
+        from io import BytesIO
+        output = BytesIO()
+        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        plt.close(fig)
+        return output.getvalue()
+    
+    # for IPython notebooks
+    def _repr_png_(self): return self.render('png')
+    def _repr_svg_(self): return self.render('svg')
+    
+    def save(self,filename,**kwargs):
+        """ save graph in various formats"""
+        ext=filename.split('.')[-1].lower()
+        if ext!='dxf':
+            open(filename,'wb').write(self.render(ext,**kwargs))
+            return
+        # save as ASCII DXF V 12
+        from dxfwrite import DXFEngine as dxf   
+        drawing=dxf.drawing(filename)
+        #remove some default tables that we don't need
+        drawing.tables.layers.clear()
+        drawing.tables.styles.clear()
+        drawing.tables.viewports.clear()
+        # self.drawing.tables.linetypes.clear()
+        
+        entities=self.to_dxf(**kwargs)
+    
+        for e in entities:
+            drawing.add(e)
+
+        """
+        for i,layer in enumerate(layers):
+            if layer:
+                self.drawing.add_layer(layer,color=i,linetype=linetypes[i])
+        """
+        drawing.save()
+            
 
 def img2base64(img, fmt='PNG'):
     """

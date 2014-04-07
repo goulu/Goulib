@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>geom &mdash; Goulib 1.6.5 documentation</title>
+    <title>geom &mdash; Goulib 1.6.6 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -2664,10 +2664,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">=</span><span class="nb">dir</span> 
             
         <span class="bp">self</span><span class="o">.</span><span class="n">_apply_transform</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="c">#to set start/end angles</span>
+        <span class="c"># self.a is now start angle in [-pi,pi]</span>
+        <span class="c"># self.b is now end angle in [-pi,pi]</span>
         </div>
 <div class="viewcode-block" id="Arc2.angle"><a class="viewcode-back" href="../modules/geom.html#geom.Arc2.angle">[docs]</a>    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;:return: float arc angle&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span>
+        <span class="sd">&quot;&quot;&quot;:return: float signed arc angle&quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+        <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">&lt;</span><span class="n">a</span><span class="p">:</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span> <span class="c"># now b&gt;a</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">b</span><span class="o">-</span><span class="n">a</span> <span class="c">#positive angle</span>
+        <span class="k">if</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="o">!=</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">:</span> <span class="c">#complementary angle</span>
+            <span class="n">res</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">-</span><span class="n">res</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span>
         </div>
 <div class="viewcode-block" id="Arc2.__abs__"><a class="viewcode-back" href="../modules/geom.html#geom.Arc2.__abs__">[docs]</a>    <span class="k">def</span> <span class="nf">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;:return: float arc length&quot;&quot;&quot;</span>
@@ -3352,7 +3360,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

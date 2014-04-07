@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>drawing &mdash; Goulib 1.6.5 documentation</title>
+    <title>drawing &mdash; Goulib 1.6.6 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -71,9 +71,9 @@
 <p>Vector graphics
 reads geometry from .dxf and .svg files
 :requires: 
+* <a class="reference external" href="http://pypi.python.org/pypi/matplotlib/">matplotlib</a> for bitmap + svg output
 * <a class="reference external" href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> for dxf input
-* <a class="reference external" href="http://pypi.python.org/pypi/dxfwrite/">dxfwrite</a> for dxf output
-* PIL or <a class="reference external" href="http://pypi.python.org/pypi/pillow/">pillow</a> for bitmap output</p>
+* <a class="reference external" href="http://pypi.python.org/pypi/dxfwrite/">dxfwrite</a> for dxf output</p>
 <dl class="function">
 <dt id="drawing.Trans">
 <tt class="descclassname">drawing.</tt><tt class="descname">Trans</tt><big>(</big><em>scale=1</em>, <em>offset=None</em>, <em>rotation=None</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Trans" title="Permalink to this definition">¶</a></dt>
@@ -310,6 +310,21 @@ reads geometry from .dxf and .svg files
 </dd></dl>
 
 <dl class="staticmethod">
+<dt id="drawing.Entity.from_pdf">
+<em class="property">static </em><tt class="descname">from_pdf</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.from_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.from_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; pdf path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Entity of correct subtype</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
 <dt id="drawing.Entity.from_dxf">
 <em class="property">static </em><tt class="descname">from_dxf</tt><big>(</big><em>e</em>, <em>mat3</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Entity.from_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Entity.from_dxf" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -356,6 +371,11 @@ reads geometry from .dxf and .svg files
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
 <p>group of Entities</p>
 <dl class="method">
+<dt id="drawing.Group.append">
+<tt class="descname">append</tt><big>(</big><em>entity</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="drawing.Group.bbox">
 <tt class="descname">bbox</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.bbox" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -382,6 +402,38 @@ reads geometry from .dxf and .svg files
 <dt id="drawing.Group.copy">
 <tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#drawing.Group.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Group.swap">
+<tt class="descname">swap</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.swap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.swap" title="Permalink to this definition">¶</a></dt>
+<dd><p>swap start and end</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Group.artist">
+<tt class="descname">artist</tt><big>(</big><em>ax=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.artist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.artist" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of matplotlib.artist corresponding to all entities</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Group.to_dxf">
+<tt class="descname">to_dxf</tt><big>(</big><em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Group.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Group.to_dxf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">flatten list of dxf entities</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="drawing.Group.__weakref__">
@@ -430,6 +482,23 @@ reads geometry from .dxf and .svg files
 </dd></dl>
 
 <dl class="staticmethod">
+<dt id="drawing.Chain.from_pdf">
+<em class="property">static </em><tt class="descname">from_pdf</tt><big>(</big><em>path</em>, <em>color=None</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.from_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.from_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; pdf path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Entity of correct subtype</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">See:</th><td class="field-body"><a class="reference external" href="http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/PDF32000_2008.pdf">http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/PDF32000_2008.pdf</a> p. 132</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
 <dt id="drawing.Chain.from_svg">
 <em class="property">static </em><tt class="descname">from_svg</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.from_svg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.from_svg" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -466,20 +535,40 @@ reads geometry from .dxf and .svg files
 
 <dl class="method">
 <dt id="drawing.Chain.to_dxf">
-<tt class="descname">to_dxf</tt><big>(</big><em>split=False</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.to_dxf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">to_dxf</tt><big>(</big><em>**attr</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Chain.to_dxf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Chain.to_dxf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">polyline or list of entities along the chain</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="drawing.Drawing">
-<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Drawing</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">drawing.</tt><tt class="descname">Drawing</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#drawing.Group" title="drawing.Group"><tt class="xref py py-class docutils literal"><span class="pre">drawing.Group</span></tt></a></p>
-<p>list of Entits representing a vector graphics drawing</p>
+<p>list of Entities representing a vector graphics drawing</p>
 <dl class="method">
 <dt id="drawing.Drawing.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>filename</em>, <em>options=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.load">
+<tt class="descname">load</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.read_pdf">
+<tt class="descname">read_pdf</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.read_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.read_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a vector graphics on a .pdf file
+only the first page is parsed</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="drawing.Drawing.read_svg">
@@ -515,6 +604,40 @@ reads geometry from .dxf and .svg files
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.figure">
+<tt class="descname">figure</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.figure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.figure" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">matplotlib axis suitable for drawing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.draw">
+<tt class="descname">draw</tt><big>(</big><em>fig=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>draw  entities
+:param fig: matplotlib figure where to draw. figure(g) is called if missing
+:return: kwargs with &#8216;artists&#8217; list of drawn matplotlib artists as returned by Goulib.drawing.Entity.artist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.render">
+<tt class="descname">render</tt><big>(</big><em>format</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>render graph to bitmap stream
+:return: matplotlib figure as a byte stream in specified format</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="drawing.Drawing.save">
+<tt class="descname">save</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/drawing.html#Drawing.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#drawing.Drawing.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save graph in various formats</p>
 </dd></dl>
 
 </dd></dl>
@@ -553,7 +676,7 @@ reads geometry from .dxf and .svg files
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -12,14 +12,14 @@ __credits__ = []
 __license__ = "LGPL"
 
 import logging
+import math
 
 import networkx as nx # http://networkx.github.io/
 from rtree import index # http://toblerity.org/rtree/
+import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 
 import Goulib.math2 as math2
-import Goulib.itertools2 as itertools2
-
 
 _nk=0 # node key
 
@@ -28,22 +28,39 @@ class GeoGraph(nx.MultiGraph):
     if edges have a "length" attribute, it is used to compute distances,
     otherwise euclidian distance between nodes is used by default
     """
-    def __init__(self, G=None, **kwargs):
+    def __init__(self, data=None, **kwargs):
         """
         :param multi: boolean to control if multiple edges between nodes are allowed (True) or not (False)
         :param **kwargs: other parameters will be copied as attributes
         """
+        super(GeoGraph,self).__init__(None, **kwargs)
         
-        super(GeoGraph,self).__init__(None,**kwargs)
+        #create a rtree and store nodes in it
+        n=kwargs.get('dimension',None)
+        if n is None:
+            try: #guess dimension from first node
+                n=len(data.node.iterkeys().next())
+            except:
+                n=2
         prop=index.Property()
-        try: #guess dimension from first node
-            n=len(G.node.iterkeys().next())
-        except:
-            n=2
         prop.set_dimension(n)
         self.idx = index.Index(properties=prop)
-        if G:
-            self.add_edges_from(G.edges(data=True))
+        
+        if data:
+            if isinstance(data,scipy.spatial.qhull.Delaunay):
+                self.delauney=data
+                triangles=data.points[data.simplices]
+                for point in triangles:
+                    p=map(tuple,point) #convert from numpy to regular list
+                    self.add_edge(p[0],p[1])
+                    self.add_edge(p[1],p[2])
+                    self.add_edge(p[2],p[0])
+            elif isinstance(data,nx.Graph): # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
+                nx.convert.to_networkx_graph(data.adj,create_using=self,multigraph_input=data.is_multigraph())
+            else:
+                nx.convert.to_networkx_graph(data,create_using=self)
+        pass
+        
             
     def copy(self):
         """does not use deepcopy because the rtree index must be rebuilt"""
@@ -53,6 +70,13 @@ class GeoGraph(nx.MultiGraph):
         """:return: True if graph has at least one node
         """
         return self.number_of_nodes()>0
+    
+    def clear(self): 
+        #saves some graph attributes cleared by convert._prep_create_using
+        t,m=self.tol,self.multi
+        super(GeoGraph,self).clear()
+        self.multi=m
+        self.graph['tol']=t
     
     @property
     def tol(self):
@@ -129,10 +153,17 @@ class GeoGraph(nx.MultiGraph):
         """
         nodes closest to a given position
         :param p: (x,y) position tuple
-        :param skip: optional bool to skip n
-        :return: list of nodes
+        :param skip: optional bool to skip n itself
+        :return: list of nodes, minimal distance
         """
         if skip: n+=1
+        if n==1:
+            try: # does it already exist ?
+                self.node[p]
+                return [p],0
+            except:
+                pass
+        
         res,d=[],None
         for p2 in self.idx.nearest(p, num_results=n, objects='raw'):
             d=self.dist(p, p2)
@@ -146,32 +177,31 @@ class GeoGraph(nx.MultiGraph):
         edges=[]
         n=0
         while not edges and n<10:
-            n+=1 #handle more and more nodes untif we find one with edges
+            n+=1 #handle more and more nodes until we find one with edges
             nbunch,d=self.closest_nodes(p,n)
             edges=self.edges(nbunch=nbunch,data=data)
             
         return edges,d
         
-    def add_node(self, n, attr_dict=None, **attr):
+    def add_node(self, p, attr_dict=None, **attr):
         """add a node or return one already very close
         """
-        close,d=self.closest_nodes(n)
-        try:
-            node=close[0]
-        except: # point doesn't exist yet
-            node=None
-            
-        if node and d<=self.tol:
-            self.max_merge=max(d,self.__dict__.get('max_merge',0))
-        else:
+        try: #point already exists ?
+            self.node[p]
+            return p
+        except:
+            pass
+        
+        close,d=self.closest_nodes(p) #search for those within tolerance
+        if close and d<=self.tol:
+            return close[0]
+        else: # point doesn't exist yet : create it
             global _nk
             _nk+=1
             attr['key']=_nk
-            super(GeoGraph,self).add_node(n, attr_dict, **attr)
-            node=n
-            #p=_smallbox(n,self.tol)
-            self.idx.insert(_nk,node,node)
-        return node
+            super(GeoGraph,self).add_node(p, attr_dict, **attr)
+            self.idx.insert(_nk,p,p)
+        return p
     
     def add_nodes_from(self, nodes, **attr):
         """must be here because Graph.add_nodes_from doesn't call add_node cleanly as it should..."""
@@ -386,28 +416,22 @@ def draw_networkx(g, **kwargs):
         
     return kwargs
     
-def delauney_triangulation(nodes, qhull_options='Qt', **kwargs):
+def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
-    :param nodes: list of (x,y) nodes positions
+    :param nodes: list of (x,y) or (x,y,z) node positions
     :param qhull_options: string passed to scipy.spatial.Delaunay, which passes it to Qhull ( http://www.qhull.org/ )
-        'Qt' ensures all points are connected
+        * 'Qt' ensures all points are connected
+        * 'Qz' required when nodes lie on a sphere
+        * 'QJ' solves some singularity situations
     :param **kwargs: passed to the GeoGraph constructor
-    :return: GeoGraph with minimum spanning tree between  nodes
+    :return: GeoGraph with delauney triangulation between nodes
     see https://en.wikipedia.org/wiki/Delaunay_triangulation
     """
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
-    import numpy
-    from scipy.spatial import Delaunay
     points=numpy.array(nodes)
-    tri = Delaunay(points, qhull_options=qhull_options) 
+    tri = scipy.spatial.Delaunay(points, qhull_options=qhull_options, incremental=incremental) 
     kwargs['multi']=False #to avoid duplicating triangle edges below
-    g=GeoGraph(None,**kwargs)
-    triangles=points[tri.simplices]
-    for point in triangles:
-        p=map(tuple,point) #convert from numpy to regular list
-        g.add_edge(p[0],p[1])
-        g.add_edge(p[1],p[2])
-        g.add_edge(p[2],p[0])
+    g=GeoGraph(tri,dimension=tri.ndim,**kwargs)
     return g
 
 def euclidean_minimum_spanning_tree(nodes,**kwargs):
@@ -421,6 +445,19 @@ def euclidean_minimum_spanning_tree(nodes,**kwargs):
     for edge in nx.minimum_spanning_edges(d, weight='length'):
         g.add_edge(*edge)
     return g
+
+# Function to distribute N points on the surface of a sphere 
+# (source: http://www.softimageblog.com/archives/115)
+def points_on_sphere(N): 
+    pts = []   
+    inc = math.pi * (3 - math.sqrt(5)) 
+    off = 2 / float(N) 
+    for k in range(0, int(N)): 
+        y = k * off - 1 + (off / 2) 
+        r = math.sqrt(1 - y*y) 
+        phi = k * inc 
+        pts.append((math.cos(phi)*r, y, math.sin(phi)*r))   
+    return pts
         
         
     

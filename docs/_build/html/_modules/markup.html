@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>markup &mdash; Goulib 1.6.5 documentation</title>
+    <title>markup &mdash; Goulib 1.6.6 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -115,6 +115,29 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line_end</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">unbuff</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="tag"><a class="viewcode-back" href="../modules/markup.html#markup.tag">[docs]</a><span class="k">def</span> <span class="nf">tag</span><span class="p">(</span> <span class="n">tag</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generate full tag.&quot;&quot;&quot;</span>
+    <span class="n">single</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;single&#39;</span><span class="p">,</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>               <span class="c"># when value is None that means stuff like &lt;... checked&gt;</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>            <span class="c"># strip this so class_ will mean class, etc.</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;http_equiv&#39;</span><span class="p">:</span>         <span class="c"># special cases, maybe change _ to - overall?</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;http-equiv&#39;</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;accept_charset&#39;</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;accept-charset&#39;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">escape</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">between</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;</span><span class="si">%s</span><span class="s">&lt;/</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="n">tag</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> /&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="n">out</span>
 
 <span class="c"># tags which are reserved python keywords will be referred </span>
 <span class="c"># to by a leading underscore otherwise we end up with a syntax error</span></div>
@@ -136,8 +159,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
     </div>
 <div class="viewcode-block" id="element.__call__"><a class="viewcode-back" href="../modules/markup.html#markup.element.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 
         <span class="c"># if class_ was defined in parent it should be added to every element</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">class_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -145,19 +166,19 @@
                 <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;class_&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">class_</span>
             
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="o">**</span><span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
             <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="o">**</span><span class="n">mydict</span> <span class="p">)</span> <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span> <span class="p">]</span>
             <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
             
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">twotags</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="o">**</span><span class="n">mydict</span> <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">onetags</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">args</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="ow">in</span> <span class="n">_argsdicts</span><span class="p">(</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="n">mydict</span> <span class="p">)</span>    <span class="c"># here myarg is always None, because len( args ) = 0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">myarg</span><span class="p">,</span> <span class="o">**</span><span class="n">mydict</span> <span class="p">)</span>    <span class="c"># here myarg is always None, because len( args ) = 0</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ClosingError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deptags</span><span class="p">:</span>
@@ -165,27 +186,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidElementError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mode</span> <span class="p">)</span>
     </div>
-<div class="viewcode-block" id="element.render"><a class="viewcode-back" href="../modules/markup.html#markup.element.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">single</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">):</span>
+<div class="viewcode-block" id="element.render"><a class="viewcode-back" href="../modules/markup.html#markup.element.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">single</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Append the actual tags to content.&quot;&quot;&quot;</span>
-
-        <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tag</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">):</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>               <span class="c"># when value is None that means stuff like &lt;... checked&gt;</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>            <span class="c"># strip this so class_ will mean class, etc.</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;http_equiv&#39;</span><span class="p">:</span>         <span class="c"># special cases, maybe change _ to - overall?</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;http-equiv&#39;</span>
-                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;accept_charset&#39;</span><span class="p">:</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;accept-charset&#39;</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">escape</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span>
-        <span class="k">if</span> <span class="n">between</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;</span><span class="si">%s</span><span class="s">&lt;/</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">between</span><span class="p">,</span> <span class="n">tag</span> <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> /&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="n">out</span>
+        <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;single&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">out</span><span class="o">=</span><span class="n">tag</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">cgiprint</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -208,7 +213,7 @@
         <span class="sd">&quot;&quot;&quot;Append an opening tag.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">twotags</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">onetags</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">kwargs</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;strict_html&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deptags</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DeprecationError</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 </div></div>
@@ -647,7 +652,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

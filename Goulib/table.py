@@ -61,6 +61,9 @@ class Cell():
     def __repr__(self):
         return str(self.data)
     
+    def _repr_html_(self):
+        return self.html()
+    
     @staticmethod
     def read(x):
         """interprets x as int, float, string or None"""
@@ -71,9 +74,6 @@ class Cell():
         except:
             if x=='': x=None
         return x
-    
-    def __repr__html(self):
-        return self.html()
         
     def html(self,**kwargs):
         """:return: string HTML formatted cell
@@ -160,7 +160,7 @@ class Row():
     def __repr__(self):
         return str(self.data)
     
-    def __repr__html(self):
+    def _repr_html_(self):
         return self.html()
 
     def html(self,cell_args={},**kwargs):
@@ -201,7 +201,7 @@ class Table(list):
             res+=str(line)+'\n'
         return res
     
-    def __repr__html(self):
+    def _repr_html_(self):
         return self.html()
     
     def html(self,head=None,foot=None,colstyle=None,**kwargs):

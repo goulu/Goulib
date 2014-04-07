@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>graph &mdash; Goulib 1.6.5 documentation</title>
+    <title>graph &mdash; Goulib 1.6.6 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" /> 
+    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -71,7 +71,7 @@
 <p>efficient Euclidian Graphs for NetworkX and related algorithms</p>
 <dl class="class">
 <dt id="graph.GeoGraph">
-<em class="property">class </em><tt class="descclassname">graph.</tt><tt class="descname">GeoGraph</tt><big>(</big><em>G=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">graph.</tt><tt class="descname">GeoGraph</tt><big>(</big><em>data=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">networkx.classes.multigraph.MultiGraph</span></tt></p>
 <p>a Graph with nodes at specified positions.
 if edges have a &#8220;length&#8221; attribute, it is used to compute distances,
@@ -91,7 +91,7 @@ otherwise euclidian distance between nodes is used by default</p>
 </table>
 <dl class="method">
 <dt id="graph.GeoGraph.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>G=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>data=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -125,6 +125,11 @@ otherwise euclidian distance between nodes is used by default</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="graph.GeoGraph.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="graph.GeoGraph.tol">
@@ -212,8 +217,8 @@ otherwise euclidian distance between nodes is used by default</p>
 <tt class="descname">closest_nodes</tt><big>(</big><em>p</em>, <em>n=1</em>, <em>skip=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.closest_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.closest_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>nodes closest to a given position
 :param p: (x,y) position tuple
-:param skip: optional bool to skip n
-:return: list of nodes</p>
+:param skip: optional bool to skip n itself
+:return: list of nodes, minimal distance</p>
 </dd></dl>
 
 <dl class="method">
@@ -231,7 +236,7 @@ otherwise euclidian distance between nodes is used by default</p>
 
 <dl class="method">
 <dt id="graph.GeoGraph.add_node">
-<tt class="descname">add_node</tt><big>(</big><em>n</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.add_node" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_node</tt><big>(</big><em>p</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.add_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>add a node or return one already very close</p>
 </dd></dl>
 
@@ -265,7 +270,7 @@ side effect: updates largest merge in self.max_merge</p>
 
 <dl class="method">
 <dt id="graph.GeoGraph.remove_edge">
-<tt class="descname">remove_edge</tt><big>(</big><em>u</em>, <em>v=None</em>, <em>clean=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.remove_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.remove_edge" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">remove_edge</tt><big>(</big><em>u</em>, <em>v=None</em>, <em>key=None</em>, <em>clean=False</em><big>)</big><a class="reference internal" href="../_modules/graph.html#GeoGraph.remove_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.GeoGraph.remove_edge" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -378,14 +383,24 @@ side effect: updates largest merge in self.max_merge</p>
 
 <dl class="function">
 <dt id="graph.delauney_triangulation">
-<tt class="descclassname">graph.</tt><tt class="descname">delauney_triangulation</tt><big>(</big><em>nodes</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#delauney_triangulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.delauney_triangulation" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">graph.</tt><tt class="descname">delauney_triangulation</tt><big>(</big><em>nodes</em>, <em>qhull_options=''</em>, <em>incremental=False</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/graph.html#delauney_triangulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.delauney_triangulation" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; list of (x,y) nodes positions</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nodes</strong> &#8211; list of (x,y) or (x,y,z) node positions</li>
+<li><strong>qhull_options</strong> &#8211; string passed to scipy.spatial.Delaunay, which passes it to Qhull ( <a class="reference external" href="http://www.qhull.org/">http://www.qhull.org/</a> )
+* &#8216;Qt&#8217; ensures all points are connected
+* &#8216;Qz&#8217; required when nodes lie on a sphere
+* &#8216;QJ&#8217; solves some singularity situations</li>
+<li><strong>**kwargs</strong> &#8211; <p>passed to the GeoGraph constructor</p>
+</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">geograph with minimum spanning tree between  nodes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">GeoGraph with delauney triangulation between nodes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -408,6 +423,11 @@ side effect: updates largest merge in self.max_merge</p>
 <p>see <a class="reference external" href="https://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree">https://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree</a></p>
 </dd></dl>
 
+<dl class="function">
+<dt id="graph.points_on_sphere">
+<tt class="descclassname">graph.</tt><tt class="descname">points_on_sphere</tt><big>(</big><em>N</em><big>)</big><a class="reference internal" href="../_modules/graph.html#points_on_sphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph.points_on_sphere" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -425,7 +445,7 @@ side effect: updates largest merge in self.max_merge</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

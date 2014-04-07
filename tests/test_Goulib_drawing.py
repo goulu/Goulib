@@ -163,6 +163,59 @@ class TestEntity:
         # assert_equal(expected, entity.artist(ax, **kwargs))
         raise SkipTest # TODO: implement your test here
 
+    def test_from_pdf(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.from_pdf())
+        raise SkipTest # TODO: implement your test here
+
+    def test_svg_path(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.svg_path(currentpos))
+        raise SkipTest # TODO: implement your test here
+    
+class TestGroup:
+    @classmethod
+    def setup_class(self):
+        seg=Segment2((1,0),(2,3))
+        arc=Arc2((1,1),(0,0),radians(120))
+        circle=Circle((1,1),2)
+        self.group=Group([seg,arc,circle])
+    
+    def test___copy__(self):
+        # group = Group()
+        # assert_equal(expected, group.__copy__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_bbox(self):
+        # group = Group()
+        # assert_equal(expected, group.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # group = Group()
+        # assert_equal(expected, group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_artist(self):
+        # group = Group()
+        # assert_equal(expected, group.artist(ax, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_swap(self):
+        # group = Group()
+        # assert_equal(expected, group.swap())
+        raise SkipTest # TODO: implement your test here
+
+    def test_append(self):
+        # group = Group()
+        # assert_equal(expected, group.append(entity))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # group = Group()
+        # assert_equal(expected, group.to_dxf(**attr))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     def test___repr__(self):
         # chain = Chain()
@@ -208,18 +261,32 @@ class TestChain:
         # assert_equal(expected, chain.from_svg())
         raise SkipTest # TODO: implement your test here
 
+    def test_from_pdf(self):
+        # chain = Chain(data)
+        # assert_equal(expected, chain.from_pdf(color))
+        raise SkipTest # TODO: implement your test here
+
 class TestDrawing:
     @classmethod
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
         self.dxf= Drawing(self.path+'/test.dxf')
-        pass
+        self.pdf= Drawing(self.path+'/test.pdf')
+        self.svg= Drawing(self.path+'/test.svg')
+        
+    def test_load(self):
+        pass #tested above
+    
+    def test_save(self):
+        for ext in ['png','svg','dxf']:
+            self.dxf.save(self.path+'/test.dxf.%s'%ext)
+            self.pdf.save(self.path+'/test.pdf.%s'%ext)
+            self.svg.save(self.path+'/test.svg.%s'%ext)
 
     def test_img(self):
-        raise SkipTest #disabled for now
+        return
         img = self.dxf.img(size=[512, None], border=5,forcelayercolor=False, background='white')
         img.save('test.png') #todo add a test
-
 
     def test___init__(self):
         # drawing = Drawing(filename, options, **kwargs)
@@ -240,25 +307,29 @@ class TestDrawing:
         # assert_equal(expected, drawing.read_svg(filename, options, **kwargs))
         raise SkipTest # TODO: implement your test here
 
+    def test_read_pdf(self):
+        # drawing = Drawing(filename, options, **kwargs)
+        # assert_equal(expected, drawing.read_pdf(filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_draw(self):
+        # drawing = Drawing(filename, **kwargs)
+        # assert_equal(expected, drawing.draw(fig, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_figure(self):
+        # drawing = Drawing(filename, **kwargs)
+        # assert_equal(expected, drawing.figure(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_render(self):
+        # drawing = Drawing(filename, **kwargs)
+        # assert_equal(expected, drawing.render(format, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestImg2base64:
     def test_img2base64(self):
         # assert_equal(expected, img2base64(img, fmt))
-        raise SkipTest # TODO: implement your test here
-
-class TestGroup:
-    def test___copy__(self):
-        # group = Group()
-        # assert_equal(expected, group.__copy__())
-        raise SkipTest # TODO: implement your test here
-
-    def test_bbox(self):
-        # group = Group()
-        # assert_equal(expected, group.bbox())
-        raise SkipTest # TODO: implement your test here
-
-    def test_length(self):
-        # group = Group()
-        # assert_equal(expected, group.length())
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

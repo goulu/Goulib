@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>graph &mdash; Goulib 1.6.5 documentation</title>
+    <title>graph &mdash; Goulib 1.6.6 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.5 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -78,14 +78,14 @@
 <span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span> <span class="c"># http://networkx.github.io/</span>
 <span class="kn">from</span> <span class="nn">rtree</span> <span class="kn">import</span> <span class="n">index</span> <span class="c"># http://toblerity.org/rtree/</span>
+<span class="kn">import</span> <span class="nn">numpy</span><span class="o">,</span> <span class="nn">scipy.spatial</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 
 <span class="kn">import</span> <span class="nn">Goulib.math2</span> <span class="kn">as</span> <span class="nn">math2</span>
-<span class="kn">import</span> <span class="nn">Goulib.itertools2</span> <span class="kn">as</span> <span class="nn">itertools2</span>
-
 
 <span class="n">_nk</span><span class="o">=</span><span class="mi">0</span> <span class="c"># node key</span>
 
@@ -94,22 +94,39 @@
 <span class="sd">    if edges have a &quot;length&quot; attribute, it is used to compute distances,</span>
 <span class="sd">    otherwise euclidian distance between nodes is used by default</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="GeoGraph.__init__"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="GeoGraph.__init__"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param multi: boolean to control if multiple edges between nodes are allowed (True) or not (False)</span>
 <span class="sd">        :param **kwargs: other parameters will be copied as attributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         
-        <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c">#create a rtree and store nodes in it</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;dimension&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span> <span class="c">#guess dimension from first node</span>
+                <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">=</span><span class="mi">2</span>
         <span class="n">prop</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">Property</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span> <span class="c">#guess dimension from first node</span>
-            <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">n</span><span class="o">=</span><span class="mi">2</span>
         <span class="n">prop</span><span class="o">.</span><span class="n">set_dimension</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">prop</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">G</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">qhull</span><span class="o">.</span><span class="n">Delaunay</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delauney</span><span class="o">=</span><span class="n">data</span>
+                <span class="n">triangles</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">simplices</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span><span class="n">point</span><span class="p">)</span> <span class="c">#convert from numpy to regular list</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span> <span class="c"># pass only the adjacency matrix to ensure node keys aren&#39;t trashed in to_networkx_graph</span>
+                <span class="n">nx</span><span class="o">.</span><span class="n">convert</span><span class="o">.</span><span class="n">to_networkx_graph</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">adj</span><span class="p">,</span><span class="n">create_using</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">multigraph_input</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">is_multigraph</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nx</span><span class="o">.</span><span class="n">convert</span><span class="o">.</span><span class="n">to_networkx_graph</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">create_using</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">pass</span>
+        
             </div>
 <div class="viewcode-block" id="GeoGraph.copy"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;does not use deepcopy because the rtree index must be rebuilt&quot;&quot;&quot;</span>
@@ -119,6 +136,13 @@
         <span class="sd">&quot;&quot;&quot;:return: True if graph has at least one node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span>
+    </div>
+<div class="viewcode-block" id="GeoGraph.clear"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="c">#saves some graph attributes cleared by convert._prep_create_using</span>
+        <span class="n">t</span><span class="p">,</span><span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">multi</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi</span><span class="o">=</span><span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s">&#39;tol&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">t</span>
     </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="GeoGraph.tol"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.tol">[docs]</a>    <span class="k">def</span> <span class="nf">tol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -170,7 +194,7 @@
         <span class="sd">&quot;&quot;&quot;:return: nodes bounding box as (xmin,ymin,...),(xmax,ymax,...)&quot;&quot;&quot;</span>
         <span class="n">minmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="o">.</span><span class="n">bounds</span>
         <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">minmax</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
-        <span class="k">return</span> <span class="n">minmax</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span><span class="n">minmax</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">minmax</span><span class="p">[:</span><span class="n">n</span><span class="p">]),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">minmax</span><span class="p">[</span><span class="n">n</span><span class="p">:])</span>
         </div>
 <div class="viewcode-block" id="GeoGraph.box_size"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.box_size">[docs]</a>    <span class="k">def</span> <span class="nf">box_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;:return: (x,y) size&quot;&quot;&quot;</span>
@@ -195,10 +219,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        nodes closest to a given position</span>
 <span class="sd">        :param p: (x,y) position tuple</span>
-<span class="sd">        :param skip: optional bool to skip n</span>
-<span class="sd">        :return: list of nodes</span>
+<span class="sd">        :param skip: optional bool to skip n itself</span>
+<span class="sd">        :return: list of nodes, minimal distance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">skip</span><span class="p">:</span> <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">n</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span> <span class="c"># does it already exist ?</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">],</span><span class="mi">0</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
         <span class="n">res</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="p">[],</span><span class="bp">None</span>
         <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="o">.</span><span class="n">nearest</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="s">&#39;raw&#39;</span><span class="p">):</span>
             <span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
@@ -212,32 +243,31 @@
         <span class="n">edges</span><span class="o">=</span><span class="p">[]</span>
         <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">edges</span> <span class="ow">and</span> <span class="n">n</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">:</span>
-            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span> <span class="c">#handle more and more nodes untif we find one with edges</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span> <span class="c">#handle more and more nodes until we find one with edges</span>
             <span class="n">nbunch</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closest_nodes</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
             <span class="n">edges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">nbunch</span><span class="o">=</span><span class="n">nbunch</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
             
         <span class="k">return</span> <span class="n">edges</span><span class="p">,</span><span class="n">d</span>
         </div>
-<div class="viewcode-block" id="GeoGraph.add_node"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
+<div class="viewcode-block" id="GeoGraph.add_node"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;add a node or return one already very close</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">close</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closest_nodes</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">node</span><span class="o">=</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">except</span><span class="p">:</span> <span class="c"># point doesn&#39;t exist yet</span>
-            <span class="n">node</span><span class="o">=</span><span class="bp">None</span>
-            
-        <span class="k">if</span> <span class="n">node</span> <span class="ow">and</span> <span class="n">d</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_merge</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;max_merge&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span> <span class="c">#point already exists ?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">p</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="n">close</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closest_nodes</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="c">#search for those within tolerance</span>
+        <span class="k">if</span> <span class="n">close</span> <span class="ow">and</span> <span class="n">d</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># point doesn&#39;t exist yet : create it</span>
             <span class="k">global</span> <span class="n">_nk</span>
             <span class="n">_nk</span><span class="o">+=</span><span class="mi">1</span>
             <span class="n">attr</span><span class="p">[</span><span class="s">&#39;key&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">_nk</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">attr_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">)</span>
-            <span class="n">node</span><span class="o">=</span><span class="n">n</span>
-            <span class="c">#p=_smallbox(n,self.tol)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">_nk</span><span class="p">,</span><span class="n">node</span><span class="p">,</span><span class="n">node</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">node</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">attr_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">_nk</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span>
     </div>
 <div class="viewcode-block" id="GeoGraph.add_nodes_from"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.add_nodes_from">[docs]</a>    <span class="k">def</span> <span class="nf">add_nodes_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;must be here because Graph.add_nodes_from doesn&#39;t call add_node cleanly as it should...&quot;&quot;&quot;</span>
@@ -309,7 +339,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="c">#doesn&#39;t return created data... what a pity ...</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
         </div>
-<div class="viewcode-block" id="GeoGraph.remove_edge"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.remove_edge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">clean</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="GeoGraph.remove_edge"><a class="viewcode-back" href="../modules/graph.html#graph.GeoGraph.remove_edge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">clean</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param u: Node or Edge (Nodes tuple)</span>
 <span class="sd">        :param v: Node if u is a single Node</span>
@@ -320,7 +350,7 @@
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         
-        <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>   
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoGraph</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">key</span><span class="p">)</span>   
         
         <span class="k">if</span> <span class="n">clean</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
@@ -452,25 +482,22 @@
         
     <span class="k">return</span> <span class="n">kwargs</span>
     </div>
-<div class="viewcode-block" id="delauney_triangulation"><a class="viewcode-back" href="../modules/graph.html#graph.delauney_triangulation">[docs]</a><span class="k">def</span> <span class="nf">delauney_triangulation</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="delauney_triangulation"><a class="viewcode-back" href="../modules/graph.html#graph.delauney_triangulation">[docs]</a><span class="k">def</span> <span class="nf">delauney_triangulation</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">incremental</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param nodes: list of (x,y) nodes positions</span>
-<span class="sd">    :return: geograph with minimum spanning tree between  nodes</span>
+<span class="sd">    :param nodes: list of (x,y) or (x,y,z) node positions</span>
+<span class="sd">    :param qhull_options: string passed to scipy.spatial.Delaunay, which passes it to Qhull ( http://www.qhull.org/ )</span>
+<span class="sd">        * &#39;Qt&#39; ensures all points are connected</span>
+<span class="sd">        * &#39;Qz&#39; required when nodes lie on a sphere</span>
+<span class="sd">        * &#39;QJ&#39; solves some singularity situations</span>
+<span class="sd">    :param **kwargs: passed to the GeoGraph constructor</span>
+<span class="sd">    :return: GeoGraph with delauney triangulation between nodes</span>
 <span class="sd">    see https://en.wikipedia.org/wiki/Delaunay_triangulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c"># http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html</span>
-    <span class="kn">import</span> <span class="nn">numpy</span>
-    <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">Delaunay</span>
     <span class="n">points</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="n">tri</span> <span class="o">=</span> <span class="n">Delaunay</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s">&#39;Qt&#39;</span><span class="p">)</span> <span class="c">#option ensures all points are connected</span>
+    <span class="n">tri</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">Delaunay</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="n">qhull_options</span><span class="p">,</span> <span class="n">incremental</span><span class="o">=</span><span class="n">incremental</span><span class="p">)</span> 
     <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;multi&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">False</span> <span class="c">#to avoid duplicating triangle edges below</span>
-    <span class="n">g</span><span class="o">=</span><span class="n">GeoGraph</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">triangles</span><span class="o">=</span><span class="n">points</span><span class="p">[</span><span class="n">tri</span><span class="o">.</span><span class="n">simplices</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span><span class="n">point</span><span class="p">)</span> <span class="c">#convert from numpy to regular list</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">g</span><span class="o">=</span><span class="n">GeoGraph</span><span class="p">(</span><span class="n">tri</span><span class="p">,</span><span class="n">dimension</span><span class="o">=</span><span class="n">tri</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">g</span>
 </div>
 <div class="viewcode-block" id="euclidean_minimum_spanning_tree"><a class="viewcode-back" href="../modules/graph.html#graph.euclidean_minimum_spanning_tree">[docs]</a><span class="k">def</span> <span class="nf">euclidean_minimum_spanning_tree</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -484,6 +511,19 @@
     <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">minimum_spanning_edges</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s">&#39;length&#39;</span><span class="p">):</span>
         <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">g</span>
+
+<span class="c"># Function to distribute N points on the surface of a sphere </span>
+<span class="c"># (source: http://www.softimageblog.com/archives/115)</span></div>
+<div class="viewcode-block" id="points_on_sphere"><a class="viewcode-back" href="../modules/graph.html#graph.points_on_sphere">[docs]</a><span class="k">def</span> <span class="nf">points_on_sphere</span><span class="p">(</span><span class="n">N</span><span class="p">):</span> 
+    <span class="n">pts</span> <span class="o">=</span> <span class="p">[]</span>   
+    <span class="n">inc</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> 
+    <span class="n">off</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> 
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span> 
+        <span class="n">y</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">off</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">off</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> 
+        <span class="n">r</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="p">)</span> 
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">inc</span> 
+        <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">r</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">r</span><span class="p">))</span>   
+    <span class="k">return</span> <span class="n">pts</span>
         
         
     
@@ -504,7 +544,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

@@ -198,6 +198,11 @@ class TestGeoGraph:
         # assert_equal(expected, geo_graph.draw(**kwargs))
         raise SkipTest # TODO: implement your test here
 
+    def test_clear(self):
+        # geo_graph = GeoGraph(data, **kwargs)
+        # assert_equal(expected, geo_graph.clear())
+        raise SkipTest # TODO: implement your test here
+
 class TestRender:
     def test_render(self):
         pass # tested in test_save TODO : more tests with attributes
@@ -207,9 +212,9 @@ class TestDelauneyTriangulation:
         import time
         n=1000
         from random import random
-        nodes=[(random(),random()) for _ in range(n)]
         start=time.clock()
-        graph=delauney_triangulation(nodes,tol=0)
+        nodes=[(random(),random()) for _ in range(n)]
+        graph=delauney_triangulation(nodes, tol=0)
         print('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
@@ -239,6 +244,13 @@ class TestDrawNetworkx:
     def test_draw_networkx(self):
         # assert_equal(expected, draw_networkx(g, **kwargs))
         raise SkipTest # TODO: implement your test here
+
+class TestPointsOnSphere:
+    def test_points_on_sphere(self):
+        nodes=points_on_sphere(50)
+        sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
+        pass
+        
 
 if __name__=="__main__":
     import sys
