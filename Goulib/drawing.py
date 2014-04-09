@@ -221,20 +221,20 @@ class Entity(object):
             raise NotImplementedError
     
     @staticmethod
-    def from_svg(path):
+    def from_svg(path,color):
         """
         :param path: svg path
         :return: Entity of correct subtype
         """
-        return Chain.from_svg(path)
+        return Chain.from_svg(path,color)
     
     @staticmethod
-    def from_pdf(path):
+    def from_pdf(path,color):
         """
         :param path: pdf path
         :return: Entity of correct subtype
         """
-        return Chain.from_pdf(path)
+        return Chain.from_pdf(path,color)
         
     @staticmethod
     def from_dxf(e,mat3):
@@ -389,7 +389,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         return None
     
     @staticmethod
-    def from_pdf(path,color=None):
+    def from_pdf(path,color):
         """
         :param path: pdf path
         :return: Entity of correct subtype
@@ -404,16 +404,18 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         while path:
             code=path.pop(0)
             if code[0]=='l':
-                end=code[1:2]
+                end=code[1:3]
                 entity=Segment2(start,end)
             elif code[0]=='h':
                 entity=Segment2(start,home)
                 entity.color=chain.color
             elif code[0]=='c': #Bezier, not circle... 
                 x1,y1,x2,y2,x3,y3=code[1:]
-                #TODO read http://itc.ktu.lt/itc354/Riskus354.pdf and implement Arc...
-                entity=None
                 end=(x3,y3)
+                #TODO understand http://itc.ktu.lt/itc354/Riskus354.pdf and implement Arc cleanly
+                t0=Vector2(Point2(x1,y1)-start)*2
+                c=Point2(start)-t0.cross()
+                entity=Arc2(c,start,end)
             else:
                 logging.warning('unsupported path command %s'%code)
             if color: entity.color=color
@@ -426,12 +428,13 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         return chain
     
     @staticmethod
-    def from_svg(path):
+    def from_svg(path,color):
         """
         :param path: svg path
         :return: Entity of correct subtype
         """
         chain=Chain()
+        chain.color=color
         def _point(svg):
             return Point2(svg.real, svg.imag)
         for seg in path._segments:
@@ -559,11 +562,25 @@ class Drawing(Group):
         
         class _Device(PDFDevice):
             def paint_path(self, graphicstate, stroke, fill, evenodd, path):
-                e=Entity.from_pdf(path)
+                e=Entity.from_pdf(path,stroke.color)
                 if e:
                     d.append(e)
                 else:
                     pass #sometimes the path is empty ... TODO find why
+                
+        # the PDFPageInterpreter doesn't handle colors yet, so we patch it here:
+        class _Interpreter(PDFPageInterpreter):
+            # stroke
+            def do_S(self):
+                self.device.paint_path(self.graphicstate, self.scs, False, False, self.curpath)
+                self.curpath = []
+                return
+            
+            # setrgb-stroking
+            def do_RG(self, r, g, b):
+                from pdfminer.pdfcolor import LITERAL_DEVICE_RGB
+                self.do_CS(LITERAL_DEVICE_RGB)
+                self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
                 
         #then all we have to do is to launch PDFMiner's parser on the file        
         fp = open(filename, 'rb')
@@ -571,22 +588,29 @@ class Drawing(Group):
         document = PDFDocument(parser, '')
         rsrcmgr = PDFResourceManager()
         device = _Device(rsrcmgr)
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        interpreter = _Interpreter(rsrcmgr, device)
         page=PDFPage.create_pages(document).next() #process only first page
         interpreter.process_page(page)
+        return
             
     def read_svg(self,filename, options=None, **kwargs):
-        import re
-        from svg.path import parse_path
-        file=open(filename,'r')
-        for line in file:
-            d = re.search('path d="(.*)"', line)
-            if d:
-                try:
-                    path=parse_path(d.group(1))
-                    self.append(Entity.from_svg(path))   
-                except:
-                    logging.warning('unknown svg %s'%d.group(1))
+        #from http://stackoverflow.com/questions/15857818/python-svg-parser
+        from xml.dom import minidom
+        doc = minidom.parse(filename)  # parseString also exists
+
+        for path in doc.getElementsByTagName('path'):
+            #find the color... dirty, but simply understandable
+            color='black'
+            style=path.getAttribute('style')
+            for s in style.split(';'):
+                item=s.split(':')
+                if item[0]=='stroke':
+                    color=item[1]
+            # process the path
+            d=path.getAttribute('d')
+            from svg.path import parse_path
+            self.append(Entity.from_svg(parse_path(d),color))   
+        doc.unlink()
         
     def read_dxf(self, filename, options=None, **kwargs):
         """reads a .dxf file

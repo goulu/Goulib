@@ -4,6 +4,7 @@ dxfgrabber
 dxfwrite
 pillow
 svg.path
+pdfminer
 rtree
 matplotlib
 numpy

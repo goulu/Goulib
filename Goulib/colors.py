@@ -22,6 +22,22 @@ def hex_to_rgb(value,scale=1):
     lv = len(value)
     return tuple(scale*int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
 
+# http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
+
+def rgb_to_cmyk(r,g,b):
+    """:param r,g,b: floats of red,green,blue in [0..1] range
+    :return: tuple of 4 floats (cyan, magenta, yellow, black) in [0..1] range
+    """
+    c = 1 - r
+    m = 1 - g
+    y = 1 - b
+
+    k = min(c, m, y)
+    c = (c - k) / (1 - k)
+    m = (m - k) / (1 - k)
+    y = (y - k) / (1 - k)
+    return (c,m,y,k)
+
 #http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
     
 def color_range(n,start,end):
