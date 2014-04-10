@@ -7,8 +7,4 @@ install:
 script:
   nosetests --with-coverage --cover-package=Goulib
 after_success:
-<<<<<<< HEAD
   coveralls
-=======
-  coveralls
->>>>>>> b3f69f3ad9756b704ba547e5618b0be559f3605b
