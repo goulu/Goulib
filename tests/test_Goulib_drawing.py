@@ -270,18 +270,19 @@ class TestDrawing:
     @classmethod
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
-        self.dxf= Drawing(self.path+'/test.dxf')
-        self.pdf= Drawing(self.path+'/test.pdf')
-        self.svg= Drawing(self.path+'/test.svg')
+        self.dxf= Drawing(self.path+'/drawing.dxf')
+        self.pdf= Drawing(self.path+'/drawing.pdf')
+        self.svg= Drawing(self.path+'/drawing.svg')
         
     def test_load(self):
         pass #tested above
     
     def test_save(self):
         for ext in ['png','svg','dxf']:
-            self.dxf.save(self.path+'/test.dxf.%s'%ext)
-            self.pdf.save(self.path+'/test.pdf.%s'%ext)
-            self.svg.save(self.path+'/test.svg.%s'%ext)
+            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
+            self.svg.save(self.path+'/drawing.svg.%s'%ext)
+            self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
+            
 
     def test_img(self):
         return
@@ -332,6 +333,44 @@ class TestImg2base64:
         # assert_equal(expected, img2base64(img, fmt))
         raise SkipTest # TODO: implement your test here
 
-if __name__ == "__main__":
+class TestSpline:
+    def test___init__(self):
+        # spline = Spline(points)
+        raise SkipTest # TODO: implement your test here
+
+    def test_bbox(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_end(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.end())
+        raise SkipTest # TODO: implement your test here
+
+    def test_start(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.start())
+        raise SkipTest # TODO: implement your test here
+
+    def test_swap(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.swap())
+        raise SkipTest # TODO: implement your test here
+
+    def test_xy(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.xy())
+        raise SkipTest # TODO: implement your test here
+
+if __name__=="__main__":
+    import sys
     import nose
-    nose.runmodule()
+    from cStringIO import StringIO  
+    module_name = sys.modules[__name__].__file__
+
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
+    sys.stdout = old_stdout
+    print mystdout.getvalue()

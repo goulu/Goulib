@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Vector graphics
-reads geometry from .dxf and .svg files
+read/process/write geometry from .dxf, .pdf and .svg files
 :requires: 
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg output
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
@@ -18,8 +18,8 @@ from math import  radians, degrees, atan, pi, copysign
 import logging, operator
 
 try:
-    import matplotlib
-    matplotlib.use("Agg") #don't know why, but looks useful
+    # import matplotlib
+    # matplotlib.use("Agg") #don't know why, but looks useful
     import matplotlib.pyplot as plt
 except:
     logging.warning('matplotlib not imported : bitmap+svg export not available')
@@ -149,22 +149,32 @@ class Entity(object):
             return self.p2
         except: #probably a Circle
             return self.p
+        
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.start,self.end)
     
     @property
     def center(self):
         return rpoint(self.bbox().center)
     
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.start,self.end)
+    def bbox(self):
+        """
+        :return: :class:`BBox` bounding box of Entity"""
+        if isinstance(self,Segment2):
+            return BBox(self.start,self.end)
+        elif isinstance(self,Arc2):
+            #TODO : improve
+            rr = Vector2(self.r, self.r)
+            return BBox(self.c - rr, self.c + rr)
+        elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
+            rr = Vector2(self.r, self.r)
+            return BBox(self.c - rr, self.c + rr)
+
+        else:
+            raise NotImplementedError()
     
     def isclosed(self):
-        try:
-            return self.end==self.start
-        except: # Circle will fail
-            pass
-        if isinstance(self,Circle):
-            return True
-        raise NotImplementedError()
+        return self.end==self.start
     
     def isline(self):
         return isinstance(self,Line2) #or derived
@@ -178,27 +188,42 @@ class Entity(object):
     def artist(self, ax=None, **kwargs):
         """:return: matplotlib.artist corresponding to entity"""
         from matplotlib.lines import Line2D
-        from matplotlib.patches import Arc
+        import matplotlib.patches as patches
+        from matplotlib.path import Path
         import matplotlib.pyplot as plt
         import numpy as np
+        
         if ax is None : ax=plt.gca()
         if 'color' not in kwargs: #do not use setdefaut as self.color might be undefined (TODO find why)
             kwargs['color']=self.color
         if isinstance(self,Segment2):
             x=np.array((self.start.x, self.end.x))
             y=np.array((self.start.y, self.end.y))
-            return ax.add_line(Line2D(x,y,**kwargs))
+            return ax.add_artist(Line2D(x,y,**kwargs))
         if isinstance(self,Arc2):
             theta1=degrees(self.a)
             theta2=degrees(self.b)
             if self.dir<1 : #swap
                 theta1,theta2=theta2,theta1
             d=self.r*2
-            return ax.add_artist(Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs))
+            a=patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)
+            return ax.add_artist(a)
+        
+        #entities below may be filled, so let's handle the color first
+        if 'color' in kwargs: # color attribute refers to edgecolor for coherency
+            kwargs.setdefault('edgecolor',kwargs.pop('color'))
+            kwargs.setdefault('fill',False)
+        if isinstance(self,Circle): #must be after isinstance(self,Arc2)
+            a=patches.Circle(self.c.xy,self.r,**kwargs)
+            return ax.add_artist(a)
+        if isinstance(self,Spline):
+            path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+            a = patches.PathPatch(path, **kwargs)
+            return ax.add_artist(a)
         raise NotImplementedError
     
     def to_dxf(self,**attr):
-        """:return: dxf entity Line or Arc"""
+        """:return: dxf entity"""
         import dxfwrite.entities as dxf
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
@@ -216,7 +241,10 @@ class Entity(object):
                 extrusion_direction=None #default
             return dxf.Arc(radius=self.r, center=center, startangle=startangle, endangle=endangle, extrusion_direction=extrusion_direction, **attr)
         elif isinstance(self,Circle):
-           return dxf.Circle(center=self.c.xy, radius=self.r, **attr)
+            return dxf.Circle(center=self.c.xy, radius=self.r, **attr)
+        elif isinstance(self,Spline):
+            from dxfwrite import DXFEngine as dxf
+            return dxf.spline(self.xy, **attr)
         else: 
             raise NotImplementedError
     
@@ -270,25 +298,53 @@ class Entity(object):
         res.color=acadcolors[e.color % len(acadcolors)]
         res.layer=e.layer
         return res
-    
-    def bbox(self):
-        """
-        :return: :class:`BBox` bounding box of Entity"""
-        if isinstance(self,Segment2):
-            return BBox(self.start,self.end)
-        elif isinstance(self,Arc2):
-            #TODO : improve
-            rr = Vector2(self.r, self.r)
-            return BBox(self.c - rr, self.c + rr)
-        elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
-            rr = Vector2(self.r, self.r)
-            return BBox(self.c - rr, self.c + rr)
 
-        else:
-            raise NotImplementedError()
-
+#Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
+
+class Spline(Entity):
+    """cubic spline segment"""
+    
+    def __init__(self, points):
+        """:param points: list of (x,y) tuples"""
+        super(Spline,self).__init__()
+        self.p=[Point2(xy) for xy in points]
+       
+    @property
+    def start(self):
+        return self.p[0]
+    
+    @property
+    def end(self):
+        return self.p[-1]
+    
+    @property
+    def xy(self):
+        return [pt.xy for pt in self.p]
+    
+    def bbox(self):
+        res=BBox()
+        for p in self.p:
+            res+=p
+        return res
+    
+    def swap(self):
+        """ swap start and end"""
+        self.p.reverse() #reverse in place
+        
+    def _apply_transform(self, t):
+        self.p=[t*p for p in self.p]
+
+'''
+def Spline(pts):
+    # uses http://www.charlespetzold.com/blog/2012/12/Bezier-Circles-and-Bezier-Ellipses.html
+    # TODO understand http://itc.ktu.lt/itc354/Riskus354.pdf and implement Arc cleanly
+    (p0,p1,p2,p3)=pts
+    t0=Vector2(Point2(p1)-p0)/0.55
+    c=Point2(p0)-t0.cross()
+    return Arc2(c,p0,p3)
+'''
 
 class Group(list):
     """group of Entities"""
@@ -334,11 +390,11 @@ class Group(list):
             res.extend(a)
         return res
     
-    def to_dxf(self, **attr):
+    def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res=[]
         for e in self:
-            r=e.to_dxf(**attr)
+            r=e.to_dxf(**kwargs)
             if not isinstance(r,list): #flatten
                 r=[r]
             res.extend(r)
@@ -377,8 +433,8 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             return super(Chain,self).append(edge)
         if len(self)>1 : 
             return None
-        else: #try to reverse the first edge
-            pass
+        #try to reverse the first edge
+
         if self.start.dist(edge.start)<=tol:
             self[0].swap()
             return super(Chain,self).append(edge)
@@ -412,14 +468,12 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             elif code[0]=='c': #Bezier, not circle... 
                 x1,y1,x2,y2,x3,y3=code[1:]
                 end=(x3,y3)
-                #TODO understand http://itc.ktu.lt/itc354/Riskus354.pdf and implement Arc cleanly
-                t0=Vector2(Point2(x1,y1)-start)*2
-                c=Point2(start)-t0.cross()
-                entity=Arc2(c,start,end)
+                entity=Spline([start,(x1,y1),(x2,y2),end])
             else:
                 logging.warning('unsupported path command %s'%code)
+                raise NotImplementedError
             if color: entity.color=color
-            if entity: chain.append(entity)
+            chain.append(entity)
             start=end
         if len(chain)==1:
             return chain[0] #single entity
@@ -433,12 +487,20 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         :param path: svg path
         :return: Entity of correct subtype
         """
+        from svg.path import Line, CubicBezier
         chain=Chain()
         chain.color=color
         def _point(svg):
             return Point2(svg.real, svg.imag)
+        
         for seg in path._segments:
-            entity=Segment2(_point(seg.start),_point(seg.end))
+            if isinstance(seg,Line):
+                entity=Segment2(_point(seg.start),_point(seg.end)) 
+            elif isinstance(seg,CubicBezier):
+                entity=Spline([_point(seg.start),_point(seg.control1),_point(seg.control2),_point(seg.end)])
+            else:
+                logging.error('unknown segment %s'%seg)
+                entity=None #will crash below
             entity.color=chain.color
             chain.append(entity)
         return chain
@@ -505,7 +567,6 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             edge.color=res.color
             edge.layer=res.layer   
         return res
-
         
     def to_dxf(self,**attr):
         """:return: polyline or list of entities along the chain"""
@@ -593,23 +654,30 @@ class Drawing(Group):
         interpreter.process_page(page)
         return
             
-    def read_svg(self,filename, options=None, **kwargs):
+    def read_svg(self,filename, **kwargs):
         #from http://stackoverflow.com/questions/15857818/python-svg-parser
         from xml.dom import minidom
         doc = minidom.parse(filename)  # parseString also exists
-
+        trans=Trans()
+        trans.f=-1 #flip y axis
         for path in doc.getElementsByTagName('path'):
             #find the color... dirty, but simply understandable
-            color='black'
+            color,alpha=None,1
             style=path.getAttribute('style')
             for s in style.split(';'):
                 item=s.split(':')
-                if item[0]=='stroke':
+                if item[0]=='opacity':
+                    alpha=float(item[1])
+                elif item[0]=='stroke':
                     color=item[1]
+            if color is None or alpha==0 : #ignore picture frame
+                continue
             # process the path
             d=path.getAttribute('d')
             from svg.path import parse_path
-            self.append(Entity.from_svg(parse_path(d),color))   
+            e=Entity.from_svg(parse_path(d),color)
+            e=trans*e
+            self.append(e)   
         doc.unlink()
         
     def read_dxf(self, filename, options=None, **kwargs):
@@ -749,11 +817,11 @@ class Drawing(Group):
         """:return: matplotlib axis suitable for drawing """
         
         fig=plt.figure(**kwargs)
-        try:
-            box=self.bbox()
-            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax),alpha=0) #draw a transparent diagonal to size everything
-        except: #probably nothing to draw ...
-            pass
+
+        box=self.bbox()
+        #for some reason we have to plot something in order to size the window (found no other way top do it...)
+        plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
+
         plt.axis('equal')
 
         import pylab
@@ -775,13 +843,11 @@ class Drawing(Group):
         artists=[]
     
         for e in self:
-            try:
-                a=e.artist(ax,**kwargs)
-            except:
-                continue
+            a=e.artist(ax,**kwargs)
             if not isinstance(a,list):
                 a=[a]
             artists.extend(a)
+                
         return fig, artists
     
     def render(self,format,**kwargs):

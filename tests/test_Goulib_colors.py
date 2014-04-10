@@ -53,6 +53,11 @@ class TestColor:
         # assert_equal(expected, color.hex())
         raise SkipTest # TODO: implement your test here
 
+class TestRgbToCmyk:
+    def test_rgb_to_cmyk(self):
+        # assert_equal(expected, rgb_to_cmyk(r, g, b))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()
