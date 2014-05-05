@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Goulib : My Python Library" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Goulib</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/goulu/Goulib">View on GitHub</a>
+
+          <h1 id="project_title">Goulib</h1>
+          <h2 id="project_tagline">My Python Library</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/goulu/Goulib/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/goulu/Goulib/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="goulib" class="anchor" href="#goulib"><span class="octicon octicon-link"></span></a>Goulib</h1>
+
+<p>My Python library of useful code found and written for various projects</p>
+
+<p>author
+:   Philippe Guglielmetti <a href="mailto:goulib@goulu.net">goulib@goulu.net</a>
+    <img src="https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif%0A%20:target:%20https://www.ohloh.net/accounts/543923?ref=Tiny" alt="ohloh"></p>
+
+<p>copyright
+:   Copyright 2013 Philippe Guglielmetti</p>
+
+<p>license
+:   LGPL (see LICENSE.TXT)</p>
+
+<blockquote>
+<p>target
+:   <a href="https://coveralls.io/r/goulu/Goulib">https://coveralls.io/r/goulu/Goulib</a></p>
+
+<h2>
+<a name="modules" class="anchor" href="#modules"><span class="octicon octicon-link"></span></a>Modules</h2>
+</blockquote>
+
+<ul>
+<li>  datetime2 : additions to datetime</li>
+<li>  itertools2 : additions to itertools</li>
+<li>  math2 : additions to math standard library</li>
+<li>  interval : operations on [x..y[ intervals</li>
+<li>  piecewise: piecewise-defined functions</li>
+<li>  polynomial: polynomials (branch of <a href="http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/">Rick Muller's
+reciepe</a>)</li>
+<li>  motion : generation of motion laws</li>
+<li>  table : Table class with Excel + CSV + HTML I/O, easy access to
+columns, and much more</li>
+<li>
+<p>workdays : WorkCalendar class with datetime operations on working
+hours</p>
+
+<p>merges and improves
+<a href="http://pypi.python.org/pypi/BusinessHours/">BusinessHours</a> and
+<a href="http://pypi.python.org/pypi/workdays/">workdays</a> packages</p>
+</li>
+<li>  colors : web (hex) colors dictionary and related functions</li>
+<li>  geom : 2D geometry</li>
+<li>  drawing : Vector graphics with I/O from .dxf and .svg formats</li>
+<li>  graph : efficient Euclidian Graphs for NetworkX and related
+algorithms</li>
+<li>
+<p>optim : Optimization algorithms</p>
+
+<p>Travelling Salesman Problem (TSP) hill climbing + simulated
+annealing</p>
+</li>
+<li><p>markup : simple HTML output (branch of
+<a href="http://pypi.python.org/pypi/markup/">markup</a> )</p></li>
+</ul><h2>
+<a name="resources" class="anchor" href="#resources"><span class="octicon octicon-link"></span></a>Resources</h2>
+
+<p>installation
+:   "pip install Goulib"</p>
+
+<p>distribution
+:   <a href="https://pypi.python.org/pypi/Goulib">https://pypi.python.org/pypi/Goulib</a></p>
+
+<p>documentation
+:   <a href="https://goulib.readthedocs.org/">https://goulib.readthedocs.org/</a></p>
+
+<p>source
+:   <a href="https://github.com/goulu/Goulib">https://github.com/goulu/Goulib</a></p>
+
+<p>changelog
+:   <a href="https://github.com/goulu/goulib/blob/master/CHANGES.rst">https://github.com/goulu/goulib/blob/master/CHANGES.rst</a></p>
+
+<p>tests status
+:   <img src="https://travis-ci.org/goulu/Goulib.png?branch=master%0A%20:target:%20https://travis-ci.org/goulu/Goulib" alt="travis"><img src="https://coveralls.io/repos/goulu/Goulib/badge.png" alt="coveralls"></p>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>Goulib uses only standard Python libs, except: - graph needs
+<a href="http://networkx.github.io/">NetworkX</a> and
+<a href="http://toblerity.org/rtree/">RTree</a> + some algorithms need
+<a href="http://scipy.org/">SciPy</a> and <a href="http://numpy.org/">NumPy</a></p>
+
+<ul>
+<li>  drawings needs:
+
+<ul>
+<li>  <a href="http://pypi.python.org/pypi/dxfgrabber/">dxfgrabber</a> and
+<a href="http://pypi.python.org/pypi/dxfwrite/">dxfwrite</a>
+</li>
+<li>  PIL or <a href="http://pypi.python.org/pypi/pillow/">pillow</a> for bitmap
+output (Pillow is prefered over PIL because of Travis CI tests)</li>
+</ul>
+</li>
+<li>  ~table.Table.read_xls needs
+<a href="http://pypi.python.org/pypi/xlrd/">xlrd</a>
+</li>
+<li>  ~table.Table.read_html needs
+<a href="http://pypi.python.org/pypi/lxml/">lxml</a>
+</li>
+</ul><p>automated <a href="http://pypi.python.org/pypi/nose/">nose</a> tests generated by
+<a href="http://pypi.python.org/pypi/pythoscope/">pythoscope</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Goulib maintained by <a href="https://github.com/goulu">goulu</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
