@@ -16,6 +16,16 @@ library of useful code for scientific + technical applications
   :target: https://coveralls.io/r/goulu/Goulib
   :alt: Tests
   
+:author: Philippe Guglielmetti goulib@goulu.net |ohloh| |endorse|
+:copyright: Copyright 2013 Philippe Guglielmetti
+:license: LGPL (see LICENSE.TXT)
+
+.. |endorse| image:: https://api.coderwall.com/goulu/endorsecount.png
+    :target: https://coderwall.com/goulu
+    
+.. |ohloh| image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
+	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
+  
 :installation: "pip install Goulib"
 :distribution: https://pypi.python.org/pypi/Goulib
 :documentation: https://goulib.readthedocs.org/
