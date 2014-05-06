@@ -4,7 +4,7 @@ Goulib
 library of useful code for scientific + technical applications
 
 .. image:: https://pypip.in/license/Goulib/badge.png
-    :target: https://pypi.python.org/pypi/Goulib/
+    :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
     :alt: License
 .. image:: https://pypip.in/version/Goulib/badge.png
     :target: https://pypi.python.org/pypi/Goulib/
@@ -15,17 +15,12 @@ library of useful code for scientific + technical applications
 .. image:: https://coveralls.io/repos/goulu/Goulib/badge.png
   :target: https://coveralls.io/r/goulu/Goulib
   :alt: Tests
-  
-:author: Philippe Guglielmetti goulib@goulu.net |ohloh| |endorse|
-:copyright: Copyright 2013 Philippe Guglielmetti
-:license: LGPL (see LICENSE.TXT)
-
-.. |endorse| image:: https://api.coderwall.com/goulu/endorsecount.png
-    :target: https://coderwall.com/goulu
-    
-.. |ohloh| image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
+.. image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
 	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
+.. image:: https://api.coderwall.com/goulu/endorsecount.png
+    :target: https://coderwall.com/goulu
   
+:author: Philippe Guglielmetti goulib@goulu.net
 :installation: "pip install Goulib"
 :distribution: https://pypi.python.org/pypi/Goulib
 :documentation: https://goulib.readthedocs.org/
