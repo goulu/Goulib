@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-define "motion laws", functions of time which return (position, velocity, acceleration, jerk) tuples
+functions of time which provide (position, velocity, acceleration, jerk) tuples
 """
 from __future__ import division #"true division" everywhere
 

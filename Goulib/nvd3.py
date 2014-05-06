@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-generate JavaScript charts using http://nvd3.org/
-outputs strings to inline in HTML : no fancy JSON or server dependent stuff
+JavaScript charts using http://nvd3.org/ and and http://d3js.org
+( Obsolete. use `python-nvd3 <http://pypi.python.org/pypi/python-nvd3/>`_ which is derived from this module. )
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"

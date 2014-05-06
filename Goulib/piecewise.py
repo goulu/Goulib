@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-piecewise-defined Exprs
+piecewise-defined functions
 """
 from __future__ import division #"true division" everywhere
 

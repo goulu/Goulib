@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Vector graphics
-read/process/write geometry from .dxf, .pdf and .svg files
+handle vector graphics in .dxf, .svg and .pdf formats
+
 :requires: 
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg output
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input

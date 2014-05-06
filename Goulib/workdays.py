@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 WorkCalendar class with datetime operations on working hours
+merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"

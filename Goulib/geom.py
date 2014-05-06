@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-A module providing vector, matrix and quaternion operations for use in 2D and 3D graphics applications.
+Vector, matrix and quaternion operations + line, arc, circle entities for use in 2D and 3D graphics applications.
 
 based on euclid http://code.google.com/p/pyeuclid
 """

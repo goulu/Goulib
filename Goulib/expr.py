@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Math expressions
+simple symbolic math expressions
 """
 
 __author__ = "Philippe Guglielmetti"

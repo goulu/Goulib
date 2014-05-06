@@ -3,25 +3,10 @@
 # This code is in the public domain, it comes
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.
+"""
+simple HTML/XML generation (forked from http://markup.sourceforge.net/ v 1.9)
+"""
 
-__date__ = '1 October 2012'
-__version__ = '1.9'
-__doc__= """
-This is markup.py - a Python module that attempts to
-make it easier to generate HTML/XML from a Python program
-in an intuitive, lightweight, customizable and pythonic way.
-
-The code is in the public domain.
-
-Version: %s as of %s.
-
-Documentation and further info is at http://markup.sourceforge.net/
-
-Please send bug reports, feature requests, enhancement
-ideas or questions to nogradi at gmail dot com.
-
-Installation: drop markup.py somewhere into your Python path.
-""" % ( __version__, __date__ )
 
 try:
     basestring

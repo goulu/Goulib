@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 """\
- Polynomial.py - A set of utilities to manipulate polynomials. This consists
- of a set of simple functions to convert polynomials to a Python list, and
+ manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by  Rick Muller
+ 
+ This consists  of a set of simple functions to convert polynomials to a Python list, and
  manipulate the resulting lists for multiplication, addition, and
  power functions. There is also a class that wraps these functions
  to make their use a little more natural.
 
  This can also evaluate the polynomials at a value, and take integrals
  and derivatives of the polynomials.
-
- Written by Rick Muller.
- http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/
 """
 from __future__ import division #"true division" everywhere
 
