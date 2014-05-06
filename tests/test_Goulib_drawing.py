@@ -278,16 +278,11 @@ class TestDrawing:
         pass #tested above
     
     def test_save(self):
-        for ext in ['png','svg','dxf']:
+        for ext in ['dxf','png','svg','pdf']:
             self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             self.svg.save(self.path+'/drawing.svg.%s'%ext)
             self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
             
-
-    def test_img(self):
-        return
-        img = self.dxf.img(size=[512, None], border=5,forcelayercolor=False, background='white')
-        img.save('test.png') #todo add a test
 
     def test___init__(self):
         # drawing = Drawing(filename, options, **kwargs)

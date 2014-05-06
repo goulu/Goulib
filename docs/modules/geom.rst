@@ -1,8 +1,0 @@
-:mod:`geom`
-===========
-
-.. automodule:: geom
-    :show-inheritance:
-    :members:
-    :undoc-members:
-    :special-members:

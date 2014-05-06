@@ -61,7 +61,7 @@ def color_range(n,start,end):
         res.append(hex)
     return res
 
-color = {'aqua': '#00ffff',
+color = {
     'black': '#000000',
     'blue': '#0000ff',
     'fuchsia': '#ff00ff',

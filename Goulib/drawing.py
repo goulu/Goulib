@@ -27,8 +27,9 @@ except:
 from math2 import rint
 from geom import *
 
-# http://sub-atomic.com/~moses/acadcolors.html
-acadcolors = ['black','red','yellow','green','cyan','blue','magenta','white']
+# http://sub-atomic.com/~moses/acadcolors.html 
+# 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
+acadcolors = ['black','red','yellow','lime','aqua','blue','magenta','white']
 
 def Trans(scale=1, offset=None, rotation=None):
     """
@@ -222,9 +223,26 @@ class Entity(object):
             return ax.add_artist(a)
         raise NotImplementedError
     
+    def _dxf_color(self):
+        from colors import color_lookup
+        try:
+            color=self.color
+        except:
+            return 0
+        # if color is an #rrggb code, find the corresponding color name
+        if color in color_lookup:
+            color=color_lookup[color]
+        # then find the name in acad color
+        try:
+            return acadcolors.index(color)
+        except:
+            pass
+        return 0 #layer color
+    
     def to_dxf(self,**attr):
         """:return: dxf entity"""
         import dxfwrite.entities as dxf
+        attr['color']=self._dxf_color()
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
         elif isinstance(self,Arc2):
@@ -243,8 +261,12 @@ class Entity(object):
         elif isinstance(self,Circle):
             return dxf.Circle(center=self.c.xy, radius=self.r, **attr)
         elif isinstance(self,Spline):
-            from dxfwrite import DXFEngine as dxf
-            return dxf.spline(self.xy, **attr)
+            from dxfwrite import curves as dxf
+            spline=dxf.Bezier(**attr)
+            spline.start(self.start.xy,(self.p[1]-self.start).xy)
+            spline.append(self.end.xy,(self.p[2]-self.end).xy)
+            return spline
+            return dxf.Spline(self.xy, **attr) # builds a POLYLINE3D (???) with 100 segments ...
         else: 
             raise NotImplementedError
     
@@ -322,6 +344,11 @@ class Spline(Entity):
     @property
     def xy(self):
         return [pt.xy for pt in self.p]
+    
+    @property   
+    def length(self):
+        """:return: float (very) approximate length"""
+        return sum((x.dist(self.p[i - 1]) for i, x in enumerate(self.p) if i>0))
     
     def bbox(self):
         res=BBox()
@@ -568,22 +595,26 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             edge.layer=res.layer   
         return res
         
-    def to_dxf(self,**attr):
+    def to_dxf(self, split=False, **attr):
         """:return: polyline or list of entities along the chain"""
-        split=attr.get('split',False)
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
-    
+        
+        #assume chain color is the same as the first element's
+        color=self[0]._dxf_color()
         from dxfwrite.entities import Polyline
-        attr['flags']=1 if self.isclosed() else 0
-        res=Polyline(**attr)
+        flags=1 if self.isclosed() else 0
+        res=Polyline(color=color, flags=flags, **attr)
             
         for e in self:
-            if isinstance(e, Arc2):
+            if isinstance(e,Line2):
+                res.add_vertex(e.start.xy)
+            elif isinstance(e, Arc2):
                 bulge=tan(e.angle()/4)
                 res.add_vertex(e.start.xy,bulge=bulge)
-            else: #assume it's a Line
-                res.add_vertex(e.start.xy)
+            else: #we have a Spline in the chain. Split it for now
+                return super(Chain,self).to_dxf(**attr)
+                
         if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
@@ -662,7 +693,8 @@ class Drawing(Group):
         trans.f=-1 #flip y axis
         for path in doc.getElementsByTagName('path'):
             #find the color... dirty, but simply understandable
-            color,alpha=None,1
+            color=path.getAttribute('fill') #assign filling color to default stroke color
+            alpha=1
             style=path.getAttribute('style')
             for s in style.split(';'):
                 item=s.split(':')

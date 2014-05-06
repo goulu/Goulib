@@ -1,10 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
+"""
+useful decorators
+"""
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2014, Philippe Guglielmetti"
+__credits__ = []
+__license__ = "LGPL"
 
 import functools
-# Decorators
-
 
 #http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):
@@ -17,17 +21,33 @@ def memoize(obj):
         return cache[key]
     return memoizer
 
-"""
-def memoize(f, maxcache=None, cache={}):
-    '''Decorator to keep a cache of input/output for a given function'''
-    cachelen = [0]
-    def g(*args, **kwargs):
-        key = (f, tuple(args), frozenset(kwargs.items()))
-        if maxcache is not None and cachelen[0] >= maxcache:
-            return f(*args, **kwargs)
-        if key not in cache:
-            cache[key] = f(*args, **kwargs)
-            cachelen[0] += 1
-        return cache[key]
-    return g
-"""
+
+import logging
+
+def debug(func):
+    # Customize these messages
+    ENTRY_MESSAGE = 'Entering {}'
+    EXIT_MESSAGE = 'Exiting {}'
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        logger=logging.getLogger()
+        logger.info(ENTRY_MESSAGE.format(func.__name__)) 
+        level=logger.getEffectiveLevel()
+        logger.setLevel(logging.DEBUG)
+        f_result = func(*args, **kwds)
+        logger.setLevel(level)
+        logger.info(EXIT_MESSAGE.format(func.__name__)) 
+        return f_result
+    return wrapper
+
+def nodebug(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        logger=logging.getLogger()
+        level=logger.getEffectiveLevel()
+        logger.setLevel(logging.INFO)
+        f_result = func(*args, **kwds)
+        logger.setLevel(level)
+        return f_result
+    return wrapper

@@ -59,7 +59,7 @@ class GeoGraph(nx.MultiGraph):
                 nx.convert.to_networkx_graph(data.adj,create_using=self,multigraph_input=data.is_multigraph())
             else:
                 nx.convert.to_networkx_graph(data,create_using=self)
-        pass
+        self.render_args={}
         
             
     def copy(self):
@@ -323,12 +323,14 @@ class GeoGraph(nx.MultiGraph):
     
         return draw_networkx(self, **kwargs)
     
-    def render(self,format,**kwargs):
+    def render(self,format='svg',**kwargs):
         """ render graph to bitmap stream
+        :param format: string defining the format. 'svg' by default for INotepads
         :return: matplotlib figure as a byte stream in specified format
         """
         
-        fig=self.draw(**kwargs)['fig']
+        self.render_args.update(kwargs)
+        fig=self.draw(**self.render_args)['fig']
         
         from io import BytesIO
         output = BytesIO()

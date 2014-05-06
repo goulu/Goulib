@@ -1,7 +1,7 @@
-:mod:`itertools2`
-=================
+colors
+====================
 
-.. automodule:: itertools2
+.. automodule:: Goulib.colors
     :show-inheritance:
     :members:
     :undoc-members:

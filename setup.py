@@ -18,15 +18,16 @@ def get_version():
 
 setup(
     name='Goulib',
+    packages=['Goulib'],
     version=get_version(),
-    description="My Python Library",
+    description="library of useful code for scientific + technical applications",
     long_description=read('README.rst'),
-    keywords='plot, graph, nvd3, d3',
+    keywords='math, geometry, graph, optimization, drawing',
     author='Philippe Guglielmetti',
     author_email='goulib@goulu.net',
     url='http://github.com/goulu/goulib',
     license='LGPL',
-    packages=['Goulib'],
+    
     scripts=[],
     install_requires=[
         'setuptools',

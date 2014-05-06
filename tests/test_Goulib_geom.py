@@ -5,15 +5,62 @@ from Goulib.geom import *
 
 from math import *
 
-class TestArgPair:
-    def test_arg_pair(self):
-        assert_equal(argPair(1,2),(1,2))
-        assert_equal(argPair((1,2)),(1,2))
-        assert_equal(argPair([1,2]),(1,2))
-        
-        assert_equal(argPair(1),(1,1))
-        
+class TestGeometry:
+    #tested in derived classes
+    @raises(NotImplementedError)
+    def test_connect(self):
+        Geometry().connect(1)
 
+    @raises(NotImplementedError)
+    def test_distance(self):
+        Geometry().distance(1)
+
+    @raises(NotImplementedError)
+    def test_intersect(self):
+        Geometry().intersect(1)
+    
+    @raises(NotImplementedError)
+    def test_point(self):
+        Geometry().point(1)
+
+    @raises(NotImplementedError)
+    def test_tangent(self):
+        Geometry().tangent(1)
+
+    def test_intersect_case_2(self):
+        # geometry = Geometry()
+        # assert_equal(expected, geometry.intersect(other))
+        raise SkipTest # TODO: implement your test here
+    
+class TestPoint2:
+    @classmethod
+    def setup_class(self):
+        self.p00=Point2(0,0)
+        self.p10=Point2(1,0)
+        self.p01=Point2(0,1)
+        self.p11=Point2(1) #both components are 1 ...
+        
+    def test___repr__(self):
+        assert_equal(repr(self.p10),'Point2(1, 0)')
+
+    def test_connect(self):
+        assert_equal(self.p10.connect(self.p01),Segment2(self.p10,self.p01))
+
+    def test_distance(self):
+        assert_equal(self.p10.distance(self.p10),0)
+        assert_equal(self.p10.distance(self.p00),1)
+        assert_equal(self.p10.distance(self.p01),sqrt(2))
+
+    def test_intersect(self):
+        # point2 = Point2()
+        # assert_equal(expected, point2.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_dist(self):
+        # point2 = Point2()
+        # assert_equal(expected, point2.dist(other))
+        raise SkipTest # TODO: implement your test here
+    
 class TestVector2:
     
     @classmethod
@@ -699,62 +746,6 @@ class TestQuaternion:
         # assert_equal(expected, quaternion.rotate_matrix(m))
         raise SkipTest # TODO: implement your test here
 
-class TestGeometry:
-    #tested in derived classes
-    @raises(NotImplementedError)
-    def test_connect(self):
-        Geometry().connect(1)
-
-    @raises(NotImplementedError)
-    def test_distance(self):
-        Geometry().distance(1)
-
-    @raises(NotImplementedError)
-    def test_intersect(self):
-        Geometry().intersect(1)
-    
-    @raises(NotImplementedError)
-    def test_point(self):
-        Geometry().point(1)
-
-    @raises(NotImplementedError)
-    def test_tangent(self):
-        Geometry().tangent(1)
-
-    def test_intersect_case_2(self):
-        # geometry = Geometry()
-        # assert_equal(expected, geometry.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-class TestPoint2:
-    @classmethod
-    def setup_class(self):
-        self.p00=Point2(0,0)
-        self.p10=Point2(1,0)
-        self.p01=Point2(0,1)
-        self.p11=Point2(1) #both components are 1 ...
-        
-    def test___repr__(self):
-        assert_equal(repr(self.p10),'Point2(1, 0)')
-
-    def test_connect(self):
-        assert_equal(self.p10.connect(self.p01),Segment2(self.p10,self.p01))
-
-    def test_distance(self):
-        assert_equal(self.p10.distance(self.p10),0)
-        assert_equal(self.p10.distance(self.p00),1)
-        assert_equal(self.p10.distance(self.p01),sqrt(2))
-
-    def test_intersect(self):
-        # point2 = Point2()
-        # assert_equal(expected, point2.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_dist(self):
-        # point2 = Point2()
-        # assert_equal(expected, point2.dist(other))
-        raise SkipTest # TODO: implement your test here
-
 class TestPolar:
     def test_polar(self):
         # assert_equal(expected, Polar(mag, angle))
@@ -1090,6 +1081,14 @@ class TestPlane:
         # plane = Plane(*args)
         # assert_equal(expected, plane.intersect(other))
         raise SkipTest # TODO: implement your test here
+    
+class TestArgPair:
+    def test_arg_pair(self):
+        assert_equal(argPair(1,2),(1,2))
+        assert_equal(argPair((1,2)),(1,2))
+        assert_equal(argPair([1,2]),(1,2))
+        
+        assert_equal(argPair(1),(1,1))
 
 if __name__ == "__main__":
     import nose
