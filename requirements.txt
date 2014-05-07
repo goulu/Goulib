@@ -1,10 +1,10 @@
+pdfminer==20140328
 xlrd
 lxml
 dxfgrabber
 dxfwrite
-pillow
 svg.path
-pdfminer==20140328
+pillow
 rtree
 matplotlib
 numpy
