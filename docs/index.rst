@@ -1,30 +1,30 @@
 Goulib
 ======
 
-library of useful code for scientific + technical applications
+library of useful Python code for scientific + technical applications
 
-:author: Philippe Guglielmetti goulib@goulu.net |ohloh| |endorse|
-:copyright: Copyright 2013 Philippe Guglielmetti
-:license: LGPL (see LICENSE.TXT)
-
-.. |endorse| image:: https://api.coderwall.com/goulu/endorsecount.png
-    :target: https://coderwall.com/goulu
-    
-.. |ohloh| image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
-	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
-    
-.. |travis| image:: https://travis-ci.org/goulu/Goulib.png?branch=master
+.. image:: https://pypip.in/license/Goulib/badge.png
+    :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
+    :alt: License
+.. image:: https://pypip.in/version/Goulib/badge.png
+    :target: https://pypi.python.org/pypi/Goulib/
+    :alt: Version
+.. image:: https://travis-ci.org/goulu/Goulib.png?branch=master
     :target: https://travis-ci.org/goulu/Goulib
-    
-.. |coveralls| image:: https://coveralls.io/repos/goulu/Goulib/badge.png
+    :alt: Build
+.. image:: https://coveralls.io/repos/goulu/Goulib/badge.png
   :target: https://coveralls.io/r/goulu/Goulib
+  :alt: Tests
+.. image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
+	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
+.. image:: https://api.coderwall.com/goulu/endorsecount.png
+    :target: https://coderwall.com/goulu
   
+:author: Philippe Guglielmetti goulib@goulu.net
 :installation: "pip install Goulib"
 :distribution: https://pypi.python.org/pypi/Goulib
 :documentation: https://goulib.readthedocs.org/
 :source: https://github.com/goulu/Goulib
-:changelog: https://github.com/goulu/goulib/blob/master/CHANGES.rst
-:tests status: |travis| |coveralls|
 
 Modules
 -------
