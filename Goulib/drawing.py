@@ -26,6 +26,7 @@ except:
     
 from math2 import rint
 from geom import *
+from itertools2 import split
 
 # http://sub-atomic.com/~moses/acadcolors.html 
 # 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
@@ -279,12 +280,12 @@ class Entity(object):
         return Chain.from_svg(path,color)
     
     @staticmethod
-    def from_pdf(path,color):
+    def from_pdf(path,trans,color):
         """
         :param path: pdf path
         :return: Entity of correct subtype
         """
-        return Chain.from_pdf(path,color)
+        return Chain.from_pdf(path,trans,color)
         
     @staticmethod
     def from_dxf(e,mat3):
@@ -332,6 +333,11 @@ class Spline(Entity):
         """:param points: list of (x,y) tuples"""
         super(Spline,self).__init__()
         self.p=[Point2(xy) for xy in points]
+        
+    def __copy__(self):
+        return self.__class__(self.p)
+    
+    copy = __copy__
        
     @property
     def start(self):
@@ -472,40 +478,52 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         return None
     
     @staticmethod
-    def from_pdf(path,color):
+    def from_pdf(path,trans,color):
         """
         :param path: pdf path
         :return: Entity of correct subtype
         :see: http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/PDF32000_2008.pdf p. 132
         
         """
+        def _pt(*args):
+            return trans(Point2(*args))
+        
         chain=Chain()
-        code,x,y=path.pop(0)
-        assert(code=='m')
-        home=(x,y)
-        start=home
-        while path:
-            code=path.pop(0)
-            if code[0]=='l':
-                end=code[1:3]
+        start=None # ensure exception if 'm' is not first
+        for code in path:
+            if code[0]=='m':
+                if start:
+                    logging.error("multiple m's in pdf path %s"%path)
+                    break # return chain till here, ignore the rest
+                home=_pt(code[1:3])
+                start=home
+                entity=None
+                continue
+            elif code[0]=='l': #line
+                end=_pt(code[1:3])
                 entity=Segment2(start,end)
-            elif code[0]=='h':
+            elif code[0]=='c': #Bezier 2 control points (no arcs in pdf!)
+                x1,y1,x2,y2,x3,y3=code[1:]
+                end=_pt(x3,y3)
+                entity=Spline([start,_pt(x1,y1),_pt(x2,y2),end])
+            elif code[0]=='v': #Bezier 1 control point
+                x2,y2,x3,y3=code[1:]
+                end=_pt(x3,y3)
+                entity=Spline([start,start,_pt(x2,y2),end])
+            elif code[0]=='y': #Bezier 0 control point
+                end=_pt(code[1:3])
+                entity=Spline([start,start,end,end])
+            elif code[0]=='h': #close to home
                 entity=Segment2(start,home)
                 entity.color=chain.color
-            elif code[0]=='c': #Bezier, not circle... 
-                x1,y1,x2,y2,x3,y3=code[1:]
-                end=(x3,y3)
-                entity=Spline([start,(x1,y1),(x2,y2),end])
             else:
-                logging.warning('unsupported path command %s'%code)
+                logging.warning('unsupported path command %s'%code[0])
                 raise NotImplementedError
-            if color: entity.color=color
+            entity.color=color
             chain.append(entity)
             start=end
         if len(chain)==1:
             return chain[0] #single entity
-        if len(chain)==0:
-            pass
         return chain
     
     @staticmethod
@@ -650,15 +668,31 @@ class Drawing(Group):
         # PDF's are fairly complex documents organized hierarchically
         # PDFMiner parses them using a stack and calls a "Device" to process entities
         # so here we define a Device that processes only "paths" one by one:
-        d=self
+        me=self
         
         class _Device(PDFDevice):
             def paint_path(self, graphicstate, stroke, fill, evenodd, path):
-                e=Entity.from_pdf(path,stroke.color)
-                if e:
-                    d.append(e)
-                else:
-                    pass #sometimes the path is empty ... TODO find why
+                color=None
+                try: color=stroke.color
+                except: pass
+                if not color:
+                    try: color=fill.color
+                    except: pass
+                t=Matrix3()
+                # geom.Matrix 3 has the following format:
+                # a b c 
+                # e f g 
+                # i j k 
+                # so we read the components already available in self.ctm:
+                t.a,t.b,t.e,t.f,t.c,t.g=tuple(self.ctm)
+                for sub in split(path,lambda x:x[0]=='m',True):
+                    if not sub: #first sub is empty because 'm' occurs in first place
+                        continue
+                    e=Entity.from_pdf(sub,t,color)
+                    if e:
+                        me.append(e)
+                    else:
+                        logging.warning('pdf path ignored %s'%sub)
                 
         # the PDFPageInterpreter doesn't handle colors yet, so we patch it here:
         class _Interpreter(PDFPageInterpreter):
@@ -668,11 +702,31 @@ class Drawing(Group):
                 self.curpath = []
                 return
             
+            # fill
+            def do_f(self):
+                self.device.paint_path(self.graphicstate, self.scs, self.ncs, False, self.curpath)
+                self.curpath = []
+                return
+            
             # setrgb-stroking
             def do_RG(self, r, g, b):
                 from pdfminer.pdfcolor import LITERAL_DEVICE_RGB
                 self.do_CS(LITERAL_DEVICE_RGB)
                 self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+                
+            # setcolor stroking
+            def do_sc(self):
+                r,g,b=self.pop(self.scs.ncomponents)
+                self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+
+            # setcolor nonstroking
+            def do_scn(self):
+                try:
+                    r,g,b=self.pop(self.ncs.ncomponents)
+                    self.ncs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+                except:
+                    pass
+            
                 
         #then all we have to do is to launch PDFMiner's parser on the file        
         fp = open(filename, 'rb')
@@ -681,8 +735,9 @@ class Drawing(Group):
         rsrcmgr = PDFResourceManager()
         device = _Device(rsrcmgr)
         interpreter = _Interpreter(rsrcmgr, device)
-        page=PDFPage.create_pages(document).next() #process only first page
-        interpreter.process_page(page)
+        for page in PDFPage.create_pages(document):
+            interpreter.process_page(page)
+            break #handle one page only
         return
             
     def read_svg(self,filename, **kwargs):
