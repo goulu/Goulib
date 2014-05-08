@@ -1,7 +1,7 @@
 Goulib
 ======
 
-library of useful code for scientific + technical applications
+library of useful Python code for scientific + technical applications
 
 .. image:: https://pypip.in/license/Goulib/badge.png
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
