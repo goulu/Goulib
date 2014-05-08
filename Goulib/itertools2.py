@@ -83,9 +83,9 @@ def flatten(lstlsts):
     """Flatten a list of lists"""
     return (b for a in lstlsts for b in a)
 
-def compact(it):
-    """Filter None values from iterator"""
-    return ifilter(bool, it)
+def compact(iterable):
+    """:returns: iterator skipping None values from iterable"""
+    return ifilter(bool, iterable)
 
 def groups(iterable, n, step):
     """Make groups of 'n' elements from the iterable advancing
@@ -250,8 +250,12 @@ def all_pairs(size):
         for j in rand_seq(size):
             yield (i,j)
             
-def split(iterable,condition):
-    """@return list of elements in iterable that satisfy condition, and those that don't"""
+# WARNING : filter2 has been renamed from "split" at v.1.7.0 for coherency
+def filter2(iterable,condition):
+    """ like filter, https://docs.python.org/2/library/functions.html#filter
+    but returns 2 lists : 
+    - list of elements in iterable that satisfy condition
+    - list of those that don't"""
     yes,no=[],[]
     for x in iterable:
         if condition(x): 
@@ -259,6 +263,37 @@ def split(iterable,condition):
         else:
             no.append(x)
     return yes,no
+
+def ifind(iterable,f):
+    """iterates through items in iterable where f(item) == True."""
+    for i,item in enumerate(iterable):
+        if f(item): 
+            yield i,item
+            
+def find(iterable,f):
+    """Return first item in iterable where f(item) == True."""
+    return ifind(iterable,f).next()
+
+def isplit(iterable,sep,include_sep=False):
+    """ split iterable by separators or condition
+    :param sep: value or function(item) returning True for items that separate
+    :param include_sep: bool. If True the separators items are included in output, at beginning of each sub-iterator
+    :return: iterates through slices before, between, and after separators
+    """
+    indexes=[i for i,_ in ifind(iterable,sep)]
+    indexes.append(None) # will be the last j
+    indexes.insert(0,0 if include_sep else -1)
+    for i,j in pairwise(indexes):
+        yield islice(iterable,i if include_sep else i+1,j)
+
+# WARNING : "split" was the former name of "filter2" before v.1.7.0
+def split(iterable,sep,include_sep=False):
+    """ like https://docs.python.org/2/library/stdtypes.html#str.split, but for iterable
+    :param sep: value or function(item) returning True for items that separate
+    :param include_sep: bool. If True the separators items are included in output, at beginning of each sub-iterator
+    :return: list of iterable slices before, between, and after separators
+    """
+    return [list(x) for x in isplit(iterable,sep,include_sep)]
 
 def next_permutation(seq, pred=cmp):
     """Like C++ std::next_permutation() but implemented as
