@@ -2,7 +2,7 @@ language: python
 python:
   - 2.7
 install:
-  - pip install -r requirements.txt
+  - pip install --allow-all-external -r requirements.txt 
   - pip install coveralls
 script:
   nosetests --with-coverage --cover-package=Goulib
