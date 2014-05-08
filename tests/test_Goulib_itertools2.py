@@ -1,4 +1,4 @@
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true, assert_false
 from nose import SkipTest
 
 from Goulib.itertools2 import *
@@ -55,8 +55,7 @@ class TestFlatten:
 
 class TestCompact:
     def test_compact(self):
-        # assert_equal(expected, compact(it))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(list(compact([None,1,2,None,3,None])),[1,2,3])
 
 class TestGroups:
     def test_groups(self):
@@ -85,33 +84,28 @@ class TestIreduce:
 
 class TestUnique:
     def test_unique(self):
-        # assert_equal(expected, unique(iterable, key))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(''.join(unique('AAAABBBCCDAABBB')),'ABCD')
+        assert_equal(''.join(unique('ABBCcAD', str.lower)),'ABCD')
 
 class TestIdentity:
     def test_identity(self):
         # assert_equal(expected, identity(x))
         raise SkipTest # TODO: implement your test here
 
-class TestOccurrences:
-    def test_occurrences(self):
-        # assert_equal(expected, occurrences(it, exchange))
-        raise SkipTest # TODO: implement your test here
-
 class TestAny:
     def test_any(self):
-        # assert_equal(expected, any(seq, pred))
-        raise SkipTest # TODO: implement your test here
+        assert_true(any((1,2,3,4),lambda x:x>3))
+        assert_false(any((1,2,3,4),lambda x:x>4))
 
 class TestAll:
     def test_all(self):
-        # assert_equal(expected, all(seq, pred))
-        raise SkipTest # TODO: implement your test here
-
+        assert_true(all((1,2,3,4),lambda x:x<5))
+        assert_false(all((1,2,3,4),lambda x:x<4))
+        
 class TestNo:
     def test_no(self):
-        # assert_equal(expected, no(seq, pred))
-        raise SkipTest # TODO: implement your test here
+        assert_true(no((1,2,3,4),lambda x:x<1))
+        assert_false(no((1,2,3,4),lambda x:x<2))
 
 class TestTakenth:
     def test_takenth(self):
@@ -158,11 +152,30 @@ class TestAllPairs:
     def test_all_pairs(self):
         # assert_equal(expected, all_pairs(size))
         raise SkipTest # TODO: implement your test here
+    
+class TestFilter2:
+    def test_filter2(self):
+        yes,no=filter2([1,2,3,4,3,2,1],lambda x:x<3)
+        assert_equal(yes,[1,2,2,1])
+        assert_equal(no,[3,4,3])
+
+class TestIfind:
+    def test_ifind(self):
+        pass #tested below
+
+class TestFind:
+    def test_find(self):
+        assert_equal(find([0,1,2,3,4],lambda x:x>2),(3,3))
+
+class TestIsplit:
+    def test_isplit(self):
+        pass #tested below
 
 class TestSplit:
     def test_split(self):
-        # assert_equal(expected, split(iterable, condition))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(split([0,1,2,-1,3,4,5], lambda x:x<0),[[0,1,2],[3,4,5]])
+        assert_equal(split([-1,0,1,2,-1,3,4,5,-1], lambda x:x<0),[[],[0,1,2],[3,4,5],[]])
+        assert_equal(split([-1,0,1,2,-1,3,4,5,-1], lambda x:x<0,True),[[],[-1,0,1,2],[-1,3,4,5],[-1]])
 
 class TestNextPermutation:
     def test_next_permutation(self):

@@ -323,6 +323,11 @@ class TestDrawing:
         # assert_equal(expected, drawing.render(format, **kwargs))
         raise SkipTest # TODO: implement your test here
 
+    def test_img(self):
+        # drawing = Drawing(filename, **kwargs)
+        # assert_equal(expected, drawing.img(size, border, box, layers, ignore, forcelayercolor, antialias, background))
+        raise SkipTest # TODO: implement your test here
+
 class TestImg2base64:
     def test_img2base64(self):
         # assert_equal(expected, img2base64(img, fmt))
@@ -356,6 +361,11 @@ class TestSpline:
     def test_xy(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.xy())
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.length())
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
