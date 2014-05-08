@@ -20,7 +20,7 @@ setup(
     name='Goulib',
     packages=['Goulib'],
     version=get_version(),
-    description="library of useful code for scientific + technical applications",
+    description="library of useful Python code for scientific + technical applications",
     long_description=read('README.rst'),
     keywords='math, geometry, graph, optimization, drawing',
     author='Philippe Guglielmetti',
