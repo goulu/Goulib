@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>decorators &mdash; Goulib 1.6.6 documentation</title>
+    <title>decorators &mdash; Goulib 1.7.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.6.6',
+        VERSION:     '1.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Goulib 1.6.6 documentation" href="../index.html" />
+    <link rel="top" title="Goulib 1.7.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.7.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>
@@ -66,11 +66,15 @@
   <h1>Source code for decorators</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/python</span>
 <span class="c"># -*- coding: utf-8 -*-</span>
-<span class="c"># https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">useful decorators</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Philippe Guglielmetti&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2014, Philippe Guglielmetti&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;LGPL&quot;</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="c"># Decorators</span>
-
 
 <span class="c">#http://wiki.python.org/moin/PythonDecoratorLibrary</span>
 <div class="viewcode-block" id="memoize"><a class="viewcode-back" href="../modules/decorators.html#decorators.memoize">[docs]</a><span class="k">def</span> <span class="nf">memoize</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -82,21 +86,37 @@
             <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">memoizer</span>
+
 </div>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">def memoize(f, maxcache=None, cache={}):</span>
-<span class="sd">    &#39;&#39;&#39;Decorator to keep a cache of input/output for a given function&#39;&#39;&#39;</span>
-<span class="sd">    cachelen = [0]</span>
-<span class="sd">    def g(*args, **kwargs):</span>
-<span class="sd">        key = (f, tuple(args), frozenset(kwargs.items()))</span>
-<span class="sd">        if maxcache is not None and cachelen[0] &gt;= maxcache:</span>
-<span class="sd">            return f(*args, **kwargs)</span>
-<span class="sd">        if key not in cache:</span>
-<span class="sd">            cache[key] = f(*args, **kwargs)</span>
-<span class="sd">            cachelen[0] += 1</span>
-<span class="sd">        return cache[key]</span>
-<span class="sd">    return g</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<div class="viewcode-block" id="debug"><a class="viewcode-back" href="../modules/decorators.html#decorators.debug">[docs]</a><span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="c"># Customize these messages</span>
+    <span class="n">ENTRY_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Entering {}&#39;</span>
+    <span class="n">EXIT_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Exiting {}&#39;</span>
+
+    <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ENTRY_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span> 
+        <span class="n">level</span><span class="o">=</span><span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">f_result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">EXIT_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span> 
+        <span class="k">return</span> <span class="n">f_result</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</div>
+<div class="viewcode-block" id="nodebug"><a class="viewcode-back" href="../modules/decorators.html#decorators.nodebug">[docs]</a><span class="k">def</span> <span class="nf">nodebug</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="n">f_result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f_result</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
 </pre></div>
 
           </div>
@@ -113,7 +133,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Goulib 1.6.6 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Goulib 1.7.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
