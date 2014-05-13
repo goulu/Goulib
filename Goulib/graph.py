@@ -12,14 +12,46 @@ __credits__ = []
 __license__ = "LGPL"
 
 import logging
-import math
+import math, math2
 
 import networkx as nx # http://networkx.github.io/
-from rtree import index # http://toblerity.org/rtree/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 
-import Goulib.math2 as math2
+try:
+    from rtree import index # http://toblerity.org/rtree/
+    RTREE=True
+except: #fallback, especially because I couldn't manage to install rtree on travis-ci
+    RTREE=False
+    
+if not RTREE:
+    logging.warning('rtree not available, falling back to slow version')
+    import itertools2 #lazy import
+    class index: #mimics rtree.index module
+
+        class Property:
+            def set_dimension(self,n):
+                self.n=n
+
+        class Index(dict):
+            """fallback for rtree.index"""
+            def __init__(self,properties):
+                self.prop=properties
+                self.bounds=[None]*properties.n*2 # minx,miny,maxx,maxy, ...
+            def count(self,ignored):
+                return len(self)
+            def insert(self,k,p,_):
+                self[k]=p
+                for i,c in enumerate(p):
+                    v=self.bounds[i]
+                    self.bounds[i]=min(c if v is None else v,c)
+                    v=self.bounds[self.prop.n+i]
+                    self.bounds[self.prop.n+i]=max(c if v is None else v,c)
+            def delete(self,k,_):
+                del self[k]
+            def nearest(self,p, num_results, objects='raw'):
+                """ very inefficient, but remember it's a fallback..."""
+                return itertools2.best(self.values(),key=lambda q:math2.dist(p,q),n=num_results)
 
 _nk=0 # node key
 
@@ -345,7 +377,10 @@ class GeoGraph(nx.MultiGraph):
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
         ext=filename.split('.')[-1].lower()
-        open(filename,'wb').write(self.render(ext,**kwargs))
+        if ext=='dxf':
+            write_dxf(self,filename)
+        else:
+            open(filename,'wb').write(self.render(ext,**kwargs))
     
 def figure(g,**kwargs):
     """:return: matplotlib axis suitable for drawing graph g"""
@@ -417,6 +452,34 @@ def draw_networkx(g, **kwargs):
         nx.draw_networkx_labels(g, pos, **kwargs)
         
     return kwargs
+
+def to_drawing(g, d=None, edges=[]):
+    """
+    draws Graph to a `Drawing`
+    :param g: Networkx Graph
+    :param d: existing `Drawing` to draw onto, or None to create a new Drawing
+    :param edges: iterable of edges (with data) that will be added, in the same order. By default all edges are drawn
+    :return: Drawing
+    
+    Graph edges with an 'entity' property
+    """
+    import drawing, geom
+    if d is None: d=drawing.Drawing()
+    if not edges:
+        edges=g.edges(data=True)
+    for u,v,data in edges:
+        try:
+            e=data['entity']
+        except:
+            e=geom.Segment2(u,v)
+        d.append(e)
+    return d
+    
+    
+    
+def write_dxf(g,filename):
+    """writes Graph in .dxf format"""
+    to_drawing(g).save(filename)
     
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
