@@ -3,15 +3,7 @@
 *.pyo
 .svn
 _svn
-_build/doctrees
-*.class
-*.pyc
-*.pyo
-.svn
-_svn
 dist
 .pythoscope
 _update.bat
-docs/_build/doctrees
-docs/_build
 docs/_build
