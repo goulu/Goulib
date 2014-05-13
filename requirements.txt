@@ -5,6 +5,7 @@ dxfgrabber
 dxfwrite
 svg.path
 pillow
+networkx
 matplotlib
 numpy
 scipy

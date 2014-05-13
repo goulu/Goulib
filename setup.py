@@ -16,6 +16,8 @@ def get_version():
     finally:
         f.close()
 
+from pip.req import parse_requirements
+
 setup(
     name='Goulib',
     packages=['Goulib'],
@@ -29,13 +31,11 @@ setup(
     license='LGPL',
     
     scripts=[],
-    install_requires=[
-        'setuptools',
-    ],
-    extras_require = {
-        'Excel':  ['xlrd'],
-        'dxf2img': ['PIL','dxfgrabber'],
-    },
+
+    # parse_requirements() returns generator of pip.req.InstallRequirement objects
+    install_reqs = parse_requirements('requirements.txt'),
+    extras_require = parse_requirements('optional-requirements.txt'),
+
     test_suite="nose.collector",       
     classifiers=[
         'Development Status :: 5 - Production/Stable',
