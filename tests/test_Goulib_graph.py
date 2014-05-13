@@ -17,13 +17,13 @@ class TestGeoGraph:
         self.logi=GeoGraph(multi=False)
         nodes={}
         from Goulib.table import Table
-        for line in Table(path+'/localisation.csv'):
+        for line in Table(path+'/Localisation.csv'):
             name=line[0]
             pos=tuple([line[3],-line[4]]) #flip Y to keep North North ...
             nodes[name]=pos
 
         
-        mat=Table(path+'/matrice.csv')
+        mat=Table(path+'/Matrice.csv')
         for line in mat:
             end=nodes[line[0]]
             for i,v in enumerate(line[2:]):
