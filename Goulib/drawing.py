@@ -138,8 +138,7 @@ def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
 class Entity(object):
     """Base class for all drawing entities"""
     
-    def __init__(self):
-        self.color='black' #default color
+    color='black' #default color
        
     @property
     def start(self):
@@ -166,7 +165,7 @@ class Entity(object):
             return BBox(self.start,self.end)
         elif isinstance(self,Arc2):
             #TODO : improve
-            rr = Vector2(self.r, self.r)
+            rr = Vector2(self.r, self.r) 
             return BBox(self.c - rr, self.c + rr)
         elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
@@ -229,7 +228,7 @@ class Entity(object):
         try:
             color=self.color
         except:
-            return 0
+            return -1
         # if color is an #rrggb code, find the corresponding color name
         if color in color_lookup:
             color=color_lookup[color]
@@ -238,12 +237,14 @@ class Entity(object):
             return acadcolors.index(color)
         except:
             pass
-        return 0 #layer color
+        return -1 #layer color
     
     def to_dxf(self,**attr):
         """:return: dxf entity"""
         import dxfwrite.entities as dxf
-        attr['color']=self._dxf_color()
+        color=self._dxf_color()
+        if color>=0:
+            attr['color']=color
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
         elif isinstance(self,Arc2):
@@ -489,6 +490,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             return trans(Point2(*args))
         
         chain=Chain()
+        chain.color=color #TODO handle multicolor chains
         start=None # ensure exception if 'm' is not first
         for code in path:
             if code[0]=='m':
@@ -640,7 +642,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
     
-    def __init__(self, filename, **kwargs):
+    def __init__(self, filename=None, **kwargs):
         if filename:
             self.load(filename,**kwargs)
             
@@ -757,7 +759,7 @@ class Drawing(Group):
                     alpha=float(item[1])
                 elif item[0]=='stroke':
                     color=item[1]
-            if color is None or alpha==0 : #ignore picture frame
+            if not color or alpha==0 : #ignore picture frame
                 continue
             # process the path
             d=path.getAttribute('d')
