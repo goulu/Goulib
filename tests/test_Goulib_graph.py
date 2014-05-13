@@ -5,15 +5,15 @@ from Goulib.graph import *
 
 import logging
 
+import os
+path=os.path.dirname(os.path.abspath(__file__))
+
 class TestGeoGraph:
     @classmethod
     def setup_class(self):
         self.empty=GeoGraph()
         self.cube=GeoGraph(nx.hypercube_graph(3),multi=False)
         
-        import os
-        path=os.path.dirname(os.path.abspath(__file__))
-
         self.logi=GeoGraph(multi=False)
         nodes={}
         from Goulib.table import Table
@@ -52,7 +52,7 @@ class TestGeoGraph:
                 c=map(float(c)/100)
             return c
         
-        self.logi.save('logi.png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue'])
+        self.logi.save(path+'/logi.png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue'])
         
     def test_render(self):
         pass #tested above
@@ -218,11 +218,11 @@ class TestDelauneyTriangulation:
         print('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
-        graph.save('delauney.png')
+        graph.save(path+'/delauney.png')
         start=time.clock()
         graph=euclidean_minimum_spanning_tree(nodes)
         print('Spanning tree %d : %f'%(n,time.clock()-start))
-        graph.save('emst.png')
+        graph.save(path+'/emst.png')
 
 class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):

@@ -1,5 +1,5 @@
 ;Colonne;Ligne;X m;Y m;;"Cette feuille contient une fonction macro ""TaxiDist"" qui renvoie la distance entre 2 Zones:";
-A202;1;1;-100;6;;"Exemple : =TaxiDist(""A202"";""B227"") renvoie";180.4
+A202;1;1;-100;6;;"Exemple : =TaxiDist(""A202"";""B227"") renvoit";180.4
 B227;27;8;38.4;48;;;
 B230;29;5;57.6;30;;;
 B423;23;15;0;90;;;
