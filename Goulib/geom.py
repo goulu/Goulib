@@ -3,7 +3,9 @@
 """
 Vector, matrix and quaternion operations + line, arc, circle entities for use in 2D and 3D graphics applications.
 
-based on euclid http://code.google.com/p/pyeuclid
+based on euclid http://code.google.com/p/pyeuclid by Alex Holkner
+
+
 """
 
 from __future__ import division #"true division" everywhere
@@ -24,11 +26,10 @@ precision = 1e-9 #for equality comparizons
 
 class Vector2(object):
     """
-   
-    Two mutable vector types are available: *Vector2* and *Vector3*,
-    for 2D and 3D vectors, respectively.  Vectors are assumed to hold
-    floats, but most operations will also work if you use ints or longs
-    instead.  Construct a vector in the obvious way::
+    Mutable 2D vector: 
+    
+    
+    Construct a vector in the obvious way::
     
         >>> Vector2(1.5, 2.0)
         Vector2(1.50, 2.00)
@@ -69,21 +70,6 @@ class Vector2(object):
         (3, 1)
         >>> v.zzzz
         (3, 3, 3, 3)
-    
-    All of the above accessors are also mutators[1]::
-    
-        >>> v = Vector3(1, 2, 3)
-        >>> v.x = 5
-        >>> v
-        Vector3(5.00, 2.00, 3.00)
-        >>> v[1:] = (10, 20)
-        >>> v
-        Vector3(5.00, 10.00, 20.00)
-    
-    [1] assignment via a swizzle (e.g., ``v.xyz = (1, 2, 3)``) is supported
-    only if the ``_enable_swizzle_set`` variable is set.  This is disabled
-    by default, as it impacts on the performance of ordinary attribute
-    setting, and is slower than setting components sequentially anyway.
     
     **Operators**
     
@@ -431,6 +417,8 @@ class Vector2(object):
         return self.dot(n)*n
 
 class Vector3(object):
+    """ Mutable 3D Vector. 
+    See `Vector2`documentation"""
 
     def __init__(self, *args):
         """Constructor.
@@ -2620,17 +2608,14 @@ class Arc2(Circle):
     
     def point(self, u):
         ":return: Point2 at parameter u"
-        if self._u_in(u):
-            return self.p+u*self.v
-        else:
-            return None
+        a=self.a+u*self.angle()
+        return self.c+Polar(self.r,a)
     
     def tangent(self, u):
-        ":return: Vector2 tangent at parameter u. Warning : tangent not a unit vector"
-        if self._u_in(u):
-            return self.v
-        else:
-            return None
+        """:return: Vector2 tangent at parameter u"""
+        a=self.a+u*self.angle()
+        res=Polar(self.r,a).cross()
+        return -res if self.dir>0 else res
             
     def _apply_transform(self, t):
         if t:
