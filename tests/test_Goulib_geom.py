@@ -784,14 +784,11 @@ class TestLine2:
         assert_equal(inter,Point2(-1,-1))
 
     def test_point(self):
-        # line2 = Line2(*args)
-        # assert_equal(expected, line2.point(u))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.l1.point(0),self.l1.p)
+        assert_equal(self.l1.point(1),self.l1.p+self.l1.v)
 
     def test_tangent(self):
-        # line2 = Line2(*args)
-        # assert_equal(expected, line2.tangent(u))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.l1.tangent(0),self.l1.v)
 
     def test___eq__(self):
         # line2 = Line2(*args)
@@ -827,11 +824,19 @@ class TestSegment2:
         inter=self.s2.intersect(self.s3)
         assert_equal(inter,Point2(-1,-1))
 
-
     def test___repr__(self):
         assert_equal(repr(self.s1),"Segment2(Point2(1, 1),Point2(2, 2))")
         assert_equal(repr(self.s2),"Segment2(Point2(2, 2),Point2(-1, -1))")
         assert_equal(repr(self.s3),"Segment2(Point2(-1, -1),Point2(-1.0, 0.0))")
+        
+    def test_point(self):
+        assert_equal(self.s1.point(0),self.s1.p1)
+        assert_equal(self.s1.point(1),self.s1.p2)
+
+    def test_tangent(self):
+        assert_equal(self.s1.tangent(0),self.s1.v)
+        assert_equal(self.s1.tangent(1),self.s1.v)
+        assert_equal(self.s1.tangent(1.001),None)
 
     def test_mag2(self):
         # segment2 = Segment2()
@@ -846,7 +851,13 @@ class TestSegment2:
 class TestCircle:
     @classmethod
     def setup_class(self):
-        pass
+        self.c1=Circle(Point2(0,0),1)
+        
+    def test_point(self):
+        assert_equal(self.c1.point(0),(1,0))
+
+    def test_tangent(self):
+        assert_equal(self.c1.tangent(0),(0,1))
     
     def test___copy__(self):
         # circle = Circle(center, radius)
@@ -880,16 +891,6 @@ class TestCircle:
     def test___eq__(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.__eq__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_point(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.point(u))
-        raise SkipTest # TODO: implement your test here
-
-    def test_tangent(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.tangent(u))
         raise SkipTest # TODO: implement your test here
 
 class TestArc2:
@@ -930,14 +931,21 @@ class TestArc2:
         raise SkipTest # TODO: implement your test here
 
     def test_point(self):
-        # arc2 = Arc2(center, p1, p2, r)
-        # assert_equal(expected, arc2.point(u))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.a1.point(0),(1,0))
+        assert_equal(self.a1.point(1),(0,1))
 
     def test_tangent(self):
-        # arc2 = Arc2(center, p1, p2, r)
-        # assert_equal(expected, arc2.tangent(u))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.a1.tangent(0),(0,1))
+        assert_equal(self.a1.tangent(1),(-1,0))
+        assert_equal(self.a2.tangent(0),(0,1))
+        assert_equal(self.a2.tangent(1),(-1,0))
+        #a3 direction is inverted wr to a1 and a2
+        assert_equal(self.a3.tangent(0),(1,0))
+        assert_equal(self.a3.tangent(1),(0,-1))
+        
+        a=Arc2((1,1),(3,0),(3,2))
+        assert_equal(a.tangent(0),(1,2))
+        assert_equal(a.tangent(1),(-1,2))
 
     def test_swap(self):
         # arc2 = Arc2(center, p1, p2, r, dir)

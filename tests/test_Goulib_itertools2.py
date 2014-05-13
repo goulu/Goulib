@@ -232,6 +232,16 @@ class TestGrouped:
         # assert_equal(expected, grouped(iterable, n))
         raise SkipTest # TODO: implement your test here
 
+class TestOccurrences:
+    def test_occurrences(self):
+        # assert_equal(expected, occurrences(it, exchange))
+        raise SkipTest # TODO: implement your test here
+
+class TestBest:
+    def test_best(self):
+        assert_equal(list(best([3,2,1,2,1])),[1,1])
+        assert_equal(list(best([3,2,1,2,1],reverse=True,n=2)),[3,2,2])
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()

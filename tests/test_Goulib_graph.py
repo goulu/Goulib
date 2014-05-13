@@ -210,7 +210,7 @@ class TestRender:
 class TestDelauneyTriangulation:
     def test_delauney_triangulation(self):
         import time
-        n=1000
+        n=1000 if RTREE else 100
         from random import random
         start=time.clock()
         nodes=[(random(),random()) for _ in range(n)]
@@ -251,6 +251,16 @@ class TestPointsOnSphere:
         sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
         pass
         
+
+class TestToDrawing:
+    def test_to_drawing(self):
+        # assert_equal(expected, to_drawing(g, d, edges))
+        raise SkipTest # TODO: implement your test here
+
+class TestWriteDxf:
+    def test_write_dxf(self):
+        # assert_equal(expected, write_dxf(g, filename))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     import sys

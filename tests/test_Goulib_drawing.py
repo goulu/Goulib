@@ -278,7 +278,7 @@ class TestDrawing:
         pass #tested above
     
     def test_save(self):
-        for ext in ['dxf','png','svg','pdf']:
+        for ext in ['png','svg','pdf','dxf']:
             self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             self.svg.save(self.path+'/drawing.svg.%s'%ext)
             self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
@@ -366,6 +366,11 @@ class TestSpline:
     def test_length(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test___copy__(self):
+        # spline = Spline(points)
+        # assert_equal(expected, spline.__copy__())
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
