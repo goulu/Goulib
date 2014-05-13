@@ -5,7 +5,6 @@ dxfgrabber
 dxfwrite
 svg.path
 pillow
-rtree
 matplotlib
 numpy
 scipy
