@@ -13,17 +13,13 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
-
 from math import  radians, degrees, atan, pi, copysign
 import logging, operator
 
-try:
-    # import matplotlib
-    # matplotlib.use("Agg") #don't know why, but looks useful
-    import matplotlib.pyplot as plt
-except:
-    logging.warning('matplotlib not imported : bitmap+svg export not available')
-    
+import matplotlib
+matplotlib.use("Agg") # Force matplotlib to not use any Xwindows backend (for travis-ci)
+import matplotlib.pyplot as plt
+
 from math2 import rint
 from geom import *
 from itertools2 import split
