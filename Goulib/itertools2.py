@@ -250,6 +250,21 @@ def all_pairs(size):
         for j in rand_seq(size):
             yield (i,j)
             
+def best(iterable, key=None, n=1, cmp=None, reverse=False):
+    """ generate items corresponding to the n best values of key sort order"""
+    v=sorted(iterable,cmp=cmp,key=key,reverse=reverse)
+    if key is None : key=identity
+    i,k=0,None
+    for x in v:
+        k2=key(x)
+        if k2==k:
+            yield x
+        else:
+            k=k2
+            i+=1
+            if i>n: break #end 
+            yield x
+            
 # WARNING : filter2 has been renamed from "split" at v.1.7.0 for coherency
 def filter2(iterable,condition):
     """ like filter, https://docs.python.org/2/library/functions.html#filter
