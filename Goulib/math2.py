@@ -124,6 +124,14 @@ def veccompare(a,b):
             res[2]+=1
     return res
 
+def sat(x,low=0,high=None):
+    """ saturates x between low and high """
+    if isinstance(x,(int,float)):
+        if low is not None: x=max(x,low)
+        if high is not None: x=min(x,high)
+        return x
+    return [sat(_,low,high) for _ in x]
+
 #norms and distances
 
 def norm_2(v):
