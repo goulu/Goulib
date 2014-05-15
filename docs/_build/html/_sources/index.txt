@@ -24,6 +24,7 @@ library of useful Python code for scientific + technical applications
 :installation: "pip install Goulib"
 :distribution: https://pypi.python.org/pypi/Goulib
 :documentation: https://goulib.readthedocs.org/
+:notebook: http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb
 :source: https://github.com/goulu/Goulib
 
 Modules

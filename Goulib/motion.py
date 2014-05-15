@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-functions of time which provide (position, velocity, acceleration, jerk) tuples
+functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
 """
 from __future__ import division #"true division" everywhere
 
