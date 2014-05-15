@@ -185,6 +185,8 @@ def mean(data):
     """:return: mean of data"""
     return sum(data)/len(data)
 
+avg=mean #alias
+
 def variance(data,avg=None):
     """:return: variance of data"""
     if avg==None:
@@ -192,6 +194,8 @@ def variance(data,avg=None):
     s = sum(((value - avg)**2) for value in data)
     var = s/(len(data) - 1)
     return var
+
+var=variance #alias
 
 def stats(l):
     """:return: min,max,sum,sum2,avg,var of a list"""
