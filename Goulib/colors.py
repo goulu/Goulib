@@ -7,6 +7,8 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
+import math2
+
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
 def rgb_to_hex(rgb):
@@ -62,6 +64,7 @@ def color_range(n,start,end):
     return res
 
 color = {
+    # dict of most used colors indexed by name
     'black': '#000000',
     'blue': '#0000ff',
     'fuchsia': '#ff00ff',
@@ -227,7 +230,14 @@ color = {
 
 color_lookup=dict([v,k] for k,v in color.iteritems()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
 
-hexcolor=dict([(i,'0x'+v[1:]) for i,v in color.iteritems()])
+def nearest_color(x):
+    """:return: name of the nearest color"""
+    if isinstance(x,basestring):
+        rgb=hex_to_rgb(x,1./255)
+    else:
+        rgb=math2.sat(x,0,1)
+    res=min(color.values(),key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
+    return color_lookup[res]
 
 from math2 import rint
 
@@ -241,19 +251,22 @@ class Color(object):
             except: #assume it's a hex string
                 pass
             self.rgb=hex_to_rgb(c,1./255)
-        else: # assume (r,g,b)
+        else: # assume (r,g,b) tuple
             if max(c)>1:
-                c=[_/255. for _ in c]
+                c=tuple(_/255. for _ in c)
             self.rgb=c
         
         try: #to guess the color name
             self.name=color_lookup[self.hex]
-        except:
-            self.name='unknown'
+            return
+        except: #find the closest one
+            pass
+        self.name='~'+nearest_color(self.rgb)
             
     @property
     def hex(self):
-        return rgb_to_hex([rint(_*255) for _ in self.rgb])
+        rgb=math2.sat(self.rgb)
+        return rgb_to_hex((rint(_*255) for _ in rgb))
     
     def __repr__(self):
         if self.name!='unknown':
@@ -261,9 +274,17 @@ class Color(object):
         else:
             return self.hex
         
+    def _repr_html_(self):
+        return '<div style="color:%s">%s</div>'%(self.hex,self.name)
+        
     def __eq__(self,other):
-        return str(self)==str(other)
+        try:
+            return self.hex==other.hex
+        except:
+            return self.name==other
     
     def __add__(self,other):
-        from Goulib.math2 import vecadd
-        return Color(vecadd(self.rgb,other.rgb))
+        return Color(math2.vecadd(self.rgb,other.rgb))
+    
+    def __sub__(self,other):        
+        return Color(math2.vecsub(self.rgb,other.rgb))

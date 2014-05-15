@@ -35,27 +35,30 @@ class TestColor:
         green=Color('lime') # 'green' has hex 80 value, not ff
         blue=Color('blue')
         assert_equal(red+green+blue,'white')
-
-
+        
+    def test___sub__(self):
+        white=Color('white')
+        green=Color('lime') # 'green' has hex 80 value, not ff
+        blue=Color('blue')
+        assert_equal(white-green-blue,'red')
 
     def test___eq__(self):
-        # color = Color(c)
-        # assert_equal(expected, color.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        pass #tested above
 
     def test___repr__(self):
-        # color = Color(c)
-        # assert_equal(expected, color.__repr__())
-        raise SkipTest # TODO: implement your test here
+        pass #tested above
 
     def test_hex(self):
-        # color = Color(c)
-        # assert_equal(expected, color.hex())
-        raise SkipTest # TODO: implement your test here
+        pass #tested above
 
 class TestRgbToCmyk:
     def test_rgb_to_cmyk(self):
         # assert_equal(expected, rgb_to_cmyk(r, g, b))
+        raise SkipTest # TODO: implement your test here
+
+class TestNearestColor:
+    def test_nearest_color(self):
+        # assert_equal(expected, nearest_color(x))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
