@@ -40,12 +40,10 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
         d=d
     elif isinstance(d,date):
         d=datetime(year=d.year, month=d.month, day=d.day)
-    elif fmt:
-        d=datetime.strptime(str(d),fmt)
     elif isinstance(d,(int,float)) : 
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
     else:
-        raise ValueError("Unsupported parameters")
+        d=datetime.strptime(str(d),fmt)
     if t:
         d=d.replace(hour=t.hour,minute=t.minute,second=t.second)
     return d
