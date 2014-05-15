@@ -1,22 +1,27 @@
 #!/usr/bin/env python
-"""\
- manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by  Rick Muller
- 
- This consists  of a set of simple functions to convert polynomials to a Python list, and
- manipulate the resulting lists for multiplication, addition, and
- power functions. There is also a class that wraps these functions
- to make their use a little more natural.
-
- This can also evaluate the polynomials at a value, and take integrals
- and derivatives of the polynomials.
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+simple manipulation of polynomials (without SimPy)
+see http://docs.sympy.org/dev/modules/polys/reference.html if you need more ...
 """
 from __future__ import division #"true division" everywhere
 
+__author__ = "Rick Muller + Philippe Guglielmetti"
+__copyright__ = "Copyright 2013, Philippe Guglielmetti"
+__credits__= ["http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/"] 
+__license__ = "LGPL"
+
 import re
 
-# Define some classes for some syntactic surgar:
 class Polynomial:
     def __init__(self,val):
+        """:param: val can be:
+        - an iterable of the factors in ascending powers order : Polynomial([1,2,3]) holds 3*x^2+2*x+1
+        - a string of the form "ax^n + b*x^m + ... + c x + d" where a,b,c,d, are floats and n,m ... are integers 
+          the 'x' variable name is fixed, and the spaces and '*' chars are optional.
+          terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
+        """
         if type(val) == type([]):
             self.plist = val
         elif type(val) == type(''):
@@ -25,24 +30,34 @@ class Polynomial:
             raise "Unknown argument to Polynomial: %s" % val
         return
     
+    def __str__(self):
+        """:return: the best string we can for text output"""
+        return tostring(self.plist)
+    
+    def __repr__(self):
+        """:return: a string we can cut/paste in a calculator"""
+        return tostring(self.plist,mul='*')
+    
+    def _repr_latex_(self):
+        """:return: LaTex string for IPython Notebook"""
+        return r'$%s$'%tostring(self.plist)
+    
     def __cmp__(self,other): 
         if isinstance(other,Polynomial):
             return cmp(self.plist,other.plist)
         elif isinstance(other,basestring):
-            return cmp(str(self),other)
+            return cmp(self.plist,Polynomial(other).plist)
         return cmp(self.plist,other)
             
     def __add__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __radd__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __sub__(self,other):  return Polynomial(sub(self.plist,plist(other)))
     def __rsub__(self,other): return -Polynomial(sub(self.plist,plist(other)))
-    def __mul__(self,other): return Polynomial(multiply(self.plist,
-                                                        plist(other)))
-    def __rmul__(self,other): return Polynomial(multiply(self.plist,
-                                                        plist(other)))
+    def __mul__(self,other): return Polynomial(multiply(self.plist, plist(other)))
+    def __rmul__(self,other): return Polynomial(multiply(self.plist, plist(other)))
     def __neg__(self): return -1*self
     def __pow__(self,e): return Polynomial(power(self.plist,e))
-    def __repr__(self): return tostring(self.plist)
+
     def __call__(self,x1,x2=None): return peval(self.plist,x1,x2)
 
     def integral(self): return Polynomial(integral(self.plist))
@@ -153,7 +168,7 @@ def power(p,e):
     for i in range(e): new = multiply(new,p)
     return new
 
-def parse_string(str=None):
+def parse_string(str):
     """\
     Do very, very primitive parsing of a string into a plist.
     'x' is the only term considered for the polynomial, and this
@@ -164,6 +179,7 @@ def parse_string(str=None):
     or
     x**2 - 1
     """
+    str=str.translate(None, '$*') #remove LateX marks and optional * mul symbols
     termpat = re.compile('([-+]?\s*\d*\.?\d*)(x?\^?\d?)')
     #print "Parsing string: ",str
     #print termpat.findall(str)
@@ -201,7 +217,7 @@ def _strip_leading_zeros(p):
         if p[i]: break
     return p[:i+1]
 
-def tostring(p):
+def tostring(p,**kwargs):
     """\
     Convert a plist into a string. This looks overly complex at first,
     but most of the complexity is caused by special cases.
@@ -211,22 +227,24 @@ def tostring(p):
     for i in range(len(p)-1,-1,-1):
         if p[i]:
             if i < len(p)-1:
-                if p[i] >= 0: str.append('+')
-                else: str.append('-')
-                str.append(_tostring_term(abs(p[i]),i))
+                if p[i] >= 0: str.append(kwargs.get('plus','+'))
+                else: str.append(kwargs.get('minus','-'))
+                str.append(_tostring_term(abs(p[i]),i,**kwargs))
             else:
-                str.append(_tostring_term(p[i],i))
+                str.append(_tostring_term(p[i],i,**kwargs))
     if not str : str='0'
     return ' '.join(str)
 
-def _tostring_term(c,i):
+def _tostring_term(c,i,**kwargs):
     "Convert a single coefficient c and power e to a string cx^i"
-    if i == 1:
-        if c == 1: return 'x'
-        elif c == -1: return '-x'
-        return "%sx" % c
-    elif i: 
-        if c == 1: return "x^%d" % i
-        elif c == -1: return "-x^%d" % i
-        return "%sx^%d" % (c,i)
-    return "%s" % c
+    if i==0:
+        return str(c)
+    res=kwargs.get('x','x')
+    if c == -1:
+        res=kwargs.get('minus','-')+res
+    elif c!=1:
+        res=str(c)+kwargs.get('mul','')+res #by default there is no multiplication sign
+    if i!=1: 
+        res=res+kwargs.get('pow','^')+str(i)
+    return res
+
