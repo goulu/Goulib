@@ -177,6 +177,7 @@ class Table(list):
         """inits a table, optionally by reading a Excel, csv or html file"""
         list.__init__(self, data)
         self.titles=titles if titles else []
+        self.footer=[]
         if filename:
             if titles: #were specified
                 kwargs['titles_line']=0 
@@ -236,7 +237,9 @@ class Table(list):
             res+=THEAD(head)
         for row in self:
             res+=TR(row,style=colstyle)  
-        if foot is not None:
+        if foot is None:
+            foot=self.footer
+        if foot:
             res+=TFOOT(foot)             
         
         return tag('table',res,**kwargs)+'\n'
@@ -423,7 +426,6 @@ class Table(list):
             list.sort(self,key=lambda x:x[i],reverse=reverse)
         else:
             list.sort(i,reverse=reverse)
-        return self
     
     def rowasdict(self,i):
         ''' returns a line as a dict '''
@@ -493,7 +495,11 @@ class Table(list):
         :param fmt: string defining datetime format
         :param skiperrors: bool. if True, conversion errors are ignored
         :return: bool True if ok, False if skiperrors==True and conversion failed
-        """  
+        """
+        if isinstance(fmt,list):
+            for f in fmt:
+                res=self.to_datetime(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
+            return res
         return self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
         
     def to_date(self,by,fmt='%Y-%m-%d',skiperrors=False):
@@ -503,20 +509,24 @@ class Table(list):
         :param skiperrors: bool. if True, conversion errors are ignored
         :return: bool True if ok, False if skiperrors==True and conversion failed
         """  
-
+        if isinstance(fmt,list):
+            for f in fmt:
+                res=self.to_date(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
+            return res
         return self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
             
 
     def total(self,funcs):
-        """builds a list by appling f functions to corresponding columns"""
+        """build a footer row by appling funcs to all columns
+        """
         funcs=funcs+[None]*(len(self.titles)-len(funcs))
-        res=[]
+        self.footer=[]
         for i,f in enumerate(funcs):
             try:
-                res.append(f(self.col(i)))
+                self.footer.append(f(self.col(i)))
             except:
-                res.append(f)
-        return res
+                self.footer.append(f)
+        return self.footer
     
     def remove_lines_where(self,filter):
         """remove lines on a condition, returns the number of lines removed"""

@@ -31,8 +31,7 @@ class TestTable:
         self.t2.applyf('Cost',float)
         self.t2.applyf('Total',lambda x:float(x) if isinstance(x,(int,float)) else float(x.replace(',','')))
         
-        self.t2.to_date('OrderDate',fmt='%m/%d/%Y',skiperrors=True) #converts string format
-        self.t2.to_date('OrderDate',fmt='') #converts Excel numeric format
+        self.t2.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
         assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))
         assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
         

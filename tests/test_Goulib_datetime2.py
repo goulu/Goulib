@@ -10,6 +10,7 @@ class TestDatef:
         assert_equal(datef('1963-12-25'),d)
         assert_equal(datef('25/12/1963',fmt='%d/%m/%Y'),d)
         assert_equal(datef(40179,fmt=None),date(year=2010,month=1,day=1)) # http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        assert_equal(datef(40179,fmt='Excel'),date(year=2010,month=1,day=1)) # http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
 
 class TestTimef:
     def test_timef(self):
