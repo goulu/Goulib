@@ -300,6 +300,14 @@ class TestDist:
         # assert_equal(expected, dist(a, b, norm))
         raise SkipTest # TODO: implement your test here
 
+class TestSat:
+    def test_sat(self):
+        assert_equal(sat(3),3)
+        assert_equal(sat(-2),0)
+        assert_equal(sat(-3,-3),-3)
+        assert_equal(sat(3,1,2),2)
+        assert_equal(sat([-2,-1,0,1,2,3],-1,2),[-1,-1,0,1,2,2])
+
 if __name__ == "__main__":
     import nose
     nose.runmodule()
