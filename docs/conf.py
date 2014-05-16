@@ -114,14 +114,21 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-intersphinx_mapping = {'python': ('http://docs.python.org/2.7', 'python.inv')}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/2.7', 'http://docs.python.org/objects.inv'),
+    'networkx': ('http://networkx.github.io/documentation/latest','http://networkx.github.io/documentation/latest/objects.inv'),
+    'numpy': ('http://docs.scipy.org/doc/numpy','http://docs.scipy.org/doc/numpy/objects.inv'),
+    'scipy' : ('http://docs.scipy.org/doc/scipy/reference','http://docs.scipy.org/doc/scipy/reference/objects.inv'),
+}
+
 import urllib2
 proxy_info = {
 'user' : 'guglie0p ',
-'pass' : 'qwe32768',
-'host' : "80.254.148.58",
+'pass' : 'ert32768',
+'host' : '80.254.148.58',
 'port' : 8080
 }
+
 # build a new opener that uses a proxy requiring authorization
 proxy_support = urllib2.ProxyHandler({"http" : \
 "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})

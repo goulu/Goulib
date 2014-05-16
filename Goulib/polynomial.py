@@ -21,6 +21,7 @@ class Polynomial:
         - a string of the form "ax^n + b*x^m + ... + c x + d" where a,b,c,d, are floats and n,m ... are integers 
           the 'x' variable name is fixed, and the spaces and '*' chars are optional.
           terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
+          
         """
         if type(val) == type([]):
             self.plist = val

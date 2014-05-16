@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-additions to itertools standard library
+additions to :mod:`itertools` standard library
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -224,8 +224,8 @@ def interleave(l1,l2):
     :param l1: iterable
     :param l2: iterable of same length, or 1 less than l1
     :result: iterable interleaving elements from l1 and l2, starting by l1[0]
-    http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2
     """
+    # http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2
     res=l1+l2
     res[::2]=l1
     res[1::2]=l2

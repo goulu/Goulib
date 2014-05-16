@@ -76,10 +76,12 @@ class Cell():
         return x
         
     def html(self,**kwargs):
-        """:return: string HTML formatted cell
+        """:return: string HTML formatted cell:
+        
         * if data is int, default align="right"
         * if data is float, default align="right" and fmt='%0.2f'
         * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
+        
         """
         args={}
         args.update(kwargs) #copy needed to avoid side effects

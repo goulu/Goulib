@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-additions to math standard library
+additions to :mod:`math` standard library
 """
 from __future__ import division #"true division" everywhere
 
@@ -167,7 +167,8 @@ def sets_levenshtein(a,b):
 
 def levenshtein(seq1, seq2):
     """:return: http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
-    http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python """
+    """
+    # http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
     oneago = None
     thisrow = range(1, len(seq2) + 1) + [0]
     for x in xrange(len(seq1)):

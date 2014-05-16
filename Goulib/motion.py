@@ -102,13 +102,13 @@ def trapeze(dp,vmax,a,v0=0,v2=0):
     :param v0: float initial velocity, 0 by default 
     :param v2: float final velocity, 0 by default 
     :return: tuple of 6 values:
+    
     * time at end of acceleration
     * position at end of acceleration
     * velocity at end of acceleration
     * time at begin of deceleration
     * position at begin of deceleration
     * total time
-    
     """
     t1=ramp(dp/2,v0,vmax,a) #acceleration time
     v1=v0+a*t1 #speed reached

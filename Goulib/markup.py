@@ -19,14 +19,12 @@ except:
 import sys
     
 #from http://www.voidspace.org.uk/python/cgiutils.html
-def cgiprint(inline='', unbuff=True, line_end='\r\n'):
+def cgiprint(line='', unbuff=True, line_end='\r\n'):
     """
     Print to the stdout.
-    
-    Set unbuff=True to flush the buffer after every write.
-    
-    It prints the inline you send it, followed by the line_end. By default this 
-    is \r\n - which is the standard specified by the RFC for http headers.
+    :param line: string to print, followed by line_end
+    :param unbuff: boolean, True to flush the buffer after every write.
+    :param line_end: string to print after each line. By default this is \r\n , which is the standard specified by the RFC for http headers.
     """
     print inline,line_end
     return
@@ -147,21 +145,20 @@ class page:
 
         :param mode: string. can be either:
         
-        *'strict_html'   for HTML 4.01 (default)
-        *'html'          alias for 'strict_html'
-        *'loose_html'    to allow some deprecated elements
-        *'xml'           to allow arbitrary elements
+        - 'strict_html'   for HTML 4.01 (default)
+        - 'html'          alias for 'strict_html'
+        - 'loose_html'    to allow some deprecated elements
+        - 'xml'           to allow arbitrary elements
 
         :param case:  string. can be either:
         
-        *'lower'         element names will be printed in lower case (default)
-        *'upper'         they will be printed in upper case
-        *'given'         element names will be printed as they are given
+        - 'lower'         element names will be printed in lower case (default)
+        - 'upper'         they will be printed in upper case
+        - 'given'         element names will be printed as they are given
 
         :param onetags:  list or tuple of valid elements with opening tags only
-        :param twotags:
+        :param twotags:  list or tuple of valid elements with both opening and closing tags
         
-        list or tuple of valid elements with both opening and closing tags
         these two keyword arguments may be used to select the set of valid elements in 'xml' mode
         invalid elements will raise appropriate exceptions
         
