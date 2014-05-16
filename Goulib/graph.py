@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-efficient Euclidian Graphs for NetworkX and related algorithms
+efficient Euclidian Graphs for :ref:`NetworkX <networkx>` and related algorithms
 """
 
 from __future__ import division #"true division" everywhere
@@ -55,42 +55,63 @@ if not RTREE:
 
 _nk=0 # node key
 
+def to_networkx_graph(data,create_using=None,multigraph_input=False):
+    """Make a NetworkX graph from a known data structure.
+    enhances :meth:`networkx.convert.to_networkx_graph`
+    :param data: any type handled by :meth:`convert.to_networkx_graph`, plus:
+        - :class:`scipy.spatial.qhull.Delaunay` to enable building a graph from a delauney triangulation
+        
+    If create_using is a :class:`GeoGraph`and data is a Graph where nodes have a 'pos' attribute,
+    then this attribute will be used to rename nodes as (x,y,...) tuples suitable for GeoGraph.
+    
+    """
+    if isinstance(data,scipy.spatial.qhull.Delaunay):
+        create_using.delauney=data
+        triangles=data.points[data.simplices]
+        for point in triangles:
+            p=map(tuple,point) #convert from numpy to regular list
+            create_using.add_edge(p[0],p[1])
+            create_using.add_edge(p[1],p[2])
+            create_using.add_edge(p[2],p[0])
+        return create_using
+    elif isinstance(data,nx.Graph): 
+        if isinstance(create_using,GeoGraph):
+            def _map(k):
+                return tuple(data.node[k]['pos'])
+            try: # rename nodes with node['pos'] attribute if any
+                for k in data.node: #create nodes
+                    create_using.add_node(_map(k),attr_dict=data.node[k])
+                for u,v,d in data.edges(data=True):
+                    create_using.add_edge(_map(u),_map(v),attr_dict=d)
+                return create_using
+            except:
+                pass
+            
+        # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
+        return nx.convert.to_networkx_graph(data.adj,create_using,data.is_multigraph())
+    else:
+        return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+
 class GeoGraph(nx.MultiGraph):
-    """a Graph with nodes at specified positions.
+    """a graph with nodes at specified positions.
     if edges have a "length" attribute, it is used to compute distances,
     otherwise euclidian distance between nodes is used by default
     """
     def __init__(self, data=None, **kwargs):
         """
-        :param multi: boolean to control if multiple edges between nodes are allowed (True) or not (False)
-        :param **kwargs: other parameters will be copied as attributes
+        :param data: see :meth:`to_networkx_graph` for valid types
+        
+        :param kwargs: other parameters will be copied as attributes, especially:
+        
+        - multi : boolean to control if multiple edges between nodes are allowed (True) or not (False)
         """
         super(GeoGraph,self).__init__(None, **kwargs)
         
-        #create a rtree and store nodes in it
-        n=kwargs.get('dimension',None)
-        if n is None:
-            try: #guess dimension from first node
-                n=len(data.node.iterkeys().next())
-            except:
-                n=2
-        prop=index.Property()
-        prop.set_dimension(n)
-        self.idx = index.Index(properties=prop)
+        self.idx=None # index is created at fist call to add_node
         
         if data:
-            if isinstance(data,scipy.spatial.qhull.Delaunay):
-                self.delauney=data
-                triangles=data.points[data.simplices]
-                for point in triangles:
-                    p=map(tuple,point) #convert from numpy to regular list
-                    self.add_edge(p[0],p[1])
-                    self.add_edge(p[1],p[2])
-                    self.add_edge(p[2],p[0])
-            elif isinstance(data,nx.Graph): # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
-                nx.convert.to_networkx_graph(data.adj,create_using=self,multigraph_input=data.is_multigraph())
-            else:
-                nx.convert.to_networkx_graph(data,create_using=self)
+            to_networkx_graph(data,self)
+            
         self.render_args={}
         
             
@@ -158,6 +179,8 @@ class GeoGraph(nx.MultiGraph):
     
     def box(self):
         """:return: nodes bounding box as (xmin,ymin,...),(xmax,ymax,...)"""
+        if self.idx is None: #empty graph
+            return (0,0)
         minmax=self.idx.bounds
         n=len(minmax)//2
         return tuple(minmax[:n]),tuple(minmax[n:])
@@ -218,6 +241,12 @@ class GeoGraph(nx.MultiGraph):
     def add_node(self, p, attr_dict=None, **attr):
         """add a node or return one already very close
         """
+        if self.idx is None: #now we know the dimension, so we can create the index
+            n=len(p)
+            prop=index.Property()
+            prop.set_dimension(n)
+            self.idx = index.Index(properties=prop)
+        
         try: #point already exists ?
             self.node[p]
             return p
@@ -403,7 +432,7 @@ def draw_networkx(g, **kwargs):
     - function of the form lambda node:(x,y) that maps node positions.
     - None. in this case, nodes are directly used as positions if graph is a GeoGraph, otherwise nx.draw_shell is used
     
-    :param fig: matplotlib figure. If None, figure(g) is used to obtain one
+    :param fig: :class:`matplotlib.figure`. If None, figure(g) is used to obtain one
     :param **kwargs: passed to nx.draw method with one tweak:
     
     - if edge_color is a function of the form lambda data:color string, it is mapped over all edges
@@ -456,10 +485,10 @@ def draw_networkx(g, **kwargs):
 def to_drawing(g, d=None, edges=[]):
     """
     draws Graph to a `Drawing`
-    :param g: Networkx Graph
-    :param d: existing `Drawing` to draw onto, or None to create a new Drawing
+    :param g: :class:`Graph`
+    :param d: existing :class:`Drawing` to draw onto, or None to create a new Drawing
     :param edges: iterable of edges (with data) that will be added, in the same order. By default all edges are drawn
-    :return: Drawing
+    :return: :class:`Drawing`
     
     Graph edges with an 'entity' property
     """
@@ -478,19 +507,19 @@ def to_drawing(g, d=None, edges=[]):
     
     
 def write_dxf(g,filename):
-    """writes Graph in .dxf format"""
+    """writes :class:`networkx.Graph` in .dxf format"""
     to_drawing(g).save(filename)
     
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
+    https://en.wikipedia.org/wiki/Delaunay_triangulation
     :param nodes: list of (x,y) or (x,y,z) node positions
-    :param qhull_options: string passed to scipy.spatial.Delaunay, which passes it to Qhull ( http://www.qhull.org/ )
-        * 'Qt' ensures all points are connected
-        * 'Qz' required when nodes lie on a sphere
-        * 'QJ' solves some singularity situations
-    :param **kwargs: passed to the GeoGraph constructor
-    :return: GeoGraph with delauney triangulation between nodes
-    see https://en.wikipedia.org/wiki/Delaunay_triangulation
+    :param qhull_options: string passed to :meth:`scipy.spatial.Delaunay`, which passes it to Qhull ( http://www.qhull.org/ )
+        - 'Qt' ensures all points are connected
+        - 'Qz' required when nodes lie on a sphere
+        - 'QJ' solves some singularity situations
+    :param kwargs: passed to the GeoGraph constructor
+    :return: :class:`GeoGraph` with delauney triangulation between nodes
     """
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
     points=numpy.array(nodes)
@@ -502,7 +531,8 @@ def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs)
 def euclidean_minimum_spanning_tree(nodes,**kwargs):
     """
     :param nodes: list of (x,y) nodes positions
-    :return: geograph with minimum spanning tree between  nodes
+    :return: :class:`GeoGraph` with minimum spanning tree between nodes
+    
     see https://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree
     """
     g=GeoGraph(None,**kwargs)

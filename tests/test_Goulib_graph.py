@@ -13,46 +13,15 @@ class TestGeoGraph:
     def setup_class(self):
         self.empty=GeoGraph()
         self.cube=GeoGraph(nx.hypercube_graph(3),multi=False)
-        
-        self.logi=GeoGraph(multi=False)
-        nodes={}
-        from Goulib.table import Table
-        for line in Table(path+'/Localisation.csv'):
-            name=line[0]
-            pos=tuple([line[3],-line[4]]) #flip Y to keep North North ...
-            nodes[name]=pos
-
-        
-        mat=Table(path+'/Matrice.csv')
-        for line in mat:
-            end=nodes[line[0]]
-            for i,v in enumerate(line[2:]):
-                if v:
-                    start=nodes[mat.titles[i+2]]
-                    try:
-                        edge=self.logi[start][end]
-                        w=edge[0]['weight']
-                        pass
-                    except:
-                        w=0
-                    self.logi.add_edge(start,end,weight=v+w)
+        self.geo=GeoGraph(nx.random_geometric_graph(50,.25))
                     
     def test_save(self):
-        from Goulib.colors import hex_to_rgb
         import matplotlib.pyplot as plt
-        
         #define a function that maps edge data to a color
-        colors={'red':'#C3001E','green':'#1DC300','blue':'#265896','lightblue':'#6598CA','gray':'#585858'}
-        map=plt.get_cmap('Greys')
-        def edge_color(data):
-            c=data['weight']
-            if c>100:
-                c=hex_to_rgb(colors['red'],scale=1./255)
-            else:
-                c=map(float(c)/100)
-            return c
-        
-        self.logi.save(path+'/logi.png', transparent=False, edge_color=edge_color, node_size=100, node_color=colors['lightblue'])
+        m=plt.get_cmap('Blues')
+        def edge_color(data): #make longer links darker
+            return m(data['length']/.25)
+        self.geo.save(path+'/geo.png', transparent=False, edge_color=edge_color, node_size=50)
         
     def test_render(self):
         pass #tested above
