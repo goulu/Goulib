@@ -14,14 +14,21 @@ class TestGeoGraph:
         self.empty=GeoGraph()
         self.cube=GeoGraph(nx.hypercube_graph(3),multi=False)
         self.geo=GeoGraph(nx.random_geometric_graph(50,.25))
+        
+        nodes=points_on_sphere(50)
+        self.sphere=GeoGraph(nodes=nodes) #test if we can construct from nodes only
+        self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
                     
     def test_save(self):
+        #try to save a 3D graph
+        self.sphere.save(path+'/graph.png', transparent=False)
+        
         import matplotlib.pyplot as plt
         #define a function that maps edge data to a color
         m=plt.get_cmap('Blues')
         def edge_color(data): #make longer links darker
             return m(data['length']/.25)
-        self.geo.save(path+'/geo.png', transparent=False, edge_color=edge_color, node_size=50)
+        self.geo.save(path+'/graph.png', transparent=False, edge_color=edge_color, node_size=50)
         
     def test_render(self):
         pass #tested above
@@ -216,8 +223,6 @@ class TestDrawNetworkx:
 
 class TestPointsOnSphere:
     def test_points_on_sphere(self):
-        nodes=points_on_sphere(50)
-        sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
         pass
         
 

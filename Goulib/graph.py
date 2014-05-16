@@ -97,7 +97,7 @@ class GeoGraph(nx.MultiGraph):
     if edges have a "length" attribute, it is used to compute distances,
     otherwise euclidian distance between nodes is used by default
     """
-    def __init__(self, data=None, **kwargs):
+    def __init__(self, data=None, nodes=None, **kwargs):
         """
         :param data: see :meth:`to_networkx_graph` for valid types
         
@@ -111,6 +111,9 @@ class GeoGraph(nx.MultiGraph):
         
         if data:
             to_networkx_graph(data,self)
+        elif nodes:
+            for node in nodes:
+                self.add_node(node)
             
         self.render_args={}
         
@@ -443,7 +446,7 @@ def draw_networkx(g, **kwargs):
     if pos is None and isinstance(g,GeoGraph):
         pos={} #dict of nodes positions
         for node in g.nodes_iter():
-            pos[node]=node
+            pos[node]=node[:2] #restrict to 2D in order to handle 3D+ graphs simply
     elif pos and callable(pos): #mapping function ?
             pos=dict(((node,pos(node)) for node in g.nodes_iter()))
             
