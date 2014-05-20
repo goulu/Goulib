@@ -26,9 +26,7 @@ def index(n, iterable):
     "Returns the nth item"
     return islice(iterable, n, n+1).next()
 
-def first(iterable):
-    """Take first element in the iterable"""
-    return iterable.next()
+first = next
 
 def last(iterable):
     """Take last element in the iterable"""
