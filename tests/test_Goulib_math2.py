@@ -275,6 +275,28 @@ class TestProportional:
         assert_equal(sum(proportional(37, votes)),37)
         assert_equal(proportional(37, votes),[4,7,11,15])
 
+class TestLinearRepartition:
+    def test_linear_repartition(self):
+        
+        ref=[0.01,0.03,0.05,0.07,0.09,0.11,0.13,0.15,0.17,0.19]
+        res=linear_repartition(1,10)
+        assert_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        ref.reverse()
+        res=linear_repartition(0,10)
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        
+        ref=[0.02,0.06,0.1,0.14,0.18,0.18,0.14,0.1,0.06,0.02]
+        res=linear_repartition(.5,10)
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        
+        ref=[0.08,0.24,0.36,0.24,0.08]
+        res=linear_repartition(.5,5) # center value is top of triangle
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        
 class TestNorm2:
     def test_norm_2(self):
         # assert_equal(expected, norm_2(v))

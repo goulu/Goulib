@@ -403,7 +403,7 @@ def combinations_with_replacement(iterable, r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
             
-#misc
+#repartitions
 def proportional(nseats,votes):
     """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
     :param nseats: int number of seats to assign
@@ -425,3 +425,22 @@ def proportional(nseats,votes):
             n-=1 # attempt to handle perfect equality
             if n==0: return res #done
     raise
+
+def linear_repartition(x,n):
+    """ divide 1 into n fractions such that:
+    - their sum is 1
+    - they follow a triangular linear repartition (sorry, no better name for now) where x/1 is the maximum
+    """
+
+    def _integral(x1,x2):
+        """return integral under triangle between x1 and x2"""
+        if x2<=x:
+            return (x1 + x2) * (x2 - x1) / x
+        elif x1>=x:
+            return  (2-x1-x2) * (x1-x2) / (x-1)
+        else: #top of the triangle:
+            return _integral(x1,x)+_integral(x,x2)
+            
+    w=1/n #width of a slice
+    return [_integral(i*w,(i+1)*w) for i in range(n)]
+        
