@@ -235,7 +235,7 @@ class Table(list):
             
         if head is None:
             head=self.titles
-        if head is not None:
+        if head:
             res+=THEAD(head)
         for row in self:
             res+=TR(row,style=colstyle)  
