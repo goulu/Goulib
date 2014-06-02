@@ -23,7 +23,8 @@ class Expr(object):
             self.right=f.right
             f=f.y #to construct this object, we take only the function of the source
         if left: # f is an operator
-            if not name: name=f.__name__
+            if not name:
+                name=f.__name__
             self.left=Expr(left)
             self.right=Expr(right) if right else None
             self.isconstant=self.left.isconstant and (not self.right or self.right.isconstant)
@@ -35,7 +36,8 @@ class Expr(object):
             try: #is f a function ?
                 f(1)
                 self.isconstant=False
-                if not name: name=f.__name__
+                if not name:
+                    name='\\'+f.__name__ #try to build LateX name
             except: #f is a constant 
                 self.isconstant=True
                 name=str(f)
@@ -44,12 +46,42 @@ class Expr(object):
         
     def __repr__(self):
         if self.isconstant:
-            return repr(self.y)
-        if self.right:
-            return '%s(%s,%s)'%(self.name,self.left,self.right)
-        if self.left: 
-            return '%s(%s)'%(self.name,self.left)
-        return '%s'%self.name
+            res=repr(self.y)
+        elif self.right:
+            res='%s(%s,%s)'%(self.name,self.left,self.right)
+        elif self.left: 
+            res='%s(%s)'%(self.name,self.left)
+        else:
+            res='%s'%self.name
+        return res.translate(None, '\\')
+    
+    def _repr_latex_(self,dollars=True):
+        """:return: LaTex string for IPython Notebook"""
+        if self.isconstant:
+            res=repr(self.y)
+        else:
+            res=self.name
+            if self.left: 
+                if res[0]=='\\':
+                    res='%s{%s}'%(res,self.left._repr_latex_(False))
+                else: #operator
+                    if self.right:
+                        res=self.left._repr_latex_(False)+res
+                    else: #monadic
+                        res=res+self.left._repr_latex_(False)
+            if self.right:
+                if res[0]=='\\':
+                    res='%s{%s}'%(res,self.right._repr_latex_(False))
+                else: #dyadic operator
+                    res=res+self.right._repr_latex_(False)
+                
+        if dollars:
+            res='$%s$'%res
+        return res
+    
+    @property
+    def latex(self):
+        return self._repr_latex_(True)
         
     def __call__(self,x): 
         """evaluate the Expr at x OR compose self(x())"""
