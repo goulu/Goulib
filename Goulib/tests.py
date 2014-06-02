@@ -24,14 +24,11 @@ def assert_equal(first, second, *args, **kwargs):
         for first_, second_ in itertools.izip_longest(
                 first, second, fillvalue = object()):
             assert_equal(first_, second_, *args, **kwargs)
-    elif not (first != first and second != second):
-        # If first = np.nan and second = np.nan, I want them to
-        # compare equal. np.isnan raises TypeErrors on some inputs,
-        # so I use `first != first` as a proxy. I avoid dependency on numpy
-        # as a bonus.
-        nose.tools.assert_almost_equal(first, second, *args, **kwargs) 
     else:
-        nose.tools.assert_equal(first, second, *args, **kwargs) 
+        try:
+            nose.tools.assert_almost_equal(first, second, *args, **kwargs) 
+        except TypeError: # unsupported operand type(s) for -
+            nose.tools.assert_equal(first, second, *args, **kwargs) 
 
 assert_almost_equal=assert_equal
 
