@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-operations on [x..y[ intervals
+operations on [a..b[ intervals
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -84,7 +84,7 @@ class Interval(object):
         return hash(self.start) ^ hash(self.end)
     
     def intersection(self, other):
-        "Intersection. @return: None if no intersection."
+        "Intersection. :return: None if no intersection."
         if self > other:
             other, self = self, other
         if self.end <= other.start:
@@ -92,49 +92,54 @@ class Interval(object):
         return Interval(other.start, self.end)
 
     def hull(self, other):
-        "@return: Interval containing both self and other."
+        ":return: Interval containing both self and other."
         if self > other:
             other, self = self, other
         return Interval(self.start, other.end)
     
-    def overlap(self, other):
-        "@return: True iff self intersects other."
+    def overlap(self, other, allow_contiguous=False):
+        ":return: True iff self intersects other."
         if self > other:
             other, self = self, other
-        return self.end > other.start
+        if allow_contiguous:
+            return self.end >= other.start
+        else:
+            return self.end > other.start
          
-    def __contains__(self, item):
-        "@return: True iff item in self."
-        return self.start <= item and item < self.end
-         
-    def contains(self,x):
-        "@return: True iff x in self."
+    def __contains__(self, x):
+        ":return: True if x in self."
         return self.start <= x and x < self.end
 
     def subset(self, other):
-        "@return: True iff self is subset of other."
+        ":return: True iff self is subset of other."
         return self.start >= other.start and self.end <= other.end
          
     def proper_subset(self, other):
-        "@return: True iff self is proper subset of other."
+        ":return: True iff self is proper subset of other."
         return self.start > other.start and self.end < other.end
 
     def empty(self):
-        "@return: True iff self is empty."
+        ":return: True iff self is empty."
         return self.start == self.end
          
     def singleton(self):
-        "@return: True iff self.end - self.start == 1."
+        ":return: True iff self.end - self.start == 1."
         return self.end - self.start == 1
     
     def separation(self, other):
-        "@return: The distance between self and other."
+        ":return: The distance between self and other."
         if self > other:
             other, self = self, other
         if self.end > other.start:
             return 0
         else:
             return other.start - self.end
+        
+    def __add__(self,other):
+        if self.overlap(other,True):
+            return self.hull(other)
+        else:
+            return Intervals([self,other])
   
 import bisect      
 class Intervals(list):
@@ -154,8 +159,5 @@ class Intervals(list):
     def __call__(self,x):
         """ returns list of intervals containing x"""
         return [i for i in self if i.contains(x)]
-        
 
-if __name__ == '__main__':
-    unittest.main()
             
