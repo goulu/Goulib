@@ -35,6 +35,8 @@ def rgb_to_cmyk(r,g,b):
     y = 1 - b
 
     k = min(c, m, y)
+    if k==1:
+        return (0,0,0,1)
     c = (c - k) / (1 - k)
     m = (m - k) / (1 - k)
     y = (y - k) / (1 - k)
@@ -269,10 +271,7 @@ class Color(object):
         return rgb_to_hex((rint(_*255) for _ in rgb))
     
     def __repr__(self):
-        if self.name!='unknown':
-            return self.name
-        else:
-            return self.hex
+        return "Color('%s')"%(self.name if self.name[0]!='~' else self.hex)
         
     def _repr_html_(self):
         return '<div style="color:%s">%s</div>'%(self.hex,self.name)
