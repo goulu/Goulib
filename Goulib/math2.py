@@ -426,7 +426,7 @@ def proportional(nseats,votes):
             if n==0: return res #done
     raise
 
-def linear_repartition(x,n):
+def triangular_repartition(x,n):
     """ divide 1 into n fractions such that:
     - their sum is 1
     - they follow a triangular linear repartition (sorry, no better name for now) where x/1 is the maximum
@@ -443,4 +443,27 @@ def linear_repartition(x,n):
             
     w=1/n #width of a slice
     return [_integral(i*w,(i+1)*w) for i in range(n)]
+
+def rectangular_repartition(x,n,h):
+    """ divide 1 into n fractions such that:
+    - their sum is 1
+    - they follow a repartition along a pulse of height h<1
+    """
+    w=1/n #width of a slice and of the pulse
+    x=max(x,w/2)
+    x=min(x,1-w/2)
+    xa,xb=x-w/2,x+w/2 #start,end of the pulse
+    o=(1-h)/(n-1) #base level
+
+    def _integral(x1,x2):
+        """return integral between x1 and x2"""
+        if x2<=xa or x1>=xb:
+            return o
+        elif x1<xa:
+            return  (o*(xa-x1)+h*(w-(xa-x1)))/w
+        else: # x1<=xb
+            return  (h*(xb-x1)+o*(w-(xb-x1)))/w
+            
+    return [_integral(i*w,(i+1)*w) for i in range(n)]
+    
         
