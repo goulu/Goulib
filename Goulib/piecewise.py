@@ -58,7 +58,7 @@ class Piecewise(Expr):
         return len(self.x)
     
     def __iter__(self):
-        """iterators through disconuities. take the opportunity to delete redundant tuples"""
+        """iterators through discontinuities. take the opportunity to delete redundant tuples"""
         prev=None
         i=0
         while i<len(self):
