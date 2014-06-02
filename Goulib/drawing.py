@@ -638,7 +638,8 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
     
-    def __init__(self, filename=None, **kwargs):
+    def __init__(self, filename=None, data=[], **kwargs):
+        Group.__init__(self,data)
         if filename:
             self.load(filename,**kwargs)
             
