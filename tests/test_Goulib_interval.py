@@ -1,6 +1,4 @@
-from nose.tools import assert_equal, assert_true, assert_false
-from nose import SkipTest
-
+from Goulib.tests import *
 from Goulib.interval import *
 
 class TestInInterval:
@@ -35,6 +33,7 @@ class TestInterval:
         self.i13 = Interval(1,3)
         self.i24 = Interval(2,4)
         self.i33 = Interval(3,3) #empty
+        self.i34 = Interval(3,3) #empty
         
     def test___init__(self):
         pass #tested above
@@ -52,8 +51,10 @@ class TestInterval:
         assert_equal(dict[Interval(2,1)],self.i12)
         
     def test___cmp__(self):
-        assert_equal(self.i12<self.i24,True)
-        assert_equal(self.i12>self.i24,False)
+        assert_equal(self.i12<self.i34,True)
+        assert_equal(self.i12>self.i34,False)
+        assert_equal(self.i12==self.i24,True)
+        assert_equal(self.i12==self.i24,True)
 
     def test___contains__(self):
         assert_true(2 in self.i13)
@@ -96,6 +97,10 @@ class TestInterval:
         i24=Interval(2,3)+Interval(3,4)
         assert_equal(i24,self.i24)
         assert_equal(Interval(4,5)+Interval(2,3),Intervals([Interval(4,5),Interval(2,3)]))
+        a=Interval(5,6)+Interval(2,3)
+        a+=Interval(3,4)
+        b=Intervals([Interval(5,6),Interval(2,4)])
+        assert_equal(a,b)
 
 class TestIntervals:
     @classmethod
@@ -103,8 +108,9 @@ class TestIntervals:
         i12 = Interval(1,2)
         i13 = Interval(1,3)
         i24 = Interval(2,4)
-        self.intervals=Intervals([i24,i13,i12])
-        assert_equal(str(self.intervals),'[[1,2), [1,3), [2,4)]')
+        i56 = Interval(5,6)
+        self.intervals=Intervals([i24,i13,i12,i56])
+        assert_equal(str(self.intervals),'[[1,4), [5,6)]')
     
     def test___init__(self):
         pass #tested above
@@ -115,15 +121,10 @@ class TestIntervals:
         raise SkipTest # TODO: implement your test here
 
     def test_append(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.append(item))
-        raise SkipTest # TODO: implement your test here
-
+        pass #tested above
+    
     def test_extend(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.extend(iterable))
-        raise SkipTest # TODO: implement your test here
+        pass #tested above
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

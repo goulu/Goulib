@@ -69,19 +69,20 @@ class Interval(object):
         "String representation."
         return '[%s,%s)' % (self.start, self.end)
     
-    def __cmp__(self, other):
-        "Compare."
-        if None == other:
-            return 1
-        start_cmp = cmp(self.start, other.start)
-        if 0 != start_cmp:
-            return start_cmp
-        else:
-            return cmp(self.end, other.end)
-
     def __hash__(self):
         "Hash."
         return hash(self.start) ^ hash(self.end)
+    
+    def __cmp__(self, other):
+        "Compare."
+        if other is None:
+            return 1
+        if self.end<other.start :
+            return -1
+        elif self.start>other.end :
+            return 1
+        else:
+            return 0 #means there is some kind of overlap or intersection
     
     def intersection(self, other):
         "Intersection. :return: None if no intersection."
@@ -93,9 +94,7 @@ class Interval(object):
 
     def hull(self, other):
         ":return: Interval containing both self and other."
-        if self > other:
-            other, self = self, other
-        return Interval(self.start, other.end)
+        return Interval(min(self.start,other.start), max(self.end,other.end))
     
     def overlap(self, other, allow_contiguous=False):
         ":return: True iff self intersects other."
@@ -105,6 +104,12 @@ class Interval(object):
             return self.end >= other.start
         else:
             return self.end > other.start
+        
+    def __add__(self,other):
+        if self.overlap(other,True):
+            return self.hull(other)
+        else:
+            return Intervals([self,other])
          
     def __contains__(self, x):
         ":return: True if x in self."
@@ -135,11 +140,7 @@ class Interval(object):
         else:
             return other.start - self.end
         
-    def __add__(self,other):
-        if self.overlap(other,True):
-            return self.hull(other)
-        else:
-            return Intervals([self,other])
+
   
 import bisect      
 class Intervals(list):
@@ -151,10 +152,26 @@ class Intervals(list):
     def extend(self,iterable):
         for i in iterable:
             self.append(i)
+        return self
     
     def append(self, item):
-        i=bisect.bisect_left(self,item)
+        i=bisect.bisect_left(self,item) #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
+        try:
+            if self[i].overlap(item,True):
+                return self.append(self.pop(i).hull(item))
+        except:
+            pass
         super(Intervals,self).insert(i,item)
+        return self
+    
+    def __iadd__(self,item):
+        return self.append(item)
+    
+    def __add__(self,item):
+        return Intervals(self).append(item)
+        
+    def insert(self, i,x):
+        raise IndexError('Intervals do not support insert. Use append or + operator.')
         
     def __call__(self,x):
         """ returns list of intervals containing x"""
