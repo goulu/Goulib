@@ -105,54 +105,30 @@ class TestTable:
         assert_equal(self.t2.ncols(),8)  
 
     def test_find_col(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.find_col(title))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.t.find_col('Date'),self.t._i('OrderDate'))
 
     def test_get(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.get(row, col))
-        raise SkipTest # TODO: implement your test here
+        assert_equal(self.t.get(3,'Cost'),self.t[3][5])
+        assert_equal(self.t.get(-1,'Total'),139.72)
 
     def test_groupby(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.groupby(by, sort, removecol))
+        d=self.t.groupby('Region')
+        assert_equal(sum([len(d[k]) for k in d]),len(self.t))
+        assert_equal(len(d['East']),13)
+
+    def test___eq__(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.__eq__(other))
         raise SkipTest # TODO: implement your test here
 
     def test_hierarchy(self):
-        # table = Table(filename, titles, init, **kwargs)
+        # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.hierarchy(by, factory, linkfct))
         raise SkipTest # TODO: implement your test here
 
-    def test_remove_lines_where(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.remove_lines_where(filter))
-        raise SkipTest # TODO: implement your test here
-
-    def test_rowasdict(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.rowasdict(i))
-        raise SkipTest # TODO: implement your test here
-
-    def test_set(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.set(row, col, value))
-        raise SkipTest # TODO: implement your test here
-
-
-    def test_total(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.total(funcs))
-        raise SkipTest # TODO: implement your test here
-    
     def test_icol(self):
-        # table = Table(filename, titles, init, **kwargs)
+        # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.icol(by))
-        raise SkipTest # TODO: implement your test here
-
-    def test___eq__(self):
-        # table = Table(filename, titles, init, **kwargs)
-        # assert_equal(expected, table.__eq__(other))
         raise SkipTest # TODO: implement your test here
 
     def test_read_element(self):
@@ -165,9 +141,24 @@ class TestTable:
         # assert_equal(expected, table.read_html(filename, **kwargs))
         raise SkipTest # TODO: implement your test here
 
-class TestHtml:
-    def test_html(self):
-        # assert_equal(expected, html(self))
+    def test_remove_lines_where(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.remove_lines_where(filter))
+        raise SkipTest # TODO: implement your test here
+
+    def test_rowasdict(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.rowasdict(i))
+        raise SkipTest # TODO: implement your test here
+
+    def test_set(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.set(row, col, value))
+        raise SkipTest # TODO: implement your test here
+
+    def test_total(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.total(funcs))
         raise SkipTest # TODO: implement your test here
 
 class TestAttr:
@@ -178,6 +169,11 @@ class TestAttr:
 class TestRead:
     def test_read(self):
         # assert_equal(expected, read(x))
+        raise SkipTest # TODO: implement your test here
+
+class TestHtml:
+    def test_html(self):
+        # assert_equal(expected, html(self, **kwargs))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
