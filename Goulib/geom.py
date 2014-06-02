@@ -2070,9 +2070,7 @@ class Quaternion:
 
 # Geometry
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
-# ---------------------------------------------------------------------------
-
-from abc import ABCMeta #Abstract Base Class
+# --------------------------------------------------------------------------
     
 class Geometry(object):
     """
@@ -2092,7 +2090,8 @@ class Geometry(object):
         >>> line.connect(circ).p2
         Point2(1.59, 0.59)
     """
-    __metaclass__ = ABCMeta
+    import abc #Abstract Base Class
+    __metaclass__ = abc.ABCMeta
     def _connect_unimplemented(self, other):
         raise AttributeError, 'Cannot connect %s to %s' % \
             (self.__class__, other.__class__)
