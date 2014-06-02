@@ -58,10 +58,6 @@ class TestInterval:
     def test___contains__(self):
         assert_true(2 in self.i13)
         assert_false(3 in self.i13)
-        
-    def test_contains(self):
-        assert_true(self.i13.contains(2))
-        assert_false(self.i13.contains(3))
 
     def test_empty(self):
         assert_true(self.i33.empty())
@@ -95,6 +91,11 @@ class TestInterval:
         assert_true(Interval(1,2).singleton())
         assert_false(Interval(1,3).singleton())
 
+    def test___add__(self):
+        assert_equal(Interval(1,3)+Interval(2,4),Interval(1,4))
+        i24=Interval(2,3)+Interval(3,4)
+        assert_equal(i24,self.i24)
+        assert_equal(Interval(4,5)+Interval(2,3),Intervals([Interval(4,5),Interval(2,3)]))
 
 class TestIntervals:
     @classmethod

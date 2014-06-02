@@ -1,12 +1,9 @@
 #! /usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-from nose import SkipTest
-from nose.tools import assert_equal, assert_true
-
+from Goulib.tests import *
 from Goulib.table import *
-import datetime
+import datetime,os
 
 class TestTable:
     
@@ -177,13 +174,4 @@ class TestHtml:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
-    import sys
-    import nose
-    from cStringIO import StringIO  
-    module_name = sys.modules[__name__].__file__
-
-    old_stdout = sys.stdout
-    sys.stdout = mystdout = StringIO()
-    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
-    sys.stdout = old_stdout
-    print mystdout.getvalue()
+    runmodule()

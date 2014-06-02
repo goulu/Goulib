@@ -1,5 +1,4 @@
-from nose.tools import assert_equal
-from nose import SkipTest
+from Goulib.tests import *
 from Goulib.colors import *
 
 class TestRgbToHex:
@@ -10,6 +9,16 @@ class TestHexToRgb:
     def test_hex_to_rgb(self):
         assert_equal(hex_to_rgb('#0010ff'),(0,16,255))
         assert_equal(hex_to_rgb('#0010ff',1./255),(0,16./255,1))
+        
+class TestRgbToCmyk:
+    def test_rgb_to_cmyk(self):
+        assert_equal(rgb_to_cmyk(0,0,0),(0,0,0,1))
+        assert_almost_equal(rgb_to_cmyk(.8,.6,.4),(0,0.25,.5,0.2))
+
+class TestNearestColor:
+    def test_nearest_color(self):
+        # assert_equal(expected, nearest_color(x))
+        raise SkipTest # TODO: implement your test here
 
 class TestColorRange:
     def test_color_range(self):
@@ -46,22 +55,14 @@ class TestColor:
         pass #tested above
 
     def test___repr__(self):
-        pass #tested above
+        assert_equal(repr(Color('blue')),"Color('blue')")
+        
+    def test__repr_html_(self):
+        assert_equal(Color('blue')._repr_html_(),'<div style="color:#0000ff">blue</div>')
 
     def test_hex(self):
         pass #tested above
 
-class TestRgbToCmyk:
-    def test_rgb_to_cmyk(self):
-        # assert_equal(expected, rgb_to_cmyk(r, g, b))
-        raise SkipTest # TODO: implement your test here
-
-class TestNearestColor:
-    def test_nearest_color(self):
-        # assert_equal(expected, nearest_color(x))
-        raise SkipTest # TODO: implement your test here
-
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()
 

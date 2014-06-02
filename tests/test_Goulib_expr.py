@@ -10,7 +10,7 @@ class TestExpr:
     def setup_class(self):
         self.f1=Expr(1)
         self.fx=Expr(lambda x:x,name='x')
-        self.fx2=Expr(lambda x:x*x,name='x')
+        self.fx2=Expr(lambda x:x*x,name='x^2')
         self.fs=Expr(sin)
         
         self.fb1=Expr(lambda x:x>1,name='x>1')
@@ -28,18 +28,28 @@ class TestExpr:
         assert_equal(repr(self.f1),'1')     
         assert_equal(repr(self.fx),'x')    
         assert_equal(repr(self.fs),'sin')    
-        assert_equal(repr(self.fb1),'x>1')      
+        assert_equal(repr(self.fb1),'x>1')    
+        
+    def test__repr_latex_(self):
+        assert_equal(self.f1.latex,'$1$')     
+        assert_equal(self.fx.latex,'$x$')    
+        assert_equal(self.fs.latex,'$\sin$')    
+        assert_equal(self.fb1.latex,'$x>1$')      
 
     def test___add__(self):
         f=self.fx+self.f1
         assert_equal(f([-1,0,1]),[0,1,2])
         assert_equal(repr(f),'+(x,1)')     
+        assert_equal(f.latex,'$x+1$')     
         
     def test___neg__(self):
-        assert_equal(repr(-self.f1),'-1')     
+        f=-self.f1
+        assert_equal(repr(f),'-1')     
+        assert_equal(f.latex,'$-1$')    
         f=-self.fx
         assert_equal(f([-1,0,1]),[1,0,-1])
         assert_equal(repr(f),'-(x)')
+        assert_equal(f.latex,'$-x$') 
         
     def test___sub__(self):
         f=self.f1-self.fx
@@ -65,10 +75,12 @@ class TestExpr:
         pass # in fact we do only truedivs with Expr s
     
     def test_applx(self):
-        e=self.fs.applx(self.fx2,name='sin(x^2)')
-        assert_equal(e(2),sin(4))
-        e=self.fs(self.fx2)
-        assert_equal(e(2),sin(4))
+        f=self.fs.applx(self.fx2)
+        assert_equal(f.latex,'$\sin{x^2}$') 
+        assert_equal(f(2),sin(4))
+        f=self.fs(self.fx2)
+        assert_equal(f.latex,'$\sin{x^2}$') 
+        assert_equal(f(2),sin(4))
     
     def test_apply(self):
         f1=self.fx.apply(self.fs)
@@ -103,6 +115,11 @@ class TestExpr:
     def test___rshift__(self):
         e=self.fx>>2
         assert_equal(e(0),-2)
+
+    def test_latex(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.latex())
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     import nose

@@ -236,6 +236,11 @@ class TestWriteDxf:
         # assert_equal(expected, write_dxf(g, filename))
         raise SkipTest # TODO: implement your test here
 
+class TestToNetworkxGraph:
+    def test_to_networkx_graph(self):
+        # assert_equal(expected, to_networkx_graph(data, create_using, multigraph_input))
+        raise SkipTest # TODO: implement your test here
+
 if __name__=="__main__":
     import sys
     import nose

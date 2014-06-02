@@ -1,6 +1,5 @@
-from nose.tools import assert_equal, assert_true, assert_false, assert_almost_equal, assert_raises
-from nose import SkipTest
-from random import random
+
+from Goulib.tests import *
 from Goulib.math2 import *
 
 class TestQuad:
@@ -88,6 +87,8 @@ class TestVeccompare:
         v1=range(5)[1:]
         v2=list(accsum(v1))
         assert_equal(veccompare(v1,v2),[3,1,0])
+
+from random import random
 
 class TestMean:
     def test_mean(self):
@@ -180,16 +181,16 @@ class TestPrimeFactors:
 
 class TestFactorize:
     def test_factorize(self):
-        assert_equal(list(factorize(2014)),[(2, 1), (19, 1), (53, 1)])
-        assert_equal(list(factorize(2048)),[(2,11)])
+        assert_equal(factorize(2014),[(2, 1), (19, 1), (53, 1)])
+        assert_equal(factorize(2048),[(2,11)])
         
 class TestDivisors:
     def test_divisors(self):
-        assert_equal(list(divisors(2014)),[1, 53, 19, 1007, 2, 106, 38, 2014])
+        assert_equal(divisors(2014),[1, 53, 19, 1007, 2, 106, 38, 2014])
 
 class TestProperDivisors:
     def test_proper_divisors(self):
-        assert_equal(list(proper_divisors(2014)),[1, 53, 19, 1007, 2, 106, 38])
+        assert_equal(proper_divisors(2014),[1, 53, 19, 1007, 2, 106, 38])
 
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
@@ -275,25 +276,46 @@ class TestProportional:
         assert_equal(sum(proportional(37, votes)),37)
         assert_equal(proportional(37, votes),[4,7,11,15])
 
-class TestLinearRepartition:
-    def test_linear_repartition(self):
+class TestTriangularRepartition:
+    def test_triangular_repartition(self):
         
         ref=[0.01,0.03,0.05,0.07,0.09,0.11,0.13,0.15,0.17,0.19]
-        res=linear_repartition(1,10)
+        res=triangular_repartition(1,10)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         ref.reverse()
-        res=linear_repartition(0,10)
+        res=triangular_repartition(0,10)
         assert_almost_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.02,0.06,0.1,0.14,0.18,0.18,0.14,0.1,0.06,0.02]
-        res=linear_repartition(.5,10)
+        res=triangular_repartition(.5,10)
         assert_almost_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.08,0.24,0.36,0.24,0.08]
-        res=linear_repartition(.5,5) # center value is top of triangle
+        res=triangular_repartition(.5,5) # center value is top of triangle
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+
+class TestRectangularRepartition:
+    def test_rectangular_repartition(self):
+        ref=[.5,.125,.125,.125,.125]
+        res=rectangular_repartition(0,5,.5)
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        
+        ref=[0.3125,0.3125,.125,.125,.125]
+        res=rectangular_repartition(.2,5,.5)
+        assert_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        ref.reverse()
+        res=rectangular_repartition(.8,5,.5)
+        assert_almost_equal(sum(res),1)
+        assert_true(dist(res,ref)<1E-6)
+        
+        ref=[0.1,0.1675,0.3325,.1,.1,.1,.1]
+        res=rectangular_repartition(.325,7,.4)
         assert_almost_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
@@ -331,5 +353,4 @@ class TestSat:
         assert_equal(sat([-2,-1,0,1,2,3],-1,2),[-1,-1,0,1,2,2])
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

@@ -1,5 +1,4 @@
-from nose.tools import assert_equal, assert_true
-from nose import SkipTest
+from Goulib.tests import *
 from Goulib.datetime2 import *
 
 
@@ -106,5 +105,4 @@ class TestTimeIntersect:
 
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

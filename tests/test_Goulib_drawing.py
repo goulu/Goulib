@@ -1,5 +1,4 @@
-from nose.tools import assert_equal, assert_almost_equal
-from nose import SkipTest
+from Goulib.tests import *
 
 import os, math
 from Goulib.geom import *
@@ -207,9 +206,7 @@ class TestGroup:
         raise SkipTest # TODO: implement your test here
 
     def test_append(self):
-        # group = Group()
-        # assert_equal(expected, group.append(entity))
-        raise SkipTest # TODO: implement your test here
+        pass #tested in TestDrawing.test_render
 
     def test_to_dxf(self):
         # group = Group()
@@ -274,6 +271,11 @@ class TestDrawing:
         self.pdf= Drawing(self.path+'/drawing.pdf')
         self.svg= Drawing(self.path+'/drawing.svg')
         
+        seg=Segment2((1,0),(2,3))
+        arc=Arc2((1,1),(0,0),radians(120))
+        circle=Circle((1,1),2)
+        self.simple=Drawing(data=[seg,arc,circle])
+        
     def test_load(self):
         pass #tested above
     
@@ -319,9 +321,7 @@ class TestDrawing:
         raise SkipTest # TODO: implement your test here
 
     def test_render(self):
-        # drawing = Drawing(filename, **kwargs)
-        # assert_equal(expected, drawing.render(format, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        assert_true('!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
 
     def test_img(self):
         # drawing = Drawing(filename, **kwargs)
@@ -374,13 +374,4 @@ class TestSpline:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
-    import sys
-    import nose
-    from cStringIO import StringIO  
-    module_name = sys.modules[__name__].__file__
-
-    old_stdout = sys.stdout
-    sys.stdout = mystdout = StringIO()
-    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
-    sys.stdout = old_stdout
-    print mystdout.getvalue()
+    runmodule()
