@@ -1,5 +1,4 @@
-from nose.tools import assert_equal
-from nose import SkipTest
+from Goulib.tests import *
 
 from Goulib.expr import *
 from math import *
@@ -105,8 +104,8 @@ class TestExpr:
         assert_equal(fb([1,2,3]),[False,True,False])
 
     def test___cmp__(self):
-        assert_equal(Expr(1)>Expr(2),False)
-        assert_equal(Expr(1)<Expr(2),True)
+        assert_false(Expr(1)>Expr(2))
+        assert_true(Expr(1)<Expr(2))
         
     def test___lshift__(self):
         e=self.fx<<1
@@ -122,5 +121,4 @@ class TestExpr:
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

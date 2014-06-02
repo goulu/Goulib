@@ -1,5 +1,4 @@
-from nose.tools import assert_equal, assert_almost_equal
-from nose import SkipTest
+from Goulib.tests import *
 
 from Goulib.piecewise import *
 from Goulib.itertools2 import arange
@@ -115,5 +114,4 @@ class TestPiecewise:
 
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()
