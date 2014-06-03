@@ -1,6 +1,4 @@
-from nose.tools import assert_equal, assert_true, assert_false
-from nose import SkipTest
-
+from Goulib.tests import *
 from Goulib.itertools2 import *
 
 def iterable(n=10,s=1):
@@ -9,7 +7,7 @@ def iterable(n=10,s=1):
 
 class TestTake:
     def test_take(self):
-        assert_equal(list(take(3, iterable())),[1,2,3])
+        assert_equal(take(3, iterable()),[1,2,3])
 
 class TestIndex:
     def test_index(self):
@@ -26,11 +24,11 @@ class TestLast:
 
 class TestTakeEvery:
     def test_take_every(self):
-        assert_equal(list(take_every(2, iterable())),[1,3,5,7,9])
+        assert_equal(take_every(2, iterable()),[1,3,5,7,9])
 
 class TestDrop:
     def test_drop(self):
-        assert_equal(list(drop(5, iterable())),[6,7,8,9,10])
+        assert_equal(drop(5, iterable()),[6,7,8,9,10])
 
 class TestIlen:
     def test_ilen(self):
@@ -39,23 +37,23 @@ class TestIlen:
 
 class TestIrange:
     def test_irange(self):
-        assert_equal(list(irange(1,5)),[1,2,3,4,5])
+        assert_equal(irange(1,5),[1,2,3,4,5])
 
 class TestArange:
     def test_arange(self):
-        assert_equal(list(arange(-1,2.5,.5)),[-1,-0.5,0,0.5,1,1.5,2])
+        assert_equal(arange(-1,2.5,.5),[-1,-0.5,0,0.5,1,1.5,2])
 
 class TestIlinear:
     def test_ilinear(self):
-        assert_equal(list(ilinear(-1,2,7)),[-1,-0.5,0,0.5,1,1.5,2])
+        assert_equal(ilinear(-1,2,7),[-1,-0.5,0,0.5,1,1.5,2])
 
 class TestFlatten:
     def test_flatten(self):
-        assert_equal(list(flatten([[1,2],[3]])),[1,2,3])
+        assert_equal(flatten([[1,2],[3]]),[1,2,3])
 
 class TestCompact:
     def test_compact(self):
-        assert_equal(list(compact([None,1,2,None,3,None])),[1,2,3])
+        assert_equal(compact([None,1,2,None,3,None]),[1,2,3])
 
 class TestGroups:
     def test_groups(self):
@@ -134,8 +132,11 @@ class TestQuantify:
 
 class TestPairwise:
     def test_pairwise(self):
-        assert_equal(list(pairwise([1,2,3])),[(1,2),(2,3)])
-        # assert_equal(list(pairwise([1,2,3],True)),[(1,2),(2,3),(3,1)])
+        assert_equal(pairwise([1,2,3]),[(1,2),(2,3)])
+        assert_equal(pairwise([1,2,3],True),[(1,2),(2,3),(3,1)])
+        assert_equal(pairwise([]),[])
+        assert_equal(pairwise([1]),[])
+        assert_equal(pairwise([1],True),[(1,1)])
     
 class TestInterleave:
     def test_interleave(self):
@@ -186,7 +187,7 @@ class TestIter2:
     def test___add__(self):
         i1 = iter2(iterable(5))
         i2 = iter2(iterable(10,6))
-        assert_equal(list(i1+i2),range(1,11))
+        assert_equal(i1+i2,range(1,11))
 
     def test___init__(self):
         # iter2 = iter2(iterable)
@@ -239,9 +240,8 @@ class TestOccurrences:
 
 class TestBest:
     def test_best(self):
-        assert_equal(list(best([3,2,1,2,1])),[1,1])
-        assert_equal(list(best([3,2,1,2,1],reverse=True,n=2)),[3,2,2])
+        assert_equal(best([3,2,1,2,1]),[1,1])
+        assert_equal(best([3,2,1,2,1],reverse=True,n=2),[3,2,2])
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

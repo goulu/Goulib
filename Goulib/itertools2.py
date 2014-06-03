@@ -207,10 +207,25 @@ def quantify(iterable, pred=bool):
     """:return: int count how many times the predicate is true"""
     return sum(imap(pred, iterable),0)
                 
-def pairwise(iterable):
-    a, b = tee(iterable)
-    next(b, None)
-    return izip(a, b)
+def pairwise(iterable,loop=False):
+    """
+    iterates through consecutive pairs
+    :param iterable: input iterable s1,s2,s3, .... sn
+    :param loop: boolean True if last pair should be (sn,s1) to close the loop
+    :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
+    """
+    #not very pythonic, but works
+    init=True
+    for b in iterable:
+        if init:
+            first=b
+            a=first
+            init=False
+        else:    
+            yield a,b
+        a=b
+    if loop:
+        yield a,first
 
 def grouped(iterable, n=2):
     """
