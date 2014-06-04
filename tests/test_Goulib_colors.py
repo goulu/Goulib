@@ -1,4 +1,8 @@
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 from Goulib.colors import *
 
 class TestRgbToHex:
@@ -18,7 +22,7 @@ class TestRgbToCmyk:
 class TestNearestColor:
     def test_nearest_color(self):
         # assert_equal(expected, nearest_color(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 class TestColorRange:
     def test_color_range(self):

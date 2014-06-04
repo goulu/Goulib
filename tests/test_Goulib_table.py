@@ -1,7 +1,8 @@
-#! /usr/local/bin/python
-# -*- coding: utf-8 -*-
-
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 from Goulib.table import *
 import datetime,os
 
@@ -116,62 +117,62 @@ class TestTable:
     def test___eq__(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_hierarchy(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.hierarchy(by, factory, linkfct))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_icol(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.icol(by))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_read_element(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.read_element(element, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_read_html(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.read_html(filename, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_remove_lines_where(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.remove_lines_where(filter))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_rowasdict(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.rowasdict(i))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_set(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.set(row, col, value))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_total(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.total(funcs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestAttr:
     def test_attr(self):
         # assert_equal(expected, attr(args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestRead:
     def test_read(self):
         # assert_equal(expected, read(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestHtml:
     def test_html(self):
         # assert_equal(expected, html(self, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
     runmodule()

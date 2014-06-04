@@ -1,4 +1,8 @@
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 from Goulib.interval import *
 
 class TestInInterval:
@@ -118,13 +122,28 @@ class TestIntervals:
     def test___call__(self):
         # intervals = Intervals(init)
         # assert_equal(expected, intervals.__call__(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
     def test_append(self):
         pass #tested above
     
     def test_extend(self):
         pass #tested above
+
+    def test___add__(self):
+        # intervals = Intervals(init)
+        # assert_equal(expected, intervals.__add__(item))
+        raise SkipTest
+
+    def test___iadd__(self):
+        # intervals = Intervals(init)
+        # assert_equal(expected, intervals.__iadd__(item))
+        raise SkipTest
+
+    def test_insert(self):
+        # intervals = Intervals(init)
+        # assert_equal(expected, intervals.insert(i, x))
+        raise SkipTest
 
 if __name__ == "__main__":
     runmodule()

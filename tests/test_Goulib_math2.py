@@ -1,5 +1,8 @@
-
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 from Goulib.math2 import *
 
 class TestQuad:
@@ -115,27 +118,27 @@ class TestStats:
 class TestFibonacci:
     def test_fibonacci(self):
         # assert_equal(expected, fibonacci())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestFactorial:
     def test_factorial(self):
         # assert_equal(expected, factorial(num))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsInteger:
     def test_is_integer(self):
         # assert_equal(expected, is_integer(x, epsilon))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIntOrFloat:
     def test_int_or_float(self):
         # assert_equal(expected, int_or_float(x, epsilon))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGetPrimes:
     def test_get_primes(self):
         # assert_equal(expected, get_primes(start, memoized))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestDigitsFromNumFast:
     def test_digits_from_num_fast(self):
@@ -165,7 +168,7 @@ class TestNumberOfDigits:
 class TestIsPalindromic:
     def test_is_palindromic(self):
         # assert_equal(expected, is_palindromic(num, base))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsPrime:
     def test_is_prime(self):
@@ -195,77 +198,77 @@ class TestProperDivisors:
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
         # assert_equal(expected, greatest_common_divisor(a, b))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestLeastCommonMultiple:
     def test_least_common_multiple(self):
         # assert_equal(expected, least_common_multiple(a, b))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestTriangle:
     def test_triangle(self):
         # assert_equal(expected, triangle(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsTriangle:
     def test_is_triangle(self):
         # assert_equal(expected, is_triangle(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPentagonal:
     def test_pentagonal(self):
         # assert_equal(expected, pentagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsPentagonal:
     def test_is_pentagonal(self):
         # assert_equal(expected, is_pentagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestHexagonal:
     def test_hexagonal(self):
         # assert_equal(expected, hexagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGetCardinalName:
     def test_get_cardinal_name(self):
         # assert_equal(expected, get_cardinal_name(num))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsPerfect:
     def test_is_perfect(self):
         # assert_equal(expected, is_perfect(num))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIsPandigital:
     def test_is_pandigital(self):
         # assert_equal(expected, is_pandigital(digits, through))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestSetsDist:
     def test_sets_dist(self):
         # assert_equal(expected, sets_dist(a, b))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestSetsLevenshtein:
     def test_sets_levenshtein(self):
         # assert_equal(expected, sets_levenshtein(a, b))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestLevenshtein:
     def test_levenshtein(self):
         # assert_equal(expected, levenshtein(seq1, seq2))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestNcombinations:
     def test_ncombinations(self):
         # assert_equal(expected, ncombinations(n, k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         # assert_equal(expected, combinations_with_replacement(iterable, r))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestProportional:
     def test_proportional(self):
@@ -322,27 +325,27 @@ class TestRectangularRepartition:
 class TestNorm2:
     def test_norm_2(self):
         # assert_equal(expected, norm_2(v))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestNorm1:
     def test_norm_1(self):
         # assert_equal(expected, norm_1(v))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestNormInf:
     def test_norm_inf(self):
         # assert_equal(expected, norm_inf(v))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestNorm:
     def test_norm(self):
         # assert_equal(expected, norm(v, order))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestDist:
     def test_dist(self):
         # assert_equal(expected, dist(a, b, norm))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestSat:
     def test_sat(self):

@@ -1,5 +1,7 @@
-from nose.tools import assert_equal, assert_true, assert_false, assert_almost_equal, raises
+from nose.tools import assert_equal
 from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
+from Goulib.tests import *
 
 from Goulib.graph import *
 
@@ -137,47 +139,47 @@ class TestGeoGraph:
     def test_contiguity(self):
         # geo_graph = GeoGraph(G, multi, **kwargs)
         # assert_equal(expected, geo_graph.contiguity(pt1, pt2))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_tol(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.tol())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___str__(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.__str__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_add_node(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.add_node(n, attr_dict, **attr))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_add_nodes_from(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.add_nodes_from(nodes, **attr))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_copy(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.copy())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_number_of_nodes(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.number_of_nodes())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_draw(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.draw(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_clear(self):
         # geo_graph = GeoGraph(data, **kwargs)
         # assert_equal(expected, geo_graph.clear())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestRender:
     def test_render(self):
@@ -208,18 +210,18 @@ class TestEuclideanMinimumSpanningTree:
 class TestFigure:
     def test_figure(self):
         # assert_equal(expected, figure(g))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestDraw:
     def test_draw(self):
         # assert_equal(expected, draw(g, pos, ax, hold, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 
 class TestDrawNetworkx:
     def test_draw_networkx(self):
         # assert_equal(expected, draw_networkx(g, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPointsOnSphere:
     def test_points_on_sphere(self):
@@ -229,27 +231,17 @@ class TestPointsOnSphere:
 class TestToDrawing:
     def test_to_drawing(self):
         # assert_equal(expected, to_drawing(g, d, edges))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestWriteDxf:
     def test_write_dxf(self):
         # assert_equal(expected, write_dxf(g, filename))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestToNetworkxGraph:
     def test_to_networkx_graph(self):
         # assert_equal(expected, to_networkx_graph(data, create_using, multigraph_input))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
-    import sys
-    import nose
-    from cStringIO import StringIO  
-    
-    module_name = sys.modules[__name__].__file__
-
-    old_stdout = sys.stdout
-    sys.stdout = mystdout = StringIO()
-    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
-    sys.stdout = old_stdout
-    print mystdout.getvalue()
+    runmodule()

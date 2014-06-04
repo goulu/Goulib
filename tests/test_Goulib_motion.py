@@ -1,7 +1,9 @@
 from __future__ import division #"true division" everywhere
 
-from nose.tools import assert_equal,assert_almost_equal,assert_true
+from nose.tools import assert_equal
 from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
+from Goulib.tests import *
 from Goulib.motion import *
 
 def pva_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
@@ -51,7 +53,7 @@ class TestSegmentPoly:
         
     def test___init__(self):
         # segment_poly = SegmentPoly(t0, t1, p)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestSegment2ndDegree:
     @classmethod
@@ -125,7 +127,7 @@ class TestSegment2ndDegree:
         
     def test_segment2nd_degree(self):
         # assert_equal(expected, Segment2ndDegree(t0, t1, start, end))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
     
 class TestRamp:
     def test_ramp(self):
@@ -147,7 +149,7 @@ class TestSegmentTrapezoidalSpeed:
         self.end=(self.p1, self.v1, self.a1, 0)
     def test_segment_trapezoidal_speed(self):
         # assert_equal(expected, SegmentTrapezoidalSpeed(t0, p0, p1, a, T, vmax))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestSegment4thDegree:
     def setup(self):
@@ -165,5 +167,4 @@ class TestSegment4thDegree:
 
 
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
+    runmodule()

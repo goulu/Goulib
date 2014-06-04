@@ -1,3 +1,6 @@
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 
 from Goulib.piecewise import *

@@ -36,6 +36,8 @@ assert_true=nose.tools.assert_true
 assert_false=nose.tools.assert_false
 assert_raises=nose.tools.assert_raises
 
+raises=nose.tools.raises
+
 SkipTest=nose.SkipTest
 
 def runmodule():

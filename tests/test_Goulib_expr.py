@@ -1,3 +1,6 @@
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 
 from Goulib.expr import *
@@ -118,7 +121,7 @@ class TestExpr:
     def test_latex(self):
         # expr = Expr(f, left, right, name)
         # assert_equal(expected, expr.latex())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 if __name__ == "__main__":
     runmodule()

@@ -1,5 +1,7 @@
-from nose.tools import assert_equal,assert_true
+from nose.tools import assert_equal
 from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
+from Goulib.tests import *
 
 from Goulib.polynomial import *
 
@@ -122,9 +124,7 @@ class TestTostring:
         assert_equal(tostring([0,1.0]),'x') # testing whether 1.0 == 1: risky
                      
 if __name__ == "__main__":
-    import nose
-    nose.runmodule()
-    
+    runmodule()
 
     # Some cases using the polynomial objects:
     print Polynomial([1,2,3]) + Polynomial([1,2]) # add

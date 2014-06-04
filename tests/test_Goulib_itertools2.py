@@ -1,4 +1,8 @@
+from nose.tools import assert_equal
+from nose import SkipTest
+#lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 from Goulib.itertools2 import *
 
 def iterable(n=10,s=1):
@@ -58,27 +62,27 @@ class TestCompact:
 class TestGroups:
     def test_groups(self):
         # assert_equal(expected, groups(iterable, n, step))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCompose:
     def test_compose(self):
         # assert_equal(expected, compose(f, g))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIterate:
     def test_iterate(self):
         # assert_equal(expected, iterate(func, arg))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestTails:
     def test_tails(self):
         # assert_equal(expected, tails(seq))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIreduce:
     def test_ireduce(self):
         # assert_equal(expected, ireduce(func, iterable, init))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestUnique:
     def test_unique(self):
@@ -88,7 +92,7 @@ class TestUnique:
 class TestIdentity:
     def test_identity(self):
         # assert_equal(expected, identity(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestAny:
     def test_any(self):
@@ -108,27 +112,27 @@ class TestNo:
 class TestTakenth:
     def test_takenth(self):
         # assert_equal(expected, takenth(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestTakeevery:
     def test_takeevery(self):
         # assert_equal(expected, takeevery(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIcross:
     def test_icross(self):
         # assert_equal(expected, icross(*sequences))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGetGroups:
     def test_get_groups(self):
         # assert_equal(expected, get_groups(iterable, n, step))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestQuantify:
     def test_quantify(self):
         # assert_equal(expected, quantify(iterable, pred))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPairwise:
     def test_pairwise(self):
@@ -147,12 +151,12 @@ class TestInterleave:
 class TestRandSeq:
     def test_rand_seq(self):
         # assert_equal(expected, rand_seq(size))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestAllPairs:
     def test_all_pairs(self):
         # assert_equal(expected, all_pairs(size))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
     
 class TestFilter2:
     def test_filter2(self):
@@ -181,7 +185,7 @@ class TestSplit:
 class TestNextPermutation:
     def test_next_permutation(self):
         # assert_equal(expected, next_permutation(seq, pred))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIter2:
     def test___add__(self):
@@ -191,52 +195,52 @@ class TestIter2:
 
     def test___init__(self):
         # iter2 = iter2(iterable)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___iter__(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.__iter__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_append(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.append(iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_insert(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.insert(place, iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_next(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.next())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIflatten:
     def test_iflatten(self):
         # assert_equal(expected, iflatten(iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestProduct:
     def test_product(self):
         # assert_equal(expected, product(*iterables, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCountUnique:
     def test_count_unique(self):
         # assert_equal(expected, count_unique(iterable, key))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGrouped:
     def test_grouped(self):
         # assert_equal(expected, grouped(iterable, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestOccurrences:
     def test_occurrences(self):
         # assert_equal(expected, occurrences(it, exchange))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestBest:
     def test_best(self):
