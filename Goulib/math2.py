@@ -11,7 +11,7 @@ __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.p
 __license__ = "LGPL"
 
 import operator,cmath
-from math import sqrt, log, log10, ceil
+from math import pi, sqrt, log, log10, ceil, asin
 from itertools import count, izip, izip_longest, ifilter
 from itertools import combinations, permutations, product as cartesian_product
 
@@ -104,12 +104,18 @@ def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
     return [reduce(operator.sub,l) for l in izip_longest(a,b,fillvalue=fillvalue)]
 
+def vecneg(a):
+    """unary negation"""
+    return map(operator.neg,a)
+
 def vecmul(a,b):
     """product of vectors of inequal lengths"""
     return [reduce(operator.mul,l) for l in izip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
+    if isinstance(b,(int,float)):
+        return [x/b for x in a]
     return [reduce(operator.truediv,l) for l in izip(a,b)]
 
 def veccompare(a,b):
@@ -152,6 +158,10 @@ def norm(v,order=2):
 
 def dist(a,b,norm=norm_2):
     return norm(vecsub(a,b))
+
+def vecunit(v,norm=norm_2):
+    """:return: vector normalized"""
+    return vecdiv(v,norm(v))
 
 def sets_dist(a,b):
     """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
@@ -403,7 +413,23 @@ def combinations_with_replacement(iterable, r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
             
-#repartitions
+#from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
+
+def angle(u,v,unit=True):
+    """
+    :param u,v: iterable vectors
+    :param unit: bool True if vectors are unit vectors. False increases computations
+    :returns: float angle n radians between u and v unit vectors i
+    """
+    if not unit:
+        u=vecunit(u)
+        v=vecunit(v)
+    if dot(u,v) >=0:
+        return 2*asin(dist(v,u)/2)
+    else:
+        return pi - 2*asin(dist(vecneg(v),u)/2)
+            
+#interpolations
 def proportional(nseats,votes):
     """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
     :param nseats: int number of seats to assign

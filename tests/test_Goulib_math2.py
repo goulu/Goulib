@@ -355,5 +355,16 @@ class TestSat:
         assert_equal(sat(3,1,2),2)
         assert_equal(sat([-2,-1,0,1,2,3],-1,2),[-1,-1,0,1,2,2])
 
+class TestVecneg:
+    def test_vecneg(self):
+        assert_equal(vecneg([-2,-1,0,1,2,3]),[2,1,0,-1,-2,-3])
+
+class TestAngle:
+    def test_angle(self):
+        assert_equal(angle((1,0),(0,1)),pi/2)
+        assert_equal(angle((1,0),(-1,0)),pi)
+        assert_equal(angle((1,1),(0,1),unit=False),pi/4)
+        assert_equal(angle(vecunit((2,1)),vecunit((1,-2))),pi/2)
+
 if __name__ == "__main__":
     runmodule()
