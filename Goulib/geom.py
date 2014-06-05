@@ -21,6 +21,7 @@ __revision__ = '$Revision$'
 
 import operator, types
 from math import *
+from Goulib import math2
 
 precision = 1e-9 #for equality comparizons
 
@@ -404,10 +405,13 @@ class Vector2(object):
         return Vector2(self.x - d * normal.x,
                        self.y - d * normal.y)
 
-    def angle(self, other=None):
-        """Return the angle to the vector other"""
+    def angle(self, other=None,unit=False):
+        """
+        :param unit: bool True if vectors are unit vectors. False increases computations
+        :return: float angle in radians to the other vector, or self direction if other=None
+        """
         if other:
-            return acos(self.dot(other) / (self.mag()*other.mag()))
+            return math2.angle(self,other,unit=unit)
         else:
             return atan2(self.y,self.x)
 

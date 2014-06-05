@@ -113,12 +113,12 @@ class TestVector2:
         
     def test_normalized(self):
         assert_true(self.v10.normalized())
-        assert_almost_equal(abs(self.v11.normalized()),1)
+        assert_equal(abs(self.v11.normalized()),1)
         
     def test_normalize(self):
         v=self.v11.copy()
         v.normalize()
-        assert_almost_equal(abs(v),1)
+        assert_equal(abs(v),1)
         
     def test___add__(self):
         assert_equal(self.v10+self.v01, self.v11) # Vector + Vector -> Vector
@@ -173,14 +173,14 @@ class TestVector2:
         assert_equal(self.v11.dot(self.v01),1)
     
     def test_angle(self):
-        assert_almost_equal(self.v10.angle(self.v01),pi/2.)
-        assert_almost_equal(self.v11.angle(self.v01),pi/4.)
+        assert_equal(self.v10.angle(self.v01),pi/2.)
+        assert_equal(self.v11.angle(self.v01),pi/4.)
 
     def test_cross(self):
         assert_equal(self.v10.cross(),-self.v01)
 
     def test_project(self):
-        assert_almost_equal(self.v10.project(self.v11),Vector2(.5,.5))
+        assert_equal(self.v10.project(self.v11),Vector2(.5,.5))
 
     def test_reflect(self):
         assert_equal(self.v11.reflect(self.v10),Vector2(-1,1))
@@ -239,12 +239,12 @@ class TestVector3:
         
     def test_normalized(self):
         assert_true(self.v10.normalized())
-        assert_almost_equal(abs(self.v11.normalized()),1)
+        assert_equal(abs(self.v11.normalized()),1)
         
     def test_normalize(self):
         v=self.v11.copy()
         v.normalize()
-        assert_almost_equal(abs(v),1)
+        assert_equal(abs(v),1)
         
     def test___add__(self):
         assert_equal(self.v10+self.v01, self.v110) # Vector + Vector -> Vector
@@ -299,14 +299,14 @@ class TestVector3:
         assert_equal(self.v11.dot(self.v01),1)
     
     def test_angle(self):
-        assert_almost_equal(self.v10.angle(self.v01),pi/2.)
-        assert_almost_equal(self.v11.angle(self.v01),acos(1/sqrt(3)))
+        assert_equal(self.v10.angle(self.v01),pi/2.)
+        assert_equal(self.v11.angle(self.v01),acos(1/sqrt(3)))
 
     def test_cross(self):
         assert_equal(self.v123.cross(self.v456),Vector3(-3.00, 6.00, -3.00))
 
     def test_project(self):
-        assert_almost_equal(self.v10.project(self.v11),Vector3(1/3.,1/3.,1/3.))
+        assert_equal(self.v10.project(self.v11),Vector3(1/3.,1/3.,1/3.))
 
     def test_reflect(self):
         assert_equal(self.v11.reflect(self.v10),Vector3(-1,1,1))
@@ -341,7 +341,7 @@ class TestMatrix3:
         mat=Matrix3.new_rotate(radians(60))
         s32=sqrt(3)/2
         res=Matrix3.new(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
-        assert_almost_equal(mat, res)
+        assert_equal(mat, res)
         return mat
 
     def test_new_translate(self):
@@ -918,7 +918,7 @@ class TestArc2:
         assert_true(self.ap2.angle()<radians(10)) # check the angle is not the complementary angle
         
     def test___abs__(self):
-        assert_almost_equal(abs(self.a1),pi/2.)
+        assert_equal(abs(self.a1),pi/2.)
         assert_true(self.ap.length<50) # check the angle is not the complementary angle
         assert_true(self.ap2.length<50) # check the angle is not the complementary angle
 
