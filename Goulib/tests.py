@@ -40,7 +40,9 @@ raises=nose.tools.raises
 
 SkipTest=nose.SkipTest
 
-def runmodule():
+def runmodule(redirect=True):
+    if not redirect:
+        return nose.runmodule()
     """ ensures stdout is printed after the tests results"""
     import sys
     from cStringIO import StringIO  
