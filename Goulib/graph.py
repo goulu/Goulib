@@ -4,7 +4,7 @@
 efficient Euclidian Graphs for :ref:`NetworkX <networkx>` and related algorithms
 """
 
-from __future__ import division #"true division" everywhere
+ #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
@@ -12,11 +12,12 @@ __credits__ = []
 __license__ = "LGPL"
 
 import logging
-import math, math2
+import math
 
 import networkx as nx # http://networkx.github.io/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
+import collections
 
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -26,7 +27,8 @@ except: #fallback, especially because I couldn't manage to install rtree on trav
     
 if not RTREE:
     logging.warning('rtree not available, falling back to slow version')
-    import itertools2 #lazy import
+    from . import itertools2 #lazy import
+    from Goulib import math2
     class index: #mimics rtree.index module
 
         class Property:
@@ -51,7 +53,7 @@ if not RTREE:
                 del self[k]
             def nearest(self,p, num_results, objects='raw'):
                 """ very inefficient, but remember it's a fallback..."""
-                return itertools2.best(self.values(),key=lambda q:math2.dist(p,q),n=num_results)
+                return itertools2.best(list(self.values()),key=lambda q:math2.dist(p,q),n=num_results)
 
 _nk=0 # node key
 
@@ -69,7 +71,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         create_using.delauney=data
         triangles=data.points[data.simplices]
         for point in triangles:
-            p=map(tuple,point) #convert from numpy to regular list
+            p=list(map(tuple,point)) #convert from numpy to regular list
             create_using.add_edge(p[0],p[1])
             create_using.add_edge(p[1],p[2])
             create_using.add_edge(p[2],p[0])
@@ -86,6 +88,12 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
                 return create_using
             except:
                 pass
+            #retry without mapping function TODO:rewrite more compactly pythonic...
+            for k in data.node: #create nodes
+                create_using.add_node(k,attr_dict=data.node[k])
+            for u,v,d in data.edges(data=True):
+                create_using.add_edge(u,v,attr_dict=d)
+            return create_using
             
         # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
         return nx.convert.to_networkx_graph(data.adj,create_using,data.is_multigraph())
@@ -122,7 +130,7 @@ class GeoGraph(nx.MultiGraph):
         """does not use deepcopy because the rtree index must be rebuilt"""
         return self.__class__(self,**self.graph)
                 
-    def __nonzero__(self):
+    def __bool__(self):
         """:return: True if graph has at least one node
         """
         return self.number_of_nodes()>0
@@ -447,7 +455,7 @@ def draw_networkx(g, **kwargs):
         pos={} #dict of nodes positions
         for node in g.nodes_iter():
             pos[node]=node[:2] #restrict to 2D in order to handle 3D+ graphs simply
-    elif pos and callable(pos): #mapping function ?
+    elif pos and isinstance(pos, collections.Callable): #mapping function ?
             pos=dict(((node,pos(node)) for node in g.nodes_iter()))
             
     if not pos:
@@ -458,8 +466,8 @@ def draw_networkx(g, **kwargs):
     # build edge_colors
     edge_color=kwargs.get('edge_color',None)
     if edge_color:
-        if callable(edge_color): #mapping function ?
-            edge_color=map(edge_color,(data for u,v,data in edgelist))
+        if isinstance(edge_color, collections.Callable): #mapping function ?
+            edge_color=list(map(edge_color,(data for u,v,data in edgelist)))
     else: #try to color the graph
         edge_color=[]
         for u,v,data in edgelist:
@@ -495,7 +503,7 @@ def to_drawing(g, d=None, edges=[]):
     
     Graph edges with an 'entity' property
     """
-    import drawing, geom
+    from . import drawing, geom
     if d is None: d=drawing.Drawing()
     if not edges:
         edges=g.edges(data=True)
