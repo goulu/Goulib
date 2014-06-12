@@ -383,7 +383,7 @@ class Group(list):
         if isinstance(entity,Entity):
             super(Group,self).append(entity)
         else: #ignore invalid items
-            pass
+            logging.warning('skipped object %s'%entity)
         return self
     
     def bbox(self):
@@ -419,6 +419,39 @@ class Group(list):
                 a=[a]
             res.extend(a)
         return res
+    
+    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, recurse=True):
+        """
+        :param dxf: dxf.entity
+        :return: Entity of correct subtype
+        """
+        if trans is None:
+            trans=Trans()
+            
+        try:
+            self.dxf #already defined ?
+        except:
+            self.dxf=dxf
+            
+        for e in dxf:
+            if layers and e.layer not in layers:
+                continue
+            if only:
+                if e.dxftype in only:
+                    self.append(Entity.from_dxf(e, trans)) 
+                else:
+                    continue
+            elif e.dxftype in ignore:
+                continue
+            elif e.dxftype == 'INSERT':
+                t2 = trans*Trans(1, e.insert[:2], e.rotation)
+                if recurse:
+                    self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, recurse=recurse)
+                else:
+                    raise NotImplementedError() #TODO add
+            else: 
+                self.append(Entity.from_dxf(e, trans)) 
+        return self
     
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
@@ -770,36 +803,28 @@ class Drawing(Group):
         """reads a .dxf file
         :param filename: string path to .dxf file to read
         :param options: passed to :class:`~dxfgrabber.drawing.Drawing`constructor
+        :param layers: list of layer names to consider. entities not on these layers are ignored. default=None: all layers are read
+        :param only: list of dxf entity types names that are read. default=[]: all are read
+        :param ignore: list of dxf entity types names that are ignored. default=[]: none is ignored
         """
         import dxfgrabber
         self.dxf = dxfgrabber.readfile(filename,options)
         self.name = filename
         
-        def _iter_dxf(entities, layers, only, ignore, trans, recurse):
-            """iterator over dxf or block entities"""
-            for e in entities:
-                if layers and e.layer not in layers:
-                    continue
-                if only:
-                    if e.dxftype in only:
-                        yield e, trans
-                    else:
-                        continue
-                elif e.dxftype in ignore:
-                    continue
-                elif recurse and e.dxftype == 'INSERT':
-                    t2 = trans*Trans(1, e.insert[:2], e.rotation)
-                    for e2, t3 in _iter_dxf(self.dxf.blocks[e.name]._entities, layers=None, ignore=ignore, only=None, trans=t2, recurse=recurse):
-                        yield e2, t3
-                else: 
-                    yield e, trans
+        #build dictionary of blocks
+        self.block={} 
+        for block in self.dxf.blocks:
+            self.block[block.name]=Group().from_dxf(block._entities)
         
-        layers=kwargs.get('layers',None)
-        only=kwargs.get('only',[])
-        ignore=kwargs.get('only',[])
-        for edge,trans in _iter_dxf(self.dxf.entities,layers=layers,only=only,ignore=ignore,trans=Trans(),recurse=True):
-            self.append(Entity.from_dxf(edge, trans))   
-    
+        super(Drawing, self).from_dxf(
+            self.dxf.entities,
+            layers=kwargs.get('layers',None),
+            only=kwargs.get('only',[]),
+            ignore=kwargs.get('only',[]),
+            trans=Trans(),
+            recurse=True
+        )
+        
     def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
         """
         :param size: [x,y] max size of image in pixels. if one coord is None, the other one will be enforced
