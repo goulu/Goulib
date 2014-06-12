@@ -366,5 +366,25 @@ class TestAngle:
         assert_equal(angle((1,1),(0,1),unit=False),pi/4)
         assert_equal(angle(vecunit((2,1)),vecunit((1,-2))),pi/2)
 
+class TestVecunit:
+    def test_vecunit(self):
+        v=vecunit((-3,4,5))
+        assert_equal(norm(v),1)
+
+class TestSinOverX:
+    def test_sin_over_x(self):
+        assert_equal(sin_over_x(1),sin(1))
+        assert_equal(sin_over_x(0),1)
+        assert_equal(sin_over_x(1e-9),1)
+
+class TestSlerp:
+    def test_slerp(self):
+        u=vecunit((1,1,1))
+        v=vecunit((1,1,-1))
+        assert_equal(slerp(u,v,0),u)
+        assert_equal(slerp(u,v,1),v)
+        s=slerp(u,v,0.5)
+        assert_equal(s,vecunit((1,1,0)))
+
 if __name__ == "__main__":
     runmodule()

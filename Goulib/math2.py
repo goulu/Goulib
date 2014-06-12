@@ -11,7 +11,7 @@ __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.p
 __license__ = "LGPL"
 
 import operator,cmath
-from math import pi, sqrt, log, log10, ceil, asin
+from math import pi, sqrt, log, log10, ceil, sin, asin
 from itertools import count, izip, izip_longest, ifilter
 from itertools import combinations, permutations, product as cartesian_product
 
@@ -414,7 +414,7 @@ def combinations_with_replacement(iterable, r):
             yield tuple(pool[i] for i in indices)
             
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
-
+            
 def angle(u,v,unit=True):
     """
     :param u,v: iterable vectors
@@ -428,6 +428,25 @@ def angle(u,v,unit=True):
         return 2*asin(dist(v,u)/2)
     else:
         return pi - 2*asin(dist(vecneg(v),u)/2)
+    
+def sin_over_x(x):
+    """numerically safe sin(x)/x"""
+    if 1. + x*x == 1.:
+        return 1.
+    else:
+        return sin(x)/x
+    
+def slerp(u,v,t):
+    """spherical linear interpolation
+    :param u,v: 3D unit vectors
+    :param t: float in [0,1] interval
+    :return: vector interpolated between u and v
+    """
+    a=angle(u,v)
+    fu=(1-t)*sin_over_x((1-t)*a)/sin_over_x(a)
+    fv=t*sin_over_x(t*a)/sin_over_x(a)
+    return vecadd([fu*x for x in u],[fv*x for x in v])
+
             
 #interpolations
 def proportional(nseats,votes):
