@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -181,6 +184,11 @@ class TestGeoGraph:
         # assert_equal(expected, geo_graph.clear())
         raise SkipTest 
 
+    def test___bool__(self):
+        # geo_graph = GeoGraph(data, nodes, **kwargs)
+        # assert_equal(expected, geo_graph.__bool__())
+        raise SkipTest # TODO: implement your test here
+
 class TestRender:
     def test_render(self):
         pass # tested in test_save TODO : more tests with attributes
@@ -193,13 +201,13 @@ class TestDelauneyTriangulation:
         start=time.clock()
         nodes=[(random(),random()) for _ in range(n)]
         graph=delauney_triangulation(nodes, tol=0)
-        print(('Delauney %d : %f'%(n,time.clock()-start)))
+        logging.info('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
         graph.save(path+'/delauney.png')
         start=time.clock()
         graph=euclidean_minimum_spanning_tree(nodes)
-        print(('Spanning tree %d : %f'%(n,time.clock()-start)))
+        logging.info('Spanning tree %d : %f'%(n,time.clock()-start))
         graph.save(path+'/emst.png')
 
 class TestEuclideanMinimumSpanningTree:

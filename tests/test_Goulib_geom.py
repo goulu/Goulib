@@ -97,7 +97,7 @@ class TestVector2:
         assert_false(self.v11 != self.v11)
         assert_true(self.v11 != self.v01)
 
-    def test___nonzero__(self):
+    def test___bool__(self):
         assert_true(self.v11)
         assert_false(self.v00)
         
@@ -184,7 +184,6 @@ class TestVector2:
 
     def test_reflect(self):
         assert_equal(self.v11.reflect(self.v10),Vector2(-1,1))
-
 
 class TestVector3:
     @classmethod
@@ -315,6 +314,11 @@ class TestVector3:
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.rotate_around(axis, theta))
         raise SkipTest 
+
+    def test___bool__(self):
+        # vector3 = Vector3(*args)
+        # assert_equal(expected, vector3.__bool__())
+        raise SkipTest # TODO: implement your test here
 
 class TestMatrix3:
     @classmethod

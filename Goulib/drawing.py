@@ -20,9 +20,9 @@ import matplotlib
 matplotlib.use("Agg") # Force matplotlib to not use any Xwindows backend (for travis-ci)
 import matplotlib.pyplot as plt
 
-from math2 import rint
-from geom import *
-from itertools2 import split
+from .math2 import rint
+from .geom import *
+from .itertools2 import split
 
 # http://sub-atomic.com/~moses/acadcolors.html 
 # 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
@@ -81,12 +81,12 @@ class BBox:
             if not self._pt1:
                 self._pt1 = Point2(pt)
             else:
-                p=map(min, zip(self._pt1.xy, pt))
+                p=list(map(min, list(zip(self._pt1.xy, pt))))
                 self._pt1 = Point2(p)
             if not self._pt2:
                 self._pt2 = Point2(pt)
             else:
-                p=map(max, zip(self._pt2.xy, pt))
+                p=list(map(max, list(zip(self._pt2.xy, pt))))
                 self._pt2 = Point2(p)
         return self
     
@@ -129,7 +129,7 @@ class BBox:
         return res
 
 def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
-    return Point2(map(lambda x:round(x,decimals),pt.xy))
+    return Point2([round(x,decimals) for x in pt.xy])
 
 class Entity(object):
     """Base class for all drawing entities"""
@@ -220,7 +220,7 @@ class Entity(object):
         raise NotImplementedError
     
     def _dxf_color(self):
-        from colors import color_lookup
+        from .colors import color_lookup
         try:
             color=self.color
         except:
@@ -859,7 +859,7 @@ class Drawing(Group):
                     c = Point2(e.center[:2])
                     b = cbox(c, e.radius)
                     b = b.trans(trans)
-                    b = map(rint, b())
+                    b = list(map(rint, b()))
                     startangle = degrees(trans.angle(radians(e.startangle)))
                     endangle = degrees(trans.angle(radians(e.endangle)))
                     startangle, endangle = endangle, startangle  # swap start/end because of Y symmetry
@@ -880,7 +880,7 @@ class Drawing(Group):
                     font = None
                     try:
                         font = ImageFont.truetype("c:/windows/fonts/Courier New.ttf", h)
-                        print "font loaded !"
+                        print("font loaded !")
                     except:
                         pass
                     if not font:
@@ -908,7 +908,7 @@ class Drawing(Group):
         if not product(box.size().xy):  # either x or y ==0
             return None
         
-        s = map(operator.div, [float(x - border) * antialias if x else 1E9 for x in size ], box.size().xy)
+        s = list(map(operator.div, [float(x - border) * antialias if x else 1E9 for x in size ], box.size().xy))
         trans = Trans(scale=min(s))
         size = trans * box.size() + Point2(2 * antialias * border, 2 * antialias * border)  # add borders as an offset
         offset = size / 2 - trans(box.center())  # offset in pixel coordinates
@@ -916,12 +916,12 @@ class Drawing(Group):
         trans = trans.scale(1, -1)  # invert y axis
         trans = trans.translate(0, size.y)  # origin is lower left corner
         
-        img = Image.new("RGB", map(rint, size.xy), background)
+        img = Image.new("RGB", list(map(rint, size.xy)), background)
         draw = ImageDraw.Draw(img)
         _draw(self.iter(layers=layers, ignore=ignore, trans=trans, recurse=False))
         if antialias > 1:
             size = size / antialias
-            img = img.resize(map(rint, size.xy), Image.ANTIALIAS)
+            img = img.resize(list(map(rint, size.xy)), Image.ANTIALIAS)
         return img
     
     def figure(self,**kwargs):
@@ -1012,8 +1012,8 @@ def img2base64(img, fmt='PNG'):
     :result: string base64 encoded image content in specified format
     :see: http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template
     """
-    import StringIO, base64
-    output = StringIO.StringIO()
+    import io, base64
+    output = io.StringIO()
     img.save(output, fmt)
     output.seek(0)
     output_s = output.read()

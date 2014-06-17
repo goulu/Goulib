@@ -10,7 +10,7 @@ __credits__ = ["http://d3js.org/","http://nvd3.org/"]
 __license__ = "LGPL"
 
 import datetime
-import colors
+from . import colors
 
 _count=0 #Chart counter for unique ids
 
@@ -23,9 +23,9 @@ def generate(y,x=None,length=100):
     if x:
         x=generate(x,None,length)
     else: 
-        x=range(length)
+        x=list(range(length))
     try: # y is f(x) ?
-        return map(y,x)
+        return list(map(y,x))
     except: pass
     try:
         return [y[i] for i in x]
@@ -88,7 +88,7 @@ class Chart:
         x=generate(x,None,100)
         y=generate(y,x)
         if len(x)<len(y):
-            x=range(len(y))
+            x=list(range(len(y)))
             
         if not name : name="Stream %d"%(len(self.data)+1)
         
@@ -148,9 +148,9 @@ class Chart:
         except:
             pass
                                
-        for k,a in self.axes.iteritems():
+        for k,a in self.axes.items():
             out+="chart.%s\n"%k
-            for attr,value in a.iteritems():
+            for attr,value in a.items():
                 out+="    .%s(%s)\n"%(attr,value)
         out+="""d3.select('#%s svg')
                 .datum(data_%s)
@@ -237,7 +237,7 @@ class Pareto(MultiChart):
         MultiChart.__init__(self,**kwargs)
         values=generate(values)
         values.sort(reverse=True)
-        from math2 import cumsum
+        from .math2 import cumsum
         if not norm:norm=sum(values)
         self.add([x/norm for x in cumsum(values)],type="line",name="CumSum", axis=2)
         self.add(values,type="bar",name="Histo") # second, only for nicer colors
@@ -245,7 +245,7 @@ class Pareto(MultiChart):
 def hist(values, bins=None):
     values.sort()
     if not bins:
-        bins=range(int(values[0]),int(values[-1])+1)
+        bins=list(range(int(values[0]),int(values[-1])+1))
     sbins=list(bins)
     hist=[]
     while values:
@@ -286,10 +286,10 @@ def bump(n,w=5):
     return [x if x>0 else 0 for x in a]
 
 if __name__ == '__main__': #tests
-    import markup
+    from . import markup
     from math import sin,cos
     from random import uniform, gauss
-    from itertools2 import arange
+    from .itertools2 import arange
     
     page=markup.page()
     page.init(
@@ -314,7 +314,7 @@ if __name__ == '__main__': #tests
     fig=LineWithFocusChart(name=type,x=X,y=Waves)
     page.add(str(fig))
     
-    from datetime2 import days
+    from .datetime2 import days
     Date=days(datetime.date.today(),len(X))
     
     type="multiBarHorizontal"
@@ -365,8 +365,8 @@ if __name__ == '__main__': #tests
     type="scatterChart"
     page.h3(type)
     fig=ScatterChart(name=type,width=400,height=400)
-    fig.add(x=map(cos,X), y=map(sin,X), name="Circle",type="line")
+    fig.add(x=list(map(cos,X)), y=list(map(sin,X)), name="Circle",type="line")
     fig.add(x=Gauss, y=Uniform, name="Noise")
     page.add(str(fig))
-    print page
+    print(page)
     

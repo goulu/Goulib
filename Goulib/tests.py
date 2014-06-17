@@ -12,19 +12,21 @@ import nose
 import nose.tools
 
 import collections
-import itertools
+import six
+
+from .itertools2 import zip_longest
 
 def assert_equal(first, second, *args, **kwargs):
     """
     http://stackoverflow.com/a/3124155/190597 (KennyTM)
     """
-    if isinstance(first,(int,bool,basestring)) and isinstance(second,(int,bool,basestring)):
+    base_types=(six.integer_types,six.string_types,six.text_type,bool)
+    if isinstance(first,base_types) and isinstance(second,base_types):
         nose.tools.assert_equal(first, second, *args, **kwargs) 
     elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
-        for first_, second_ in itertools.izip_longest(
-                first, second, fillvalue = object()):
+        for first_, second_ in zip_longest(first, second, fillvalue = object()):
             assert_equal(first_, second_, *args, **kwargs)
-    else:
+    else: #float and classes
         try:
             nose.tools.assert_almost_equal(first, second, *args, **kwargs) 
         except TypeError: # unsupported operand type(s) for -
@@ -45,13 +47,13 @@ def runmodule(redirect=True):
         return nose.runmodule()
     """ ensures stdout is printed after the tests results"""
     import sys
-    from cStringIO import StringIO  
+    from io import StringIO  
     module_name = sys.modules["__main__"].__file__
 
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
     result = nose.run(argv=[sys.argv[0], module_name, '-s'])
     sys.stdout = old_stdout
-    print mystdout.getvalue()
+    print(mystdout.getvalue())
 
 runtests=runmodule

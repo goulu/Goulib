@@ -11,6 +11,7 @@ __license__ = "LGPL"
 import csv, itertools, operator, string, codecs
 from datetime import datetime, date, timedelta
 import logging
+from functools import reduce
 
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
@@ -18,7 +19,7 @@ try: # using http://lxml.de/
 except: #ElementTree
     logging.info('LXML unavailable : falling back to ElementTree')
     from xml.etree import ElementTree
-    from HTMLParser import HTMLParser
+    from html.parser import HTMLParser
     defaultparser=HTMLParser
     
 Element=ElementTree._Element
@@ -28,7 +29,7 @@ from Goulib.markup import tag
 
 def attr(args):
     res=''
-    for key,val in args.iteritems():
+    for key,val in args.items():
         k="class" if key=="_class" else key
         res+=' %s="%s"'%(k,val)
     return res
@@ -49,7 +50,7 @@ class Cell():
             assert(tag in ('td','th'))
             data=Cell.read(data.text)
             
-        if isinstance(data,basestring):
+        if isinstance(data,str):
             data=data.lstrip().rstrip() #remove spaces, but also trailing \r\n
                     
         self.data=data
@@ -301,13 +302,13 @@ class Table(list):
         titles_line=kwargs.get('titles_line',1)-1
         data_line=kwargs.get('data_line',2)-1
         dialect=kwargs.get('dialect','excel')
-        delimiter=kwargs.get('delimiter',';')
+        delimiter=kwargs.get('delimiter',b';')
         encoding=kwargs.get('encoding','iso-8859-15')
         #reader = csv.reader(codecs.open(filename, 'rb', encoding, errors='ignore'), dialect=dialect, delimiter=delimiter)
         reader = open(filename,'rb') 
         for i,row in enumerate(reader):
-            row=row.replace('\x00', '') # avoid NULLs from from .XLS saved as .CSV
-            row=row.rstrip('\r\n')
+            row=row.replace(b'\x00',b'') # avoid NULLs from from .XLS saved as .CSV
+            row=row.rstrip(b'\r\n')
             row=row.split(delimiter)
             if encoding:
                 row=[x.decode(encoding) for x in row]
@@ -324,10 +325,19 @@ class Table(list):
     
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
-        encoding=kwargs.get('encoding','iso-8859-15')
+        encoding=kwargs.get('encoding','iso-8859-15') #for windows
         empty=''.encode(encoding)
-        def encode(line): return [empty if s is None else str(s).encode(encoding) for s in line]
-        f=open(filename, 'wb')
+        
+        import sys
+        if sys.version_info >= (3,0,0):
+            f = open(filename, 'w', newline='')
+            def _encode(line): 
+                return [s for s in line]
+        else: #Python 2
+            f = open(filename, 'wb')
+            def _encode(line): 
+                return [empty if s is None else str(s).encode(encoding) for s in line]
+        
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if transpose:
             i=0
@@ -335,17 +345,20 @@ class Table(list):
                 line=[empty]
                 if self.titles: line=[self.titles[i]]
                 line.extend(self.col(i))
-                writer.writerow(encode(line))
+                writer.writerow(_encode(line))
                 i+=1
         else:
-            if self.titles: writer.writerow(encode(self.titles))
+            if self.titles:
+                s=_encode(self.titles)
+                writer.writerow(s)
             for line in self:
-                writer.writerow(encode(line))
+                s=_encode(line)
+                writer.writerow(s)
         f.close()
     
     def ncols(self):
         """return number of columns, ignoring title"""
-        return reduce(max,map(len,self))
+        return reduce(max,list(map(len,self)))
                 
     def find_col(self,title):
         """finds a column from a part of the title"""
@@ -357,7 +370,7 @@ class Table(list):
 
     def _i(self,by):
         '''column index'''
-        if isinstance(by, basestring):
+        if isinstance(by, str):
             try:
                 return self.titles.index(by)
             except ValueError:
@@ -402,7 +415,7 @@ class Table(list):
         '''
         if isinstance(line,dict):
             r=len(self) #row number
-            for k,v in line.iteritems():
+            for k,v in line.items():
                 i=self._i(k)
                 if i is None: #column doesn't exist:
                     i=len(self.titles)
@@ -431,7 +444,7 @@ class Table(list):
     
     def rowasdict(self,i):
         ''' returns a line as a dict '''
-        return dict(zip(self.titles,self[i]))
+        return dict(list(zip(self.titles,self[i])))
         
     def groupby(self,by,sort=True,removecol=True):
         '''dictionary of subtables grouped by a column'''
@@ -535,7 +548,7 @@ class Table(list):
         res=0
         if len(self)>0:
             for line in reversed(self):
-                if filter(line):
+                if list(filter(line)):
                     self.remove(line)
                     res+=1
         return res

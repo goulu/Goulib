@@ -5,7 +5,7 @@
 simple manipulation of polynomials (without SimPy)
 see http://docs.sympy.org/dev/modules/polys/reference.html if you need more ...
 """
-from __future__ import division #"true division" everywhere
+ #"true division" everywhere
 
 __author__ = "Rick Muller + Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -46,7 +46,7 @@ class Polynomial:
     def __cmp__(self,other): 
         if isinstance(other,Polynomial):
             return cmp(self.plist,other.plist)
-        elif isinstance(other,basestring):
+        elif isinstance(other,str):
             return cmp(self.plist,Polynomial(other).plist)
         return cmp(self.plist,other)
             
@@ -147,10 +147,10 @@ def mult_const(p,c):
 
 def multiply(p1,p2):
     "Return a new plist corresponding to the product of the two input plists"
-    if len(p1) > len(p2): short,long = p2,p1
-    else: short,long = p1,p2
+    if len(p1) > len(p2): short,int = p2,p1
+    else: short,int = p1,p2
     new = []
-    for i in range(len(short)): new = add(new,mult_one(long,short[i],i))
+    for i in range(len(short)): new = add(new,mult_one(int,short[i],i))
     return new
 
 def mult_one(p,c,i):
@@ -189,11 +189,11 @@ def parse_string(str):
         n,p = n.strip(),p.strip()
         if not n and not p: continue
         n,p = _parse_n(n),_parse_p(p)
-        if res_dict.has_key(p): res_dict[p] += n
+        if p in res_dict: res_dict[p] += n
         else: res_dict[p] = n
     highest_order = max(res_dict.keys())
     res = [0]*(highest_order+1)
-    for key,value in res_dict.items(): res[key] = value
+    for key,value in list(res_dict.items()): res[key] = value
     return res
 
 def _parse_n(str):

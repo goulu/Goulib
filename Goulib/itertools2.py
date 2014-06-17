@@ -12,11 +12,23 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
 __license__ = "LGPL"
 
 #!/usr/bin/python
-from itertools import ifilter, islice, repeat, groupby
-from itertools import count, imap, takewhile, tee, izip
+from itertools import islice, repeat, groupby
+from itertools import count, takewhile, tee
 from itertools import chain, starmap, cycle, dropwhile
 import random
 import logging
+import collections
+from functools import reduce
+
+#Python2-3 compatibility utilities
+import itertools
+import sys
+if sys.version_info >= (3,0,0):
+    zip_longest=itertools.zip_longest
+else:
+    zip_longest=itertools.izip_longest
+    
+#reciepes from Python manual 
 
 def take(n, iterable):
     """Take first n elements from iterable"""
@@ -24,11 +36,11 @@ def take(n, iterable):
 
 def index(n, iterable):
     "Returns the nth item"
-    return islice(iterable, n, n+1).next()
+    return next(islice(iterable, n, n+1))
 
 def first(iterable):
     """Take first element in the iterable"""
-    return iterable.next()
+    return next(iterable)
 
 def last(iterable):
     """Take last element in the iterable"""
@@ -77,7 +89,7 @@ def ilinear(start,end,n):
             return arange(start,end+step/2,step)
     else: #suppose start and end are tuples or lists of the same size
         res=(ilinear(s,e,n) for s,e in zip(start,end))
-        return izip(*res)
+        return zip(*res)
 
 def flatten(lstlsts):
     """Flatten a list of lists"""
@@ -85,13 +97,13 @@ def flatten(lstlsts):
 
 def compact(iterable):
     """:returns: iterator skipping None values from iterable"""
-    return ifilter(bool, iterable)
+    return filter(bool, iterable)
 
 def groups(iterable, n, step):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n)
-    onestepit = izip(*(starmap(drop, enumerate(itlist))))
+    onestepit = zip(*(starmap(drop, enumerate(itlist))))
     return take_every(step, onestepit)
 
 def compose(f, g):
@@ -109,7 +121,7 @@ def iterate(func, arg):
 
 def tails(seq):
     """Get tails of a sequence: tails([1,2,3]) -> [1,2,3], [2,3], [3], []."""
-    for idx in xrange(len(seq)+1):
+    for idx in range(len(seq)+1):
         yield seq[idx:]
      
 def ireduce(func, iterable, init=None):
@@ -117,7 +129,7 @@ def ireduce(func, iterable, init=None):
     # not functional
     if init is None:
         iterable = iter(iterable)
-        curr = iterable.next()
+        curr = next(iterable)
     else:
         curr = init
         yield init
@@ -162,7 +174,7 @@ def product(*iterables, **kwargs):
     else:
         iterables = iterables * kwargs.get('repeat', 1)
         it = iterables[0]
-        for item in it() if callable(it) else iter(it):
+        for item in it() if isinstance(it, collections.Callable) else iter(it):
             for items in product(*iterables[1:]):
                 yield (item, ) + items
 
@@ -170,19 +182,19 @@ def product(*iterables, **kwargs):
 
 def any(seq, pred=bool):
     "Return True if pred(x) is True for at least one element in the iterable"
-    return (True in imap(pred, seq))
+    return (True in map(pred, seq))
 
 def all(seq, pred=bool):
     "Return True if pred(x) is True for all elements in the iterable"
-    return (False not in imap(pred, seq))
+    return (False not in map(pred, seq))
 
 def no(seq, pred=bool):
     "Returns True if pred(x) is False for every element in the iterable"
-    return (True not in imap(pred, seq))
+    return (True not in map(pred, seq))
 
 def takenth(n, iterable):
     "Returns the nth item"
-    return islice(iterable, n, n+1).next()
+    return next(islice(iterable, n, n+1))
 
 def takeevery(n, iterable):
     """Take an element from iterator every n elements"""
@@ -200,12 +212,12 @@ def get_groups(iterable, n, step):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements each iteration"""
     itlist = tee(iterable, n)
-    onestepit = izip(*(starmap(drop, enumerate(itlist))))
+    onestepit = zip(*(starmap(drop, enumerate(itlist))))
     return takeevery(step, onestepit)
 
 def quantify(iterable, pred=bool):
     """:return: int count how many times the predicate is true"""
-    return sum(imap(pred, iterable),0)
+    return sum(map(pred, iterable),0)
                 
 def pairwise(iterable,loop=False):
     """
@@ -232,7 +244,7 @@ def grouped(iterable, n=2):
     s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ...
     see http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
     """
-    return izip(*[iter(iterable)]*n)
+    return zip(*[iter(iterable)]*n)
 
 def interleave(l1,l2):
     """
@@ -250,8 +262,8 @@ def rand_seq(size):
     '''generates values in random order
     equivalent to using shuffle in random,
     without generating all values at once'''
-    values=range(size)
-    for i in xrange(size):
+    values=list(range(size))
+    for i in range(size):
         # pick a random index into remaining values
         j=i+int(random.random()*(size-i))
         # swap the values
@@ -265,9 +277,9 @@ def all_pairs(size):
         for j in rand_seq(size):
             yield (i,j)
             
-def best(iterable, key=None, n=1, cmp=None, reverse=False):
+def best(iterable, key=None, n=1, reverse=False):
     """ generate items corresponding to the n best values of key sort order"""
-    v=sorted(iterable,cmp=cmp,key=key,reverse=reverse)
+    v=sorted(iterable,key=key,reverse=reverse)
     if key is None : key=identity
     i,k=0,None
     for x in v:
@@ -302,7 +314,7 @@ def ifind(iterable,f):
             
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
-    return ifind(iterable,f).next()
+    return next(ifind(iterable,f))
 
 def isplit(iterable,sep,include_sep=False):
     """ split iterable by separators or condition
@@ -325,10 +337,12 @@ def split(iterable,sep,include_sep=False):
     """
     return [list(x) for x in isplit(iterable,sep,include_sep)]
 
-def next_permutation(seq, pred=cmp):
-    """Like C++ std::next_permutation() but implemented as
-    generator. Yields copies of seq.
-    see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html"""
+def next_permutation(seq, pred=lambda x:-1 if x[0]<x[1] else 0):
+    """Like C++ std::next_permutation() but implemented as generator.
+    see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html
+    :param seq: iterable
+    :param pred: a function (a,b) that returns a negative number if a<b, like cmp(a,b) in Python 2.7
+    """
 
     def reverse(seq, start, end):
         # seq = seq[:start] + reversed(seq[start:end]) + \
@@ -413,8 +427,10 @@ class iter2(object):
     def __add__(self, iterable):
         return chain(self._iter, iter(iterable))
         
-    def next(self):
-        return self._iter.next()
+    def __next__(self):
+        return next(self._iter)
+    
+    next=__next__ #Python2-3 compatibility
     
     def __iter__(self):
         return self
@@ -427,3 +443,4 @@ def iflatten(iterable):
             iterable.insert(0, e)
         else:
             yield e
+            

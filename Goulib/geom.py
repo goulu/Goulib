@@ -5,10 +5,7 @@ Vector, matrix and quaternion operations + line, arc, circle entities for use in
 
 based on euclid http://code.google.com/p/pyeuclid by Alex Holkner
 
-
 """
-
-from __future__ import division #"true division" everywhere
 
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
@@ -252,11 +249,10 @@ class Vector2(object):
         except: pass
         return (self-Vector2(other)).mag()<precision
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __nonzero__(self):
+    def __bool__(self):
         return self.x != 0 or self.y != 0
+    
+    __nonzero__=__bool__
 
     def __len__(self):
         return 2
@@ -316,48 +312,48 @@ class Vector2(object):
                            other.y - self[1])
 
     def __mul__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(self.x * other,
                        self.y * other)
 
     __rmul__ = __mul__
 
     def __imul__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         self.x *= other
         self.y *= other
         return self
 
     def __div__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.div(self.x, other),
                        operator.div(self.y, other))
 
 
     def __rdiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.div(other, self.x),
                        operator.div(other, self.y))
 
     def __floordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.floordiv(self.x, other),
                        operator.floordiv(self.y, other))
 
 
     def __rfloordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.floordiv(other, self.x),
                        operator.floordiv(other, self.y))
 
     def __truediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.truediv(self.x, other),
                        operator.truediv(self.y, other))
 
 
     def __rtruediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector2(operator.truediv(other, self.x),
                        operator.truediv(other, self.y))
     
@@ -463,8 +459,10 @@ class Vector3(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.x != 0 or self.y != 0 or self.z != 0
+    
+    __nonzero__=__bool__
 
     def __len__(self):
         return 3
@@ -542,7 +540,7 @@ class Vector3(object):
                           self.y * other.y,
                           self.z * other.z)
         else: 
-            assert type(other) in (int, long, float)
+            assert type(other) in (int, int, float)
             return Vector3(self.x * other,
                            self.y * other,
                            self.z * other)
@@ -550,47 +548,47 @@ class Vector3(object):
     __rmul__ = __mul__
 
     def __imul__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         self.x *= other
         self.y *= other
         self.z *= other
         return self
 
     def __div__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.div(self.x, other),
                        operator.div(self.y, other),
                        operator.div(self.z, other))
 
 
     def __rdiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.div(other, self.x),
                        operator.div(other, self.y),
                        operator.div(other, self.z))
 
     def __floordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.floordiv(self.x, other),
                        operator.floordiv(self.y, other),
                        operator.floordiv(self.z, other))
 
 
     def __rfloordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.floordiv(other, self.x),
                        operator.floordiv(other, self.y),
                        operator.floordiv(other, self.z))
 
     def __truediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.truediv(self.x, other),
                        operator.truediv(self.y, other),
                        operator.truediv(self.z, other))
 
 
     def __rtruediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, int, float)
         return Vector3(operator.truediv(other, self.x),
                        operator.truediv(other, self.y),
                        operator.truediv(other, self.z))
@@ -1445,7 +1443,7 @@ class Matrix4(object):
         self.k = z
         return self
 
-    classmethod
+    @classmethod
     def new_translate(cls, x, y, z):
         self = cls()
         self.d = x
@@ -2076,6 +2074,8 @@ class Quaternion:
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
 # --------------------------------------------------------------------------
     
+import six,abc
+@six.add_metaclass(abc.ABCMeta)
 class Geometry(object):
     """
     The following classes are available for dealing with simple 2D geometry.
@@ -2094,15 +2094,13 @@ class Geometry(object):
         >>> line.connect(circ).p2
         Point2(1.59, 0.59)
     """
-    import abc #Abstract Base Class
-    __metaclass__ = abc.ABCMeta
     def _connect_unimplemented(self, other):
-        raise AttributeError, 'Cannot connect %s to %s' % \
-            (self.__class__, other.__class__)
+        raise AttributeError('Cannot connect %s to %s' % \
+            (self.__class__, other.__class__))
 
     def _intersect_unimplemented(self, other):
-        raise AttributeError, 'Cannot intersect %s and %s' % \
-            (self.__class__, other.__class__)
+        raise AttributeError('Cannot intersect %s and %s' % \
+            (self.__class__, other.__class__))
 
     _intersect_point2 = _intersect_unimplemented
     _intersect_line2 = _intersect_unimplemented
@@ -2195,15 +2193,14 @@ def _intersect_line2_circle(L, C):
                                L.p.y + u2 * L.v.y))
 
 def _connect_point2_line2(P, L):
+    # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     d = L.v.mag2()
-    assert d != 0
-    u = ((P.x - L.p.x) * L.v.x + \
-         (P.y - L.p.y) * L.v.y) / d
+    if d==0: #L is degenerate to a point
+        return Segment2(P,L.p)
+    u=float(L.v.dot(P-L.p))/d
     if not L._u_in(u):
-        u = max(min(u, 1.0), 0.0)
-    return Segment2(P, 
-                        Point2(L.p.x + u * L.v.x,
-                               L.p.y + u * L.v.y))
+        u = math2.sat(u,0,1)
+    return Segment2(P,L.point(u))
 
 def _connect_point2_circle(P, C):
     v = P - C.c
@@ -2598,7 +2595,7 @@ class Arc2(Circle):
         b=self.b
         if b<a: b=b+2*pi # now b>a
         res=b-a #positive angle
-        if cmp(b,a)!=self.dir: #complementary angle
+        if (b<a and self.dir>0) or (b>a and self.dir<0): #complementary angle
             res=2*pi-res
         return res*self.dir
         
@@ -2977,15 +2974,15 @@ class Line3(Geometry):
                 self.p = args[0].copy()
                 self.v = args[1].copy()
             else:
-                raise AttributeError, '%r' % (args,)
+                raise AttributeError('%r' % (args,))
         elif len(args) == 1:
             if isinstance(args[0], Line3):
                 self.p = args[0].p.copy()
                 self.v = args[0].v.copy()
             else:
-                raise AttributeError, '%r' % (args,)
+                raise AttributeError('%r' % (args,))
         else:
-            raise AttributeError, '%r' % (args,)
+            raise AttributeError('%r' % (args,))
         
         # XXX This is annoying.
         #if not self.v:
@@ -3183,13 +3180,13 @@ class Plane:
                 self.n = args[0].normalized()
                 self.k = args[1]
             else:
-                raise AttributeError, '%r' % (args,)
+                raise AttributeError('%r' % (args,))
 
         else:
-            raise AttributeError, '%r' % (args,)
+            raise AttributeError('%r' % (args,))
         
         if not self.n:
-            raise AttributeError, 'Points on plane are colinear'
+            raise AttributeError('Points on plane are colinear')
 
     def __copy__(self):
         return self.__class__(self.n, self.k)

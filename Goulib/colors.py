@@ -7,7 +7,7 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import math2
+from . import math2
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
@@ -22,7 +22,7 @@ def hex_to_rgb(value,scale=1):
     :result: tuple (r,g,b) of 3 ints 0-255"""
     value = value.lstrip('#')
     lv = len(value)
-    return tuple(scale*int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+    return tuple(scale*int(value[i:i+int(lv/3)], 16) for i in range(0, lv, int(lv/3)))
 
 # http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
 
@@ -51,7 +51,7 @@ def color_range(n,start,end):
     :result: list of n hexcolors interpolated between start and end, included
     """
     import colorsys
-    from itertools2 import ilinear
+    from .itertools2 import ilinear
     if start in color: start=color[start]
     start=hex_to_rgb(start,1./255)
     start=colorsys.rgb_to_hsv(*start)
@@ -230,24 +230,24 @@ color = {
     'yellow': '#ffff00',
     'yellowgreen': '#9acd32'}
 
-color_lookup=dict([v,k] for k,v in color.iteritems()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
+color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
 
 def nearest_color(x):
     """:return: name of the nearest color"""
-    if isinstance(x,basestring):
+    if isinstance(x,str):
         rgb=hex_to_rgb(x,1./255)
     else:
         rgb=math2.sat(x,0,1)
-    res=min(color.values(),key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
+    res=min(list(color.values()),key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
     return color_lookup[res]
 
-from math2 import rint
+from .math2 import rint
 
 class Color(object):
     '''class to allow simple math operations on colors'''
     def __init__(self,c):
         ''':param c: either color name, hex string, or (r,g,b) tuple in [0..255] int or [0,.1.] float range'''
-        if isinstance(c,basestring):
+        if isinstance(c,str):
             try: #is c a color name ?
                 c=color[c]
             except: #assume it's a hex string

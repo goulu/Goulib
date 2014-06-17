@@ -3,7 +3,6 @@
 """
 additions to :mod:`math` standard library
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -12,15 +11,16 @@ __license__ = "LGPL"
 
 import operator,cmath
 from math import pi, sqrt, log, log10, ceil, sin, asin
-from itertools import count, izip, izip_longest, ifilter
-from itertools import combinations, permutations, product as cartesian_product
+from itertools import count, combinations, permutations, product as cartesian_product
 
-from itertools2 import drop, ireduce, groupby, ilen, compact, flatten
+from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten, zip_longest
 
 import fractions
+
+from functools import reduce
 def lcm(a,b):
     """least common multiple""" 
-    return abs(a * b) / fractions.gcd(a,b) if a and b else 0
+    return float(abs(a * b)) / fractions.gcd(a,b) if a and b else 0
 
 def quad(a, b, c, complex=False):
     """ solves quadratic equations 
@@ -32,7 +32,7 @@ def quad(a, b, c, complex=False):
         d=cmath.sqrt(discriminant)
     else:
         d=sqrt(discriminant)
-    return (-b + d) / (2 * a), (-b - d) / (2 * a)
+    return (-b + d) / (2. * a), (-b - d) / (2. * a)
 
 def equal(a,b,epsilon=1e-6):
     """approximately equal. Use this instead of a==b in floating point ops
@@ -62,7 +62,7 @@ def dot(a,b):
         pass
     #matrix*matrix
     res=[dot(a,col) for col in zip(*b)]
-    return map(list,zip(*res))
+    return list(map(list,list(zip(*res))))
 
 def product(nums):
     """Product of nums"""
@@ -70,7 +70,7 @@ def product(nums):
 
 def transpose(m):
     """:return: matrix m transposed"""
-    return zip(*m) #trivially simple once you know it
+    return list(zip(*m)) #trivially simple once you know it
 
 def maximum(m):
     """
@@ -98,25 +98,25 @@ def _longer(a,b,fillvalue=0):
         
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return [reduce(operator.add,l) for l in izip_longest(a,b,fillvalue=fillvalue)]
+    return [reduce(operator.add,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [reduce(operator.sub,l) for l in izip_longest(a,b,fillvalue=fillvalue)]
+    return [reduce(operator.sub,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     """unary negation"""
-    return map(operator.neg,a)
+    return list(map(operator.neg,a))
 
 def vecmul(a,b):
     """product of vectors of inequal lengths"""
-    return [reduce(operator.mul,l) for l in izip(a,b)]
+    return [reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
     if isinstance(b,(int,float)):
-        return [x/b for x in a]
-    return [reduce(operator.truediv,l) for l in izip(a,b)]
+        return [float(x)/b for x in a]
+    return [reduce(operator.truediv,l) for l in zip(a,b)]
 
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
@@ -180,10 +180,10 @@ def levenshtein(seq1, seq2):
     """
     # http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
     oneago = None
-    thisrow = range(1, len(seq2) + 1) + [0]
-    for x in xrange(len(seq1)):
+    thisrow = list(range(1, len(seq2) + 1)) + [0]
+    for x in range(len(seq1)):
         twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
-        for y in xrange(len(seq2)):
+        for y in range(len(seq2)):
             delcost = oneago[y] + 1
             addcost = thisrow[y - 1] + 1
             subcost = oneago[y - 1] + (seq1[x] != seq2[y])
@@ -194,7 +194,7 @@ def levenshtein(seq1, seq2):
 
 def mean(data):
     """:return: mean of data"""
-    return sum(data)/len(data)
+    return float(sum(data))/len(data)
 
 avg=mean #alias
 
@@ -203,7 +203,7 @@ def variance(data,avg=None):
     if avg==None:
         avg=mean(data)
     s = sum(((value - avg)**2) for value in data)
-    var = s/(len(data) - 1)
+    var = float(s)/(len(data) - 1)
     return var
 
 var=variance #alias
@@ -235,12 +235,12 @@ def stats(l):
 
 def fibonacci():
     """Generate fibonnacci serie"""
-    get_next = lambda (a, b), _: (b, a+b)
+    get_next = lambda ab_: (ab_[1], ab_[0]+ab_[1])
     return (b for (a, b) in ireduce(get_next, count(), (0, 1)))
 
 def factorial(num):
     """:return: factorial value of num (num!)"""
-    return product(xrange(2, num+1))
+    return product(range(2, num+1))
 
 def is_integer(x, epsilon=1e-6):
     """:return: True if the float x "seems" an integer"""
@@ -268,18 +268,18 @@ def is_prime(n):
         return (n == 2)
     elif n % 2 == 0:
         return False
-    elif any(((n % x) == 0) for x in xrange(3, int(sqrt(n))+1, 2)):
+    elif any(((n % x) == 0) for x in range(3, int(sqrt(n))+1, 2)):
         return False
     return True
 
 def get_primes(start=2, memoized=False):
     """Yield prime numbers from 'start'"""
     is_prime_fun = (memoize(is_prime) if memoized else is_prime)
-    return ifilter(is_prime_fun, count(start))
+    return filter(is_prime_fun, count(start))
 
 def digits_from_num_fast(num):
     """Get digits from num in base 10 (fast implementation)"""
-    return map(int, str(num))
+    return list(map(int, str(num)))
 
 def digits_from_num(num, base=10):
     """Get digits from num in base 'base'"""
@@ -322,7 +322,7 @@ def is_palindromic(num, base=10):
 
 def prime_factors(num, start=2):
     """Return all prime factors (ordered) of num in a list"""
-    candidates = xrange(start, int(sqrt(num)) + 1)
+    candidates = range(start, int(sqrt(num)) + 1)
     factor = next((x for x in candidates if (num % x == 0)), None)
     return ([factor] + prime_factors(num // factor, factor) if factor else [num])
 
@@ -340,13 +340,13 @@ def least_common_multiple(a, b):
 
 def triangle(x):
     """The nth triangle number is defined as the sum of [1,n] values. http://en.wikipedia.org/wiki/Triangular_number"""
-    return (x*(x+1))/2
+    return (x*(x+1))/2.
 
 def is_triangle(x):
-    return is_integer((-1 + sqrt(1 + 8*x)) / 2)
+    return is_integer((-1 + sqrt(1 + 8*x)) / 2.)
 
 def pentagonal(n):
-    return n*(3*n - 1)/2
+    return n*(3*n - 1)/2.
 
 def is_pentagonal(n):
     return (n >= 1) and is_integer((1+sqrt(1+24*n))/6.0)
@@ -369,7 +369,7 @@ def get_cardinal_name(num):
         return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))    
     def _get_hundreds(n):
         tens = n % 100
-        hundreds = (n / 100) % 10
+        hundreds = (n // 100) % 10
         return list(compact([
             hundreds > 0 and numbers[hundreds], 
             hundreds > 0 and "hundred", 
@@ -379,8 +379,8 @@ def get_cardinal_name(num):
 
     # This needs some refactoring
     if not (0 <= num < 1e6):
-        raise ValueError, "value not supported: %s" % num      
-    thousands = (num / 1000) % 1000
+        raise ValueError("value not supported: %s" % num)      
+    thousands = (num // 1000) % 1000
     strings = compact([
         thousands and (_get_hundreds(thousands) + ["thousand"]),
         (num % 1000 or not thousands) and _get_hundreds(num % 1000),
@@ -395,7 +395,7 @@ def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
     return int(log(num)/log(base)) + 1
 
-def is_pandigital(digits, through=range(1, 10)):
+def is_pandigital(digits, through=list(range(1, 10))):
     """Return True if digits form a pandigital number"""
     return (sorted(digits) == through)
         
@@ -403,13 +403,13 @@ def is_pandigital(digits, through=range(1, 10)):
 
 def ncombinations(n, k):
     """Combinations of k elements from a group of n"""
-    return cartesian_product(xrange(n-k+1, n+1)) / factorial(k)
+    return cartesian_product(range(n-k+1, n+1)) // factorial(k)
 
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
     pool = tuple(iterable)
     n = len(pool)
-    for indices in cartesian_product(range(n), repeat=r):
+    for indices in cartesian_product(list(range(n)), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
             
@@ -425,9 +425,9 @@ def angle(u,v,unit=True):
         u=vecunit(u)
         v=vecunit(v)
     if dot(u,v) >=0:
-        return 2*asin(dist(v,u)/2)
+        return 2.*asin(dist(v,u)/2)
     else:
-        return pi - 2*asin(dist(vecneg(v),u)/2)
+        return pi - 2.*asin(dist(vecneg(v),u)/2)
     
 def sin_over_x(x):
     """numerically safe sin(x)/x"""
@@ -480,13 +480,13 @@ def triangular_repartition(x,n):
     def _integral(x1,x2):
         """return integral under triangle between x1 and x2"""
         if x2<=x:
-            return (x1 + x2) * (x2 - x1) / x
+            return (x1 + x2) * float(x2 - x1) / x
         elif x1>=x:
-            return  (2-x1-x2) * (x1-x2) / (x-1)
+            return  (2-x1-x2) * float(x1-x2) / (x-1)
         else: #top of the triangle:
             return _integral(x1,x)+_integral(x,x2)
             
-    w=1/n #width of a slice
+    w=1./n #width of a slice
     return [_integral(i*w,(i+1)*w) for i in range(n)]
 
 def rectangular_repartition(x,n,h):
@@ -494,20 +494,20 @@ def rectangular_repartition(x,n,h):
     - their sum is 1
     - they follow a repartition along a pulse of height h<1
     """
-    w=1/n #width of a slice and of the pulse
-    x=max(x,w/2)
-    x=min(x,1-w/2)
-    xa,xb=x-w/2,x+w/2 #start,end of the pulse
-    o=(1-h)/(n-1) #base level
+    w=1./n #width of a slice and of the pulse
+    x=max(x,w/2.)
+    x=min(x,1-w/2.)
+    xa,xb=x-w/2,x+w/2. #start,end of the pulse
+    o=(1.-h)/(n-1) #base level
 
     def _integral(x1,x2):
         """return integral between x1 and x2"""
         if x2<=xa or x1>=xb:
             return o
         elif x1<xa:
-            return  (o*(xa-x1)+h*(w-(xa-x1)))/w
+            return  float(o*(xa-x1)+h*(w-(xa-x1)))/w
         else: # x1<=xb
-            return  (h*(xb-x1)+o*(w-(xb-x1)))/w
+            return  float(h*(xb-x1)+o*(w-(xb-x1)))/w
             
     return [_integral(i*w,(i+1)*w) for i in range(n)]
     

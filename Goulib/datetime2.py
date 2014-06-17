@@ -11,7 +11,9 @@ __license__ = "LGPL"
 
 from datetime import *
 import datetime as dt #to distinguish from class
-from interval import *
+from .interval import *
+
+import six
 
 #useful constants
 timedelta0=timedelta(0) 
@@ -40,7 +42,7 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
         d=d
     elif isinstance(d,date):
         d=datetime(year=d.year, month=d.month, day=d.day)
-    elif isinstance(d,(int,float)) : 
+    elif isinstance(d,(int,long,float)): 
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
     else:
         d=datetime.strptime(str(d),fmt)
@@ -54,7 +56,7 @@ def datef(d,fmt='%Y-%m-%d'):
         return d.date()
     if isinstance(d,date):
         return d
-    if isinstance(d,(basestring,int,float)):
+    if isinstance(d,(six.string_types,six.integer_types,float)):
         return datetimef(d,fmt=fmt).date()
     return date(d)  #last chance...
     

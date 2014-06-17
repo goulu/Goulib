@@ -25,12 +25,12 @@ class TestLcm:
 
 class TestAccsum:
     def test_accsum(self):
-        for s in accsum(range(10)): pass
+        for s in accsum(list(range(10))): pass
         assert_equal(s,45)
 
 class TestTranspose:
     def test_transpose(self):
-        v1=range(3)
+        v1=list(range(3))
         v2=list(accsum(v1))
         m1=[v1,v2,vecsub(v2,v1)]
         assert_equal(transpose(m1),[(0, 0, 0), (1, 1, 0), (2, 3, 1)])
@@ -47,7 +47,7 @@ class TestMinimum:
         
 class TestDot:
     def test_dot(self):
-        v1=range(3)
+        v1=list(range(3))
         v2=list(accsum(v1))
         assert_equal(dot(v1, v2),7)
         m1=[v1,v2,vecsub(v2,v1)]
@@ -57,7 +57,7 @@ class TestDot:
 
 class TestVecadd:
     def test_vecadd(self):
-        v1=range(4)
+        v1=list(range(4))
         v2=list(accsum(v1))
         assert_equal(vecadd(v1,v2),[0,2,5,9])
         v1=v1[1:]
@@ -66,7 +66,7 @@ class TestVecadd:
 
 class TestVecsub:
     def test_vecsub(self):
-        v1=range(4)
+        v1=list(range(4))
         v2=tuple(accsum(v1))
         assert_equal(vecsub(v1,v2),[0,0,-1,-3])
         v1=v1[1:]
@@ -75,19 +75,19 @@ class TestVecsub:
 
 class TestVecmul:
     def test_vecmul(self):
-        v1=range(4)
+        v1=list(range(4))
         v2=list(accsum(v1))
         assert_equal(vecmul(v1,v2),[0,1,6,18])
 
 class TestVecdiv:
     def test_vecdiv(self):
-        v1=range(5)[1:]
+        v1=list(range(5))[1:]
         v2=list(accsum(v1))
         assert_equal(vecdiv(v1,v2),[1,2./3,1./2,2./5])
 
 class TestVeccompare:
     def test_veccompare(self):
-        v1=range(5)[1:]
+        v1=list(range(5))[1:]
         v2=list(accsum(v1))
         assert_equal(veccompare(v1,v2),[3,1,0])
 

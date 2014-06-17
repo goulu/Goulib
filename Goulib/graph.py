@@ -4,8 +4,6 @@
 efficient Euclidian Graphs for :ref:`NetworkX <networkx>` and related algorithms
 """
 
- #"true division" everywhere
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = []
@@ -18,6 +16,8 @@ import networkx as nx # http://networkx.github.io/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 import collections
+
+import math2
 
 try:
     from rtree import index # http://toblerity.org/rtree/

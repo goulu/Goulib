@@ -9,11 +9,11 @@ simple HTML/XML generation (forked from http://markup.sourceforge.net/ v 1.9)
 
 
 try:
-    basestring
+    str
     import string
 except:
     # python 3
-    basestring = str
+    str = str
     string = str
     
 import sys
@@ -26,7 +26,7 @@ def cgiprint(line='', unbuff=True, line_end='\r\n'):
     :param unbuff: boolean, True to flush the buffer after every write.
     :param line_end: string to print after each line. By default this is \r\n , which is the standard specified by the RFC for http headers.
     """
-    print line,line_end
+    print(line,line_end)
     return
     sys.stdout.write(line)
     sys.stdout.write(line_end)
@@ -37,7 +37,7 @@ def tag( tag, between, **kwargs ):
     """generate full tag."""
     single=kwargs.pop('single',False)
     out = "<%s" % tag
-    for key, value in kwargs.items():
+    for key, value in list(kwargs.items()):
         if value is not None:               # when value is None that means stuff like <... checked>
             key = key.strip('_')            # strip this so class_ will mean class, etc.
             if key == 'http_equiv':         # special cases, maybe change _ to - overall?
@@ -362,7 +362,7 @@ class page:
         """This convenience function is only useful for html.
         It adds css stylesheet(s) to the document via the <link> element."""
       
-        if isinstance( filelist, basestring ):
+        if isinstance( filelist, str ):
             self.link( href=filelist, rel='stylesheet', type='text/css', media='all' )
         else:
             for file in filelist:
@@ -452,9 +452,9 @@ def _argsdicts( args, mydict ):
 def _totuple( x ):
     """Utility stuff to convert string, int, long, float, None or anything to a usable tuple."""
 
-    if isinstance( x, basestring ):
+    if isinstance( x, str ):
         out = x,
-    elif isinstance( x, ( int, long, float ) ):
+    elif isinstance( x, ( int, float ) ):
         out = str( x ),
     elif x is None:
         out = None,
@@ -466,7 +466,7 @@ def _totuple( x ):
 def escape( text, newline=False ):
     """Escape special html characters."""
 
-    if isinstance( text, basestring ):
+    if isinstance( text, str ):
         if '&' in text:
             text = text.replace( '&', '&amp;' )
         if '>' in text:
@@ -488,7 +488,7 @@ _escape = escape
 def unescape( text ):
     """Inverse of escape."""
     
-    if isinstance( text, basestring ):
+    if isinstance( text, str ):
         if '&amp;' in text:
             text = text.replace( '&amp;', '&' )
         if '&gt;' in text:

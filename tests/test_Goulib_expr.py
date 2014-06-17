@@ -106,7 +106,7 @@ class TestExpr:
         fb=self.fb1 ^ self.fb2
         assert_equal(fb([1,2,3]),[False,True,False])
 
-    def test___cmp__(self):
+    def test___lt__(self):
         assert_false(Expr(1)>Expr(2))
         assert_true(Expr(1)<Expr(2))
         
@@ -122,6 +122,11 @@ class TestExpr:
         # expr = Expr(f, left, right, name)
         # assert_equal(expected, expr.latex())
         raise SkipTest
+
+    def test___eq__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__eq__(other))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

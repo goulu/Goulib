@@ -18,7 +18,7 @@ class TestTimef:
         t=time(hour=12,minute=34,second=56)
         assert_equal(timef(t),t)
         assert_equal(timef('12:34:56'),t)
-        assert_true(equal(timef(0.503473,fmt=None),time(hour=12,minute=05))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        assert_true(equal(timef(0.503473,fmt=None),time(hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
     
 class TestDatetimef:
     def test_datetimef(self):
@@ -27,13 +27,13 @@ class TestDatetimef:
         assert_equal(datetimef(d),d)
         assert_equal(datetimef('1963-12-25',t),d)
         assert_equal(datetimef('25/12/1963',t,fmt='%d/%m/%Y'),d)
-        assert_true(equal(datetimef(40179.503472,fmt=None),datetime(year=2010,month=01,day=01,hour=12,minute=05))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        assert_true(equal(datetimef(40179.503472,fmt=None),datetime(year=2010,month=0o1,day=0o1,hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
 
 
 class TestStrftimedelta:
     def test_strftimedelta(self):
         d1=datetime(year=1963,month=12,day=25,hour=12,minute=34,second=56)
-        d2=datetime(year=1965,month=6,day=13,hour=01,minute=23,second=45)
+        d2=datetime(year=1965,month=6,day=13,hour=0o1,minute=23,second=45)
         td=d2-d1
         assert_equal(strftimedelta(td),'12852:48:49')
 
@@ -82,13 +82,13 @@ class TestTimedeltaMul:
 class TestTimeSub:
     def test_time_sub(self):
         t1=time(hour=12,minute=34,second=56)
-        t2=time(hour=01,minute=23,second=45)
+        t2=time(hour=0o1,minute=23,second=45)
         assert_equal(time_sub(t1, t2),timedelta(seconds=40271))
 
 class TestTimeAdd:
     def test_time_add(self):
         t1=time(hour=12,minute=34,second=56)
-        t2=time(hour=01,minute=23,second=45)
+        t2=time(hour=0o1,minute=23,second=45)
         assert_equal(time_add(t2, timedelta(seconds=40271)),t1)
 
 class TestDatetimeIntersect:

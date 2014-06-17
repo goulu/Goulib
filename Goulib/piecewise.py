@@ -3,7 +3,6 @@
 """
 piecewise-defined functions
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
@@ -89,15 +88,16 @@ class Piecewise(Expr):
     def __str__(self):
         return str(list(self))
 
-    def _apply(self,f,right,name=None):
-        if not right:
+    def iapply(self,f,right,name=None):
+        """apply function to self"""
+        if not right: #monadic . apply to each expr
             self.y=[v.apply(f,name=name) for v in self.y]
-        elif isinstance(right,Piecewise):
+        elif isinstance(right,Piecewise): #combine each piece of right with self
             for i,p in enumerate(right):
                 try:
-                    self._apply(f,(p[0],p[1],right[i+1][0]),name)
+                    self.iapply(f,(p[0],p[1],right[i+1][0]),name)
                 except:
-                    self._apply(f,(p[0],p[1]),name)
+                    self.iapply(f,(p[0],p[1]),name)
         else: #assume a triplet (start,value,end) as called above
             i=self.index(right[0])
             try:
@@ -112,13 +112,11 @@ class Piecewise(Expr):
         return self
     
     def apply(self,f,right,name=None):
-        """ overloads Expr.apply
-        :return:
-        """
-        return Piecewise(self)._apply(f,right,name)
+        """apply function to copy of self"""
+        return Piecewise(self).iapply(f,right,name)
     
     def applx(self,f,name=None):
-        """ apply a funtion to each x value """
+        """ apply a function to each x value """
         self.x=[f(x) for x in self.x]
         self.y=[y.applx(f,name) for y in self.y]
         return self

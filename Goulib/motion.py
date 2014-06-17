@@ -3,17 +3,16 @@
 """
 functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-from piecewise import *
-from polynomial import Polynomial
-from itertools2 import any
-from math2 import quad, equal
+from .piecewise import *
+from .polynomial import Polynomial
+from .itertools2 import any
+from .math2 import quad, equal
 
 class PVA(object):
     """represents a function of time returning position, velocity, and acceleration
@@ -70,7 +69,7 @@ def _pva(val):
            
 def _delta(x0,x1):
     try:
-        return x1-x0
+        return float(x1-x0)
     except:
         return None
     
@@ -87,10 +86,10 @@ def ramp(dp,v0,v1,a):
     if dv:
         dt.append(dv/a) #time to accelerate
     try: # solve a.t^2/2+v0.t == dp
-        dt.extend(list(quad(a/2,v0,-dp)))
+        dt.extend(list(quad(a/2.,v0,-dp)))
     except: 
         try: # solve v1.t-a.t^2/2 == dp
-            dt.extend(list(quad(-a/2,v1, -dp)))
+            dt.extend(list(quad(-a/2.,v1, -dp)))
         except: pass
     return min(t for t in dt if t > 0) #return smallest positive
 
@@ -110,12 +109,12 @@ def trapeze(dp,vmax,a,v0=0,v2=0):
     * position at begin of deceleration
     * total time
     """
-    t1=ramp(dp/2,v0,vmax,a) #acceleration time
+    t1=ramp(dp/2.,v0,vmax,a) #acceleration time
     v1=v0+a*t1 #speed reached
-    p1=t1*(v0+v1)/2 #position at end of acceleration
-    t3=ramp(dp/2,v1,v2,-a) #deceleration time
-    p2=t3*(v1+v2)/2 #distance to decelerate
-    t2=(dp-p1-p2)/v1 #time at constant velocity
+    p1=t1*(v0+v1)/2. #position at end of acceleration
+    t3=ramp(dp/2.,v1,v2,-a) #deceleration time
+    p2=t3*(v1+v2)/2. #distance to decelerate
+    t2=float(dp-p1-p2)/v1 #time at constant velocity
     return t1,p1,v1,t1+t2,dp-p2,t1+t2+t3
     
 def Segment2ndDegree(t0,t1,start,end=(None)):
@@ -171,7 +170,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
                 dt=ramp(dp,v0,v1,a0)
             else:
                 try:
-                    dt=2*dp/(v0+v1) #time to reach the position
+                    dt=2.*dp/(v0+v1) #time to reach the position
                 except: pass
 
         if t0 is None:
@@ -182,9 +181,9 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
             except: pass
                 
         if a0 is None:
-            try: a0=dv/dt
+            try: a0=float(dv)/dt
             except:
-                try: a0=2*(dp-v0*dt)/dt*dt
+                try: a0=2.*(dp-v0*dt)/dt*dt
                 except: pass
         if v0 is None:
             try: v0=v1-a0*dt
@@ -193,7 +192,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
             try: p0=p1-dt*(v1+v0)/2.
             except: pass
     
-    raise(ValueError("could not determine Segment2ndDegree"))
+    raise ValueError
     
 def Segment4thDegree(t0,t1,start,end):
     """smooth trajectory from an initial position and initial speed (p0,v0) to a final position and speed (p1,v1)
@@ -203,7 +202,7 @@ def Segment4thDegree(t0,t1,start,end):
     p1,v1,a1=_pva(end)
     
     if t1<=t0:
-        dt=(p1-p0)/((v1-v0)/2. + v0) #truediv
+        dt=float(p1-p0)/((v1-v0)/2. + v0) #truediv
         t1=t0+dt
     else:
         dt=t1-t0

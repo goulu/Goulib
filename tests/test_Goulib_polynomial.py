@@ -127,31 +127,31 @@ if __name__ == "__main__":
     runmodule()
 
     # Some cases using the polynomial objects:
-    print Polynomial([1,2,3]) + Polynomial([1,2]) # add
-    print Polynomial([1,2,3]) + 1                 # add
-    print Polynomial([1,2,3])-1                   # sub
-    print 1-Polynomial([1,2,3])                   # rsub
-    print 1+Polynomial([1,2,3])                   # radd
-    print Polynomial([1,2,3])*-1                  # mul
-    print -1*Polynomial([1,2,3])                  # rmul
-    print -Polynomial([1,2,3])                    # neg
-    print ''
+    print(Polynomial([1,2,3]) + Polynomial([1,2])) # add
+    print(Polynomial([1,2,3]) + 1)                 # add
+    print(Polynomial([1,2,3])-1)                   # sub
+    print(1-Polynomial([1,2,3]))                   # rsub
+    print(1+Polynomial([1,2,3]))                   # radd
+    print(Polynomial([1,2,3])*-1)                  # mul
+    print(-1*Polynomial([1,2,3]))                  # rmul
+    print(-Polynomial([1,2,3]))                    # neg
+    print('')
     # Work out Niklasson's raising and lowering operators:
     #  tests putting constants into the polynomial.
     for m in range(1,4):
-        print 'P^a_%d = ' % m,\
-              1 - Polynomial([1,-1])**m*Polynomial([1,m])
-        print 'P^b_%d = ' % m,\
-              Polynomial([0,1])**m*Polynomial([1+m,-m])
-    print ''
+        print('P^a_%d = ' % m,\
+              1 - Polynomial([1,-1])**m*Polynomial([1,m]))
+        print('P^b_%d = ' % m,\
+              Polynomial([0,1])**m*Polynomial([1+m,-m]))
+    print('')
 
     # Test the integral and derivatives
-    print integral([])
-    print integral([1])
-    print integral([0,1])
-    print derivative([0,0,0.5])
+    print(integral([]))
+    print(integral([1]))
+    print(integral([0,1]))
+    print(derivative([0,0,0.5]))
     p = Polynomial('x')
     ip = p.integral()
     dp = p.derivative()
-    print ip,dp
-    print ip(0,1) # integral of y=x from (0,1)
+    print(ip,dp)
+    print(ip(0,1)) # integral of y=x from (0,1)

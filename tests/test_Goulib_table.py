@@ -5,6 +5,7 @@ from Goulib.tests import *
 
 from Goulib.table import *
 import datetime,os
+import six
 
 class TestTable:
     
@@ -27,7 +28,7 @@ class TestTable:
         
         #format some columns
         self.t2.applyf('Cost',float)
-        self.t2.applyf('Total',lambda x:float(x) if isinstance(x,(int,float)) else float(x.replace(',','')))
+        self.t2.applyf('Total',lambda x:float(x) if isinstance(x,(six.integer_types,float)) else float(x.replace(',','')))
         
         self.t2.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
         assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))

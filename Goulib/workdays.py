@@ -15,13 +15,13 @@ from datetime import *
 import collections
 import logging
 
-from datetime2 import *
+from .datetime2 import *
 
 class WorkCalendar:
     """WorkCalendar class with datetime operations on working hours"""
     
     # Define the weekday mnemonics to match the date.weekday function
-    (MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
+    (MON, TUE, WED, THU, FRI, SAT, SUN) = list(range(7))
  
     def __init__(self,worktime=[time.min,time.max],parent=[], weekends=(SAT,SUN), holidays=set()):
         self.weekends=weekends
@@ -35,7 +35,7 @@ class WorkCalendar:
     end = property(fget=lambda self: self._worktime[1])
     
     def setworktime(self,worktime):
-        self._worktime=map(timef,worktime)
+        self._worktime=list(map(timef,worktime))
         for p in self.parents:
             self._worktime=intersection(self._worktime,p._worktime)
         self.delta=timedelta(minutes=(self.end.hour-self.start.hour)*60+(self.end.minute-self.start.minute))
@@ -258,9 +258,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(cal.networkdays(date1,date2),2,'networkdays')
         
                 
-        print cal.cast(datetime(2011,12,16,19))
-        print cal.cast(datetime(2012,1,9,3))
-        print cal.cast(datetime(2012,1,9,17))
+        print(cal.cast(datetime(2011,12,16,19)))
+        print(cal.cast(datetime(2012,1,9,3)))
+        print(cal.cast(datetime(2012,1,9,17)))
         
         self.assertEqual(cal.diff(date1,date2),timedelta(hours=8),'diff')
         self.assertEqual(cal.diff(date2,date1),timedelta(hours=-8),'diff')

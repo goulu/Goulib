@@ -5,39 +5,35 @@ from Goulib.tests import *
 
 from Goulib.itertools2 import *
 
-def iterable(n=10,s=1):
-    for i in range(s,n+1):
-        yield i
-
 class TestTake:
     def test_take(self):
-        assert_equal(take(3, iterable()),[1,2,3])
+        assert_equal(take(3, irange(1,10)),[1,2,3])
 
 class TestIndex:
     def test_index(self):
-        assert_equal(index(4, iterable()),5)
-        assert_equal(index(9, iterable()),10) # index=-1 doesn't work
+        assert_equal(index(4, irange(1,10)),5)
+        assert_equal(index(9, irange(1,10)),10) # index=-1 doesn't work
 
 class TestFirst:
     def test_first(self):
-        assert_equal(first(iterable()),1)
+        assert_equal(first(irange(1,10)),1)
 
 class TestLast:
     def test_last(self):
-        assert_equal(last(iterable()),10)
+        assert_equal(last(irange(1,10)),10)
 
 class TestTakeEvery:
     def test_take_every(self):
-        assert_equal(take_every(2, iterable()),[1,3,5,7,9])
+        assert_equal(take_every(2, irange(1,10)),[1,3,5,7,9])
 
 class TestDrop:
     def test_drop(self):
-        assert_equal(drop(5, iterable()),[6,7,8,9,10])
+        assert_equal(drop(5, irange(1,10)),[6,7,8,9,10])
 
 class TestIlen:
     def test_ilen(self):
-        assert_equal(ilen(iterable(0)),0)
-        assert_equal(ilen(iterable(10)),10)
+        assert_equal(ilen(irange(10,0)),0)
+        assert_equal(ilen(irange(11,20)),10)
 
 class TestIrange:
     def test_irange(self):
@@ -189,8 +185,8 @@ class TestNextPermutation:
 
 class TestIter2:
     def test___add__(self):
-        i1 = iter2(iterable(5))
-        i2 = iter2(iterable(10,6))
+        i1 = iter2(irange(1,5))
+        i2 = iter2(irange(6,10))
         assert_equal(i1+i2,range(1,11))
 
     def test___init__(self):
@@ -216,6 +212,11 @@ class TestIter2:
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.next())
         raise SkipTest 
+
+    def test___next__(self):
+        # iter2 = iter2(iterable)
+        # assert_equal(expected, iter2.__next__())
+        raise SkipTest # TODO: implement your test here
 
 class TestIflatten:
     def test_iflatten(self):

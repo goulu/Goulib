@@ -1,5 +1,3 @@
-from __future__ import division #"true division" everywhere
-
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -7,7 +5,7 @@ from Goulib.tests import *
 from Goulib.motion import *
 
 def pva_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
-    map(lambda x:assert_almost_equal(x[0],x[1],precision),zip(a,b))
+    list(map(lambda x:assert_almost_equal(x[0],x[1],precision),list(zip(a,b))))
     
 class TestPVA:
     def test___init__(self):
@@ -123,7 +121,7 @@ class TestSegment2ndDegree:
         seg=Segment2ndDegree(t0,t1,(p0,v0,a),(None,v1)) # time interval, start pva, v1= max vel => adjust t1
         assert_equal(seg.start(),(p0,v0,a,0))
         assert_equal(seg.end()[1],self.v1)
-        assert_equal(seg.dt(),(self.t1-self.t0)/2) # double acceleration => half dt
+        assert_equal(seg.dt(),(self.t1-self.t0)/2.) # double acceleration => half dt
         
     def test_segment2nd_degree(self):
         # assert_equal(expected, Segment2ndDegree(t0, t1, start, end))
@@ -163,7 +161,7 @@ class TestSegment4thDegree:
         seg=Segment4thDegree(self.t0, self.t1, self.start, self.end)
         assert_equal(seg.start()[:3],self.start[:3])  #ignore jerk
         assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
-        assert_equal(seg((self.t0+self.t1)/2),(-0.3125, 2.0, 3.0, 0.0)) #truediv
+        assert_equal(seg((self.t0+self.t1)/2.),(-0.3125, 2.0, 3.0, 0.0)) #truediv
 
 
 if __name__ == "__main__":

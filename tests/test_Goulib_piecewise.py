@@ -16,6 +16,7 @@ class TestPiecewise:
         
         self.p2+=(2.5,1,6.5)
         self.p2+=(1.5,1,3.5)
+        assert_equal(self.p2(range(8)),[1, 1, 2, 3, 2, 2, 2, 1])
         
         #boolean
         self.b1=Piecewise([(2,True)],False)
@@ -58,7 +59,6 @@ class TestPiecewise:
         
     def test___add__(self):
         pass # += tested in setup
-        assert_equal(self.p2(range(8)),[1, 1, 2, 3, 2, 2, 2, 1])
         
         p=self.p1+self.p2
         assert_equal(p(range(8)),[1, 2, 3, 6, 6, 2, 2, 1])
@@ -69,7 +69,7 @@ class TestPiecewise:
         assert_equal(y,[-1, 0, -1, 0, 2, -2, -2, -1])
         
     def test___neg__(self):
-        assert_equal(list(-self.p1),[(-inf, 0), (1, -1), (3, -3.0), (4, -4), (5, 0)])
+        assert_equal((-self.p1),[(-inf, 0), (1, -1), (3, -3.0), (4, -4), (5, 0)])
         
     def test___mul__(self):
         p=self.p1*self.p2
@@ -88,25 +88,25 @@ class TestPiecewise:
         pass #tested in functions below, where list(p) calls
     
     def test___invert__(self):
-        assert_equal(list(~self.b2),[(-inf, True), (1, False), (2, True), (3, False)])
+        assert_equal(~self.b2,[(-inf, True), (1, False), (2, True), (3, False)])
     
     def test___lshift__(self):
-        assert_equal(list(self.b2<<2),[(-inf, False), (-1, True), (0, False), (1, True)])
+        assert_equal(self.b2<<2,[(-inf, False), (-1, True), (0, False), (1, True)])
     
     def test___rshift__(self):
-        assert_equal(list(self.b2>>3),[(-inf, False), (4, True), (5, False), (6, True)])
+        assert_equal(self.b2>>3,[(-inf, False), (4, True), (5, False), (6, True)])
         
     def test___and__(self):
         b=self.b1 & self.b2
-        assert_equal(list(b),[(-inf, False), (3, True)])
+        assert_equal(b,[(-inf, False), (3, True)])
         
     def test___or__(self):
         b=self.b1 | self.b2
-        assert_equal(list(b),[(-inf, False), (1, True)])
+        assert_equal(b,[(-inf, False), (1, True)])
 
     def test___xor__(self):
         b=self.b1 ^ self.b2
-        assert_equal(list(b),[(-inf, False), (1, True), (3, False)])
+        assert_equal(b,[(-inf, False), (1, True), (3, False)])
         
 
     def test_applx(self):
@@ -115,6 +115,11 @@ class TestPiecewise:
     def test_apply(self):
         pass #tested in most operators
 
+
+    def test_iapply(self):
+        # piecewise = Piecewise(init, default, start)
+        # assert_equal(expected, piecewise.iapply(f, right, name))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

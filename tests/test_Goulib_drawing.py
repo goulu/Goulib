@@ -216,6 +216,11 @@ class TestGroup:
         # assert_equal(expected, group.to_dxf(**attr))
         raise SkipTest 
 
+    def test_from_dxf(self):
+        # group = Group()
+        # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, recurse))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     def test___repr__(self):
         # chain = Chain()

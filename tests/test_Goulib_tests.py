@@ -7,13 +7,12 @@ from Goulib.tests import * #a module that tests itself using itself... cool :-)
 
 class TestAssertEqual:
     def test_assert_equal(self):
-        # assert_equal(expected, assert_equal(first, second, *args, **kwargs))
-        raise SkipTest
+        assert_equal(0,1E-12)
+        assert_equal((x**2 for x in range(2,12)),[x**2 for x in range(2,12)])
 
 class TestRunmodule:
     def test_runmodule(self):
-        # assert_equal(expected, runmodule())
-        raise SkipTest
+        pass #tested by testing ;-)
 
 if __name__=="__main__":
     runmodule()

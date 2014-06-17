@@ -1,5 +1,5 @@
 cd goulib
-sphinx-apidoc . -eo ..\docs\modules 
+call sphinx-apidoc . -eo ..\docs\modules 
 rem del ..\docs\modules\Goulib.rst
 cd ..
 cd docs

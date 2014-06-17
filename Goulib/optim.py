@@ -33,7 +33,7 @@ class _Bin():
             return tot+value
         if isinstance(value,set):
             return tot|value
-        return map(self._add,zip(value,tot))
+        return list(map(self._add,list(zip(value,tot))))
     
     def _recalc(self):
         self._used=self._f(0)
@@ -56,7 +56,7 @@ class _Bin():
                 self._recalc()
                 return self._used[i] if i is not None else self._used
                 
-        return map(self._sub,zip(value,tot))
+        return list(map(self._sub,list(zip(value,tot))))
     
     def size(self):
         return self._sub(self._used,self._capacity)
@@ -68,7 +68,7 @@ class _Bin():
             return value<=cap
         if isinstance(value,set):
             return len(value)<=cap
-        return all(itertools.imap(self._fits,zip(value,cap)))
+        return all(map(self._fits,list(zip(value,cap))))
     
     def fits(self,item):
         """:return: bool True if item fits in bin without exceeding capacity"""
@@ -320,7 +320,7 @@ def swapped_cities(tour):
             
 def tour_length(points,dist,tour=None):
     """generator of point-to-point distances along a tour"""
-    if not tour:tour=range(len(points)) #will generate the closed tour length
+    if not tour:tour=list(range(len(points))) #will generate the closed tour length
     n=len(tour)
     for i in range(n):
         j=(i+1)%n
@@ -339,7 +339,7 @@ def tsp(points,dist,max_iterations=100,start_temp=None,alpha=None,close=True,ran
     import random
     n=len(points)
     def init_function():
-        tour=range(1,n)
+        tour=list(range(1,n))
         if rand:
             random.shuffle(tour)
         return [0]+tour

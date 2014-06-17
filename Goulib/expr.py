@@ -53,7 +53,7 @@ class Expr(object):
             res='%s(%s)'%(self.name,self.left)
         else:
             res='%s'%self.name
-        return res.translate(None, '\\')
+        return res.replace('\\','')
     
     def _repr_latex_(self,dollars=True):
         """:return: LaTex string for IPython Notebook"""
@@ -113,13 +113,22 @@ class Expr(object):
             res.right=Expr(f,res.right,name=name)
         return res
     
-    def __cmp__(self,other):
+    def __eq__(self,other):
         if self.isconstant:
             try:
                 if other.isconstant:
-                    return cmp(self.y,other.y)
+                    return self.y==other.y
             except:
-                return cmp(self.y,other)
+                return self.y==other
+        raise NotImplementedError #TODO : implement for general expressions...
+    
+    def __lt__(self,other):
+        if self.isconstant:
+            try:
+                if other.isconstant:
+                    return self.y<other.y
+            except:
+                return self.y<other
         raise NotImplementedError #TODO : implement for general expressions...
 
     def __add__(self,right):

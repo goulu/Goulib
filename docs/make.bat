@@ -1,10 +1,9 @@
-@ECHO OFF
+@ECHO ON
 
 REM Command file for Sphinx documentation
 
-if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=sphinx-build
-)
+set SPHINXBUILD=CALL c:\PYTHON27\SCRIPTS\sphinx-build.BAT
+
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
@@ -61,6 +60,7 @@ if errorlevel 9009 (
 )
 
 if "%1" == "html" (
+	@ECHO ON
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	echo.
