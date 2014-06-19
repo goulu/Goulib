@@ -543,12 +543,15 @@ class Table(list):
                 self.footer.append(f)
         return self.footer
     
-    def remove_lines_where(self,filter):
-        """remove lines on a condition, returns the number of lines removed"""
+    def remove_lines_where(self,f):
+        """
+        :param f: function of the form lambda line:bool returning True if line should be removed
+        :return: int number of lines removed
+        """
         res=0
         if len(self)>0:
             for line in reversed(self):
-                if list(filter(line)):
+                if f(line):
                     self.remove(line)
                     res+=1
         return res
