@@ -7,16 +7,7 @@
 simple HTML/XML generation (forked from http://markup.sourceforge.net/ v 1.9)
 """
 
-
-try:
-    str
-    import string
-except:
-    # python 3
-    str = str
-    string = str
-    
-import sys
+import sys, six
     
 #from http://www.voidspace.org.uk/python/cgiutils.html
 def cgiprint(line='', unbuff=True, line_end='\r\n'):
@@ -26,8 +17,8 @@ def cgiprint(line='', unbuff=True, line_end='\r\n'):
     :param unbuff: boolean, True to flush the buffer after every write.
     :param line_end: string to print after each line. By default this is \r\n , which is the standard specified by the RFC for http headers.
     """
-    print(line,line_end)
-    return
+    # print(line,line_end)
+    # return
     sys.stdout.write(line)
     sys.stdout.write(line_end)
     if unbuff:
@@ -192,17 +183,17 @@ class page:
 
         if mode == 'strict_html' or mode == 'html':
             self.onetags = valid_onetags
-            self.onetags += list( map( string.lower, self.onetags ) )
+            self.onetags += [x.lower() for x in self.onetags]
             self.twotags = valid_twotags
-            self.twotags += list( map( string.lower, self.twotags ) )
+            self.twotags += [x.lower() for x in self.twotags]
             self.deptags = deprecated_onetags + deprecated_twotags
-            self.deptags += list( map( string.lower, self.deptags ) )
+            self.deptags += [x.lower() for x in self.deptags]
             self.mode = 'strict_html'
         elif mode == 'loose_html':
             self.onetags = valid_onetags + deprecated_onetags 
-            self.onetags += list( map( string.lower, self.onetags ) )
+            self.onetags += [x.lower() for x in self.onetags]
             self.twotags = valid_twotags + deprecated_twotags
-            self.twotags += list( map( string.lower, self.twotags ) )
+            self.twotags += [x.lower() for x in self.twotags]
             self.mode = mode
         elif mode == 'xml':
             if onetags and twotags:
@@ -452,7 +443,7 @@ def _argsdicts( args, mydict ):
 def _totuple( x ):
     """Utility stuff to convert string, int, long, float, None or anything to a usable tuple."""
 
-    if isinstance( x, str ):
+    if isinstance( x, six.string_types ):
         out = x,
     elif isinstance( x, ( int, float ) ):
         out = str( x ),
