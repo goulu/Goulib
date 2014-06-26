@@ -130,10 +130,12 @@ class GeoGraph(nx.MultiGraph):
         """does not use deepcopy because the rtree index must be rebuilt"""
         return self.__class__(self,**self.graph)
                 
-    def __bool__(self):
+    def __nonzero__(self):
         """:return: True if graph has at least one node
         """
         return self.number_of_nodes()>0
+    
+    __bool__ = __nonzero__
     
     def clear(self): 
         #saves some graph attributes cleared by convert._prep_create_using

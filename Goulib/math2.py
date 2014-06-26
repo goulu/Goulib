@@ -11,8 +11,10 @@ __license__ = "LGPL"
 
 import operator,cmath
 from math import pi, sqrt, log, log10, ceil, sin, asin
-from itertools import count, combinations, permutations, product as cartesian_product
 
+from six.moves import filter
+
+from itertools import count, combinations, permutations, product as cartesian_product
 from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten, zip_longest
 
 import fractions
@@ -154,7 +156,7 @@ def norm_inf(v):
 
 def norm(v,order=2):
     """http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html"""
-    return sum(x**order for x in v)**(1./order)
+    return sum(abs(x)**order for x in v)**(1./order)
 
 def dist(a,b,norm=norm_2):
     return norm(vecsub(a,b))
@@ -230,6 +232,48 @@ def stats(l):
         var=None
     return lo,hi,sum,sum2,avg,var
 
+def linear_regression(x, y, conf=None):
+    """
+    :param x,y: iterable data
+    :param conf: float confidence level [0..1]. If None, confidence intervals are not returned
+    :return: b0,b1,b2, (b0 
+    
+    Return the linear regression parameters and their <prob> confidence intervals.
+ 
+    ex:
+    >>> linear_regression([.1,.2,.3],[10,11,11.5],0.95)
+    """
+    # https://gist.github.com/riccardoscalco/5356167
+    import scipy.stats, numpy #TODO remove these requirements
+    
+    x = numpy.array(x)
+    y = numpy.array(y)
+    n = len(x)
+    xy = x * y
+    xx = x * x
+ 
+    # estimates
+ 
+    b1 = (xy.mean() - x.mean() * y.mean()) / (xx.mean() - x.mean()**2)
+    b0 = y.mean() - b1 * x.mean()
+    s2 = 1./n * sum([(y[i] - b0 - b1 * x[i])**2 for i in xrange(n)])
+    
+    if not conf:
+        return b1,b0,s2
+    
+    #confidence intervals
+    
+    alpha = 1 - conf
+    c1 = scipy.stats.chi2.ppf(alpha/2.,n-2)
+    c2 = scipy.stats.chi2.ppf(1-alpha/2.,n-2)
+    
+    c = -1 * scipy.stats.t.ppf(alpha/2.,n-2)
+    bb1 = c * (s2 / ((n-2) * (xx.mean() - (x.mean())**2)))**.5
+    
+    bb0 = c * ((s2 / (n-2)) * (1 + (x.mean())**2 / (xx.mean() - (x.mean())**2)))**.5
+    
+    return b1,b0,s2,(b1-bb1,b1+bb1),(b0-bb0,b0+bb0),(n*s2/c2,n*s2/c1)
+
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
@@ -273,6 +317,7 @@ def is_prime(n):
     return True
 
 def get_primes(start=2, memoized=False):
+    from decorators import memoize
     """Yield prime numbers from 'start'"""
     is_prime_fun = (memoize(is_prime) if memoized else is_prime)
     return filter(is_prime_fun, count(start))
@@ -289,8 +334,13 @@ def digits_from_num(num, base=10):
         return recursive(num//base, base, current + [num%base])
     return list(reversed(recursive(num, base, [])))
 
-def str_base(num, base, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
-    """string representation of an ordinal in given base"""
+def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
+    """
+    :param num: int number (decimal)
+    :param base: int base, 10 by default
+    :param numerals: string with all chars representing numbers in base base. chars after the base-th are ignored
+    :return: string representation of num in base
+    """
     if base < 2 or base > len(numerals):
         raise ValueError("str_base: base must be between 2 and %i" % len(numerals))
 
@@ -311,7 +361,11 @@ def str_base(num, base, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     return sign + result
 
 def num_from_digits(digits, base=10):
-    """Get digits from num in base 'base'"""
+    """
+    :param digits: string representing a number in given base
+    :param base: int base, 10 by default
+    :return: int number
+    """
     return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
 
 def is_palindromic(num, base=10):
