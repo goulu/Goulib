@@ -96,25 +96,35 @@ from random import random
 class TestMean:
     def test_mean(self):
         r=[random() for _ in range(5000)]
-        assert_almost_equal(mean(r),0.5,1) # significant difference is unlikely
+        assert_equal(mean(r),0.5,1)
 
 class TestVariance:
     def test_variance(self):
         r=[random() for _ in range(5000)]
-        assert_almost_equal(variance(r),0.082,2) # significant difference is unlikely
+        assert_equal(variance(r),0.082,2)
 
 class TestStats:
     def test_stats(self):
         n=10000
         r=[float(_)/n for _ in range(n+1)]
         min,max,sum,sum2,avg,var=stats(r)
-        assert_almost_equal(min,0.,1) # significant difference is unlikely
-        assert_almost_equal(max,1.,1) # significant difference is unlikely
-        assert_almost_equal(sum,(n+1)/2.,2) # significant difference is unlikely
-        assert_almost_equal(sum2,(n+2)/3.,0) # significant difference is unlikely
-        assert_almost_equal(avg,0.5,4) # significant difference is unlikely
-        assert_almost_equal(var,1./12,4) # significant difference is unlikely
+        assert_equal(min,0.,1)
+        assert_equal(max,1.,1)
+        assert_equal(sum,(n+1)/2.,2)
+        assert_equal(sum2,(n+2)/3.,0)
+        assert_equal(avg,0.5,4)
+        assert_equal(var,1./12,4)
 
+class TestLinearRegression:
+    def test_linear_regression(self):
+        #first test a perfect fit
+        a,b,c=linear_regression([1,2,3],[-1,-3,-5])
+        assert_equal((a,b,c),(-2,1,0))
+        a,b,c,ai,bi,ci=linear_regression([1,2,3],[-1,-3,-5],.95)
+        assert_equal(ai,(-2,-2))
+        assert_equal(bi,(1,1))
+        assert_equal(ci,(0,0))
+        
 class TestFibonacci:
     def test_fibonacci(self):
         # assert_equal(expected, fibonacci())
@@ -127,18 +137,21 @@ class TestFactorial:
 
 class TestIsInteger:
     def test_is_integer(self):
-        # assert_equal(expected, is_integer(x, epsilon))
-        raise SkipTest 
+        assert_true(is_integer(1+1e-6, 1e-6))
+        assert_false(is_integer(1+2e-6, 1e-6))
 
 class TestIntOrFloat:
     def test_int_or_float(self):
-        # assert_equal(expected, int_or_float(x, epsilon))
-        raise SkipTest 
-
+        assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
+        assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
+                     
 class TestGetPrimes:
     def test_get_primes(self):
-        # assert_equal(expected, get_primes(start, memoized))
-        raise SkipTest 
+        from itertools import islice
+        a=[p for p in islice(get_primes(),10)]
+        assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
+        a=[p for p in islice(get_primes(29,True),10)]
+        assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
 
 class TestDigitsFromNumFast:
     def test_digits_from_num_fast(self):
@@ -288,24 +301,24 @@ class TestTriangularRepartition:
         assert_true(dist(res,ref)<1E-6)
         ref.reverse()
         res=triangular_repartition(0,10)
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.02,0.06,0.1,0.14,0.18,0.18,0.14,0.1,0.06,0.02]
         res=triangular_repartition(.5,10)
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.08,0.24,0.36,0.24,0.08]
         res=triangular_repartition(.5,5) # center value is top of triangle
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
 
 class TestRectangularRepartition:
     def test_rectangular_repartition(self):
         ref=[.5,.125,.125,.125,.125]
         res=rectangular_repartition(0,5,.5)
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.3125,0.3125,.125,.125,.125]
@@ -314,33 +327,30 @@ class TestRectangularRepartition:
         assert_true(dist(res,ref)<1E-6)
         ref.reverse()
         res=rectangular_repartition(.8,5,.5)
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
         ref=[0.1,0.1675,0.3325,.1,.1,.1,.1]
         res=rectangular_repartition(.325,7,.4)
-        assert_almost_equal(sum(res),1)
+        assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
         
 class TestNorm2:
     def test_norm_2(self):
-        # assert_equal(expected, norm_2(v))
-        raise SkipTest 
+        assert_equal(norm_2([-3,4]),5)
 
 class TestNorm1:
     def test_norm_1(self):
-        # assert_equal(expected, norm_1(v))
-        raise SkipTest 
+        assert_equal(norm_1([-3,4]),7)
 
 class TestNormInf:
     def test_norm_inf(self):
-        # assert_equal(expected, norm_inf(v))
-        raise SkipTest 
+        assert_equal(norm_inf([-3,4]),4)
 
 class TestNorm:
     def test_norm(self):
-        # assert_equal(expected, norm(v, order))
-        raise SkipTest 
+        assert_equal(norm([-3,4],2),5)
+        assert_equal(norm([-3,4],1),7)
 
 class TestDist:
     def test_dist(self):
@@ -385,6 +395,7 @@ class TestSlerp:
         assert_equal(slerp(u,v,1),v)
         s=slerp(u,v,0.5)
         assert_equal(s,vecunit((1,1,0)))
+
 
 if __name__ == "__main__":
     runmodule()
