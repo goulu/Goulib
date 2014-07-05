@@ -189,7 +189,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
             try: v0=v1-a0*dt
             except: pass
         if p0 is None:
-            try: p0=p1-dt*(v1+v0)/2.
+            try: p0=p1-dt*float(v1+v0)/2.
             except: pass
     
     raise ValueError
@@ -206,7 +206,7 @@ def Segment4thDegree(t0,t1,start,end):
         t1=t0+dt
     else:
         dt=t1-t0
-    return SegmentPoly(t0,t1,[p0,v0,0,(v1-v0)/(dt*dt),-(v1-v0)/(2*dt*dt*dt)]) #truediv
+    return SegmentPoly(t0,t1,[p0,v0,0,float(v1-v0)/(dt*dt),-float(v1-v0)/(2*dt*dt*dt)]) #truediv
 
 
 def SegmentTrapezoidalSpeed(t0,p0,p1,a,T=0,vmax=float('inf')):
