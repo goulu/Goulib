@@ -37,6 +37,14 @@ class TestLinearRegression:
         assert_equal(ai,(-2,-2))
         assert_equal(bi,(1,1))
         assert_equal(ci,(0,0))
+
+class TestQuantileFit:
+    def test_quantile_fit(self):
+        from scipy.stats import norm
+        d=quantile_fit([0.25,0.5,0.75],[-0.68,0,0.68], dist=norm,x0=(.5,.5))
+        assert_equal(d.mean(),0)
+        assert_almost_equal(d.var(),1,delta=0.05)
+        
         
 if __name__ == "__main__":
     runmodule()

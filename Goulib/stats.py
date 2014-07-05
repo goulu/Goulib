@@ -9,6 +9,10 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
+import logging
+
+import math, math2
+
 def mean(data):
     """:return: mean of data"""
     return float(sum(data))/len(data)
@@ -88,3 +92,42 @@ def linear_regression(x, y, conf=None):
     bb0 = c * ((s2 / (n-2)) * (1 + (x.mean())**2 / (xx.mean() - (x.mean())**2)))**.5
     
     return b1,b0,s2,(b1-bb1,b1+bb1),(b0-bb0,b0+bb0),(n*s2/c2,n*s2/c1)
+
+def quantile_fit(x,q,dist,x0, bounds=None, mean=None, norm=None):
+    """fits a distribution from quantile points
+    (is it a type of https://en.wikipedia.org/wiki/Quantile_regression ?)
+    :param x: iterable of floats containing the x values. For quartiles it would be [0.25,0.5,0.75]
+    :param y: iterable of floats containing the quantile function corresponding to x (see https://en.wikipedia.org/wiki/Quantile_function)
+    :param dist: distribution law from http://docs.scipy.org/doc/scipy/reference/stats.html
+    :param x0: iterable of floats : initial dist parameters guess:
+    :param bounds: iterable of (min,max) bounds for each parameter 
+    :param mean: float mean value, if available
+    :param norm: function that return a float norm of a vector, by default the euclidian norm
+    """
+    
+    if norm is None:
+        from math import sqrt
+        norm=lambda v:sqrt(sum([x*x for x in v]))
+
+    def f(p): #function to minimize. p are dist's shape parameters
+        d=dist(*p)
+        qp=[d.ppf(_) for _ in x] #quantile values from estimated distribution
+        v=[a-b for a,b in zip(qp,q)]
+        if mean is not None:
+            v.append(d.mean()-mean)
+        return norm(v)
+    
+    import scipy.optimize as optimize
+            
+    r=optimize.minimize(f,x0=x0,bounds=bounds), # options={'disp':True} for debug
+    try: #sometimes scipy returns an array... TODO : find why
+        r=r[0]
+    except:
+        pass
+    if not r.success:
+        logging.warning(r)
+    return dist(*r.x)
+    
+
+#new distributions
+#http://stackoverflow.com/questions/10678546/creating-new-distributions-in-scipy
