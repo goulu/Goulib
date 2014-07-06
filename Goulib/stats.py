@@ -93,16 +93,16 @@ def linear_regression(x, y, conf=None):
     
     return b1,b0,s2,(b1-bb1,b1+bb1),(b0-bb0,b0+bb0),(n*s2/c2,n*s2/c1)
 
-def quantile_fit(x,q,dist,x0, bounds=None, mean=None, norm=None):
+def quantile_fit(x,q,dist,x0, mean=None, norm=None, **kwargs):
     """fits a distribution from quantile points
     (is it a type of https://en.wikipedia.org/wiki/Quantile_regression ?)
     :param x: iterable of floats containing the x values. For quartiles it would be [0.25,0.5,0.75]
     :param y: iterable of floats containing the quantile function corresponding to x (see https://en.wikipedia.org/wiki/Quantile_function)
     :param dist: distribution law from http://docs.scipy.org/doc/scipy/reference/stats.html
     :param x0: iterable of floats : initial dist parameters guess:
-    :param bounds: iterable of (min,max) bounds for each parameter 
     :param mean: float mean value, if available
     :param norm: function that return a float norm of a vector, by default the euclidian norm
+    :param **kwargs: other params are passed to http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
     """
     
     if norm is None:
@@ -119,7 +119,7 @@ def quantile_fit(x,q,dist,x0, bounds=None, mean=None, norm=None):
     
     import scipy.optimize as optimize
             
-    r=optimize.minimize(f,x0=x0,bounds=bounds), # options={'disp':True} for debug
+    r=optimize.minimize(f,x0=x0,**kwargs)
     try: #sometimes scipy returns an array... TODO : find why
         r=r[0]
     except:

@@ -41,9 +41,13 @@ class TestLinearRegression:
 class TestQuantileFit:
     def test_quantile_fit(self):
         from scipy.stats import norm
-        d=quantile_fit([0.25,0.5,0.75],[-0.68,0,0.68], dist=norm,x0=(.5,.5))
+        d=quantile_fit([0.25,0.5,0.75],[-0.67448,0,0.67448], dist=norm, x0=(.5,.5))
         assert_equal(d.mean(),0)
-        assert_almost_equal(d.var(),1,delta=0.05)
+        assert_equal(d.var(),1,places=3)
+               
+        from scipy.stats import burr
+        d=quantile_fit([0.25,0.5,0.75],[9655,11280,13384], dist=burr, x0=(3,100),bounds=[(2,4),(100,None)])
+
         
         
 if __name__ == "__main__":
