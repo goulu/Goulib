@@ -100,22 +100,18 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
     else:
         return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
 
-class GeoGraph(nx.MultiGraph):
-    """a graph with nodes at specified positions.
+class _Geo(object):
+    """base class for graph with nodes at specified positions.
     if edges have a "length" attribute, it is used to compute distances,
     otherwise euclidian distance between nodes is used by default
     """
-    def __init__(self, data=None, nodes=None, **kwargs):
+    def __init__(self, parent, data=None, nodes=None, **kwargs):
         """
+        :param parent: type of the graph. nx.Graph, nx.DiGraph or nx.MultiGraph
         :param data: see :meth:`to_networkx_graph` for valid types
-        
-        :param kwargs: other parameters will be copied as attributes, especially:
-        
-        - multi : boolean to control if multiple edges between nodes are allowed (True) or not (False)
         """
-        super(GeoGraph,self).__init__(None, **kwargs)
-        
-        self.idx=None # index is created at fist call to add_node
+        self.parent=parent 
+        self.idx=None # index is created at first call to add_node
         
         if data:
             to_networkx_graph(data,self)
@@ -137,10 +133,14 @@ class GeoGraph(nx.MultiGraph):
     
     __bool__ = __nonzero__
     
+    def __getattr__(self,name):
+        """called if name attribute is not found in self"""
+        return self.graph.get(name)
+    
     def clear(self): 
         #saves some graph attributes cleared by convert._prep_create_using
         t,m=self.tol,self.multi
-        super(GeoGraph,self).clear()
+        self.parent.clear(self)
         self.multi=m
         self.graph['tol']=t
     
@@ -175,18 +175,23 @@ class GeoGraph(nx.MultiGraph):
             return math2.dist(u,v)
                 
     def length(self,edges=None):
-        """:returns: sum of 'length' attributes of edges"""
+        """
+        :param edges: iterator over edges either as (u,v,data) or (u,v,key,data). If None, all edges are taken
+        :returns: sum of 'length' attributes of edges
+        """
         
         if edges is None: # take all edges
             return self.size(weight="length")
             
         res=0
         for edge in edges:
+            data=edge[-1]
+            (u,v)=edge[:2]
             try:
-                l=edge[2]['length']
+                l=data['length']
             except:
-                l=self.dist(edge[0],edge[1])
-                edge[2]['length']=l
+                l=self.dist(u,v)
+                data['length']=l
             res+=l
         return res
     
@@ -273,7 +278,7 @@ class GeoGraph(nx.MultiGraph):
             global _nk
             _nk+=1
             attr['key']=_nk
-            super(GeoGraph,self).add_node(p, attr_dict, **attr)
+            self.parent.add_node(self,p, attr_dict, **attr)
             self.idx.insert(_nk,p,p)
         return p
     
@@ -298,7 +303,7 @@ class GeoGraph(nx.MultiGraph):
             logging.error('GeoGraph has %d!=%d'%(n1,n2))
             raise RuntimeError('Nodes/Rtree mismatch')
         nk=self.node[n]['key']
-        super(GeoGraph,self).remove_node(n)  
+        self.parent.remove_node(self,n)  
         self.idx.delete(nk,n) #in fact n is ignored, the nk key is used here
 
     def _last(self,u,v):
@@ -330,7 +335,10 @@ class GeoGraph(nx.MultiGraph):
             a.update(**attrs)
         
         if not self.is_multigraph():
-            data=self._last(u,v)
+            try:
+                data=self[u][v][0] # 0 because there is only one entry if not multi
+            except:
+                data=None
             if data:
                 data.update(a)
                 return data #return existing edge data
@@ -344,8 +352,17 @@ class GeoGraph(nx.MultiGraph):
         #if no length is explicitely defined, we calculate it and set it as parameter
         #therefore all edges in a GeoGraph have a length attribute
         a.setdefault('length',self.dist(u,v))
-        super(GeoGraph,self).add_edge(u, v, attr_dict=a) #doesn't return created data... what a pity ...
-        return self._last(u,v)
+        
+        try:
+            keys=set(self[u][v].keys()) #existing keys
+            k=0 if len(keys)==0 else None #if k=None, it will be determined below
+        except:
+            keys=set()
+            k=0
+        self.parent.add_edge(self,u, v, attr_dict=a) #doesn't return created data... what a pity ...
+        if k is None:
+            k=next(iter(set(self[u][v].keys())-keys))
+        return self[u][v][k]
         
     def remove_edge(self,u,v=None,key=None,clean=False):
         """
@@ -358,7 +375,7 @@ class GeoGraph(nx.MultiGraph):
         if v is None:
             u,v=u[0],u[1]
         
-        super(GeoGraph,self).remove_edge(u,v,key)   
+        self.parent.remove_edge(self,u,v,key)   
         
         if clean:
             if self.degree(u)==0:
@@ -368,7 +385,7 @@ class GeoGraph(nx.MultiGraph):
                 
     def number_of_nodes(self):
         #check that both structures are coherent at the same time
-        n1=super(GeoGraph,self).number_of_nodes()   
+        n1=self.parent.number_of_nodes(self)   
         n2=self.idx.count(self.idx.bounds) if n1 else 0
         if n1!=n2:
             raise KeyError('%s %s number of nodes %d!=%d'%(self.__class__.__name__, self.name, n1,n2))
@@ -423,6 +440,17 @@ class GeoGraph(nx.MultiGraph):
             write_dxf(self,filename)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
+            
+class GeoGraph(_Geo, nx.MultiGraph):
+    def __init__(self, data=None, nodes=None, **kwargs):
+        """
+        :param data: see :meth:`to_networkx_graph` for valid types
+        :param kwargs: other parameters will be copied as attributes, especially:
+
+        """
+        nx.MultiGraph.__init__(self,None, **kwargs)
+        _Geo.__init__(self,nx.MultiGraph,data,nodes)
+    
     
 def figure(g,**kwargs):
     """:return: matplotlib axis suitable for drawing graph g"""
