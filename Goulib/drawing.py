@@ -312,7 +312,7 @@ class Entity(object):
         elif e.dxftype == 'LWPOLYLINE':
             res=Chain.from_dxf(e,trans)
         else:
-            logging.warning('unhandled entity type %s'%e.dxftype)
+            logging.debug('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
         res.color=acadcolors[e.color % len(acadcolors)]
@@ -380,10 +380,11 @@ class Group(list):
     """group of Entities"""
     
     def append(self,entity):
-        if isinstance(entity,Entity):
-            super(Group,self).append(entity)
-        else: #ignore invalid items
-            logging.warning('skipped object %s'%entity)
+        if entity is not None:
+            if isinstance(entity,Entity):
+                super(Group,self).append(entity)
+            else: #ignore invalid items
+                logging.warning('skipped object %s'%entity)
         return self
     
     def bbox(self):
