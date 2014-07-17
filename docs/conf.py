@@ -119,22 +119,8 @@ intersphinx_mapping = {
     'networkx': ('http://networkx.github.io/documentation/latest','http://networkx.github.io/documentation/latest/objects.inv'),
     'numpy': ('http://docs.scipy.org/doc/numpy','http://docs.scipy.org/doc/numpy/objects.inv'),
     'scipy' : ('http://docs.scipy.org/doc/scipy/reference','http://docs.scipy.org/doc/scipy/reference/objects.inv'),
+    'matplotlib': ('http://matplotlib.sourceforge.net/', None),
 }
-
-import urllib2
-proxy_info = {
-'user' : 'guglie0p ',
-'pass' : 'ert32768',
-'host' : '80.254.148.58',
-'port' : 8080
-}
-
-# build a new opener that uses a proxy requiring authorization
-proxy_support = urllib2.ProxyHandler({"http" : \
-"http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
-opener = urllib2.build_opener(proxy_support, urllib2.HTTPHandler)
-# install it
-urllib2.install_opener(opener)
 
 # -- Options for HTML output ---------------------------------------------------
 
