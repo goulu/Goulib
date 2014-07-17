@@ -30,7 +30,7 @@ acadcolors = ['black','red','yellow','lime','aqua','blue','magenta','white']
 
 def Trans(scale=1, offset=None, rotation=None):
     """
-    :return: :class:Matrix3 of generalized scale+offset+rotation
+    :return: :class:`Matrix3` of generalized scale+offset+rotation
     """
     res = Matrix3()
     if rotation:
@@ -101,8 +101,7 @@ class BBox:
     
     def __call__(self):
         """:return: list of flatten corners"""
-        l = list(self._pt1.xy)
-        l.extend(list(self._pt2.xy))
+        l = list(self._pt1.xy)+list(self._pt2.xy)
         return l
     
     def size(self):
@@ -182,41 +181,34 @@ class Entity(object):
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
     
-    def artist(self, ax=None, **kwargs):
-        """:return: matplotlib.artist corresponding to entity"""
-        from matplotlib.lines import Line2D
+    def patches(self, **kwargs):
+        """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
         import matplotlib.patches as patches
         from matplotlib.path import Path
-        import matplotlib.pyplot as plt
-        import numpy as np
         
-        if ax is None : ax=plt.gca()
-        if 'color' not in kwargs: #do not use setdefaut as self.color might be undefined (TODO find why)
-            kwargs['color']=self.color
+        kwargs.setdefault('color',self.color)
         if isinstance(self,Segment2):
-            x=np.array((self.start.x, self.end.x))
-            y=np.array((self.start.y, self.end.y))
-            return ax.add_artist(Line2D(x,y,**kwargs))
+            path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
+            return [patches.PathPatch(path, **kwargs)]
+
+            # return Line2D(x,y,**kwargs)
         if isinstance(self,Arc2):
             theta1=degrees(self.a)
             theta2=degrees(self.b)
             if self.dir<1 : #swap
                 theta1,theta2=theta2,theta1
             d=self.r*2
-            a=patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)
-            return ax.add_artist(a)
+            return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
         
         #entities below may be filled, so let's handle the color first
         if 'color' in kwargs: # color attribute refers to edgecolor for coherency
             kwargs.setdefault('edgecolor',kwargs.pop('color'))
             kwargs.setdefault('fill',False)
         if isinstance(self,Circle): #must be after isinstance(self,Arc2)
-            a=patches.Circle(self.c.xy,self.r,**kwargs)
-            return ax.add_artist(a)
+            return [patches.Circle(self.c.xy,self.r,**kwargs)]
         if isinstance(self,Spline):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
-            a = patches.PathPatch(path, **kwargs)
-            return ax.add_artist(a)
+            return [patches.PathPatch(path, **kwargs)]
         raise NotImplementedError
     
     def _dxf_color(self):
@@ -411,15 +403,12 @@ class Group(list):
         for e in self:
             e.swap()
             
-    def artist(self, ax=None, **kwargs):
-        """:return: list of matplotlib.artist corresponding to all entities"""
-        res=[]
+    def patches(self, **kwargs):
+        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
+        patches=[]
         for e in self:
-            a=e.artist(ax,**kwargs)
-            if not isinstance(a,list): #flatten
-                a=[a]
-            res.extend(a)
-        return res
+            patches+=e.patches(**kwargs)
+        return patches
     
     def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, recurse=True):
         """
@@ -461,7 +450,7 @@ class Group(list):
             r=e.to_dxf(**kwargs)
             if not isinstance(r,list): #flatten
                 r=[r]
-            res.extend(r)
+            res+=r
         return res
 
 class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
@@ -809,7 +798,11 @@ class Drawing(Group):
         :param ignore: list of dxf entity types names that are ignored. default=[]: none is ignored
         """
         import dxfgrabber
-        self.dxf = dxfgrabber.readfile(filename,options)
+        try:
+            self.dxf = dxfgrabber.readfile(filename,options)
+        except:
+            logging.error('could not read %s'%filename)
+            return
         self.name = filename
         
         #build dictionary of blocks
@@ -850,7 +843,7 @@ class Drawing(Group):
                 if pen==background: pen=acadcolors[(len(acadcolors)-i) % len(acadcolors)]
                 if e.dxftype == 'LINE':
                     b = list((trans * Point2(e.start[:2])).xy)
-                    b.extend(list(trans(Point2(e.end[:2])).xy))
+                    b+=list(trans(Point2(e.end[:2])).xy)
                     draw.line(b, fill=pen)
                 elif e.dxftype == 'CIRCLE':
                     b = cbox(Point2(e.center[:2]), e.radius)
@@ -868,12 +861,12 @@ class Drawing(Group):
                 elif e.dxftype == 'POLYLINE':
                     b = []
                     for v in e.vertices:
-                        b.extend(list(trans(Point2(v.location[:2])).xy))
+                        b+=list(trans(Point2(v.location[:2])).xy)
                     draw.line(b, fill=pen)
                 elif e.dxftype == 'SPLINE':
                     b = []
                     for v in e.controlpoints:
-                        b.extend(list(trans(Point2(v[:2])).xy))
+                        b+=list(trans(Point2(v[:2])).xy)
                     draw.line(b, fill=pen) # splines are drawn as lines for now...
                 elif e.dxftype == 'TEXT':
                     h = e.height * trans.mag()  # [pixels]
@@ -944,23 +937,20 @@ class Drawing(Group):
     def draw(self, fig=None, **kwargs):
         """ draw  entities
         :param fig: matplotlib figure where to draw. figure(g) is called if missing
-        :return: kwargs with 'artists' list of drawn matplotlib artists as returned by Goulib.drawing.Entity.artist 
+        :return: fig,patch
         """
         
         if fig is None: 
             fig=self.figure()
             
-        ax=plt.gca()
+        p=self.patches()
             
-        artists=[]
-    
-        for e in self:
-            a=e.artist(ax,**kwargs)
-            if not isinstance(a,list):
-                a=[a]
-            artists.extend(a)
+        from matplotlib.collections import PatchCollection
+            
+        c=PatchCollection(p,match_original=True)
+        plt.gca().add_collection(c)
                 
-        return fig, artists
+        return fig, p
     
     def render(self,format,**kwargs):
         """ render graph to bitmap stream
