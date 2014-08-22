@@ -46,5 +46,6 @@ Modules
    Goulib.optim
    Goulib.piecewise
    Goulib.polynomial
+   Goulib.stats
    Goulib.table
    Goulib.workdays
