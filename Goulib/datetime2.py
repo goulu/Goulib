@@ -42,7 +42,7 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
         d=d
     elif isinstance(d,date):
         d=datetime(year=d.year, month=d.month, day=d.day)
-    elif isinstance(d,(int,long,float)): 
+    elif isinstance(d,(six.integer_types,float)): 
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
     else:
         d=datetime.strptime(str(d),fmt)

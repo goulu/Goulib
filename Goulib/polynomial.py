@@ -12,6 +12,8 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/"] 
 __license__ = "LGPL"
 
+import six #python 2+3 compatibility
+
 import re
 
 class Polynomial:
@@ -43,12 +45,19 @@ class Polynomial:
         """:return: LaTex string for IPython Notebook"""
         return r'$%s$'%tostring(self.plist)
     
-    def __cmp__(self,other): 
+    def __lt__(self,other): 
         if isinstance(other,Polynomial):
-            return cmp(self.plist,other.plist)
+            return self.plist<other.plist
         elif isinstance(other,str):
-            return cmp(self.plist,Polynomial(other).plist)
-        return cmp(self.plist,other)
+            return self.plist<Polynomial(other).plist
+        return self.plist<other
+    
+    def __eq__(self,other): 
+        if isinstance(other,Polynomial):
+            return self.plist==other.plist
+        elif isinstance(other,str):
+            return self.plist==Polynomial(other).plist
+        return self.plist==other
             
     def __add__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __radd__(self,other): return Polynomial(add(self.plist,plist(other)))
@@ -169,7 +178,7 @@ def power(p,e):
     for i in range(e): new = multiply(new,p)
     return new
 
-def parse_string(str):
+def parse_string(s):
     """\
     Do very, very primitive parsing of a string into a plist.
     'x' is the only term considered for the polynomial, and this
@@ -180,12 +189,12 @@ def parse_string(str):
     or
     x**2 - 1
     """
-    str=str.translate(None, '$*') #remove LateX marks and optional * mul symbols
+    s=s.replace('$','').replace('*','') #remove LateX marks and optional * mul symbols
     termpat = re.compile('([-+]?\s*\d*\.?\d*)(x?\^?\d?)')
     #print "Parsing string: ",str
     #print termpat.findall(str)
     res_dict = {}
-    for n,p in termpat.findall(str):
+    for n,p in termpat.findall(s):
         n,p = n.strip(),p.strip()
         if not n and not p: continue
         n,p = _parse_n(n),_parse_p(p)

@@ -77,8 +77,8 @@ class TestTails:
 
 class TestIreduce:
     def test_ireduce(self):
-        # assert_equal(expected, ireduce(func, iterable, init))
-        raise SkipTest 
+        import operator
+        assert_equal(ireduce(operator.add, irange(10)),[1,3,6,10,15,21,28,36,45,55])
 
 class TestUnique:
     def test_unique(self):

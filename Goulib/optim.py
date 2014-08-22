@@ -11,7 +11,9 @@ __license__ = "LGPL"
 import random
 import math
 import logging
-import itertools, itertools2
+import itertools
+
+import Goulib.itertools2 as itertools2
 
 class _Bin():
     def __init__(self, capacity, f=lambda x:x):

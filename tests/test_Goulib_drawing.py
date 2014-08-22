@@ -175,6 +175,11 @@ class TestEntity:
         # assert_equal(expected, entity.svg_path(currentpos))
         raise SkipTest 
     
+    def test_patches(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestGroup:
     @classmethod
     def setup_class(self):
@@ -219,6 +224,11 @@ class TestGroup:
     def test_from_dxf(self):
         # group = Group()
         # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, recurse))
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # group = Group()
+        # assert_equal(expected, group.patches(**kwargs))
         raise SkipTest # TODO: implement your test here
 
 class TestChain:
@@ -276,8 +286,10 @@ class TestDrawing:
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
         self.dxf= Drawing(self.path+'/drawing.dxf')
-        self.pdf= Drawing(self.path+'/drawing.pdf')
         self.svg= Drawing(self.path+'/drawing.svg')
+        import sys
+        if sys.version_info < (3,0): #skip Pdf for now as PDFParser isn't ported to Python 3
+            self.pdf= Drawing(self.path+'/drawing.pdf')
         
         seg=Segment2((1,0),(2,3))
         arc=Arc2((1,1),(0,0),radians(120))
@@ -289,9 +301,11 @@ class TestDrawing:
     
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
-            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             self.svg.save(self.path+'/drawing.svg.%s'%ext)
             self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
+            import sys
+            if sys.version_info < (3,0): #skip Pdf for now as PDFParser isn't ported to Python 3
+                self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             
 
     def test___init__(self):
@@ -329,7 +343,7 @@ class TestDrawing:
         raise SkipTest 
 
     def test_render(self):
-        assert_true('!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
+        assert_true(b'!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
 
     def test_img(self):
         # drawing = Drawing(filename, **kwargs)

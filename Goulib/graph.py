@@ -17,7 +17,7 @@ import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 import collections
 
-import math2
+import Goulib.math2
 
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -503,7 +503,7 @@ def draw_networkx(g, **kwargs):
         for u,v,data in edgelist:
             if 'color' in data:
                 edge_color.append(data['color'])
-            else:
+            elif g.color:
                 try:
                     edge_color.append(g.color)
                 except:

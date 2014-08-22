@@ -9,12 +9,12 @@ from random import random
 class TestMean:
     def test_mean(self):
         r=[random() for _ in range(5000)]
-        assert_equal(mean(r),0.5,1)
+        assert_equal(mean(r),0.5,places=1)
 
 class TestVariance:
     def test_variance(self):
         r=[random() for _ in range(5000)]
-        assert_equal(variance(r),0.082,2)
+        assert_equal(variance(r),0.082,places=2)
 
 class TestStats:
     def test_stats(self):
