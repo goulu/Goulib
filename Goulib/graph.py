@@ -17,7 +17,7 @@ import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 import collections
 
-import Goulib.math2
+import Goulib.math2 as math2
 
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -414,6 +414,11 @@ class _Geo(object):
     
         return draw_networkx(self, **kwargs)
     
+        """ for debug and compatibility check:
+        kwargs.pop('edge_color',None)
+        return nx.draw_networkx(self, **kwargs)
+        """
+    
     def render(self,format='svg',**kwargs):
         """ render graph to bitmap stream
         :param format: string defining the format. 'svg' by default for INotepads
@@ -421,7 +426,8 @@ class _Geo(object):
         """
         
         self.render_args.update(kwargs)
-        fig=self.draw(**self.render_args)['fig']
+        self.draw(**self.render_args)
+        fig=plt.gcf()
         
         from io import BytesIO
         output = BytesIO()
@@ -452,19 +458,24 @@ class GeoGraph(_Geo, nx.MultiGraph):
         _Geo.__init__(self,nx.MultiGraph,data,nodes)
     
     
-def figure(g,**kwargs):
+def figure(g,box=None,**kwargs):
     """:return: matplotlib axis suitable for drawing graph g"""
     fig=plt.figure(**kwargs)
-    min,max=g.box()
-    plt.plot((min[0],max[0]),(min[1],max[1]),alpha=0) #draw a transparent diagonal to size everything
+    if box:
+        min,max=box
+    else:
+        min,max=g.box()
+    try:
+        plt.plot((min[0],max[0]),(min[1],max[1]),alpha=0) #draw a transparent diagonal to size everything
+    except:
+        return None
     plt.axis('equal')
-    
     import pylab
     pylab.axis('off') # turn off axis
     
     return fig
 
-def draw_networkx(g, **kwargs):
+def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     """ improves draw_networkx 
     :param g: NetworkX Graph
     :param pos: can be either :
@@ -473,55 +484,73 @@ def draw_networkx(g, **kwargs):
     - function of the form lambda node:(x,y) that maps node positions.
     - None. in this case, nodes are directly used as positions if graph is a GeoGraph, otherwise nx.draw_shell is used
     
-    :param fig: :class:`matplotlib.figure`. If None, figure(g) is used to obtain one
-    :param **kwargs: passed to nx.draw method with one tweak:
+    :param **kwargs: passed to nx.draw method as described in http://networkx.lanl.gov/reference/generated/networkx.drawing.nx_pylab.draw_networkx.html with one tweak:
     
     - if edge_color is a function of the form lambda data:color string, it is mapped over all edges
+    
     """
     
     #build node positions
-    pos=kwargs.get('pos',None)
-    if pos is None and isinstance(g,GeoGraph):
-        pos={} #dict of nodes positions
-        for node in g.nodes_iter():
-            pos[node]=node[:2] #restrict to 2D in order to handle 3D+ graphs simply
-    elif pos and isinstance(pos, collections.Callable): #mapping function ?
-            pos=dict(((node,pos(node)) for node in g.nodes_iter()))
+    
+    if isinstance(pos, collections.Callable): #mapping function
+        pos=dict(((node,pos(node)) for node in g.nodes_iter()))
+    
+    if pos is None:
+        try:
+            pos=dict(((node,node[:2]) for node in g.nodes_iter()))
+        except:
+            pass
             
-    if not pos:
+    if pos is None:
         pos=nx.spring_layout(g) # default to spring layout
+            
+        
+    try: #convert ndarray to python lists
+        for k in pos:
+            pos[k]=pos[k].tolist()
+    except:
+        pass
         
     edgelist=kwargs.setdefault('edgelist',g.edges(data=True))
-    
-    # build edge_colors
+        
     edge_color=kwargs.get('edge_color',None)
-    if edge_color:
-        if isinstance(edge_color, collections.Callable): #mapping function ?
-            edge_color=list(map(edge_color,(data for u,v,data in edgelist)))
-    else: #try to color the graph
-        edge_color=[]
-        for u,v,data in edgelist:
-            if 'color' in data:
-                edge_color.append(data['color'])
-            elif g.color:
-                try:
-                    edge_color.append(g.color)
-                except:
-                    pass
+    if edge_color is None:
+        # build edge_colors
+        default=None
+        try: # get default edge color
+            default=g.color
+        except:
+            pass
+        if default is None:
+            default='k' #black
+            
+        def edge_color(data): #function to color edges, applied below
+            c=data.get('color',default)
+            return c if c else default
+        
+    if isinstance(edge_color, collections.Callable): #mapping function ?
+        edge_color=list(map(edge_color,(data for u,v,data in edgelist)))
+            
     if edge_color: #not empty
         kwargs['edge_color']=edge_color
+        
+    fig=kwargs.pop('fig',None)
     
-    if not 'fig' in kwargs:
-        kwargs['fig']=figure(g)
+    if not fig:
+        try: # we need a bounding box
+            box=g.box()
+        except:
+            box=(math2.minimum(pos.values()),math2.maximum(pos.values()))
+        fig=figure(g,box=box,figsize=kwargs.get('figsize',None))
     
     if kwargs.get('node_size',300)>0:
         nx.draw_networkx_nodes(g, pos, **kwargs)
         
     nx.draw_networkx_edges(g, pos, **kwargs)
-    if kwargs.get('with_labels',False):
+    if with_labels:
         nx.draw_networkx_labels(g, pos, **kwargs)
         
-    return kwargs
+    return fig
 
 def to_drawing(g, d=None, edges=[]):
     """
@@ -544,8 +573,6 @@ def to_drawing(g, d=None, edges=[]):
             e=geom.Segment2(u,v)
         d.append(e)
     return d
-    
-    
     
 def write_dxf(g,filename):
     """writes :class:`networkx.Graph` in .dxf format"""
