@@ -69,6 +69,16 @@ class TestPolynomial:
     def test___str__(self):
         assert_equal(str(self.p), '3x^2 + 2x + 1')
 
+    def test___eq__(self):
+        # polynomial = Polynomial(val)
+        # assert_equal(expected, polynomial.__eq__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___lt__(self):
+        # polynomial = Polynomial(val)
+        # assert_equal(expected, polynomial.__lt__(other))
+        raise SkipTest # TODO: implement your test here
+
 class TestPlist:
     def test_plist(self):
         pass #tested above

@@ -287,9 +287,7 @@ class TestDrawing:
         self.path=os.path.dirname(os.path.abspath(__file__))
         self.dxf= Drawing(self.path+'/drawing.dxf')
         self.svg= Drawing(self.path+'/drawing.svg')
-        import sys
-        if sys.version_info < (3,0): #skip Pdf for now as PDFParser isn't ported to Python 3
-            self.pdf= Drawing(self.path+'/drawing.pdf')
+        self.pdf= Drawing(self.path+'/drawing.pdf')
         
         seg=Segment2((1,0),(2,3))
         arc=Arc2((1,1),(0,0),radians(120))
@@ -303,9 +301,7 @@ class TestDrawing:
         for ext in ['png','svg','pdf','dxf']:
             self.svg.save(self.path+'/drawing.svg.%s'%ext)
             self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
-            import sys
-            if sys.version_info < (3,0): #skip Pdf for now as PDFParser isn't ported to Python 3
-                self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
+            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             
 
     def test___init__(self):
@@ -396,4 +392,10 @@ class TestSpline:
         raise SkipTest 
 
 if __name__=="__main__":
+    import logging,sys,os,six
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        filename='%s_%d.%d.log'%(os.path.basename(__file__),sys.version_info[0],sys.version_info[1]),
+        format = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s",
+    )
     runmodule()

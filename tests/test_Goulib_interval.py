@@ -104,6 +104,11 @@ class TestInterval:
         b=Intervals([Interval(5,6),Interval(2,4)])
         assert_equal(a,b)
 
+    def test___eq__(self):
+        # interval = Interval(start, end)
+        # assert_equal(expected, interval.__eq__(other))
+        raise SkipTest # TODO: implement your test here
+
 class TestIntervals:
     @classmethod
     def setup_class(self):
