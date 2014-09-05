@@ -1,0 +1,12 @@
+pdfminer3k
+xlrd
+lxml
+dxfgrabber
+dxfwrite
+svg.path
+pillow
+networkx
+matplotlib
+numpy
+scipy
+six
