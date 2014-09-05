@@ -369,7 +369,9 @@ def Spline(pts):
 '''
 
 class Group(list):
-    """group of Entities"""
+    """group of Entities
+    Notice : a Group is NOT an Entity because it cannot be handled as a single geometry
+    """
     
     def append(self,entity):
         if entity is not None:
@@ -396,6 +398,18 @@ class Group(list):
     def _apply_transform(self,trans):
         for entity in self:
             entity._apply_transform(trans)
+            
+    def intersect(self, other):
+        """
+        :param other: `geom.Entity`
+        :result: list of tuples (Point2,Entity) of intersections between other and each Entity
+        """
+        res=[]
+        for entity in self:
+            inter=entity.intersect(other)
+            if inter:
+                res.append((inter,entity))
+        return res
             
     def swap(self):
         """ swap start and end"""
@@ -753,7 +767,7 @@ class Drawing(Group):
         #then all we have to do is to launch PDFMiner's parser on the file        
         fp = open(filename, 'rb')
         parser = PDFParser(fp)
-        document = PDFDocument(parser, '')
+        document = PDFDocument(parser, fallback=False)
         rsrcmgr = PDFResourceManager()
         device = _Device(rsrcmgr)
         interpreter = _Interpreter(rsrcmgr, device)
@@ -816,7 +830,7 @@ class Drawing(Group):
             only=kwargs.get('only',[]),
             ignore=kwargs.get('only',[]),
             trans=Trans(),
-            recurse=True
+            recurse=kwargs.get('recurse',True),
         )
         
     def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
@@ -925,8 +939,12 @@ class Drawing(Group):
 
         box=self.bbox()
         #for some reason we have to plot something in order to size the window (found no other way top do it...)
-        plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
-
+        try:
+            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
+        except:
+            logging.error('drawing is empty')
+            raise
+    
         plt.axis('equal')
 
         import pylab
