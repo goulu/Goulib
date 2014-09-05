@@ -22,4 +22,5 @@ Goulib\optim.py
 Goulib\piecewise.py
 Goulib\polynomial.py
 Goulib\table.py
+Goulib\tests.py
 Goulib\workdays.py
