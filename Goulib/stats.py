@@ -111,7 +111,7 @@ def quantile_fit(x,q,dist,x0, mean=None, norm=None, **kwargs):
 
     def f(p): #function to minimize. p are dist's shape parameters
         d=dist(*p)
-        qp=[d.ppf(_) for _ in x] #quantile values from estimated distribution
+        qp=d.ppf(x) #quantile values from estimated distribution
         v=[a-b for a,b in zip(qp,q)]
         if mean is not None:
             v.append(d.mean()-mean)
