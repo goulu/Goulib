@@ -67,6 +67,7 @@ def mode(data, is_sorted=False):
                 res,count=prev,c
             c=1
         prev=v
+    x.pop() #no side effect please
     return res
 
 
