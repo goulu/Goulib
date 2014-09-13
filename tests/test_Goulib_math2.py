@@ -93,8 +93,8 @@ class TestVeccompare:
         
 class TestFibonacci:
     def test_fibonacci(self):
-        # assert_equal(expected, fibonacci())
-        raise SkipTest 
+        from Goulib.itertools2 import take
+        assert_equal(take(10,fibonacci()),[0,1,1,2,3,5,8,13,21,34])
 
 class TestFactorial:
     def test_factorial(self):
@@ -118,10 +118,6 @@ class TestGetPrimes:
         assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
         a=[p for p in islice(get_primes(29,True),10)]
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
-
-class TestDigitsFromNumFast:
-    def test_digits_from_num_fast(self):
-        assert_equal(digits_from_num_fast(1234),[1,2,3,4])
         
 class TestStrBase:
     def test_str_base(self):

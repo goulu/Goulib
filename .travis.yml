@@ -1,6 +1,7 @@
 language: python
 python:
   - 2.7
+  - 3.4
 notifications:
   email: false
  
@@ -20,7 +21,8 @@ before_install:
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib networkx nose
   - source activate env_name
-  - pip install --allow-all-external -r requirements.txt 
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip install --allow-all-external -r requirements3.txt 
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install --allow-all-external -r requirements2.txt 
   - pip install coveralls
  
 script:

@@ -11,22 +11,17 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
                ]
 __license__ = "LGPL"
 
-#!/usr/bin/python
+import six #Python2+3 compatibility utilities
+
 from itertools import islice, repeat, groupby
-from itertools import count, takewhile, tee
+from itertools import count, tee
 from itertools import chain, starmap, cycle, dropwhile
 import random
 import logging
 import collections
 from functools import reduce
 
-#Python2-3 compatibility utilities
-import itertools
-import sys
-if sys.version_info >= (3,0,0):
-    zip_longest=itertools.zip_longest
-else:
-    zip_longest=itertools.izip_longest
+
     
 #reciepes from Python manual 
 
@@ -337,7 +332,7 @@ def split(iterable,sep,include_sep=False):
     """
     return [list(x) for x in isplit(iterable,sep,include_sep)]
 
-def next_permutation(seq, pred=lambda x:-1 if x[0]<x[1] else 0):
+def next_permutation(seq, pred=lambda x,y:-1 if x<y else 0):
     """Like C++ std::next_permutation() but implemented as generator.
     see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html
     :param seq: iterable

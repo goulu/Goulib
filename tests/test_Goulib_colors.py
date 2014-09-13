@@ -17,7 +17,7 @@ class TestHexToRgb:
 class TestRgbToCmyk:
     def test_rgb_to_cmyk(self):
         assert_equal(rgb_to_cmyk(0,0,0),(0,0,0,1))
-        assert_almost_equal(rgb_to_cmyk(.8,.6,.4),(0,0.25,.5,0.2))
+        assert_equal(rgb_to_cmyk(.8,.6,.4),(0,0.25,.5,0.2))
 
 class TestNearestColor:
     def test_nearest_color(self):

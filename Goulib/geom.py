@@ -2447,8 +2447,7 @@ class Ray2(Line2):
 
 class Segment2(Line2):
     p1 = property(lambda self: self.p)
-    p2 = property(lambda self: Point2(self.p.x + self.v.x, 
-                                      self.p.y + self.v.y))
+    p2 = property(lambda self: Point2(self.p.x + self.v.x, self.p.y + self.v.y))
     
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)

@@ -73,16 +73,11 @@ class Interval(object):
         "Hash."
         return hash(self.start) ^ hash(self.end)
     
-    def __cmp__(self, other):
-        "Compare."
-        if other is None:
-            return 1
-        if self.end<other.start :
-            return -1
-        elif self.start>other.end :
-            return 1
-        else:
-            return 0 #means there is some kind of overlap or intersection
+    def __lt__(self, other):
+        return self.end<other.start #it has to be < even if 
+    
+    def __eq__(self,other):
+        return self.start==other.start and self.end==other.end
     
     def intersection(self, other):
         "Intersection. :return: None if no intersection."
@@ -140,8 +135,6 @@ class Interval(object):
         else:
             return other.start - self.end
         
-
-  
 import bisect      
 class Intervals(list):
     """a list of intevals kept in ascending order"""

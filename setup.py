@@ -2,7 +2,7 @@
 # coding=utf-8
 
 from distutils.core import setup
-import os
+import os,sys
 
 def read(*parts):
     return open(os.path.join(os.path.dirname(__file__), *parts)).read()
@@ -33,7 +33,7 @@ setup(
     scripts=[],
 
     # parse_requirements() returns generator of pip.req.InstallRequirement objects
-    install_reqs = parse_requirements('requirements.txt'),
+    install_reqs = parse_requirements('requirements%d.txt'%sys.version_info[0]),
     extras_require = parse_requirements('optional-requirements.txt'),
 
     test_suite="nose.collector",       
@@ -45,6 +45,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Multimedia :: Graphics :: Graphics Conversion',

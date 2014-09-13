@@ -175,6 +175,11 @@ class TestEntity:
         # assert_equal(expected, entity.svg_path(currentpos))
         raise SkipTest 
     
+    def test_patches(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestGroup:
     @classmethod
     def setup_class(self):
@@ -219,6 +224,11 @@ class TestGroup:
     def test_from_dxf(self):
         # group = Group()
         # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, recurse))
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # group = Group()
+        # assert_equal(expected, group.patches(**kwargs))
         raise SkipTest # TODO: implement your test here
 
 class TestChain:
@@ -276,8 +286,8 @@ class TestDrawing:
     def setup_class(self):
         self.path=os.path.dirname(os.path.abspath(__file__))
         self.dxf= Drawing(self.path+'/drawing.dxf')
-        self.pdf= Drawing(self.path+'/drawing.pdf')
         self.svg= Drawing(self.path+'/drawing.svg')
+        self.pdf= Drawing(self.path+'/drawing.pdf')
         
         seg=Segment2((1,0),(2,3))
         arc=Arc2((1,1),(0,0),radians(120))
@@ -289,9 +299,9 @@ class TestDrawing:
     
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
-            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             self.svg.save(self.path+'/drawing.svg.%s'%ext)
             self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
+            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
             
 
     def test___init__(self):
@@ -329,7 +339,7 @@ class TestDrawing:
         raise SkipTest 
 
     def test_render(self):
-        assert_true('!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
+        assert_true(b'!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
 
     def test_img(self):
         # drawing = Drawing(filename, **kwargs)
@@ -382,4 +392,10 @@ class TestSpline:
         raise SkipTest 
 
 if __name__=="__main__":
+    import logging,sys,os,six
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        filename='%s_%d.%d.log'%(os.path.basename(__file__),sys.version_info[0],sys.version_info[1]),
+        format = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s",
+    )
     runmodule()

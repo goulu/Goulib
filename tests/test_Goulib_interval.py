@@ -54,11 +54,9 @@ class TestInterval:
         dict[self.i12]=self.i12
         assert_equal(dict[Interval(2,1)],self.i12)
         
-    def test___cmp__(self):
+    def test___lt__(self):
         assert_equal(self.i12<self.i34,True)
         assert_equal(self.i12>self.i34,False)
-        assert_equal(self.i12==self.i24,True)
-        assert_equal(self.i12==self.i24,True)
 
     def test___contains__(self):
         assert_true(2 in self.i13)
@@ -105,6 +103,11 @@ class TestInterval:
         a+=Interval(3,4)
         b=Intervals([Interval(5,6),Interval(2,4)])
         assert_equal(a,b)
+
+    def test___eq__(self):
+        # interval = Interval(start, end)
+        # assert_equal(expected, interval.__eq__(other))
+        raise SkipTest # TODO: implement your test here
 
 class TestIntervals:
     @classmethod

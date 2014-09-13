@@ -12,10 +12,10 @@ __license__ = "LGPL"
 import operator,cmath
 from math import pi, sqrt, log, log10, ceil, sin, asin
 
-from six.moves import filter
+from six.moves import filter, zip_longest
 
 from itertools import count, combinations, permutations, product as cartesian_product
-from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten, zip_longest
+from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten
 
 import fractions
 
@@ -178,7 +178,8 @@ def sets_levenshtein(a,b):
     return len(a-c)+len(b-c)
 
 def levenshtein(seq1, seq2):
-    """:return: http://en.wikipedia.org/wiki/Levenshtein_distance distance between 2 iterables
+    """:return: distance between 2 iterables
+    :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
     # http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
     oneago = None
@@ -200,9 +201,11 @@ def levenshtein(seq1, seq2):
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
 def fibonacci():
-    """Generate fibonnacci serie"""
-    get_next = lambda ab_: (ab_[1], ab_[0]+ab_[1])
-    return (b for (a, b) in ireduce(get_next, count(), (0, 1)))
+    """Generate fibonacci serie"""
+    a,b=0,1
+    while True:
+        yield a
+        a,b=b,a+b
 
 def factorial(num):
     """:return: factorial value of num (num!)"""
@@ -239,22 +242,21 @@ def is_prime(n):
     return True
 
 def get_primes(start=2, memoized=False):
-    from decorators import memoize
+    from .decorators import memoize
     """Yield prime numbers from 'start'"""
     is_prime_fun = (memoize(is_prime) if memoized else is_prime)
     return filter(is_prime_fun, count(start))
-
-def digits_from_num_fast(num):
-    """Get digits from num in base 10 (fast implementation)"""
-    return list(map(int, str(num)))
+    
 
 def digits_from_num(num, base=10):
     """Get digits from num in base 'base'"""
+    if base==10:
+        return map(int, str(num))
     def recursive(num, base, current):
         if num < base:
             return current+[num]
         return recursive(num//base, base, current + [num%base])
-    return list(reversed(recursive(num, base, [])))
+    return reversed(recursive(num, base, []))
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """

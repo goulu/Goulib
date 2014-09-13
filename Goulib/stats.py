@@ -10,8 +10,10 @@ __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.p
 __license__ = "LGPL"
 
 import logging
+import six
 
-import math, math2
+import math
+import Goulib.math2
 
 def mean(data):
     """:return: mean of data"""
@@ -75,7 +77,7 @@ def linear_regression(x, y, conf=None):
  
     b1 = (xy.mean() - x.mean() * y.mean()) / (xx.mean() - x.mean()**2)
     b0 = y.mean() - b1 * x.mean()
-    s2 = 1./n * sum([(y[i] - b0 - b1 * x[i])**2 for i in xrange(n)])
+    s2 = 1./n * sum([(y[i] - b0 - b1 * x[i])**2 for i in range(n)])
     
     if not conf:
         return b1,b0,s2

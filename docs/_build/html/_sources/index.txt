@@ -42,9 +42,9 @@ Modules
    Goulib.markup
    Goulib.math2
    Goulib.motion
-   Goulib.nvd3
    Goulib.optim
    Goulib.piecewise
    Goulib.polynomial
+   Goulib.stats
    Goulib.table
    Goulib.workdays
