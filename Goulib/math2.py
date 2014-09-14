@@ -9,10 +9,11 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
-import operator,cmath
-from math import pi, sqrt, log, log10, ceil, sin, asin
-
+import six
 from six.moves import filter, zip_longest
+
+import operator,cmath
+from math import pi, sqrt, log, log10, ceil, sin, asin, exp, factorial
 
 from itertools import count, combinations, permutations, product as cartesian_product
 from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten
@@ -207,10 +208,6 @@ def fibonacci():
         yield a
         a,b=b,a+b
 
-def factorial(num):
-    """:return: factorial value of num (num!)"""
-    return product(range(2, num+1))
-
 def is_integer(x, epsilon=1e-6):
     """:return: True if the float x "seems" an integer"""
     return (abs(round(x) - x) < epsilon)
@@ -378,6 +375,20 @@ def is_pandigital(digits, through=list(range(1, 10))):
     return (sorted(digits) == through)
         
 #combinatorics
+
+def binomial_coefficient(n,k):
+    """https://en.wikipedia.org/wiki/Binomial_coefficient"""
+    #return factorial(n) // (factorial(k) * factorial(n - k)) # is slow
+    # code from https://en.wikipedia.org/wiki/Binomial_coefficient#Binomial_coefficient_in_programming_languages
+    if k < 0 or k > n:
+        return 0
+    if k == 0 or k == n:
+        return 1
+    k = min(k, n - k) # take advantage of symmetry
+    c = 1
+    for i in range(k):
+        c = c * (n - i) // (i + 1)
+    return int(c)
 
 def ncombinations(n, k):
     """Combinations of k elements from a group of n"""
