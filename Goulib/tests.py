@@ -60,7 +60,7 @@ class TestCase(unittest.TestCase):
         if isinstance(first,self.base_types) and isinstance(second,self.base_types):
             super(TestCase,self).assertEqual(first, second,msg=msg) 
         elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
-            self.assertSequenceEqual(first, second,msg=msg) 
+            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta) 
         else: #float and classes
             try:
                 super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta) 

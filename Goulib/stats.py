@@ -26,10 +26,50 @@ def variance(data,avg=None):
     if avg==None:
         avg=mean(data)
     s = sum(((value - avg)**2) for value in data)
-    var = float(s)/(len(data) - 1)
+    var = float(s)/len(data)
     return var
 
 var=variance #alias
+
+def stddev(data,avg=None):
+    """:return: standard deviation of data"""
+    return math.sqrt(variance(data,avg))
+
+def confidence_interval(data,conf=0.95, avg=None):
+    """:return: (low,high) bounds of 95% confidence interval of data"""
+    if avg is None:
+        avg=mean(data)
+    e = 1.96 * stddev(data,avg) / math.sqrt(len(data))
+    return avg-e,avg+e
+
+def median(data, is_sorted=False):
+    """:return: median of data"""
+    x=data if is_sorted else sorted(data)
+    n=len(data)
+    i=n//2
+    if n % 2:
+        return x[i]
+    else:
+        return avg(x[i-1:i+1])
+
+def mode(data, is_sorted=False):
+    """:return: mode (most frequent value) of data"""
+    #we could use a collection.Counter, but we're only looking for the largest value
+    x=data if is_sorted else sorted(data)
+    res,count=None,0
+    prev,c=None,0
+    x.append(None)# to force the last loop
+    for v in x:
+        if v==prev:
+            c+=1
+        else:
+            if c>count: #best so far
+                res,count=prev,c
+            c=1
+        prev=v
+    x.pop() #no side effect please
+    return res
+
 
 def stats(l):
     """:return: min,max,sum,sum2,avg,var of a list"""
@@ -113,7 +153,7 @@ def quantile_fit(x,q,dist,x0, mean=None, norm=None, **kwargs):
 
     def f(p): #function to minimize. p are dist's shape parameters
         d=dist(*p)
-        qp=[d.ppf(_) for _ in x] #quantile values from estimated distribution
+        qp=d.ppf(x) #quantile values from estimated distribution
         v=[a-b for a,b in zip(qp,q)]
         if mean is not None:
             v.append(d.mean()-mean)

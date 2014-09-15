@@ -239,6 +239,16 @@ class TestNcombinations:
     def test_ncombinations(self):
         # assert_equal(expected, ncombinations(n, k))
         raise SkipTest 
+    
+class TestBinomialCoefficient:
+    def test_binomial_coefficient(self):
+        # https://www.hackerrank.com/challenges/ncr
+        assert_equal(binomial_coefficient(2,1),2)
+        assert_equal(binomial_coefficient(4,0),1)
+        assert_equal(binomial_coefficient(5,2),10)
+        assert_equal(binomial_coefficient(10,3),120)
+        assert_equal(binomial_coefficient(87,28) % 142857,141525)
+        # assert_equal(binomial_coefficient(961173600,386223045) % 142857,0) # much too large for now
 
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
