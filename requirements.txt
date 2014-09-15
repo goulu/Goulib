@@ -1,12 +1,12 @@
-pdfminer==20140328
+six
 xlrd
 lxml
 dxfgrabber
 dxfwrite
 svg.path
+pdfminer_six
 pillow
 networkx
 matplotlib
 numpy
 scipy
-six
