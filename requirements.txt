@@ -4,7 +4,8 @@ lxml
 dxfgrabber
 dxfwrite
 svg.path
---allow-unverified pdfminer.six==20140915
+--allow-unverified pdfminer.six
+pdfminer.six==20140915
 pillow
 networkx
 matplotlib
