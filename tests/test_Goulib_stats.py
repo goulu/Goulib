@@ -19,20 +19,20 @@ class TestMean:
 class TestVariance:
     def test_variance(self):
         assert_equal(variance(r),0.082,places=2)
-        
+
 class TestStddev:
     def test_stddev(self):
         assert_equal(stddev(h),30466.9,1)
-        
+
 class TestConfidenceInterval:
     def test_confidence_interval(self):
         assert_equal(confidence_interval(h),(25017.0,62784.2),1)
-        
+
 class TestMedian:
     def test_median(self):
         assert_equal(median(h),44627.5)
         assert_equal(median(r),0.5,places=1)
-        
+
 class TestMode:
     def test_mode(self):
         assert_equal(mode(h),4978)
@@ -51,7 +51,7 @@ class TestStats:
         assert_equal(sum2,28554975720)
         assert_equal(avg,43900.6)
         assert_equal(var,928234891.64,3)
-        
+
         min,max,sum,sum2,avg,var=stats(f)
         assert_equal(min,0.,1)
         assert_equal(max,1.,1)
@@ -70,18 +70,5 @@ class TestLinearRegression:
         assert_equal(bi,(1,1))
         assert_equal(ci,(0,0))
 
-class TestQuantileFit:
-    def test_quantile_fit(self):
-        """
-        from scipy.stats import norm
-        d=quantile_fit([0.25,0.5,0.75],[-0.67448,0,0.67448], dist=norm, x0=(.5,.5))
-        assert_equal(d.mean(),0)
-        assert_equal(d.var(),1,places=3)
-        """
-               
-        from scipy.stats import burr
-        d=quantile_fit([0.25,0.5,0.75],[9.655,11.280,13.384], dist=burr, x0=(3.9,1),bounds=[(3,4),(1,None)],options={'disp':True})
-        pass
-        
 if __name__ == "__main__":
     runmodule()
