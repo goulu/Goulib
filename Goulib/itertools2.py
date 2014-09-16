@@ -22,8 +22,8 @@ import collections
 from functools import reduce
 
 
-    
-#reciepes from Python manual 
+
+#reciepes from Python manual
 
 def take(n, iterable):
     """Take first n elements from iterable"""
@@ -39,7 +39,8 @@ def first(iterable):
 
 def last(iterable):
     """Take last element in the iterable"""
-    return reduce(lambda x, y: y, iterable)
+    for x in iterable: pass
+    return x
 
 def take_every(n, iterable):
     """Take an element from iterator every n elements"""
@@ -65,7 +66,7 @@ def arange(start,stop,step=1.):
     """range for floats or other types"""
     r = start
     step=abs(step)
-    if stop<start : 
+    if stop<start :
         while r > stop:
             yield r
             r -= step
@@ -73,7 +74,7 @@ def arange(start,stop,step=1.):
         while r < stop:
             yield r
             r += step
-        
+
 def ilinear(start,end,n):
     """return iterator over n values linearly interpolated between (and including) start and end"""
     if isinstance(start,(int,float)):
@@ -106,19 +107,19 @@ def compose(f, g):
     def _wrapper(*args, **kwargs):
         return f(g(*args, **kwargs))
     return _wrapper
-  
+
 def iterate(func, arg):
     """After Haskell's iterate: apply function repeatedly."""
     # not functional
     while 1:
         yield arg
-        arg = func(arg)                
+        arg = func(arg)
 
 def tails(seq):
     """Get tails of a sequence: tails([1,2,3]) -> [1,2,3], [2,3], [3], []."""
     for idx in range(len(seq)+1):
         yield seq[idx:]
-     
+
 def ireduce(func, iterable, init=None):
     """Like reduce() but using iterators (a.k.a scanl)"""
     # not functional
@@ -143,7 +144,7 @@ def unique(iterable, key=None):
         if k not in seen:
             seen.add(k)
             yield element
-            
+
 def count_unique(iterable, key=None):
     """Count unique elements
     # unique('AAAABBBCCDAABBB') --> 4
@@ -153,7 +154,7 @@ def count_unique(iterable, key=None):
     for element in iterable:
         seen.add(key(element) if key else element)
     return len(seen)
-        
+
 def identity(x):
     """Do nothing and return the variable untouched"""
     return x
@@ -162,15 +163,17 @@ def occurrences(it, exchange=False):
     """Return dictionary with occurrences from iterable"""
     return reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
-def product(*iterables, **kwargs):
-    """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools"""
+def cartesian_product(*iterables, **kwargs):
+    """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
+    :warning: there is also a math2.product
+    """
     if len(iterables) == 0:
         yield ()
     else:
         iterables = iterables * kwargs.get('repeat', 1)
         it = iterables[0]
         for item in it() if isinstance(it, collections.Callable) else iter(it):
-            for items in product(*iterables[1:]):
+            for items in cartesian_product(*iterables[1:]):
                 yield (item, ) + items
 
 # my functions added
@@ -213,7 +216,7 @@ def get_groups(iterable, n, step):
 def quantify(iterable, pred=bool):
     """:return: int count how many times the predicate is true"""
     return sum(map(pred, iterable),0)
-                
+
 def pairwise(iterable,loop=False):
     """
     iterates through consecutive pairs
@@ -228,7 +231,7 @@ def pairwise(iterable,loop=False):
             first=b
             a=first
             init=False
-        else:    
+        else:
             yield a,b
         a=b
     if loop:
@@ -264,14 +267,14 @@ def rand_seq(size):
         # swap the values
         values[j],values[i]=values[i],values[j]
         # return the swapped value
-        yield values[i] 
+        yield values[i]
 
 def all_pairs(size):
     '''generates all i,j pairs for i,j from 0-size'''
     for i in rand_seq(size):
         for j in rand_seq(size):
             yield (i,j)
-            
+
 def best(iterable, key=None, n=1, reverse=False):
     """ generate items corresponding to the n best values of key sort order"""
     v=sorted(iterable,key=key,reverse=reverse)
@@ -284,18 +287,18 @@ def best(iterable, key=None, n=1, reverse=False):
         else:
             k=k2
             i+=1
-            if i>n: break #end 
+            if i>n: break #end
             yield x
-            
+
 # WARNING : filter2 has been renamed from "split" at v.1.7.0 for coherency
 def filter2(iterable,condition):
     """ like filter, https://docs.python.org/2/library/functions.html#filter
-    but returns 2 lists : 
+    but returns 2 lists :
     - list of elements in iterable that satisfy condition
     - list of those that don't"""
     yes,no=[],[]
     for x in iterable:
-        if condition(x): 
+        if condition(x):
             yes.append(x)
         else:
             no.append(x)
@@ -304,9 +307,9 @@ def filter2(iterable,condition):
 def ifind(iterable,f):
     """iterates through items in iterable where f(item) == True."""
     for i,item in enumerate(iterable):
-        if f(item): 
+        if f(item):
             yield i,item
-            
+
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
     return next(ifind(iterable,f))
@@ -398,35 +401,35 @@ def next_permutation(seq, pred=lambda x,y:-1 if x<y else 0):
     raise StopIteration
 
 class iter2(object):
-    """Takes in an object that is iterable.  
+    """Takes in an object that is iterable.
     http://code.activestate.com/recipes/578092-flattening-an-arbitrarily-deep-list-or-any-iterato/
     Allows for the following method calls (that should be built into iterators anyway...)
     calls:
     - append - appends another iterable onto the iterator.
     - insert - only accepts inserting at the 0 place, inserts an iterable before other iterables.
     - adding.  an iter2 object can be added to another object that is
-    iterable.  i.e. iter2 + iter (not iter + iter2). 
+    iterable.  i.e. iter2 + iter (not iter + iter2).
     It's best to make all objects iter2 objects to avoid syntax errors.  :D
     """
     def __init__(self, iterable):
         self._iter = iter(iterable)
-    
+
     def append(self, iterable):
         self._iter = chain(self._iter, iter(iterable))
-        
+
     def insert(self, place, iterable):
         if place != 0:
             raise ValueError('Can only insert at index of 0')
         self._iter = chain(iter(iterable), self._iter)
-    
+
     def __add__(self, iterable):
         return chain(self._iter, iter(iterable))
-        
+
     def __next__(self):
         return next(self._iter)
-    
+
     next=__next__ #Python2-3 compatibility
-    
+
     def __iter__(self):
         return self
 
@@ -438,4 +441,4 @@ def iflatten(iterable):
             iterable.insert(0, e)
         else:
             yield e
-            
+

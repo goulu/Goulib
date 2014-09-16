@@ -223,11 +223,20 @@ class TestIflatten:
         # assert_equal(expected, iflatten(iterable))
         raise SkipTest 
 
-class TestProduct:
-    def test_product(self):
-        # assert_equal(expected, product(*iterables, **kwargs))
-        raise SkipTest 
+class TestCartesianProduct:
+    def test_cartesian_product(self):
+        #test case for compatibility with itertools.product
+        arrays = [(-1,+1), (-2,+2), (-3,+3)]
+        res=cartesian_product(*arrays)
+        assert_equal(res,[(-1, -2, -3), (-1, -2, 3), (-1, 2, -3), (-1, 2, 3), (1, -2, -3), (1, -2, 3), (1, 2, -3), (1, 2, 3)])
 
+        #test case from http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
+        import itertools
+        g = cartesian_product(lambda: itertools.permutations(range(100)),
+            lambda: itertools.permutations(range(100)))
+        
+        assert_equal(next(g),(range(100),range(100)))
+        
 class TestCountUnique:
     def test_count_unique(self):
         # assert_equal(expected, count_unique(iterable, key))
