@@ -26,7 +26,7 @@ class TestCase(unittest.TestCase):
             msg: Optional message to use on failure instead of a list of
                     differences.
         """
-        
+
         if seq_type is not None:
             seq_type_name = seq_type.__name__
             if not isinstance(seq1, seq_type):
@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
                 raise self.failureException('Second sequence is not a %s: %s' % (seq_type_name, str(seq2)))
         else:
             seq_type_name = "sequence"
-        
+
         seq1_repr = str(seq1)
         seq2_repr = str(seq2)
         MAXLEN=30
@@ -45,27 +45,27 @@ class TestCase(unittest.TestCase):
             seq2_repr = seq2_repr[:MAXLEN] + '...'
         elements = (seq_type_name.capitalize(), seq1_repr, seq2_repr)
         differing = '%ss differ: %s != %s\n' % elements
-            
+
         i=0
         for item1,item2 in zip(seq1,seq2):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
-            self.assertEqual(item1,item2, places=places, msg=m, delta=delta) 
+            self.assertEqual(item1,item2, places=places, msg=m, delta=delta)
             i+=1
-        
+
     base_types=(six.integer_types,six.string_types,six.text_type,bool)
-    
+
     def assertEqual(self, first, second, places=7, msg=None, delta=None):
         #inspired from http://stackoverflow.com/a/3124155/190597 (KennyTM)
         import collections
-        if isinstance(first,self.base_types) and isinstance(second,self.base_types):
-            super(TestCase,self).assertEqual(first, second,msg=msg) 
+        if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
+            super(TestCase,self).assertEqual(first, second,msg=msg)
         elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
-            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta) 
+            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta)
         else: #float and classes
             try:
-                super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta) 
+                super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
             except TypeError: # unsupported operand type(s) for -
-                super(TestCase,self).assertEqual(first, second,msg=msg) 
+                super(TestCase,self).assertEqual(first, second,msg=msg)
 
 
 import nose
@@ -93,9 +93,15 @@ for at in [ at for at in dir(_t)
     vars()[pepd] = getattr(_t, at)
     #__all__.append(pepd)
 
+#explicitly define the most common asserts to avoid "undefined variable" messages in IDEs
+assert_true = _t.assertTrue
+assert_false = _t.assertFalse
+assert_equal = _t.assertEqual
+assert_almost_equal = _t.assertAlmostEqual
+assert_raises = _t.assertRaises
+
 del Dummy
 del _t
-del pep8
 
 #add other shortcuts
 
@@ -107,7 +113,7 @@ def runmodule(redirect=True):
         return nose.runmodule()
     """ ensures stdout is printed after the tests results"""
     import sys
-    from io import StringIO  
+    from io import StringIO
     module_name = sys.modules["__main__"].__file__
 
     old_stdout = sys.stdout
