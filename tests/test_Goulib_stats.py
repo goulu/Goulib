@@ -6,7 +6,6 @@ from Goulib.stats import *
 
 from random import random
 
-
 h=[64630,11735,14216,99233,14470,4978,73429,38120,51135,67060] # data from https://www.hackerrank.com/challenges/stat-warmup
 r=[random() for _ in range(5000)]
 n=10000
