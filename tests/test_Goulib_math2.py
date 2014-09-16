@@ -5,12 +5,36 @@ from Goulib.tests import *
 
 from Goulib.math2 import *
 
+class TestSign:
+    def test_sign(self):
+        assert_equal(sign(0.0001),1)
+        assert_equal(sign(-0.0001),-1)
+        assert_equal(sign(-0.0000),0)
+
+class TestCmp:
+    def test_cmp(self):
+        assert_equal(cmp(0.0002, 0.0001),1)
+        assert_equal(cmp(0.0001, 0.0002),-1)
+        assert_equal(cmp(0.0000, 0.0000),0)
+
+class TestProduct(unittest.TestCase):
+    def test_product(self):
+        assert_equal(product(range(1,10)),362880)
+
+class TestRint(unittest.TestCase):
+    def test_rint(self):
+        assert_equal(rint(0.5),0,places=None)
+        assert_equal(rint(0.50001),1,places=None)
+        assert_equal(rint(-0.5),0,places=None)
+        assert_equal(rint(-0.50001),-1,places=None)
+
+
 class TestQuad:
     def test_quad(self):
         import cmath
-        assert_equal(quad(1,3,2),(-1,-2)) 
+        assert_equal(quad(1,3,2),(-1,-2))
         assert_raises(ValueError,quad,1,2,3) #complex results
-        assert_equal(sum(quad(1,2,3,complex=True)),-2) #complex results
+        assert_equal(sum(quad(1,2,3,allow_complex=True)),-2) #complex results
 
 class TestEqual:
     def test_equal(self):
@@ -34,7 +58,7 @@ class TestTranspose:
         v2=list(accsum(v1))
         m1=[v1,v2,vecsub(v2,v1)]
         assert_equal(transpose(m1),[(0, 0, 0), (1, 1, 0), (2, 3, 1)])
-        
+
 class TestMaximum:
     def test_maximum(self):
         m=[(1,2,3),(1,-2,0),(4,0,0)]
@@ -44,7 +68,7 @@ class TestMinimum:
     def test_minimum(self):
         m=[(1,2,3),(1,-2,0),(4,0,0)]
         assert_equal(minimum(m),[1,-2,0])
-        
+
 class TestDot:
     def test_dot(self):
         v1=list(range(3))
@@ -90,16 +114,11 @@ class TestVeccompare:
         v1=list(range(5))[1:]
         v2=list(accsum(v1))
         assert_equal(veccompare(v1,v2),[3,1,0])
-        
+
 class TestFibonacci:
     def test_fibonacci(self):
         from Goulib.itertools2 import take
         assert_equal(take(10,fibonacci()),[0,1,1,2,3,5,8,13,21,34])
-
-class TestFactorial:
-    def test_factorial(self):
-        # assert_equal(expected, factorial(num))
-        raise SkipTest 
 
 class TestIsInteger:
     def test_is_integer(self):
@@ -110,7 +129,7 @@ class TestIntOrFloat:
     def test_int_or_float(self):
         assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
         assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
-                     
+
 class TestGetPrimes:
     def test_get_primes(self):
         from itertools import islice
@@ -118,7 +137,7 @@ class TestGetPrimes:
         assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
         a=[p for p in islice(get_primes(29,True),10)]
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
-        
+
 class TestStrBase:
     def test_str_base(self):
         assert_equal(str_base(2014,2),"11111011110")
@@ -133,7 +152,7 @@ class TestNumFromDigits:
     def test_num_from_digits(self):
         assert_equal(num_from_digits([1,2,3,4]),1234)
         assert_equal(num_from_digits([1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],2),2014)
-        
+
 class TestNumberOfDigits:
     def test_number_of_digits(self):
         assert_equal(number_of_digits(1234),4)
@@ -142,8 +161,8 @@ class TestNumberOfDigits:
 
 class TestIsPalindromic:
     def test_is_palindromic(self):
-        # assert_equal(expected, is_palindromic(num, base))
-        raise SkipTest 
+        assert_true(is_palindromic(4352534))
+        assert_true(is_palindromic(17,2))
 
 class TestIsPrime:
     def test_is_prime(self):
@@ -151,7 +170,7 @@ class TestIsPrime:
         assert_false(is_prime(20132013))
         assert_false(is_prime(201420132013))
         assert_true(is_prime(201420142013))
-        
+
 class TestPrimeFactors:
     def test_prime_factors(self):
         assert_equal(prime_factors(2014),[2, 19, 53])
@@ -161,7 +180,7 @@ class TestFactorize:
     def test_factorize(self):
         assert_equal(factorize(2014),[(2, 1), (19, 1), (53, 1)])
         assert_equal(factorize(2048),[(2,11)])
-        
+
 class TestDivisors:
     def test_divisors(self):
         assert_equal(divisors(2014),[1, 53, 19, 1007, 2, 106, 38, 2014])
@@ -173,73 +192,73 @@ class TestProperDivisors:
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
         # assert_equal(expected, greatest_common_divisor(a, b))
-        raise SkipTest 
+        raise SkipTest
 
 class TestLeastCommonMultiple:
     def test_least_common_multiple(self):
         # assert_equal(expected, least_common_multiple(a, b))
-        raise SkipTest 
+        raise SkipTest
 
 class TestTriangle:
     def test_triangle(self):
         # assert_equal(expected, triangle(x))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIsTriangle:
     def test_is_triangle(self):
         # assert_equal(expected, is_triangle(x))
-        raise SkipTest 
+        raise SkipTest
 
 class TestPentagonal:
     def test_pentagonal(self):
         # assert_equal(expected, pentagonal(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIsPentagonal:
     def test_is_pentagonal(self):
         # assert_equal(expected, is_pentagonal(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestHexagonal:
     def test_hexagonal(self):
         # assert_equal(expected, hexagonal(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestGetCardinalName:
     def test_get_cardinal_name(self):
         # assert_equal(expected, get_cardinal_name(num))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIsPerfect:
     def test_is_perfect(self):
         # assert_equal(expected, is_perfect(num))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIsPandigital:
     def test_is_pandigital(self):
         # assert_equal(expected, is_pandigital(digits, through))
-        raise SkipTest 
+        raise SkipTest
 
 class TestSetsDist:
     def test_sets_dist(self):
         # assert_equal(expected, sets_dist(a, b))
-        raise SkipTest 
+        raise SkipTest
 
 class TestSetsLevenshtein:
     def test_sets_levenshtein(self):
         # assert_equal(expected, sets_levenshtein(a, b))
-        raise SkipTest 
+        raise SkipTest
 
 class TestLevenshtein:
     def test_levenshtein(self):
         # assert_equal(expected, levenshtein(seq1, seq2))
-        raise SkipTest 
+        raise SkipTest
 
 class TestNcombinations:
     def test_ncombinations(self):
         # assert_equal(expected, ncombinations(n, k))
-        raise SkipTest 
-    
+        raise SkipTest
+
 class TestBinomialCoefficient:
     def test_binomial_coefficient(self):
         # https://www.hackerrank.com/challenges/ncr
@@ -253,7 +272,7 @@ class TestBinomialCoefficient:
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         # assert_equal(expected, combinations_with_replacement(iterable, r))
-        raise SkipTest 
+        raise SkipTest
 
 class TestProportional:
     def test_proportional(self):
@@ -266,7 +285,7 @@ class TestProportional:
 
 class TestTriangularRepartition:
     def test_triangular_repartition(self):
-        
+
         ref=[0.01,0.03,0.05,0.07,0.09,0.11,0.13,0.15,0.17,0.19]
         res=triangular_repartition(1,10)
         assert_equal(sum(res),1)
@@ -275,12 +294,12 @@ class TestTriangularRepartition:
         res=triangular_repartition(0,10)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
-        
+
         ref=[0.02,0.06,0.1,0.14,0.18,0.18,0.14,0.1,0.06,0.02]
         res=triangular_repartition(.5,10)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
-        
+
         ref=[0.08,0.24,0.36,0.24,0.08]
         res=triangular_repartition(.5,5) # center value is top of triangle
         assert_equal(sum(res),1)
@@ -292,7 +311,7 @@ class TestRectangularRepartition:
         res=rectangular_repartition(0,5,.5)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
-        
+
         ref=[0.3125,0.3125,.125,.125,.125]
         res=rectangular_repartition(.2,5,.5)
         assert_equal(sum(res),1)
@@ -301,12 +320,12 @@ class TestRectangularRepartition:
         res=rectangular_repartition(.8,5,.5)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
-        
+
         ref=[0.1,0.1675,0.3325,.1,.1,.1,.1]
         res=rectangular_repartition(.325,7,.4)
         assert_equal(sum(res),1)
         assert_true(dist(res,ref)<1E-6)
-        
+
 class TestNorm2:
     def test_norm_2(self):
         assert_equal(norm_2([-3,4]),5)
@@ -327,7 +346,7 @@ class TestNorm:
 class TestDist:
     def test_dist(self):
         # assert_equal(expected, dist(a, b, norm))
-        raise SkipTest 
+        raise SkipTest
 
 class TestSat:
     def test_sat(self):
@@ -367,7 +386,6 @@ class TestSlerp:
         assert_equal(slerp(u,v,1),v)
         s=slerp(u,v,0.5)
         assert_equal(s,vecunit((1,1,0)))
-
 
 if __name__ == "__main__":
     runmodule()

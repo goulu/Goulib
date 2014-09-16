@@ -21,17 +21,33 @@ from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten
 import fractions
 
 from functools import reduce
+
+def sign(number):
+    """Will return 1 for positive,
+    -1 for negative, and 0 for 0"""
+    try:
+        return number/abs(number)
+    except ZeroDivisionError:
+        return 0
+
+if six.PY3:
+    def cmp(x,y):
+        """Compare the two objects x and y and return an integer according to the outcome.
+        The return value is negative if x < y, zero if x == y and strictly positive if x > y.
+        """
+        return sign(x-y)
+
 def lcm(a,b):
-    """least common multiple""" 
+    """least common multiple"""
     return float(abs(a * b)) / fractions.gcd(a,b) if a and b else 0
 
-def quad(a, b, c, complex=False):
-    """ solves quadratic equations 
+def quad(a, b, c, allow_complex=False):
+    """ solves quadratic equations
         form aX^2+bX+c, inputs a,b,c,
         works for all roots(real or complex)
     """
     discriminant = (b ** 2) -  4  * a * c
-    if complex:
+    if allow_complex:
         d=cmath.sqrt(discriminant)
     else:
         d=sqrt(discriminant)
@@ -42,7 +58,7 @@ def equal(a,b,epsilon=1e-6):
     :return: True if a and b are less than epsilon apart
     """
     return abs(a-b)<epsilon
-    
+
 
 #vector operations
 
@@ -67,9 +83,12 @@ def dot(a,b):
     res=[dot(a,col) for col in zip(*b)]
     return list(map(list,list(zip(*res))))
 
-def product(nums):
-    """Product of nums"""
-    return reduce(operator.mul, nums, 1)
+def product(nums,init=1):
+    """
+    :return: Product of nums
+    :warning: there is also a itertools2.product
+    """
+    return reduce(operator.mul, nums, init)
 
 def transpose(m):
     """:return: matrix m transposed"""
@@ -98,7 +117,7 @@ def _longer(a,b,fillvalue=0):
     n=len(b)-len(a)
     if n>0:
         a.extend([fillvalue]*n)
-        
+
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
     return [reduce(operator.add,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
@@ -215,7 +234,7 @@ def is_integer(x, epsilon=1e-6):
 def int_or_float(x, epsilon=1e-6):
     return int(x) if is_integer(x, epsilon) else x
 
-def rint(v): 
+def rint(v):
     """:return: int value nearest to float v"""
     return int(round(v))
 
@@ -243,17 +262,17 @@ def get_primes(start=2, memoized=False):
     """Yield prime numbers from 'start'"""
     is_prime_fun = (memoize(is_prime) if memoized else is_prime)
     return filter(is_prime_fun, count(start))
-    
+
 
 def digits_from_num(num, base=10):
     """Get digits from num in base 'base'"""
     if base==10:
-        return map(int, str(num))
+        return list(map(int, str(num)))
     def recursive(num, base, current):
         if num < base:
             return current+[num]
         return recursive(num//base, base, current + [num%base])
-    return reversed(recursive(num, base, []))
+    return list(reversed(recursive(num, base, [])))
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
@@ -309,7 +328,7 @@ def greatest_common_divisor(a, b):
     """Return greatest common divisor of a and b"""
     return (greatest_common_divisor(b, a % b) if b else a)
 
-def least_common_multiple(a, b): 
+def least_common_multiple(a, b):
     """Return least common multiples of a and b"""
     return (a * b) / greatest_common_divisor(a, b)
 
@@ -328,7 +347,7 @@ def is_pentagonal(n):
 
 def hexagonal(n):
     return n*(2*n - 1)
-       
+
 def get_cardinal_name(num):
     """Get cardinal name for number (0 to 1 million)"""
     numbers = {
@@ -341,20 +360,20 @@ def get_cardinal_name(num):
       }
     def _get_tens(n):
         a, b = divmod(n, 10)
-        return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))    
+        return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))
     def _get_hundreds(n):
         tens = n % 100
         hundreds = (n // 100) % 10
         return list(compact([
-            hundreds > 0 and numbers[hundreds], 
-            hundreds > 0 and "hundred", 
-            hundreds > 0 and tens and "and", 
+            hundreds > 0 and numbers[hundreds],
+            hundreds > 0 and "hundred",
+            hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
           ]))
 
     # This needs some refactoring
     if not (0 <= num < 1e6):
-        raise ValueError("value not supported: %s" % num)      
+        raise ValueError("value not supported: %s" % num)
     thousands = (num // 1000) % 1000
     strings = compact([
         thousands and (_get_hundreds(thousands) + ["thousand"]),
@@ -373,7 +392,7 @@ def number_of_digits(num, base=10):
 def is_pandigital(digits, through=list(range(1, 10))):
     """Return True if digits form a pandigital number"""
     return (sorted(digits) == through)
-        
+
 #combinatorics
 
 def binomial_coefficient(n,k):
@@ -401,9 +420,9 @@ def combinations_with_replacement(iterable, r):
     for indices in cartesian_product(list(range(n)), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
-            
+
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
-            
+
 def angle(u,v,unit=True):
     """
     :param u,v: iterable vectors
@@ -417,14 +436,14 @@ def angle(u,v,unit=True):
         return 2.*asin(dist(v,u)/2)
     else:
         return pi - 2.*asin(dist(vecneg(v),u)/2)
-    
+
 def sin_over_x(x):
     """numerically safe sin(x)/x"""
     if 1. + x*x == 1.:
         return 1.
     else:
         return sin(x)/x
-    
+
 def slerp(u,v,t):
     """spherical linear interpolation
     :param u,v: 3D unit vectors
@@ -436,7 +455,7 @@ def slerp(u,v,t):
     fv=t*sin_over_x(t*a)/sin_over_x(a)
     return vecadd([fu*x for x in u],[fv*x for x in v])
 
-            
+
 #interpolations
 def proportional(nseats,votes):
     """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
@@ -474,7 +493,7 @@ def triangular_repartition(x,n):
             return  (2-x1-x2) * float(x1-x2) / (x-1)
         else: #top of the triangle:
             return _integral(x1,x)+_integral(x,x2)
-            
+
     w=1./n #width of a slice
     return [_integral(i*w,(i+1)*w) for i in range(n)]
 
@@ -497,7 +516,6 @@ def rectangular_repartition(x,n,h):
             return  float(o*(xa-x1)+h*(w-(xa-x1)))/w
         else: # x1<=xb
             return  float(h*(xb-x1)+o*(w-(xb-x1)))/w
-            
+
     return [_integral(i*w,(i+1)*w) for i in range(n)]
-    
-        
+
