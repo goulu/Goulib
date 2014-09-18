@@ -22,6 +22,7 @@ install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib networkx nose
   - source activate env_name
   - pip install --allow-all-external -r requirements.txt
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install pdfminer; fi
   - pip install coveralls
  
 script:
