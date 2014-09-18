@@ -1096,6 +1096,13 @@ class TestPlane:
         # assert_equal(expected, plane.intersect(other))
         raise SkipTest 
     
+    def test_distance(self):
+        # https://www.hackerrank.com/challenges/sherlock-and-planes
+        p1,p2,p3,p4=Point3(1,2,0),Point3(2,3,0),Point3(4,0,0),Point3(0,0,0)
+        plane=Plane(p1,p2,p3)
+        assert_equal(plane.distance(p4),0)
+        assert_equal(Point3(1,2,3).distance(plane),3)
+    
 class TestArgPair:
     def test_arg_pair(self):
         assert_equal(argPair(1,2),(1,2))
