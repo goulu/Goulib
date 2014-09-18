@@ -13,11 +13,10 @@ __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
 
-from itertools import islice, repeat, groupby
+from itertools import islice, repeat
 from itertools import count, tee
-from itertools import chain, starmap, cycle, dropwhile
+from itertools import chain, starmap
 import random
-import logging
 import collections
 from functools import reduce
 

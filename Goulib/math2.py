@@ -13,10 +13,10 @@ import six
 from six.moves import filter, zip_longest
 
 import operator,cmath
-from math import pi, sqrt, log, log10, ceil, sin, asin, exp, factorial
+from math import pi, sqrt, log, sin, asin, factorial
 
-from itertools import count, combinations, permutations, product as cartesian_product
-from .itertools2 import drop, ireduce, groupby, ilen, compact, flatten
+from itertools import count, groupby, product as cartesian_product
+from .itertools2 import drop, ireduce, ilen, compact, flatten
 
 import fractions
 
@@ -205,7 +205,7 @@ def levenshtein(seq1, seq2):
     oneago = None
     thisrow = list(range(1, len(seq2) + 1)) + [0]
     for x in range(len(seq1)):
-        twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
+        _, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
         for y in range(len(seq2)):
             delcost = oneago[y] + 1
             addcost = thisrow[y - 1] + 1
@@ -420,6 +420,14 @@ def combinations_with_replacement(iterable, r):
     for indices in cartesian_product(list(range(n)), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
+
+def log_factorial(n):
+    """:return: float approximation of log(n!) by Ramanujan formula"""
+    return n*log(n) - n + (log(n*(1+4*n*(1+2*n))))/6 + log(pi)/2
+
+def log_binomial_coefficient(n,k):
+    """:return: float approximation of log(binomial_coefficient(n,k))"""
+    return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
 
