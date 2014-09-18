@@ -16,31 +16,34 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, types
-from math import *
+import operator, six
+_div=operator.truediv if six.PY3 else operator.floordiv #because _div is undefined in Py3
+
+from math import pi,sin,cos,tan,acos,asin,atan2,sqrt
+
 from Goulib import math2
 
-precision = 1e-9 #for equality comparizons
+precision = 1e-9 #for equality comparisons
 
 class Vector2(object):
     """
-    Mutable 2D vector: 
-    
-    
+    Mutable 2D vector:
+
+
     Construct a vector in the obvious way::
-    
+
         >>> Vector2(1.5, 2.0)
         Vector2(1.50, 2.00)
-    
+
         >>> Vector3(1.0, 2.0, 3.0)
         Vector3(1.00, 2.00, 3.00)
-    
+
     **Element access**
-    
+
     Components may be accessed as attributes (examples that follow use
     *Vector3*, but all results are similar for *Vector2*, using only the *x*
     and *y* components)::
-    
+
         >>> v = Vector3(1, 2, 3)
         >>> v.x
         1
@@ -48,9 +51,9 @@ class Vector2(object):
         2
         >>> v.z
         3
-    
+
     Vectors support the list interface via slicing::
-    
+
         >>> v = Vector3(1, 2, 3)
         >>> len(v)
         3
@@ -58,9 +61,9 @@ class Vector2(object):
         1
         >>> v[:]
         (1, 2, 3)
-    
+
     You can also "swizzle" the components (*a la* GLSL or Cg)::
-    
+
         >>> v = Vector3(1, 2, 3)
         >>> v.xyz
         (1, 2, 3)
@@ -68,12 +71,12 @@ class Vector2(object):
         (3, 1)
         >>> v.zzzz
         (3, 3, 3, 3)
-    
+
     **Operators**
-    
-    Addition and subtraction are supported via operator overloading (note 
+
+    Addition and subtraction are supported via operator overloading (note
     that in-place operators perform faster than those that create a new object)::
-    
+
         >>> v1 = Vector3(1, 2, 3)
         >>> v2 = Vector3(4, 5, 6)
         >>> v1 + v2
@@ -81,115 +84,115 @@ class Vector2(object):
         >>> v1 -= v2
         >>> v1
         Vector3(-3.00, -3.00, -3.00)
-    
+
     Multiplication and division can be performed with a scalar only::
-    
+
         >>> Vector3(1, 2, 3) * 2
         Vector3(2.00, 4.00, 6.00)
         >>> v1 = Vector3(1., 2., 3.)
         >>> v1 /= 2
         >>> v1
         Vector3(0.50, 1.00, 1.50)
-    
+
     The magnitude of a vector can be found with ``abs``::
-    
+
         >>> v = Vector3(1., 2., 3.)
         >>> abs(v)
         3.7416573867739413
-    
+
     A vector can be normalized in-place (note that the in-place method also
     returns ``self``, so you can chain it with further operators)::
-    
+
         >>> v = Vector3(1., 2., 3.)
         >>> v.normalize()
         Vector3(0.27, 0.53, 0.80)
         >>> v
         Vector3(0.27, 0.53, 0.80)
-    
+
     The following methods do *not* alter the original vector or their arguments:
-    
+
     ``copy()``
         Returns a copy of the vector.  ``__copy__`` is also implemented.
-    
+
     ``magnitude()``
         Returns the magnitude of the vector; equivalent to ``abs(v)``.  Example::
-    
+
             >>> v = Vector3(1., 2., 3.)
             >>> v.magnitude()
             3.7416573867739413
-    
+
     ``magnitude_squared()``
         Returns the sum of the squares of each component.  Useful for comparing
         the length of two vectors without the expensive square root operation.
         Example::
-    
+
             >>> v = Vector3(1., 2., 3.)
             >>> v.magnitude_squared()
             14.0
-    
+
     ``normalized()``
         Return a unit length vector in the same direction.  Note that this
         method differs from ``normalize`` in that it does not modify the
         vector in-place.  Example::
-    
+
             >>> v = Vector3(1., 2., 3.)
             >>> v.normalized()
             Vector3(0.27, 0.53, 0.80)
             >>> v
             Vector3(1.00, 2.00, 3.00)
-    
+
     ``dot(other)``
         Return the scalar "dot" product of two vectors.  Example::
-    
+
             >>> v1 = Vector3(1., 2., 3.)
             >>> v2 = Vector3(4., 5., 6.)
             >>> v1.dot(v2)
             32.0
-    
+
     ``cross()`` and ``cross(other)``
         Return the cross product of a vector (for **Vector2**), or the cross
         product of two vectors (for **Vector3**).  The return type is a
         vector.  Example::
-    
+
             >>> v1 = Vector3(1., 2., 3.)
             >>> v2 = Vector3(4., 5., 6.)
             >>> v1.cross(v2)
             Vector3(-3.00, 6.00, -3.00)
-    
+
         In two dimensions there can be no argument to ``cross``::
-    
+
             >>> v1 = Vector2(1., 2.)
             >>> v1.cross()
             Vector2(2.00, -1.00)
-    
+
     ``reflect(normal)``
         Return the vector reflected about the given normal.  In two dimensions,
         *normal* is the normal to a line, in three dimensions it is the normal
         to a plane.  The normal must have unit length.  Example::
-    
+
             >>> v = Vector3(1., 2., 3.)
             >>> v.reflect(Vector3(0, 1, 0))
             Vector3(1.00, -2.00, 3.00)
             >>> v = Vector2(1., 2.)
             >>> v.reflect(Vector2(1, 0))
             Vector2(-1.00, 2.00)
-    
+
     ``rotate_around(axes, theta)``
         For 3D vectors, return the vector rotated around axis by the angle theta.
-    
+
             >>> v = Vector3(1., 2., 3.)
             >>> axes = Vector3(1.,1.,0)
             >>> v.rotate_around(axes,math.pi/4)
             Vector3(2.65, 0.35, 2.62)
-    
+
     ``angle(other)``
         Return the angle between two vectors.
-        
+
     ``project(other)``
         Return the projection (the component) of the vector on other.
-    
+
     Tests for equality include comparing against other sequences::
-    
+
         >>> v2 = Vector2(1, 2)
         >>> v2 == Vector2(3, 4)
         False
@@ -197,7 +200,7 @@ class Vector2(object):
         False
         >>> v2 == (1, 2)
         True
-    
+
         >>> v3 = Vector3(1, 2, 3)
         >>> v3 == Vector3(3, 4, 5)
         False
@@ -205,15 +208,15 @@ class Vector2(object):
         False
         >>> v3 == (1, 2, 3)
         True
-    
+
     Vectors are not hashable, and hence cannot be put in sets nor used as
     dictionary keys::
-    
+
         >>> {Vector2(): 0}
         Traceback (most recent call last):
             ...
         TypeError: unhashable type: 'Vector2'
-    
+
         >>> {Vector3(): 0}
         Traceback (most recent call last):
             ...
@@ -226,12 +229,12 @@ class Vector2(object):
         :param *args: x,y values
         """
         self.x,self.y=argPair(*args)
-        
+
     @property
     def xy(self):
         """:return: tuple (x,y)"""
         return (self.x, self.y)
-        
+
     def __copy__(self):
         return self.__class__(self.xy)
 
@@ -251,7 +254,7 @@ class Vector2(object):
 
     def __bool__(self):
         return self.x != 0 or self.y != 0
-    
+
     __nonzero__=__bool__
 
     def __len__(self):
@@ -301,7 +304,7 @@ class Vector2(object):
             return Vector2(self.x - other[0],
                            self.y - other[1])
 
-   
+
     def __rsub__(self, other):
         if isinstance(other, Vector2):
             return Vector2(other.x - self.x,
@@ -326,14 +329,13 @@ class Vector2(object):
 
     def __div__(self, other):
         assert type(other) in (int, int, float)
-        return Vector2(operator.div(self.x, other),
-                       operator.div(self.y, other))
-
+        return Vector2(_div(self.x, other),
+                       _div(self.y, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, int, float)
-        return Vector2(operator.div(other, self.x),
-                       operator.div(other, self.y))
+        return Vector2(_div(other, self.x),
+                       _div(other, self.y))
 
     def __floordiv__(self, other):
         assert type(other) in (int, int, float)
@@ -356,18 +358,18 @@ class Vector2(object):
         assert type(other) in (int, int, float)
         return Vector2(operator.truediv(other, self.x),
                        operator.truediv(other, self.y))
-    
+
     def __neg__(self):
         return Vector2(-self.x,
                         -self.y)
 
     __pos__ = __copy__
-    
+
     def __abs__(self):
         return sqrt(self.x ** 2 + self.y ** 2)
 
     mag = __abs__
-    
+
     length = property(lambda self: abs(self))
 
     def mag2(self):
@@ -383,7 +385,7 @@ class Vector2(object):
     def normalized(self):
         d = self.mag()
         if d:
-            return Vector2(self.x / d, 
+            return Vector2(self.x / d,
                            self.y / d)
         return self.copy()
 
@@ -417,7 +419,7 @@ class Vector2(object):
         return self.dot(n)*n
 
 class Vector3(object):
-    """ Mutable 3D Vector. 
+    """ Mutable 3D Vector.
     See `Vector2`documentation"""
 
     def __init__(self, *args):
@@ -431,9 +433,9 @@ class Vector3(object):
         else:
             x, y,z = args
         self.x = x
-        self.y = y 
+        self.y = y
         self.z = z
-        
+
     @property
     def xyz(self):
         """:return: tuple (x,y,z)"""
@@ -461,7 +463,7 @@ class Vector3(object):
 
     def __bool__(self):
         return self.x != 0 or self.y != 0 or self.z != 0
-    
+
     __nonzero__=__bool__
 
     def __len__(self):
@@ -517,7 +519,7 @@ class Vector3(object):
                            self.y - other[1],
                            self.z - other[2])
 
-   
+
     def __rsub__(self, other):
         if isinstance(other, Vector3):
             return Vector3(other.x - self.x,
@@ -539,7 +541,7 @@ class Vector3(object):
             return _class(self.x * other.x,
                           self.y * other.y,
                           self.z * other.z)
-        else: 
+        else:
             assert type(other) in (int, int, float)
             return Vector3(self.x * other,
                            self.y * other,
@@ -556,16 +558,17 @@ class Vector3(object):
 
     def __div__(self, other):
         assert type(other) in (int, int, float)
-        return Vector3(operator.div(self.x, other),
-                       operator.div(self.y, other),
-                       operator.div(self.z, other))
+        div=operator.truediv if six.PY3 else operator.floordiv #because _div is undefined in Py3
+        return Vector3(_div(self.x, other),
+                       _div(self.y, other),
+                       _div(self.z, other))
 
 
     def __rdiv__(self, other):
         assert type(other) in (int, int, float)
-        return Vector3(operator.div(other, self.x),
-                       operator.div(other, self.y),
-                       operator.div(other, self.z))
+        return Vector3(_div(other, self.x),
+                       _div(other, self.y),
+                       _div(other, self.z))
 
     def __floordiv__(self, other):
         assert type(other) in (int, int, float)
@@ -592,14 +595,14 @@ class Vector3(object):
         return Vector3(operator.truediv(other, self.x),
                        operator.truediv(other, self.y),
                        operator.truediv(other, self.z))
-    
+
     def __neg__(self):
         return Vector3(-self.x,
                         -self.y,
                         -self.z)
 
     __pos__ = __copy__
-    
+
     def __abs__(self):
         return sqrt(self.x ** 2 + \
                          self.y ** 2 + \
@@ -623,8 +626,8 @@ class Vector3(object):
     def normalized(self):
         d = self.mag()
         if d:
-            return Vector3(self.x / d, 
-                           self.y / d, 
+            return Vector3(self.x / d,
+                           self.y / d,
                            self.z / d)
         return self.copy()
 
@@ -635,7 +638,6 @@ class Vector3(object):
                self.z * other.z
 
     def cross(self, other):
-        assert isinstance(other, Vector3)
         return Vector3(self.y * other.z - self.z * other.y,
                        -self.x * other.z + self.z * other.x,
                        self.x * other.y - self.y * other.x)
@@ -681,9 +683,9 @@ class Matrix3(object):
     Two matrix classes are supplied, *Matrix3*, a 3x3 matrix for working with 2D
     affine transformations, and *Matrix4*, a 4x4 matrix for working with 3D
     affine transformations.
-    
+
     The default constructor intializes the matrix to the identity::
-    
+
         >>> Matrix3()
         Matrix3([    1.00     0.00     0.00
                      0.00     1.00     0.00
@@ -693,26 +695,26 @@ class Matrix3(object):
                      0.00     1.00     0.00     0.00
                      0.00     0.00     1.00     0.00
                      0.00     0.00     0.00     1.00])
-    
+
     **Element access**
-    
+
     Internally each matrix is stored as a set of attributes named ``a`` to ``p``.
     The layout for Matrix3 is::
-    
-        # a b c 
-        # e f g 
-        # i j k 
-    
+
+        # a b c
+        # e f g
+        # i j k
+
     and for Matrix4::
-    
+
         # a b c d
         # e f g h
         # i j k l
         # m n o p
-    
+
     If you wish to set or retrieve a number of elements at once, you can
     do so with a slice::
-    
+
         >>> m = Matrix4()
         >>> m[:]
         [1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0]
@@ -722,104 +724,104 @@ class Matrix3(object):
                      0.00     1.00     0.00     5.00
                      0.00     0.00     1.00     5.00
                      0.00     0.00     0.00     1.00])
-    
+
     Note that slices operate in column-major order, which makes them
     suitable for working directly with OpenGL's ``glLoadMatrix`` and
     ``glGetFloatv`` functions.
-    
+
     **Class constructors**
-    
+
     There are class constructors for the most common types of transform.
-    
+
     ``new_identity``
         Equivalent to the default constructor.  Example::
-    
+
             >>> m = Matrix4.new_identity()
             >>> m
             Matrix4([    1.00     0.00     0.00     0.00
                          0.00     1.00     0.00     0.00
                          0.00     0.00     1.00     0.00
                          0.00     0.00     0.00     1.00])
-    
+
     ``new_scale(x, y)`` and ``new_scale(x, y, z)``
         The former is defined on **Matrix3**, the latter on **Matrix4**.
         Equivalent to the OpenGL call ``glScalef``.
         Example::
-    
+
             >>> m = Matrix4.new_scale(2.0, 3.0, 4.0)
             >>> m
             Matrix4([    2.00     0.00     0.00     0.00
                          0.00     3.00     0.00     0.00
                          0.00     0.00     4.00     0.00
                          0.00     0.00     0.00     1.00])
-        
+
     ``new_translate(x, y)`` and ``new_translate(x, y, z)``
         The former is defined on **Matrix3**, the latter on **Matrix4**.
         Equivalent to the OpenGL call ``glTranslatef``.
         Example::
-    
+
             >>> m = Matrix4.new_translate(3.0, 4.0, 5.0)
             >>> m
             Matrix4([    1.00     0.00     0.00     3.00
                          0.00     1.00     0.00     4.00
                          0.00     0.00     1.00     5.00
                          0.00     0.00     0.00     1.00])
-    
+
     ``new_rotate(angle)``
         Create a **Matrix3** for a rotation around the origin.  *angle* is
         specified in radians, anti-clockwise.  This is not implemented in
         **Matrix4** (see below for equivalent methods).
         Example::
-    
+
             >>> import math
             >>> m = Matrix3.new_rotate(math.pi / 2)
             >>> m
             Matrix3([    0.00    -1.00     0.00
                          1.00     0.00     0.00
                          0.00     0.00     1.00])
-    
+
     The following constructors are defined for **Matrix4** only.
-    
+
     ``new``
         Construct a matrix with 16 values in column-major order.
-    
+
     ``new_rotatex(angle)``, ``new_rotatey(angle)``, ``new_rotatez(angle)``
         Create a **Matrix4** for a rotation around the X, Y or Z axis, respectively.
         *angle* is specified in radians.  Example::
-    
+
             >>> m = Matrix4.new_rotatex(math.pi / 2)
             >>> m
             Matrix4([    1.00     0.00     0.00     0.00
                          0.00     0.00    -1.00     0.00
                          0.00     1.00     0.00     0.00
                          0.00     0.00     0.00     1.00])
-    
+
     ``new_rotate_axis(angle, axis)``
         Create a **Matrix4** for a rotation around the given axis.  *angle*
         is specified in radians, and *axis* must be an instance of **Vector3**.
         It is not necessary to normalize the axis.  Example::
-    
+
             >>> m = Matrix4.new_rotate_axis(math.pi / 2, Vector3(1.0, 0.0, 0.0))
-            >>> m        
+            >>> m
             Matrix4([    1.00     0.00     0.00     0.00
                          0.00     0.00    -1.00     0.00
                          0.00     1.00     0.00     0.00
                          0.00     0.00     0.00     1.00])
-    
+
     ``new_rotate_euler(heading, attitude, bank)``
         Create a **Matrix4** for the given Euler rotation.  *heading* is a rotation
         around the Y axis, *attitude* around the X axis and *bank* around the Z
         axis.  All rotations are performed simultaneously, so this method avoids
         "gimbal lock" and is the usual method for implemented 3D rotations in a
         game.  Example::
-    
+
             >>> m = Matrix4.new_rotate_euler(math.pi / 2, math.pi / 2, 0.0)
             >>> m
             Matrix4([    0.00    -0.00     1.00     0.00
                          1.00     0.00    -0.00     0.00
                         -0.00     1.00     0.00     0.00
                          0.00     0.00     0.00     1.00])
-    
+
     ``new_perspective(fov_y, aspect, near, far)``
         Create a **Matrix4** for projection onto the 2D viewing plane.  This
         method is equivalent to the OpenGL call ``gluPerspective``.  *fov_y* is
@@ -827,80 +829,80 @@ class Matrix3(object):
         ration *width* / *height* of the viewing plane.  *near* and *far* are
         the distance to the near and far clipping planes.  They must be
         positive and non-zero.  Example::
-    
+
             >>> m = Matrix4.new_perspective(math.pi / 2, 1024.0 / 768, 1.0, 100.0)
             >>> m
             Matrix4([    0.75     0.00     0.00     0.00
                          0.00     1.00     0.00     0.00
                          0.00     0.00    -1.02    -2.02
                          0.00     0.00    -1.00     0.00])
-    
+
     **Operators**
-    
+
     Matrices of the same dimension may be multiplied to give a new matrix.
     For example, to create a transform which translates and scales::
-    
+
         >>> m1 = Matrix3.new_translate(5.0, 6.0)
         >>> m2 = Matrix3.new_scale(1.0, 2.0)
         >>> m1 * m2
         Matrix3([    1.00     0.00     5.00
                      0.00     2.00     6.00
                      0.00     0.00     1.00])
-    
+
     Note that multiplication is not commutative (the order that you apply
     transforms matters)::
-    
+
         >>> m2 * m1
         Matrix3([    1.00     0.00     5.00
                      0.00     2.00    12.00
                      0.00     0.00     1.00])
-    
+
     In-place multiplication is also permitted (and optimised)::
-    
+
         >>> m1 *= m2
         >>> m1
         Matrix3([    1.00     0.00     5.00
                      0.00     2.00     6.00
                      0.00     0.00     1.00])
-    
+
     Multiplying a matrix by a vector returns a vector, and is used to
     transform a vector::
-    
+
         >>> m1 = Matrix3.new_rotate(math.pi / 2)
         >>> m1 * Vector2(1.0, 1.0)
         Vector2(-1.00, 1.00)
-    
+
     Note that translations have no effect on vectors.  They do affect
     points, however::
-    
+
         >>> m1 = Matrix3.new_translate(5.0, 6.0)
         >>> m1 * Vector2(1.0, 2.0)
         Vector2(1.00, 2.00)
         >>> m1 * Point2(1.0, 2.0)
         Point2(6.00, 8.00)
-    
+
     Multiplication is currently incorrect between matrices and vectors -- the
     projection component is ignored.  Use the **Matrix4.transform** method
     instead.
-    
+
     Matrix4 also defines **transpose** (in-place), **transposed** (functional),
     **determinant** and **inverse** (functional) methods.
-    
+
     A **Matrix3** can be multiplied with a **Vector2** or any of the 2D geometry
-    objects (**Point2**, **Line2**, **Circle**, etc).  
-    
+    objects (**Point2**, **Line2**, **Circle**, etc).
+
     A **Matrix4** can be multiplied with a **Vector3** or any of the 3D geometry
     objects (**Point3**, **Line3**, **Sphere**, etc).
-    
+
     For convenience, each of the matrix constructors are also available as
     in-place operators.  For example, instead of writing::
-    
+
         >>> m1 = Matrix3.new_translate(5.0, 6.0)
         >>> m2 = Matrix3.new_scale(1.0, 2.0)
         >>> m1 *= m2
-    
+
     you can apply the scale directly to *m1*::
-    
+
         >>> m1 = Matrix3.new_translate(5.0, 6.0)
         >>> m1.scale(1.0, 2.0)
         Matrix3([    1.00     0.00     5.00
@@ -910,29 +912,29 @@ class Matrix3(object):
         Matrix3([    1.00     0.00     5.00
                      0.00     2.00     6.00
                      0.00     0.00     1.00])
-    
+
     Note that these methods operate in-place (they modify the original matrix),
     and they also return themselves as a result.  This allows you to chain
     transforms together directly::
-    
+
         >>> Matrix3().translate(1.0, 2.0).rotate(math.pi / 2).scale(4.0, 4.0)
         Matrix3([    0.00    -4.00     1.00
                      4.00     0.00     2.00
                      0.00     0.00     1.00])
-    
+
     All constructors have an equivalent in-place method.  For **Matrix3**, they
     are ``identity``, ``translate``, ``scale`` and ``rotate``.  For **Matrix4**,
-    they are ``identity``, ``translate``, ``scale``, ``rotatex``, ``rotatey``, 
+    they are ``identity``, ``translate``, ``scale``, ``rotatex``, ``rotatey``,
     ``rotatez``, ``rotate_axis`` and ``rotate_euler``.  Both **Matrix3** and
     **Matrix4** also have an in-place ``transpose`` method.
-    
+
     The ``copy`` method is also implemented in both matrix classes and
     behaves in the obvious way.
     """
 
     def __init__(self):
         self.identity()
-        
+
     def __copy__(self):
         return Matrix3.new(*self[:])
 
@@ -952,13 +954,13 @@ class Matrix3(object):
         (self.a, self.e, self.i,
          self.b, self.f, self.j,
          self.c, self.g, self.k) = L
-         
+
     def __eq__(self,other):
         try:
             return list(self)==list(other)
         except:
             return False
-    
+
     def __sub__(self, other):
         return Matrix3.new(*(ai-bi for ai,bi in zip(self[:],other[:])))
 
@@ -1006,14 +1008,14 @@ class Matrix3(object):
             A = self
             B = other
             V = Vector2(0, 0)
-            V.x = A.a * B.x + A.b * B.y 
-            V.y = A.e * B.x + A.f * B.y 
+            V.x = A.a * B.x + A.b * B.y
+            V.y = A.e * B.x + A.f * B.y
             return V
         else:
             other = other.copy()
             other._apply_transform(self)
             return other
-        
+
     def __call__(self,other):
         return self*other
 
@@ -1057,7 +1059,7 @@ class Matrix3(object):
     def scale(self, x, y=None):
         if y is None: y=x
         return Matrix3.new_scale(x, y)*self
-    
+
     def offset(self):
         return self*Point2(0,0)
 
@@ -1068,7 +1070,7 @@ class Matrix3(object):
         """
         v=self*Polar(1.0,angle)
         return atan2(v.y,v.x)
-    
+
     def mag(self,v=None):
         """Return the net (uniform) scaling of this transform.
         """
@@ -1091,7 +1093,7 @@ class Matrix3(object):
         M = cls()
         M[:] = values
         return M
-    
+
     @classmethod
     def new_identity(cls):
         self = cls()
@@ -1109,7 +1111,7 @@ class Matrix3(object):
         self.c = x
         self.g = y
         return self
-    
+
     @classmethod
     def new_rotate(cls, angle):
         self = cls()
@@ -1119,13 +1121,13 @@ class Matrix3(object):
         self.b = -s
         self.e = s
         return self
-    
+
     def mag2(self):
         return sum(x*x for x in self)
 
     def __abs__(self):
         return sqrt(self.mag2())
-    
+
     def transpose(self):
         (self.a, self.e, self.i,
          self.b, self.f, self.j,
@@ -1140,11 +1142,11 @@ class Matrix3(object):
         return M
 
     def determinant(self):
-        return (self.a*self.f*self.k 
-                + self.b*self.g*self.i 
-                + self.c*self.e*self.j 
-                - self.a*self.g*self.j 
-                - self.b*self.e*self.k 
+        return (self.a*self.f*self.k
+                + self.b*self.g*self.i
+                + self.c*self.e*self.j
+                - self.a*self.g*self.j
+                - self.b*self.e*self.k
                 - self.c*self.f*self.i)
 
     def inverse(self):
@@ -1185,7 +1187,7 @@ class Matrix4(object):
         M.b = self.b
         M.c = self.c
         M.d = self.d
-        M.e = self.e 
+        M.e = self.e
         M.f = self.f
         M.g = self.g
         M.h = self.h
@@ -1299,7 +1301,7 @@ class Matrix4(object):
             other = other.copy()
             other._apply_transform(self)
             return other
-        
+
     def __call__(self,other):
         return self*other
 
@@ -1382,7 +1384,7 @@ class Matrix4(object):
 
     def translate(self, x, y, z):
         self *= Matrix4.new_translate(x, y, z)
-        return self 
+        return self
 
     def rotatex(self, angle):
         self *= Matrix4.new_rotatex(angle)
@@ -1460,7 +1462,7 @@ class Matrix4(object):
         self.g = -s
         self.j = s
         return self
-    
+
     @classmethod
     def new_rotatey(cls, angle):
         self = cls()
@@ -1469,8 +1471,8 @@ class Matrix4(object):
         self.a = self.k = c
         self.c = s
         self.i = -s
-        return self    
-    
+        return self
+
     @classmethod
     def new_rotatez(cls, angle):
         self = cls()
@@ -1480,7 +1482,7 @@ class Matrix4(object):
         self.b = -s
         self.e = s
         return self
-    
+
     @classmethod
     def new_rotate_axis(cls, angle, axis):
         assert(isinstance(axis, Vector3))
@@ -1493,7 +1495,7 @@ class Matrix4(object):
         s = sin(angle)
         c = cos(angle)
         c1 = 1. - c
-        
+
         # from the glRotate man page
         self.a = x * x * c1 + c
         self.b = x * y * c1 - z * s
@@ -1505,7 +1507,7 @@ class Matrix4(object):
         self.j = y * z * c1 + x * s
         self.k = z * z * c1 + c
         return self
-    
+
     @classmethod
     def new_rotate_euler(cls, heading, attitude, bank):
         # from http://www.euclideanspace.com/
@@ -1531,11 +1533,11 @@ class Matrix4(object):
     @classmethod
     def new_rotate_triple_axis(cls, x, y, z):
         m = cls()
-        
+
         m.a, m.b, m.c = x.x, y.x, z.x
         m.e, m.f, m.g = x.y, y.y, z.y
         m.i, m.j, m.k = x.z, y.z, z.z
-        
+
         return m
 
     @classmethod
@@ -1543,12 +1545,12 @@ class Matrix4(object):
         z = (eye - at).normalized()
         x = up.cross(z).normalized()
         y = z.cross(x)
-        
+
         m = cls.new_rotate_triple_axis(x, y, z)
         m.d, m.h, m.l = eye.x, eye.y, eye.z
         return m
-    
-    @classmethod    
+
+    @classmethod
     def new_perspective(cls, fov_y, aspect, near, far):
         # from the gluPerspective man page
         f = 1 / tan(fov_y / 2)
@@ -1590,72 +1592,72 @@ class Matrix4(object):
             tmp.e = d * (self.g * (self.i * self.p - self.m * self.l) + self.k * (self.m * self.h - self.e * self.p) + self.o * (self.e * self.l - self.i * self.h));
             tmp.i = d * (self.h * (self.i * self.n - self.m * self.j) + self.l * (self.m * self.f - self.e * self.n) + self.p * (self.e * self.j - self.i * self.f));
             tmp.m = d * (self.e * (self.n * self.k - self.j * self.o) + self.i * (self.f * self.o - self.n * self.g) + self.m * (self.j * self.g - self.f * self.k));
-            
+
             tmp.b = d * (self.j * (self.c * self.p - self.o * self.d) + self.n * (self.k * self.d - self.c * self.l) + self.b * (self.o * self.l - self.k * self.p));
             tmp.f = d * (self.k * (self.a * self.p - self.m * self.d) + self.o * (self.i * self.d - self.a * self.l) + self.c * (self.m * self.l - self.i * self.p));
             tmp.j = d * (self.l * (self.a * self.n - self.m * self.b) + self.p * (self.i * self.b - self.a * self.j) + self.d * (self.m * self.j - self.i * self.n));
             tmp.n = d * (self.i * (self.n * self.c - self.b * self.o) + self.m * (self.b * self.k - self.j * self.c) + self.a * (self.j * self.o - self.n * self.k));
-            
+
             tmp.c = d * (self.n * (self.c * self.h - self.g * self.d) + self.b * (self.g * self.p - self.o * self.h) + self.f * (self.o * self.d - self.c * self.p));
             tmp.g = d * (self.o * (self.a * self.h - self.e * self.d) + self.c * (self.e * self.p - self.m * self.h) + self.g * (self.m * self.d - self.a * self.p));
             tmp.k = d * (self.p * (self.a * self.f - self.e * self.b) + self.d * (self.e * self.n - self.m * self.f) + self.h * (self.m * self.b - self.a * self.n));
             tmp.o = d * (self.m * (self.f * self.c - self.b * self.g) + self.a * (self.n * self.g - self.f * self.o) + self.e * (self.b * self.o - self.n * self.c));
-            
+
             tmp.d = d * (self.b * (self.k * self.h - self.g * self.l) + self.f * (self.c * self.l - self.k * self.d) + self.j * (self.g * self.d - self.c * self.h));
             tmp.h = d * (self.c * (self.i * self.h - self.e * self.l) + self.g * (self.a * self.l - self.i * self.d) + self.k * (self.e * self.d - self.a * self.h));
             tmp.l = d * (self.d * (self.i * self.f - self.e * self.j) + self.h * (self.a * self.j - self.i * self.b) + self.l * (self.e * self.b - self.a * self.f));
             tmp.p = d * (self.a * (self.f * self.k - self.j * self.g) + self.e * (self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c));
 
         return tmp;
-        
+
 class Quaternion:
     """
     A quaternion represents a three-dimensional rotation or reflection
     transformation.  They are the preferred way to store and manipulate
     rotations in 3D applications, as they do not suffer the same numerical
     degredation that matrices do.
-    
+
     The quaternion constructor initializes to the identity transform::
-    
+
         >>> q = Quaternion()
         >>> q
         Quaternion(real=1.00, imag=<0.00, 0.00, 0.00>)
-    
+
     **Element access**
-    
+
     Internally, the quaternion is stored as four attributes: ``x``, ``y`` and
     ``z`` forming the imaginary vector, and ``w`` the real component.
-    
+
     **Constructors**
-    
+
     Rotations can be formed using the constructors:
-    
+
     ``new_identity()``
         Equivalent to the default constructor.
-    
+
     ``new_rotate_axis(angle, axis)``
         Equivalent to the Matrix4 constructor of the same name.  *angle* is
         specified in radians, *axis* is an instance of **Vector3**.  It is
         not necessary to normalize the axis.  Example::
-    
+
             >>> q = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
             >>> q
             Quaternion(real=0.71, imag=<0.71, 0.00, 0.00>)
-    
+
     ``new_rotate_euler(heading, attitude, bank)``
         Equivalent to the Matrix4 constructor of the same name.  *heading*
         is a rotation around the Y axis, *attitude* around the X axis and
         *bank* around the Z axis.  All angles are given in radians.  Example::
-    
+
             >>> q = Quaternion.new_rotate_euler(math.pi / 2, math.pi / 2, 0)
             >>> q
             Quaternion(real=0.50, imag=<0.50, 0.50, 0.50>)
-    
+
     ``new_interpolate(q1, q2, t)``
         Create a quaternion which gives a (SLERP) interpolated rotation
         between *q1* and *q2*.  *q1* and *q2* are instances of **Quaternion**,
         and *t* is a value between 0.0 and 1.0.  For example::
-    
+
             >>> q1 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
             >>> q2 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(0, 1, 0))
             >>> for i in range(11):
@@ -1672,79 +1674,79 @@ class Quaternion:
             Quaternion(real=0.78, imag=<0.17, 0.61, 0.00>)
             Quaternion(real=0.75, imag=<0.09, 0.66, 0.00>)
             Quaternion(real=0.71, imag=<0.00, 0.71, 0.00>)
-    
-    
+
+
     **Operators**
-    
+
     Quaternions may be multiplied to compound rotations.  For example, to
     rotate 90 degrees around the X axis and then 90 degrees around the Y axis::
-    
+
         >>> q1 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
         >>> q2 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(0, 1, 0))
         >>> q1 * q2
         Quaternion(real=0.50, imag=<0.50, 0.50, 0.50>)
-    
+
     Multiplying a quaternion by a vector gives a vector, transformed
     appropriately::
-    
+
         >>> q = Quaternion.new_rotate_axis(math.pi / 2, Vector3(0, 1, 0))
         >>> q * Vector3(1.0, 0, 0)
         Vector3(0.00, 0.00, -1.00)
-    
+
     Similarly, any 3D object can be multiplied (e.g., **Point3**, **Line3**,
     **Sphere**, etc)::
-    
+
         >>> q * Ray3(Point3(1., 1., 1.), Vector3(1., 1., 1.))
         Ray3(<1.00, 1.00, -1.00> + u<1.00, 1.00, -1.00>)
-    
+
     As with the matrix classes, the constructors are also available as in-place
     operators.  These are named ``identity``, ``rotate_euler`` and
     ``rotate_axis``.  For example::
-    
+
         >>> q1 = Quaternion()
         >>> q1.rotate_euler(math.pi / 2, math.pi / 2, 0)
         Quaternion(real=0.50, imag=<0.50, 0.50, 0.50>)
         >>> q1
         Quaternion(real=0.50, imag=<0.50, 0.50, 0.50>)
-    
+
     Quaternions are usually unit length, but you may wish to use sized
     quaternions.  In this case, you can find the magnitude using ``abs``,
     ``magnitude`` and ``magnitude_squared``, as with the vector classes.
     Example::
-    
+
         >>> q1 = Quaternion()
         >>> abs(q1)
         1.0
         >>> q1.magnitude()
         1.0
-    
+
     Similarly, the class implements ``normalize`` and ``normalized`` in the
     same way as the vectors.
-    
+
     The following methods do not alter the quaternion:
-    
+
     ``conjugated()``
         Returns a quaternion that is the conjugate of the instance.  For
         example::
-            
+
             >>> q1 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
             >>> q1.conjugated()
             Quaternion(real=0.71, imag=<-0.71, -0.00, -0.00>)
             >>> q1
             Quaternion(real=0.71, imag=<0.71, 0.00, 0.00>)
-    
+
     ``get_angle_axis()``
         Returns a tuple (angle, axis), giving the angle to rotate around an
         axis equivalent to the quaternion.  For example::
-    
+
             >>> q1 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
             >>> q1.get_angle_axis()
             (1.5707963267948966, Vector3(1.00, 0.00, 0.00))
-    
+
     ``get_matrix()``
         Returns a **Matrix4** implementing the transformation of the quaternion.
         For example::
-            
+
             >>> q1 = Quaternion.new_rotate_axis(math.pi / 2, Vector3(1, 0, 0))
             >>> q1.get_matrix()
             Matrix4([    1.00     0.00     0.00     0.00
@@ -1752,7 +1754,7 @@ class Quaternion:
                          0.00     1.00     0.00     0.00
                          0.00     0.00     0.00     1.00])
     """
-    # All methods and naming conventions based off 
+    # All methods and naming conventions based off
     # http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
 
     # w is the real part, (x, y, z) are the imaginary parts
@@ -1787,7 +1789,7 @@ class Quaternion:
             Bz = other.z
             Bw = other.w
             Q = Quaternion()
-            Q.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx    
+            Q.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx
             Q.y = -Ax * Bz + Ay * Bw + Az * Bx + Aw * By
             Q.z =  Ax * By - Ay * Bx + Az * Bw + Aw * Bz
             Q.w = -Ax * Bx - Ay * By - Az * Bz + Aw * Bw
@@ -1837,19 +1839,19 @@ class Quaternion:
         By = other.y
         Bz = other.z
         Bw = other.w
-        self.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx    
+        self.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx
         self.y = -Ax * Bz + Ay * Bw + Az * Bx + Aw * By
         self.z =  Ax * By - Ay * Bx + Az * Bw + Aw * Bz
         self.w = -Ax * Bx - Ay * By - Az * Bz + Aw * Bw
         return self
-    
+
 
     def mag2(self):
-        return self.w ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2 
+        return self.w ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2
 
     def __abs__(self):
         return sqrt(self.mag2())
-            
+
     mag = __abs__
 
 
@@ -1987,46 +1989,46 @@ class Quaternion:
         Q.y = s1 * c2 * c3 + c1 * s2 * s3
         Q.z = c1 * s2 * c3 - s1 * c2 * s3
         return Q
-    
+
     @classmethod
     def new_rotate_matrix(cls, m):
         if m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] > 0.00000001:
             t = m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] + 1.0
             s = 0.5/sqrt(t)
-        
+
             return cls(
               s*t,
               (m[1*4 + 2] - m[2*4 + 1])*s,
               (m[2*4 + 0] - m[0*4 + 2])*s,
               (m[0*4 + 1] - m[1*4 + 0])*s
               )
-        
+
         elif m[0*4 + 0] > m[1*4 + 1] and m[0*4 + 0] > m[2*4 + 2]:
             t = m[0*4 + 0] - m[1*4 + 1] - m[2*4 + 2] + 1.0
             s = 0.5/sqrt(t)
-            
+
             return cls(
               (m[1*4 + 2] - m[2*4 + 1])*s,
               s*t,
               (m[0*4 + 1] + m[1*4 + 0])*s,
               (m[2*4 + 0] + m[0*4 + 2])*s
               )
-        
+
         elif m[1*4 + 1] > m[2*4 + 2]:
             t = -m[0*4 + 0] + m[1*4 + 1] - m[2*4 + 2] + 1.0
             s = 0.5/sqrt(t)
-            
+
             return cls(
               (m[2*4 + 0] - m[0*4 + 2])*s,
               (m[0*4 + 1] + m[1*4 + 0])*s,
               s*t,
               (m[1*4 + 2] + m[2*4 + 1])*s
               )
-        
+
         else:
             t = -m[0*4 + 0] - m[1*4 + 1] + m[2*4 + 2] + 1.0
             s = 0.5/sqrt(t)
-        
+
             return cls(
               (m[0*4 + 1] - m[1*4 + 0])*s,
               (m[2*4 + 0] + m[0*4 + 2])*s,
@@ -2073,7 +2075,7 @@ class Quaternion:
 # Geometry
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
 # --------------------------------------------------------------------------
-    
+
 import six,abc
 @six.add_metaclass(abc.ABCMeta)
 class Geometry(object):
@@ -2081,16 +2083,16 @@ class Geometry(object):
     The following classes are available for dealing with simple 2D geometry.
     The interface to each shape is similar; in particular, the ``connect``
     and ``distance`` methods are defined identically for each.
-    
+
     For example, to find the closest point on a line to a circle::
-    
+
         >>> circ = Circle(Point2(3., 2.), 2.)
         >>> line = Line2(Point2(0., 0.), Point2(-1., 1.))
         >>> line.connect(circ).p1
         Point2(0.50, -0.50)
-    
+
     To find the corresponding closest point on the circle to the line::
-    
+
         >>> line.connect(circ).p2
         Point2(1.59, 0.59)
     """
@@ -2117,15 +2119,15 @@ class Geometry(object):
     _connect_line3 = _connect_unimplemented
     _connect_sphere = _connect_unimplemented
     _connect_plane = _connect_unimplemented
-    
+
     def point(self, u):
         ":return: Point2 or Point3 at parameter u"
         raise NotImplementedError
-    
+
     def tangent(self, u):
         ":return: Vector2 or Vector3 tangent at parameter u"
         raise NotImplementedError
-    
+
     def intersect(self, other):
         raise NotImplementedError
 
@@ -2142,12 +2144,12 @@ class Geometry(object):
 
 def _intersect_point2_circle(P, C):
     return abs(P - C.c) <= C.r
-    
+
 def _intersect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
     if d == 0: #both lines are parallel
         if A.distance(B.p)==0: #colinear
-            return A 
+            return A
         else:
             return None
 
@@ -2278,12 +2280,12 @@ class Point2(Vector2, Geometry):
         Returns a **LineSegment2** which is the minimum length line segment
         that can connect the two shapes.  *other* may be a **Point2**, **Line2**,
         **Ray2**, **LineSegment2** or **Circle**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``. 
+        simply returns the length of the result of ``connect``.
     """
-    
+
     def dist(self,other):
         return (self-other).mag()
 
@@ -2298,7 +2300,7 @@ class Point2(Vector2, Geometry):
 
     def _connect_point2(self, other):
         return Segment2(other, self)
-    
+
     def _connect_line2(self, other):
         c = _connect_point2_line2(self, other)
         if c:
@@ -2308,7 +2310,7 @@ class Point2(Vector2, Geometry):
         c = _connect_point2_circle(self, other)
         if c:
             return c.swap()
-        
+
 def Polar(mag,angle):
     return Vector2(mag*cos(angle),mag*sin(angle))
 
@@ -2317,51 +2319,51 @@ class Line2(Geometry):
     """
     A **Line2** is a line on a 2D plane extending to infinity in both directions;
     a **Ray2** has a finite end-point and extends to infinity in a single
-    direction; a **LineSegment2** joins two points.  
-    
+    direction; a **LineSegment2** joins two points.
+
     All three classes support the same constructors, operators and methods,
     but may behave differently when calculating intersections etc.
-    
+
     You may construct a line, ray or line segment using any of:
-    
+
     * another line, ray or line segment
     * two points
     * a point and a vector
     * a point, a vector and a length
-    
+
     For example::
-    
+
         >>> Line2(Point2(1.0, 1.0), Point2(2.0, 3.0))
         Line2(<1.00, 1.00> + u<1.00, 2.00>)
         >>> Line2(Point2(1.0, 1.0), Vector2(1.0, 2.0))
         Line2(<1.00, 1.00> + u<1.00, 2.00>)
         >>> Ray2(Point2(1.0, 1.0), Vector2(1.0, 2.0), 1.0)
         Ray2(<1.00, 1.00> + u<0.45, 0.89>)
-    
+
     Internally, lines, rays and line segments store a Point2 *p* and a
     Vector2 *v*.  You can also access (but not set) the two endpoints
     *p1* and *p2*.  These may or may not be meaningful for all types of lines.
-    
+
     The following methods are supported by all three classes:
-    
+
     ``intersect(other)``
         If *other* is a **Line2**, **Ray2** or **LineSegment2**, returns
         a **Point2** of intersection, or None if the lines are parallel.
-    
+
         If *other* is a **Circle**, returns a **LineSegment2** or **Point2** giving
         the part of the line that intersects the circle, or None if there
         is no intersection.
-    
+
     ``connect(other)``
         Returns a **LineSegment2** which is the minimum length line segment
         that can connect the two shapes.  For two parallel lines, this
         line segment may be in an arbitrary position.  *other* may be
         a **Point2**, **Line2**, **Ray2**, **LineSegment2** or **Circle**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
-    
+
     **LineSegment2** also has a *length* property which is read-only.
     """
 
@@ -2375,10 +2377,10 @@ class Line2(Geometry):
                 self.v = Vector2(args[1])
             else:
                 self.v = Point2(args[1]) - self.p
-            
+
             if len(args) == 3:
                 self.v=self.v*args[2]/abs(self.v)
-        
+
     def __eq__(self, other):
         """lines are "equal" only if base points and vector are strictly equal.
         to compare if lines are "same", use line1.distance(line2)==0
@@ -2395,17 +2397,17 @@ class Line2(Geometry):
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
-            
+
     def _u_in(self, u):
         return True
-    
+
     def point(self, u):
         ":return: Point2 at parameter u"
         if self._u_in(u):
             return self.p+u*self.v
         else:
             return None
-    
+
     def tangent(self, u):
         ":return: Vector2 tangent at parameter u. Warning : tangent is generally not a unit vector"
         if self._u_in(u):
@@ -2437,7 +2439,7 @@ class Line2(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_line2(other, self)
-    
+
 
 
 class Ray2(Line2):
@@ -2448,7 +2450,7 @@ class Ray2(Line2):
 class Segment2(Line2):
     p1 = property(lambda self: self.p)
     p2 = property(lambda self: Point2(self.p.x + self.v.x, self.p.y + self.v.y))
-    
+
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
 
@@ -2462,7 +2464,7 @@ class Segment2(Line2):
         return self.v.mag2()
 
     length = property(lambda self: abs(self.v))
-    
+
     def swap(self):
         # used by connect methods to switch order of points
         self.p = self.p2
@@ -2479,22 +2481,22 @@ class Circle(Geometry):
 
     Internally there are two attributes: *c*, giving the center point and
     *r*, giving the radius.
-    
+
     The following methods are supported:
-    
+
     ``intersect(other)``
         If *other* is a **Line2**, **Ray2** or **LineSegment2**, returns
         a **LineSegment2** giving the part of the line that intersects the
         circle, or None if there is no intersection.
-    
+
     ``connect(other)``
         Returns a **LineSegment2** which is the minimum length line segment
         that can connect the two shapes. *other* may be a **Point2**, **Line2**,
         **Ray2**, **LineSegment2** or **Circle**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``. 
+        simply returns the length of the result of ``connect``.
     """
 
     def __init__(self, center, radius):
@@ -2509,14 +2511,14 @@ class Circle(Geometry):
     def point(self, u):
         ":return: Point2 at angle u radians"
         return self.c+Polar(self.r,u)
-    
+
     def tangent(self, u):
         ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
         return Polar(self.r,u+pi/2.)
-        
+
     def __copy__(self):
         return self.__class__(self.c, self.r)
-    
+
     def __eq__(self, other):
         if not isinstance(other,Circle):
             return False
@@ -2531,11 +2533,11 @@ class Circle(Geometry):
         self.c = t * self.c
         self.p = t * self.p
         self.r=abs(self.p-self.c)
-        
+
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
-    
+
     length = property(lambda self: abs(self))
 
     def intersect(self, other):
@@ -2560,16 +2562,16 @@ class Circle(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_circle(other, self)
-    
+
 class Arc2(Circle):
     def __init__(self, center, p1,p2,r=None,dir=1):
         """
         :param center: Point2 or (x,y) tuple
-        :param p1: starting Point2 or angle in radians 
-        :param p2: ending Point2 or angle in radians 
+        :param p1: starting Point2 or angle in radians
+        :param p2: ending Point2 or angle in radians
         :param r: float radius, needed onyl if p1 or p2 is an angle
         .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
-        
+
         """
         c=Point2(center) if not isinstance(center,Point2) else center
         if isinstance(p1,(int,float)):
@@ -2582,12 +2584,12 @@ class Arc2(Circle):
             self.p2=c+Polar(r,p2)
         else:
             self.p2=Point2(p2)
-        self.dir=dir 
-            
+        self.dir=dir
+
         self._apply_transform(None) #to set start/end angles
         # self.a is now start angle in [-pi,pi]
         # self.b is now end angle in [-pi,pi]
-        
+
     def angle(self):
         """:return: float signed arc angle"""
         a=self.a
@@ -2597,42 +2599,42 @@ class Arc2(Circle):
         if (b<a and self.dir>0) or (b>a and self.dir<0): #complementary angle
             res=2*pi-res
         return res*self.dir
-        
+
     def __abs__(self):
         """:return: float arc length"""
         return abs(self.r*self.angle())
-        
+
     def _u_in(self, u): #unlike Circle, Arc2 is parametrized on [0,1] for coherency with Segment2
         return u >= 0.0 and u <= 1.0
-    
+
     def point(self, u):
         ":return: Point2 at parameter u"
         a=self.a+u*self.angle()
         return self.c+Polar(self.r,a)
-    
+
     def tangent(self, u):
         """:return: Vector2 tangent at parameter u"""
         a=self.a+u*self.angle()
         res=Polar(self.r,a).cross()
         return -res if self.dir>0 else res
-            
+
     def _apply_transform(self, t):
         if t:
             super(Arc2,self)._apply_transform(t)
             self.p2 = t * self.p2
         self.a=(self.p-self.c).angle(None) #start angle
         self.b=(self.p2-self.c).angle(None) #end angle
-        
+
     def __copy__(self):
         return self.__class__(self.c, self.p, self.p2)
 
     copy = __copy__
-    
+
     def __eq__(self, other):
         if not super(Arc2,self).__eq__(other): #support Circles must be the same
             return False
         return self.p==other.p and self.p2==other.p2 and self.dir==other.dir
-        
+
     def __repr__(self):
         return '%s(center=%s,p1=%s,p2=%s,r=%s)' % (self.__class__.__name__,self.c,self.p,self.p2,self.r)
 
@@ -2748,7 +2750,7 @@ def _connect_sphere_line3(S, L):
     v = (point - S.c)
     v.normalize()
     v *= S.r
-    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z), 
+    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
                         point)
 
 def _connect_sphere_sphere(A, B):
@@ -2779,7 +2781,7 @@ def _connect_sphere_plane(S, P):
     v = p2 - S.c
     v.normalize()
     v *= S.r
-    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z), 
+    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
                         p2)
 
 def _connect_plane_plane(A, B):
@@ -2792,7 +2794,7 @@ def _connect_plane_plane(A, B):
 
 def _intersect_point3_sphere(P, S):
     return abs(P - S.c) <= S.r
-    
+
 def _intersect_line3_sphere(L, S):
     a = L.v.mag2()
     b = 2 * (L.v.x * (L.p.x - S.c.x) + \
@@ -2843,7 +2845,7 @@ def _intersect_plane_plane(A, B):
     c2 = (B.k * n1_m - A.k * n1d2) / det
     return Line3(Point3(c1 * A.n.x + c2 * B.n.x,
                         c1 * A.n.y + c2 * B.n.y,
-                        c1 * A.n.z + c2 * B.n.z), 
+                        c1 * A.n.z + c2 * B.n.z),
                  A.n.cross(B.n))
 
 class Point3(Vector3, Geometry):
@@ -2853,27 +2855,27 @@ class Point3(Vector3, Geometry):
         >>> p = Point3(1.0, 2.0, 3.0)
         >>> p
         Point3(1.00, 2.00, 3.00)
-    
+
     **Point3** subclasses **Vector3**, so all of **Vector3** operators and
     methods apply.  In particular, subtracting two points gives a vector::
-    
+
         >>> Point3(1.0, 2.0, 3.0) - Point3(1.0, 0.0, -2.0)
         Vector3(0.00, 2.00, 5.00)
-    
+
     The following methods are also defined:
-    
+
     ``intersect(other)``
         If *other* is a **Sphere**, returns ``True`` iff the point lies within
         the sphere.
-    
+
     ``connect(other)``
         Returns a **LineSegment3** which is the minimum length line segment
         that can connect the two shapes.  *other* may be a **Point3**, **Line3**,
         **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``. 
+        simply returns the length of the result of ``connect``.
     """
 
     def intersect(self, other):
@@ -2894,7 +2896,7 @@ class Point3(Vector3, Geometry):
         c = _connect_point3_line3(self, other)
         if c:
             return c.swap()
-        
+
     def _connect_sphere(self, other):
         c = _connect_point3_sphere(self, other)
         if c:
@@ -2909,55 +2911,55 @@ class Line3(Geometry):
     """
     A **Line3** is a line on a 3D plane extending to infinity in both directions;
     a **Ray3** has a finite end-point and extends to infinity in a single
-    direction; a **LineSegment3** joins two points.  
-    
+    direction; a **LineSegment3** joins two points.
+
     All three classes support the same constructors, operators and methods,
     but may behave differently when calculating intersections etc.
-    
+
     You may construct a line, ray or line segment using any of:
-    
+
     * another line, ray or line segment
     * two points
     * a point and a vector
     * a point, a vector and a length
-    
+
     For example::
-    
+
         >>> Line3(Point3(1.0, 1.0, 1.0), Point3(1.0, 2.0, 3.0))
         Line3(<1.00, 1.00, 1.00> + u<0.00, 1.00, 2.00>)
         >>> Line3(Point3(0.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0))
         Line3(<0.00, 1.00, 1.00> + u<1.00, 1.00, 2.00>)
         >>> Ray3(Point3(1.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0), 1.0)
         Ray3(<1.00, 1.00, 1.00> + u<0.41, 0.41, 0.82>)
-    
+
     Internally, lines, rays and line segments store a Point3 *p* and a
     Vector3 *v*.  You can also access (but not set) the two endpoints
     *p1* and *p2*.  These may or may not be meaningful for all types of lines.
-    
+
     The following methods are supported by all three classes:
-    
+
     ``intersect(other)``
         If *other* is a **Sphere**, returns a **LineSegment3** which is the
         intersection of the sphere and line, or ``None`` if there is no
         intersection.
-    
+
         If *other* is a **Plane**, returns a **Point3** of intersection, or
         ``None``.
-    
+
     ``connect(other)``
         Returns a **LineSegment3** which is the minimum length line segment
         that can connect the two shapes.  For two parallel lines, this
         line segment may be in an arbitrary position.  *other* may be
         a **Point3**, **Line3**, **Ray3**, **LineSegment3**, **Sphere** or
         **Plane**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
-    
+
     **LineSegment3** also has a *length* property which is read-only.
     """
-    
+
     def __init__(self, *args):
         if len(args) == 3:
             assert isinstance(args[0], Point3) and \
@@ -2982,7 +2984,7 @@ class Line3(Geometry):
                 raise AttributeError('%r' % (args,))
         else:
             raise AttributeError('%r' % (args,))
-        
+
         # XXX This is annoying.
         #if not self.v:
         #    raise AttributeError, 'Line has zero-length vector'
@@ -2996,7 +2998,7 @@ class Line3(Geometry):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
 
     p1 = property(lambda self: self.p)
-    p2 = property(lambda self: Point3(self.p.x + self.v.x, 
+    p2 = property(lambda self: Point3(self.p.x + self.v.x,
                                       self.p.y + self.v.y,
                                       self.p.z + self.v.z))
 
@@ -3068,22 +3070,22 @@ class Sphere(Geometry):
 
     Internally there are two attributes: *c*, giving the center point and
     *r*, giving the radius.
-    
+
     The following methods are supported:
-    
+
     ``intersect(other)``:
         If *other* is a **Point3**, returns ``True`` iff the point lies
         within the sphere.
-    
+
         If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns
         a **LineSegment3** giving the intersection, or ``None`` if the
         line does not intersect the sphere.
-    
+
     ``connect(other)``
         Returns a **LineSegment3** which is the minimum length line segment
         that can connect the two shapes. *other* may be a **Point3**, **Line3**,
         **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
@@ -3133,30 +3135,30 @@ class Sphere(Geometry):
         if c:
             return c
 
-class Plane:
+class Plane(Geometry):
     """
     Planes can be constructed with any of:
 
     * three **Point3**'s lying on the plane
     * a **Point3** on the plane and the **Vector3** normal
     * a **Vector3** normal and *k*, described below.
-    
+
     Internally, planes are stored with the normal *n* and constant *k* such
     that *n.p* = *k* for any point on the plane *p*.
-    
+
     The following methods are supported:
-    
+
     ``intersect(other)``
         If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns a
         **Point3** of intersection, or ``None`` if there is no intersection.
-    
+
         If *other* is a **Plane**, returns the **Line3** of intersection.
-    
+
     ``connect(other)``
         Returns a **LineSegment3** which is the minimum length line segment
         that can connect the two shapes. *other* may be a **Point3**, **Line3**,
         **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
@@ -3165,12 +3167,9 @@ class Plane:
 
     def __init__(self, *args):
         if len(args) == 3:
-            assert isinstance(args[0], Point3) and \
-                   isinstance(args[1], Point3) and \
-                   isinstance(args[2], Point3)
-            self.n = (args[1] - args[0]).cross(args[2] - args[0])
+            self.n = (Point3(args[1]) - Point3(args[0])).cross(Point3(args[2]) - Point3(args[0]))
             self.n.normalize()
-            self.k = self.n.dot(args[0])
+            self.k = self.n.dot(Point3(args[0]))
         elif len(args) == 2:
             if isinstance(args[0], Point3) and isinstance(args[1], Vector3):
                 self.n = args[1].normalized()
@@ -3183,7 +3182,7 @@ class Plane:
 
         else:
             raise AttributeError('%r' % (args,))
-        
+
         if not self.n:
             raise AttributeError('Points on plane are colinear')
 
@@ -3261,4 +3260,3 @@ def argPair(*p):
         return (values[0], values[0])
     else:
         return (values[0], values[1])
-    

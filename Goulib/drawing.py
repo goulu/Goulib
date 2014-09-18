@@ -3,10 +3,13 @@
 """
 handle vector graphics in .dxf, .svg and .pdf formats
 
-:requires: 
-* `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg output
+:requires:
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
+* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
+* `svg.path <http://pypi.python.org/pypisvg.path/>`_ for svg input
+* `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg and pdf output
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
+
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
@@ -24,13 +27,15 @@ from .math2 import rint
 from .geom import *
 from .itertools2 import split
 
-# http://sub-atomic.com/~moses/acadcolors.html 
+# http://sub-atomic.com/~moses/acadcolors.html
 # 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
 acadcolors = ['black','red','yellow','lime','aqua','blue','magenta','white']
 
 def Trans(scale=1, offset=None, rotation=None):
     """
-    :return: :class:`Matrix3` of generalized scale+offset+rotation
+    :param scale: float or (scalex,scaley) tuple of scale factor
+    :param offset: :class:`~geom.Vector3`
+    :return: :class:`~geom.Matrix3` of generalized scale+offset+rotation
     """
     res = Matrix3()
     if rotation:
@@ -45,30 +50,30 @@ class BBox:
     """bounding box"""
     def __init__(self, pt1=None, pt2=None):
         """
-        :param pt1: :class:`Pt` first corner (any)
-        :param pt2: :class:`Pt` opposite corner (any)
+        :param pt1: :class:`~geom.Point2` first corner (any)
+        :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
         self._pt1 = None
         self._pt2 = None
         if pt1: self +=pt1
         if pt2: self +=pt2
-    
+
     @property
     def xmin(self): return self._pt1.x
-    
+
     @property
     def ymin(self): return self._pt1.y
-    
+
     @property
     def xmax(self): return self._pt2.x
-    
+
     @property
     def ymax(self): return self._pt2.y
-        
+
     def __iadd__(self, pt):
         """
         enlarge box if required to contain specified point
-        :param pt1: :class:`Pt` point to add
+        :param pt1: :class:`geom.Point2` point to add
         """
         if not pt:
             return self
@@ -89,37 +94,37 @@ class BBox:
                 p=list(map(max, list(zip(self._pt2.xy, pt))))
                 self._pt2 = Point2(p)
         return self
-    
+
     def __add__(self,other):
         res=BBox()
         res+=self
         res+=other
         return res
-        
+
     def __repr__(self):
         return "%s(%s,%s)" % (self.__class__.__name__,self._pt1, self._pt2)
-    
+
     def __call__(self):
         """:return: list of flatten corners"""
         l = list(self._pt1.xy)+list(self._pt2.xy)
         return l
-    
+
     def size(self):
-        """:return: Pt with xy sizes"""
+        """:return: :class:`geom.Vector2` with xy sizes"""
         try:
             return self._pt2 - self._pt1
         except:
             return Vector2(0, 0)
-    
+
     def center(self):
         """:return: Pt center"""
         res = self._pt2 + self._pt1
         return res / 2
-        
+
     def trans(self, trans):
         """
         :param trans: Xform
-        :return: BBox = self transformed by trans
+        :return: :class:`BBox` = self transformed by trans
         """
         res = BBox(trans(self._pt1), trans(self._pt2))
         # add 2 more corners as they matter if we rotate the box
@@ -132,27 +137,27 @@ def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
 
 class Entity(object):
     """Base class for all drawing entities"""
-    
+
     color='black' #default color
-       
+
     @property
     def start(self):
         return self.p
-    
+
     @property
     def end(self):
         try:
             return self.p2
         except: #probably a Circle
             return self.p
-        
+
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.start,self.end)
-    
+
     @property
     def center(self):
         return rpoint(self.bbox().center)
-    
+
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
@@ -160,7 +165,7 @@ class Entity(object):
             return BBox(self.start,self.end)
         elif isinstance(self,Arc2):
             #TODO : improve
-            rr = Vector2(self.r, self.r) 
+            rr = Vector2(self.r, self.r)
             return BBox(self.c - rr, self.c + rr)
         elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
@@ -168,24 +173,24 @@ class Entity(object):
 
         else:
             raise NotImplementedError()
-    
+
     def isclosed(self):
         return self.end==self.start
-    
+
     def isline(self):
         return isinstance(self,Line2) #or derived
-    
+
     def isvertical(self,tol=0.01):
         return self.isline() and abs(self.start.x-self.end.x)<tol
-    
+
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
-    
+
     def patches(self, **kwargs):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
         import matplotlib.patches as patches
         from matplotlib.path import Path
-        
+
         kwargs.setdefault('color',self.color)
         if isinstance(self,Segment2):
             path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
@@ -199,7 +204,7 @@ class Entity(object):
                 theta1,theta2=theta2,theta1
             d=self.r*2
             return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
-        
+
         #entities below may be filled, so let's handle the color first
         if 'color' in kwargs: # color attribute refers to edgecolor for coherency
             kwargs.setdefault('edgecolor',kwargs.pop('color'))
@@ -210,7 +215,7 @@ class Entity(object):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
         raise NotImplementedError
-    
+
     def _dxf_color(self):
         from .colors import color_lookup
         try:
@@ -226,7 +231,7 @@ class Entity(object):
         except:
             pass
         return -1 #layer color
-    
+
     def to_dxf(self,**attr):
         """:return: dxf entity"""
         import dxfwrite.entities as dxf
@@ -257,9 +262,9 @@ class Entity(object):
             spline.append(self.end.xy,(self.p[2]-self.end).xy)
             return spline
             return dxf.Spline(self.xy, **attr) # builds a POLYLINE3D (???) with 100 segments ...
-        else: 
+        else:
             raise NotImplementedError
-    
+
     @staticmethod
     def from_svg(path,color):
         """
@@ -267,7 +272,7 @@ class Entity(object):
         :return: Entity of correct subtype
         """
         return Chain.from_svg(path,color)
-    
+
     @staticmethod
     def from_pdf(path,trans,color):
         """
@@ -275,7 +280,7 @@ class Entity(object):
         :return: Entity of correct subtype
         """
         return Chain.from_pdf(path,trans,color)
-        
+
     @staticmethod
     def from_dxf(e,mat3):
         """
@@ -284,7 +289,7 @@ class Entity(object):
         :return: Entity of correct subtype
         """
         def trans(pt): return rpoint(mat3(Point2(pt)))
-        
+
         if e.dxftype=='LINE':
             start=trans(Point2(e.start[:2]))
             end=trans(Point2(e.end[:2]))
@@ -317,44 +322,44 @@ Circle.__bases__ += (Entity,) # adds it also to Arc2
 
 class Spline(Entity):
     """cubic spline segment"""
-    
+
     def __init__(self, points):
         """:param points: list of (x,y) tuples"""
         super(Spline,self).__init__()
         self.p=[Point2(xy) for xy in points]
-        
+
     def __copy__(self):
         return self.__class__(self.p)
-    
+
     copy = __copy__
-       
+
     @property
     def start(self):
         return self.p[0]
-    
+
     @property
     def end(self):
         return self.p[-1]
-    
+
     @property
     def xy(self):
         return [pt.xy for pt in self.p]
-    
-    @property   
+
+    @property
     def length(self):
         """:return: float (very) approximate length"""
         return sum((x.dist(self.p[i - 1]) for i, x in enumerate(self.p) if i>0))
-    
+
     def bbox(self):
         res=BBox()
         for p in self.p:
             res+=p
         return res
-    
+
     def swap(self):
         """ swap start and end"""
         self.p.reverse() #reverse in place
-        
+
     def _apply_transform(self, t):
         self.p=[t*p for p in self.p]
 
@@ -372,7 +377,7 @@ class Group(list):
     """group of Entities
     Notice : a Group is NOT an Entity because it cannot be handled as a single geometry
     """
-    
+
     def append(self,entity):
         if entity is not None:
             if isinstance(entity,Entity):
@@ -380,25 +385,25 @@ class Group(list):
             else: #ignore invalid items
                 logging.warning('skipped object %s'%entity)
         return self
-    
+
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
         return sum((entity.bbox() for entity in self), BBox())
-    
-    @property    
+
+    @property
     def length(self):
         return sum((entity.length for entity in self))
-    
+
     def __copy__(self):
         return self.__class__(self)
-    
+
     copy = __copy__
-    
+
     def _apply_transform(self,trans):
         for entity in self:
             entity._apply_transform(trans)
-            
+
     def intersect(self, other):
         """
         :param other: `geom.Entity`
@@ -410,20 +415,20 @@ class Group(list):
             if inter:
                 res.append((inter,entity))
         return res
-            
+
     def swap(self):
         """ swap start and end"""
         super(Group,self).reverse() #reverse in place
         for e in self:
             e.swap()
-            
+
     def patches(self, **kwargs):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
         patches=[]
         for e in self:
             patches+=e.patches(**kwargs)
         return patches
-    
+
     def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, recurse=True):
         """
         :param dxf: dxf.entity
@@ -431,18 +436,18 @@ class Group(list):
         """
         if trans is None:
             trans=Trans()
-            
+
         try:
             self.dxf #already defined ?
         except:
             self.dxf=dxf
-            
+
         for e in dxf:
             if layers and e.layer not in layers:
                 continue
             if only:
                 if e.dxftype in only:
-                    self.append(Entity.from_dxf(e, trans)) 
+                    self.append(Entity.from_dxf(e, trans))
                 else:
                     continue
             elif e.dxftype in ignore:
@@ -453,10 +458,10 @@ class Group(list):
                     self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, recurse=recurse)
                 else:
                     raise NotImplementedError() #TODO add
-            else: 
-                self.append(Entity.from_dxf(e, trans)) 
+            else:
+                self.append(Entity.from_dxf(e, trans))
         return self
-    
+
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res=[]
@@ -469,28 +474,28 @@ class Group(list):
 
 class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
     """ group of contiguous Entities (Polyline or similar)"""
-        
+
     def __init__(self,data=[]):
         Group.__init__(self,data)
         Entity.__init__(self)
-        
-    @property    
+
+    @property
     def start(self):
         return self[0].start
-    
+
     @property
     def end(self):
         return self[-1].end
-    
+
     def __repr__(self):
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
-    
+
     def append(self,edge,tol=1E6):
         """
         :return: self, or None if edge is not contiguous
         """
-        
+
         if len(self)==0:
             return super(Chain,self).append(edge)
         if self.end.dist(edge.start)<=tol:
@@ -498,7 +503,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         if self.end.dist(edge.end)<=tol:
             edge.swap()
             return super(Chain,self).append(edge)
-        if len(self)>1 : 
+        if len(self)>1 :
             return None
         #try to reverse the first edge
 
@@ -510,18 +515,18 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             edge.swap()
             return super(Chain,self).append(edge)
         return None
-    
+
     @staticmethod
     def from_pdf(path,trans,color):
         """
         :param path: pdf path
         :return: Entity of correct subtype
         :see: http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/PDF32000_2008.pdf p. 132
-        
+
         """
         def _pt(*args):
             return trans(Point2(*args))
-        
+
         chain=Chain()
         chain.color=color #TODO handle multicolor chains
         start=None # ensure exception if 'm' is not first
@@ -560,7 +565,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         if len(chain)==1:
             return chain[0] #single entity
         return chain
-    
+
     @staticmethod
     def from_svg(path,color):
         """
@@ -572,10 +577,10 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         chain.color=color
         def _point(svg):
             return Point2(svg.real, svg.imag)
-        
+
         for seg in path._segments:
             if isinstance(seg,Line):
-                entity=Segment2(_point(seg.start),_point(seg.end)) 
+                entity=Segment2(_point(seg.start),_point(seg.end))
             elif isinstance(seg,CubicBezier):
                 entity=Spline([_point(seg.start),_point(seg.control1),_point(seg.control2),_point(seg.end)])
             else:
@@ -584,7 +589,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
             entity.color=chain.color
             chain.append(entity)
         return chain
-    
+
     @staticmethod
     def from_dxf(e,mat3):
         """
@@ -593,7 +598,7 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         :return: Entity of correct subtype
         """
         def trans(pt): return rpoint(mat3(Point2(pt)))
-        
+
         if e.dxftype == 'POLYLINE':
             res=Chain()
             for i in range(1,len(e.vertices)):
@@ -645,20 +650,20 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         for edge in res:
             edge.dxf=e
             edge.color=res.color
-            edge.layer=res.layer   
+            edge.layer=res.layer
         return res
-        
+
     def to_dxf(self, split=False, **attr):
         """:return: polyline or list of entities along the chain"""
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
-        
+
         #assume chain color is the same as the first element's
         color=self[0]._dxf_color()
         from dxfwrite.entities import Polyline
         flags=1 if self.isclosed() else 0
         res=Polyline(color=color, flags=flags, **attr)
-            
+
         for e in self:
             if isinstance(e,Line2):
                 res.add_vertex(e.start.xy)
@@ -667,19 +672,19 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
                 res.add_vertex(e.start.xy,bulge=bulge)
             else: #we have a Spline in the chain. Split it for now
                 return super(Chain,self).to_dxf(**attr)
-                
+
         if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
 
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
-    
+
     def __init__(self, filename=None, data=[], **kwargs):
         Group.__init__(self,data)
         if filename:
             self.load(filename,**kwargs)
-            
+
     def load(self,filename, **kwargs):
             ext=filename.split('.')[-1].lower()
             if ext=='dxf':
@@ -690,7 +695,7 @@ class Drawing(Group):
                 self.read_pdf(filename, **kwargs)
             else:
                 raise IOError("file format .%s not (yet) supported"%ext)
-    
+
     def read_pdf(self,filename,**kwargs):
         """ reads a vector graphics on a .pdf file
         only the first page is parsed
@@ -705,7 +710,7 @@ class Drawing(Group):
         # PDFMiner parses them using a stack and calls a "Device" to process entities
         # so here we define a Device that processes only "paths" one by one:
         me=self
-        
+
         class _Device(PDFDevice):
             def paint_path(self, graphicstate, stroke, fill, evenodd, path):
                 color=None
@@ -716,9 +721,9 @@ class Drawing(Group):
                     except: pass
                 t=Matrix3()
                 # geom.Matrix 3 has the following format:
-                # a b c 
-                # e f g 
-                # i j k 
+                # a b c
+                # e f g
+                # i j k
                 # so we read the components already available in self.ctm:
                 t.a,t.b,t.e,t.f,t.c,t.g=tuple(self.ctm)
                 for sub in split(path,lambda x:x[0]=='m',True):
@@ -729,7 +734,7 @@ class Drawing(Group):
                         me.append(e)
                     else:
                         logging.warning('pdf path ignored %s'%sub)
-                
+
         # the PDFPageInterpreter doesn't handle colors yet, so we patch it here:
         class _Interpreter(PDFPageInterpreter):
             # stroke
@@ -737,19 +742,19 @@ class Drawing(Group):
                 self.device.paint_path(self.graphicstate, self.scs, False, False, self.curpath)
                 self.curpath = []
                 return
-            
+
             # fill
             def do_f(self):
                 self.device.paint_path(self.graphicstate, self.scs, self.ncs, False, self.curpath)
                 self.curpath = []
                 return
-            
+
             # setrgb-stroking
             def do_RG(self, r, g, b):
                 from pdfminer.pdfcolor import LITERAL_DEVICE_RGB
                 self.do_CS(LITERAL_DEVICE_RGB)
                 self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
-                
+
             # setcolor stroking
             def do_sc(self):
                 r,g,b=self.pop(self.scs.ncomponents)
@@ -762,9 +767,9 @@ class Drawing(Group):
                     self.ncs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
                 except:
                     pass
-            
-                
-        #then all we have to do is to launch PDFMiner's parser on the file        
+
+
+        #then all we have to do is to launch PDFMiner's parser on the file
         fp = open(filename, 'rb')
         parser = PDFParser(fp)
         document = PDFDocument(parser, fallback=False)
@@ -775,7 +780,7 @@ class Drawing(Group):
             interpreter.process_page(page)
             break #handle one page only
         return
-            
+
     def read_svg(self,filename, **kwargs):
         #from http://stackoverflow.com/questions/15857818/python-svg-parser
         from xml.dom import minidom
@@ -800,9 +805,9 @@ class Drawing(Group):
             from svg.path import parse_path
             e=Entity.from_svg(parse_path(d),color)
             e=trans*e
-            self.append(e)   
+            self.append(e)
         doc.unlink()
-        
+
     def read_dxf(self, filename, options=None, **kwargs):
         """reads a .dxf file
         :param filename: string path to .dxf file to read
@@ -818,12 +823,12 @@ class Drawing(Group):
             logging.error('could not read %s'%filename)
             return
         self.name = filename
-        
+
         #build dictionary of blocks
-        self.block={} 
+        self.block={}
         for block in self.dxf.blocks:
             self.block[block.name]=Group().from_dxf(block._entities)
-        
+
         super(Drawing, self).from_dxf(
             self.dxf.entities,
             layers=kwargs.get('layers',None),
@@ -832,7 +837,7 @@ class Drawing(Group):
             trans=Trans(),
             recurse=kwargs.get('recurse',True),
         )
-        
+
     def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
         """
         :param size: [x,y] max size of image in pixels. if one coord is None, the other one will be enforced
@@ -842,9 +847,9 @@ class Drawing(Group):
         :param ignore: list of strings of entity types to ignore
         :result: :class:`PIL:Image` rasterized image
         """
-        
+
         from PIL import Image, ImageDraw, ImageFont  # PIL or Pillow
-        
+
         def _draw(entities):
             for e, trans in entities:
                 i = e.color  # color index
@@ -900,22 +905,22 @@ class Drawing(Group):
                         font = ImageFont.load(path + '/base_pil/72/Courier New_%s_72.pil' % h)
                     pt = Point2(e.insert[0], e.insert[1] + e.height)  # ACAD places texts by top left point...
                     draw.text(trans(pt).xy, e.text, font=font, fill=pen)
-                     
-                elif e.dxftype == 'INSERT': 
+
+                elif e.dxftype == 'INSERT':
                     t2 = trans * Trans(1, e.insert[:2], e.rotation)
                     _draw(self.iter(self.blocks[e.name]._entities, layers=None, ignore=ignore, trans=t2))
-                elif e.dxftype == 'BLOCK': 
+                elif e.dxftype == 'BLOCK':
                     pass  # block definition is automatically stored in dxf.blocks dictionary
                 else:
                     logging.warning('Unknown entity %s' % e)
         # img
         if not box:
             box = self.bbox(layers, ignore)
-            
+
         from Goulib.math2 import product
         if not product(box.size().xy):  # either x or y ==0
             return None
-        
+
         s = list(map(operator.div, [float(x - border) * antialias if x else 1E9 for x in size ], box.size().xy))
         trans = Trans(scale=min(s))
         size = trans * box.size() + Point2(2 * antialias * border, 2 * antialias * border)  # add borders as an offset
@@ -923,7 +928,7 @@ class Drawing(Group):
         trans = trans.translate(offset)
         trans = trans.scale(1, -1)  # invert y axis
         trans = trans.translate(0, size.y)  # origin is lower left corner
-        
+
         img = Image.new("RGB", list(map(rint, size.xy)), background)
         draw = ImageDraw.Draw(img)
         _draw(self.iter(layers=layers, ignore=ignore, trans=trans, recurse=False))
@@ -931,10 +936,10 @@ class Drawing(Group):
             size = size / antialias
             img = img.resize(list(map(rint, size.xy)), Image.ANTIALIAS)
         return img
-    
+
     def figure(self,**kwargs):
         """:return: matplotlib axis suitable for drawing """
-        
+
         fig=plt.figure(**kwargs)
 
         box=self.bbox()
@@ -944,49 +949,49 @@ class Drawing(Group):
         except:
             logging.error('drawing is empty')
             raise
-    
+
         plt.axis('equal')
 
         import pylab
         pylab.axis('off') # turn off axis
-    
+
         return fig
-    
+
     def draw(self, fig=None, **kwargs):
         """ draw  entities
         :param fig: matplotlib figure where to draw. figure(g) is called if missing
         :return: fig,patch
         """
-        
-        if fig is None: 
+
+        if fig is None:
             fig=self.figure()
-            
+
         p=self.patches()
-            
+
         from matplotlib.collections import PatchCollection
-            
+
         c=PatchCollection(p,match_original=True)
         plt.gca().add_collection(c)
-                
+
         return fig, p
-    
+
     def render(self,format,**kwargs):
         """ render graph to bitmap stream
         :return: matplotlib figure as a byte stream in specified format
         """
-        
+
         fig,_=self.draw(**kwargs)
-        
+
         from io import BytesIO
         output = BytesIO()
         fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
         plt.close(fig)
         return output.getvalue()
-    
+
     # for IPython notebooks
     def _repr_png_(self): return self.render('png')
     def _repr_svg_(self): return self.render('svg')
-    
+
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
         ext=filename.split('.')[-1].lower()
@@ -994,16 +999,16 @@ class Drawing(Group):
             open(filename,'wb').write(self.render(ext,**kwargs))
             return
         # save as ASCII DXF V 12
-        from dxfwrite import DXFEngine as dxf   
+        from dxfwrite import DXFEngine as dxf
         drawing=dxf.drawing(filename)
         #remove some default tables that we don't need
         drawing.tables.layers.clear()
         drawing.tables.styles.clear()
         drawing.tables.viewports.clear()
         # self.drawing.tables.linetypes.clear()
-        
+
         entities=self.to_dxf(**kwargs)
-    
+
         for e in entities:
             drawing.add(e)
 
@@ -1013,7 +1018,7 @@ class Drawing(Group):
                 self.drawing.add_layer(layer,color=i,linetype=linetypes[i])
         """
         drawing.save()
-            
+
 
 def img2base64(img, fmt='PNG'):
     """
@@ -1027,4 +1032,4 @@ def img2base64(img, fmt='PNG'):
     output.seek(0)
     output_s = output.read()
     return base64.b64encode(output_s)
-    
+
