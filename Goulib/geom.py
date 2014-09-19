@@ -17,7 +17,6 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import operator, six
-_div=operator.truediv if six.PY3 else operator.floordiv #because _div is undefined in Py3
 
 from math import pi,sin,cos,tan,acos,asin,atan2,sqrt
 
@@ -327,15 +326,17 @@ class Vector2(object):
         self.y *= other
         return self
 
+    # geometry requires truediv even in Python 2...
+    
     def __div__(self, other):
         assert type(other) in (int, int, float)
-        return Vector2(_div(self.x, other),
-                       _div(self.y, other))
+        return Vector2(operator.truediv(self.x, other),
+                       operator.truediv(self.y, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, int, float)
-        return Vector2(_div(other, self.x),
-                       _div(other, self.y))
+        return Vector2(operator.truediv(other, self.x),
+                       operator.truediv(other, self.y))
 
     def __floordiv__(self, other):
         assert type(other) in (int, int, float)
@@ -556,19 +557,19 @@ class Vector3(object):
         self.z *= other
         return self
 
+    #geometry requires truediv even in Python2
+    
     def __div__(self, other):
         assert type(other) in (int, int, float)
-        div=operator.truediv if six.PY3 else operator.floordiv #because _div is undefined in Py3
-        return Vector3(_div(self.x, other),
-                       _div(self.y, other),
-                       _div(self.z, other))
-
+        return Vector3(operator.truediv(self.x, other),
+                       operator.truediv(self.y, other),
+                       operator.truediv(self.z, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, int, float)
-        return Vector3(_div(other, self.x),
-                       _div(other, self.y),
-                       _div(other, self.z))
+        return Vector3(operator.truediv(other, self.x),
+                       operator.truediv(other, self.y),
+                       operator.truediv(other, self.z))
 
     def __floordiv__(self, other):
         assert type(other) in (int, int, float)
