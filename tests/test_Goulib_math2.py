@@ -5,6 +5,8 @@ from Goulib.tests import *
 
 from Goulib.math2 import *
 
+import six
+
 class TestSign:
     def test_sign(self):
         assert_equal(sign(0.0001),1)
@@ -23,15 +25,19 @@ class TestProduct(unittest.TestCase):
 
 class TestRint(unittest.TestCase):
     def test_rint(self):
-        assert_equal(rint(0.5),0,places=None)
+        if six.PY2 : #https://docs.python.org/2.7/library/functions.html#round
+            assert_equal(rint(0.5),1,places=None)
+            assert_equal(rint(-0.5),-1,places=None)
+        else: # https://docs.python.org/3.4/library/functions.html#round
+            assert_equal(rint(0.5),0,places=None)
+            assert_equal(rint(-0.5),-0,places=None)
+
         assert_equal(rint(0.50001),1,places=None)
-        assert_equal(rint(-0.5),0,places=None)
         assert_equal(rint(-0.50001),-1,places=None)
 
 
 class TestQuad:
     def test_quad(self):
-        import cmath
         assert_equal(quad(1,3,2),(-1,-2))
         assert_raises(ValueError,quad,1,2,3) #complex results
         assert_equal(sum(quad(1,2,3,allow_complex=True)),-2) #complex results
@@ -117,8 +123,18 @@ class TestVeccompare:
 
 class TestFibonacci:
     def test_fibonacci(self):
-        from Goulib.itertools2 import take
-        assert_equal(take(10,fibonacci()),[0,1,1,2,3,5,8,13,21,34])
+        # https://projecteuler.net/problem=2
+        from itertools import takewhile
+
+        def problem2(n):
+            """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
+            even_fibonacci = (x for x in fibonacci() if x % 2 ==0)
+            l=list(takewhile(lambda x: x < n, even_fibonacci))
+            return sum(l)
+
+        assert_equal(problem2(10),10)
+        assert_equal(problem2(100),44)
+        assert_equal(problem2(4E6),4613732)
 
 class TestIsInteger:
     def test_is_integer(self):
@@ -386,6 +402,16 @@ class TestSlerp:
         assert_equal(slerp(u,v,1),v)
         s=slerp(u,v,0.5)
         assert_equal(s,vecunit((1,1,0)))
+
+class TestLogFactorial:
+    def test_log_factorial(self):
+        # assert_equal(expected, log_factorial(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestLogBinomialCoefficient:
+    def test_log_binomial_coefficient(self):
+        # assert_equal(expected, log_binomial_coefficient(n, k))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
