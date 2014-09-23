@@ -16,7 +16,7 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
-from math import  radians, degrees, atan, pi, copysign
+from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
 import matplotlib
@@ -24,7 +24,7 @@ matplotlib.use("Agg") # Force matplotlib to not use any Xwindows backend (for tr
 import matplotlib.pyplot as plt
 
 from .math2 import rint
-from .geom import *
+from .geom import Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
 from .itertools2 import split
 
 # http://sub-atomic.com/~moses/acadcolors.html
@@ -235,9 +235,17 @@ class Entity(object):
     def to_dxf(self,**attr):
         """:return: dxf entity"""
         import dxfwrite.entities as dxf
+        
         color=self._dxf_color()
         if color>=0:
             attr['color']=color
+            
+        try: 
+            layer=self.layer
+            attr['layer']=layer
+        except:
+            pass
+        
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
         elif isinstance(self,Arc2):
@@ -378,13 +386,22 @@ class Group(list):
     Notice : a Group is NOT an Entity because it cannot be handled as a single geometry
     """
 
-    def append(self,entity):
+    def append(self,entity,**kwargs):
         if entity is not None:
             if isinstance(entity,Entity):
+                for key in kwargs:
+                    setattr(entity, key, kwargs[key])
                 super(Group,self).append(entity)
             else: #ignore invalid items
                 logging.warning('skipped object %s'%entity)
         return self
+    
+    def extend(self,entities,**kwargs):
+        if not kwargs:
+            return super(Group,self).extend(entities)
+
+        for entity in entities:
+            self.append(entity,**kwargs)
 
     def bbox(self):
         """
@@ -676,6 +693,22 @@ class Chain(Group,Entity): #inherit in this order for overloaded methods to work
         if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
+
+class Rect(Chain):
+    """a rectangle starting at low/left and going trigowise through top/right"""
+    def __init__(self,*args):
+        if len(args) == 1: #assume it is a Rect of 4 Segment2
+            p1=Point2(args[0][0].p1)
+            p2=Point2(args[0][2].p1)
+        else:
+            v1,v2 = Point2(args[0]),Point2(args[1])
+            p1=Point2(min(v1.x,v2.x),min(v1.y,v2.y))
+            p2=Point2(max(v1.x,v2.x),max(v1.y,v2.y))
+        self.append(Segment2(p1,(p2.x,p1.y)))
+        self.append(Segment2((p2.x,p1.y),p2))
+        self.append(Segment2(p2,(p1.x,p2.y)))
+        self.append(Segment2((p1.x,p2.y),p1))
+
 
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
