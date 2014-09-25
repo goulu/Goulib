@@ -20,8 +20,6 @@ import random
 import collections
 from functools import reduce
 
-
-
 #reciepes from Python manual
 
 def take(n, iterable):

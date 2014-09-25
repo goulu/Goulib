@@ -83,7 +83,7 @@ def pep8(name):
     return caps.sub(lambda m: '_' + m.groups()[0].lower(), name)
 
 class Dummy(TestCase):
-    def nop():
+    def nop(self):
         pass
 _t = Dummy('nop')
 
