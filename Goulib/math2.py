@@ -264,7 +264,7 @@ def get_primes(start=2, memoized=False):
     return filter(is_prime_fun, count(start))
 
 
-def digits_from_num(num, base=10, reversed=False):
+def digits_from_num(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
     if base==10:
         res=map(int, str(num))
@@ -274,7 +274,7 @@ def digits_from_num(num, base=10, reversed=False):
                 return [num]+current
             return recursive(num//base, base, [num%base]+current)
         res=recursive(num, base, [])
-    if reversed: res.reverse()
+    if rev: res=reversed(res)
     return list(res)
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):

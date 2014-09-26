@@ -162,7 +162,7 @@ class TestStrBase:
 class TestDigitsFromNum:
     def test_digits_from_num(self):
         assert_equal(digits_from_num(1234),[1,2,3,4])
-        assert_equal(digits_from_num(1234, reversed=True),[4,3,2,1])
+        assert_equal(digits_from_num(1234, rev=True),[4,3,2,1])
         assert_equal(digits_from_num(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
 
 class TestNumFromDigits:
