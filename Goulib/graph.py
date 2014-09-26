@@ -208,7 +208,7 @@ class _Geo(object):
         a,b=self.box()
         try:
             a[0],b[0] #at least one dimension ?
-            return tuple(math2.vecsub(a,b))
+            return tuple(math2.vecsub(b,a))
         except:
             return (0,0)
     
