@@ -274,7 +274,7 @@ def digits_from_num(num, base=10, rev=False):
                 return [num]+current
             return recursive(num//base, base, [num%base]+current)
         res=recursive(num, base, [])
-    if rev: res=reversed(res)
+    if rev: res=reversed(list(res))
     return list(res)
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
