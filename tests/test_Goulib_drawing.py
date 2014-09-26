@@ -178,7 +178,7 @@ class TestEntity:
     def test_patches(self):
         # entity = Entity()
         # assert_equal(expected, entity.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGroup:
     @classmethod
@@ -224,17 +224,17 @@ class TestGroup:
     def test_from_dxf(self):
         # group = Group()
         # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, recurse))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_patches(self):
         # group = Group()
         # assert_equal(expected, group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_intersect(self):
         # group = Group()
         # assert_equal(expected, group.intersect(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestChain:
     def test___repr__(self):

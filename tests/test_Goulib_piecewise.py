@@ -119,7 +119,7 @@ class TestPiecewise:
     def test_iapply(self):
         # piecewise = Piecewise(init, default, start)
         # assert_equal(expected, piecewise.iapply(f, right, name))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

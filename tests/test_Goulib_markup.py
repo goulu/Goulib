@@ -165,21 +165,21 @@ class test__oneliner:
     def test___getattr__(self):
         # _oneliner = _oneliner(case)
         # assert_equal(expected, _oneliner.__getattr__(attr))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___init__(self):
         # _oneliner = _oneliner(case)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class test__oneliner:
     def test___getattr__(self):
         # _oneliner = _oneliner(case)
         # assert_equal(expected, _oneliner.__getattr__(attr))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___init__(self):
         # _oneliner = _oneliner(case)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
     runmodule()

@@ -407,12 +407,12 @@ class TestSlerp:
 class TestLogFactorial:
     def test_log_factorial(self):
         # assert_equal(expected, log_factorial(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestLogBinomialCoefficient:
     def test_log_binomial_coefficient(self):
         # assert_equal(expected, log_binomial_coefficient(n, k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

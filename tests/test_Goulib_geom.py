@@ -318,7 +318,7 @@ class TestVector3:
     def test___bool__(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.__bool__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestMatrix3:
     @classmethod

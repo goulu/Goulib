@@ -216,7 +216,7 @@ class TestIter2:
     def test___next__(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.__next__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIflatten:
     def test_iflatten(self):

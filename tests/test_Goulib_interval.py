@@ -107,7 +107,7 @@ class TestInterval:
     def test___eq__(self):
         # interval = Interval(start, end)
         # assert_equal(expected, interval.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestIntervals:
     @classmethod

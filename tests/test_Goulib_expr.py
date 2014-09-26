@@ -126,7 +126,7 @@ class TestExpr:
     def test___eq__(self):
         # expr = Expr(f, left, right, name)
         # assert_equal(expected, expr.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

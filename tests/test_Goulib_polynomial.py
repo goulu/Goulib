@@ -72,12 +72,12 @@ class TestPolynomial:
     def test___eq__(self):
         # polynomial = Polynomial(val)
         # assert_equal(expected, polynomial.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___lt__(self):
         # polynomial = Polynomial(val)
         # assert_equal(expected, polynomial.__lt__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPlist:
     def test_plist(self):
