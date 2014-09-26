@@ -17,7 +17,7 @@ import numpy, scipy.spatial
 import matplotlib.pyplot as plt
 import collections
 
-import Goulib.math2 as math2
+from . import math2
 
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -28,7 +28,7 @@ except: #fallback, especially because I couldn't manage to install rtree on trav
 if not RTREE:
     logging.warning('rtree not available, falling back to slow version')
     from . import itertools2 #lazy import
-    from Goulib import math2
+    
     class index: #mimics rtree.index module
 
         class Property:
@@ -205,10 +205,10 @@ class _Geo(object):
         
     def box_size(self):
         """:return: (x,y) size"""
-        min,max=self.box()
+        a,b=self.box()
         try:
-            min[0],max[0] #at least one dimension ?
-            return tuple(math2.vecsub(max,min))
+            a[0],b[0] #at least one dimension ?
+            return tuple(math2.vecsub(a,b))
         except:
             return (0,0)
     
@@ -419,9 +419,9 @@ class _Geo(object):
         return nx.draw_networkx(self, **kwargs)
         """
     
-    def render(self,format='svg',**kwargs):
+    def render(self,fmt='svg',**kwargs):
         """ render graph to bitmap stream
-        :param format: string defining the format. 'svg' by default for INotepads
+        :param fmt: string defining the format. 'svg' by default for INotepads
         :return: matplotlib figure as a byte stream in specified format
         """
         
@@ -431,7 +431,7 @@ class _Geo(object):
         
         from io import BytesIO
         output = BytesIO()
-        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        fig.savefig(output, format=fmt, transparent=kwargs.get('transparent',True))
         plt.close(fig)
         return output.getvalue()
     
@@ -462,11 +462,11 @@ def figure(g,box=None,**kwargs):
     """:return: matplotlib axis suitable for drawing graph g"""
     fig=plt.figure(**kwargs)
     if box:
-        min,max=box
+        a,b=box
     else:
-        min,max=g.box()
+        a,b=g.box()
     try:
-        plt.plot((min[0],max[0]),(min[1],max[1]),alpha=0) #draw a transparent diagonal to size everything
+        plt.plot((a[0],b[0]),(a[1],b[1]),alpha=0) #draw a transparent diagonal to size everything
     except:
         return None
     plt.axis('equal')
