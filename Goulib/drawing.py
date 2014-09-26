@@ -20,7 +20,11 @@ from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
 import matplotlib
-matplotlib.use("Agg") # Force matplotlib to not use any Xwindows backend (for travis-ci)
+import os
+
+matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend (for travis-ci)
+# matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
+
 import matplotlib.pyplot as plt
 
 from .math2 import rint
@@ -316,8 +320,14 @@ class Entity(object):
             res=Chain.from_dxf(e,trans)
         elif e.dxftype == 'LWPOLYLINE':
             res=Chain.from_dxf(e,trans)
+        elif e.dxftype == 'SOLID':
+            return None #TODO : implement
+        elif e.dxftype == 'POINT':
+            return None #ignore
+        elif e.dxftype == 'TEXT':
+            return None #TODO : implement
         else:
-            logging.debug('unhandled entity type %s'%e.dxftype)
+            logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
         res.color=acadcolors[e.color % len(acadcolors)]
@@ -922,7 +932,8 @@ class Drawing(Group):
                     draw.line(b, fill=pen) # splines are drawn as lines for now...
                 elif e.dxftype == 'TEXT':
                     h = e.height * trans.mag()  # [pixels]
-                    if h < 4: continue  # too small
+                    if h < 4:
+                        continue  # too small
                     font = None
                     try:
                         font = ImageFont.truetype("c:/windows/fonts/Courier New.ttf", h)
@@ -1029,6 +1040,7 @@ class Drawing(Group):
         """ save graph in various formats"""
         ext=filename.split('.')[-1].lower()
         if ext!='dxf':
+            kwargs.setdefault('dpi',600) #force good quality
             open(filename,'wb').write(self.render(ext,**kwargs))
             return
         # save as ASCII DXF V 12
