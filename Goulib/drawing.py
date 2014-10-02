@@ -11,6 +11,7 @@ handle vector graphics in .dxf, .svg and .pdf formats
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
 
 """
+from bokeh.properties import Size
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
@@ -22,7 +23,8 @@ import logging, operator
 import matplotlib
 import os
 
-matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend (for travis-ci)
+if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
+    matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend
 # matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
 
 import matplotlib.pyplot as plt
@@ -48,6 +50,7 @@ def Trans(scale=1, offset=None, rotation=None):
         res = res.scale(scale)
     if offset:
         res = res.translate(offset)
+
     return res
 
 class BBox:
@@ -200,7 +203,6 @@ class Entity(object):
             path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
             return [patches.PathPatch(path, **kwargs)]
 
-            # return Line2D(x,y,**kwargs)
         if isinstance(self,Arc2):
             theta1=degrees(self.a)
             theta2=degrees(self.b)
@@ -239,17 +241,17 @@ class Entity(object):
     def to_dxf(self,**attr):
         """:return: dxf entity"""
         import dxfwrite.entities as dxf
-        
+
         color=self._dxf_color()
         if color>=0:
             attr['color']=color
-            
-        try: 
+
+        try:
             layer=self.layer
             attr['layer']=layer
         except:
             pass
-        
+
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
         elif isinstance(self,Arc2):
@@ -325,7 +327,8 @@ class Entity(object):
         elif e.dxftype == 'POINT':
             return None #ignore
         elif e.dxftype == 'TEXT':
-            return None #TODO : implement
+            p=trans(Point2(e.insert[:2]))
+            res=Text(e.text,p,size=e.height,rotation=e.rotation)
         else:
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
@@ -405,7 +408,7 @@ class Group(list):
             else: #ignore invalid items
                 logging.warning('skipped object %s'%entity)
         return self
-    
+
     def extend(self,entities,**kwargs):
         if not kwargs:
             return super(Group,self).extend(entities)
@@ -453,7 +456,7 @@ class Group(list):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
         patches=[]
         for e in self:
-            patches+=e.patches(**kwargs)
+            patches.extend(e.patches(**kwargs))
         return patches
 
     def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, recurse=True):
@@ -719,6 +722,53 @@ class Rect(Chain):
         self.append(Segment2(p2,(p1.x,p2.y)))
         self.append(Segment2((p1.x,p2.y),p1))
 
+class Text(Point2, Entity):
+
+    def __init__( self, text, point, size=12, rotation=0):
+        """
+        :param text: string
+        :param point: Point2
+        :param size: size in points
+        :param rotation: float angle in degrees trigowise
+        """
+        super(Text,self).__init__(point)
+        self.text=text
+        self.size=size
+        self.rotation=rotation
+
+    def bbox(self):
+        return BBox(self,self)
+
+    def to_dxf(self, **attr):
+        #TODO: avoir duplicating Entity.to_dxf code
+        color=self._dxf_color()
+        if color>=0:
+            attr['color']=color
+
+        try:
+            layer=self.layer
+            attr['layer']=layer
+        except:
+            pass
+
+        from dxfwrite.entities import Text as Text_dxf
+        return Text_dxf(insert=self.xy, text=self.text, height=self.size, **attr)
+
+    def patches(self, **kwargs):
+        """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
+        #http://matplotlib.org/api/text_api.html?highlight=text#module-matplotlib.text
+
+                #entities below may be filled, so let's handle the color first
+        if 'color' in kwargs: # color attribute refers to edgecolor for coherency
+            kwargs.setdefault('edgecolor',kwargs.pop('color'))
+            kwargs.setdefault('fill',False)
+
+        kwargs.setdefault('family','sans-serif')
+
+        from matplotlib.text import Annotation
+        from matplotlib.text import Text as Text_pdf
+
+        return [Text_pdf(self.x,self.y, self.text, size=self.size, rotation=self.rotation,**kwargs)]
 
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
@@ -1010,12 +1060,20 @@ class Drawing(Group):
         if fig is None:
             fig=self.figure()
 
-        p=self.patches()
+        p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
 
-        from matplotlib.collections import PatchCollection
+        from itertools2 import filter2
+        from matplotlib.patches import Patch
+        patches,artists=filter2(p,lambda e:isinstance(e,Patch))
 
-        c=PatchCollection(p,match_original=True)
-        plt.gca().add_collection(c)
+        if patches:
+            from matplotlib.collections import PatchCollection
+            plt.gca().add_collection(PatchCollection(patches,match_original=True))
+
+        if artists:
+            for e in artists:
+                plt.gca().add_artist(e)
+            plt.draw()
 
         return fig, p
 
