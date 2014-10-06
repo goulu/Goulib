@@ -11,7 +11,8 @@ handle vector graphics in .dxf, .svg and .pdf formats
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
 
 """
-from bokeh.properties import Size
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
@@ -32,6 +33,8 @@ import matplotlib.pyplot as plt
 from .math2 import rint
 from .geom import Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
 from .itertools2 import split
+
+from Goulib.geom import Geometry
 
 # http://sub-atomic.com/~moses/acadcolors.html
 # 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
@@ -341,7 +344,7 @@ class Entity(object):
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
 
-class Spline(Entity):
+class Spline(Entity, Geometry):
     """cubic spline segment"""
 
     def __init__(self, points):
@@ -394,9 +397,10 @@ def Spline(pts):
     return Arc2(c,p0,p3)
 '''
 
-class Group(list):
+class Group(list, Geometry):
     """group of Entities
-    Notice : a Group is NOT an Entity because it cannot be handled as a single geometry
+    Notice : a Group is NOT an Entity (I don't remember why...)
+    but it is a Geometry since we can intesect, connect and compute distances between Groups
     """
 
     def append(self,entity,**kwargs):
@@ -437,14 +441,31 @@ class Group(list):
     def intersect(self, other):
         """
         :param other: `geom.Entity`
-        :result: list of tuples (Point2,Entity) of intersections between other and each Entity
+        :result: generate tuples (Point2,Entity) of intersections between other and each Entity
         """
-        res=[]
-        for entity in self:
-            inter=entity.intersect(other)
-            if inter:
-                res.append((inter,entity))
-        return res
+        try:
+            iter(other)
+        except:
+            other=[other]
+        for e in self:
+            for o in other:
+                inter=e.intersect(o)
+                if inter:
+                    inter=e.intersect(o)
+                    yield (inter,e)
+    
+    def connect(self, other):
+        for (inter, _) in self.intersect(other):
+            if isinstance(inter,Point2):
+                return Segment2(inter,inter) #segment of null length
+            if isinstance(inter,Segment2):
+                return Segment2(inter.p,inter.p) #segment of null length
+            raise
+        try:
+            iter(other)
+        except:
+            other=[other]
+        return min((e.connect(o) for e in self for o in other), key=lambda e:e.length)
 
     def swap(self):
         """ swap start and end"""
@@ -711,8 +732,8 @@ class Rect(Chain):
     """a rectangle starting at low/left and going trigowise through top/right"""
     def __init__(self,*args):
         if len(args) == 1: #assume it is a Rect of 4 Segment2
-            p1=Point2(args[0][0].p1)
-            p2=Point2(args[0][2].p1)
+            self.p1=Point2(args[0][0].p1)
+            self.p2=Point2(args[0][2].p1)
         else:
             v1,v2 = Point2(args[0]),Point2(args[1])
             p1=Point2(min(v1.x,v2.x),min(v1.y,v2.y))
@@ -721,6 +742,11 @@ class Rect(Chain):
         self.append(Segment2((p2.x,p1.y),p2))
         self.append(Segment2(p2,(p1.x,p2.y)))
         self.append(Segment2((p1.x,p2.y),p1))
+        self.p1=p1
+        self.p2=p2
+        
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p1,self.p2)
 
 class Text(Point2, Entity):
 

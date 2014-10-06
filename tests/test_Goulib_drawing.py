@@ -236,6 +236,11 @@ class TestGroup:
         # assert_equal(expected, group.intersect(other))
         raise SkipTest 
 
+    def test_extend(self):
+        # group = Group()
+        # assert_equal(expected, group.extend(entities, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     def test___repr__(self):
         # chain = Chain()
@@ -395,6 +400,46 @@ class TestSpline:
         # spline = Spline(points)
         # assert_equal(expected, spline.__copy__())
         raise SkipTest
+
+class TestRect:
+    @classmethod
+    def setup_class(self):
+        # see IPython notebook for graphical examples
+        self.r1=r1=Rect((0,0),(-1,1))
+        self.r2=Rect((1,-1),(2,2))
+        
+    def test___init__(self):
+        pass #tested above
+    
+    def test_connect(self):
+        s1=self.r1.connect(self.r2)
+        assert_equal(s1,Segment2(Point2(0,0),Point2(1,0)))
+        c1=Circle(Point2(4,1),1)
+        s2=self.r2.connect(c1)
+        assert_equal(s2,Segment2(Point2(2,1),Point2(3,1)))
+        
+    def test_distance(self):
+        assert_equal(self.r1.distance(self.r2),1)
+
+class TestText:
+    def test___init__(self):
+        # text = Text(text, point, size, rotation)
+        raise SkipTest # TODO: implement your test here
+
+    def test_bbox(self):
+        # text = Text(text, point, size, rotation)
+        # assert_equal(expected, text.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # text = Text(text, point, size, rotation)
+        # assert_equal(expected, text.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # text = Text(text, point, size, rotation)
+        # assert_equal(expected, text.to_dxf(**attr))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     logging.basicConfig(

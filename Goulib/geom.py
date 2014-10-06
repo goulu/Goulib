@@ -6,6 +6,7 @@ Vector, matrix and quaternion operations + line, arc, circle entities for use in
 based on euclid http://code.google.com/p/pyeuclid by Alex Holkner
 
 """
+from __future__ import division #"true division" everywhere
 
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
@@ -2180,20 +2181,15 @@ def _intersect_line2_circle(L, C):
     sq = sqrt(det)
     u1 = (-b + sq) / (2 * a)
     u2 = (-b - sq) / (2 * a)
-    if not L._u_in(u1):
-        u1 = max(min(u1, 1.0), 0.0)
-    if not L._u_in(u2):
-        u2 = max(min(u2, 1.0), 0.0)
-
-    # Tangent
-    if u1 == u2:
-        return Point2(L.p.x + u1 * L.v.x,
-                      L.p.y + u1 * L.v.y)
-
-    return Segment2(Point2(L.p.x + u1 * L.v.x,
-                               L.p.y + u1 * L.v.y),
-                        Point2(L.p.x + u2 * L.v.x,
-                               L.p.y + u2 * L.v.y))
+    
+    p1 = L.point(u1)
+    p2 = L.point(u2)
+    
+    if p1 is None:
+        return p2
+    if p2 is None:
+        return p1
+    return Segment2(p1,p2)
 
 def _connect_point2_line2(P, L):
     # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
