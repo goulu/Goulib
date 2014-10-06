@@ -810,9 +810,14 @@ class TestRay2:
 class TestSegment2:
     @classmethod
     def setup_class(self):
-        self.s1=Segment2((1,1),Vector2(1,1))
-        self.s2=Segment2((2,2),Point2(-1,-1)) #parallel to l1
+        self.s1=Segment2((1,1),Vector2(1,1)) # (1,1) -> (2,2)
+        self.s2=Segment2((2,2),Point2(-1,-1)) # (2,2) -> (-1,-1) is parallel to s1
         self.s3=Segment2((-1,-1),(-1,1),1) #perpendicular to l1 and l2, normalized
+        
+    def test___repr__(self):
+        assert_equal(repr(self.s1),"Segment2(Point2(1, 1),Point2(2, 2))")
+        assert_equal(repr(self.s2),"Segment2(Point2(2, 2),Point2(-1, -1))")
+        assert_equal(repr(self.s3),"Segment2(Point2(-1, -1),Point2(-1.0, 0.0))")
     
     def test___abs__(self):
         # segment2 = Segment2()
@@ -829,11 +834,12 @@ class TestSegment2:
         assert_equal(inter,None)
         inter=self.s2.intersect(self.s3)
         assert_equal(inter,Point2(-1,-1))
+        
+    def test_distance(self):
+        assert_equal(self.s1.distance(self.s2),0)
+        assert_equal(self.s2.distance(self.s3),0)
+        assert_equal(self.s1.distance(self.s3),2*sqrt(2))
 
-    def test___repr__(self):
-        assert_equal(repr(self.s1),"Segment2(Point2(1, 1),Point2(2, 2))")
-        assert_equal(repr(self.s2),"Segment2(Point2(2, 2),Point2(-1, -1))")
-        assert_equal(repr(self.s3),"Segment2(Point2(-1, -1),Point2(-1.0, 0.0))")
         
     def test_point(self):
         assert_equal(self.s1.point(0),self.s1.p1)

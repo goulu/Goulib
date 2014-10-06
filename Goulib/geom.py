@@ -2216,8 +2216,7 @@ def _connect_line2_line2(A, B):
     if d == 0:
         # Parallel, connect an endpoint with a line
         if isinstance(B, (Ray2,Segment2)):
-            p1, p2 = _connect_point2_line2(B.p, A)
-            return p2, p1
+            return _connect_point2_line2(B.p, A)
         # No endpoint (or endpoint is on A), possibly choose arbitrary point
         # on line.
         return _connect_point2_line2(A.p, B)
