@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 
 from .math2 import rint
 from .geom import Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
-from .itertools2 import split
+from .itertools2 import split, filter2
 
 from Goulib.geom import Geometry
 
@@ -1088,7 +1088,6 @@ class Drawing(Group):
 
         p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
 
-        from itertools2 import filter2
         from matplotlib.patches import Patch
         patches,artists=filter2(p,lambda e:isinstance(e,Patch))
 
