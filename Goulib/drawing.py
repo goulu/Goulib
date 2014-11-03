@@ -30,11 +30,10 @@ if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests 
 
 import matplotlib.pyplot as plt
 
-from .math2 import rint
-from .geom import Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
+from .math2 import rint, product
+from .geom import Geometry,Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
 from .itertools2 import split, filter2
 
-from Goulib.geom import Geometry
 
 # http://sub-atomic.com/~moses/acadcolors.html
 # 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
@@ -196,35 +195,6 @@ class Entity(object):
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
 
-    def patches(self, **kwargs):
-        """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
-        import matplotlib.patches as patches
-        from matplotlib.path import Path
-
-        kwargs.setdefault('color',self.color)
-        if isinstance(self,Segment2):
-            path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
-            return [patches.PathPatch(path, **kwargs)]
-
-        if isinstance(self,Arc2):
-            theta1=degrees(self.a)
-            theta2=degrees(self.b)
-            if self.dir<1 : #swap
-                theta1,theta2=theta2,theta1
-            d=self.r*2
-            return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
-
-        #entities below may be filled, so let's handle the color first
-        if 'color' in kwargs: # color attribute refers to edgecolor for coherency
-            kwargs.setdefault('edgecolor',kwargs.pop('color'))
-            kwargs.setdefault('fill',False)
-        if isinstance(self,Circle): #must be after isinstance(self,Arc2)
-            return [patches.Circle(self.c.xy,self.r,**kwargs)]
-        if isinstance(self,Spline):
-            path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
-            return [patches.PathPatch(path, **kwargs)]
-        raise NotImplementedError
-
     def _dxf_color(self):
         from .colors import color_lookup
         try:
@@ -339,6 +309,100 @@ class Entity(object):
         res.color=acadcolors[e.color % len(acadcolors)]
         res.layer=e.layer
         return res
+    
+    def patches(self, **kwargs):
+        """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity
+        this is the only method that needs to be overridden in descendants for draw, render and IPython _repr_xxx_ to work
+        """
+        import matplotlib.patches as patches
+        from matplotlib.path import Path
+
+        kwargs.setdefault('color',self.color)
+        if isinstance(self,Segment2):
+            path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
+            return [patches.PathPatch(path, **kwargs)]
+
+        if isinstance(self,Arc2):
+            theta1=degrees(self.a)
+            theta2=degrees(self.b)
+            if self.dir<1 : #swap
+                theta1,theta2=theta2,theta1
+            d=self.r*2
+            return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
+
+        #entities below may be filled, so let's handle the color first
+        if 'color' in kwargs: # color attribute refers to edgecolor for coherency
+            kwargs.setdefault('edgecolor',kwargs.pop('color'))
+            kwargs.setdefault('fill',False)
+        if isinstance(self,Circle): #must be after isinstance(self,Arc2)
+            return [patches.Circle(self.c.xy,self.r,**kwargs)]
+        if isinstance(self,Spline):
+            path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+            return [patches.PathPatch(path, **kwargs)]
+        raise NotImplementedError
+    
+    @staticmethod
+    def figure(entity,**kwargs):
+        """:return: matplotlib axis suitable for drawing """
+
+        fig=plt.figure(**kwargs)
+
+        box=entity.bbox()
+        #for some reason we have to plot something in order to size the window (found no other way top do it...)
+        try:
+            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
+        except:
+            logging.error('drawing is empty')
+            raise
+
+        plt.axis('equal')
+
+        import pylab
+        pylab.axis('off') # turn off axis
+
+        return fig
+    
+    def draw(self, fig=None, **kwargs):
+        """ draw  entities
+        :param fig: matplotlib figure where to draw. figure(g) is called if missing
+        :return: fig,patch
+        """
+
+        if fig is None:
+            fig=self.figure(self)
+
+        p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
+
+        from matplotlib.patches import Patch
+        patches,artists=filter2(p,lambda e:isinstance(e,Patch))
+
+        if patches:
+            from matplotlib.collections import PatchCollection
+            plt.gca().add_collection(PatchCollection(patches,match_original=True))
+
+        if artists:
+            for e in artists:
+                plt.gca().add_artist(e)
+            plt.draw()
+
+        return fig, p
+    
+    def render(self,format,**kwargs):
+        """ render graph to bitmap stream
+        :return: matplotlib figure as a byte stream in specified format
+        """
+
+        fig,_=self.draw(**kwargs)
+
+        from io import BytesIO
+        output = BytesIO()
+        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        plt.close(fig)
+        return output.getvalue()
+
+    # for IPython notebooks
+    def _repr_png_(self): return self.render('png')
+    def _repr_svg_(self): return self.render('svg')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Segment2.__bases__ += (Entity,)
@@ -397,7 +461,7 @@ def Spline(pts):
     return Arc2(c,p0,p3)
 '''
 
-class Group(list, Geometry):
+class Group(list, Entity, Geometry):
     """group of Entities
     Notice : a Group is NOT an Entity (I don't remember why...)
     but it is a Geometry since we can intesect, connect and compute distances between Groups
@@ -1037,7 +1101,6 @@ class Drawing(Group):
         if not box:
             box = self.bbox(layers, ignore)
 
-        from Goulib.math2 import product
         if not product(box.size().xy):  # either x or y ==0
             return None
 
@@ -1056,68 +1119,6 @@ class Drawing(Group):
             size = size / antialias
             img = img.resize(list(map(rint, size.xy)), Image.ANTIALIAS)
         return img
-
-    def figure(self,**kwargs):
-        """:return: matplotlib axis suitable for drawing """
-
-        fig=plt.figure(**kwargs)
-
-        box=self.bbox()
-        #for some reason we have to plot something in order to size the window (found no other way top do it...)
-        try:
-            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
-        except:
-            logging.error('drawing is empty')
-            raise
-
-        plt.axis('equal')
-
-        import pylab
-        pylab.axis('off') # turn off axis
-
-        return fig
-
-    def draw(self, fig=None, **kwargs):
-        """ draw  entities
-        :param fig: matplotlib figure where to draw. figure(g) is called if missing
-        :return: fig,patch
-        """
-
-        if fig is None:
-            fig=self.figure()
-
-        p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
-
-        from matplotlib.patches import Patch
-        patches,artists=filter2(p,lambda e:isinstance(e,Patch))
-
-        if patches:
-            from matplotlib.collections import PatchCollection
-            plt.gca().add_collection(PatchCollection(patches,match_original=True))
-
-        if artists:
-            for e in artists:
-                plt.gca().add_artist(e)
-            plt.draw()
-
-        return fig, p
-
-    def render(self,format,**kwargs):
-        """ render graph to bitmap stream
-        :return: matplotlib figure as a byte stream in specified format
-        """
-
-        fig,_=self.draw(**kwargs)
-
-        from io import BytesIO
-        output = BytesIO()
-        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
-        plt.close(fig)
-        return output.getvalue()
-
-    # for IPython notebooks
-    def _repr_png_(self): return self.render('png')
-    def _repr_svg_(self): return self.render('svg')
 
     def save(self,filename,**kwargs):
         """ save graph in various formats"""

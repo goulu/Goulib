@@ -305,7 +305,8 @@ class TestDrawing:
         self.simple=Drawing(data=[seg,arc,circle])
 
     def test_load(self):
-        pass #tested above
+        cube=Drawing(self.path+'/cubeecraft_template.pdf')
+        cube.save(self.path+'/cubeecraft.dxf')
 
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
@@ -315,8 +316,7 @@ class TestDrawing:
 
 
     def test___init__(self):
-        # drawing = Drawing(filename, options, **kwargs)
-        raise SkipTest
+        pass # tested above
 
     def test_bbox(self):
         # drawing = Drawing(filename, options, **kwargs)
