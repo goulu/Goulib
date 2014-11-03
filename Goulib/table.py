@@ -24,8 +24,8 @@ except: #ElementTree
     
 Element=ElementTree._Element
 
-from Goulib.datetime2 import datef, datetimef,strftimedelta
-from Goulib.markup import tag
+from .datetime2 import datef, datetimef,strftimedelta
+from .markup import tag
 
 def attr(args):
     res=''
@@ -299,24 +299,33 @@ class Table(list):
         
     def read_csv(self, filename, **kwargs):
         """appends a .csv or similar file to the table"""
-        titles_line=kwargs.get('titles_line',1)-1
-        data_line=kwargs.get('data_line',2)-1
-        dialect=kwargs.get('dialect','excel')
-        delimiter=kwargs.get('delimiter',b';')
-        encoding=kwargs.get('encoding','iso-8859-15')
-        #reader = csv.reader(codecs.open(filename, 'rb', encoding, errors='ignore'), dialect=dialect, delimiter=delimiter)
-        reader = open(filename,'rb') 
+        titles_line=kwargs.pop('titles_line',1)-1
+        data_line=kwargs.pop('data_line',2)-1
+        dialect=kwargs.setdefault('dialect',csv.excel)
+        delimiter=kwargs.setdefault('delimiter',b';')
+        encoding=kwargs.pop('encoding','iso-8859-15')
+        errors=kwargs.pop('errors','strict')
+        
+        def csv_reader(data, **kwargs):
+            csv_reader = csv.reader(data, **kwargs)
+            for row in csv_reader:
+                yield [unicode(cell, encoding) for cell in row]
+        
+        reader = csv_reader(codecs.open(filename, 'rb', errors=errors), **kwargs)
+        # reader = open(filename,'rb') 
         for i,row in enumerate(reader):
+            """old code. was it useful ?
             row=row.replace(b'\x00',b'') # avoid NULLs from from .XLS saved as .CSV
             row=row.rstrip(b'\r\n')
             row=row.split(delimiter)
             if encoding:
                 row=[x.decode(encoding) for x in row]
+            """
             if i==titles_line: #titles can have no left/right spaces
                 self.titles=[Cell.read(x) for x in row]
             elif i>=data_line:
                 line=[Cell.read(x) for x in row]
-                if line!=[None]: #strange last line ...
+                if line!=[None]: #strange last line sometimes ...
                     self.append(line)
         return self
             
