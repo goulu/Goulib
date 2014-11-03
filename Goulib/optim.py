@@ -8,11 +8,9 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["http://www.psychicorigami.com/category/tsp/",]
 __license__ = "LGPL"
 
-import random
-import math
-import logging
+import logging, math, random
 
-import Goulib.itertools2 as itertools2
+from .itertools2 import all_pairs
 
 class _Bin():
     def __init__(self, capacity, f=lambda x:x):
@@ -305,7 +303,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,start_
 
 def reversed_sections(tour):
     '''generator to return all possible variations where the section between two cities are swapped'''
-    for i,j in itertools2.all_pairs(len(tour)):
+    for i,j in all_pairs(len(tour)):
         if i and j and i < j:
             copy=tour[:]
             copy[i:j+1]=reversed(tour[i:j+1])
@@ -313,7 +311,7 @@ def reversed_sections(tour):
 
 def swapped_cities(tour):
     '''generator to create all possible variations where two cities have been swapped'''
-    for i,j in itertools2.all_pairs(len(tour)):
+    for i,j in all_pairs(len(tour)):
         if i < j:
             copy=tour[:]
             copy[i],copy[j]=tour[j],tour[i]
@@ -328,7 +326,7 @@ def tour_length(points,dist,tour=None):
         yield dist(points[tour[i]],points[tour[j]])
 
 def tsp(points,dist,max_iterations=100,start_temp=None,alpha=None,close=True,rand=True):
-    """Travelling Salesman Problem
+    """Traveling Salesman Problem
     @see http://en.wikipedia.org/wiki/Travelling_salesman_problem
     @param points : iterable containing all points
     @param dist : function returning the distance between 2 points : def dist(a,b):
