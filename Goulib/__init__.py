@@ -9,4 +9,4 @@ for various projects
 Project location : https://github.com/goulu/goulib
 """
 
-__version__ = '1.8.2'
+__version__ = '1.8.3'
