@@ -9,11 +9,7 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
 __license__ = "LGPL"
 
-import logging
-import six
-
-import math
-import Goulib.math2
+import logging, six, math
 
 def mean(data):
     """:return: mean of data"""
@@ -76,22 +72,22 @@ def stats(l):
     lo=float("inf")
     hi=float("-inf")
     n=0
-    sum=0. #must be float
+    sum1=0. #must be float
     sum2=0. #must be float
     for i in l:
         if i is not None:
             n+=1
-            sum+=i
+            sum1+=i
             sum2+=i*i
             if i<lo:lo=i
             if i>hi:hi=i
     if n>0:
-        avg=sum/n
+        avg=sum1/n
         var=sum2/n-avg*avg #mean of square minus square of mean
     else:
         avg=None
         var=None
-    return lo,hi,sum,sum2,avg,var
+    return lo,hi,sum1,sum2,avg,var
 
 def linear_regression(x, y, conf=None):
     """
