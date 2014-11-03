@@ -23,8 +23,19 @@ class TestGeoGraph:
         nodes=points_on_sphere(50)
         self.sphere=GeoGraph(nodes=nodes) #test if we can construct from nodes only
         self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
+        
+        try:
+            from pygraphviz import AGraph
+        except:
+            self.crazy=None
+            return #skip AGraph tests as pygraphviz is an optional requirement
+        a=AGraph(path+'/crazy.dot')
+        self.crazy=GeoGraph(a)
                     
     def test_save(self):
+        
+        #complex AGraph
+        self.crazy.save(path+'/crazy.png', transparent=False)
         
         import matplotlib.pyplot as plt
         #define a function that maps edge data to a color
@@ -35,6 +46,9 @@ class TestGeoGraph:
         
         #3D graph
         self.sphere.save(path+'/sphere.png', transparent=False)
+        
+
+
         
     def test_render(self):
         pass #tested above

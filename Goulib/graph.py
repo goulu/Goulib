@@ -9,16 +9,15 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import logging
-import math
+import logging, math, six
 
 import networkx as nx # http://networkx.github.io/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
-import collections
+from pygraphviz import AGraph
 
 from . import math2
-
+    
 try:
     from rtree import index # http://toblerity.org/rtree/
     RTREE=True
@@ -78,17 +77,6 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         return create_using
     elif isinstance(data,nx.Graph): 
         if isinstance(create_using,GeoGraph):
-            def _map(k):
-                return tuple(data.node[k]['pos'])
-            try: # rename nodes with node['pos'] attribute if any
-                for k in data.node: #create nodes
-                    create_using.add_node(_map(k),attr_dict=data.node[k])
-                for u,v,d in data.edges(data=True):
-                    create_using.add_edge(_map(u),_map(v),attr_dict=d)
-                return create_using
-            except:
-                pass
-            #retry without mapping function TODO:rewrite more compactly pythonic...
             for k in data.node: #create nodes
                 create_using.add_node(k,attr_dict=data.node[k])
             for u,v,d in data.edges(data=True):
@@ -113,7 +101,13 @@ class _Geo(object):
         self.parent=parent 
         self.idx=None # index is created at first call to add_node
         
+        self._map={} #map from original node name to position for AGraph and other graphs were 'pos' is a node attribute
+        
         if data:
+            if isinstance(data,AGraph):
+                if not getattr(data,'has_layout',False):
+                    data.layout()
+                
             to_networkx_graph(data,self)
         elif nodes:
             for node in nodes:
@@ -259,6 +253,25 @@ class _Geo(object):
     def add_node(self, p, attr_dict=None, **attr):
         """add a node or return one already very close
         """
+        if type(p) is not tuple:
+            if p in self._map:
+                return self._map[p]
+            a={} 
+            if attr_dict : 
+                a.update(**attr_dict)
+            if attr :
+                a.update(**attr)
+
+            try:
+                n=p
+                p=a['pos']
+                if isinstance(p,six.string_types): # string ?
+                    p=map(float,p.split(','))
+                p=tuple(p)
+                self._map[n]=p
+            except:
+                pass
+            
         if self.idx is None: #now we know the dimension, so we can create the index
             n=len(p)
             prop=index.Property()
@@ -325,6 +338,10 @@ class _Geo(object):
         side effect: updates largest merge in self.max_merge
         """
         
+        #adjust to existing nodes within tolerance and keep track of actual precision
+        u=self.add_node(u)
+        v=self.add_node(v)
+        
         #attr and kwargs will be merged and copied here. 
         #this is important because we want to handle the 
         #length parameter separately for each edge
@@ -344,10 +361,7 @@ class _Geo(object):
                 return data #return existing edge data
             else:
                 pass #and add the edge normally below
-            
-        #adjust to existing nodes within tolerance and keep track of actual precision
-        u=self.add_node(u)
-        v=self.add_node(v)
+
         
         #if no length is explicitely defined, we calculate it and set it as parameter
         #therefore all edges in a GeoGraph have a length attribute
@@ -383,12 +397,13 @@ class _Geo(object):
             if self.degree(v)==0:
                 self.remove_node(v)
                 
-    def number_of_nodes(self):
+    def number_of_nodes(self,doublecheck=False):
         #check that both structures are coherent at the same time
         n1=self.parent.number_of_nodes(self)   
-        n2=self.idx.count(self.idx.bounds) if n1 else 0
-        if n1!=n2:
-            raise KeyError('%s %s number of nodes %d!=%d'%(self.__class__.__name__, self.name, n1,n2))
+        if doublecheck:
+            n2=self.idx.count(self.idx.bounds) if n1 else 0
+            if n1!=n2:
+                raise KeyError('%s %s number of nodes %d!=%d'%(self.__class__.__name__, self.name, n1,n2))
         return n1
     
     def stats(self):
@@ -492,7 +507,7 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     
     #build node positions
     
-    if isinstance(pos, collections.Callable): #mapping function
+    if six.callable(pos): #mapping function
         pos=dict(((node,pos(node)) for node in g.nodes_iter()))
     
     if pos is None:
@@ -528,7 +543,7 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
             c=data.get('color',default)
             return c if c else default
         
-    if isinstance(edge_color, collections.Callable): #mapping function ?
+    if six.callable(edge_color): #mapping function ?
         edge_color=list(map(edge_color,(data for u,v,data in edgelist)))
             
     if edge_color: #not empty

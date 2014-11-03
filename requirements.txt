@@ -6,6 +6,7 @@ dxfwrite
 svg.path
 pdfminer.six
 pillow
+pygraphviz
 networkx
 matplotlib
 numpy
