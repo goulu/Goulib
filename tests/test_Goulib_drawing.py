@@ -305,6 +305,7 @@ class TestDrawing:
         self.simple=Drawing(data=[seg,arc,circle])
 
     def test_load(self):
+        return
         cube=Drawing(self.path+'/cubeecraft_template.pdf')
         cube.save(self.path+'/cubeecraft.dxf')
 
