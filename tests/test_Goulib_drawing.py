@@ -7,6 +7,8 @@ import os, sys
 from Goulib.geom import *
 from Goulib.drawing import *
 
+path=os.path.dirname(os.path.abspath(__file__))
+
 class TestTrans:
     def test_trans(self):
         assert_equal(Trans(), Matrix3.new(1,0,0, 0,1,0, 0,0,1))
@@ -180,6 +182,26 @@ class TestEntity:
         # assert_equal(expected, entity.patches(**kwargs))
         raise SkipTest 
 
+    def test___copy__(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.__copy__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_draw(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.draw(fig, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_figure(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.figure(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_render(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.render(format, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestGroup:
     @classmethod
     def setup_class(self):
@@ -187,58 +209,29 @@ class TestGroup:
         arc=Arc2((1,1),(0,0),radians(120))
         circle=Circle((1,1),2)
         self.group=Group([seg,arc,circle])
-
-    def test___copy__(self):
-        # group = Group()
-        # assert_equal(expected, group.__copy__())
-        raise SkipTest
-
-    def test_bbox(self):
-        # group = Group()
-        # assert_equal(expected, group.bbox())
-        raise SkipTest
-
-    def test_length(self):
-        # group = Group()
-        # assert_equal(expected, group.length())
-        raise SkipTest
-
-    def test_artist(self):
-        # group = Group()
-        # assert_equal(expected, group.artist(ax, **kwargs))
-        raise SkipTest
-
-    def test_swap(self):
-        # group = Group()
-        # assert_equal(expected, group.swap())
-        raise SkipTest
+        
+        self.dxf= Drawing(path+'/Homer_Simpson_by_CyberDrone.dxf')
+        self.blocks= self.dxf.block
+        assert_true('hand 1' in self.blocks)
 
     def test_append(self):
-        pass #tested in TestDrawing.test_render
-
-    def test_to_dxf(self):
         # group = Group()
-        # assert_equal(expected, group.to_dxf(**attr))
-        raise SkipTest
-
-    def test_from_dxf(self):
-        # group = Group()
-        # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, recurse))
-        raise SkipTest 
-
-    def test_patches(self):
-        # group = Group()
-        # assert_equal(expected, group.patches(**kwargs))
-        raise SkipTest 
-
-    def test_intersect(self):
-        # group = Group()
-        # assert_equal(expected, group.intersect(other))
-        raise SkipTest 
+        # assert_equal(expected, group.append(entity, **kwargs))
+        raise SkipTest # TODO: implement your test here
 
     def test_extend(self):
         # group = Group()
         # assert_equal(expected, group.extend(entities, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_from_dxf(self):
+        # group = Group()
+        # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, flatten))
+        raise SkipTest # TODO: implement your test here
+
+    def test_swap(self):
+        # group = Group()
+        # assert_equal(expected, group.swap())
         raise SkipTest # TODO: implement your test here
 
 class TestChain:
@@ -294,10 +287,9 @@ class TestChain:
 class TestDrawing:
     @classmethod
     def setup_class(self):
-        self.path=os.path.dirname(os.path.abspath(__file__))
-        self.dxf= Drawing(self.path+'/drawing.dxf')
-        self.svg= Drawing(self.path+'/drawing.svg')
-        self.pdf= Drawing(self.path+'/drawing.pdf')
+        self.dxf= Drawing(path+'/drawing.dxf')
+        self.svg= Drawing(path+'/drawing.svg')
+        self.pdf= Drawing(path+'/drawing.pdf')
 
         seg=Segment2((1,0),(2,3))
         arc=Arc2((1,1),(0,0),radians(120))
@@ -306,14 +298,14 @@ class TestDrawing:
 
     def test_load(self):
         return
-        cube=Drawing(self.path+'/cubeecraft_template.pdf')
-        cube.save(self.path+'/cubeecraft.dxf')
+        cube=Drawing(path+'/cubeecraft_template.pdf')
+        cube.save(path+'/cubeecraft.dxf')
 
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
-            self.svg.save(self.path+'/drawing.svg.%s'%ext)
-            self.dxf.save(self.path+'/drawing.dxf.%s'%ext)
-            self.pdf.save(self.path+'/drawing.pdf.%s'%ext)
+            self.svg.save(path+'/drawing.svg.%s'%ext)
+            self.dxf.save(path+'/drawing.dxf.%s'%ext)
+            self.pdf.save(path+'/drawing.pdf.%s'%ext)
 
 
     def test___init__(self):
@@ -422,6 +414,11 @@ class TestRect:
     def test_distance(self):
         assert_equal(self.r1.distance(self.r2),1)
 
+    def test___repr__(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.__repr__())
+        raise SkipTest # TODO: implement your test here
+
 class TestText:
     def test___init__(self):
         # text = Text(text, point, size, rotation)
@@ -440,6 +437,52 @@ class TestText:
     def test_to_dxf(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.to_dxf(**attr))
+        raise SkipTest # TODO: implement your test here
+
+class test__Group:
+    def test_bbox(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_connect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.connect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.to_dxf(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestInstance:
+    def test___init__(self):
+        # instance = Instance(group, trans, name)
+        raise SkipTest # TODO: implement your test here
+
+    def test___iter__(self):
+        # instance = Instance(group, trans, name)
+        # assert_equal(expected, instance.__iter__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # instance = Instance(group, trans, name)
+        # assert_equal(expected, instance.__repr__())
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":

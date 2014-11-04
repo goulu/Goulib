@@ -162,6 +162,11 @@ class Entity(object):
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.start,self.end)
+    
+    def __copy__(self):
+        return self.__class__(self)
+
+    copy = __copy__
 
     @property
     def center(self):
@@ -416,11 +421,6 @@ class Spline(Entity, Geometry):
         super(Spline,self).__init__()
         self.p=[Point2(xy) for xy in points]
 
-    def __copy__(self):
-        return self.__class__(self.p)
-
-    copy = __copy__
-
     @property
     def start(self):
         return self.p[0]
@@ -460,30 +460,8 @@ def Spline(pts):
     c=Point2(p0)-t0.cross()
     return Arc2(c,p0,p3)
 '''
-
-class Group(list, Entity, Geometry):
-    """group of Entities
-    Notice : a Group is NOT an Entity (I don't remember why...)
-    but it is a Geometry since we can intesect, connect and compute distances between Groups
-    """
-
-    def append(self,entity,**kwargs):
-        if entity is not None:
-            if isinstance(entity,Entity):
-                for key in kwargs:
-                    setattr(entity, key, kwargs[key])
-                super(Group,self).append(entity)
-            else: #ignore invalid items
-                logging.warning('skipped object %s'%entity)
-        return self
-
-    def extend(self,entities,**kwargs):
-        if not kwargs:
-            return super(Group,self).extend(entities)
-
-        for entity in entities:
-            self.append(entity,**kwargs)
-
+class _Group(Entity, Geometry):
+    """ abstract class for iterable Entities"""
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
@@ -492,16 +470,7 @@ class Group(list, Entity, Geometry):
     @property
     def length(self):
         return sum((entity.length for entity in self))
-
-    def __copy__(self):
-        return self.__class__(self)
-
-    copy = __copy__
-
-    def _apply_transform(self,trans):
-        for entity in self:
-            entity._apply_transform(trans)
-
+    
     def intersect(self, other):
         """
         :param other: `geom.Entity`
@@ -530,6 +499,49 @@ class Group(list, Entity, Geometry):
         except:
             other=[other]
         return min((e.connect(o) for e in self for o in other), key=lambda e:e.length)
+    
+    def patches(self, **kwargs):
+        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
+        patches=[]
+        for e in self:
+            patches.extend(e.patches(**kwargs))
+        return patches
+    
+    def to_dxf(self, **kwargs):
+        """:return: flatten list of dxf entities"""
+        res=[]
+        for e in self:
+            r=e.to_dxf(**kwargs)
+            if not isinstance(r,list): #flatten
+                r=[r]
+            res+=r
+        return res
+
+class Group(list, _Group):
+    """group of Entities
+    but it is a Geometry since we can intersect, connect and compute distances between Groups
+    """
+
+    def append(self,entity,**kwargs):
+        if entity is not None:
+            if isinstance(entity,Entity):
+                for key in kwargs:
+                    setattr(entity, key, kwargs[key])
+                super(Group,self).append(entity)
+            else: #ignore invalid items
+                logging.warning('skipped object %s'%entity)
+        return self
+
+    def extend(self,entities,**kwargs):
+        if not kwargs:
+            return super(Group,self).extend(entities)
+
+        for entity in entities:
+            self.append(entity,**kwargs)
+
+    def _apply_transform(self,trans):
+        for entity in self:
+            entity._apply_transform(trans)
 
     def swap(self):
         """ swap start and end"""
@@ -537,14 +549,7 @@ class Group(list, Entity, Geometry):
         for e in self:
             e.swap()
 
-    def patches(self, **kwargs):
-        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
-        patches=[]
-        for e in self:
-            patches.extend(e.patches(**kwargs))
-        return patches
-
-    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, recurse=True):
+    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, flatten=False):
         """
         :param dxf: dxf.entity
         :return: Entity of correct subtype
@@ -569,23 +574,30 @@ class Group(list, Entity, Geometry):
                 continue
             elif e.dxftype == 'INSERT':
                 t2 = trans*Trans(1, e.insert[:2], e.rotation)
-                if recurse:
-                    self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, recurse=recurse)
+                if flatten:
+                    self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, flatten=flatten)
                 else:
-                    raise NotImplementedError() #TODO add
+                    self.append(Instance(self.block[e.name],t2, name=e.name))
             else:
                 self.append(Entity.from_dxf(e, trans))
         return self
-
-    def to_dxf(self, **kwargs):
-        """:return: flatten list of dxf entities"""
-        res=[]
-        for e in self:
-            r=e.to_dxf(**kwargs)
-            if not isinstance(r,list): #flatten
-                r=[r]
-            res+=r
-        return res
+    
+class Instance(_Group):
+    def __init__(self, group, trans, name=''):
+        """
+        :param group: `Group` (or block)
+        :param trans: `Matrix3` transform
+        """
+        self.group=group
+        self.trans=trans
+        self.name=name
+        
+    def __repr__(self):
+        return '%s %s' % (self.__class__.__name__, self.name)
+        
+    def __iter__(self):
+        for e in self.group:
+            yield self.trans*e
 
 class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
     """ group of contiguous Entities (Polyline or similar)"""
@@ -1018,7 +1030,7 @@ class Drawing(Group):
             only=kwargs.get('only',[]),
             ignore=kwargs.get('only',[]),
             trans=Trans(),
-            recurse=kwargs.get('recurse',True),
+            flatten=kwargs.get('flatten',False),
         )
 
     def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
@@ -1114,7 +1126,7 @@ class Drawing(Group):
 
         img = Image.new("RGB", list(map(rint, size.xy)), background)
         draw = ImageDraw.Draw(img)
-        _draw(self.iter(layers=layers, ignore=ignore, trans=trans, recurse=False))
+        _draw(self.iter(layers=layers, ignore=ignore, trans=trans, flatten=False))
         if antialias > 1:
             size = size / antialias
             img = img.resize(list(map(rint, size.xy)), Image.ANTIALIAS)
