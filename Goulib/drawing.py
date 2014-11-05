@@ -25,13 +25,13 @@ import matplotlib
 import os
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
-    matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend
+    matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
 # matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
 
 import matplotlib.pyplot as plt
 
 from .math2 import rint, product
-from .geom import Geometry,Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
+from .geom import copy, Geometry,Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
 from .itertools2 import split, filter2
 
 
@@ -148,6 +148,14 @@ class Entity(object):
     """Base class for all drawing entities"""
 
     color='black' #default color
+    layer=None
+    dxf=None
+    
+    def copy_attrs_from(self,other):
+        """copy attributes that are lost in geom copy operations, typically in math operations"""
+        self.color=other.color
+        self.layer=other.layer
+        self.dxf=other.dxf
 
     @property
     def start(self):
@@ -162,11 +170,6 @@ class Entity(object):
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.start,self.end)
-    
-    def __copy__(self):
-        return self.__class__(self)
-
-    copy = __copy__
 
     @property
     def center(self):
@@ -465,7 +468,7 @@ class _Group(Entity, Geometry):
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
-        return sum((entity.bbox() for entity in self), BBox())
+        return sum((entity.bbox() for entity in self), BBox())              
 
     @property
     def length(self):
@@ -538,6 +541,12 @@ class Group(list, _Group):
 
         for entity in entities:
             self.append(entity,**kwargs)
+            
+    def __copy__(self):
+        res=self.__class__()
+        for e in self:
+            res.append(copy(e))
+        return res
 
     def _apply_transform(self,trans):
         for entity in self:
@@ -557,10 +566,7 @@ class Group(list, _Group):
         if trans is None:
             trans=Trans()
 
-        try:
-            self.dxf #already defined ?
-        except:
-            self.dxf=dxf
+        self.dxf=dxf
 
         for e in dxf:
             if layers and e.layer not in layers:
@@ -577,27 +583,43 @@ class Group(list, _Group):
                 if flatten:
                     self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, flatten=flatten)
                 else:
-                    self.append(Instance(self.block[e.name],t2, name=e.name))
+                    self.append(Instance.from_dxf(e, self.block, t2))
             else:
                 self.append(Entity.from_dxf(e, trans))
         return self
     
 class Instance(_Group):
-    def __init__(self, group, trans, name=''):
+    
+    @staticmethod
+    def from_dxf(e, blocks, mat3):
         """
-        :param group: `Group` (or block)
-        :param trans: `Matrix3` transform
+        :param e: dxf.entity
+        :param blocks: dict of Groups indexed by name
+        :param mat3: Matrix3 transform
         """
-        self.group=group
-        self.trans=trans
-        self.name=name
+        res=Instance()
+        res.name=e.name
+        res.group=blocks[e.name]
+        res.trans=mat3
+        res.p=Point2(e.insert[:2])
+        # code below copied from Entity.from_dxf. TODO : merge
+        res.dxf=e #keep link to source entity
+        res.color=acadcolors[e.color % len(acadcolors)]
+        res.layer=e.layer
+        return res
         
     def __repr__(self):
         return '%s %s' % (self.__class__.__name__, self.name)
         
     def __iter__(self):
+        #TODO : optimize when trans is identity
         for e in self.group:
-            yield self.trans*e
+            res=self.trans*e
+            # res.copy_attrs_from(e)
+            yield res
+            
+    def _apply_transform(self,trans):
+        self.trans=trans*self.trans
 
 class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
     """ group of contiguous Entities (Polyline or similar)"""

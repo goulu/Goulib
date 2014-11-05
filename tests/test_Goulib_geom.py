@@ -102,8 +102,9 @@ class TestVector2:
         assert_false(self.v00)
         
     def test___copy__(self):
-        assert_true(self.v10.copy()==self.v10)
-        assert_false(self.v10.copy()==self.v01)
+        v10 = copy(self.v10)
+        assert_true(v10==self.v10)
+        assert_false(v10 is self.v10) #copy is a deepcopy
         
     def test_mag2(self):
         assert_equal(self.v11.mag2(), 2)
@@ -116,7 +117,7 @@ class TestVector2:
         assert_equal(abs(self.v11.normalized()),1)
         
     def test_normalize(self):
-        v=self.v11.copy()
+        v=copy(self.v11)
         v.normalize()
         assert_equal(abs(v),1)
         
@@ -126,7 +127,7 @@ class TestVector2:
         assert_equal(Point2(1,0)+Point2(0,1),self.v11)# Point + Point -> Vector
         
     def test___iadd__(self):
-        v=self.v10.copy()
+        v=copy(self.v10)
         v+=self.v01
         assert_equal(v, self.v11)
         
@@ -146,7 +147,7 @@ class TestVector2:
         assert_equal(self.v11*2,Vector2(2))
         
     def test___imul__(self):
-        v=self.v10.copy()
+        v=copy(self.v10)
         v*=2
         assert_equal(v,Vector2(2,0))
 
@@ -227,8 +228,9 @@ class TestVector3:
         assert_false(self.v00)
         
     def test___copy__(self):
-        assert_true(self.v10.copy()==self.v10)
-        assert_false(self.v10.copy()==self.v01)
+        v10=copy(self.v10)
+        assert_true(v10==self.v10)
+        assert_false(v10 is self.v10)
         
     def test_mag2(self):
         assert_equal(self.v11.mag2(), 3)
@@ -241,7 +243,7 @@ class TestVector3:
         assert_equal(abs(self.v11.normalized()),1)
         
     def test_normalize(self):
-        v=self.v11.copy()
+        v=copy(self.v11)
         v.normalize()
         assert_equal(abs(v),1)
         
@@ -251,7 +253,7 @@ class TestVector3:
         assert_equal(Point3(1,0,0.5)+Point3(0,1,0.5),self.v11)# Point + Point -> Vector
         
     def test___iadd__(self):
-        v=self.v10.copy()
+        v=copy(self.v10)
         v+=self.v01
         assert_equal(v, self.v110)
         
@@ -271,7 +273,7 @@ class TestVector3:
         assert_equal(self.v11*2,Vector3(2,2,2))
         
     def test___imul__(self):
-        v=self.v10.copy()
+        v=copy(self.v10)
         v*=2
         assert_equal(v,Vector3(2,0,0))
 

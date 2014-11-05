@@ -183,9 +183,11 @@ class TestEntity:
         raise SkipTest 
 
     def test___copy__(self):
-        # entity = Entity()
-        # assert_equal(expected, entity.__copy__())
-        raise SkipTest # TODO: implement your test here
+        s2=copy(self.seg)
+        assert_false(self.seg.p is s2.p) # Segment2.copy is in fact a deepcopy
+        s2.layer="something"
+        s3=copy(s2)
+        assert_equal(s3.layer,"something")
 
     def test_draw(self):
         # entity = Entity()

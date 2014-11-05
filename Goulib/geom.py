@@ -25,6 +25,15 @@ from Goulib import math2
 
 precision = 1e-9 #for equality comparisons
 
+def copy(object):
+    """ copy method for geom classes and drawing.Entities
+    makes sure we call the __copy__ method of geom classe, which might deep copy some fields
+    and shallow copy drawing.Entity attributes (such as .dxf)
+    """
+    
+    import copy
+    return copy.copy(object)
+
 class Vector2(object):
     """
     Mutable 2D vector:
@@ -111,8 +120,8 @@ class Vector2(object):
 
     The following methods do *not* alter the original vector or their arguments:
 
-    ``copy()``
-        Returns a copy of the vector.  ``__copy__`` is also implemented.
+    ``__copy()__``
+        Returns a copy of the vector. 
 
     ``magnitude()``
         Returns the magnitude of the vector; equivalent to ``abs(v)``.  Example::
@@ -237,8 +246,6 @@ class Vector2(object):
 
     def __copy__(self):
         return self.__class__(self.xy)
-
-    copy = __copy__
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xy)
@@ -379,17 +386,14 @@ class Vector2(object):
 
     def normalize(self):
         d = self.mag()
-        if d:
+        if d!=0:
             self.x /= d
             self.y /= d
         return self
 
     def normalized(self):
-        d = self.mag()
-        if d:
-            return Vector2(self.x / d,
-                           self.y / d)
-        return self.copy()
+        res=copy(self)
+        return res.normalize()
 
     def dot(self, other):
         assert isinstance(other, Vector2)
@@ -445,8 +449,6 @@ class Vector3(object):
 
     def __copy__(self):
         return self.__class__(self.xyz)
-
-    copy = __copy__
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xyz)
@@ -626,13 +628,9 @@ class Vector3(object):
         return self
 
     def normalized(self):
-        d = self.mag()
-        if d:
-            return Vector3(self.x / d,
-                           self.y / d,
-                           self.z / d)
-        return self.copy()
-
+        res=copy(self)
+        return res.normalize()
+           
     def dot(self, other):
         assert isinstance(other, Vector3)
         return self.x * other.x + \
@@ -937,10 +935,6 @@ class Matrix3(object):
     def __init__(self):
         self.identity()
 
-    def __copy__(self):
-        return Matrix3.new(*self[:])
-
-    copy = __copy__
     def __repr__(self):
         t=self.transposed() #repr is by line while [:] is by column
         return ('%s%s') % (self.__class__.__name__,tuple(t))
@@ -1014,7 +1008,7 @@ class Matrix3(object):
             V.y = A.e * B.x + A.f * B.y
             return V
         else:
-            other = other.copy()
+            other = copy(other)
             other._apply_transform(self)
             return other
 
@@ -1139,7 +1133,7 @@ class Matrix3(object):
          self.i, self.j, self.k)
 
     def transposed(self):
-        M = self.copy()
+        M = copy(self)
         M.transpose()
         return M
 
@@ -1182,29 +1176,6 @@ class Matrix4(object):
 
     def __init__(self):
         self.identity()
-
-    def __copy__(self):
-        M = Matrix4()
-        M.a = self.a
-        M.b = self.b
-        M.c = self.c
-        M.d = self.d
-        M.e = self.e
-        M.f = self.f
-        M.g = self.g
-        M.h = self.h
-        M.i = self.i
-        M.j = self.j
-        M.k = self.k
-        M.l = self.l
-        M.m = self.m
-        M.n = self.n
-        M.o = self.o
-        M.p = self.p
-        return M
-
-    copy = __copy__
-
 
     def __repr__(self):
         return ('%s([%g %g %g %g\n'  \
@@ -1300,7 +1271,7 @@ class Matrix4(object):
             V.z = A.i * B.x + A.j * B.y + A.k * B.z
             return V
         else:
-            other = other.copy()
+            other = copy(other)
             other._apply_transform(self)
             return other
 
@@ -1423,7 +1394,7 @@ class Matrix4(object):
          self.m, self.n, self.o, self.p)
 
     def transposed(self):
-        M = self.copy()
+        M = copy(self)
         M.transpose()
         return M
 
@@ -1767,16 +1738,6 @@ class Quaternion:
         self.y = y
         self.z = z
 
-    def __copy__(self):
-        Q = Quaternion()
-        Q.w = self.w
-        Q.x = self.x
-        Q.y = self.y
-        Q.z = self.z
-        return Q
-
-    copy = __copy__
-
     def __repr__(self):
         return '%s(%g,%g,%g,%g)' % (self.__class__.__name__,self.w, self.x, self.y, self.z)
 
@@ -1827,7 +1788,7 @@ class Quaternion:
                zz * Vz - wy2 * Vx - yy * Vz + \
                wx2 * Vy - xx * Vz + ww * Vz)
         else:
-            other = other.copy()
+            other = copy(other)
             other._apply_transform(self)
             return other
 
@@ -1895,16 +1856,8 @@ class Quaternion:
         return self
 
     def normalized(self):
-        d = self.mag()
-        if d != 0:
-            Q = Quaternion()
-            Q.w = self.w / d
-            Q.x = self.x / d
-            Q.y = self.y / d
-            Q.z = self.z / d
-            return Q
-        else:
-            return self.copy()
+        res=copy(self)
+        return res.normalize()
 
     def get_angle_axis(self):
         if self.w > 1:
@@ -2365,8 +2318,8 @@ class Line2(Geometry):
 
     def __init__(self, *args):
         if len(args) == 1: # Line2 or derived class
-            self.p = args[0].p.copy()
-            self.v = args[0].v.copy()
+            self.p = copy(args[0].p)
+            self.v = copy(args[0].v)
         else:
             self.p = Point2(args[0])
             if type(args[1]) is Vector2:
@@ -2388,8 +2341,6 @@ class Line2(Geometry):
 
     def __copy__(self):
         return self.__class__(self.p, self.v)
-
-    copy = __copy__
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
@@ -2520,8 +2471,6 @@ class Circle(Geometry):
             return False
         return self.c==other.c and self.r==other.r
 
-    copy = __copy__
-
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
 
@@ -2569,7 +2518,7 @@ class Arc2(Circle):
         .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
 
         """
-        c=Point2(center) if not isinstance(center,Point2) else center
+        c=Point2(center)
         if isinstance(p1,(int,float)):
             p=c+Polar(r,p1)
         else:
@@ -2623,8 +2572,6 @@ class Arc2(Circle):
 
     def __copy__(self):
         return self.__class__(self.c, self.p, self.p2)
-
-    copy = __copy__
 
     def __eq__(self, other):
         if not super(Arc2,self).__eq__(other): #support Circles must be the same
@@ -2961,21 +2908,21 @@ class Line3(Geometry):
             assert isinstance(args[0], Point3) and \
                    isinstance(args[1], Vector3) and \
                    type(args[2]) == float
-            self.p = args[0].copy()
+            self.p = copy(args[0])
             self.v = args[1] * args[2] / abs(args[1])
         elif len(args) == 2:
             if isinstance(args[0], Point3) and isinstance(args[1], Point3):
-                self.p = args[0].copy()
+                self.p = copy(args[0])
                 self.v = args[1] - args[0]
             elif isinstance(args[0], Point3) and isinstance(args[1], Vector3):
-                self.p = args[0].copy()
-                self.v = args[1].copy()
+                self.p = copy(args[0])
+                self.v = copy(args[1])
             else:
                 raise AttributeError('%r' % (args,))
         elif len(args) == 1:
             if isinstance(args[0], Line3):
-                self.p = args[0].p.copy()
-                self.v = args[0].v.copy()
+                self.p = copy(args[0])
+                self.v = copy(args[0])
             else:
                 raise AttributeError('%r' % (args,))
         else:
@@ -2987,8 +2934,6 @@ class Line3(Geometry):
 
     def __copy__(self):
         return self.__class__(self.p, self.v)
-
-    copy = __copy__
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
@@ -3089,13 +3034,11 @@ class Sphere(Geometry):
 
     def __init__(self, center, radius):
         assert isinstance(center, Vector3) and type(radius) == float
-        self.c = center.copy()
+        self.c = copy(center)
         self.r = radius
 
     def __copy__(self):
         return self.__class__(self.c, self.r)
-
-    copy = __copy__
 
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
@@ -3184,8 +3127,6 @@ class Plane(Geometry):
 
     def __copy__(self):
         return self.__class__(self.n, self.k)
-
-    copy = __copy__
 
     def __repr__(self):
         return 'Plane(<%.2f, %.2f, %.2f>.p = %.2f)' % \
