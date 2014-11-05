@@ -73,7 +73,10 @@ class TestVector2:
         self.v11=Vector2(1) #both components are 1 ...
         
     def test___init__(self):
-        pass #tested above
+        #copy constructor
+        v10=Vector2(self.v10)
+        assert_equal(v10,self.v10)
+        assert_false(v10 is self.v10)
     
     def test___repr__(self):
         assert_equal(repr(self.v10),'Vector2(1, 0)')
@@ -199,7 +202,10 @@ class TestVector3:
         self.v456=Vector3(4,5,6)
         
     def test___init__(self):
-        pass #tested above
+        #test copy constructor
+        v10=Vector2(self.v10)
+        assert_equal(v10,self.v10)
+        assert_false(v10 is self.v10)
     
     def test___repr__(self):
         assert_equal(repr(self.v10),'Vector3(1, 0, 0)')
@@ -325,10 +331,20 @@ class TestVector3:
 class TestMatrix3:
     @classmethod
     def setup_class(self):
-        self.mat123=Matrix3.new(1,2,3,4,5,6,7,8,9)
+        self.mat123=Matrix3(1,2,3,4,5,6,7,8,9)
 
     def test___init__(self):
-        assert_equal(Matrix3(), Matrix3.new(1,0,0, 0,1,0, 0,0,1))
+        #default constructor makes an identity matrix
+        assert_equal(Matrix3(), Matrix3(1,0,0, 0,1,0, 0,0,1))
+        #copy constructor
+        mat123=Matrix3(self.mat123)
+        assert_equal(mat123,self.mat123)
+        assert_false(mat123 is self.mat123)
+        
+    def test___copy__(self):
+        mat123=copy(self.mat123)
+        assert_equal(mat123,self.mat123)
+        assert_false(mat123 is self.mat123)
         
     def test___repr__(self):
         assert_equal(repr(self.mat123), 'Matrix3(1, 4, 7, 2, 5, 8, 3, 6, 9)')
@@ -340,13 +356,13 @@ class TestMatrix3:
         
     def test_new_scale(self): 
         mat=Matrix3.new_scale(2,3)
-        assert_equal(mat,Matrix3.new(2,0,0, 0,3,0, 0,0,1))
+        assert_equal(mat,Matrix3(2,0,0, 0,3,0, 0,0,1))
         return mat
 
     def test_new_rotate(self):
         mat=Matrix3.new_rotate(radians(60))
         s32=sqrt(3)/2
-        res=Matrix3.new(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
+        res=Matrix3(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
         assert_equal(mat, res)
         return mat
 
@@ -359,11 +375,6 @@ class TestMatrix3:
     def test___call__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__call__(other))
-        raise SkipTest 
-
-    def test___copy__(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.__copy__())
         raise SkipTest 
 
     def test___getitem__(self):
@@ -451,11 +462,6 @@ class TestMatrix3:
         # assert_equal(expected, matrix3.mag2())
         raise SkipTest 
 
-    def test_new(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.new(*values))
-        raise SkipTest 
-
     def test_transpose(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.transpose())
@@ -469,16 +475,24 @@ class TestMatrix3:
 class TestMatrix4:
     @classmethod
     def setup_class(self):
-        pass
+        self.mat123=Matrix4(1,2,3,0, 4,5,6,0, 7,8,9,0, 0,0,0,1)
+        
+    def test___init__(self):
+        #default constructor makes an identity matrix
+        assert_equal(Matrix4(), Matrix4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1))
+        #copy constructor
+        mat123=Matrix4(self.mat123)
+        assert_equal(mat123,self.mat123)
+        assert_false(mat123 is self.mat123)
+        
+    def test___copy__(self):
+        mat123=copy(self.mat123)
+        assert_equal(mat123,self.mat123)
+        assert_false(mat123 is self.mat123)
     
     def test___call__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__call__(other))
-        raise SkipTest 
-
-    def test___copy__(self):
-        # matrix4 = Matrix4()
-        # assert_equal(expected, matrix4.__copy__())
         raise SkipTest 
 
     def test___getitem__(self):
@@ -489,10 +503,6 @@ class TestMatrix4:
     def test___imul__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__imul__(other))
-        raise SkipTest 
-
-    def test___init__(self):
-        # matrix4 = Matrix4()
         raise SkipTest 
 
     def test___mul__(self):
@@ -645,6 +655,10 @@ class TestQuaternion:
     def setup_class(self):
         pass
     
+    def test___init__(self):
+        # quaternion = Quaternion(w, x, y, z)
+        raise SkipTest 
+    
     def test___abs__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__abs__())
@@ -660,9 +674,7 @@ class TestQuaternion:
         # assert_equal(expected, quaternion.__imul__(other))
         raise SkipTest 
 
-    def test___init__(self):
-        # quaternion = Quaternion(w, x, y, z)
-        raise SkipTest 
+
 
     def test___mul__(self):
         # quaternion = Quaternion(w, x, y, z)
@@ -768,11 +780,12 @@ class TestLine2:
         self.l3=Line2((-1,-1),(-1,1),1) #perpendicular to l1 and l2, normalized
             
     def test___init__(self):
-        pass #tested above
-        
-    def test___copy__(self):
-        pass #tested
-
+         #copy constructor
+        l1=Line2(self.l1)
+        assert_equal(l1,self.l1)
+        assert_false(l1 is self.l1)
+        assert_false(l1.p is self.l1.p)
+        assert_false(l1.v is self.l1.v)
 
     def test___repr__(self):
         assert_equal(repr(self.l3),"Line2(Point2(-1, -1),Vector2(0.0, 1.0))")
@@ -915,9 +928,15 @@ class TestArc2:
         self.a3=Arc2((0,0),pi/2.,0,1,dir=-1) #same, inverted
         self.ap=Arc2(center=Point2(454.80692478710336, 69.74749779176005),p1=Point2(74.67492478710335, 86.62949779176006),p2=Point2(74.48092478710339, 58.021497791760055),r=380.506687652)
         self.ap2=Arc2(center=Point2(-454.80607521289664, -9.203502208239968),p1=Point2(-74.67307521289663, -26.08650220823995),p2=Point2(-74.47907521289662, 2.521497791760055),r=380.507731036)
+    
     def test___init__(self):
-        pass #tested above
-        assert_equal(self.a1,self.a2)
+        #copy constructor
+        a1=Arc2(self.a1)
+        assert_equal(a1,self.a1)
+        assert_false(a1 is self.a1)
+        assert_false(a1.c is self.a1.c)
+        assert_false(a1.p is self.a1.p)
+        assert_false(a1.p2 is self.a1.p2)
         
     def test___eq__(self):
         assert_true(self.a1==self.a2)
@@ -934,10 +953,6 @@ class TestArc2:
         assert_true(self.ap.length<50) # check the angle is not the complementary angle
         assert_true(self.ap2.length<50) # check the angle is not the complementary angle
 
-    def test___copy__(self):
-        # arc2 = Arc2(center, p1, p2, r)
-        # assert_equal(expected, arc2.__copy__())
-        raise SkipTest 
 
     def test___repr__(self):
         # arc2 = Arc2(center, p1, p2, r)

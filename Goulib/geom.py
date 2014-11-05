@@ -26,13 +26,10 @@ from Goulib import math2
 precision = 1e-9 #for equality comparisons
 
 def copy(object):
-    """ copy method for geom classes and drawing.Entities
-    makes sure we call the __copy__ method of geom classe, which might deep copy some fields
-    and shallow copy drawing.Entity attributes (such as .dxf)
-    """
-    
-    import copy
-    return copy.copy(object)
+    try:
+        return object.__class__(object) #call copy constructor
+    except:
+        raise RuntimeError('could not copy %s'%object)
 
 class Vector2(object):
     """
@@ -119,9 +116,6 @@ class Vector2(object):
         Vector3(0.27, 0.53, 0.80)
 
     The following methods do *not* alter the original vector or their arguments:
-
-    ``__copy()__``
-        Returns a copy of the vector. 
 
     ``magnitude()``
         Returns the magnitude of the vector; equivalent to ``abs(v)``.  Example::
@@ -243,9 +237,6 @@ class Vector2(object):
     def xy(self):
         """:return: tuple (x,y)"""
         return (self.x, self.y)
-
-    def __copy__(self):
-        return self.__class__(self.xy)
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xy)
@@ -369,10 +360,10 @@ class Vector2(object):
                        operator.truediv(other, self.y))
 
     def __neg__(self):
-        return Vector2(-self.x,
-                        -self.y)
+        return Vector2(-self.x, -self.y)
 
-    __pos__ = __copy__
+    def __pos__(self):
+        return Vector2(self)
 
     def __abs__(self):
         return sqrt(self.x ** 2 + self.y ** 2)
@@ -446,9 +437,6 @@ class Vector3(object):
     def xyz(self):
         """:return: tuple (x,y,z)"""
         return (self.x, self.y, self.z)
-
-    def __copy__(self):
-        return self.__class__(self.xyz)
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xyz)
@@ -601,11 +589,10 @@ class Vector3(object):
                        operator.truediv(other, self.z))
 
     def __neg__(self):
-        return Vector3(-self.x,
-                        -self.y,
-                        -self.z)
+        return Vector3(-self.x, -self.y, -self.z)
 
-    __pos__ = __copy__
+    def __pos__(self):
+        return Vector3(self)
 
     def __abs__(self):
         return sqrt(self.x ** 2 + \
@@ -782,9 +769,6 @@ class Matrix3(object):
 
     The following constructors are defined for **Matrix4** only.
 
-    ``new``
-        Construct a matrix with 16 values in column-major order.
-
     ``new_rotatex(angle)``, ``new_rotatey(angle)``, ``new_rotatez(angle)``
         Create a **Matrix4** for a rotation around the X, Y or Z axis, respectively.
         *angle* is specified in radians.  Example::
@@ -932,12 +916,25 @@ class Matrix3(object):
     behaves in the obvious way.
     """
 
-    def __init__(self):
+    def __init__(self, *values):
         self.identity()
+        if not values:
+            return
+        if len(values)==1:
+            values=values[0][:]
+        if len(values)==9:
+            self[:] = values
+        else:
+            raise RuntimeError('%s.__init__(%s) failed'%(self.__class__.__name__,object))
 
     def __repr__(self):
         t=self.transposed() #repr is by line while [:] is by column
         return ('%s%s') % (self.__class__.__name__,tuple(t))
+    
+    def __iter__(self):
+        return iter((self.a, self.e, self.i,
+         self.b, self.f, self.j,
+         self.c, self.g, self.k))
 
     def __getitem__(self, key):
         return [self.a, self.e, self.i,
@@ -958,7 +955,7 @@ class Matrix3(object):
             return False
 
     def __sub__(self, other):
-        return Matrix3.new(*(ai-bi for ai,bi in zip(self[:],other[:])))
+        return Matrix3(*(ai-bi for ai,bi in zip(self[:],other[:])))
 
     def __mul__(self, other):
         if isinstance(other, Matrix3):
@@ -1084,11 +1081,6 @@ class Matrix3(object):
     def rotate(self, angle):
         return Matrix3.new_rotate(angle)*self
 
-    @classmethod
-    def new(cls, *values):
-        M = cls()
-        M[:] = values
-        return M
 
     @classmethod
     def new_identity(cls):
@@ -1174,18 +1166,26 @@ class Matrix3(object):
 
 class Matrix4(object):
 
-    def __init__(self):
+    def __init__(self, *values):
         self.identity()
+        if not values:
+            return
+        if len(values)==1:
+            values=values[0][:]
+        if len(values)==16:
+            self[:] = values
+        else:
+            raise RuntimeError('%s.__init__(%s) failed'%(self.__class__.__name__,object))
 
     def __repr__(self):
-        return ('%s([%g %g %g %g\n'  \
-                '         %g %g %g %g\n'  \
-                '         %g %g %g %g\n'  \
-                '         %g %g %g %g])') \
-                % (self.__class__.__name__,self.a, self.b, self.c, self.d,
-                   self.e, self.f, self.g, self.h,
-                   self.i, self.j, self.k, self.l,
-                   self.m, self.n, self.o, self.p)
+        t=self.transposed() #repr is by line while [:] is by column
+        return ('%s%s') % (self.__class__.__name__,tuple(t))
+                
+    def __iter__(self):
+        return iter((self.a, self.e, self.i, self.m,
+         self.b, self.f, self.j, self.n,
+         self.c, self.g, self.k, self.o,
+         self.d, self.h, self.l, self.p))
 
     def __getitem__(self, key):
         return [self.a, self.e, self.i, self.m,
@@ -2318,8 +2318,8 @@ class Line2(Geometry):
 
     def __init__(self, *args):
         if len(args) == 1: # Line2 or derived class
-            self.p = copy(args[0].p)
-            self.v = copy(args[0].v)
+            self.p = Point2(args[0].p)
+            self.v = Vector2(args[0].v)
         else:
             self.p = Point2(args[0])
             if type(args[1]) is Vector2:
@@ -2338,9 +2338,6 @@ class Line2(Geometry):
             return self.p==other.p and self.v==other.v
         except:
             return False
-
-    def __copy__(self):
-        return self.__class__(self.p, self.v)
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
@@ -2445,15 +2442,24 @@ class Circle(Geometry):
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
     """
-
-    def __init__(self, center, radius):
-        self.c = Point2(center)
-        if isinstance(radius,(float,int)):
-            self.r = radius
-            self.p = center+Vector2(radius,0) #for coherency + transform
-        else:
-            self.p=radius #one point on circle
-            self.r=abs(self.p-self.c)
+    def __init__(self, *args):
+        """:param args: can be
+        * Circle
+        * center, point on circle
+        * center, radius
+        """
+        if len(args) == 1: # Circle or derived class
+            self.c = Point2(args[0].c)
+            self.p = Point2(args[0].p)
+            self.r = args[0].r
+        else: #2 first params are used to stay compatible with Arc2
+            self.c = Point2(args[0])
+            if isinstance(args[1],(float,int)):
+                self.r = args[1]
+                self.p = self.c+Vector2(args[1],0) #for coherency + transform
+            else:
+                self.p=Point2(args[1]) #one point on circle
+                self.r=abs(self.p-self.c)
 
     def point(self, u):
         ":return: Point2 at angle u radians"
@@ -2462,9 +2468,6 @@ class Circle(Geometry):
     def tangent(self, u):
         ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
         return Polar(self.r,u+pi/2.)
-
-    def __copy__(self):
-        return self.__class__(self.c, self.r)
 
     def __eq__(self, other):
         if not isinstance(other,Circle):
@@ -2509,15 +2512,23 @@ class Circle(Geometry):
         return _connect_circle_circle(other, self)
 
 class Arc2(Circle):
-    def __init__(self, center, p1,p2,r=None,dir=1):
+
+    def __init__(self, center, p1=0,p2=2*pi, r=None, dir=1):
         """
         :param center: Point2 or (x,y) tuple
         :param p1: starting Point2 or angle in radians
         :param p2: ending Point2 or angle in radians
-        :param r: float radius, needed onyl if p1 or p2 is an angle
+        :param r: float radius, needed only if p1 or p2 is an angle
         .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
 
         """
+        if isinstance(center,Arc2): #copy constructor
+            p1=center.p
+            p2=center.p2
+            r=center.r
+            dir=center.dir
+            center=center.c
+            
         c=Point2(center)
         if isinstance(p1,(int,float)):
             p=c+Polar(r,p1)
@@ -2569,9 +2580,6 @@ class Arc2(Circle):
             self.p2 = t * self.p2
         self.a=(self.p-self.c).angle(None) #start angle
         self.b=(self.p2-self.c).angle(None) #end angle
-
-    def __copy__(self):
-        return self.__class__(self.c, self.p, self.p2)
 
     def __eq__(self, other):
         if not super(Arc2,self).__eq__(other): #support Circles must be the same
@@ -2908,21 +2916,21 @@ class Line3(Geometry):
             assert isinstance(args[0], Point3) and \
                    isinstance(args[1], Vector3) and \
                    type(args[2]) == float
-            self.p = copy(args[0])
+            self.p = Point3(args[0])
             self.v = args[1] * args[2] / abs(args[1])
         elif len(args) == 2:
             if isinstance(args[0], Point3) and isinstance(args[1], Point3):
-                self.p = copy(args[0])
-                self.v = args[1] - args[0]
+                self.p = Point3(args[0])
+                self.v = Vector3(args[1] - args[0])
             elif isinstance(args[0], Point3) and isinstance(args[1], Vector3):
-                self.p = copy(args[0])
-                self.v = copy(args[1])
+                self.p = Point3(args[0])
+                self.v = Vector3(args[1])
             else:
                 raise AttributeError('%r' % (args,))
-        elif len(args) == 1:
+        elif len(args) == 1: #copy constructor
             if isinstance(args[0], Line3):
-                self.p = copy(args[0])
-                self.v = copy(args[0])
+                self.p = Point3(args[0])
+                self.v = Vector3(args[0])
             else:
                 raise AttributeError('%r' % (args,))
         else:
@@ -2931,9 +2939,6 @@ class Line3(Geometry):
         # XXX This is annoying.
         #if not self.v:
         #    raise AttributeError, 'Line has zero-length vector'
-
-    def __copy__(self):
-        return self.__class__(self.p, self.v)
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
@@ -3037,9 +3042,6 @@ class Sphere(Geometry):
         self.c = copy(center)
         self.r = radius
 
-    def __copy__(self):
-        return self.__class__(self.c, self.r)
-
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
 
@@ -3124,9 +3126,6 @@ class Plane(Geometry):
 
         if not self.n:
             raise AttributeError('Points on plane are colinear')
-
-    def __copy__(self):
-        return self.__class__(self.n, self.k)
 
     def __repr__(self):
         return 'Plane(<%.2f, %.2f, %.2f>.p = %.2f)' % \
