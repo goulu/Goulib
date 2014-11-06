@@ -29,14 +29,14 @@ setup(
     author_email='goulib@goulu.net',
     url='http://github.com/goulu/goulib',
     license='LGPL',
-    
+
     scripts=[],
 
     # parse_requirements() returns generator of pip.req.InstallRequirement objects
-    install_reqs = parse_requirements('requirements%d.txt'%sys.version_info[0]),
-    extras_require = parse_requirements('optional-requirements.txt'),
+    install_reqs = parse_requirements('requirements.txt'),
+    # extras_require = parse_requirements('optional-requirements.txt'),
 
-    test_suite="nose.collector",       
+    test_suite="nose.collector",
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

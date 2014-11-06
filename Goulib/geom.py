@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
 """
-Vector, matrix and quaternion operations + line, arc, circle entities for use in 2D and 3D graphics applications.
-
-based on euclid http://code.google.com/p/pyeuclid by Alex Holkner
-
+2D + 3D geometry
 """
 from __future__ import division #"true division" everywhere
 

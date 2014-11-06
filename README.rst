@@ -3,6 +3,8 @@ Goulib
 
 library of useful Python code for scientific + technical applications
 
+see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>` to get an idea of what's inside
+
 .. image:: https://pypip.in/license/Goulib/badge.png
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
     :alt: License
@@ -37,13 +39,13 @@ datetime2
 decorators
 	useful decorators
 drawing
-	handle vector graphics in .dxf, .svg and .pdf formats
+	Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 expr
 	simple symbolic math expressions
 geom
-	vector, matrix and quaternion operations + line, arc, circle entities for use in 2D and 3D graphics applications.
+	2D + 3D geometry
 graph
-	efficient Euclidian Graphs for NetworkX and related algorithms
+	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>` and related algorithms
 interval
 	operations on [x..y[ intervals
 itertools2
@@ -54,17 +56,25 @@ math2
 	additions to math standard library
 motion
 	functions of time which provide (position, velocity, acceleration, jerk) tuples
-nvd3
-	JavaScript charts using http://nvd3.org/ and and http://d3js.org
-	( Obsolete. use `python-nvd3 <http://pypi.python.org/pypi/python-nvd3/>`_ which is derived from this module. )
 optim
 	optimization algorithms : knapsack, travelling salesman, simulated annealing
 piecewise
 	piecewise-defined functions
 polynomial
 	manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by Rick Muller
+stats
+    very basic statistics functions
 table
 	Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
+tests
+    utilities for unit tests (using nose)
 workdays
 	WorkCalendar class with datetime operations on working hours
 	merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
+
+Requirements
+-------
+
+Goulib uses "lazy" requirements.
+Many modules and functions do not require any other packages,
+packages listed in requirements.txt are needed only by some Goulib classes or functions

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-statistics
+very basic statistics functions
 """
 
 __author__ = "Philippe Guglielmetti"
