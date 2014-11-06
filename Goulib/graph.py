@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-efficient Euclidian Graphs for :ref:`NetworkX <networkx>` and related algorithms
+efficient Euclidian Graphs for :ref:`NetworkX <http://networkx.github.io/>` and related algorithms
 """
 
 __author__ = "Philippe Guglielmetti"
@@ -14,7 +14,6 @@ import logging, math, six
 import networkx as nx # http://networkx.github.io/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
-from pygraphviz import AGraph
 
 from . import math2
     
@@ -53,6 +52,16 @@ if not RTREE:
             def nearest(self,p, num_results, objects='raw'):
                 """ very inefficient, but remember it's a fallback..."""
                 return itertools2.best(list(self.values()),key=lambda q:math2.dist(p,q),n=num_results)
+
+try:
+    from pygraphviz import AGraph # http://pygraphviz.github.io/
+    PYGRAPHVIZ=True
+except: #fallback since I couldn't manage to install graphviz on travis-ci ...
+    PYGRAPHVIZ=False
+    
+if not PYGRAPHVIZ:
+    logging.warning('PyGraphViz not available')
+    class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 
 _nk=0 # node key
 

@@ -35,7 +35,8 @@ class TestGeoGraph:
     def test_save(self):
         
         #complex AGraph
-        self.crazy.save(path+'/crazy.png', transparent=False)
+        if self.crazy:
+            self.crazy.save(path+'/crazy.png', transparent=False)
         
         import matplotlib.pyplot as plt
         #define a function that maps edge data to a color
@@ -47,8 +48,6 @@ class TestGeoGraph:
         #3D graph
         self.sphere.save(path+'/sphere.png', transparent=False)
         
-
-
         
     def test_render(self):
         pass #tested above
@@ -532,6 +531,276 @@ class test__Geo:
         # __geo = _Geo(parent, data, nodes, **kwargs)
         # assert_equal(expected, __geo.tol())
         raise SkipTest 
+
+class test__Geo:
+    def test___getattr__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__getattr__(name))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___nonzero__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__nonzero__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___str__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__str__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_edge(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_edge(u, v, attr_dict, **attrs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_node(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_node(p, attr_dict, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_nodes_from(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_nodes_from(nodes, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_box(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.box())
+        raise SkipTest # TODO: implement your test here
+
+    def test_box_size(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.box_size())
+        raise SkipTest # TODO: implement your test here
+
+    def test_clear(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.clear())
+        raise SkipTest # TODO: implement your test here
+
+    def test_closest_edges(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.closest_edges(p, data))
+        raise SkipTest # TODO: implement your test here
+
+    def test_closest_nodes(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.closest_nodes(p, n, skip))
+        raise SkipTest # TODO: implement your test here
+
+    def test_contiguity(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.contiguity(pts))
+        raise SkipTest # TODO: implement your test here
+
+    def test_copy(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.copy())
+        raise SkipTest # TODO: implement your test here
+
+    def test_dist(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.dist(u, v))
+        raise SkipTest # TODO: implement your test here
+
+    def test_draw(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.draw(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_is_multigraph(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.is_multigraph())
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.length(edges))
+        raise SkipTest # TODO: implement your test here
+
+    def test_multi(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.multi())
+        raise SkipTest # TODO: implement your test here
+
+    def test_multi_case_2(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.multi(s))
+        raise SkipTest # TODO: implement your test here
+
+    def test_number_of_nodes(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.number_of_nodes(doublecheck))
+        raise SkipTest # TODO: implement your test here
+
+    def test_remove_edge(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.remove_edge(u, v, key, clean))
+        raise SkipTest # TODO: implement your test here
+
+    def test_remove_node(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.remove_node(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_render(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.render(fmt, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_save(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.save(filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_stats(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.stats())
+        raise SkipTest # TODO: implement your test here
+
+    def test_tol(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.tol())
+        raise SkipTest # TODO: implement your test here
+
+class test__Geo:
+    def test___getattr__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__getattr__(name))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___nonzero__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__nonzero__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___str__(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.__str__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_edge(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_edge(u, v, attr_dict, **attrs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_node(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_node(p, attr_dict, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_add_nodes_from(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.add_nodes_from(nodes, **attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test_box(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.box())
+        raise SkipTest # TODO: implement your test here
+
+    def test_box_size(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.box_size())
+        raise SkipTest # TODO: implement your test here
+
+    def test_clear(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.clear())
+        raise SkipTest # TODO: implement your test here
+
+    def test_closest_edges(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.closest_edges(p, data))
+        raise SkipTest # TODO: implement your test here
+
+    def test_closest_nodes(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.closest_nodes(p, n, skip))
+        raise SkipTest # TODO: implement your test here
+
+    def test_contiguity(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.contiguity(pts))
+        raise SkipTest # TODO: implement your test here
+
+    def test_copy(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.copy())
+        raise SkipTest # TODO: implement your test here
+
+    def test_dist(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.dist(u, v))
+        raise SkipTest # TODO: implement your test here
+
+    def test_draw(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.draw(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_is_multigraph(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.is_multigraph())
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.length(edges))
+        raise SkipTest # TODO: implement your test here
+
+    def test_multi(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.multi())
+        raise SkipTest # TODO: implement your test here
+
+    def test_multi_case_2(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.multi(s))
+        raise SkipTest # TODO: implement your test here
+
+    def test_number_of_nodes(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.number_of_nodes(doublecheck))
+        raise SkipTest # TODO: implement your test here
+
+    def test_remove_edge(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.remove_edge(u, v, key, clean))
+        raise SkipTest # TODO: implement your test here
+
+    def test_remove_node(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.remove_node(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_render(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.render(fmt, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_save(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.save(filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_stats(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.stats())
+        raise SkipTest # TODO: implement your test here
+
+    def test_tol(self):
+        # __geo = _Geo(parent, data, nodes, **kwargs)
+        # assert_equal(expected, __geo.tol())
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()
