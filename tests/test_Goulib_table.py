@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -15,7 +18,7 @@ class TestTable:
         
         #test reading an Excel file
         self.t=Table(self.path+'/test.xls') # from http://www.contextures.com/xlSampleData01.html
-        assert_equal(self.t.titles,['OrderDate', 'Region', 'Rep', 'Item', 'Units', 'Cost', 'Total'])
+        assert_equal(self.t.titles,['OrderDate', u'Région', 'Rep', 'Item', u'Unités', 'Cost', 'Total'])
         
         #test that t can be written to csv, then re-read in t2 without loss
         self.t.write_csv(self.path+'/test.csv')
@@ -65,8 +68,9 @@ class TestTable:
         pass #tested in setup
 
     def test_html(self):
+        t=self.t2.html()
         f = open(self.path+'/test.htm', 'w')
-        f.write(self.t2.html())
+        f.write(t)
         f.close()
         
         t=Table(self.path+'/test.htm')
@@ -111,7 +115,7 @@ class TestTable:
         assert_equal(self.t.get(-1,'Total'),139.72)
 
     def test_groupby(self):
-        d=self.t.groupby('Region')
+        d=self.t.groupby(u'Région')
         assert_equal(sum([len(d[k]) for k in d]),len(self.t))
         assert_equal(len(d['East']),13)
 

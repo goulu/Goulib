@@ -8,9 +8,9 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import csv, itertools, operator, string, codecs
+import csv, itertools, operator, string, codecs, six, logging
+
 from datetime import datetime, date, timedelta
-import logging
 from functools import reduce
 
 try: # using http://lxml.de/
@@ -114,7 +114,7 @@ class Cell():
         if not v or v=='':
             v="&nbsp;" #for IE8
         else:
-            v=f%v if f else str(v)
+            v=f%v if f else six.text_type(v)
         if self.style:
             args.setdefault('style',self.style)
         return tag(self.tag,v,**args)
@@ -302,25 +302,25 @@ class Table(list):
         titles_line=kwargs.pop('titles_line',1)-1
         data_line=kwargs.pop('data_line',2)-1
         dialect=kwargs.setdefault('dialect',csv.excel)
-        delimiter=kwargs.setdefault('delimiter',b';')
+        delimiter=kwargs.setdefault('delimiter',';')
         encoding=kwargs.pop('encoding','iso-8859-15')
         errors=kwargs.pop('errors','strict')
         
-        def csv_reader(data, **kwargs):
-            csv_reader = csv.reader(data, **kwargs)
-            for row in csv_reader:
-                yield [unicode(cell, encoding) for cell in row]
+        def csv_reader2(): # version for Python 2
+            with codecs.open(filename, 'rb', errors=errors) as f:
+                csv_reader = csv.reader(f, **kwargs)
+                for row in csv_reader:
+                    yield [unicode(cell, encoding) for cell in row]
         
-        reader = csv_reader(codecs.open(filename, 'rb', errors=errors), **kwargs)
-        # reader = open(filename,'rb') 
+        def csv_reader3():  # version for Python 3
+            with open(filename, 'rt', errors=errors, encoding=encoding) as f:
+                csv_reader = csv.reader(f, **kwargs)
+                for row in csv_reader:
+                    yield row
+        
+        reader = csv_reader2() if six.PY2 else csv_reader3()
+        
         for i,row in enumerate(reader):
-            """old code. was it useful ?
-            row=row.replace(b'\x00',b'') # avoid NULLs from from .XLS saved as .CSV
-            row=row.rstrip(b'\r\n')
-            row=row.split(delimiter)
-            if encoding:
-                row=[x.decode(encoding) for x in row]
-            """
             if i==titles_line: #titles can have no left/right spaces
                 self.titles=[Cell.read(x) for x in row]
             elif i>=data_line:
@@ -337,15 +337,14 @@ class Table(list):
         encoding=kwargs.get('encoding','iso-8859-15') #for windows
         empty=''.encode(encoding)
         
-        import sys
-        if sys.version_info >= (3,0,0):
+        if six.PY3 :
             f = open(filename, 'w', newline='')
             def _encode(line): 
                 return [s for s in line]
         else: #Python 2
             f = open(filename, 'wb')
             def _encode(line): 
-                return [empty if s is None else str(s).encode(encoding) for s in line]
+                return [empty if s is None else unicode(s).encode(encoding) for s in line]
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if transpose:
@@ -379,12 +378,12 @@ class Table(list):
 
     def _i(self,by):
         '''column index'''
-        if isinstance(by, str):
-            try:
-                return self.titles.index(by)
-            except ValueError:
-                return None
-        return by
+        if isinstance(by, int):
+            return by
+        try:
+            return self.titles.index(by)
+        except ValueError:
+            return None
     
     def icol(self,by):
         '''iterates column'''
