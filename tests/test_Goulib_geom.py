@@ -34,6 +34,10 @@ class TestGeometry:
         # assert_equal(expected, geometry.intersect(other))
         raise SkipTest 
     
+    def test___init__(self):
+        # geometry = Geometry(*args)
+        raise SkipTest # TODO: implement your test here
+
 class TestPoint2:
     @classmethod
     def setup_class(self):
@@ -189,6 +193,11 @@ class TestVector2:
     def test_reflect(self):
         assert_equal(self.v11.reflect(self.v10),Vector2(-1,1))
 
+    def test___pos__(self):
+        # vector2 = Vector2(*args)
+        # assert_equal(expected, vector2.__pos__())
+        raise SkipTest # TODO: implement your test here
+
 class TestVector3:
     @classmethod
     def setup_class(self):
@@ -327,6 +336,11 @@ class TestVector3:
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.__bool__())
         raise SkipTest 
+
+    def test___pos__(self):
+        # vector3 = Vector3(*args)
+        # assert_equal(expected, vector3.__pos__())
+        raise SkipTest # TODO: implement your test here
 
 class TestMatrix3:
     @classmethod
@@ -471,6 +485,11 @@ class TestMatrix3:
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.transposed())
         raise SkipTest 
+
+    def test___iter__(self):
+        # matrix3 = Matrix3(*args)
+        # assert_equal(expected, matrix3.__iter__())
+        raise SkipTest # TODO: implement your test here
 
 class TestMatrix4:
     @classmethod
@@ -649,6 +668,11 @@ class TestMatrix4:
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.transposed())
         raise SkipTest 
+
+    def test___iter__(self):
+        # matrix4 = Matrix4(*args)
+        # assert_equal(expected, matrix4.__iter__())
+        raise SkipTest # TODO: implement your test here
 
 class TestQuaternion:
     @classmethod
@@ -1133,6 +1157,11 @@ class TestArgPair:
         assert_equal(argPair([1,2]),(1,2))
         
         assert_equal(argPair(1),(1,1))
+
+class TestCopy:
+    def test_copy(self):
+        # assert_equal(expected, copy(object))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

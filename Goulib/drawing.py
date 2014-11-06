@@ -21,8 +21,7 @@ __license__ = "LGPL"
 from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
-import matplotlib
-import os
+import matplotlib, os
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
@@ -31,8 +30,8 @@ if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests 
 import matplotlib.pyplot as plt
 
 from .math2 import rint, product
-from .geom import copy, Geometry,Point2, Vector2, Line2, Segment2, Arc2, Circle, Polar, Matrix3
 from .itertools2 import split, filter2
+from .geom import *
 
 
 # http://sub-atomic.com/~moses/acadcolors.html
@@ -146,16 +145,8 @@ def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
 
 class Entity(object):
     """Base class for all drawing entities"""
-
-    color='black' #default color
-    layer=None
-    dxf=None
     
-    def copy_attrs_from(self,other):
-        """copy attributes that are lost in geom copy operations, typically in math operations"""
-        self.color=other.color
-        self.layer=other.layer
-        self.dxf=other.dxf
+    color='black' # by default
 
     @property
     def start(self):
@@ -317,7 +308,7 @@ class Entity(object):
         res.color=acadcolors[e.color % len(acadcolors)]
         res.layer=e.layer
         return res
-    
+
     def patches(self, **kwargs):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity
         this is the only method that needs to be overridden in descendants for draw, render and IPython _repr_xxx_ to work
@@ -348,7 +339,7 @@ class Entity(object):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
         raise NotImplementedError
-    
+
     @staticmethod
     def figure(entity,**kwargs):
         """:return: matplotlib axis suitable for drawing """
@@ -369,7 +360,7 @@ class Entity(object):
         pylab.axis('off') # turn off axis
 
         return fig
-    
+
     def draw(self, fig=None, **kwargs):
         """ draw  entities
         :param fig: matplotlib figure where to draw. figure(g) is called if missing
@@ -394,7 +385,7 @@ class Entity(object):
             plt.draw()
 
         return fig, p
-    
+
     def render(self,format,**kwargs):
         """ render graph to bitmap stream
         :return: matplotlib figure as a byte stream in specified format
@@ -468,12 +459,12 @@ class _Group(Entity, Geometry):
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
-        return sum((entity.bbox() for entity in self), BBox())              
+        return sum((entity.bbox() for entity in self), BBox())
 
     @property
     def length(self):
         return sum((entity.length for entity in self))
-    
+
     def intersect(self, other):
         """
         :param other: `geom.Entity`
@@ -489,7 +480,7 @@ class _Group(Entity, Geometry):
                 if inter:
                     inter=e.intersect(o)
                     yield (inter,e)
-    
+
     def connect(self, other):
         for (inter, _) in self.intersect(other):
             if isinstance(inter,Point2):
@@ -502,14 +493,14 @@ class _Group(Entity, Geometry):
         except:
             other=[other]
         return min((e.connect(o) for e in self for o in other), key=lambda e:e.length)
-    
+
     def patches(self, **kwargs):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
         patches=[]
         for e in self:
             patches.extend(e.patches(**kwargs))
         return patches
-    
+
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res=[]
@@ -541,7 +532,7 @@ class Group(list, _Group):
 
         for entity in entities:
             self.append(entity,**kwargs)
-            
+
     def __copy__(self):
         res=self.__class__()
         for e in self:
@@ -587,9 +578,9 @@ class Group(list, _Group):
             else:
                 self.append(Entity.from_dxf(e, trans))
         return self
-    
+
 class Instance(_Group):
-    
+
     @staticmethod
     def from_dxf(e, blocks, mat3):
         """
@@ -607,26 +598,26 @@ class Instance(_Group):
         res.color=acadcolors[e.color % len(acadcolors)]
         res.layer=e.layer
         return res
-        
+
     def __repr__(self):
         return '%s %s' % (self.__class__.__name__, self.name)
-        
+
     def __iter__(self):
         #TODO : optimize when trans is identity
         for e in self.group:
             res=self.trans*e
             # res.copy_attrs_from(e)
             yield res
-            
+
     def _apply_transform(self,trans):
         self.trans=trans*self.trans
 
-class Chain(Group,Entity): #inherit in this order for overloaded methods to work correctly
+class Chain(Group): #inherit in this order for overloaded methods to work correctly
     """ group of contiguous Entities (Polyline or similar)"""
 
     def __init__(self,data=[]):
         Group.__init__(self,data)
-        Entity.__init__(self)
+        # Entity.__init__(self)
 
     @property
     def start(self):
@@ -842,7 +833,7 @@ class Rect(Chain):
         self.append(Segment2((p1.x,p2.y),p1))
         self.p1=p1
         self.p2=p2
-        
+
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p1,self.p2)
 

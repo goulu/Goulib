@@ -11,11 +11,11 @@ path=os.path.dirname(os.path.abspath(__file__))
 
 class TestTrans:
     def test_trans(self):
-        assert_equal(Trans(), Matrix3.new(1,0,0, 0,1,0, 0,0,1))
-        assert_equal(Trans(scale=2), Matrix3.new(2,0,0, 0,2,0, 0,0,1))
-        assert_equal(Trans(offset=(2,3)), Matrix3.new(1,0,0, 0,1,0, 2,3,1))
+        assert_equal(Trans(), Matrix3(1,0,0, 0,1,0, 0,0,1))
+        assert_equal(Trans(scale=2), Matrix3(2,0,0, 0,2,0, 0,0,1))
+        assert_equal(Trans(offset=(2,3)), Matrix3(1,0,0, 0,1,0, 2,3,1))
         s32=sqrt(3)/2
-        res=Matrix3.new(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
+        res=Matrix3(0.5,+s32,0, -s32,0.5,0, 0,0,1) #warning : .new takes columnwise elements
         assert_almost_equal(Trans(rotation=60),res)
 
 class TestBBox:
@@ -234,6 +234,11 @@ class TestGroup:
     def test_swap(self):
         # group = Group()
         # assert_equal(expected, group.swap())
+        raise SkipTest # TODO: implement your test here
+
+    def test___copy__(self):
+        # group = Group()
+        # assert_equal(expected, group.__copy__())
         raise SkipTest # TODO: implement your test here
 
 class TestChain:
@@ -485,6 +490,42 @@ class TestInstance:
     def test___repr__(self):
         # instance = Instance(group, trans, name)
         # assert_equal(expected, instance.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_from_dxf(self):
+        # instance = Instance()
+        # assert_equal(expected, instance.from_dxf(blocks, mat3))
+        raise SkipTest # TODO: implement your test here
+
+class test__Group:
+    def test_bbox(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_connect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.connect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.to_dxf(**kwargs))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":

@@ -11,7 +11,9 @@ from __future__ import division #"true division" everywhere
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
 __license__ = "LGPL"
-__credits__ = ['http://code.google.com/p/pyeuclid', 'http://www.nmt.edu/tcc/help/lang/python/examples/homcoord/']
+__credits__ = [
+    'http://code.google.com/p/pyeuclid', 
+    'http://www.nmt.edu/tcc/help/lang/python/examples/homcoord/']
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
@@ -916,14 +918,14 @@ class Matrix3(object):
     behaves in the obvious way.
     """
 
-    def __init__(self, *values):
+    def __init__(self, *args):
         self.identity()
-        if not values:
+        if not args:
             return
-        if len(values)==1:
-            values=values[0][:]
-        if len(values)==9:
-            self[:] = values
+        if len(args)==1:
+            args=args[0][:]
+        if len(args)==9:
+            self[:] = args
         else:
             raise RuntimeError('%s.__init__(%s) failed'%(self.__class__.__name__,object))
 
@@ -1166,14 +1168,14 @@ class Matrix3(object):
 
 class Matrix4(object):
 
-    def __init__(self, *values):
+    def __init__(self, *args):
         self.identity()
-        if not values:
+        if not args:
             return
-        if len(values)==1:
-            values=values[0][:]
-        if len(values)==16:
-            self[:] = values
+        if len(args)==1:
+            args=args[0][:]
+        if len(args)==16:
+            self[:] = args
         else:
             raise RuntimeError('%s.__init__(%s) failed'%(self.__class__.__name__,object))
 
@@ -1733,6 +1735,7 @@ class Quaternion:
     # w is the real part, (x, y, z) are the imaginary parts
 
     def __init__(self, w=1, x=0, y=0, z=0):
+        super(Quaternion,self).__init__() #TODO : add a copy constructor one day
         self.w = w
         self.x = x
         self.y = y
@@ -2051,6 +2054,14 @@ class Geometry(object):
         >>> line.connect(circ).p2
         Point2(1.59, 0.59)
     """
+    def __init__(self,*args):
+        """ 
+        this constructor is called by descendant classes at copy
+        it is replaced to copy some graphics attributes in module drawings
+        """
+        if len(args)==1 and isinstance(args[0],Geometry): #copy constructor
+            self.__dict__.update(args[0].__dict__)
+    
     def _connect_unimplemented(self, other):
         raise AttributeError('Cannot connect %s to %s' % \
             (self.__class__, other.__class__))
@@ -2317,6 +2328,7 @@ class Line2(Geometry):
     """
 
     def __init__(self, *args):
+        super(Line2,self).__init__(*args)
         if len(args) == 1: # Line2 or derived class
             self.p = Point2(args[0].p)
             self.v = Vector2(args[0].v)
@@ -2449,6 +2461,7 @@ class Circle(Geometry):
         * center, radius
         """
         if len(args) == 1: # Circle or derived class
+            super(Circle,self).__init__(*args)
             self.c = Point2(args[0].c)
             self.p = Point2(args[0].p)
             self.r = args[0].r
@@ -2523,24 +2536,22 @@ class Arc2(Circle):
 
         """
         if isinstance(center,Arc2): #copy constructor
-            p1=center.p
-            p2=center.p2
-            r=center.r
-            dir=center.dir
-            center=center.c
-            
-        c=Point2(center)
-        if isinstance(p1,(int,float)):
-            p=c+Polar(r,p1)
+            super(Arc2,self).__init__(center)
+            self.p2=Point2(center.p2)
+            self.dir=center.dir
         else:
-            p=Point2(p1)
-            r=c.dist(p)
-        super(Arc2,self).__init__(c,p)
-        if isinstance(p2,(int,float)):
-            self.p2=c+Polar(r,p2)
-        else:
-            self.p2=Point2(p2)
-        self.dir=dir
+            c=Point2(center)
+            if isinstance(p1,(int,float)):
+                p=c+Polar(r,p1)
+            else:
+                p=Point2(p1)
+                r=c.dist(p)
+            super(Arc2,self).__init__(c,p)
+            if isinstance(p2,(int,float)):
+                self.p2=c+Polar(r,p2)
+            else:
+                self.p2=Point2(p2)
+            self.dir=dir
 
         self._apply_transform(None) #to set start/end angles
         # self.a is now start angle in [-pi,pi]
@@ -2929,6 +2940,7 @@ class Line3(Geometry):
                 raise AttributeError('%r' % (args,))
         elif len(args) == 1: #copy constructor
             if isinstance(args[0], Line3):
+                super(Line3,self).__init__(*args)
                 self.p = Point3(args[0])
                 self.v = Vector3(args[0])
             else:
@@ -3037,10 +3049,23 @@ class Sphere(Geometry):
         simply returns the length of the result of ``connect``.
     """
 
-    def __init__(self, center, radius):
-        assert isinstance(center, Vector3) and type(radius) == float
-        self.c = copy(center)
-        self.r = radius
+    def __init__(self, *args):
+        """:param args: can be
+        * Sphere
+        * center, point on sphere
+        * center, radius
+        """
+        if len(args) == 1: # Circle or derived class
+            super(Sphere,self).__init__(*args)
+            self.c = Point2(args[0].c)
+            self.r = args[0].r
+        else: #2 first params are used to stay compatible with Arc2
+            self.c = Point2(args[0])
+            if isinstance(args[1],(float,int)):
+                self.r = args[1]
+            else:
+                p=Point2(args[1]) #one point on sphere
+                self.r=abs(p-self.c)
 
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
