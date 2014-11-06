@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-handle vector graphics in .dxf, .svg and .pdf formats
+Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 :requires:
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
@@ -25,7 +25,9 @@ import matplotlib, os
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
-# matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
+else:
+    matplotlib.use('Agg')
+    # matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
 
 import matplotlib.pyplot as plt
 
@@ -211,16 +213,17 @@ class Entity(object):
         return -1 #layer color
 
     def to_dxf(self,**attr):
-        """:return: dxf entity"""
+        """
+        :param attr: dict of attributes passed to the dxf entity, overriding those defined in self
+        :return: dxf entity
+        """
         import dxfwrite.entities as dxf
 
         color=self._dxf_color()
         if color>=0:
-            attr['color']=color
-
+            attr.setdefault('color',color)
         try:
-            layer=self.layer
-            attr['layer']=layer
+            attr.setdefault('layer',self.layer)
         except:
             pass
 
@@ -396,8 +399,9 @@ class Entity(object):
         from io import BytesIO
         output = BytesIO()
         fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        res=output.getvalue()
         plt.close(fig)
-        return output.getvalue()
+        return res
 
     # for IPython notebooks
     def _repr_png_(self): return self.render('png')
