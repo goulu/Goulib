@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -12,7 +15,8 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        assert_equal(tag('tag', 'between', class_='class'),'<tag class="class">between</tag>')
+        t=tag('tag', u'bétweêñ', class_='class')
+        assert_equal(t,b'<tag class="class">b&#233;twe&#234;&#241;</tag>')
         
 
 class TestElement:
@@ -180,6 +184,16 @@ class test__oneliner:
     def test___init__(self):
         # _oneliner = _oneliner(case)
         raise SkipTest 
+
+class test__oneliner:
+    def test___getattr__(self):
+        # _oneliner = _oneliner(case)
+        # assert_equal(expected, _oneliner.__getattr__(attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # _oneliner = _oneliner(case)
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()

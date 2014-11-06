@@ -4,7 +4,7 @@
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.
 """
-simple HTML/XML generation (forked from http://markup.sourceforge.net/ v 1.9)
+simple HTML/XML generation (forked from `markup <http://pypi.python.org/pypi/markup/>`_)
 """
 
 import sys, six
@@ -45,7 +45,7 @@ def tag( tag, between, **kwargs ):
             out = "%s />" % out
         else:
             out = "%s>" % out
-    return out
+    return out.encode('ascii', 'xmlcharrefreplace')
 
 # tags which are reserved python keywords will be referred 
 # to by a leading underscore otherwise we end up with a syntax error
