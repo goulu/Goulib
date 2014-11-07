@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Goulib'
-copyright = u'2013, Ph. Guglielmetti, https://github.com/goulu/Goulib'
+copyright = u'2014, Ph. Guglielmetti, https://github.com/goulu/Goulib'
 
 #autodoc options:
 autodoc_member_order = 'bysource'

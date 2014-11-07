@@ -3,7 +3,7 @@ Goulib
 
 library of useful Python code for scientific + technical applications
 
-see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>` to get an idea of what's inside
+see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
 .. image:: https://pypip.in/license/Goulib/badge.png
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT

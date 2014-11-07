@@ -3,7 +3,7 @@ Goulib
 
 library of useful Python code for scientific + technical applications
 
-see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>` to get an idea of what's inside
+see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
 .. image:: https://pypip.in/license/Goulib/badge.png
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
@@ -45,7 +45,7 @@ expr
 geom
 	2D + 3D geometry
 graph
-	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>` and related algorithms
+	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>`_ and related algorithms
 interval
 	operations on [x..y[ intervals
 itertools2
@@ -57,7 +57,7 @@ math2
 motion
 	functions of time which provide (position, velocity, acceleration, jerk) tuples
 optim
-	optimization algorithms : knapsack, travelling salesman, simulated annealing
+	optimization algorithms : knapsack, traveling salesman, simulated annealing
 piecewise
 	piecewise-defined functions
 polynomial
