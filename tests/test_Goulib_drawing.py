@@ -180,7 +180,7 @@ class TestEntity:
     def test_patches(self):
         # entity = Entity()
         # assert_equal(expected, entity.patches(**kwargs))
-        raise SkipTest 
+        raise SkipTest
 
     def test___copy__(self):
         s2=copy(self.seg)
@@ -211,7 +211,7 @@ class TestGroup:
         arc=Arc2((1,1),(0,0),radians(120))
         circle=Circle((1,1),2)
         self.group=Group([seg,arc,circle])
-        
+
         self.dxf= Drawing(path+'/Homer_Simpson_by_CyberDrone.dxf')
         self.blocks= self.dxf.block
         assert_true('hand 1' in self.blocks)
@@ -407,17 +407,17 @@ class TestRect:
         # see IPython notebook for graphical examples
         self.r1=r1=Rect((0,0),(-1,1))
         self.r2=Rect((1,-1),(2,2))
-        
+
     def test___init__(self):
         pass #tested above
-    
+
     def test_connect(self):
         s1=self.r1.connect(self.r2)
         assert_equal(s1,Segment2(Point2(0,0),Point2(1,0)))
         c1=Circle(Point2(4,1),1)
         s2=self.r2.connect(c1)
         assert_equal(s2,Segment2(Point2(2,1),Point2(3,1)))
-        
+
     def test_distance(self):
         assert_equal(self.r1.distance(self.r2),1)
 
@@ -529,9 +529,11 @@ class test__Group:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
+    """
     logging.basicConfig(
         level=logging.DEBUG,
         filename='%s_%d.%d.log'%(os.path.basename(__file__),sys.version_info[0],sys.version_info[1]),
         format = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s",
     )
+    """
     runmodule()
