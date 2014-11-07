@@ -16,7 +16,7 @@ class TestCgiprint:
 class TestTag:
     def test_tag(self):
         t=tag('tag', u'bétweêñ', class_='class')
-        assert_equal(t,b'<tag class="class">b&#233;twe&#234;&#241;</tag>')
+        assert_equal(t,'<tag class="class">b&#233;twe&#234;&#241;</tag>')
         
 
 class TestElement:

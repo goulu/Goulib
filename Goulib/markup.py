@@ -39,13 +39,15 @@ def tag( tag, between, **kwargs ):
         else:
             out = "%s %s" % ( out, key )
     if between is not None:
+        if isinstance(between,six.text_type): #unicode
+            between=between.encode('ascii', 'xmlcharrefreplace').decode('unicode_escape')
         out = "%s>%s</%s>" % ( out, between, tag )
     else:
         if single:
             out = "%s />" % out
         else:
             out = "%s>" % out
-    return out.encode('ascii', 'xmlcharrefreplace')
+    return out
 
 # tags which are reserved python keywords will be referred 
 # to by a leading underscore otherwise we end up with a syntax error

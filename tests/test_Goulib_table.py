@@ -38,7 +38,8 @@ class TestTable:
         assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
         
         ref='<tr><td align="right">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td align="right">2</td><td align="right">125.00</td><td align="right">250.00</td></tr>'
-        assert_equal(Row(self.t2[14]).html(),ref)
+        t=Row(self.t2[14]).html()
+        assert_equal(t,ref)
         
     def test___init__(self):
         pass #tested in setup
