@@ -19,7 +19,7 @@ try: # using http://lxml.de/
 except: #ElementTree
     logging.info('LXML unavailable : falling back to ElementTree')
     from xml.etree import ElementTree
-    from html.parser import HTMLParser
+    from six.html_parser import HTMLParser
     defaultparser=HTMLParser
     
 Element=ElementTree._Element
@@ -338,7 +338,7 @@ class Table(list):
         empty=''.encode(encoding)
         
         if six.PY3 :
-            f = open(filename, 'w', newline='')
+            f = open(filename, 'w', newline='', encoding=encoding)
             def _encode(line): 
                 return [s for s in line]
         else: #Python 2
