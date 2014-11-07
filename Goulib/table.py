@@ -303,7 +303,7 @@ class Table(list):
         data_line=kwargs.pop('data_line',2)-1
         dialect=kwargs.setdefault('dialect',csv.excel)
         delimiter=kwargs.setdefault('delimiter',';')
-        encoding=kwargs.pop('encoding','iso-8859-15')
+        encoding=kwargs.pop('encoding','utf-8') #was iso-8859-15 earlier
         errors=kwargs.pop('errors','strict')
         
         def csv_reader2(): # version for Python 2
@@ -334,7 +334,7 @@ class Table(list):
     
         dialect=kwargs.get('dialect','excel')
         delimiter=kwargs.get('delimiter',';')
-        encoding=kwargs.get('encoding','iso-8859-15') #for windows
+        encoding=kwargs.pop('encoding','utf-8') #was iso-8859-15 earlier
         empty=''.encode(encoding)
         
         if six.PY3 :
