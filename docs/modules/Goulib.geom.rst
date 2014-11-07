@@ -1,4 +1,4 @@
-geom
+Goulib.geom module
 ==================
 .. automodule:: Goulib.geom
 

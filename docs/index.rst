@@ -17,6 +17,9 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 .. image:: https://coveralls.io/repos/goulu/Goulib/badge.png
   :target: https://coveralls.io/r/goulu/Goulib
   :alt: Tests
+.. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
+  :target: http://goulib.readthedocs.org/en/latest/
+  :alt: Doc
 .. image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
 	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
 .. image:: https://api.coderwall.com/goulu/endorsecount.png
@@ -31,6 +34,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 
 Modules
 -------
+
 .. autosummary::
    Goulib.colors
    Goulib.datetime2

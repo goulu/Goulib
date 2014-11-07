@@ -1,4 +1,4 @@
-colors
+Goulib.colors module
 ====================
 
 .. automodule:: Goulib.colors
