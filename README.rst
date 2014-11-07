@@ -35,49 +35,49 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 Modules
 -------
 
-colors
+**colors**
 	hex RGB colors and related functions
-datetime2
+**datetime2**
 	additions to datetime standard library
-decorators
+**decorators**
 	useful decorators
-drawing
+**drawing**
 	Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
-expr
+**expr**
 	simple symbolic math expressions
-geom
+**geom**
 	2D + 3D geometry
-graph
+**graph**
 	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>`_ and related algorithms
-interval
+**interval**
 	operations on [x..y[ intervals
-itertools2
+**itertools2**
 	additions to itertools standard library
-markup
+**markup**
 	simple HTML/XML generation (forked from `markup <http://pypi.python.org/pypi/markup/>`_)
-math2
+**math2**
 	additions to math standard library
-motion
+**motion**
 	functions of time which provide (position, velocity, acceleration, jerk) tuples
-optim
+**optim**
 	optimization algorithms : knapsack, traveling salesman, simulated annealing
-piecewise
+**piecewise**
 	piecewise-defined functions
-polynomial
+**polynomial**
 	manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by Rick Muller
-stats
+**stats**
     very basic statistics functions
-table
+**table**
 	Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
-tests
+**tests**
     utilities for unit tests (using nose)
-workdays
+**workdays**
 	WorkCalendar class with datetime operations on working hours
 	merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
 
 Requirements
--------
+------------
 
-Goulib uses "lazy" requirements.
+Goulib uses lazy requirements.
 Many modules and functions do not require any other packages,
 packages listed in requirements.txt are needed only by some Goulib classes or functions
