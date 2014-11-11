@@ -481,7 +481,7 @@ class _Group(Entity, Geometry):
                 inter=e.intersect(o)
                 if inter is None: 
                     continue
-                if type(inter) is Point2 :
+                if isinstance(inter,(Point2,Segment2)) :
                     yield (inter,e)
                 else:
                     try: #generator ?
@@ -490,6 +490,7 @@ class _Group(Entity, Geometry):
                             yield (i,e2)
                     except: #simple
                         logging.warning('unknown intersection type %s'%inter)
+                        inter=e.intersect(o) #reproduce for debug
                         yield (inter,e) 
 
     def connect(self, other):
@@ -848,7 +849,7 @@ class Rect(Chain):
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p1,self.p2)
 
-class Text(Point2, Entity):
+class Text(Entity):
 
     def __init__( self, text, point, size=12, rotation=0):
         """
@@ -857,13 +858,20 @@ class Text(Point2, Entity):
         :param size: size in points
         :param rotation: float angle in degrees trigowise
         """
-        super(Text,self).__init__(point)
+        self.p=Point2(point)
         self.text=text
         self.size=size
         self.rotation=rotation
+        
+    def _apply_transform(self, t):
+        self.p=t*self.p
+        self.rotation+=degrees(t.angle())
 
     def bbox(self):
         return BBox(self,self)
+    
+    def intersect(self,other):
+        return None #TODO implement
 
     def to_dxf(self, **attr):
         #TODO: avoir duplicating Entity.to_dxf code
@@ -878,7 +886,7 @@ class Text(Point2, Entity):
             pass
 
         from dxfwrite.entities import Text as Text_dxf
-        return Text_dxf(insert=self.xy, text=self.text, height=self.size, **attr)
+        return Text_dxf(insert=self.p.xy, text=self.text, height=self.size, **attr)
 
     def patches(self, **kwargs):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
@@ -894,7 +902,7 @@ class Text(Point2, Entity):
         from matplotlib.text import Annotation
         from matplotlib.text import Text as Text_pdf
 
-        return [Text_pdf(self.x,self.y, self.text, size=self.size, rotation=self.rotation,**kwargs)]
+        return [Text_pdf(self.p.x,self.p.y, self.text, size=self.size, rotation=self.rotation,**kwargs)]
 
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
