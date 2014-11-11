@@ -556,13 +556,8 @@ class Table(list):
         :param f: function of the form lambda line:bool returning True if line should be removed
         :return: int number of lines removed
         """
-        res=0
-        if len(self)>0:
-            for line in reversed(self):
-                if f(line):
-                    self.remove(line)
-                    res+=1
-        return res
+        from .itertools2 import removef
+        return len(removef(self,f))
     
     def __eq__(self,other):
         """compare 2 Tables contents, mainly for tests"""

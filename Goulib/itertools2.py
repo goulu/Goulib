@@ -315,11 +315,29 @@ def filter2(iterable,condition):
             no.append(x)
     return yes,no
 
-def ifind(iterable,f):
+def ifind(iterable,f,reverse=False):
     """iterates through items in iterable where f(item) == True."""
-    for i,item in enumerate(iterable):
-        if f(item):
-            yield i,item
+    if not reverse:
+        for i,item in enumerate(iterable):
+            if f(item):
+                yield i,item
+    else:
+        l=len(iterable)-1
+        for i,item in enumerate(reversed(iterable)):
+            if f(item):
+                yield l-i,item
+
+def removef(iterable,f):
+    """
+    removes items from an iterable based on condition
+    :param iterable: iterable . will be modified in place
+    :param f: function of the form lambda line:bool returning True if item should be removed
+    :return: list of removed items.
+    """
+    res=[]
+    for i,_ in ifind(iterable,f,reverse=True):
+        res.insert(0,iterable.pop(i)) #prepend since we traverse iterable backwards :-)
+    return res
 
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""

@@ -146,14 +146,17 @@ class TestTable:
         raise SkipTest 
 
     def test_remove_lines_where(self):
-        # table = Table(filename, titles, data, **kwargs)
-        # assert_equal(expected, table.remove_lines_where(filter))
-        raise SkipTest 
+        import copy
+        t=copy.deepcopy(self.t) #so we can play with it
+        i=t._i('Rep')
+        l=len(t)
+        r=t.remove_lines_where(lambda line:line[i]=='Jones')
+        assert_equal(r,8)
+        assert_equal(len(t),l-r)
 
     def test_rowasdict(self):
-        # table = Table(filename, titles, data, **kwargs)
-        # assert_equal(expected, table.rowasdict(i))
-        raise SkipTest 
+        r=self.t.rowasdict(3)
+        assert_equal(r,{})
 
     def test_set(self):
         # table = Table(filename, titles, data, **kwargs)

@@ -257,5 +257,12 @@ class TestBest:
         assert_equal(best([3,2,1,2,1]),[1,1])
         assert_equal(best([3,2,1,2,1],reverse=True,n=2),[3,2,2])
 
+class TestRemovef:
+    def test_removef(self):
+        l=[0,1,'a',None,3.14,[]]
+        r=removef(l,lambda x:True if not x else False)
+        assert_equal(r,[0,None,[]])
+        assert_equal(l,[1,'a',3.14])
+
 if __name__ == "__main__":
     runmodule()
