@@ -1055,7 +1055,7 @@ class Matrix3(object):
     def offset(self):
         return self*Point2(0,0)
 
-    def angle(self,angle):
+    def angle(self,angle=0):
         """
         :param angle: angle in radians of a unit vector starting at origin
         :return: float bearing in radians of the transformed vector
