@@ -47,7 +47,7 @@ class TestCase(unittest.TestCase):
         differing = '%ss differ: %s != %s\n' % elements
 
         i=0
-        for item1,item2 in zip(seq1,seq2):
+        for item1,item2 in six.moves.zip_longest(seq1,seq2):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta)
             i+=1
@@ -98,6 +98,7 @@ assert_true = _t.assertTrue
 assert_false = _t.assertFalse
 assert_equal = _t.assertEqual
 assert_almost_equal = _t.assertAlmostEqual
+assert_not_equal = _t.assertNotEqual
 assert_raises = _t.assertRaises
 
 del Dummy

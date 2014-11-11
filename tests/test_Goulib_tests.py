@@ -26,6 +26,11 @@ class TestAssertEqual:
             First differing element 1: [2, 3] != [2, 4]
             First differing element 1: 3 != 4
             """
+            
+        assert_equal({'a':0,'b':1},{'b':1,'a':0})
+        # assert_equal({'a':0,'b':1},{}) # did not fail, but how to test it ?
+        assert_not_equal({'a':0,'b':1},{})
+        assert_not_equal({'a':'dict'},{'another':'dict'})
 
 class TestRunmodule:
     def test_runmodule(self):
