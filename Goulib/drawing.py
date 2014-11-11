@@ -25,8 +25,6 @@ import matplotlib, os
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
-else:
-    matplotlib.use('Agg')
     # matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
 
 import matplotlib.pyplot as plt
@@ -472,7 +470,7 @@ class _Group(Entity, Geometry):
     def intersect(self, other):
         """
         :param other: `geom.Entity`
-        :result: generate tuples (Point2,Entity) of intersections between other and each Entity
+        :result: generate tuples (Point2,Entity_self) of intersections between other and each Entity
         """
         try:
             iter(other)
@@ -481,9 +479,18 @@ class _Group(Entity, Geometry):
         for e in self:
             for o in other:
                 inter=e.intersect(o)
-                if inter:
-                    inter=e.intersect(o)
+                if inter is None: 
+                    continue
+                if type(inter) is Point2 :
                     yield (inter,e)
+                else:
+                    try: #generator ?
+                        for i,e2 in inter:
+                            e2.group=e
+                            yield (i,e2)
+                    except: #simple
+                        logging.warning('unknown intersection type %s'%inter)
+                        yield (inter,e) 
 
     def connect(self, other):
         for (inter, _) in self.intersect(other):
@@ -892,10 +899,11 @@ class Text(Point2, Entity):
 class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
 
-    def __init__(self, filename=None, data=[], **kwargs):
-        Group.__init__(self,data)
-        if filename:
-            self.load(filename,**kwargs)
+    def __init__(self, data=[], **kwargs):
+        if isinstance(data,six.string_types): #filename
+            self.load(data,**kwargs)
+        else:
+            Group.__init__(self,data)
 
     def load(self,filename, **kwargs):
             ext=filename.split('.')[-1].lower()
