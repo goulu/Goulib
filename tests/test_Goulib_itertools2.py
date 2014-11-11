@@ -17,6 +17,7 @@ class TestIndex:
 class TestFirst:
     def test_first(self):
         assert_equal(first(irange(1,10)),1)
+        assert_equal(first('abc'),'a')
 
 class TestLast:
     def test_last(self):
@@ -49,7 +50,11 @@ class TestIlinear:
 
 class TestFlatten:
     def test_flatten(self):
-        assert_equal(flatten([[1,2],[3]]),[1,2,3])
+        f=list(flatten([[1,2],[3]]))
+        assert_equal(f,[1,2,3])
+        assert_equal(flatten([1,[2,[3]]]),[1,2,3])
+        assert_equal(flatten(['a',['bc']]),['a','bc']) #do not recurse in strings
+        assert_equal(flatten([[[1],(2,[3])]],(tuple)),[1,(2,[3])]) # do not recurse in tuple
 
 class TestCompact:
     def test_compact(self):

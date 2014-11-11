@@ -16,8 +16,7 @@ import six #Python2+3 compatibility utilities
 from itertools import islice, repeat
 from itertools import count, tee
 from itertools import chain, starmap
-import random
-import collections
+import random, collections
 from functools import reduce
 
 #reciepes from Python manual
@@ -28,11 +27,14 @@ def take(n, iterable):
 
 def index(n, iterable):
     "Returns the nth item"
-    return next(islice(iterable, n, n+1))
+    return six.next(islice(iterable, n, n+1))
 
 def first(iterable):
-    """Take first element in the iterable"""
-    return next(iterable)
+    """:return: first element in the iterable"""
+    try:
+        return six.next(iterable)
+    except:
+        return iterable[0]
 
 def last(iterable):
     """Take last element in the iterable"""
@@ -84,9 +86,21 @@ def ilinear(start,end,n):
         res=(ilinear(s,e,n) for s,e in zip(start,end))
         return zip(*res)
 
-def flatten(lstlsts):
-    """Flatten a list of lists"""
-    return (b for a in lstlsts for b in a)
+def flatten(l, donotrecursein=six.string_types):
+    """iterator to flatten (depth-first) structure
+    :param l: iterable structure
+    :param donotrecursein: tuple of iterable types in which algo doesn't recurse
+                           string type by default
+    """
+    #http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
+    for el in l:
+        if not isinstance(el, collections.Iterable):
+            yield el
+        elif isinstance(el, donotrecursein):
+            yield el
+        else:
+            for sub in flatten(el,donotrecursein):
+                yield sub
 
 def compact(iterable):
     """:returns: iterator skipping None values from iterable"""
@@ -122,7 +136,7 @@ def ireduce(func, iterable, init=None):
     # not functional
     if init is None:
         iterable = iter(iterable)
-        curr = next(iterable)
+        curr = six.next(iterable)
     else:
         curr = init
         yield init
@@ -189,7 +203,7 @@ def no(seq, pred=bool):
 
 def takenth(n, iterable):
     "Returns the nth item"
-    return next(islice(iterable, n, n+1))
+    return six.next(islice(iterable, n, n+1))
 
 def takeevery(n, iterable):
     """Take an element from iterator every n elements"""
@@ -309,7 +323,7 @@ def ifind(iterable,f):
 
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
-    return next(ifind(iterable,f))
+    return six.next(ifind(iterable,f))
 
 def isplit(iterable,sep,include_sep=False):
     """ split iterable by separators or condition
@@ -423,7 +437,7 @@ class iter2(object):
         return chain(self._iter, iter(iterable))
 
     def __next__(self):
-        return next(self._iter)
+        return six.next(self._iter)
 
     next=__next__ #Python2-3 compatibility
 
