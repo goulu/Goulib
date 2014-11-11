@@ -444,12 +444,4 @@ class iter2(object):
     def __iter__(self):
         return self
 
-def iflatten(iterable):
-    '''flatten a list of any depth'''
-    iterable = iter2(iterable)
-    for e in iterable:
-        if hasattr(e, '__iter__'):
-            iterable.insert(0, e)
-        else:
-            yield e
 

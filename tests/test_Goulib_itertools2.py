@@ -223,11 +223,6 @@ class TestIter2:
         # assert_equal(expected, iter2.__next__())
         raise SkipTest 
 
-class TestIflatten:
-    def test_iflatten(self):
-        # assert_equal(expected, iflatten(iterable))
-        raise SkipTest 
-
 class TestCartesianProduct:
     def test_cartesian_product(self):
         #test case for compatibility with itertools.product
