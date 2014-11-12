@@ -38,6 +38,11 @@ class TestGeometry:
         # geometry = Geometry(*args)
         raise SkipTest # TODO: implement your test here
 
+    def test___contains__(self):
+        # geometry = Geometry(*args)
+        # assert_equal(expected, geometry.__contains__(pt))
+        raise SkipTest # TODO: implement your test here
+
 class TestPoint2:
     @classmethod
     def setup_class(self):
@@ -212,7 +217,7 @@ class TestVector3:
         
     def test___init__(self):
         #test copy constructor
-        v10=Vector2(self.v10)
+        v10=Vector3(self.v10)
         assert_equal(v10,self.v10)
         assert_false(v10 is self.v10)
     
@@ -827,6 +832,27 @@ class TestLine2:
         assert_equal(inter,Point2(-1,-1))
         inter=self.l1.intersect(self.l3)
         assert_equal(inter,Point2(-1,-1))
+        
+        #same tests as in Notebook
+        a=Arc2((0,0),(0,1),(1,0))
+        l1=Line2((-2,.5),Vector2(4,0)) #horizontal at y=0.5
+        l2=Line2((-2,-.5),Vector2(4,0)) #horizontal at y=-0.5
+        
+        #l1 has a single intersection with a
+        p1=Point2(-sqrt(3)/2,.5)
+        inter=l1.intersect(a)
+        assert_equal(inter,p1)
+        inter=a.intersect(l1) #same intersection after entity swapping
+        assert_equal(inter,p1)
+        
+         #l2 has a two intersection with a
+        p1=Point2(-sqrt(3)/2,-.5)
+        p2=Point2(+sqrt(3)/2,-.5)
+        inter=l2.intersect(a)
+        assert_equal(set(inter),set([p1,p2]))
+        inter=a.intersect(l2)
+        assert_equal(set(inter),set([p1,p2]))
+
 
     def test_point(self):
         assert_equal(self.l1.point(0),self.l1.p)
@@ -952,6 +978,7 @@ class TestArc2:
         self.a3=Arc2((0,0),pi/2.,0,1,dir=-1) #same, inverted
         self.ap=Arc2(center=Point2(454.80692478710336, 69.74749779176005),p1=Point2(74.67492478710335, 86.62949779176006),p2=Point2(74.48092478710339, 58.021497791760055),r=380.506687652)
         self.ap2=Arc2(center=Point2(-454.80607521289664, -9.203502208239968),p1=Point2(-74.67307521289663, -26.08650220823995),p2=Point2(-74.47907521289662, 2.521497791760055),r=380.507731036)
+        self.c=Arc2((1,1),r=1) #unit circle around (1,1)
     
     def test___init__(self):
         #copy constructor

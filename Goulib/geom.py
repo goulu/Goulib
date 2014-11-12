@@ -24,6 +24,14 @@ from Goulib import math2
 
 precision = 1e-9 #for equality comparisons
 
+def _hash(v):
+    # http://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
+    primes=[73856093, 19349663, 83492791]
+    res=0
+    for x,p in zip(v,primes):
+        res=res^int(x*p) # ^ is xor
+    return res
+
 def copy(object):
     try:
         return object.__class__(object) #call copy constructor
@@ -211,19 +219,6 @@ class Vector2(object):
         >>> v3 == (1, 2, 3)
         True
 
-    Vectors are not hashable, and hence cannot be put in sets nor used as
-    dictionary keys::
-
-        >>> {Vector2(): 0}
-        Traceback (most recent call last):
-            ...
-        TypeError: unhashable type: 'Vector2'
-
-        >>> {Vector3(): 0}
-        Traceback (most recent call last):
-            ...
-        TypeError: unhashable type: 'Vector3'
-
     """
 
     def __init__ ( self, *args ):
@@ -239,6 +234,9 @@ class Vector2(object):
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xy)
+    
+    def __hash__(self):
+        return _hash(self.xy)
 
     def __eq__(self, other):
         try: #quick
@@ -2104,9 +2102,20 @@ class Geometry(object):
             return c.length
         else:
             return None
-
-def _intersect_point2_circle(P, C):
-    return abs(P - C.c) <= C.r
+        
+    def _u(self, pt):
+        """:return: float parameter corresponding to pt"""
+        raise NotImplementedError
+    
+    def _u_in(self, u):
+        """:return: bool true if u is a valid parameter of geometry"""
+        raise NotImplementedError
+        
+    def __contains__(self,pt):
+        d=self.distance(pt)
+        if d is None or d>precision:
+            return False
+        return self._u_in(self._u(pt))
 
 def _intersect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
@@ -2150,7 +2159,7 @@ def _intersect_line2_circle(L, C):
         return p2
     if p2 is None:
         return p1
-    return Segment2(p1,p2)
+    return [p1,p2]
 
 def _connect_point2_line2(P, L):
     # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
@@ -2247,7 +2256,7 @@ class Point2(Vector2, Geometry):
         return (self-other).mag()
 
     def intersect(self, other):
-        return other._intersect_point2(self)
+        return self in other #calls other.__contains__
 
     def _intersect_circle(self, other):
         return _intersect_point2_circle(self, other)
@@ -2470,15 +2479,7 @@ class Circle(Geometry):
             else:
                 self.p=Point2(args[1]) #one point on circle
                 self.r=abs(self.p-self.c)
-
-    def point(self, u):
-        ":return: Point2 at angle u radians"
-        return self.c+Polar(self.r,u)
-
-    def tangent(self, u):
-        ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
-        return Polar(self.r,u+pi/2.)
-
+                
     def __eq__(self, other):
         if not isinstance(other,Circle):
             return False
@@ -2495,14 +2496,23 @@ class Circle(Geometry):
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
-
+    
     length = property(lambda self: abs(self))
+    
+    def point(self, u):
+        ":return: Point2 at angle u radians"
+        return self.c+Polar(self.r,u)
+
+    def tangent(self, u):
+        ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
+        return Polar(self.r,u+pi/2.)
+    
+    def __contains__(self,pt):
+        ":return: True if pt is ON or IN the circle"
+        return self.c.dist(pt)<=self.r
 
     def intersect(self, other):
         return other._intersect_circle(self)
-
-    def _intersect_point2(self, other):
-        return _intersect_point2_circle(other, self)
 
     def _intersect_line2(self, other):
         return _intersect_line2_circle(other, self)
@@ -2523,7 +2533,7 @@ class Circle(Geometry):
 
 class Arc2(Circle):
 
-    def __init__(self, center, p1=0,p2=2*pi, r=None, dir=1):
+    def __init__(self, center, p1=0, p2=2*pi, r=None, dir=1):
         """
         :param center: Point2 or (x,y) tuple
         :param p1: starting Point2 or angle in radians
@@ -2554,10 +2564,10 @@ class Arc2(Circle):
         # self.a is now start angle in [-pi,pi]
         # self.b is now end angle in [-pi,pi]
 
-    def angle(self):
+    def angle(self,b=None):
         """:return: float signed arc angle"""
         a=self.a
-        b=self.b
+        if b is None: b=self.b
         if b<a: b=b+2*pi # now b>a
         res=b-a #positive angle
         if (b<a and self.dir>0) or (b>a and self.dir<0): #complementary angle
@@ -2603,7 +2613,34 @@ class Arc2(Circle):
         self.a,self.b = self.b,self.a
         self.dir=-self.dir
         return self
+    
+    def _u(self,pt):
+        a=(pt-self.c).angle()
+        return self.angle(a)/self.angle()
+    
+    def __contains__(self,pt):
+        ":return: True if pt is ON the Arc"
+        return Geometry.__contains__(self,pt)
+    
+    def intersect(self, other):
+        inters= other._intersect_circle(self)
+        try:
+            inters[1]
+        except:
+            inters=tuple(inters)
+        res=[]
+        for pt in inters:
+            if pt in self:
+                res.append(pt)
+        if len(res)==0:
+            return None
+        elif len(res)==1:
+            return res[0]
+        else:
+            return res
 
+    def _intersect_line2(self, other):
+        return self.intersect(other)
 
 # 3D Geometry
 # -------------------------------------------------------------------------
@@ -2750,9 +2787,6 @@ def _connect_plane_plane(A, B):
     else:
         # Planes are parallel, connect to arbitrary point
         return _connect_point3_plane(A._get_point(), B)
-
-def _intersect_point3_sphere(P, S):
-    return abs(P - S.c) <= S.r
 
 def _intersect_line3_sphere(L, S):
     a = L.v.mag2()
