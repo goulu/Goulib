@@ -56,27 +56,27 @@ def Trans(scale=1, offset=None, rotation=None):
 
 class BBox:
     """bounding box"""
-    def __init__(self, pt1=None, pt2=None):
+    def __init__(self, p1=None, p2=None):
         """
         :param pt1: :class:`~geom.Point2` first corner (any)
         :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
-        self._pt1 = None
-        self._pt2 = None
-        if pt1: self +=pt1
-        if pt2: self +=pt2
+        self.p1 = None
+        self.p2 = None
+        if p1: self +=p1
+        if p2: self +=p2
 
     @property
-    def xmin(self): return self._pt1.x
+    def xmin(self): return self.p1.x
 
     @property
-    def ymin(self): return self._pt1.y
+    def ymin(self): return self.p1.y
 
     @property
-    def xmax(self): return self._pt2.x
+    def xmax(self): return self.p2.x
 
     @property
-    def ymax(self): return self._pt2.y
+    def ymax(self): return self.p2.y
 
     def __iadd__(self, pt):
         """
@@ -86,21 +86,21 @@ class BBox:
         if not pt:
             return self
         if isinstance(pt, BBox):
-            self +=pt._pt1
-            self +=pt._pt2
+            self +=pt.p1
+            self +=pt.p2
         elif isinstance(pt,Point2):
             self+= pt.xy
         else:
-            if not self._pt1:
-                self._pt1 = Point2(pt)
+            if not self.p1:
+                self.p1 = Point2(pt)
             else:
-                p=list(map(min, list(zip(self._pt1.xy, pt))))
-                self._pt1 = Point2(p)
-            if not self._pt2:
-                self._pt2 = Point2(pt)
+                p=list(map(min, list(zip(self.p1.xy, pt))))
+                self.p1 = Point2(p)
+            if not self.p2:
+                self.p2 = Point2(pt)
             else:
-                p=list(map(max, list(zip(self._pt2.xy, pt))))
-                self._pt2 = Point2(p)
+                p=list(map(max, list(zip(self.p2.xy, pt))))
+                self.p2 = Point2(p)
         return self
 
     def __add__(self,other):
@@ -110,23 +110,23 @@ class BBox:
         return res
 
     def __repr__(self):
-        return "%s(%s,%s)" % (self.__class__.__name__,self._pt1, self._pt2)
+        return "%s(%s,%s)" % (self.__class__.__name__,self.p1, self.p2)
 
     def __call__(self):
         """:return: list of flatten corners"""
-        l = list(self._pt1.xy)+list(self._pt2.xy)
+        l = list(self.p1.xy)+list(self.p2.xy)
         return l
 
     def size(self):
         """:return: :class:`geom.Vector2` with xy sizes"""
         try:
-            return self._pt2 - self._pt1
+            return self.p2 - self.p1
         except:
             return Vector2(0, 0)
 
     def center(self):
         """:return: Pt center"""
-        res = self._pt2 + self._pt1
+        res = self.p2 + self.p1
         return res / 2
 
     def trans(self, trans):
@@ -134,10 +134,10 @@ class BBox:
         :param trans: Xform
         :return: :class:`BBox` = self transformed by trans
         """
-        res = BBox(trans(self._pt1), trans(self._pt2))
+        res = BBox(trans(self.p1), trans(self.p2))
         # add 2 more corners as they matter if we rotate the box
-        res += trans(Point2(self._pt1.x, self._pt2.y))
-        res += trans(Point2(self._pt2.x, self._pt1.y))
+        res += trans(Point2(self.p1.x, self.p2.y))
+        res += trans(Point2(self.p2.x, self.p1.y))
         return res
 
 def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
@@ -169,7 +169,9 @@ class Entity(object):
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
-        if isinstance(self,Segment2):
+        if isinstance(self,Point2):
+            return BBox(self,self)
+        elif isinstance(self,Segment2):
             return BBox(self.start,self.end)
         elif isinstance(self,Arc2):
             #TODO : improve
@@ -336,6 +338,8 @@ class Entity(object):
             kwargs.setdefault('fill',False)
         if isinstance(self,Circle): #must be after isinstance(self,Arc2)
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
+        if isinstance(self,Point2):
+            return [patches.Circle(self,0,**kwargs)]
         if isinstance(self,Spline):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
@@ -406,6 +410,7 @@ class Entity(object):
     def _repr_svg_(self): return self.render('svg')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
+Point2.__bases__ += (Entity,)
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
 
@@ -481,17 +486,22 @@ class _Group(Entity, Geometry):
                 inter=e.intersect(o)
                 if inter is None: 
                     continue
-                if isinstance(inter,(Point2,Segment2)) :
+                if isinstance(inter,Point2) :
                     yield (inter,e)
+                elif isinstance(inter,Segment2) :
+                    yield (inter.p,e)
+                    yield (inter.p2,e)
+                elif isinstance(inter,list) : # list of multiple points
+                    for i in inter:
+                        yield (i,e)
                 else:
-                    try: #generator ?
+                    try:
                         for i,e2 in inter:
                             e2.group=e
                             yield (i,e2)
-                    except: #simple
-                        logging.warning('unknown intersection type %s'%inter)
-                        inter=e.intersect(o) #reproduce for debug
-                        yield (inter,e) 
+                    except:
+                        logging.error('strange intersection %s'%inter)
+
 
     def connect(self, other):
         for (inter, _) in self.intersect(other):
@@ -832,9 +842,9 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
 class Rect(Chain):
     """a rectangle starting at low/left and going trigowise through top/right"""
     def __init__(self,*args):
-        if len(args) == 1: #assume it is a Rect of 4 Segment2
-            self.p1=Point2(args[0][0].p1)
-            self.p2=Point2(args[0][2].p1)
+        if isinstance(args[0], Rect): #copy constructor
+            p1=Point2(args[0].p1)
+            p2=Point2(args[0].p2)
         else:
             v1,v2 = Point2(args[0]),Point2(args[1])
             p1=Point2(min(v1.x,v2.x),min(v1.y,v2.y))
@@ -860,7 +870,7 @@ class Text(Entity):
         """
         self.p=Point2(point)
         self.text=text
-        self.size=size
+        self.size=size # unit is point. point is 0.188 mm
         self.rotation=rotation
         
     def _apply_transform(self, t):
@@ -868,7 +878,7 @@ class Text(Entity):
         self.rotation+=degrees(t.angle())
 
     def bbox(self):
-        return BBox(self,self)
+        return BBox(self.p,self.p+Vector2(0.8*len(self.text)*self.size,self.size))
     
     def intersect(self,other):
         return None #TODO implement
