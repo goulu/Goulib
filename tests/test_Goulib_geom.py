@@ -203,6 +203,11 @@ class TestVector2:
         # assert_equal(expected, vector2.__pos__())
         raise SkipTest # TODO: implement your test here
 
+    def test___hash__(self):
+        # vector2 = Vector2(*args)
+        # assert_equal(expected, vector2.__hash__())
+        raise SkipTest # TODO: implement your test here
+
 class TestVector3:
     @classmethod
     def setup_class(self):
@@ -970,6 +975,11 @@ class TestCircle:
         # assert_equal(expected, circle.__eq__(other))
         raise SkipTest 
 
+    def test___contains__(self):
+        # circle = Circle(*args)
+        # assert_equal(expected, circle.__contains__(pt))
+        raise SkipTest # TODO: implement your test here
+
 class TestArc2:
     @classmethod
     def setup_class(self):
@@ -1031,6 +1041,16 @@ class TestArc2:
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.swap())
         raise SkipTest 
+
+    def test___contains__(self):
+        # arc2 = Arc2(center, p1, p2, r, dir)
+        # assert_equal(expected, arc2.__contains__(pt))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # arc2 = Arc2(center, p1, p2, r, dir)
+        # assert_equal(expected, arc2.intersect(other))
+        raise SkipTest # TODO: implement your test here
 
 class TestPoint3:
     @classmethod

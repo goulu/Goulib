@@ -446,6 +446,11 @@ class TestText:
         # assert_equal(expected, text.to_dxf(**attr))
         raise SkipTest # TODO: implement your test here
 
+    def test_intersect(self):
+        # text = Text(text, point, size, rotation)
+        # assert_equal(expected, text.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
 class test__Group:
     def test_bbox(self):
         # __group = _Group()
@@ -495,6 +500,37 @@ class TestInstance:
     def test_from_dxf(self):
         # instance = Instance()
         # assert_equal(expected, instance.from_dxf(blocks, mat3))
+        raise SkipTest # TODO: implement your test here
+
+class test__Group:
+    def test_bbox(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_connect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.connect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.to_dxf(**kwargs))
         raise SkipTest # TODO: implement your test here
 
 class test__Group:
