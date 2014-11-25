@@ -52,7 +52,7 @@ class TestCase(unittest.TestCase):
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta)
             i+=1
 
-    base_types=(six.integer_types,six.string_types,six.text_type,bool,set)
+    base_types=(six.integer_types,six.string_types,six.text_type,bool,set,dict)
 
     def assertEqual(self, first, second, places=7, msg=None, delta=None):
         #inspired from http://stackoverflow.com/a/3124155/190597 (KennyTM)
