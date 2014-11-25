@@ -2624,6 +2624,7 @@ class Arc2(Circle):
     
     def intersect(self, other):
         inters= other._intersect_circle(self)
+        if not inters: return None
         try:
             inters[1]
         except:
