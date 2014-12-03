@@ -402,11 +402,11 @@ class Vector2(object):
         :param unit: bool True if vectors are unit vectors. False increases computations
         :return: float angle in radians to the other vector, or self direction if other=None
         """
-        if other:
-            return math2.angle(self,other,unit=unit)
-        else:
+        if other is None:
             return atan2(self.y,self.x)
-
+        else:
+            return math2.angle(self,other,unit=unit)
+                
     def project(self, other):
         """Return one vector projected on the vector other"""
         n = other.normalized()
