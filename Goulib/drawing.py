@@ -591,7 +591,7 @@ class Group(list, _Group):
                     continue
             elif e.dxftype in ignore:
                 continue
-            elif e.dxftype == 'INSERT':
+            elif e.dxftype == 'INSERT': #TODO : improve insertion on correct layer
                 t2 = trans*Trans(1, e.insert[:2], e.rotation)
                 if flatten:
                     self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, flatten=flatten)
@@ -859,6 +859,8 @@ class Rect(Chain):
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p1,self.p2)
 
+dtp= 25.4/72 # one dtp point in mm https://en.wikipedia.org/wiki/Point_(typography)#Current_DTP_point_system
+
 class Text(Entity):
 
     def __init__( self, text, point, size=12, rotation=0):
@@ -870,15 +872,20 @@ class Text(Entity):
         """
         self.p=Point2(point)
         self.text=text
-        self.size=size # unit is point. point is 0.188 mm
+        self.size=size # unit is dtp
         self.rotation=rotation
         
     def _apply_transform(self, t):
         self.p=t*self.p
         self.rotation+=degrees(t.angle())
 
-    def bbox(self):
-        return BBox(self.p,self.p+Vector2(0.8*len(self.text)*self.size,self.size))
+    def bbox(self): #TODO : improve this very rough approximation
+        return BBox(self.p,self.p+Vector2(0.8*len(self.text)*self.size*dtp,self.size*dtp))
+    
+    @property
+    def length(self): #TODO : improve this very rough approximation
+        """:return: float length of the text contour in mm"""
+        return len(self.text)*3.6*self.size*dtp
     
     def intersect(self,other):
         return None #TODO implement
