@@ -112,6 +112,12 @@ SkipTest=nose.SkipTest
 def runmodule(redirect=True):
     if not redirect:
         return nose.runmodule()
+    
+    # enable logging
+    import logging
+    FORMAT = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s"
+    logging.basicConfig(format=FORMAT,level=logging.INFO)
+
     """ ensures stdout is printed after the tests results"""
     import sys
     from io import StringIO
