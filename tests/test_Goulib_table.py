@@ -156,7 +156,14 @@ class TestTable:
 
     def test_rowasdict(self):
         r=self.t.rowasdict(3)
-        assert_equal(r,{})
+        assert_equal(r,{'Cost': 1.99,
+                        'Item': 'Pencil',
+                        'OrderDate': '4/18/2012',
+                        'Rep': 'Andrews',
+                        'Région': 'Central',
+                        'Total': 149.25,
+                        'Unités': 75}
+                     )
 
     def test_set(self):
         # table = Table(filename, titles, data, **kwargs)
