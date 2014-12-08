@@ -63,8 +63,8 @@ class BBox:
         """
         self.p1 = None
         self.p2 = None
-        if p1: self +=p1
-        if p2: self +=p2
+        if p1 is not None: self +=p1
+        if p2 is not None: self +=p2
 
     @property
     def xmin(self): return self.p1.x
@@ -83,24 +83,26 @@ class BBox:
         enlarge box if required to contain specified point
         :param pt1: :class:`geom.Point2` point to add
         """
-        if not pt:
+        if pt is None:
             return self
-        if isinstance(pt, BBox):
-            self +=pt.p1
-            self +=pt.p2
-        elif isinstance(pt,Point2):
-            self+= pt.xy
-        else:
-            if not self.p1:
+        if type(pt) is tuple:
+            if self.p1 is None:
                 self.p1 = Point2(pt)
             else:
                 p=list(map(min, list(zip(self.p1.xy, pt))))
                 self.p1 = Point2(p)
-            if not self.p2:
+            if self.p2 is None:
                 self.p2 = Point2(pt)
             else:
                 p=list(map(max, list(zip(self.p2.xy, pt))))
                 self.p2 = Point2(p)
+        elif isinstance(pt,Point2):
+            self+= pt.xy
+        elif isinstance(pt, BBox):
+            self +=pt.p1
+            self +=pt.p2
+        else:
+            raise(NotImplementedError)
         return self
 
     def __add__(self,other):
