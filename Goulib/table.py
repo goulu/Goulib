@@ -19,7 +19,7 @@ try: # using http://lxml.de/
 except: #ElementTree
     logging.info('LXML unavailable : falling back to ElementTree')
     from xml.etree import ElementTree
-    from six.html_parser import HTMLParser
+    from six.moves.html_parser import HTMLParser
     defaultparser=HTMLParser
     
 Element=ElementTree._Element
