@@ -156,13 +156,13 @@ class TestTable:
 
     def test_rowasdict(self):
         r=self.t.rowasdict(3)
-        assert_equal(r,{'Cost': 1.99,
-                        'Item': 'Pencil',
-                        'OrderDate': '4/18/2012',
-                        'Rep': 'Andrews',
-                        'Région': 'Central',
-                        'Total': 149.25,
-                        'Unités': 75}
+        assert_equal(r,{u'Cost': 1.99,
+                        u'Item': u'Pencil',
+                        u'OrderDate': u'4/18/2012',
+                        u'Rep': u'Andrews',
+                        u'Région': u'Central',
+                        u'Total': 149.25,
+                        u'Unités': 75}
                      )
 
     def test_set(self):
