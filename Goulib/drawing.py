@@ -21,11 +21,16 @@ __license__ = "LGPL"
 from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
-import matplotlib, os
+import matplotlib, os, sys
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
-    # matplotlib.use('pgf') #for high quality pdf, but doesn't work for png, svg ...
+elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
+    matplotlib.use('WXAgg') #because 'QtAgg' crashes python while debugging
+else:
+    pass
+    # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
+logging.info('matplotlib backend is '+matplotlib.get_backend())
 
 import matplotlib.pyplot as plt
 
@@ -655,29 +660,39 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
 
-    def append(self,edge,tol=1E6):
+    def append(self, edge, tol=1E6, allow_swap=True, **attrs):
         """
+        append edge to chain, ensuring contiguity
+        :param edge: :class:`Entity` to append
+        :param tol: float tolerance on contiguity
+        :param allow_swap: if True (default), tries to swap edge or self to find contiguity
+        :param attrs: attributes passed to Group.append
         :return: self, or None if edge is not contiguous
         """
 
-        if len(self)==0:
-            return super(Chain,self).append(edge)
+        if len(self)==0: #init the chain with edge
+            return super(Chain,self).append(edge,**attrs)
         if self.end.dist(edge.start)<=tol:
-            return super(Chain,self).append(edge)
-        if self.end.dist(edge.end)<=tol:
+            return super(Chain,self).append(edge,**attrs)
+        if allow_swap and self.end.dist(edge.end)<=tol:
             edge.swap()
-            return super(Chain,self).append(edge)
-        if len(self)>1 :
+            return super(Chain,self).append(edge,**attrs)
+        
+        if not allow_swap:
             return None
-        #try to reverse the first edge
+        
+        #try to swap the first edge
+        
+        if len(self)>1 : #but if chain already contains more than 1 edge, game is over
+            return None
 
         if self.start.dist(edge.start)<=tol:
             self[0].swap()
-            return super(Chain,self).append(edge)
+            return super(Chain,self).append(edge,**attrs)
         if self.start.dist(edge.end)<=tol:
             self[0].swap()
             edge.swap()
-            return super(Chain,self).append(edge)
+            return super(Chain,self).append(edge,**attrs)
         return None
 
     @staticmethod

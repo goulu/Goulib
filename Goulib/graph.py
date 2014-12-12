@@ -11,6 +11,17 @@ __license__ = "LGPL"
 
 import logging, math, six
 
+import matplotlib, os, sys
+
+if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
+    matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
+elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
+    matplotlib.use('WXAgg') #because 'QtAgg' crashes python while debugging
+else:
+    pass
+    # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
+logging.info('matplotlib backend is '+matplotlib.get_backend())
+
 import networkx as nx # http://networkx.github.io/
 import numpy, scipy.spatial
 import matplotlib.pyplot as plt
@@ -85,7 +96,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
             create_using.add_edge(p[2],p[0])
         return create_using
     elif isinstance(data,nx.Graph): 
-        if isinstance(create_using,GeoGraph):
+        if isinstance(create_using,_Geo):
             for k in data.node: #create nodes
                 create_using.add_node(k,attr_dict=data.node[k])
             for u,v,d in data.edges(data=True):
@@ -113,7 +124,13 @@ class _Geo(object):
         self._map={} #map from original node name to position for AGraph and other graphs were 'pos' is a node attribute
         
         if data:
-            if isinstance(data,AGraph):
+            if isinstance(data,six.string_types): # suppose data is a filename
+                ext=data.split('.')[-1].lower()
+                if ext=='dot':
+                    data=nx.read_dot(data)
+                else:
+                    raise(Exception('unknown file format'))
+            elif isinstance(data,AGraph):
                 if not getattr(data,'has_layout',False):
                     data.layout()
                 
@@ -279,6 +296,7 @@ class _Geo(object):
                 p=tuple(p)
                 self._map[n]=p
             except:
+                raise(Exception('could not map %s to a (x,y,...) position'%p))
                 pass
             
         if self.idx is None: #now we know the dimension, so we can create the index
