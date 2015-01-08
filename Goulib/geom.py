@@ -2121,7 +2121,7 @@ def _intersect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
     if d == 0: #both lines are parallel
         if A.distance(B.p)==0: #colinear
-            return A
+            return A if isinstance(A,Segment2) else B
         else:
             return None
 
