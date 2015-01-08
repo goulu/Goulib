@@ -53,10 +53,12 @@ def Trans(scale=1, offset=None, rotation=None):
     if rotation:
         res = res.rotate(radians(rotation))
     if scale != 1:
-        res = res.scale(scale)
+        try:
+            res = res.scale(scale[0],scale[1])
+        except:
+            res = res.scale(scale)
     if offset:
         res = res.translate(offset)
-
     return res
 
 class BBox:

@@ -451,6 +451,11 @@ class TestText:
         # assert_equal(expected, text.intersect(other))
         raise SkipTest # TODO: implement your test here
 
+    def test_length(self):
+        # text = Text(text, point, size, rotation)
+        # assert_equal(expected, text.length())
+        raise SkipTest # TODO: implement your test here
+
 class test__Group:
     def test_bbox(self):
         # __group = _Group()
