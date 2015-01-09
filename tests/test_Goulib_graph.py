@@ -24,17 +24,13 @@ class TestGeoGraph:
         self.sphere=GeoGraph(nodes=nodes) #test if we can construct from nodes only
         self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
         
-        try:
-            from pygraphviz import AGraph
-        except:
+        if PYGRAPHVIZ: #optional import
+            self.crazy=GeoGraph(path+'/crazy.dot')
+        else:
             self.crazy=None
-            return #skip AGraph tests as pygraphviz is an optional requirement
-        a=AGraph(path+'/crazy.dot')
-        self.crazy=GeoGraph(a)
                     
     def test_save(self):
         
-        #complex AGraph
         if self.crazy:
             self.crazy.save(path+'/crazy.png', transparent=False)
         
@@ -71,6 +67,13 @@ class TestGeoGraph:
 
     def test_multi_case_2(self):
         pass #tested below
+    
+    def test_add_node(self):
+        g = GeoGraph()
+        #tests the various ways, checking the second attempt returns the same node
+        assert_equal(g.add_node((1.2,3)),g.add_node((1.2,3)))
+        assert_equal(g.add_node('(-1.2,-5)'),g.add_node('(-1.2,-5)'))
+        assert_equal(g.add_node("label"),g.add_node("label"))
         
     def test_add_edge(self):
         g=self.cube.copy()
@@ -166,11 +169,6 @@ class TestGeoGraph:
     def test___str__(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.__str__())
-        raise SkipTest 
-
-    def test_add_node(self):
-        # geo_graph = GeoGraph(G, **kwargs)
-        # assert_equal(expected, geo_graph.add_node(n, attr_dict, **attr))
         raise SkipTest 
 
     def test_add_nodes_from(self):

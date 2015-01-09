@@ -68,6 +68,7 @@ try:
     from pygraphviz import AGraph # http://pygraphviz.github.io/
     PYGRAPHVIZ=True
 except: #fallback since I couldn't manage to install graphviz on travis-ci ...
+    logging.warning('pygraphviz module not available')
     PYGRAPHVIZ=False
     
 if not PYGRAPHVIZ:
@@ -251,11 +252,8 @@ class _Geo(object):
         """
         if skip: n+=1
         if n==1:
-            try: # does it already exist ?
-                self.node[p]
+            if p in self.node:
                 return [p],0
-            except:
-                pass
         
         res,d=[],None
         for p2 in self.idx.nearest(p, num_results=n, objects='raw'):
@@ -278,8 +276,15 @@ class _Geo(object):
         
     def add_node(self, p, attr_dict=None, **attr):
         """add a node or return one already very close
+        :return (x,y,...) node id
         """
+        if p in self.node: #point already exists
+            return p
+        
         if type(p) is not tuple:
+            # try to find a position tuple somewhere
+            # otherwise generate a random position
+            # and store the node id
             if p in self._map:
                 return self._map[p]
             a={} 
@@ -288,28 +293,23 @@ class _Geo(object):
             if attr :
                 a.update(**attr)
 
+            id=p #save p as key
+            p=a.get('pos',id)
+            if isinstance(p,six.string_types):
+                p=p.split(',')
             try:
-                n=p
-                p=a['pos']
-                if isinstance(p,six.string_types): # string ?
-                    p=map(float,p.split(','))
-                p=tuple(p)
-                self._map[n]=p
-            except:
-                raise(Exception('could not map %s to a (x,y,...) position'%p))
-                pass
+                p=tuple(float(x) for x in p)
+            except: # assign a random position
+                from random import random
+                p=tuple((random(),random()))
+
+            self._map[id]=p
             
         if self.idx is None: #now we know the dimension, so we can create the index
             n=len(p)
             prop=index.Property()
             prop.set_dimension(n)
             self.idx = index.Index(properties=prop)
-        
-        try: #point already exists ?
-            self.node[p]
-            return p
-        except:
-            pass
         
         close,d=self.closest_nodes(p) #search for those within tolerance
         if close and d<=self.tol:
