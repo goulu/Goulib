@@ -33,10 +33,12 @@ def _hash(v):
     return res
 
 def copy(object):
+    #in fact it is a deepcopy
     try:
         return object.__class__(object) #call copy constructor
     except:
-        raise RuntimeError('could not copy %s'%object)
+        import copy
+        return copy.deepcopy(object)
 
 class Vector2(object):
     """
