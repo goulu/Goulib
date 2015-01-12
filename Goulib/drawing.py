@@ -37,11 +37,7 @@ import matplotlib.pyplot as plt
 from .math2 import rint, product
 from .itertools2 import split, filter2
 from .geom import *
-
-
-# http://sub-atomic.com/~moses/acadcolors.html
-# 'aqua' and 'lime' are the names of 'cyan' and 'green' inf goulib.colors
-acadcolors = ['black','red','yellow','lime','aqua','blue','magenta','white']
+from .colors import acadcolors
 
 def Trans(scale=1, offset=None, rotation=None):
     """
@@ -317,7 +313,7 @@ class Entity(object):
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color % len(acadcolors)]
+        res.color=acadcolors[e.color]
         res.layer=e.layer
         return res
 
@@ -565,6 +561,8 @@ class Group(list, _Group):
             self.append(entity,**kwargs)
 
     def __copy__(self):
+        #in fact it is a deepcopy...
+        #TODO : make this clearer
         res=self.__class__()
         for e in self:
             res.append(copy(e))
@@ -626,7 +624,7 @@ class Instance(_Group):
         res.p=Point2(e.insert[:2])
         # code below copied from Entity.from_dxf. TODO : merge
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color % len(acadcolors)]
+        res.color=acadcolors[e.color]
         res.layer=e.layer
         return res
 
@@ -648,7 +646,6 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
 
     def __init__(self,data=[]):
         Group.__init__(self,data)
-        # Entity.__init__(self)
 
     @property
     def start(self):
@@ -826,7 +823,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color % len(acadcolors)]
+        res.color=acadcolors[e.color]
         res.layer=e.layer
         for edge in res:
             edge.dxf=e
@@ -1122,8 +1119,9 @@ class Drawing(Group):
                         i = self.layers[e.layer].color
                     except:
                         pass  # no layer
-                pen = acadcolors[i % len(acadcolors)]
-                if pen==background: pen=acadcolors[(len(acadcolors)-i) % len(acadcolors)]
+                pen = acadcolors[i]
+                if pen==background:
+                    pen=acadcolors[(len(acadcolors)-i)]
                 if e.dxftype == 'LINE':
                     b = list((trans * Point2(e.start[:2])).xy)
                     b+=list(trans(Point2(e.end[:2])).xy)
