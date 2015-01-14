@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
 from .math2 import rint, product
 from .itertools2 import split, filter2
 from .geom import *
-from .colors import acadcolors
+from .colors import acadcolors, aci
 
 def Trans(scale=1, offset=None, rotation=None):
     """
@@ -201,22 +201,6 @@ class Entity(object):
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
 
-    def _dxf_color(self):
-        from .colors import color_lookup
-        try:
-            color=self.color
-        except:
-            return -1
-        # if color is an #rrggb code, find the corresponding color name
-        if color in color_lookup:
-            color=color_lookup[color]
-        # then find the name in acad color
-        try:
-            return acadcolors.index(color)
-        except:
-            pass
-        return -1 #layer color
-
     def to_dxf(self,**attr):
         """
         :param attr: dict of attributes passed to the dxf entity, overriding those defined in self
@@ -224,9 +208,8 @@ class Entity(object):
         """
         import dxfwrite.entities as dxf
 
-        color=self._dxf_color()
-        if color>=0:
-            attr.setdefault('color',color)
+        attr['color']=aci(attr.get('color',self.color))
+            
         try:
             attr.setdefault('layer',self.layer)
         except:
@@ -609,6 +592,15 @@ class Group(list, _Group):
         return self
 
 class Instance(_Group):
+    
+    def __init__(self, group, p, trans=None):
+        """
+        :param group: Group
+        :param p: Point2 of insertion
+        :param trans: optional mat3 of transformation
+        """
+        self.group=group
+        self.trans=trans.translate(p) if trans else Trans().translate(p)
 
     @staticmethod
     def from_dxf(e, blocks, mat3):
@@ -617,11 +609,8 @@ class Instance(_Group):
         :param blocks: dict of Groups indexed by name
         :param mat3: Matrix3 transform
         """
-        res=Instance()
+        res=Instance(blocks[e.name],Point2(e.insert[:2]),mat3)
         res.name=e.name
-        res.group=blocks[e.name]
-        res.trans=mat3
-        res.p=Point2(e.insert[:2])
         # code below copied from Entity.from_dxf. TODO : merge
         res.dxf=e #keep link to source entity
         res.color=acadcolors[e.color]
@@ -629,7 +618,7 @@ class Instance(_Group):
         return res
 
     def __repr__(self):
-        return '%s %s' % (self.__class__.__name__, self.name)
+        return '%s %s' % (self.__class__.__name__, self.group)
 
     def __iter__(self):
         #TODO : optimize when trans is identity
@@ -836,11 +825,12 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
 
-        #assume chain color is the same as the first element's
-        color=self[0]._dxf_color()
+        #if no color specified assume chain color is the same as the first element's
+        color=attr.get('color', self.color or self[0].color)
+        attr['color']=aci(color)
         from dxfwrite.entities import Polyline
-        flags=1 if self.isclosed() else 0
-        res=Polyline(color=color, flags=flags, **attr)
+        attr['flags']=1 if self.isclosed() else 0
+        res=Polyline(**attr)
 
         for e in self:
             if isinstance(e,Line2):
@@ -909,8 +899,7 @@ class Text(Entity):
     def to_dxf(self, **attr):
         #TODO: avoir duplicating Entity.to_dxf code
         color=self._dxf_color()
-        if color>=0:
-            attr['color']=color
+        cattr.setdefault['color']=color
 
         try:
             layer=self.layer

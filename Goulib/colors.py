@@ -232,15 +232,15 @@ color = {
 
 color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
 
-acadcolors=[
-    """array of 256 Autocad/Autodesk colors produced from http://www.isctex.com/acadcolors.php produced by this code :
+"""array of 256 Autocad/Autodesk ACI colors produced from http://www.isctex.com/acadcolors.php produced by this code :
     from Goulib.table import Table
     acadcolors=[]
     t=Table('AutoCAD Color Index RGB Equivalents.html')[1:] #outer <table> from original file must be removed
     for c in t:
         s=rgb_to_hex(c[4:])
         acadcolors.append(color_lookup[s] if s in color_lookup else s)
-    """
+"""
+acadcolors=[
     'black', 'red', 'yellow', 'lime', 'aqua', 'blue', 'magenta', 'white', 
     '#414141', 'grey', 'red', '#ffaaaa', '#bd0000', '#bd7e7e', '#810000', '#815656',
     '#680000', '#684545', '#4f0000', '#4f3535', '#ff3f00', '#ffbfaa', '#bd2e00', '#bd8d7e', 
@@ -274,13 +274,26 @@ acadcolors=[
     '#ff003f', '#ffaabf', '#bd002e', '#bd7e8d', '#81001f', '#815660', '#680019', '#68454e', 
     '#4f0013', '#4f353b', '#333333', '#505050', 'dimgrey', '#828282', '#bebebe', 'white']
 
-def nearest_color(x):
-    """:return: name of the nearest color"""
+def aci(color):
+    """
+    :return: int Autocad Color Index of color
+    """
+    if color is None:
+        return -1
+    try:
+        return acadcolors.index(color)
+    except:
+        pass
+    return acadcolors.index(color_lookup[color])
+
+def nearest_color(x,l=None):
+    """:return: name of the nearest color in list l"""
+    l=l or color.values()
     if isinstance(x,str):
         rgb=hex_to_rgb(x,1./255)
     else:
         rgb=math2.sat(x,0,1)
-    res=min(list(color.values()),key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
+    res=min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
     return color_lookup[res]
 
 from .math2 import rint
