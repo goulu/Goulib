@@ -264,5 +264,20 @@ class TestRemovef:
         assert_equal(r,[0,None,[]])
         assert_equal(l,[1,'a',3.14])
 
+class TestShuffle:
+    def test_shuffle(self):
+        # assert_equal(expected, shuffle(ary))
+        raise SkipTest # TODO: implement your test here
+
+class TestIndexMin:
+    def test_index_min(self):
+        # assert_equal(expected, index_min(values, key))
+        raise SkipTest # TODO: implement your test here
+
+class TestIndexMax:
+    def test_index_max(self):
+        # assert_equal(expected, index_max(values, key))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

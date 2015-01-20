@@ -12,11 +12,9 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
+import random, operator, collections
 
-from itertools import islice, repeat
-from itertools import count, tee
-from itertools import chain, starmap
-import random, collections
+from itertools import islice, repeat, count, tee, starmap, chain
 from functools import reduce
 
 #reciepes from Python manual
@@ -267,24 +265,36 @@ def interleave(l1,l2):
     res[1::2]=l2
     return res
 
+def shuffle(ary):
+    """
+    :param: array to shuffle by Fisher-Yates algorithm
+    :result: shuffled array (IN PLACE!)
+    :see: http://www.drgoulu.com/2013/01/19/comment-bien-brasser-les-cartes/
+    """
+    for i in range(len(ary)-1,0,-1):
+        j=random.randint(0,i)
+        ary[i],ary[j]=ary[j],ary[i]
+    return ary
+
 def rand_seq(size):
-    '''generates values in random order
-    equivalent to using shuffle in random,
-    without generating all values at once'''
-    values=list(range(size))
-    for i in range(size):
-        # pick a random index into remaining values
-        j=i+int(random.random()*(size-i))
-        # swap the values
-        values[j],values[i]=values[i],values[j]
-        # return the swapped value
-        yield values[i]
+    """
+    :return: range(size) shuffled
+    """
+    return shuffle(list(range(size)))
 
 def all_pairs(size):
     '''generates all i,j pairs for i,j from 0-size'''
     for i in rand_seq(size):
         for j in rand_seq(size):
             yield (i,j)
+            
+def index_min(values, key=identity):
+    """:return: min_index, min_value"""
+    return min(enumerate(values), key=lambda v:key(v[1]))
+
+def index_max(values, key=identity):
+    """:return: min_index, min_value"""
+    return max(enumerate(values), key=lambda v:key(v[1]))
 
 def best(iterable, key=None, n=1, reverse=False):
     """ generate items corresponding to the n best values of key sort order"""
