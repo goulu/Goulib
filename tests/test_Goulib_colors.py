@@ -21,8 +21,14 @@ class TestRgbToCmyk:
 
 class TestNearestColor:
     def test_nearest_color(self):
-        # assert_equal(expected, nearest_color(x))
-        raise SkipTest
+        assert_equal(nearest_color('#414142'),'darkslategray')
+    
+class TestAci:
+    def test_aci(self):
+        assert_equal(aci('red'), 1)
+        assert_equal(aci(acadcolors[123]), 123)
+        c=aci('#414142',True)
+        assert_equal(acadcolors[c],'#414141')
 
 class TestColorRange:
     def test_color_range(self):
