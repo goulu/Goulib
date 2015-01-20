@@ -201,19 +201,26 @@ class Entity(object):
     def ishorizontal(self,tol=0.01):
         return self.isline() and abs(self.start.y-self.end.y)<tol
 
+    def _dxf_attr(self,attr):
+        """
+        :return: dict of attributes for dxf.entity
+        """
+        res={}
+        res.update(attr)
+        res['color']=aci(res.get('color',self.color),True)
+        try:
+            res.setdefault('layer',self.layer)
+        except:
+            pass
+        return res
+        
     def to_dxf(self,**attr):
         """
         :param attr: dict of attributes passed to the dxf entity, overriding those defined in self
         :return: dxf entity
         """
         import dxfwrite.entities as dxf
-
-        attr['color']=aci(attr.get('color',self.color))
-            
-        try:
-            attr.setdefault('layer',self.layer)
-        except:
-            pass
+        attr=self._dxf_attr(attr)
 
         if isinstance(self,Segment2):
             return dxf.Line(start=self.start.xy,end=self.end.xy, **attr)
@@ -296,7 +303,11 @@ class Entity(object):
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color]
+        try:
+            res.color=acadcolors[e.color]
+        except:
+            #TODO: handle this :  0 = BYBLOCK; 256 = BYLAYER
+            res.color=None
         res.layer=e.layer
         return res
 
@@ -613,7 +624,11 @@ class Instance(_Group):
         res.name=e.name
         # code below copied from Entity.from_dxf. TODO : merge
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color]
+        try: 
+            res.color=acadcolors[e.color] 
+        except: #TODO: handle this : 0 = BYBLOCK; 256 = BYLAYER
+            res.color=None 
+            
         res.layer=e.layer
         return res
 
@@ -827,7 +842,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
 
         #if no color specified assume chain color is the same as the first element's
         color=attr.get('color', self.color or self[0].color)
-        attr['color']=aci(color)
+        attr['color']=aci(color,True)
         from dxfwrite.entities import Polyline
         attr['flags']=1 if self.isclosed() else 0
         res=Polyline(**attr)
@@ -839,6 +854,8 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
                 bulge=tan(e.angle()/4)
                 res.add_vertex(e.start.xy,bulge=bulge)
             else: #we have a Spline in the chain. Split it for now
+                attr['color']=color #otherwise it causes trouble
+                del attr['flags']
                 return super(Chain,self).to_dxf(**attr)
 
         if not self.isclosed():
@@ -897,18 +914,8 @@ class Text(Entity):
         return None #TODO implement
 
     def to_dxf(self, **attr):
-        #TODO: avoir duplicating Entity.to_dxf code
-        color=self._dxf_color()
-        cattr.setdefault['color']=color
-
-        try:
-            layer=self.layer
-            attr['layer']=layer
-        except:
-            pass
-
         from dxfwrite.entities import Text as Text_dxf
-        return Text_dxf(insert=self.p.xy, text=self.text, height=self.size, **attr)
+        return Text_dxf(insert=self.p.xy, text=self.text, height=self.size, **self._dxf_attr(attr))
 
     def patches(self, **kwargs):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
