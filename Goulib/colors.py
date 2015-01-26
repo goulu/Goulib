@@ -274,7 +274,7 @@ acadcolors=[
     '#4f0013', '#4f353b', '#333333', '#505050', '#696969', '#828282', '#bebebe', '#ffffff']
 
 
-def aci(x,nearest=False):
+def color_to_aci(x, nearest=True):
     """
     :return: int Autocad Color Index of color x
     """
@@ -290,6 +290,17 @@ def aci(x,nearest=False):
         return _nearest(x,acadcolors)[0] #return index only
     else:
         return acadcolors.index(color_lookup[x])
+
+    
+def aci_to_color(x, block_color=None, layer_color=None):
+    if x==0: return block_color
+    if x==256: return layer_color
+    c=acadcolors[x]
+    try: #handle standard Matplotlib colors by name
+        c=color_lookup[c]
+    except:
+        pass
+    return c
 
 def _nearest(x,l):
     """:return: index  of the nearest color in list l"""

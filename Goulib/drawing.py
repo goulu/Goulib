@@ -12,6 +12,7 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 """
 from __future__ import division #"true division" everywhere
+from Goulib.colors import color_lookup
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
@@ -37,7 +38,7 @@ import matplotlib.pyplot as plt
 from .math2 import rint, product
 from .itertools2 import split, filter2
 from .geom import *
-from .colors import acadcolors, aci
+from .colors import color_to_aci, aci_to_color
 
 def Trans(scale=1, offset=None, rotation=None):
     """
@@ -206,11 +207,10 @@ class Entity(object):
         :return: dict of attributes for dxf.entity
         """
         res={}
-        res.update(attr)
-        res['color']=aci(res.get('color',self.color),True)
+        res['color']=color_to_aci(attr.get('color',self.color))
         try:
-            res.setdefault('layer',self.layer)
-        except:
+            res['layer']=attr.get('layer',self.layer)
+        except: #no layer specified
             pass
         return res
         
@@ -240,12 +240,12 @@ class Entity(object):
         elif isinstance(self,Circle):
             return dxf.Circle(center=self.c.xy, radius=self.r, **attr)
         elif isinstance(self,Spline):
-            from dxfwrite import curves as dxf
-            spline=dxf.Bezier(**attr)
+            from dxfwrite import curves
+            spline=curves.Bezier(**attr)
             spline.start(self.start.xy,(self.p[1]-self.start).xy)
             spline.append(self.end.xy,(self.p[2]-self.end).xy)
             return spline
-            return dxf.Spline(self.xy, **attr) # builds a POLYLINE3D (???) with 100 segments ...
+            return curves.Spline(self.xy, **attr) # builds a POLYLINE3D (???) with 100 segments ...
         else:
             raise NotImplementedError
 
@@ -303,11 +303,7 @@ class Entity(object):
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
-        try:
-            res.color=acadcolors[e.color]
-        except:
-            #TODO: handle this :  0 = BYBLOCK; 256 = BYLAYER
-            res.color=None
+        res.color=aci_to_color(e.color)
         res.layer=e.layer
         return res
 
@@ -624,11 +620,7 @@ class Instance(_Group):
         res.name=e.name
         # code below copied from Entity.from_dxf. TODO : merge
         res.dxf=e #keep link to source entity
-        try: 
-            res.color=acadcolors[e.color] 
-        except: #TODO: handle this : 0 = BYBLOCK; 256 = BYLAYER
-            res.color=None 
-            
+        res.color=aci_to_color(e.color)
         res.layer=e.layer
         return res
 
@@ -827,7 +819,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res.dxf=e #keep link to source entity
-        res.color=acadcolors[e.color]
+        res.color=aci_to_color(e.color)
         res.layer=e.layer
         for edge in res:
             edge.dxf=e
@@ -835,14 +827,14 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
             edge.layer=res.layer
         return res
 
-    def to_dxf(self, split=False, **attr):
+    def to_dxf(self, split=True, **attr):
         """:return: polyline or list of entities along the chain"""
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
 
         #if no color specified assume chain color is the same as the first element's
         color=attr.get('color', self.color or self[0].color)
-        attr['color']=aci(color,True)
+        attr['color']=color_to_aci(color)
         from dxfwrite.entities import Polyline
         attr['flags']=1 if self.isclosed() else 0
         res=Polyline(**attr)
@@ -853,10 +845,11 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
             elif isinstance(e, Arc2):
                 bulge=tan(e.angle()/4)
                 res.add_vertex(e.start.xy,bulge=bulge)
-            else: #we have a Spline in the chain. Split it for now
-                attr['color']=color #otherwise it causes trouble
-                del attr['flags']
-                return super(Chain,self).to_dxf(**attr)
+            else: 
+                if attr.pop('R12',True): #R12 doesn't handle splines.
+                    attr['color']=color #otherwise it causes trouble
+                    del attr['flags']
+                    return super(Chain,self).to_dxf(**attr)
 
         if not self.isclosed():
             res.add_vertex(self.end.xy)
@@ -1115,9 +1108,9 @@ class Drawing(Group):
                         i = self.layers[e.layer].color
                     except:
                         pass  # no layer
-                pen = acadcolors[i]
+                pen = aci_to_color(i)
                 if pen==background:
-                    pen=acadcolors[(len(acadcolors)-i)]
+                    pen=aci_to_color(255-i) #TODO: Check
                 if e.dxftype == 'LINE':
                     b = list((trans * Point2(e.start[:2])).xy)
                     b+=list(trans(Point2(e.end[:2])).xy)

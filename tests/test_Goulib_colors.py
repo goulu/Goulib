@@ -24,10 +24,10 @@ class TestNearestColor:
         assert_equal(nearest_color('#414142'),'darkslategray')
     
 class TestAci:
-    def test_aci(self):
-        assert_equal(aci('red'), 1)
-        assert_equal(aci(acadcolors[123]), 123)
-        c=aci('#414142',True)
+    def test_color_to_aci(self):
+        assert_equal(color_to_aci('red'), 1)
+        assert_equal(color_to_aci(acadcolors[123]), 123)
+        c=color_to_aci('#414142',True)
         assert_equal(acadcolors[c],'#414141')
 
 class TestColorRange:

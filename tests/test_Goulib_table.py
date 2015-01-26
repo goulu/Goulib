@@ -75,7 +75,7 @@ class TestTable:
         f.close()
         
         t=Table(self.path+'/test.htm')
-        assert_equal(t._i('OrderDate'),0) #check the colum exists
+        assert_equal(t._i('OrderDate'),0) #check the column exists
         
         t.to_date('OrderDate')
         assert_equal(t,self.t2)
