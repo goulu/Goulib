@@ -33,6 +33,7 @@ class TestIntersectlen:
 class TestInterval:
     @classmethod
     def setup_class(self):
+        self.none = Interval(None,None) #required for Box
         self.i12 = Interval(1,2)
         self.i13 = Interval(1,3)
         self.i24 = Interval(2,4)
@@ -143,5 +144,14 @@ class TestIntervals:
     def test_insert(self):
         assert_raises(IndexError, Intervals.insert, self.intervals,1,Interval(2,3))
 
+class TestBox:
+    @classmethod
+    def setup_class(self):
+        self.box=Box([(1,2),(3,4)])
+        self.box2=Box(2)
+        
+    def test___repr__(self):
+        assert_equal(repr(self.box),'[[1,3), [2,4)]')
+        
 if __name__ == "__main__":
     runmodule()

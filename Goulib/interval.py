@@ -91,12 +91,24 @@ class Interval(object):
             return None
         return Interval(other.start, self.end)
 
+    def __iadd__(self, other):
+        """expands self to contain other."""
+        if isinstance(other,Interval):
+            s,e=other.start,other.end
+        else:
+            s,e=other,other
+        self._start=s if self.start is None else min(self.start,s)
+        self._end=e if self.end is None else max(self.end,e)
+        return self
+    
     def hull(self, other):
-        ":return: Interval containing both self and other."
-        return Interval(min(self.start,other.start), max(self.end,other.end))
+        """:return: new Interval containing both self and other."""
+        res=Interval(self.start,self.end)
+        res+=other
+        return res
     
     def overlap(self, other, allow_contiguous=False):
-        ":return: True iff self intersects other."
+        """:return: True iff self intersects other."""
         if self > other:
             other, self = self, other
         if allow_contiguous:
@@ -111,7 +123,7 @@ class Interval(object):
             return Intervals([self,other])
          
     def __contains__(self, x):
-        ":return: True if x in self."
+        """:return: True if x in self."""
         return self.start <= x and x < self.end
 
     def subset(self, other):
@@ -139,7 +151,6 @@ class Interval(object):
         else:
             return other.start - self.end
         
-import bisect      
 class Intervals(list):
     """a list of intervals kept in ascending order"""
     def __init__(self, init=[]):
@@ -152,12 +163,15 @@ class Intervals(list):
         return self
     
     def append(self, item):
+        import bisect # https://docs.python.org/2/library/bisect.html
         i=bisect.bisect_left(self,item) #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
         try:
-            if self[i].overlap(item,True):
-                return self.append(self.pop(i).hull(item))
-        except:
+            if self and self[i].overlap(item,True):
+                item=self.pop(i).hull(item)
+                return self.append(item)
+        except: #TODO : find why we have an IndexError when self is []
             pass
+        
         super(Intervals,self).insert(i,item)
         return self
     
@@ -177,4 +191,25 @@ class Intervals(list):
                 return interval
         return None
 
+class Box(list):
+    """a N dimensional rectangular box defined by a list of N Intervals"""
+    def __init__(self,data):
+        if type(data) is int:
+            super(Box,self).__init__([Interval(None,None) for _ in range(data)])
+        elif isinstance(data[0],Interval): #works also as copy constructor
+            super(Box,self).__init__(data)
+        else: #consider data as points in the box (as in a bounding box)
+            super(Box,self).__init__([Interval(None,None) for _ in data[0]])
+            for pt in data:
+                self+=pt
             
+    def __iadd__(self, pt):
+        """
+        enlarge box if required to contain specified point
+        :param pt1: :class:`geom.Point2` point to add
+        """
+        for interval,x in zip(self,pt):
+            interval+=x
+        return self
+            
+        
