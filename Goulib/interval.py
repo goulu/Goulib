@@ -13,20 +13,20 @@ def _order(interval):
     return (interval[0], interval[1]) if interval[0]<interval[1] else (interval[1], interval[0])
 
 def in_interval(interval,x,closed=True):
-    ''' True if x is in interval [a,b] or [b,a] (tuple)'''
+    """:return: bool True if x is in interval [a,b] or [b,a] (tuple)"""
     a,b = _order(interval)
     return (a <= x <= b) if closed else (a <= x < b)
 
 def intersect(t1, t2):
-    ''' True if intervals [t1[ [t2[ intersect'''
+    """:return: bool True if intervals [t1[ [t2[ intersect"""
     '''http://stackoverflow.com/questions/3721249/python-date-interval-intersection'''
     t1start, t1end = _order(t1)
     t2start, t2end = _order(t2)
     return (t1start <= t2start < t1end) or (t2start <= t1start < t2end)
 
 def intersection(t1, t2):
-    '''returns intersection between 2 intervals (tuples), 
-    or None if intervals don't intersect'''
+    """:return: tuple intersection between 2 intervals (tuples), 
+    or None if intervals don't intersect"""
     t1start, t1end = _order(t1)
     t2start, t2end = _order(t2)
     start=max(t1start,t2start)
@@ -47,11 +47,15 @@ def intersectlen(t1, t2, none=0):
 class Interval(object):
     """
     Represents an interval. 
-    Defined as half-open interval [start,end), which includes the start position but not the end.
+    Defined as half-open interval [start,end), 
+    which includes the start position but not the end.
     Start and end do not have to be numeric types. 
+    They might especially be time, date or timedate as used in datetime2
     
-    http://code.activestate.com/recipes/576816-interval/
-    alternatives could be https://pypi.python.org/pypi/interval/ (outdated, no more doc) or https://pypi.python.org/pypi/pyinterval/
+    inspired from http://code.activestate.com/recipes/576816-interval/
+    alternatives could be https://pypi.python.org/pypi/interval/
+     (outdated, no more doc)
+     or https://pypi.python.org/pypi/pyinterval/
     """
     
     def __init__(self, start, end):
@@ -137,7 +141,7 @@ class Interval(object):
         
 import bisect      
 class Intervals(list):
-    """a list of intevals kept in ascending order"""
+    """a list of intervals kept in ascending order"""
     def __init__(self, init=[]):
         super(Intervals,self).__init__()
         self.extend(init)
@@ -167,7 +171,10 @@ class Intervals(list):
         raise IndexError('Intervals do not support insert. Use append or + operator.')
         
     def __call__(self,x):
-        """ returns list of intervals containing x"""
-        return [i for i in self if i.contains(x)]
+        """ returns intervals containing x"""
+        for interval in self:
+            if x in interval:
+                return interval
+        return None
 
             

@@ -105,9 +105,7 @@ class TestInterval:
         assert_equal(a,b)
 
     def test___eq__(self):
-        # interval = Interval(start, end)
-        # assert_equal(expected, interval.__eq__(other))
-        raise SkipTest 
+        pass #tested in other tests...
 
 class TestIntervals:
     @classmethod
@@ -123,9 +121,9 @@ class TestIntervals:
         pass #tested above
         
     def test___call__(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.__call__(x))
-        raise SkipTest
+        assert_equal(self.intervals(2),Interval(1,4))
+        assert_equal(self.intervals(4),None)
+        assert_equal(self.intervals(5),Interval(5,6))
 
     def test_append(self):
         pass #tested above
@@ -134,19 +132,16 @@ class TestIntervals:
         pass #tested above
 
     def test___add__(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.__add__(item))
-        raise SkipTest
+        i=self.intervals+Interval(-1,-3)
+        assert_equal(str(i),'[[-3,-1), [1,4), [5,6)]')
 
     def test___iadd__(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.__iadd__(item))
-        raise SkipTest
+        i=Intervals(self.intervals)
+        i+=Interval(-1,-3)
+        assert_equal(str(i),'[[-3,-1), [1,4), [5,6)]')
 
     def test_insert(self):
-        # intervals = Intervals(init)
-        # assert_equal(expected, intervals.insert(i, x))
-        raise SkipTest
+        assert_raises(IndexError, Intervals.insert, self.intervals,1,Interval(2,3))
 
 if __name__ == "__main__":
     runmodule()
