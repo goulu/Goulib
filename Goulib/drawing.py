@@ -27,7 +27,7 @@ import matplotlib, os, sys
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
 elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
-    matplotlib.use('WXAgg') #because 'QtAgg' crashes python while debugging
+    matplotlib.use('Agg') #because 'QtAgg' crashes python while debugging
 else:
     pass
     # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
@@ -330,12 +330,14 @@ class Entity(object):
         #entities below may be filled, so let's handle the color first
         if 'color' in kwargs: # color attribute refers to edgecolor for coherency
             kwargs.setdefault('edgecolor',kwargs.pop('color'))
-            kwargs.setdefault('fill',False)
         if isinstance(self,Circle): #must be after isinstance(self,Arc2)
+            kwargs.setdefault('fill',False)
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
         if isinstance(self,Point2):
-            return [patches.Circle(self,0,**kwargs)]
+            kwargs.setdefault('fill',True)
+            return [patches.Circle(self.xy,0,**kwargs)]
         if isinstance(self,Spline):
+            kwargs.setdefault('fill',False)
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
         raise NotImplementedError
@@ -532,6 +534,17 @@ class Group(list, _Group):
     """group of Entities
     but it is a Geometry since we can intersect, connect and compute distances between Groups
     """
+    _color='black'
+    
+    @property
+    def color(self):
+        return self._color
+    
+    @color.setter
+    def color(self, c):
+        self._color=c
+        for e in self:
+            e.color=c
 
     def append(self,entity,**kwargs):
         if entity is not None:

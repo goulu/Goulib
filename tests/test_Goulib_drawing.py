@@ -207,10 +207,15 @@ class TestEntity:
 class TestGroup:
     @classmethod
     def setup_class(self):
-        seg=Segment2((1,0),(2,3))
-        arc=Arc2((1,1),(0,0),radians(120))
-        circle=Circle((1,1),2)
-        self.group=Group([seg,arc,circle])
+        #example from notebook
+        a=Arc2((0,0),(0,1),(1,0))
+        l1=Segment2((-2,.5),Vector2(4,0)) #horizontal at y=0.5
+        l2=Segment2((-2,-.5),Vector2(4,0)) #horizontal at y=-0.5
+        lines=Group([l1,l2])
+        lines.color='blue'
+        pts=Group([i[0] for i in lines.intersect(a)]) # list of intersection points
+        self.group=Group([lines,a,pts])
+        self.group.render('svg')
 
         self.dxf= Drawing(path+'/Homer_Simpson_by_CyberDrone.dxf')
         self.blocks= self.dxf.block
@@ -477,11 +482,5 @@ class TestInstance:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
-    """
-    logging.basicConfig(
-        level=logging.DEBUG,
-        filename='%s_%d.%d.log'%(os.path.basename(__file__),sys.version_info[0],sys.version_info[1]),
-        format = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s",
-    )
-    """
-    runmodule()
+    import logging
+    runmodule(level=logging.WARNING)
