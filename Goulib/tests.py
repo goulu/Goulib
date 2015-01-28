@@ -109,14 +109,14 @@ del _t
 raises=nose.tools.raises
 SkipTest=nose.SkipTest
 
-def runmodule(redirect=True):
+import logging
+def runmodule(redirect=True, level=logging.INFO):
     if not redirect:
         return nose.runmodule()
     
     # enable logging
-    import logging
     FORMAT = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s"
-    logging.basicConfig(format=FORMAT,level=logging.INFO)
+    logging.basicConfig(format=FORMAT,level=level)
 
     """ ensures stdout is printed after the tests results"""
     import sys
