@@ -10,7 +10,12 @@ __license__ = "LGPL"
 
 def _order(interval):
     """:return: (a,b) interval such that a<=b"""
-    return (interval[0], interval[1]) if interval[0]<interval[1] else (interval[1], interval[0])
+    if interval[0]==interval[1]:
+        return (interval[0], interval[1])
+    elif interval[0]<interval[1]:
+        return (interval[0], interval[1])
+    else:
+        return (interval[1], interval[0])
 
 def in_interval(interval,x,closed=True):
     """:return: bool True if x is in interval [a,b] or [b,a] (tuple)"""
@@ -78,10 +83,18 @@ class Interval(object):
         return hash(self.start) ^ hash(self.end)
     
     def __lt__(self, other):
-        return self.end<other.start #it has to be < even if 
+        return self.end<other.start #it has to be < even if ==
     
     def __eq__(self,other):
         return self.start==other.start and self.end==other.end
+    
+    @property
+    def size(self):
+        return self._end-self.start
+    
+    @property
+    def center(self):
+        return (self._end+self.start)/2
     
     def intersection(self, other):
         "Intersection. :return: None if no intersection."
@@ -140,7 +153,7 @@ class Interval(object):
          
     def singleton(self):
         ":return: True iff self.end - self.start == 1."
-        return self.end - self.start == 1
+        return self.size == 1
     
     def separation(self, other):
         ":return: The distance between self and other."
@@ -193,23 +206,52 @@ class Intervals(list):
 
 class Box(list):
     """a N dimensional rectangular box defined by a list of N Intervals"""
-    def __init__(self,data):
-        if type(data) is int:
-            super(Box,self).__init__([Interval(None,None) for _ in range(data)])
-        elif isinstance(data[0],Interval): #works also as copy constructor
-            super(Box,self).__init__(data)
+    def __init__(self,*args):
+        if len(args)==1 and type(args[0]) is int:
+            super(Box,self).__init__([Interval(None,None) for _ in range(args[0])])
+            return
+        if isinstance(args[0],Interval): #works also as copy constructor
+            super(Box,self).__init__(args)
         else: #consider data as points in the box (as in a bounding box)
-            super(Box,self).__init__([Interval(None,None) for _ in data[0]])
-            for pt in data:
+            super(Box,self).__init__([Interval(None,None) for _ in args[0]])
+            for pt in args:
                 self+=pt
             
-    def __iadd__(self, pt):
+    def __iadd__(self, other):
         """
         enlarge box if required to contain specified point
-        :param pt1: :class:`geom.Point2` point to add
+        :param other: :class:`Box` or (list of) N-tuple point(s)
         """
-        for interval,x in zip(self,pt):
+        for interval,x in zip(self,other):
             interval+=x
         return self
+    
+    def __add__(self, other):
+        """
+        enlarge box if required to contain specified point
+        :param other: :class:`Box` or (list of) N-tuple point(s)
+        :return: new Box containing both
+        """
+        res=Box(self)
+        res+=other
+        return res
+    
+    @property
+    def start(self):
+        return tuple(i.start for i in self)
+    
+    @property
+    def end(self):
+        return tuple(i.end for i in self)
+    
+    min,max=start,end #alias
+    
+    @property
+    def size(self):
+        return tuple(i.size for i in self)
+    
+    @property
+    def center(self):
+        return tuple(i.center for i in self)
             
         

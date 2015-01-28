@@ -147,11 +147,50 @@ class TestIntervals:
 class TestBox:
     @classmethod
     def setup_class(self):
-        self.box=Box([(1,2),(3,4)])
-        self.box2=Box(2)
+        self.empty=Box(2)
+        self.unit=Box((0,1),(1,0))
+        self.box=Box((-1,4),[3,-2])
+        self.copy=Box(self.box)
+        assert_equal(self.box,self.copy)
         
+    def test___init__(self):
+        pass #tested in setup_class
+    
     def test___repr__(self):
-        assert_equal(repr(self.box),'[[1,3), [2,4)]')
+        assert_equal(repr(self.box),'[[-1,3), [-2,4)]')
+
+    def test_min(self):
+        assert_equal(self.unit.min, (0,0))
+        assert_equal(self.box.min, (-1,-2))
+
+    def test_max(self):
+        assert_equal(self.unit.max, (1,1))
+        assert_equal(self.box.max, (3,4))
+        
+    def test_size(self):
+        assert_equal(self.box.size, (4,6))
+        
+    def test_center(self):
+        assert_equal(self.box.center, (1,1))
+
+    def test___add__(self):
+        box=self.unit+(2,0)
+        assert_equal(repr(box),'[[0,2), [0,1)]')
+        box=box+Box((-2,-1),(.5,.5))
+        assert_equal(repr(box),'[[-2,2), [-1,1)]')
+        
+    def test___iadd__(self):
+        box=Box(self.unit)
+        box+=(2,0)
+        assert_equal(repr(box),'[[0,2), [0,1)]')
+        box+=Box((-2,-1),(.5,.5))
+        assert_equal(repr(box),'[[-2,2), [-1,1)]')
+
+    def test___call__(self):
+        # b_box = BBox(pt1, pt2)
+        # assert_equal(expected, b_box.__call__())
+        raise SkipTest
+
         
 if __name__ == "__main__":
     runmodule()
