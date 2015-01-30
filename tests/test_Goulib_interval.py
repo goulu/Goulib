@@ -24,11 +24,15 @@ class TestIntersection:
     def test_intersection(self):
         assert_equal(intersection([1,3],(4,2)),(2,3))
         assert_equal(intersection([1,5],(3,2)),(2,3))
+        assert_equal(intersection((1,2),[2,4]),(2,2))
+        assert_equal(intersection((1,2),[3,4]),None)
 
 class TestIntersectlen:
     def test_intersectlen(self):
         assert_equal(intersectlen([1,5],(3,2)),1)
         assert_equal(intersectlen((1,2),[2,4]),0)
+        assert_equal(intersectlen((1,2),[3,4],None),None)
+        
 
 class TestInterval:
     @classmethod
@@ -36,9 +40,12 @@ class TestInterval:
         self.none = Interval(None,None) #required for Box
         self.i12 = Interval(1,2)
         self.i13 = Interval(1,3)
+        self.i23 = Interval(2,3)
         self.i24 = Interval(2,4)
+        self.i25 = Interval(5,2)
+        assert_equal(self.i25,Interval(2,5)) #check order
         self.i33 = Interval(3,3) #empty
-        self.i34 = Interval(3,3) #empty
+        self.i34 = Interval(3,4)
         
     def test___init__(self):
         pass #tested above
@@ -68,18 +75,21 @@ class TestInterval:
         assert_false(self.i13.empty())
 
     def test_hull(self):
-        assert_equal(Interval(1,2).hull(Interval(3,4)),Interval(1,4))
+        assert_equal(self.i12.hull(self.i34),Interval(1,4))
 
     def test_intersection(self):
-        assert_equal(Interval(1,2).intersection(Interval(3,4)),None)
-        assert_equal(Interval(1,3).intersection(Interval(2,5)),Interval(2,3))
+        assert_equal(self.i12.intersection(self.i34),None)
+        assert_equal(self.i13.intersection(self.i25),self.i23)
+        assert_equal(self.i25.intersection(self.i13),self.i23)
 
     def test_overlap(self):
         assert_false(Interval(1,2).overlap(Interval(3,4)))
         assert_true(Interval(1,3).overlap(Interval(2,5)))
         
     def test_separation(self):
-        assert_equal(Interval(1,2).separation(Interval(3,5)),3-2)
+        assert_equal(self.i12.separation(self.i23),0)
+        assert_equal(self.i12.separation(self.i34),3-2)
+        assert_equal(self.i34.separation(self.i12),3-2)
     
     def test_subset(self):
         assert_true(Interval(1,3).subset(Interval(1,3)))
@@ -148,7 +158,7 @@ class TestBox:
     @classmethod
     def setup_class(self):
         self.empty=Box(2)
-        self.unit=Box((0,1),(1,0))
+        self.unit=Box(Interval(0,1),Interval(0,1))
         self.box=Box((-1,4),[3,-2])
         self.copy=Box(self.box)
         assert_equal(self.box,self.copy)

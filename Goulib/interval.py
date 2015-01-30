@@ -41,13 +41,16 @@ def intersection(t1, t2):
     return (start,end)
 
 def intersectlen(t1, t2, none=0):
-    '''returns len of intersection between 2 intervals (tuples), 
-    or none if intervals don't intersect'''
-    try:
-        (start,end)=intersection(t1,t2)
-        return end-start
-    except:
-        return none
+    """
+    :param t1: interval 1 (tuple)
+    :param t2: interval 2 (tuple)
+    :param none: value to return when t1 does not intersect t2
+    :return: len of intersection between 2 intervals (tuples), 
+    or none if intervals don't intersect"""
+    i=intersection(t1,t2)
+    if i is None:
+        return none #the parameter...
+    return i[1]-i[0]
 
 class Interval(object):
     """
@@ -96,13 +99,31 @@ class Interval(object):
     def center(self):
         return (self._end+self.start)/2
     
+    def _combine(self,other):
+        """used in several methods below"""
+        start=max(self._start,other._start)
+        end=min(self._end,other._end)
+        return start,end
+    
+    def separation(self, other):
+        ":return: distance between self and other, negative if overlap"
+        start,end=self._combine(other)
+        return start-end #yes, in this order ...
+    
+    def overlap(self, other, allow_contiguous=False):
+        """:return: True iff self intersects other."""
+        d=self.separation(other)
+        if allow_contiguous and d==0:
+            return True
+        else:
+            return d<0
+    
     def intersection(self, other):
-        "Intersection. :return: None if no intersection."
-        if self > other:
-            other, self = self, other
-        if self.end <= other.start:
+        """:return: Intersection with other, or None if no intersection."""
+        start,end=self._combine(other)
+        if start>end: #no intersection
             return None
-        return Interval(other.start, self.end)
+        return Interval(start, end)
 
     def __iadd__(self, other):
         """expands self to contain other."""
@@ -116,18 +137,9 @@ class Interval(object):
     
     def hull(self, other):
         """:return: new Interval containing both self and other."""
-        res=Interval(self.start,self.end)
+        res=Interval(self._start,self._end)
         res+=other
         return res
-    
-    def overlap(self, other, allow_contiguous=False):
-        """:return: True iff self intersects other."""
-        if self > other:
-            other, self = self, other
-        if allow_contiguous:
-            return self.end >= other.start
-        else:
-            return self.end > other.start
         
     def __add__(self,other):
         if self.overlap(other,True):
@@ -154,15 +166,6 @@ class Interval(object):
     def singleton(self):
         ":return: True iff self.end - self.start == 1."
         return self.size == 1
-    
-    def separation(self, other):
-        ":return: The distance between self and other."
-        if self > other:
-            other, self = self, other
-        if self.end > other.start:
-            return 0
-        else:
-            return other.start - self.end
         
 class Intervals(list):
     """a list of intervals kept in ascending order"""
