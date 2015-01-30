@@ -55,8 +55,8 @@ class TestLcm:
 
 class TestAccsum:
     def test_accsum(self):
-        for s in accsum(list(range(10))): pass
-        assert_equal(s,45)
+        s=list(accsum(range(10)))
+        assert_equal(s[-1],45)
 
 class TestTranspose:
     def test_transpose(self):
@@ -117,9 +117,10 @@ class TestVecdiv:
 
 class TestVeccompare:
     def test_veccompare(self):
-        v1=list(range(5))[1:]
+        v1=list(range(5))
         v2=list(accsum(v1))
-        assert_equal(veccompare(v1,v2),[3,1,0])
+        v2[-1]=2 #force to test ai>bi
+        assert_equal(veccompare(v1,v2),[2,2,1])
 
 class TestFibonacci:
     def test_fibonacci(self):
@@ -156,8 +157,20 @@ class TestGetPrimes:
 
 class TestStrBase:
     def test_str_base(self):
+        assert_equal(str_base(2014),"2014")
+        assert_equal(str_base(-2014),"-2014")
+        assert_equal(str_base(-0),"0")
         assert_equal(str_base(2014,2),"11111011110")
         assert_equal(str_base(65535,16),"ffff")
+        
+        assert_raises(ValueError,str_base,0,1)
+        
+        # http://www.drgoulu.com/2011/09/25/comment-comptent-les-extraterrestres
+        shadok=['GA','BU','ZO','MEU']
+        assert_raises(ValueError,str_base,0,10,shadok)
+        assert_equal(str_base(41,4,shadok),"ZOZOBU")
+        assert_equal(str_base(1681,4,shadok),"BUZOZOBUGABU")
+         
 
 class TestDigitsFromNum:
     def test_digits_from_num(self):
@@ -208,77 +221,78 @@ class TestProperDivisors:
 
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
-        # assert_equal(expected, greatest_common_divisor(a, b))
-        raise SkipTest
+        assert_equal(greatest_common_divisor(54,24),6)
 
 class TestLeastCommonMultiple:
     def test_least_common_multiple(self):
-        # assert_equal(expected, least_common_multiple(a, b))
-        raise SkipTest
+        assert_equal(least_common_multiple(4,6),12)
 
 class TestTriangle:
     def test_triangle(self):
-        # assert_equal(expected, triangle(x))
-        raise SkipTest
+        assert_equal(triangle(10),55)
 
 class TestIsTriangle:
     def test_is_triangle(self):
-        # assert_equal(expected, is_triangle(x))
-        raise SkipTest
+        assert_true(is_triangle(55))
+        assert_false(is_triangle(54))
 
 class TestPentagonal:
     def test_pentagonal(self):
-        # assert_equal(expected, pentagonal(n))
-        raise SkipTest
+        assert_equal(pentagonal(10),145)
 
 class TestIsPentagonal:
     def test_is_pentagonal(self):
-        # assert_equal(expected, is_pentagonal(n))
-        raise SkipTest
+        assert_true(is_pentagonal(145))
+        assert_false(is_pentagonal(146))
 
 class TestHexagonal:
     def test_hexagonal(self):
-        # assert_equal(expected, hexagonal(n))
-        raise SkipTest
+        assert_equal(hexagonal(10),190)
 
 class TestGetCardinalName:
     def test_get_cardinal_name(self):
-        # assert_equal(expected, get_cardinal_name(num))
-        raise SkipTest
-
+       assert_equal(get_cardinal_name(123456),
+            'one hundred and twenty-three thousand four hundred and fifty-six'
+        )
+       assert_equal(get_cardinal_name(1234567890),
+            'one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety'
+        )
+       
 class TestIsPerfect:
     def test_is_perfect(self):
-        # assert_equal(expected, is_perfect(num))
-        raise SkipTest
+        assert_equal(is_perfect(496),0) #perfect
+        assert_equal(is_perfect(54),1) #abundant
+        assert_equal(is_perfect(2),-1) #deficient
 
 class TestIsPandigital:
     def test_is_pandigital(self):
-        # assert_equal(expected, is_pandigital(digits, through))
-        raise SkipTest
+        # https://en.wikipedia.org/wiki/Pandigital_number
+        assert_true(is_pandigital(9786530421))
+        assert_true(is_pandigital(1223334444555567890))
+        assert_true(is_pandigital(10,2))
+        assert_true(is_pandigital(0x1023456789ABCDEF,16))
+        
 
 class TestSetsDist:
     def test_sets_dist(self):
-        # assert_equal(expected, sets_dist(a, b))
-        raise SkipTest
+        a=set(list('hello'))
+        b=set(list('world'))
+        assert_equal(sets_dist(a, b),3.1622776601683795)
 
 class TestSetsLevenshtein:
     def test_sets_levenshtein(self):
-        # assert_equal(expected, sets_levenshtein(a, b))
-        raise SkipTest
+        a=set(list('hello'))
+        b=set(list('world'))
+        assert_equal(sets_levenshtein(a, b),5)
 
 class TestLevenshtein:
     def test_levenshtein(self):
-        # assert_equal(expected, levenshtein(seq1, seq2))
-        raise SkipTest
-
-class TestNcombinations:
-    def test_ncombinations(self):
-        # assert_equal(expected, ncombinations(n, k))
-        raise SkipTest
+        assert_equal(levenshtein('hello','world'),4)
 
 class TestBinomialCoefficient:
     def test_binomial_coefficient(self):
         # https://www.hackerrank.com/challenges/ncr
+        assert_equal(binomial_coefficient(1,2),0)
         assert_equal(binomial_coefficient(2,1),2)
         assert_equal(binomial_coefficient(4,0),1)
         assert_equal(binomial_coefficient(5,2),10)
@@ -288,8 +302,8 @@ class TestBinomialCoefficient:
 
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
-        # assert_equal(expected, combinations_with_replacement(iterable, r))
-        raise SkipTest
+        assert_equal(combinations_with_replacement('ABC', 2),
+            ['AA','AB','AC','BB','BC','CC'])
 
 class TestProportional:
     def test_proportional(self):
@@ -362,8 +376,7 @@ class TestNorm:
 
 class TestDist:
     def test_dist(self):
-        # assert_equal(expected, dist(a, b, norm))
-        raise SkipTest
+        pass #tested somewhere else
 
 class TestSat:
     def test_sat(self):
@@ -406,13 +419,11 @@ class TestSlerp:
 
 class TestLogFactorial:
     def test_log_factorial(self):
-        # assert_equal(expected, log_factorial(n))
-        raise SkipTest 
+        assert_equal(log_factorial(100),363.73937555556349014408) 
 
 class TestLogBinomialCoefficient:
     def test_log_binomial_coefficient(self):
-        # assert_equal(expected, log_binomial_coefficient(n, k))
-        raise SkipTest 
+        assert_equal(log_binomial_coefficient(87,28),log(49848969000742658237160))
 
 if __name__ == "__main__":
     runmodule()

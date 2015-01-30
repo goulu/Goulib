@@ -112,12 +112,6 @@ def minimum(m):
     """
     return [min(c) for c in transpose(m)]
 
-def _longer(a,b,fillvalue=0):
-    '''makes a as long as b by appending fillvalues'''
-    n=len(b)-len(a)
-    if n>0:
-        a.extend([fillvalue]*n)
-
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
     return [reduce(operator.add,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
@@ -143,10 +137,10 @@ def vecdiv(a,b):
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
     res=[0,0,0]
-    for i in range(min([len(a),len(b)])):
-        if a[i]<b[i]:
+    for ai,bi in zip(a,b):
+        if ai<bi:
             res[0]+=1
-        elif a[i]==b[i]:
+        elif ai==bi:
             res[1]+=1
         else:
             res[2]+=1
@@ -285,7 +279,7 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     :return: string representation of num in base
     """
     if base < 2 or base > len(numerals):
-        raise ValueError("str_base: base must be between 2 and %i" % len(numerals))
+        raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
 
     if num == 0:
         return '0'
@@ -328,27 +322,40 @@ def factorize(num):
     return ((factor, ilen(fs)) for (factor, fs) in groupby(prime_factors(num)))
 
 def greatest_common_divisor(a, b):
-    """Return greatest common divisor of a and b"""
+    """:return: greatest common divisor of a and b"""
     return (greatest_common_divisor(b, a % b) if b else a)
 
 def least_common_multiple(a, b):
-    """Return least common multiples of a and b"""
+    """:return: least common multiples of a and b"""
     return (a * b) / greatest_common_divisor(a, b)
 
-def triangle(x):
-    """The nth triangle number is defined as the sum of [1,n] values. http://en.wikipedia.org/wiki/Triangular_number"""
-    return (x*(x+1))/2.
+def triangle(n):
+    """
+    :return: nth triangle number, defined as the sum of [1,n] values. 
+    :see: http://en.wikipedia.org/wiki/Triangular_number
+    """
+    return (n*(n+1))/2
 
 def is_triangle(x):
+    """:return: True if x is a triangle number"""
     return is_integer((-1 + sqrt(1 + 8*x)) / 2.)
 
 def pentagonal(n):
-    return n*(3*n - 1)/2.
+    """
+    :return: nth pentagonal number
+    :see: https://en.wikipedia.org/wiki/Pentagonal_number
+    """
+    return n*(3*n - 1)/2
 
 def is_pentagonal(n):
+    """:return: True if x is a pentagonal number"""
     return (n >= 1) and is_integer((1+sqrt(1+24*n))/6.0)
 
 def hexagonal(n):
+    """
+    :return: nth hexagonal number
+    :see: https://en.wikipedia.org/wiki/Hexagonal_number
+    """
     return n*(2*n - 1)
 
 def get_cardinal_name(num):
@@ -364,6 +371,7 @@ def get_cardinal_name(num):
     def _get_tens(n):
         a, b = divmod(n, 10)
         return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))
+    
     def _get_hundreds(n):
         tens = n % 100
         hundreds = (n // 100) % 10
@@ -373,28 +381,30 @@ def get_cardinal_name(num):
             hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
           ]))
-
-    # This needs some refactoring
-    if not (0 <= num < 1e6):
-        raise ValueError("value not supported: %s" % num)
-    thousands = (num // 1000) % 1000
-    strings = compact([
-        thousands and (_get_hundreds(thousands) + ["thousand"]),
-        (num % 1000 or not thousands) and _get_hundreds(num % 1000),
-    ])
-    return " ".join(flatten(strings))
+        
+    blocks=digits_from_num(num,1000,rev=True) #group by 1000
+    res=''
+    for hdu,word in zip(blocks,['',' thousand ',' million ',' billion ']):
+        if hdu==0: continue #skip
+        res=' '.join(_get_hundreds(hdu))+word+res
+    return res
 
 def is_perfect(num):
-    """Return -1 if num is deficient, 0 if perfect, 1 if abundant"""
+    """
+    :return: -1 if num is deficient, 0 if perfect, 1 if abundant
+    :see: https://en.wikipedia.org/wiki/Perfect_number,
+    https://en.wikipedia.org/wiki/Abundant_number,
+    https://en.wikipedia.org/wiki/Deficient_number
+    """
     return cmp(sum(proper_divisors(num)), num)
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
     return int(log(num)/log(base)) + 1
 
-def is_pandigital(digits, through=list(range(1, 10))):
-    """Return True if digits form a pandigital number"""
-    return (sorted(digits) == through)
+def is_pandigital(num, base=10):
+    """:Return: True if num contains all digits in specified base"""
+    return set(sorted(digits_from_num(num,base))) == set(range(base))
 
 #combinatorics
 
@@ -412,9 +422,7 @@ def binomial_coefficient(n,k):
         c = c * (n - i) // (i + 1)
     return int(c)
 
-def ncombinations(n, k):
-    """Combinations of k elements from a group of n"""
-    return cartesian_product(range(n-k+1, n+1)) // factorial(k)
+ncombinations=binomial_coefficient #alias
 
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
@@ -425,11 +433,11 @@ def combinations_with_replacement(iterable, r):
             yield tuple(pool[i] for i in indices)
 
 def log_factorial(n):
-    """:return: float approximation of log(n!) by Ramanujan formula"""
+    """:return: float approximation of ln(n!) by Ramanujan formula"""
     return n*log(n) - n + (log(n*(1+4*n*(1+2*n))))/6 + log(pi)/2
 
 def log_binomial_coefficient(n,k):
-    """:return: float approximation of log(binomial_coefficient(n,k))"""
+    """:return: float approximation of ln(binomial_coefficient(n,k))"""
     return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
@@ -488,7 +496,6 @@ def proportional(nseats,votes):
             res[i]+=1
             n-=1 # attempt to handle perfect equality
             if n==0: return res #done
-    raise
 
 def triangular_repartition(x,n):
     """ divide 1 into n fractions such that:
