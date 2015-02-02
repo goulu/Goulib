@@ -39,9 +39,11 @@ def last(iterable):
     for x in iterable: pass
     return x
 
-def take_every(n, iterable):
+def takeevery(n, iterable):
     """Take an element from iterator every n elements"""
     return islice(iterable, 0, None, n)
+
+every=takeevery
 
 def drop(n, iterable):
     """Drop n elements from iterable and return the rest"""
@@ -104,12 +106,26 @@ def compact(iterable):
     """:returns: iterator skipping None values from iterable"""
     return filter(bool, iterable)
 
-def groups(iterable, n, step):
+def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n)
     onestepit = zip(*(starmap(drop, enumerate(itlist))))
-    return take_every(step, onestepit)
+    return every(step or n, onestepit)
+
+def pairwise(iterable,loop=False):
+    """
+    iterates through consecutive pairs
+    :param iterable: input iterable s1,s2,s3, .... sn
+    :param loop: boolean True if last pair should be (sn,s1) to close the loop
+    :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
+    """
+
+    i=chain(iterable,[first(iterable)]) if loop else iterable
+    i=list(i)
+    for x in groups(i,2,1):
+        yield x[0],x[1]
+        
 
 def compose(f, g):
     """Compose two functions -> compose(f, g)(x) -> f(g(x))"""
@@ -120,7 +136,7 @@ def compose(f, g):
 def iterate(func, arg):
     """After Haskell's iterate: apply function repeatedly."""
     # not functional
-    while 1:
+    while True:
         yield arg
         arg = func(arg)
 
@@ -156,8 +172,8 @@ def unique(iterable, key=None):
 
 def count_unique(iterable, key=None):
     """Count unique elements
-    # unique('AAAABBBCCDAABBB') --> 4
-    # unique('ABBCcAD', str.lower) --> 4
+    # count_unique('AAAABBBCCDAABBB') --> 4
+    # count_unique('ABBCcAD', str.lower) --> 4
     """
     seen = set()
     for element in iterable:
@@ -199,59 +215,25 @@ def no(seq, pred=bool):
     "Returns True if pred(x) is False for every element in the iterable"
     return (True not in map(pred, seq))
 
-def takenth(n, iterable):
+def takenth(n, iterable, default=None):
     "Returns the nth item"
-    return six.next(islice(iterable, n, n+1))
+    # https://docs.python.org/2/library/itertools.html#recipes
+    return six.next(islice(iterable, n, n+1),default)
 
-def takeevery(n, iterable):
-    """Take an element from iterator every n elements"""
-    return islice(iterable, 0, None, n)
+nth=takenth
 
 def icross(*sequences):
     """Cartesian product of sequences (recursive version)"""
+    # http://stackoverflow.com/questions/15099647/cross-product-of-sets-using-recursion
     if sequences:
         for x in sequences[0]:
             for y in icross(*sequences[1:]):
                 yield (x,)+y
     else: yield ()
 
-def get_groups(iterable, n, step):
-    """Make groups of 'n' elements from the iterable advancing
-    'step' elements each iteration"""
-    itlist = tee(iterable, n)
-    onestepit = zip(*(starmap(drop, enumerate(itlist))))
-    return takeevery(step, onestepit)
-
 def quantify(iterable, pred=bool):
     """:return: int count how many times the predicate is true"""
     return sum(map(pred, iterable),0)
-
-def pairwise(iterable,loop=False):
-    """
-    iterates through consecutive pairs
-    :param iterable: input iterable s1,s2,s3, .... sn
-    :param loop: boolean True if last pair should be (sn,s1) to close the loop
-    :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
-    """
-    #not very pythonic, but works
-    init=True
-    for b in iterable:
-        if init:
-            first=b
-            a=first
-            init=False
-        else:
-            yield a,b
-        a=b
-    if loop:
-        yield a,first
-
-def grouped(iterable, n=2):
-    """
-    s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ...
-    see http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
-    """
-    return zip(*[iter(iterable)]*n)
 
 def interleave(l1,l2):
     """
