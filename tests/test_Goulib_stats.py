@@ -62,6 +62,11 @@ class TestStats:
 
 class TestLinearRegression:
     def test_linear_regression(self):
+        try:
+            import scipy
+        except:
+            logging.warning('scipy required')
+            return
         #first test a perfect fit
         a,b,c=linear_regression([1,2,3],[-1,-3,-5])
         assert_equal((a,b,c),(-2,1,0))

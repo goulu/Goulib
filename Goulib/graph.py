@@ -23,8 +23,14 @@ else:
 logging.info('matplotlib backend is '+matplotlib.get_backend())
 
 import networkx as nx # http://networkx.github.io/
-import numpy, scipy.spatial
 import matplotlib.pyplot as plt
+
+try:
+    import numpy, scipy.spatial
+    SCIPY=True
+except:
+    logging.warning('scipy not available, delauney triangulation not supported')
+    SCIPY=False
 
 from . import math2
     
@@ -70,9 +76,6 @@ try:
 except: #fallback since I couldn't manage to install graphviz on travis-ci ...
     logging.warning('pygraphviz module not available')
     PYGRAPHVIZ=False
-    
-if not PYGRAPHVIZ:
-    logging.warning('PyGraphViz not available')
     class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 
 _nk=0 # node key
@@ -87,7 +90,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
     then this attribute will be used to rename nodes as (x,y,...) tuples suitable for GeoGraph.
     
     """
-    if isinstance(data,scipy.spatial.qhull.Delaunay):
+    if SCIPY and isinstance(data,scipy.spatial.qhull.Delaunay):
         create_using.delauney=data
         triangles=data.points[data.simplices]
         for point in triangles:

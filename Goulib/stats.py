@@ -101,7 +101,11 @@ def linear_regression(x, y, conf=None):
     >>> linear_regression([.1,.2,.3],[10,11,11.5],0.95)
     """
     # https://gist.github.com/riccardoscalco/5356167
-    import scipy.stats, numpy #TODO remove these requirements
+    try:
+        import scipy.stats, numpy #TODO remove these requirements
+    except:
+        logging.error('scipy needed')
+        return None
     
     x = numpy.array(x)
     y = numpy.array(y)
