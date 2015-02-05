@@ -246,6 +246,16 @@ class TestGroup:
         # assert_equal(expected, group.__copy__())
         raise SkipTest # TODO: implement your test here
 
+    def test_color(self):
+        # group = Group()
+        # assert_equal(expected, group.color())
+        raise SkipTest # TODO: implement your test here
+
+    def test_color_case_2(self):
+        # group = Group()
+        # assert_equal(expected, group.color(c))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     def test___repr__(self):
         # chain = Chain()
@@ -479,6 +489,37 @@ class TestInstance:
     def test_from_dxf(self):
         # instance = Instance()
         # assert_equal(expected, instance.from_dxf(blocks, mat3))
+        raise SkipTest # TODO: implement your test here
+
+class test__Group:
+    def test_bbox(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.bbox())
+        raise SkipTest # TODO: implement your test here
+
+    def test_connect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.connect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.to_dxf(**kwargs))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":

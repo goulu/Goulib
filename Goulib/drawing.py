@@ -39,6 +39,7 @@ from .math2 import rint, product
 from .itertools2 import split, filter2
 from .geom import *
 from .colors import color_to_aci, aci_to_color
+from .interval import Box
 
 def Trans(scale=1, offset=None, rotation=None):
     """
@@ -58,29 +59,28 @@ def Trans(scale=1, offset=None, rotation=None):
         res = res.translate(offset)
     return res
 
-class BBox:
+class BBox(Box):
     """bounding box"""
     def __init__(self, p1=None, p2=None):
         """
         :param pt1: :class:`~geom.Point2` first corner (any)
         :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
-        self.p1 = None
-        self.p2 = None
-        if p1 is not None: self +=p1
-        if p2 is not None: self +=p2
+        super(BBox,self).__init__(2)
+        if p1 : self+=p1
+        if p2 : self+=p2
 
     @property
-    def xmin(self): return self.p1.x
+    def xmin(self): return self[0].start
 
     @property
-    def ymin(self): return self.p1.y
+    def ymin(self): return self[1].start
 
     @property
-    def xmax(self): return self.p2.x
+    def xmax(self): return self[0].end
 
     @property
-    def ymax(self): return self.p2.y
+    def ymax(self): return self[1].end
 
     def __iadd__(self, pt):
         """
@@ -89,34 +89,11 @@ class BBox:
         """
         if pt is None:
             return self
-        if type(pt) is tuple:
-            if self.p1 is None:
-                self.p1 = Point2(pt)
-            else:
-                p=list(map(min, list(zip(self.p1.xy, pt))))
-                self.p1 = Point2(p)
-            if self.p2 is None:
-                self.p2 = Point2(pt)
-            else:
-                p=list(map(max, list(zip(self.p2.xy, pt))))
-                self.p2 = Point2(p)
         elif isinstance(pt,Point2):
             self+= pt.xy
-        elif isinstance(pt, BBox):
-            self +=pt.p1
-            self +=pt.p2
         else:
-            raise(NotImplementedError)
+            super(BBox,self).__iadd__(pt)
         return self
-
-    def __add__(self,other):
-        res=BBox()
-        res+=self
-        res+=other
-        return res
-
-    def __repr__(self):
-        return "%s(%s,%s)" % (self.__class__.__name__,self.p1, self.p2)
 
     def __call__(self):
         """:return: list of flatten corners"""
@@ -125,25 +102,21 @@ class BBox:
 
     def size(self):
         """:return: :class:`geom.Vector2` with xy sizes"""
-        try:
-            return self.p2 - self.p1
-        except:
-            return Vector2(0, 0)
+        return Vector2(super(BBox,self).size)
 
     def center(self):
         """:return: Pt center"""
-        res = self.p2 + self.p1
-        return res / 2
+        return Point2(super(BBox,self).center)
 
     def trans(self, trans):
         """
         :param trans: Xform
         :return: :class:`BBox` = self transformed by trans
         """
-        res = BBox(trans(self.p1), trans(self.p2))
+        res = BBox(trans(self.min), trans(self.max))
         # add 2 more corners as they matter if we rotate the box
-        res += trans(Point2(self.p1.x, self.p2.y))
-        res += trans(Point2(self.p2.x, self.p1.y))
+        res += trans(self.xmin, self.ymax)
+        res += trans(self.xmax, self.ymin)
         return res
 
 def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
@@ -463,7 +436,10 @@ class _Group(Entity, Geometry):
     def bbox(self):
         """
         :return: :class:`BBox` bounding box of Entity"""
-        return sum((entity.bbox() for entity in self), BBox())
+        res=BBox()
+        for entity in self: # do not use sum() as it copies Boxes unnecessarily
+            res+=entity.bbox()
+        return res
 
     @property
     def length(self):
