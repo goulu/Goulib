@@ -118,6 +118,14 @@ class TestInterval:
     def test___eq__(self):
         pass #tested in other tests...
 
+    def test___iadd__(self):
+        pass #tested in other tests...
+
+    def test_center(self):
+        pass #tested in other tests...
+    def test_size(self):
+        pass #tested in other tests...
+    
 class TestIntervals:
     @classmethod
     def setup_class(self):
@@ -197,10 +205,13 @@ class TestBox:
         assert_equal(repr(box),'[[-2,2), [-1,1)]')
 
     def test___call__(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.__call__())
-        raise SkipTest
-
+        pass #tested in other tests...
         
+    def test_end(self):
+        pass #tested in other tests...
+
+    def test_start(self):
+        pass #tested in other tests...
+
 if __name__ == "__main__":
     runmodule()
