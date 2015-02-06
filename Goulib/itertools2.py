@@ -29,10 +29,9 @@ def index(n, iterable):
 
 def first(iterable):
     """:return: first element in the iterable"""
-    try:
-        return six.next(iterable)
-    except:
-        return iterable[0]
+    for x in iterable: return x # works in all cases by definition of iterable 
+    raise IndexError
+    
 
 def last(iterable):
     """Take last element in the iterable"""
@@ -312,12 +311,12 @@ def ifind(iterable,f,reverse=False):
     if not reverse:
         for i,item in enumerate(iterable):
             if f(item):
-                yield i,item
+                yield (i,item)
     else:
         l=len(iterable)-1
         for i,item in enumerate(reversed(iterable)):
             if f(item):
-                yield l-i,item
+                yield (l-i,item)
 
 def removef(iterable,f):
     """

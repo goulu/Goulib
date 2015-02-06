@@ -152,12 +152,11 @@ class Interval(object):
          
     def __contains__(self, x):
         """:return: True if x in self."""
-        try: # assume x is a single point
+        if isinstance(x,Interval):
+            return self.start <= x.start and x.end < self.end
+        else:
             return self.start <= x and x < self.end
-        except:
-            pass
-        #assume it is an Interval
-        return self.start <= x.start and x.end < self.end
+        
 
     def subset(self, other):
         ":return: True iff self is subset of other."
