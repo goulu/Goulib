@@ -81,6 +81,26 @@ class BBox(Box):
 
     @property
     def ymax(self): return self[1].end
+    
+    def __contains__(self, other):
+        """:return: True if other lies in bounding box."""
+        if isinstance(other,(Box,tuple)):
+            return super(BBox,self).__contains__(other)
+
+        #process simple geom entities without building Box objects
+        if isinstance(other,Point2):
+            return super(BBox,self).__contains__(other.xy)
+        if isinstance(other,Segment2):
+            return (super(BBox,self).__contains__(other.p1.xy)
+                and super(BBox,self).__contains__(other.p2.xy))
+            
+        #for more complex entites, get the box
+        if isinstance(other,Entity):    
+            return super(BBox,self).__contains__(other.bbox())
+            
+        #if we reached till here, suppose other is an iterable    
+        return all(x in i for i,x in zip(self,other))
+        
 
     def __iadd__(self, pt):
         """

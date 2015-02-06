@@ -72,6 +72,9 @@ class Interval(object):
         
     start = property(fget=lambda self: self._start, doc="The interval's start")
     end = property(fget=lambda self: self._end, doc="The interval's end")
+    
+    def __call__(self):
+        return (self.start, self.end)
      
     def __str__(self):
         "As string."
@@ -93,16 +96,16 @@ class Interval(object):
     
     @property
     def size(self):
-        return self._end-self.start
+        return self.end-self.start
     
     @property
     def center(self):
-        return (self._end+self.start)/2
+        return (self.end+self.start)/2
     
     def _combine(self,other):
         """used in several methods below"""
-        start=max(self._start,other._start)
-        end=min(self._end,other._end)
+        start=max(self.start,other.start)
+        end=min(self.end,other.end)
         return start,end
     
     def separation(self, other):
@@ -137,7 +140,7 @@ class Interval(object):
     
     def hull(self, other):
         """:return: new Interval containing both self and other."""
-        res=Interval(self._start,self._end)
+        res=Interval(self.start,self.end)
         res+=other
         return res
         
@@ -149,7 +152,12 @@ class Interval(object):
          
     def __contains__(self, x):
         """:return: True if x in self."""
-        return self.start <= x and x < self.end
+        try: # assume x is a single point
+            return self.start <= x and x < self.end
+        except:
+            pass
+        #assume it is an Interval
+        return self.start <= x.start and x.end < self.end
 
     def subset(self, other):
         ":return: True iff self is subset of other."
@@ -219,6 +227,24 @@ class Box(list):
             super(Box,self).__init__([Interval(None,None) for _ in args[0]])
             for pt in args:
                 self+=pt
+                
+    @property
+    def start(self):
+        return tuple(i.start for i in self)
+    
+    @property
+    def end(self):
+        return tuple(i.end for i in self)
+    
+    min,max=start,end #alias
+    
+    @property
+    def size(self):
+        return tuple(i.size for i in self)
+    
+    @property
+    def center(self):
+        return tuple(i.center for i in self)
             
     def __iadd__(self, other):
         """
@@ -239,22 +265,10 @@ class Box(list):
         res+=other
         return res
     
-    @property
-    def start(self):
-        return tuple(i.start for i in self)
+    def __contains__(self, other):
+        """:return: True if x in self."""
+        return all(x in i for i,x in zip(self,other))
     
-    @property
-    def end(self):
-        return tuple(i.end for i in self)
     
-    min,max=start,end #alias
-    
-    @property
-    def size(self):
-        return tuple(i.size for i in self)
-    
-    @property
-    def center(self):
-        return tuple(i.center for i in self)
             
         

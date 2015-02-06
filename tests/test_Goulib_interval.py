@@ -37,7 +37,7 @@ class TestIntersectlen:
 class TestInterval:
     @classmethod
     def setup_class(self):
-        self.none = Interval(None,None) #required for Box
+        self.none = Interval(None,None) #required for Box, equivalent t
         self.i12 = Interval(1,2)
         self.i13 = Interval(1,3)
         self.i23 = Interval(2,3)
@@ -126,6 +126,11 @@ class TestInterval:
     def test_size(self):
         pass #tested in other tests...
     
+    def test___call__(self):
+        # interval = Interval(start, end)
+        # assert_equal(expected, interval.__call__())
+        raise SkipTest # TODO: implement your test here
+
 class TestIntervals:
     @classmethod
     def setup_class(self):
@@ -212,6 +217,11 @@ class TestBox:
 
     def test_start(self):
         pass #tested in other tests...
+
+    def test___contains__(self):
+        # box = Box(*args)
+        # assert_equal(expected, box.__contains__(other))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
