@@ -291,6 +291,11 @@ def best(iterable, key=None, n=1, reverse=False):
             i+=1
             if i>n: break #end
             yield x
+            
+def sort_indexes(iterable, key=identity, reverse=False):
+    """return list of indexes of iterable that correspond to the sorted iterable"""
+    # http://stackoverflow.com/questions/6422700/how-to-get-indices-of-a-sorted-array-in-python
+    return [i[0] for i in sorted(enumerate(iterable), key=lambda x:key(x[1]))]
 
 # WARNING : filter2 has been renamed from "split" at v.1.7.0 for coherency
 def filter2(iterable,condition):
