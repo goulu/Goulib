@@ -108,12 +108,15 @@ class TestVecmul:
         v1=list(range(4))
         v2=list(accsum(v1))
         assert_equal(vecmul(v1,v2),[0,1,6,18])
+        assert_equal(vecmul(v1,2),[0,2,4,6])
+        assert_equal(vecmul(2,v1),[0,2,4,6])
 
 class TestVecdiv:
     def test_vecdiv(self):
         v1=list(range(5))[1:]
         v2=list(accsum(v1))
         assert_equal(vecdiv(v1,v2),[1,2./3,1./2,2./5])
+        assert_equal(vecdiv(v1,2),[1./2,2./2,3./2,4./2])
 
 class TestVeccompare:
     def test_veccompare(self):

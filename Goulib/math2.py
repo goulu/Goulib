@@ -126,6 +126,10 @@ def vecneg(a):
 
 def vecmul(a,b):
     """product of vectors of inequal lengths"""
+    if isinstance(a,(int,float)):
+        return [x*a for x in b]
+    if isinstance(b,(int,float)):
+        return [x*b for x in a]
     return [reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
