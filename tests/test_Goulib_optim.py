@@ -235,6 +235,89 @@ class TestFits:
     def test_fits(self):
         # assert_equal(expected, fits(self, item))
         raise SkipTest 
+    
+
+
+
+class TestDifferentialEvolution:
+    def test___init__(self):
+            pass
+        
+    def test_function(self):
+        from math import cos
+        from Goulib.math2 import vecmul, norm_2
+        
+        class function(object):
+            def __init__(self):
+                self.x = None
+                self.n = 9
+                self.domain = [ (-100,100) ]*self.n
+                self.optimizer =  DifferentialEvolution(
+                    self,population_size=100,n_cross=5,
+                    show_progress=True
+                )
+        
+            def target(self, vector):
+                result = (sum(map(cos,vecmul(vector,10)))+self.n+1)*norm_2(vector)
+                return result
+            
+            def print_status(self, mins,means,vector,txt):
+                logging.info('%s %s %s %s'%(txt,mins, means, vector))
+            
+        v=function()
+        logging.info('%s'%v.x)
+        assert_true(norm_2(v.x)<1e-5)
+        
+            
+    def test_rosenbrock_function(self):
+        class rosenbrock(object):
+            #http://en.wikipedia.org/wiki/Rosenbrock_function
+            def __init__(self, dim=5):
+                self.x = None
+                self.n = 2*dim
+                self.dim = dim
+                self.domain = [ (1,3) ]*self.n
+                self.optimizer =  DifferentialEvolution(
+                    self,population_size=min(self.n*10,40),
+                    n_cross=self.n,
+                    cr=0.9,
+                    eps=1e-8, 
+                    show_progress=True
+                )
+        
+            def target(self, vector):
+                x_vec = vector[0:self.dim]
+                y_vec = vector[self.dim:]
+                result=0
+                for x,y in zip(x_vec,y_vec):
+                    result+=100.0*((y-x*x)**2.0) + (1-x)**2.0
+                #print list(x_vec), list(y_vec), result
+                return result
+            
+            def print_status(self, mins,means,vector,txt):
+                logging.info('%s %s %s %s'%(txt,mins, means, vector))
+        
+        v=rosenbrock(1) #single dimension to be faster...
+        logging.info('%s'%v.x)
+        for x in v.x:
+            assert_true(abs(x-1.0)<1e-2)
+
+        
+
+    def test_evolve(self):
+        pass #tested above
+
+    def test_make_random_population(self):
+        pass #tested above
+
+    def test_optimize(self):
+        pass #tested above
+
+    def test_score_population(self):
+        pass #tested above
+
+    def test_show_population(self):
+        pass #tested above
 
 if __name__=="__main__":
     runmodule()
