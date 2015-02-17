@@ -2532,6 +2532,9 @@ class Circle(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_circle(other, self)
+    
+    def swap(self):
+        pass #for consistency
 
 class Arc2(Circle):
 
