@@ -173,15 +173,22 @@ class Entity(object):
         elif isinstance(self,Segment2):
             return BBox(self.start,self.end)
         elif isinstance(self,Arc2):
-            #TODO : improve
-            rr = Vector2(self.r, self.r)
-            return BBox(self.c - rr, self.c + rr)
+            #http://stackoverflow.com/questions/1336663/2d-bounding-box-of-a-sector
+            res=BBox(self.p, self.p2)
+            p=self.c+Vector2(self.r,0)
+            if p in self : res+=p
+            p=self.c+Vector2(-self.r,0)
+            if p in self : res+=p
+            p=self.c+Vector2(0,self.r)
+            if p in self : res+=p
+            p=self.c+Vector2(0,-self.r)
+            if p in self : res+=p
+            return res
         elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
             return BBox(self.c - rr, self.c + rr)
 
-        else:
-            raise NotImplementedError()
+        raise NotImplementedError()
 
     def isclosed(self):
         return self.end==self.start
