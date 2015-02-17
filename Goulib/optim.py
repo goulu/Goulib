@@ -11,7 +11,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import logging, math, random, copy
+import logging, math, random, copy, six
 
 from .itertools2 import all_pairs, index_min, sort_indexes
 from .stats import mean
@@ -442,7 +442,7 @@ class DifferentialEvolution(object):
         if insert_solution_vector is not None:
             assert len(insert_solution_vector) == self.vector_length
             self.seeded = insert_solution_vector
-        for _ in xrange(self.population_size):
+        for _ in range(self.population_size):
             self.population.append([0.]*self.vector_length)
     
     
@@ -495,12 +495,12 @@ class DifferentialEvolution(object):
                 converged = True
 
     def make_random_population(self):
-        for ii in xrange(self.vector_length):
+        for ii in range(self.vector_length):
             delta = self.evaluator.domain[ii][1] - self.evaluator.domain[ii][0]
             offset = self.evaluator.domain[ii][0]
             random_values = [
                 random.uniform(offset,offset+delta) 
-                for _ in xrange(self.population_size - 1)
+                for _ in range(self.population_size - 1)
             ]
             # now place these values ni the proper places in the
             # vectors of the population we generated
@@ -510,13 +510,13 @@ class DifferentialEvolution(object):
             self.population[0] = self.seeded
 
     def score_population(self):
-        for vector, ii in zip(self.population, xrange(self.population_size)):
+        for vector, ii in zip(self.population, range(self.population_size)):
             tmp_score = self.evaluator.target(vector)
             self.scores[ii] = tmp_score
 
     def evolve(self):
-        for ii in xrange(self.population_size):
-            rnd = [random.random() for _ in xrange(self.population_size - 1)]
+        for ii in range(self.population_size):
+            rnd = [random.random() for _ in range(self.population_size - 1)]
             permut = sort_indexes(rnd)
             # make parent indices
             i1 = permut[0]
@@ -540,11 +540,11 @@ class DifferentialEvolution(object):
             
             vi = vecadd(x1,vecmul(use_f,vecsub(x2,x3)))
             # prepare the offspring vector
-            rnd = [random.random() for _ in xrange(self.vector_length)]
+            rnd = [random.random() for _ in range(self.vector_length)]
             permut = sort_indexes(rnd)
             test_vector = copy.copy(self.population[ii]) #deep_copy ?
             # first the parameters that sure cross over
-            for jj in xrange(self.vector_length):
+            for jj in range(self.vector_length):
                 if (jj < self.n_cross):
                     test_vector[ permut[jj] ] = vi[ permut[jj] ]
                 else:
