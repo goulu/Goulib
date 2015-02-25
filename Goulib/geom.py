@@ -9,7 +9,7 @@ __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
 __license__ = "LGPL"
 __credits__ = [
-    'http://code.google.com/p/pyeuclid', 
+    'http://code.google.com/p/pyeuclid',
     'http://www.nmt.edu/tcc/help/lang/python/examples/homcoord/']
 
 __docformat__ = 'restructuredtext'
@@ -236,7 +236,7 @@ class Vector2(object):
 
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.xy)
-    
+
     def __hash__(self):
         return _hash(self.xy)
 
@@ -261,100 +261,83 @@ class Vector2(object):
         return iter(self.xy)
 
     def __add__(self, other):
-        if isinstance(other, Vector2):
-            # Vector + Vector -> Vector
-            # Vector + Point -> Point
-            # Point + Point -> Vector
-            if self.__class__ is other.__class__:
-                _class = Vector2
-            else:
-                _class = Point2
-            return _class(self.x + other.x,
-                          self.y + other.y)
+        x,y=argPair(other)
+        # Vector - Vector -> Vector
+        # Vector - Point -> Point
+        # Point - Point -> Vector
+        if self.__class__ is other.__class__:
+            _class = Vector2
         else:
-            return Vector2(self.x + other[0],
-                           self.y + other[1])
+            _class = Point2
+            
+        return _class(self.x + x, self.y + other.y)
+
     __radd__ = __add__
 
     def __iadd__(self, other):
-        if isinstance(other, Vector2):
-            self.x += other.x
-            self.y += other.y
-        else:
-            self.x += other[0]
-            self.y += other[1]
+        x,y=argPair(other)
+        self.x += x
+        self.y += y
         return self
 
     def __sub__(self, other):
-        if isinstance(other, Vector2):
-            # Vector - Vector -> Vector
-            # Vector - Point -> Point
-            # Point - Point -> Vector
-            if self.__class__ is other.__class__:
-                _class = Vector2
-            else:
-                _class = Point2
-            return _class(self.x - other.x,
-                          self.y - other.y)
+        x,y=argPair(other)
+        # Vector - Vector -> Vector
+        # Vector - Point -> Point
+        # Point - Point -> Vector
+        if self.__class__ is other.__class__:
+            _class = Vector2
         else:
-            assert hasattr(other, '__len__') and len(other) == 2
-            return Vector2(self.x - other[0],
-                           self.y - other[1])
-
+            _class = Point2
+        return _class(self.x - x, self.y - y)
 
     def __rsub__(self, other):
-        if isinstance(other, Vector2):
-            return Vector2(other.x - self.x,
-                           other.y - self.y)
-        else:
-            assert hasattr(other, '__len__') and len(other) == 2
-            return Vector2(other.x - self[0],
-                           other.y - self[1])
+        x,y=argPair(other)
+        return Vector2(x - self.x, y - self.y)
 
     def __mul__(self, other):
-        assert type(other) in (int, int, float)
-        return Vector2(self.x * other,
-                       self.y * other)
+        # assert type(other) in (int, int, float)
+        return Vector2(self.x * other, self.y * other)
 
     __rmul__ = __mul__
 
     def __imul__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         self.x *= other
         self.y *= other
         return self
 
     # geometry requires truediv even in Python 2...
-    
+
     def __div__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.truediv(self.x, other),
                        operator.truediv(self.y, other))
 
     def __rdiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.truediv(other, self.x),
                        operator.truediv(other, self.y))
 
     def __floordiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.floordiv(self.x, other),
                        operator.floordiv(self.y, other))
 
 
     def __rfloordiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.floordiv(other, self.x),
                        operator.floordiv(other, self.y))
 
     def __truediv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.truediv(self.x, other),
                        operator.truediv(self.y, other))
 
 
     def __rtruediv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector2(operator.truediv(other, self.x),
                        operator.truediv(other, self.y))
 
@@ -365,14 +348,14 @@ class Vector2(object):
         return Vector2(self)
 
     def __abs__(self):
-        return sqrt(self.x ** 2 + self.y ** 2)
+        return sqrt(self.x**2 + self.y**2)
 
     mag = __abs__
 
     length = property(lambda self: abs(self))
 
     def mag2(self):
-        return self.x ** 2 + self.y ** 2
+        return self.x**2 + self.y**2
 
     def normalize(self):
         d = self.mag()
@@ -386,15 +369,15 @@ class Vector2(object):
         return res.normalize()
 
     def dot(self, other):
-        assert isinstance(other, Vector2)
-        return self.x * other.x + self.y * other.y
+        x,y=argPair(other)
+        return self.x * x + self.y * y
 
     def cross(self):
         return Vector2(self.y, -self.x)
 
     def reflect(self, normal):
         # assume normal is normalized
-        assert isinstance(normal, Vector2)
+        # assert isinstance(normal, Vector2)
         d = 2 * (self.x * normal.x + self.y * normal.y)
         return Vector2(self.x - d * normal.x,
                        self.y - d * normal.y)
@@ -408,7 +391,7 @@ class Vector2(object):
             return atan2(self.y,self.x)
         else:
             return math2.angle(self,other,unit=unit)
-                
+
     def project(self, other):
         """Return one vector projected on the vector other"""
         n = other.normalized()
@@ -424,7 +407,7 @@ class Vector3(object):
         """
         if len(args) == 1:
             value = args[0]
-            assert(len(value) == 3)
+            # assert(len(value) == 3)
             x, y, z = value
         else:
             x, y,z = args
@@ -441,10 +424,10 @@ class Vector3(object):
         return '%s%s' % (self.__class__.__name__,self.xyz)
 
     def __eq__(self, other):
-        if isinstance(other, Vector3):
+        try:
             return self.xyz == other.xyz
-        else:
-            assert hasattr(other, '__len__') and len(other) == 3
+        except:
+            # assert hasattr(other, '__len__') and len(other) == 3
             return self.x == other[0] and \
                    self.y == other[1] and \
                    self.z == other[2]
@@ -464,7 +447,7 @@ class Vector3(object):
         return iter(self.xyz)
 
     def __add__(self, other):
-        if isinstance(other, Vector3):
+        try:
             # Vector + Vector -> Vector
             # Vector + Point -> Point
             # Point + Point -> Vector
@@ -475,25 +458,25 @@ class Vector3(object):
             return _class(self.x + other.x,
                           self.y + other.y,
                           self.z + other.z)
-        else:
+        except:
             return Vector3(self.x + other[0],
                            self.y + other[1],
                            self.z + other[2])
     __radd__ = __add__
 
     def __iadd__(self, other):
-        if isinstance(other, Vector3):
+        try:
             self.x += other.x
             self.y += other.y
             self.z += other.z
-        else:
+        except:
             self.x += other[0]
             self.y += other[1]
             self.z += other[2]
         return self
 
     def __sub__(self, other):
-        if isinstance(other, Vector3):
+        try:
             # Vector - Vector -> Vector
             # Vector - Point -> Point
             # Point - Point -> Vector
@@ -504,26 +487,26 @@ class Vector3(object):
             return Vector3(self.x - other.x,
                            self.y - other.y,
                            self.z - other.z)
-        else:
-            assert hasattr(other, '__len__') and len(other) == 3
+        except:
+            #assert hasattr(other, '__len__') and len(other) == 3
             return Vector3(self.x - other[0],
                            self.y - other[1],
                            self.z - other[2])
 
 
     def __rsub__(self, other):
-        if isinstance(other, Vector3):
+        try:
             return Vector3(other.x - self.x,
                            other.y - self.y,
                            other.z - self.z)
-        else:
-            assert hasattr(other, '__len__') and len(other) == 3
+        except:
+            # assert hasattr(other, '__len__') and len(other) == 3
             return Vector3(other.x - self[0],
                            other.y - self[1],
                            other.z - self[2])
 
     def __mul__(self, other):
-        if isinstance(other, Vector3):
+        try:
             # TODO component-wise mul/div in-place and on Vector2; docs.
             if self.__class__ is Point3 or other.__class__ is Point3:
                 _class = Point3
@@ -532,8 +515,8 @@ class Vector3(object):
             return _class(self.x * other.x,
                           self.y * other.y,
                           self.z * other.z)
-        else:
-            assert type(other) in (int, int, float)
+        except:
+            # assert type(other) in (int, int, float)
             return Vector3(self.x * other,
                            self.y * other,
                            self.z * other)
@@ -541,48 +524,48 @@ class Vector3(object):
     __rmul__ = __mul__
 
     def __imul__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         self.x *= other
         self.y *= other
         self.z *= other
         return self
 
     #geometry requires truediv even in Python2
-    
+
     def __div__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.truediv(self.x, other),
                        operator.truediv(self.y, other),
                        operator.truediv(self.z, other))
 
     def __rdiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.truediv(other, self.x),
                        operator.truediv(other, self.y),
                        operator.truediv(other, self.z))
 
     def __floordiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.floordiv(self.x, other),
                        operator.floordiv(self.y, other),
                        operator.floordiv(self.z, other))
 
 
     def __rfloordiv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.floordiv(other, self.x),
                        operator.floordiv(other, self.y),
                        operator.floordiv(other, self.z))
 
     def __truediv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.truediv(self.x, other),
                        operator.truediv(self.y, other),
                        operator.truediv(self.z, other))
 
 
     def __rtruediv__(self, other):
-        assert type(other) in (int, int, float)
+        # assert type(other) in (int, int, float)
         return Vector3(operator.truediv(other, self.x),
                        operator.truediv(other, self.y),
                        operator.truediv(other, self.z))
@@ -616,9 +599,9 @@ class Vector3(object):
     def normalized(self):
         res=copy(self)
         return res.normalize()
-           
+
     def dot(self, other):
-        assert isinstance(other, Vector3)
+        # assert isinstance(other, Vector3)
         return self.x * other.x + \
                self.y * other.y + \
                self.z * other.z
@@ -630,7 +613,7 @@ class Vector3(object):
 
     def reflect(self, normal):
         # assume normal is normalized
-        assert isinstance(normal, Vector3)
+        # assert isinstance(normal, Vector3)
         d = 2 * (self.x * normal.x + self.y * normal.y + self.z * normal.z)
         return Vector3(self.x - d * normal.x,
                        self.y - d * normal.y,
@@ -929,7 +912,7 @@ class Matrix3(object):
     def __repr__(self):
         t=self.transposed() #repr is by line while [:] is by column
         return ('%s%s') % (self.__class__.__name__,tuple(t))
-    
+
     def __iter__(self):
         return iter((self.a, self.e, self.i,
          self.b, self.f, self.j,
@@ -1012,7 +995,7 @@ class Matrix3(object):
         return self*other
 
     def __imul__(self, other):
-        assert isinstance(other, Matrix3)
+        # assert isinstance(other, Matrix3)
         # Cache attributes in local vars (see Matrix3.__mul__).
         Aa = self.a
         Ab = self.b
@@ -1179,7 +1162,7 @@ class Matrix4(object):
     def __repr__(self):
         t=self.transposed() #repr is by line while [:] is by column
         return ('%s%s') % (self.__class__.__name__,tuple(t))
-                
+
     def __iter__(self):
         return iter((self.a, self.e, self.i, self.m,
          self.b, self.f, self.j, self.n,
@@ -1278,7 +1261,7 @@ class Matrix4(object):
         return self*other
 
     def __imul__(self, other):
-        assert isinstance(other, Matrix4)
+        # assert isinstance(other, Matrix4)
         # Cache attributes in local vars (see Matrix3.__mul__).
         Aa = self.a
         Ab = self.b
@@ -1457,7 +1440,7 @@ class Matrix4(object):
 
     @classmethod
     def new_rotate_axis(cls, angle, axis):
-        assert(isinstance(axis, Vector3))
+        # assert(isinstance(axis, Vector3))
         vector = axis.normalized()
         x = vector.x
         y = vector.y
@@ -1527,7 +1510,7 @@ class Matrix4(object):
         # from the gluPerspective man page
         f = 1 / tan(fov_y / 2)
         self = cls()
-        assert near != 0.0 and near != far
+        # assert near != 0.0 and near != far
         self.a = f / aspect
         self.f = f
         self.k = (far + near) / (near - far)
@@ -1793,7 +1776,7 @@ class Quaternion:
             return other
 
     def __imul__(self, other):
-        assert isinstance(other, Quaternion)
+        # assert isinstance(other, Quaternion)
         Ax = self.x
         Ay = self.y
         Az = self.z
@@ -1919,7 +1902,7 @@ class Quaternion:
 
     @classmethod
     def new_rotate_axis(cls, angle, axis):
-        assert(isinstance(axis, Vector3))
+        # assert(isinstance(axis, Vector3))
         axis = axis.normalized()
         s = sin(angle / 2)
         Q = cls()
@@ -1992,7 +1975,7 @@ class Quaternion:
               )
     @classmethod
     def new_interpolate(cls, q1, q2, t):
-        assert isinstance(q1, Quaternion) and isinstance(q2, Quaternion)
+        # assert isinstance(q1, Quaternion) and isinstance(q2, Quaternion)
         Q = cls()
 
         costheta = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z
@@ -2052,13 +2035,15 @@ class Geometry(object):
         Point2(1.59, 0.59)
     """
     def __init__(self,*args):
-        """ 
+        """
         this constructor is called by descendant classes at copy
         it is replaced to copy some graphics attributes in module drawings
         """
-        if len(args)==1 and isinstance(args[0],Geometry): #copy constructor
+        try: #copy constructor
             self.__dict__.update(args[0].__dict__)
-    
+        except:
+            pass
+
     def _connect_unimplemented(self, other):
         raise AttributeError('Cannot connect %s to %s' % \
             (self.__class__, other.__class__))
@@ -2104,15 +2089,15 @@ class Geometry(object):
             return c.length
         else:
             return None
-        
+
     def _u(self, pt):
         """:return: float parameter corresponding to pt"""
         raise NotImplementedError
-    
+
     def _u_in(self, u):
         """:return: bool true if u is a valid parameter of geometry"""
         raise NotImplementedError
-        
+
     def __contains__(self,pt):
         d=self.distance(pt)
         if d is None or d>precision:
@@ -2143,20 +2128,17 @@ def _intersect_line2_circle(L, C):
     a = L.v.mag2()
     b = 2 * (L.v.x * (L.p.x - C.c.x) + \
              L.v.y * (L.p.y - C.c.y))
-    c = C.c.mag2() + \
-        L.p.mag2() - \
-        2 * C.c.dot(L.p) - \
-        C.r ** 2
+    c = C.c.mag2() + L.p.mag2() - 2 * C.c.dot(L.p) - C.r ** 2
     det = b ** 2 - 4 * a * c
     if det < 0:
         return None
     sq = sqrt(det)
     u1 = (-b + sq) / (2 * a)
     u2 = (-b - sq) / (2 * a)
-    
+
     p1 = L.point(u1)
     p2 = L.point(u2)
-    
+
     if p1 is None:
         return p2
     if p2 is None:
@@ -2203,7 +2185,7 @@ def _connect_line2_line2(A, B):
 
 def _connect_circle_line2(C, L):
     d = L.v.mag2()
-    assert d != 0
+    # assert d != 0
     u = ((C.c.x - L.p.x) * L.v.x + (C.c.y - L.p.y) * L.v.y) / d
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
@@ -2255,7 +2237,15 @@ class Point2(Vector2, Geometry):
     """
 
     def dist(self,other):
-        return (self-other).mag()
+        try:
+            dx,dy=self.x-other.x,self.y-other.y
+        except:
+            try:
+                dx,dy=self.x-other[0],self.y-other[1]
+            except:
+                return (self-other).mag()
+        return sqrt(dx*dx+dy*dy)
+
 
     def intersect(self, other):
         return self in other #calls other.__contains__
@@ -2480,8 +2470,8 @@ class Circle(Geometry):
                 self.p = self.c+Vector2(args[1],0) #for coherency + transform
             else:
                 self.p=Point2(args[1]) #one point on circle
-                self.r=abs(self.p-self.c)
-                
+                self.r=self.p.dist(self.c)
+
     def __eq__(self, other):
         if not isinstance(other,Circle):
             return False
@@ -2498,9 +2488,9 @@ class Circle(Geometry):
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
-    
+
     length = property(lambda self: abs(self))
-    
+
     def point(self, u):
         ":return: Point2 at angle u radians"
         return self.c+Polar(self.r,u)
@@ -2508,7 +2498,7 @@ class Circle(Geometry):
     def tangent(self, u):
         ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
         return Polar(self.r,u+pi/2.)
-    
+
     def __contains__(self,pt):
         ":return: True if pt is ON or IN the circle"
         return self.c.dist(pt)<=self.r
@@ -2532,7 +2522,7 @@ class Circle(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_circle(other, self)
-    
+
     def swap(self):
         pass #for consistency
 
@@ -2618,15 +2608,15 @@ class Arc2(Circle):
         self.a,self.b = self.b,self.a
         self.dir=-self.dir
         return self
-    
+
     def _u(self,pt):
         a=(pt-self.c).angle()
         return self.angle(a)/self.angle()
-    
+
     def __contains__(self,pt):
         ":return: True if pt is ON the Arc"
         return Geometry.__contains__(self,pt)
-    
+
     def intersect(self, other):
         inters= other._intersect_circle(self)
         if not inters: return None
@@ -2675,7 +2665,7 @@ XXX I have not checked if these are correct.
 
 def _connect_point3_line3(P, L):
     d = L.v.mag2()
-    assert d != 0
+    # assert d != 0
     u = ((P.x - L.p.x) * L.v.x + \
          (P.y - L.p.y) * L.v.y + \
          (P.z - L.p.z) * L.v.z) / d
@@ -2697,7 +2687,7 @@ def _connect_point3_plane(p, plane):
     return Segment3(p, Point3(p.x - n.x * d, p.y - n.y * d, p.z - n.z * d))
 
 def _connect_line3_line3(A, B):
-    assert A.v and B.v
+    # assert A.v and B.v
     p13 = A.p - B.p
     d1343 = p13.dot(B.v)
     d4321 = B.v.dot(A.v)
@@ -2742,7 +2732,7 @@ def _connect_line3_plane(L, P):
 
 def _connect_sphere_line3(S, L):
     d = L.v.mag2()
-    assert d != 0
+    # assert d != 0
     u = ((S.c.x - L.p.x) * L.v.x + \
          (S.c.y - L.p.y) * L.v.y + \
          (S.c.z - L.p.z) * L.v.z) / d
@@ -2961,9 +2951,7 @@ class Line3(Geometry):
 
     def __init__(self, *args):
         if len(args) == 3:
-            assert isinstance(args[0], Point3) and \
-                   isinstance(args[1], Vector3) and \
-                   type(args[2]) == float
+            # assert isinstance(args[0], Point3) and isinstance(args[1], Vector3) and type(args[2]) == float
             self.p = Point3(args[0])
             self.v = args[1] * args[2] / abs(args[1])
         elif len(args) == 2:
@@ -3231,30 +3219,19 @@ class Plane(Geometry):
     def _connect_plane(self, other):
         return _connect_plane_plane(other, self)
 
-def argPair(*p):
-    """Process a pair of values passed in various ways.
-
-      [ if len(p) is 2 ->
-            return (p[0], p[1])
-        else if p is a single non-iterable ->
-          return (p[0], p[0])
-        else if p is an iterable with two values ->
-            return (p[0][0], p[0][1])
-        else if p is an iterable with one value ->
-            return (p[0][0], p[0][0])
-    """
-    #-- 1 --
-    if len(p) == 2:
-        return (p[0], p[1])
-
-    it = p[0]
-    if not hasattr(it, "__iter__"):
-        return(it, it)
-
-    values = [ x for x in p[0] ]
-
-    #-- 4 --
-    if len(values) == 1:
-        return (values[0], values[0])
+def argPair(x,y=None):
+    """Process a pair of values passed in various ways."""
+    if y is None:
+        try:
+            return (x[0], x[1])
+        except:
+            pass
+    
+        try:
+            return x.xy
+        except:
+            pass
     else:
-        return (values[0], values[1])
+        return (x,y)
+
+
