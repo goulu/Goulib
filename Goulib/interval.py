@@ -169,6 +169,9 @@ class Interval(object):
     def empty(self):
         ":return: True iff self is empty."
         return self.start == self.end
+    
+    def __nonzero__(self):
+        return not self.empty()
          
     def singleton(self):
         ":return: True iff self.end - self.start == 1."
@@ -267,6 +270,15 @@ class Box(list):
     def __contains__(self, other):
         """:return: True if x in self."""
         return all(x in i for i,x in zip(self,other))
+    
+    def __nonzero__(self):
+        return any(self)
+    
+    def empty(self):
+        ":return: True iff Box is empty."
+        return not self
+    
+    
     
     
             
