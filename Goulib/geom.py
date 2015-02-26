@@ -270,7 +270,7 @@ class Vector2(object):
         else:
             _class = Point2
             
-        return _class(self.x + x, self.y + other.y)
+        return _class(self.x + x, self.y + y)
 
     __radd__ = __add__
 
