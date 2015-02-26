@@ -16,7 +16,7 @@ import matplotlib, os, sys
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
 elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
-    matplotlib.use('WXAgg') #because 'QtAgg' crashes python while debugging
+    matplotlib.use('Agg') #because 'QtAgg' crashes python while debugging
 else:
     pass
     # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
@@ -29,7 +29,7 @@ try:
     import numpy, scipy.spatial
     SCIPY=True
 except:
-    logging.warning('scipy not available, delauney triangulation not supported')
+    logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
 from . import math2
@@ -111,6 +111,8 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         return nx.convert.to_networkx_graph(data.adj,create_using,data.is_multigraph())
     else:
         return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+    
+
 
 class _Geo(object):
     """base class for graph with nodes at specified positions.
@@ -149,6 +151,11 @@ class _Geo(object):
     def copy(self):
         """does not use deepcopy because the rtree index must be rebuilt"""
         return self.__class__(self,**self.graph)
+    
+    def __eq__(self,other):
+        """:return: True if self and other are equal"""
+        def eq(a,b): return a==b
+        return nx.is_isomorphic(self,other, node_match=eq, edge_match=eq)
                 
     def __nonzero__(self):
         """:return: True if graph has at least one node
@@ -413,12 +420,17 @@ class _Geo(object):
         :param u: Node or Edge (Nodes tuple)
         :param v: Node if u is a single Node
         :param clean: bool removes disconnected nodes. must be False for certain nx algos to work
+        :result: return attributes of removed edge
         remove edge from graph. NetworkX graphs do not remove unused nodes
         """
         
         if v is None:
             u,v=u[0],u[1]
         
+        if self.is_multigraph():
+            data=self.edge[u][v][key or 0]
+        else:
+            data=self.edge[u][v]
         self.parent.remove_edge(self,u,v,key)   
         
         if clean:
@@ -426,6 +438,7 @@ class _Geo(object):
                 self.remove_node(u)
             if self.degree(v)==0:
                 self.remove_node(v)
+        return data
                 
     def number_of_nodes(self,doublecheck=False):
         #check that both structures are coherent at the same time

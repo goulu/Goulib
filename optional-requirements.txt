@@ -1,2 +1,3 @@
 rtree
+scipy
 pygraphviz

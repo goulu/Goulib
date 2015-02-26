@@ -131,6 +131,11 @@ class TestInterval:
         # assert_equal(expected, interval.__call__())
         raise SkipTest # TODO: implement your test here
 
+    def test___nonzero__(self):
+        # interval = Interval(start, end)
+        # assert_equal(expected, interval.__nonzero__())
+        raise SkipTest # TODO: implement your test here
+
 class TestIntervals:
     @classmethod
     def setup_class(self):
@@ -221,6 +226,16 @@ class TestBox:
     def test___contains__(self):
         # box = Box(*args)
         # assert_equal(expected, box.__contains__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___nonzero__(self):
+        # box = Box(*args)
+        # assert_equal(expected, box.__nonzero__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_empty(self):
+        # box = Box(*args)
+        # assert_equal(expected, box.empty())
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

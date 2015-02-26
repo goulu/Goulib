@@ -3,9 +3,6 @@
 	<name>Goulib</name>
 	<comment></comment>
 	<projects>
-		<project>dxfgrabber</project>
-		<project>dxfwrite</project>
-		<project>networkx</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-optimization algorithms : knapsack, traveling salesman, simulated annealing, differential evolution
+various optimization algorithms : knapsack, traveling salesman, simulated annealing, differential evolution
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"

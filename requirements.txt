@@ -9,4 +9,3 @@ pillow
 networkx
 matplotlib
 numpy
-scipy

@@ -17,10 +17,10 @@ Goulib\itertools2.py
 Goulib\markup.py
 Goulib\math2.py
 Goulib\motion.py
-Goulib\nvd3.py
 Goulib\optim.py
 Goulib\piecewise.py
 Goulib\polynomial.py
+Goulib\stats.py
 Goulib\table.py
 Goulib\tests.py
 Goulib\workdays.py
