@@ -25,13 +25,9 @@ class Polynomial:
           terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
           
         """
-        if type(val) == type([]):
-            self.plist = val
-        elif type(val) == type(''):
-            self.plist = parse_string(val)
-        else:
-            raise "Unknown argument to Polynomial: %s" % val
+        self.plist = plist(val)
         return
+
     
     def __str__(self):
         """:return: the best string we can for text output"""
@@ -45,19 +41,29 @@ class Polynomial:
         """:return: LaTex string for IPython Notebook"""
         return r'$%s$'%tostring(self.plist)
     
+
     def __lt__(self,other): 
-        if isinstance(other,Polynomial):
-            return self.plist<other.plist
-        elif isinstance(other,str):
-            return self.plist<Polynomial(other).plist
-        return self.plist<other
+        try:
+            other=other.plist
+        except:
+            other=Polynomial(other).plist
+        if len(other)<len(self.plist):
+            return False
+        if len(other)>len(self.plist):
+            return True
+        #compare the coefficients by decreasing degree
+        for i in range(len(self.plist)-1,-1,-1):
+            if self.plist[i]<other[i]:
+                return True
+            elif self.plist[i]>other[i]:
+                return False
+        return False #equality
     
     def __eq__(self,other): 
-        if isinstance(other,Polynomial):
+        try:
             return self.plist==other.plist
-        elif isinstance(other,str):
+        except:
             return self.plist==Polynomial(other).plist
-        return self.plist==other
             
     def __add__(self,other): return Polynomial(add(self.plist,plist(other)))
     def __radd__(self,other): return Polynomial(add(self.plist,plist(other)))
@@ -80,22 +86,24 @@ class Polynomial:
 
 def plist(term):
     "Force term to have the form of a polynomial list"
-    # First see if this is already a Polynomial object
-    try:
-        pl = term.plist
-        return pl
+
+    try: # already a Polynomial ?
+        return term.plist
+    except:
+        pass
+    
+    try: # a string ?
+        return parse_string(term)
     except:
         pass
 
-    # It isn't. Try to force coercion from an integer or a float
-    if type(term) == type(1.0) or type(term) == type(1):
-        return [term]
-    elif type(term) == type(''):
-        return parse_string(term)
-    # We ultimately want to be able to parse a string here
-    else:
-        raise "Unsupported term can't be corced into a plist: %s" % term
-    return None
+    try: # a list of coeffcients ?
+        term[0]
+        return term
+    except:
+        pass
+    return [term] #then it's a constant
+
 
 def peval(plist,x,x2=None):
     """\
@@ -156,10 +164,13 @@ def mult_const(p,c):
 
 def multiply(p1,p2):
     "Return a new plist corresponding to the product of the two input plists"
-    if len(p1) > len(p2): short,int = p2,p1
-    else: short,int = p1,p2
+    if len(p1) > len(p2):
+        short,f = p2,p1
+    else:
+        short,f = p1,p2
     new = []
-    for i in range(len(short)): new = add(new,mult_one(int,short[i],i))
+    for i in range(len(short)):
+        new = add(new, mult_one(f,short[i],i))
     return new
 
 def mult_one(p,c,i):

@@ -17,12 +17,6 @@ class TestPolynomial:
     def test___init__(self):
         pass #tested above
         
-    def test___cmp__(self):
-        assert_true(self.p==self.p)
-        assert_true(self.p>self.p2)
-        assert_equal(self.p3,[1,2,-4,0,0,7])
-        assert_equal(self.p3,'7x^5 - 4x^2 + 2x + 1')
-        
     def test___call__(self):
         assert_equal(self.p(0),1)
         assert_equal(self.p(1),6)
@@ -70,14 +64,23 @@ class TestPolynomial:
         assert_equal(str(self.p), '3x^2 + 2x + 1')
 
     def test___eq__(self):
-        # polynomial = Polynomial(val)
-        # assert_equal(expected, polynomial.__eq__(other))
-        raise SkipTest 
+       assert_true(self.p=='3x^2+2*x+1')
+       assert_false(self.p=='3x^2+2*x+2')
+       assert_true(self.p!='3x^2+2*x+2')
 
     def test___lt__(self):
-        # polynomial = Polynomial(val)
-        # assert_equal(expected, polynomial.__lt__(other))
-        raise SkipTest 
+        assert_true(self.p2<self.p)
+        assert_false(self.p<self.p)
+        assert_false(self.p<self.p2)
+        assert_true(self.p<'3x^2+2*x+2')
+        assert_false(self.p<[2,3,1])
+        
+    def test___cmp__(self):
+        assert_true(self.p==self.p)
+        assert_true(self.p==[1,2,3])
+        assert_true(self.p>self.p2)
+        assert_equal(self.p3,[1,2,-4,0,0,7])
+        assert_equal(self.p3,'7x^5 - 4x^2 + 2x + 1')
 
 class TestPlist:
     def test_plist(self):
