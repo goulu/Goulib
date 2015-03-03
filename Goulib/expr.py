@@ -146,11 +146,10 @@ class Expr(object):
     def __rmul__(self,right):
         return Expr(right).apply(operator.mul,self,'*')
     
-    def __div__(self,right):
-        return self.apply(operator.truediv,right,'/')
-    
     def __truediv__(self,right):
         return self.apply(operator.truediv,right,'/')
+    
+    __div__=__truediv__
     
     def __invert__(self):
         return self.apply(operator.not_,None,'~')

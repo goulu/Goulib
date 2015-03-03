@@ -1,6 +1,7 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
+
 from Goulib.tests import *
 
 from Goulib.expr import *
@@ -72,9 +73,6 @@ class TestExpr:
         f2=self.f1*2
         fx=self.fx/f2
         assert_equal(fx([-1,0,1]),[-0.5,0,0.5])
-        
-    def test___truediv__(self):
-        pass # in fact we do only truedivs with Expr s
     
     def test_applx(self):
         f=self.fs.applx(self.fx2)
@@ -83,6 +81,9 @@ class TestExpr:
         f=self.fs(self.fx2)
         assert_equal(f.latex,'$\sin{x^2}$') 
         assert_equal(f(2),sin(4))
+        
+    def test_latex(self):
+        pass #tested above
     
     def test_apply(self):
         f1=self.fx.apply(self.fs)
@@ -108,7 +109,7 @@ class TestExpr:
 
     def test___lt__(self):
         assert_false(Expr(1)>Expr(2))
-        assert_true(Expr(1)<Expr(2))
+        assert_true(Expr(1)<2)
         
     def test___lshift__(self):
         e=self.fx<<1
@@ -118,15 +119,9 @@ class TestExpr:
         e=self.fx>>2
         assert_equal(e(0),-2)
 
-    def test_latex(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.latex())
-        raise SkipTest
-
     def test___eq__(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.__eq__(other))
-        raise SkipTest 
+        assert_false(Expr(1)==Expr(2))
+        assert_true(Expr(1)==1)
 
 if __name__ == "__main__":
     runmodule()
