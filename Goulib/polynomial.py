@@ -13,10 +13,11 @@ __credits__= ["http://code.activestate.com/recipes/362193-manipulate-simple-poly
 __license__ = "LGPL"
 
 import six #python 2+3 compatibility
-
 import re
 
-class Polynomial:
+from .expr import Expr
+
+class Polynomial(Expr):
     def __init__(self,val):
         """:param: val can be:
         - an iterable of the factors in ascending powers order : Polynomial([1,2,3]) holds 3*x^2+2*x+1
@@ -26,6 +27,7 @@ class Polynomial:
           
         """
         self.plist = plist(val)
+        super(Polynomial,self).__init__(lambda x:peval(self.plist,x))
         return
 
     
@@ -73,8 +75,6 @@ class Polynomial:
     def __rmul__(self,other): return Polynomial(multiply(self.plist, plist(other)))
     def __neg__(self): return -1*self
     def __pow__(self,e): return Polynomial(power(self.plist,e))
-
-    def __call__(self,x1,x2=None): return peval(self.plist,x1,x2)
 
     def integral(self): return Polynomial(integral(self.plist))
     def derivative(self): return Polynomial(derivative(self.plist))
