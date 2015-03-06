@@ -11,19 +11,10 @@ __license__ = "LGPL"
 
 import logging, math, six
 
-import matplotlib, os, sys
-
-if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
-    matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
-elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
-    matplotlib.use('Agg') #because 'QtAgg' crashes python while debugging
-else:
-    pass
-    # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
-logging.info('matplotlib backend is '+matplotlib.get_backend())
-
 import networkx as nx # http://networkx.github.io/
-import matplotlib.pyplot as plt
+
+import Goulib.plot #set matplotlib backend
+import matplotlib.pyplot as plt # after import .plot
 
 try:
     import numpy, scipy.spatial

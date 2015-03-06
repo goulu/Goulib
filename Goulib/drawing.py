@@ -12,7 +12,6 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 """
 from __future__ import division #"true division" everywhere
-from Goulib.colors import color_lookup
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
@@ -22,24 +21,14 @@ __license__ = "LGPL"
 from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
-import matplotlib, os, sys
-
-if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
-    matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
-elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-that-python-code-is-being-executed-through-the-debugger
-    matplotlib.use('Agg') #because 'QtAgg' crashes python while debugging
-else:
-    pass
-    # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
-logging.info('matplotlib backend is '+matplotlib.get_backend())
-
-import matplotlib.pyplot as plt
-
 from .math2 import rint, product
 from .itertools2 import split, filter2
 from .geom import *
-from .colors import color_to_aci, aci_to_color
+from .colors import color_to_aci, aci_to_color, color_lookup
 from .interval import Box
+
+import Goulib.plot #set matplotlib backend
+import matplotlib.pyplot as plt # after import .plot
 
 def Trans(scale=1, offset=None, rotation=None):
     """

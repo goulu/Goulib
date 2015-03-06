@@ -30,29 +30,30 @@ class TestExpr:
     def test___repr__(self):
         assert_equal(repr(self.f1),'1')     
         assert_equal(repr(self.fx),'x')    
-        assert_equal(repr(self.fs),'sin')    
+        assert_equal(repr(self.fs),'sin(x)')    
         assert_equal(repr(self.fb1),'x>1')    
         
     def test__repr_latex_(self):
-        assert_equal(self.f1.latex,'$1$')     
-        assert_equal(self.fx.latex,'$x$')    
-        assert_equal(self.fs.latex,'$\sin$')    
-        assert_equal(self.fb1.latex,'$x>1$')      
+        assert_equal(self.f1._repr_latex_(),'1')     
+        assert_equal(self.fx._repr_latex_(),'x')    
+        assert_equal(self.fs._repr_latex_(),'\sin(x)')    
+        assert_equal(self.fb1._repr_latex_(),'x>1')      
+        assert_equal(self.fs(self.fx2)._repr_latex_(),'\sin(x^2)') 
+        
+    def test_latex(self):
+        pass #tested above
 
     def test___add__(self):
         f=self.fx+self.f1
         assert_equal(f([-1,0,1]),[0,1,2])
-        assert_equal(repr(f),'+(x,1)')     
-        assert_equal(f.latex,'$x+1$')     
+        assert_equal(repr(f),'+(x,1)')        
         
     def test___neg__(self):
         f=-self.f1
-        assert_equal(repr(f),'-1')     
-        assert_equal(f.latex,'$-1$')    
+        assert_equal(repr(f),'-1')        
         f=-self.fx
         assert_equal(f([-1,0,1]),[1,0,-1])
         assert_equal(repr(f),'-(x)')
-        assert_equal(f.latex,'$-x$') 
         
     def test___sub__(self):
         f=self.f1-self.fx
@@ -76,14 +77,7 @@ class TestExpr:
     
     def test_applx(self):
         f=self.fs.applx(self.fx2)
-        assert_equal(f.latex,'$\sin{x^2}$') 
         assert_equal(f(2),sin(4))
-        f=self.fs(self.fx2)
-        assert_equal(f.latex,'$\sin{x^2}$') 
-        assert_equal(f(2),sin(4))
-        
-    def test_latex(self):
-        pass #tested above
     
     def test_apply(self):
         f1=self.fx.apply(self.fs)

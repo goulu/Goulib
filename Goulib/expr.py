@@ -8,14 +8,24 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import operator
+import six, operator, logging, matplotlib
 
-class Expr(object):
+from Goulib import plot #sets matplotlib backend
+import matplotlib.pyplot as plt # after import .plot
+
+from Goulib import itertools2
+
+class Expr(plot.Plot):
     """
     Math expressions that can be evaluated like standard functions and combined using standard operators
     """
-
     def __init__(self,f,left=None,right=None,name=None):
+        """
+        :param f: function or operator, or Expr to copy construct
+        :param left: Expr function parameter or left operand
+        :param right: Expr function parameter or left operand
+        :param name: string used in repr, preferably in LaTeX
+        """
         if isinstance(f,Expr): #copy constructor
             name=f.name
             self.isconstant=f.isconstant
@@ -30,62 +40,25 @@ class Expr(object):
             self.isconstant=self.left.isconstant and (not self.right or self.right.isconstant)
             if self.isconstant: #simplify
                 f=f(self.left.y,self.right.y) if self.right else f(self.left.y)
-        else:
+        else:              
             self.left=None
             self.right=None
             try: #is f a function ?
                 f(1)
                 self.isconstant=False
                 if not name:
-                    name='\\'+f.__name__ #try to build LateX name
+                    name='\\%s(x)'%f.__name__ #try to build LateX name
+                elif name.isalpha() and name!='x':
+                    name='\\'+name
             except: #f is a constant 
                 self.isconstant=True
                 name=str(f)
         self.name=name
         self.y=f
         
-    def __repr__(self):
-        if self.isconstant:
-            res=repr(self.y)
-        elif self.right:
-            res='%s(%s,%s)'%(self.name,self.left,self.right)
-        elif self.left: 
-            res='%s(%s)'%(self.name,self.left)
-        else:
-            res='%s'%self.name
-        return res.replace('\\','')
-    
-    def _repr_latex_(self,dollars=True):
-        """:return: LaTex string for IPython Notebook"""
-        if self.isconstant:
-            res=repr(self.y)
-        else:
-            res=self.name
-            if self.left: 
-                if res[0]=='\\':
-                    res='%s{%s}'%(res,self.left._repr_latex_(False))
-                else: #operator
-                    if self.right:
-                        res=self.left._repr_latex_(False)+res
-                    else: #monadic
-                        res=res+self.left._repr_latex_(False)
-            if self.right:
-                if res[0]=='\\':
-                    res='%s{%s}'%(res,self.right._repr_latex_(False))
-                else: #dyadic operator
-                    res=res+self.right._repr_latex_(False)
-                
-        if dollars:
-            res='$%s$'%res
-        return res
-    
-    @property
-    def latex(self):
-        return self._repr_latex_(True)
-        
     def __call__(self,x): 
         """evaluate the Expr at x OR compose self(x())"""
-        if isinstance(x,Expr):
+        if isinstance(x,Expr): #composition
             return self.applx(x)
         try: #is x iterable ?
             return [self(x) for x in x]
@@ -96,18 +69,78 @@ class Expr(object):
             l=self.left(x)
             r=self.right(x)
             return self.y(l,r)
-        elif self.left:
+        if self.left:
             return self.y(self.left(x))
         else:
             return self.y(x)
+        
+    def __repr__(self):
+        if self.isconstant:
+            res=repr(self.y)
+        elif self.right: #dyadic operator
+            res='%s(%s,%s)'%(self.name,self.left,self.right) # no precedence worries
+        elif self.left:
+            res='%s(%s)'%(self.name,self.left)
+        else:
+            res=self.name
+        return res.replace('\\','') #remove latex prefix if any
     
+    def _repr_latex_(self):
+        """:return: LaTex string for IPython Notebook"""
+        if self.isconstant:
+            res=repr(self.y)
+        else:
+            name=self.name
+            left=''
+            if self.left:
+                left=self.left._repr_latex_()
+                if self.left.left: #complex
+                    left='{'+left+'}'
+            right=''
+            if self.right:
+                right=self.right._repr_latex_()
+                if self.right.left: #complex
+                    right='{'+right+'}'
+            if right: #dyadic operator
+                res=left+name+right
+            elif left: #monadic or function
+                if len(name)>1:
+                    res='%s(%s)'%(name,left)
+                else:
+                    res=name+left
+            else:
+                res=name
+        return res
+    
+    def plot(self, fmt='svg', x=None):
+        from IPython.core.pylabtools import print_figure
+        import matplotlib.pyplot as plt
+        # plt.rc('text', usetex=True)
+        fig, ax = plt.subplots()
+        if x is None:
+            x=itertools2.arange(-1,1,.1)
+        x=list(x)
+        y=self(x)
+        ax.plot(x,y)
+        ax.set_title(self._repr_latex_())
+        data = print_figure(fig, fmt)
+        plt.close(fig)
+        return data
+    
+    def _repr_png_(self):
+        return self.plot(fmt='png')
+
+    def _repr_svg_(self):
+        return self.plot(fmt='svg')
+
     def apply(self,f,right=None,name=None):
         """function composition self o f = f(self(x)) or f(self,right)"""
         return Expr(f,self,right, name=name)
     
     def applx(self,f,name=None):
-        """function composition f o self = self(self(x))"""
+        """function composition f o self = self(f(x))"""
         res=Expr(self) #copy
+        res.name=res.name.replace('(x)','')
         res.left=Expr(f,res.left,name=name)
         if res.right:
             res.right=Expr(f,res.right,name=name)
@@ -168,4 +201,4 @@ class Expr(object):
     
     def __rshift__(self,dx):
         return self.applx(lambda x:x-dx,name='rshift')
-    
+
