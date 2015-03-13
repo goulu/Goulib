@@ -45,6 +45,8 @@ class TestArange:
     def test_arange(self):
         assert_equal(arange(-1,2.5,.5),[-1,-0.5,0,0.5,1,1.5,2])
         assert_equal(arange(2,-1.5,.5),reversed([-1,-0.5,0,0.5,1,1.5,2]))
+        l=list(arange(0,1,.01))
+        assert_equal(len(l),100)
 
 class TestIlinear:
     def test_ilinear(self):
