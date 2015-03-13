@@ -2562,12 +2562,13 @@ class Arc2(Circle):
     def angle(self,b=None):
         """:return: float signed arc angle"""
         a=self.a
-        if b is None: b=self.b
-        if b<a: b=b+2*pi # now b>a
-        res=b-a #positive angle
-        if (b<a and self.dir>0) or (b>a and self.dir<0): #complementary angle
-            res=2*pi-res
-        return res*self.dir
+        if b is None: b=self.b 
+        if abs(b-a)<precision: b=a #handle complete arcs
+        res=b-a
+        if math2.sign(res)==self.dir:
+            return res
+        else: #return complementary angle
+            return self.dir*(2*pi-abs(res))
 
     def __abs__(self):
         """:return: float arc length"""

@@ -994,6 +994,7 @@ class TestArc2:
         self.ap=Arc2(center=Point2(454.80692478710336, 69.74749779176005),p1=Point2(74.67492478710335, 86.62949779176006),p2=Point2(74.48092478710339, 58.021497791760055),r=380.506687652)
         self.ap2=Arc2(center=Point2(-454.80607521289664, -9.203502208239968),p1=Point2(-74.67307521289663, -26.08650220823995),p2=Point2(-74.47907521289662, 2.521497791760055),r=380.507731036)
         self.c=Arc2((1,1),r=1) #unit circle around (1,1)
+        self.cw=Arc2((1,1),r=1,dir=-1) #unit circle around (1,1) clockwise
 
     def test___init__(self):
         #copy constructor
@@ -1013,6 +1014,8 @@ class TestArc2:
         assert_equal(self.a1.angle(),-self.a3.angle())
         assert_true(self.ap.angle()<radians(10)) # check the angle is not the complementary angle
         assert_true(self.ap2.angle()<radians(10)) # check the angle is not the complementary angle
+        assert_equal(self.c.angle(),2*pi)
+        assert_equal(self.cw.angle(),-2*pi)
 
     def test___abs__(self):
         assert_equal(abs(self.a1),pi/2.)
