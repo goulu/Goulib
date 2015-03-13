@@ -71,6 +71,12 @@ class BBox(Box):
     @property
     def ymax(self): return self[1].end
     
+    @property
+    def xmed(self): return (self.xmin+self.xmax)/2
+
+    @property
+    def ymed(self): return (self.ymin+self.ymax)/2
+    
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
         if isinstance(other,(Box,tuple)):
@@ -449,12 +455,15 @@ def Spline(pts):
 '''
 class _Group(Entity, Geometry):
     """ abstract class for iterable Entities"""
-    def bbox(self):
+    def bbox(self, filter=None):
         """
-        :return: :class:`BBox` bounding box of Entity"""
+        :param filter: optional function(entity):bool returning True if entity should be considered in box
+        :return: :class:`BBox` bounding box of Entity
+        """
         res=BBox()
         for entity in self: # do not use sum() as it copies Boxes unnecessarily
-            res+=entity.bbox()
+            if filter is None or filter(entity):
+                res+=entity.bbox()
         return res
 
     @property
@@ -586,12 +595,9 @@ class Group(list, _Group):
         for e in dxf:
             if layers and e.layer not in layers:
                 continue
-            if only:
-                if e.dxftype in only:
-                    self.append(Entity.from_dxf(e, trans))
-                else:
-                    continue
             elif e.dxftype in ignore:
+                continue
+            elif only and  e.dxftype not in only:
                 continue
             elif e.dxftype == 'INSERT': #TODO : improve insertion on correct layer
                 t2 = trans*Trans(1, e.insert[:2], e.rotation)
@@ -1088,7 +1094,7 @@ class Drawing(Group):
             self.dxf.entities,
             layers=kwargs.get('layers',None),
             only=kwargs.get('only',[]),
-            ignore=kwargs.get('only',[]),
+            ignore=kwargs.get('ignore',[]),
             trans=Trans(),
             flatten=kwargs.get('flatten',False),
         )
