@@ -23,12 +23,12 @@ import fractions
 from functools import reduce
 
 def sign(number):
-    """Will return 1 for positive,
-    -1 for negative, and 0 for 0"""
-    try:
-        return number/abs(number)
-    except ZeroDivisionError:
-        return 0
+    """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
+    if number<0:
+        return -1
+    if number>0:
+        return 1
+    return 0
 
 if six.PY3:
     def cmp(x,y):
