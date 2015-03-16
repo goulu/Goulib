@@ -3,6 +3,8 @@
 """
 utilities for unit tests (using nose)
 """
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
@@ -13,18 +15,17 @@ import unittest
 
 class TestCase(unittest.TestCase):
 
-    def assertSequenceEqual(self, seq1, seq2, msg=None, seq_type=None, places=7, delta=None):
-        """An equality assertion for ordered sequences (like lists and tuples).
-
+    def assertSequenceEqual(self, seq1, seq2, msg=None, seq_type=None, places=7, delta=None, reltol=None):
+        """
+        An equality assertion for ordered sequences (like lists and tuples).
         constraints on seq1,seq2 from unittest.TestCase.assertSequenceEqual are mostly removed
-
-        Args:
-            seq1: The first sequence to compare.
-            seq2: The second sequence to compare.
-            seq_type: The expected datatype of the sequences, or None if no
-                    datatype should be enforced.
-            msg: Optional message to use on failure instead of a list of
-                    differences.
+        
+        :param seq1, seq2: sequences to compare for (quasi) equality
+        :param msg: optional string message to use on failure instead of a list of differences
+        :param places: int number of digits to consider in float comparisons.
+                If None, enforces strict equality
+        :param delta: optional float absolute tolerance value
+        :param reltol: optional float relative tolerance value
         """
 
         if seq_type is not None:
@@ -49,18 +50,30 @@ class TestCase(unittest.TestCase):
         i=0
         for item1,item2 in six.moves.zip_longest(seq1,seq2):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
-            self.assertEqual(item1,item2, places=places, msg=m, delta=delta)
+            self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
 
     base_types=(six.integer_types,six.string_types,six.text_type,bool,set,dict)
 
-    def assertEqual(self, first, second, places=7, msg=None, delta=None):
+    def assertEqual(self, first, second, places=7, msg=None, delta=None, reltol=None):
+        """automatically calls assertAlmostEqual when needed
+        :param first, second: objects to compare for (quasi) equality
+        :param places: int number of digits to consider in float comparisons.
+                        If None, forces strict equality
+        :param msg: optional string error message to display in cas of failure
+        :param delta: optional float absolute tolerance value
+        :param reltol: optional float relative tolerance value
+        """
         #inspired from http://stackoverflow.com/a/3124155/190597 (KennyTM)
         import collections
         if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
             super(TestCase,self).assertEqual(first, second,msg=msg)
         elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
-            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta)
+            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
+        elif reltol:
+            ratio=first/second if second else second/first
+            msg='%s != %s within %.2f%%'%(first,second,reltol*100)
+            super(TestCase,self).assertAlmostEqual(ratio,1, places=None, msg=msg, delta=reltol)
         else: #float and classes
             try:
                 super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
@@ -115,8 +128,11 @@ def runmodule(redirect=True, level=logging.INFO):
         return nose.runmodule()
     
     # enable logging
-    FORMAT = "%(levelname)s:%(filename)s:%(funcName)s: %(message)s"
-    logging.basicConfig(format=FORMAT,level=level)
+    root=logging.getLogger()
+    root.setLevel(level)
+    hdlr = root.handlers[0]
+    fmt = logging.Formatter('%(levelname)s:%(filename)s:%(funcName)s: %(message)s')
+    hdlr.setFormatter(fmt)
 
     """ ensures stdout is printed after the tests results"""
     import sys
@@ -125,7 +141,11 @@ def runmodule(redirect=True, level=logging.INFO):
 
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
-    result = nose.run(argv=[sys.argv[0], module_name, '-s'])
+    
+    result = nose.run(
+        argv=[sys.argv[0], module_name, '-s', '--nologcapture'],
+    )
+    
     sys.stdout = old_stdout
     print(mystdout.getvalue())
 
