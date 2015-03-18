@@ -92,10 +92,13 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         return create_using
     elif isinstance(data,nx.Graph): 
         if isinstance(create_using,_Geo):
+            tol=create_using.tol
+            create_using.tol=0 #zero tolerance when copying
             for k in data.node: #create nodes
                 create_using.add_node(k,attr_dict=data.node[k])
             for u,v,d in data.edges(data=True):
                 create_using.add_edge(u,v,attr_dict=d)
+            create_using.tol=tol # revert original tolerance
             return create_using
             
         # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
@@ -168,7 +171,11 @@ class _Geo(object):
     
     @property
     def tol(self):
-        return self.graph.get('tol',0.010)
+        return self.graph['tol']
+    
+    @tol.setter
+    def tol(self, tol):
+        self.graph['tol']=tol
     
     @property
     def multi(self):
@@ -503,7 +510,14 @@ class GeoGraph(_Geo, nx.MultiGraph):
         :param kwargs: other parameters will be copied as attributes, especially:
 
         """
-        nx.MultiGraph.__init__(self,None, **kwargs)
+        properties=kwargs
+        try:
+            properties.update(data.graph)
+        except:
+            pass
+        properties.setdefault('tol',0.010) #default tolerance on node positions
+        
+        nx.MultiGraph.__init__(self,None, **properties)
         _Geo.__init__(self,nx.MultiGraph,data,nodes)
     
     
