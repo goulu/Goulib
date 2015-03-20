@@ -77,6 +77,12 @@ class BBox(Box):
     @property
     def ymed(self): return (self.ymin+self.ymax)/2
     
+    @property
+    def width(self): return self[0].size
+    
+    @property
+    def height(self): return self[1].size
+    
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
         if isinstance(other,(Box,tuple)):
@@ -203,10 +209,13 @@ class Entity(object):
         """
         res={}
         res['color']=color_to_aci(attr.get('color',self.color))
-        try:
-            res['layer']=attr.get('layer',self.layer)
-        except: #no layer specified
-            pass
+        if 'layer' in attr:
+            res['layer']=attr.get('layer')
+        else:
+            try:
+                res['layer']=self.layer
+            except:
+                pass
         return res
         
     def to_dxf(self,**attr):
@@ -310,6 +319,11 @@ class Entity(object):
         from matplotlib.path import Path
 
         kwargs.setdefault('color',self.color)
+        try:
+            kwargs.setdefault('linewidth',self.width)
+        except:
+            pass
+        
         if isinstance(self,Segment2):
             path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
             return [patches.PathPatch(path, **kwargs)]
@@ -338,18 +352,22 @@ class Entity(object):
         raise NotImplementedError
 
     @staticmethod
-    def figure(entity,**kwargs):
-        """:return: matplotlib axis suitable for drawing """
-
+    def figure(box, **kwargs):
+        """
+        :param box: :class:`drawing.BBox` bounds and clipping box
+        :param kwargs: parameters passed to  :method:`~matplotlib.pyplot.figure`
+        :return: matplotlib axis suitable for drawing
+        """
+            
         fig=plt.figure(**kwargs)
-
-        box=entity.bbox()
-        #for some reason we have to plot something in order to size the window (found no other way top do it...)
-        try:
-            plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
-        except:
-            logging.error('drawing is empty')
-            raise
+        # ax  = fig.add_subplot(111) # unneeded
+            
+        # TODO: find why this doesn't work:
+        # plt.gca().set_position([box.xmin,box.ymin,box.width, box.height])
+            
+        #for some reason we have to plot something in order to size the window
+        #TODO: find a better way... (found no other way top do it...)
+        plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
 
         plt.axis('equal')
 
@@ -365,7 +383,10 @@ class Entity(object):
         """
 
         if fig is None:
-            fig=self.figure(self)
+            if not 'box' in kwargs:
+                kwargs['box']=self.bbox()
+                
+            fig=self.figure(**kwargs)
 
         p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
 
