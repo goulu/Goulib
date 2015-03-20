@@ -629,7 +629,8 @@ def to_drawing(g, d=None, edges=[]):
     if d is None: d=drawing.Drawing()
     if not edges:
         edges=g.edges(data=True)
-    for u,v,data in edges:
+    for edge in edges:
+        u,v,data=edge[0],edge[1],edge[-1]
         try:
             e=data['entity']
         except:
