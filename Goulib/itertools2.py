@@ -458,4 +458,12 @@ class iter2(object):
     def __iter__(self):
         return self
 
-
+def subdict(d,keys):
+    """extract "sub-dictionary"
+    :param d: dict
+    :param keys: container of keys to extract:
+    :return: dict:
+    # http://stackoverflow.com/questions/5352546/best-way-to-extract-subset-of-key-value-pairs-from-python-dictionary-object/5352649#5352649
+    """
+    return dict([(i, d[i]) for i in keys if i in d])
+    
