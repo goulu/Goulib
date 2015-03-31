@@ -191,12 +191,9 @@ class Intervals(list):
     def append(self, item):
         import bisect # https://docs.python.org/2/library/bisect.html
         i=bisect.bisect_left(self,item) #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
-        try:
-            if self and self[i].overlap(item,True):
-                item=self.pop(i).hull(item)
-                return self.append(item)
-        except: #TODO : find why we have an IndexError when self is []
-            pass
+        if i<len(self) and self[i].overlap(item,True):
+            item=self.pop(i).hull(item)
+            return self.append(item)
         
         super(Intervals,self).insert(i,item)
         return self
