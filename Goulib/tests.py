@@ -130,10 +130,11 @@ def runmodule(redirect=True, level=logging.INFO):
     # enable logging
     root=logging.getLogger()
     root.setLevel(level)
-    hdlr = root.handlers[0]
     fmt = logging.Formatter('%(levelname)s:%(filename)s:%(funcName)s: %(message)s')
-    hdlr.setFormatter(fmt)
-
+    try:
+        root.handlers[0].setFormatter(fmt)
+    except:
+        logging.basicConfig(format=fmt)
     """ ensures stdout is printed after the tests results"""
     import sys
     from io import StringIO
