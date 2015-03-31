@@ -22,7 +22,7 @@ from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
 from .math2 import rint, product
-from .itertools2 import split, filter2
+from .itertools2 import split, filter2, subdict
 from .geom import *
 from .colors import color_to_aci, aci_to_color, color_lookup
 from .interval import Box
@@ -387,8 +387,10 @@ class Entity(object):
                 kwargs['box']=self.bbox()
                 
             fig=self.figure(**kwargs)
+            
+        args=subdict(kwargs,('color','linewidth'))
 
-        p=self.patches() #some of which might be Annotations, which aren't patches but Artists...
+        p=self.patches(**args) #some of which might be Annotations, which aren't patches but Artists...
 
         from matplotlib.patches import Patch
         patches,artists=filter2(p,lambda e:isinstance(e,Patch))
