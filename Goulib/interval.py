@@ -8,6 +8,9 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
+from container import SortedCollection
+from bisect import bisect_left
+
 def _order(interval):
     """:return: (a,b) interval such that a<=b"""
     if interval[0]==interval[1]:
@@ -176,36 +179,30 @@ class Interval(object):
     def singleton(self):
         ":return: True iff self.end - self.start == 1."
         return self.size == 1
-        
-class Intervals(list):
-    """a list of intervals kept in ascending order"""
-    def __init__(self, init=[]):
-        super(Intervals,self).__init__()
-        self.extend(init)
-        
-    def extend(self,iterable):
-        for i in iterable:
-            self.append(i)
-        return self
     
-    def append(self, item):
-        import bisect # https://docs.python.org/2/library/bisect.html
-        i=bisect.bisect_left(self,item) #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
+
+        
+class Intervals(SortedCollection):
+    """a list of intervals kept in ascending order"""
+    
+    def __repr__(self):
+        return str(list(self))
+
+    def insert(self, item):
+        k = self._key(item)
+        i = bisect_left(self._keys, k)  #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
         if i<len(self) and self[i].overlap(item,True):
             item=self.pop(i).hull(item)
-            return self.append(item)
+            return self.insert(item)
         
-        super(Intervals,self).insert(i,item)
+        super(Intervals,self).insert(item)
         return self
     
     def __iadd__(self,item):
-        return self.append(item)
+        return self.insert(item)
     
     def __add__(self,item):
-        return Intervals(self).append(item)
-        
-    def insert(self, i,x):
-        raise IndexError('Intervals do not support insert. Use append or + operator.')
+        return Intervals(self).insert(item)
         
     def __call__(self,x):
         """ returns intervals containing x"""
