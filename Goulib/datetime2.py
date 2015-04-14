@@ -12,7 +12,7 @@ import six
 
 from datetime import *
 import datetime as dt #to distinguish from class
-from interval import *
+from .interval import *
 
 #useful constants
 timedelta0=timedelta(0) 

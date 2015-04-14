@@ -9,10 +9,10 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-from piecewise import *
-from polynomial import Polynomial
-from itertools2 import any
-from math2 import quad, equal
+from .piecewise import *
+from .polynomial import Polynomial
+from .itertools2 import any
+from .math2 import quad, equal
 
 class PVA(object):
     """represents a function of time returning position, velocity, and acceleration

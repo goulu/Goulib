@@ -21,13 +21,13 @@ __license__ = "LGPL"
 from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
-from math2 import rint, product
-from itertools2 import split, filter2, subdict
-from geom import *
-from colors import color_to_aci, aci_to_color, color_lookup
-from interval import Box
+from .math2 import rint, product
+from .itertools2 import split, filter2, subdict
+from .geom import *
+from .colors import color_to_aci, aci_to_color, color_lookup
+from .interval import Box
 
-import plot #set matplotlib backend
+from . import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
 def Trans(scale=1, offset=None, rotation=None):
@@ -327,8 +327,9 @@ class Entity(object):
         return res
 
     def patches(self, **kwargs):
-        """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity
-        this is the only method that needs to be overridden in descendants for draw, render and IPython _repr_xxx_ to work
+        """
+        :return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity
+        :note: this is the only method that needs to be overridden in descendants for draw, render and IPython _repr_xxx_ to work
         """
         import matplotlib.patches as patches
         from matplotlib.path import Path
@@ -370,7 +371,7 @@ class Entity(object):
     def figure(box, **kwargs):
         """
         :param box: :class:`drawing.BBox` bounds and clipping box
-        :param kwargs: parameters passed to  :method:`~matplotlib.pyplot.figure`
+        :param kwargs: parameters passed to `~matplotlib.pyplot.figure`
         :return: matplotlib axis suitable for drawing
         """
             

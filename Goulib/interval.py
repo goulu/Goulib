@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-from container import SortedCollection
+from .container import SortedCollection
 from bisect import bisect_left
 
 def _order(interval):
@@ -49,7 +49,8 @@ def intersectlen(t1, t2, none=0):
     :param t2: interval 2 (tuple)
     :param none: value to return when t1 does not intersect t2
     :return: len of intersection between 2 intervals (tuples), 
-    or none if intervals don't intersect"""
+    or none if intervals don't intersect
+    """
     i=intersection(t1,t2)
     if i is None:
         return none #the parameter...

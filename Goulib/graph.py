@@ -13,7 +13,7 @@ import logging, math, six
 
 import networkx as nx # http://networkx.github.io/
 
-import plot #set matplotlib backend
+from . import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
 try:
@@ -73,9 +73,9 @@ _nk=0 # node key
 
 def to_networkx_graph(data,create_using=None,multigraph_input=False):
     """Make a NetworkX graph from a known data structure.
-    enhances :meth:`networkx.convert.to_networkx_graph`
-    :param data: any type handled by :meth:`convert.to_networkx_graph`, plus:
-        - :class:`scipy.spatial.qhull.Delaunay` to enable building a graph from a delauney triangulation
+    enhances `networkx.convert.to_networkx_graph`
+    :param data: any type handled by `convert.to_networkx_graph`, plus:
+    * :class:`scipy.spatial.qhull.Delaunay` to enable building a graph from a delauney triangulation
         
     If create_using is a :class:`GeoGraph`and data is a Graph where nodes have a 'pos' attribute,
     then this attribute will be used to rename nodes as (x,y,...) tuples suitable for GeoGraph.
@@ -646,11 +646,13 @@ def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs)
     """
     https://en.wikipedia.org/wiki/Delaunay_triangulation
     :param nodes: list of (x,y) or (x,y,z) node positions
-    :param qhull_options: string passed to :meth:`scipy.spatial.Delaunay`, which passes it to Qhull ( http://www.qhull.org/ )
-        - 'Qt' ensures all points are connected
-        - 'Qz' required when nodes lie on a sphere
-        - 'QJ' solves some singularity situations
-    :param kwargs: passed to the GeoGraph constructor
+    :param qhull_options: string passed to :meth:`scipy.spatial.Delaunay`, 
+    which passes it to Qhull ( http://www.qhull.org/ )
+    *'Qt' ensures all points are connected
+    *'Qz' required when nodes lie on a sphere
+    *'QJ' solves some singularity situations
+        
+    :param kwargs: passed to the :class:`GeoGraph` constructor
     :return: :class:`GeoGraph` with delauney triangulation between nodes
     """
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html

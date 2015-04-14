@@ -19,7 +19,7 @@ __revision__ = '$Revision$'
 import operator, six
 
 from math import pi,sin,cos,tan,acos,asin,atan2,sqrt
-import math2
+from . import math2
 
 precision = 1e-9 #for equality comparisons
 

@@ -13,9 +13,9 @@ __license__ = "LGPL"
 
 import logging, math, random, copy, six
 
-from itertools2 import all_pairs, index_min, sort_indexes
-from stats import mean
-from math2 import vecadd, vecsub, vecmul
+from .itertools2 import all_pairs, index_min, sort_indexes
+from .stats import mean
+from .math2 import vecadd, vecsub, vecmul
 
 class _Bin():
     def __init__(self, capacity, f=lambda x:x):

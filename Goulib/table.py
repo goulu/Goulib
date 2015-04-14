@@ -24,8 +24,8 @@ except: #ElementTree
     
 Element=ElementTree._Element
 
-from datetime2 import datef, datetimef,strftimedelta
-from markup import tag
+from .datetime2 import datef, datetimef,strftimedelta
+from .markup import tag
 
 def attr(args):
     res=''

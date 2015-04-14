@@ -8,10 +8,9 @@ __author__ = "Philippe Guglielmetti"
 __cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-from expr import Expr
+from .expr import Expr
 import bisect
-    
-inf=float('Inf')
+from .math2 import inf
 
 class Piecewise(Expr):
     """
@@ -31,7 +30,7 @@ class Piecewise(Expr):
             self.y=[]
             self.append((start,default))
             self.extend(init)
-            
+
     def __call__(self,x):
         """returns value of Expr at point x """
         try: #is x iterable ?
@@ -41,7 +40,7 @@ class Piecewise(Expr):
         if i<1 : #ignore the first x value
             return self.y[0](x) #this is the default, leftmost value
         return self.y[i](x)
-            
+
     def index(self,x,v=None):
         """finds an existing point or insert one and returns its index"""
         i=bisect.bisect_left(self.x,x)
@@ -52,10 +51,10 @@ class Piecewise(Expr):
         self.y.insert(i,v if v is not None else self.y[i-1])
         self.x.insert(i,x)
         return i
-    
+
     def __len__(self):
         return len(self.x)
-    
+
     def __iter__(self):
         """iterators through discontinuities. take the opportunity to delete redundant tuples"""
         prev=None
@@ -68,23 +67,23 @@ class Piecewise(Expr):
                 yield (self.x[i],self.y[i])
                 prev=self.y[i]
                 i+=1
-    
+
     def append(self, item):
         """appends a (x,y) item. In fact inserts it at correct position and returns the corresponding index"""
         f=item[1]
         if not isinstance(f,Expr):
             f=Expr(f)
         return self.index(item[0],f)
-            
-        
+
+
     def extend(self,iterable):
         """appends an iterable of (x,y) values"""
         for p in iterable:
             self.append(p)
-    
+
     def __getitem__(self, i):
         return (self.x[i],self.y[i])
-    
+
     def __str__(self):
         return str(list(self))
 
@@ -106,27 +105,27 @@ class Piecewise(Expr):
                     i,j=j,i
             except:
                 j=len(self)
-    
+
             for k in range(i,j):
                 self.y[k]=self.y[k].apply(f,right[1],name) #calls Expr.apply
         return self
-    
+
     def apply(self,f,right,name=None):
         """apply function to copy of self"""
         return Piecewise(self).iapply(f,right,name)
-    
+
     def applx(self,f,name=None):
         """ apply a function to each x value """
         self.x=[f(x) for x in self.x]
         self.y=[y.applx(f,name) for y in self.y]
         return self
-    
+
     def __lshift__(self,dx):
         return Piecewise(self).applx(lambda x:x-dx)
-    
+
     def __rshift__(self,dx):
         return Piecewise(self).applx(lambda x:x+dx)
-    
+
     def points(self,min=0,max=None,eps=0):
         """@return x and y for a line plot"""
         for x in self: pass #traverse to simplify through __iter__

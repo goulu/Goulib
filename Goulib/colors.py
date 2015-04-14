@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import six
-import math2
+from . import math2
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
@@ -233,11 +233,10 @@ color = {
 color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
 
 """array of 256 Autocad/Autodesk ACI colors produced from http://www.isctex.com/acadcolors.php produced by this code :
-    from Goulib.table import Table
-    acadcolors=[]
-    t=Table('AutoCAD Color Index RGB Equivalents.html')[1:] #outer <table> from original file must be removed
-    for c in t:
-        acadcolors.append(rgb_to_hex(c[4:]))
+    >>> from Goulib.table import Table
+    >>> acadcolors=[]
+    >>> t=Table('AutoCAD Color Index RGB Equivalents.html')[1:] #outer <table> from original file must be removed
+    >>> for c in t: acadcolors.append(rgb_to_hex(c[4:]))
 """
 acadcolors=[
     '#000000', '#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ffffff', 

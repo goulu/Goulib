@@ -16,11 +16,13 @@ import operator,cmath
 from math import pi, sqrt, log, sin, asin, factorial
 
 from itertools import count, groupby, product as cartesian_product
-from itertools2 import drop, ireduce, ilen, compact, flatten
+from .itertools2 import drop, ireduce, ilen, compact, flatten
 
 import fractions
 
 from functools import reduce
+
+inf=float('Inf') #infinity
 
 def sign(number):
     """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
