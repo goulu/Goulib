@@ -23,7 +23,7 @@ except:
     logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
-import math2
+from . import math2
     
 try:
     from rtree import index # http://toblerity.org/rtree/
