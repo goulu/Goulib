@@ -15,7 +15,7 @@ __license__ = "LGPL"
 import six #python 2+3 compatibility
 import re
 
-from .expr import Expr
+from expr import Expr
 
 class Polynomial(Expr):
     def __init__(self,val):

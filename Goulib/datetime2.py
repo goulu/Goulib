@@ -8,12 +8,11 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
+import six
 
 from datetime import *
 import datetime as dt #to distinguish from class
-from .interval import *
-
-import six
+from interval import *
 
 #useful constants
 timedelta0=timedelta(0) 

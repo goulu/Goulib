@@ -16,7 +16,7 @@ import operator,cmath
 from math import pi, sqrt, log, sin, asin, factorial
 
 from itertools import count, groupby, product as cartesian_product
-from .itertools2 import drop, ireduce, ilen, compact, flatten
+from itertools2 import drop, ireduce, ilen, compact, flatten
 
 import fractions
 

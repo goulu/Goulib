@@ -21,19 +21,20 @@ __license__ = "LGPL"
 from math import  radians, degrees, tan, atan, pi, copysign
 import logging, operator
 
-from .math2 import rint, product
-from .itertools2 import split, filter2, subdict
-from .geom import *
-from .colors import color_to_aci, aci_to_color, color_lookup
-from .interval import Box
+from math2 import rint, product
+from itertools2 import split, filter2, subdict
+from geom import *
+from colors import color_to_aci, aci_to_color, color_lookup
+from interval import Box
 
-import Goulib.plot #set matplotlib backend
+import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
 def Trans(scale=1, offset=None, rotation=None):
     """
     :param scale: float or (scalex,scaley) tuple of scale factor
     :param offset: :class:`~geom.Vector3`
+    :param rotation: float angle in degrees
     :return: :class:`~geom.Matrix3` of generalized scale+offset+rotation
     """
     res = Matrix3()
@@ -142,6 +143,20 @@ class BBox(Box):
 
 def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
     return Point2([round(x,decimals) for x in pt.xy])
+
+def calcBulge(p1,bulge,p2):
+    #taken from http://free-cad.sourceforge.net/SrcDocu/de/d1f/importDXF_8py_source.html
+    """
+    calculates intermediary vertex for curved segments.
+    algorithm from http://www.afralisp.net/lisp/Bulges1.htm
+    """
+    chord = p2-p1
+    sagitta = (bulge * chord.length)/2
+    startpoint = p1+chord/2
+    perp = chord.cross()
+    perp.normalize()
+    endpoint = perp*sagitta
+    return startpoint+endpoint
 
 class Entity(object):
     """Base class for all drawing entities"""
@@ -605,10 +620,16 @@ class Group(list, _Group):
         for e in self:
             e.swap()
 
-    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, flatten=False):
+    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, flatten=True):
+        #TODO : make it work properly with flatten=False
         """
         :param dxf: dxf.entity
-        :return: Entity of correct subtype
+        :param layers: list of layer names to consider. entities not on these layers are ignored. default=None: all layers are read
+        :param only: list of dxf entity types names that are read. default=[]: all are read
+        :param ignore: list of dxf entity types names that are ignored. default=[]: none is ignored
+        :param trans: :class:`Trans` optional transform matrix
+        :parm flatten: bool flatten block structure
+        :return: :class:`Entity` of correct subtype
         """
         if trans is None:
             trans=Trans()
@@ -701,9 +722,9 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
 
         if len(self)==0: #init the chain with edge
             return super(Chain,self).append(edge,**attrs)
-        if self.end.dist(edge.start)<=tol:
+        if self.end.distance(edge.start)<=tol:
             return super(Chain,self).append(edge,**attrs)
-        if allow_swap and self.end.dist(edge.end)<=tol:
+        if allow_swap and self.end.distance(edge.end)<=tol:
             edge.swap()
             return super(Chain,self).append(edge,**attrs)
         
@@ -715,10 +736,10 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         if len(self)>1 : #but if chain already contains more than 1 edge, game is over
             return None
 
-        if self.start.dist(edge.start)<=tol:
+        if self.start.distance(edge.start)<=tol:
             self[0].swap()
             return super(Chain,self).append(edge,**attrs)
-        if self.start.dist(edge.end)<=tol:
+        if self.start.distance(edge.end)<=tol:
             self[0].swap()
             edge.swap()
             return super(Chain,self).append(edge,**attrs)
@@ -807,6 +828,23 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         """
         def trans(pt): return rpoint(mat3(Point2(pt)))
 
+        def arc_from_bulge(start,end,bulge):
+            #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
+            theta=4*atan(bulge)
+            chord=Segment2(start,end)
+            c=chord.length
+            s=bulge*c/2
+            r=(c*c/4+s*s)/(2*s) #radius (negative if clockwise)
+            gamma=(pi-theta)/2
+            angle=chord.v.angle()+(gamma if bulge>=0 else -gamma)
+            center=start+Polar(r,angle)
+            return Arc2(
+                trans(center),
+                trans(start),
+                trans(end),
+                # dir=1 if bulge>=0 else -1
+            )
+
         if e.dxftype == 'POLYLINE':
             res=Chain()
             for i in range(1,len(e.vertices)):
@@ -816,16 +854,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
                 if bulge==0:
                     res.append(Segment2(trans(start),trans(end)))
                 else:
-                    #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
-                    theta=4*atan(bulge)
-                    chord=Segment2(start,end)
-                    c=chord.length
-                    s=bulge*c/2
-                    r=(c*c/4+s*s)/(2*s) #radius (negative if clockwise)
-                    gamma=(pi-theta)/2
-                    angle=chord.v.angle()+copysign(gamma,bulge)
-                    center=start+Polar(r,angle)
-                    res.append(Arc2(trans(center),trans(start),trans(end)))
+                    res.append(arc_from_bulge(start,end,bulge))
             if e.is_closed:
                 res.append(Segment2(trans(e.vertices[-1].location[:2]),trans(e.vertices[0].location[:2])))
         elif e.dxftype == 'LWPOLYLINE':
@@ -836,17 +865,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
                 if len(end)==2:
                     res.append(Segment2(trans(start),trans(end)))
                 else:
-                    bulge=end[2]
-                    #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
-                    theta=4*atan(bulge)
-                    chord=Segment2(start,end)
-                    c=chord.length
-                    s=bulge*c/2
-                    r=(c*c/4+s*s)/(2*s) #radius (negative if clockwise)
-                    gamma=(pi-theta)/2
-                    angle=chord.v.angle()+copysign(gamma,bulge)
-                    center=start+Polar(r,angle)
-                    res.append(Arc2(trans(center),trans(start),trans(end)))
+                    res.append(arc_from_bulge(start,end,bulge=end[2]))
             if e.is_closed:
                 res.append(Segment2(trans(e.points[-1]),trans(e.points[0])))
         else:
@@ -1096,9 +1115,7 @@ class Drawing(Group):
         """reads a .dxf file
         :param filename: string path to .dxf file to read
         :param options: passed to :class:`~dxfgrabber.drawing.Drawing`constructor
-        :param layers: list of layer names to consider. entities not on these layers are ignored. default=None: all layers are read
-        :param only: list of dxf entity types names that are read. default=[]: all are read
-        :param ignore: list of dxf entity types names that are ignored. default=[]: none is ignored
+        :param kwargs: dict of optional parameters passed to :method:`Group.from_dxf`
         """
         import dxfgrabber
         try:
@@ -1111,16 +1128,9 @@ class Drawing(Group):
         #build dictionary of blocks
         self.block={}
         for block in self.dxf.blocks:
-            self.block[block.name]=Group().from_dxf(block._entities)
+            self.block[block.name]=Group().from_dxf(block._entities, **kwargs)
 
-        super(Drawing, self).from_dxf(
-            self.dxf.entities,
-            layers=kwargs.get('layers',None),
-            only=kwargs.get('only',[]),
-            ignore=kwargs.get('ignore',[]),
-            trans=Trans(),
-            flatten=kwargs.get('flatten',False),
-        )
+        super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
 
     def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
         """

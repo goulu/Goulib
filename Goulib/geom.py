@@ -19,8 +19,7 @@ __revision__ = '$Revision$'
 import operator, six
 
 from math import pi,sin,cos,tan,acos,asin,atan2,sqrt
-
-from Goulib import math2
+import math2
 
 precision = 1e-9 #for equality comparisons
 
@@ -2236,7 +2235,7 @@ class Point2(Vector2, Geometry):
         simply returns the length of the result of ``connect``.
     """
 
-    def dist(self,other):
+    def distance(self,other):
         try:
             dx,dy=self.x-other.x,self.y-other.y
         except:
@@ -2424,6 +2423,11 @@ class Segment2(Line2):
         self.p = self.p2
         self.v *= -1
         return self
+    
+def circle_from_3_points(p1,p2,p3):
+    #TODO : implement
+    raise NotImplementedError('TODO')
+    return Circle(c,r)
 
 class Circle(Geometry):
     """
@@ -2470,7 +2474,7 @@ class Circle(Geometry):
                 self.p = self.c+Vector2(args[1],0) #for coherency + transform
             else:
                 self.p=Point2(args[1]) #one point on circle
-                self.r=self.p.dist(self.c)
+                self.r=self.p.distance(self.c)
 
     def __eq__(self, other):
         if not isinstance(other,Circle):
@@ -2525,6 +2529,12 @@ class Circle(Geometry):
 
     def swap(self):
         pass #for consistency
+    
+def arc_from_3_points(p1,p2,p3):
+    #TODO : implement, ideally from Ian Galton, "An efficient three-point arc algorithm"
+    #see http://petrified.ucsd.edu/~ispg-adm/pubs/j_icga_89_1.pdf
+    raise NotImplementedError('TODO')
+    return Arc2(c,p1,p3)
 
 class Arc2(Circle):
 
@@ -2547,7 +2557,7 @@ class Arc2(Circle):
                 p=c+Polar(r,p1)
             else:
                 p=Point2(p1)
-                r=c.dist(p)
+                r=c.distance(p)
             super(Arc2,self).__init__(c,p)
             if isinstance(p2,(int,float)):
                 self.p2=c+Polar(r,p2)

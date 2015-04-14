@@ -24,8 +24,8 @@ except: #ElementTree
     
 Element=ElementTree._Element
 
-from .datetime2 import datef, datetimef,strftimedelta
-from .markup import tag
+from datetime2 import datef, datetimef,strftimedelta
+from markup import tag
 
 def attr(args):
     res=''
@@ -376,25 +376,34 @@ class Table(list):
                 return i
         return None
 
-    def _i(self,by):
+    def _i(self,column):
         '''column index'''
-        if isinstance(by, int):
-            return by
+        if isinstance(column, int):
+            return column
         try:
-            return self.titles.index(by)
+            return self.titles.index(column)
         except ValueError:
             return None
     
-    def icol(self,by):
+    def icol(self,column):
         '''iterates column'''
         for row in self:
             try:
-                yield row[self._i(by)]
+                yield row[self._i(column)]
             except:
                 yield None
                 
-    def col(self,by):
-        return [x for x in self.icol(by)]
+    def col(self,column):
+        return [x for x in self.icol(column)]
+    
+    def index(self,value,column=0):
+        """
+        :return: int row number of first line where column contains value
+        """
+        for i,v in enumerate(self.icol(column)):
+            if v==value:
+                return i
+        return None
     
     def get(self,row,col):
         col=self._i(col)

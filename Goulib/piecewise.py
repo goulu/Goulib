@@ -8,7 +8,7 @@ __author__ = "Philippe Guglielmetti"
 __cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-from .expr import Expr
+from expr import Expr
 import bisect
     
 inf=float('Inf')

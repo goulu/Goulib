@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import six
-from . import math2
+import math2
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
@@ -319,8 +319,6 @@ def nearest_color(x,l=None):
         return l[c]
     return l[i]
 
-from .math2 import rint
-
 class Color(object):
     '''class to allow simple math operations on colors'''
     def __init__(self,c):
@@ -346,7 +344,7 @@ class Color(object):
     @property
     def hex(self):
         rgb=math2.sat(self.rgb)
-        return rgb_to_hex((rint(_*255) for _ in rgb))
+        return rgb_to_hex((math2.rint(_*255) for _ in rgb))
     
     def __repr__(self):
         return "Color('%s')"%(self.name if self.name[0]!='~' else self.hex)

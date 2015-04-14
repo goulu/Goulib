@@ -13,7 +13,7 @@ import logging, math, six
 
 import networkx as nx # http://networkx.github.io/
 
-import Goulib.plot #set matplotlib backend
+import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
 try:
@@ -23,7 +23,7 @@ except:
     logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
-from . import math2
+import math2
     
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -33,7 +33,7 @@ except: #fallback, especially because I couldn't manage to install rtree on trav
     
 if not RTREE:
     logging.warning('rtree not available, falling back to slow version')
-    from . import itertools2 #lazy import
+    from Goulib import itertools2 #lazy import
     
     class index: #mimics rtree.index module
 
