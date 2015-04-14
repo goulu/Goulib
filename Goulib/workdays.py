@@ -236,39 +236,5 @@ def networkdays(start_date, end_date,holidays=[]):
     Use NETWORKDAYS to calculate employee benefits that accrue 
     based on the number of days worked during a specific term'''
     return WorkCalendar([8,16],holidays).networkdays(start_date,end_date)
-                        
-import unittest
-class TestCase(unittest.TestCase):
-    def runTest(self):
-        cal=WorkCalendar([8,16])
-        date1=date(2011,12,16) # a FRI close to year end and holidays
-        self.assertEqual(cal.networkdays(date1,date1),1,'networkdays')
-        self.assertEqual(cal.networkdays(date1,date(2011,12,17)),1,'networkdays')
-        self.assertEqual(cal.networkdays(date1,date(2011,12,18)),1,'networkdays')
-        self.assertEqual(cal.networkdays(date1,date(2011,12,19)),2,'networkdays')
-        date2=date(2012,1,9) # a MON close to next year begin
-        self.assertEqual(cal.networkdays(date1,date2),17,'networkdays')
-        cal.addholidays(date(1,12,25)) #Christmas was a SUN in 2011
-        self.assertEqual(cal.networkdays(date1,date2),17,'networkdays')
-        cal.addholidays(date(1,1,1)) #NewYear was also a SUN in 2012...
-        self.assertEqual(cal.networkdays(date1,date2),17,'networkdays')
-        cal.addholidays(date(2012,1,2)) #...so the 2th was holiday
-        self.assertEqual(cal.networkdays(date1,date2),16,'networkdays')
-        cal.addholidays(days(date(2011,12,19),21)) #in fact, the company was closed 3 weeks
-        self.assertEqual(cal.networkdays(date1,date2),2,'networkdays')
-        
-                
-        print(cal.cast(datetime(2011,12,16,19)))
-        print(cal.cast(datetime(2012,1,9,3)))
-        print(cal.cast(datetime(2012,1,9,17)))
-        
-        self.assertEqual(cal.diff(date1,date2),timedelta(hours=8),'diff')
-        self.assertEqual(cal.diff(date2,date1),timedelta(hours=-8),'diff')
-        self.assertEqual(cal.gethours(date1,date2),8.,'gethours')
-        
-        self.assertEqual(cal.workday(date1,1),date2, 'workday')
-        self.assertEqual(cal.workday(date2,-1),date1, 'workday %s != %s'%(cal.workday(date2,-1),date1))
-        
-if __name__ == '__main__':
-    unittest.main()
+
 
