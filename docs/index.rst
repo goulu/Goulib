@@ -33,7 +33,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 :source: https://github.com/goulu/Goulib
 
 Requirements
--------
+------------
 
 Goulib uses "lazy" requirements.
 Many modules and functions do not require any other packages,
@@ -68,9 +68,28 @@ Modules
 Classes
 -------
 
-.. inheritance-diagram:: colors container datetime2 decorators drawing expr geom
-    graph interval itertools2 markup math2 motion optim piecewise plot polynomial
-    stats table tests workdays
+.. inheritance-diagram::
+    Goulib.colors
+    Goulib.container
+    Goulib.datetime2
+    Goulib.decorators
+    Goulib.drawing
+    Goulib.expr
+    Goulib.geom
+    Goulib.graph
+    Goulib.interval
+    Goulib.itertools2
+    Goulib.math2
+    Goulib.motion
+    Goulib.optim
+    Goulib.piecewise
+    Goulib.plot
+    Goulib.polynomial
+    Goulib.stats
+    Goulib.table
+    Goulib.tests
+    Goulib.workdays
+    :parts: 2
 
 Indices and tables
 ------------------

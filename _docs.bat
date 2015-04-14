@@ -1,8 +1,9 @@
 cd goulib
 call sphinx-apidoc . -eo ..\docs\modules 
-rem del ..\docs\modules\Goulib.rst
 cd ..
 cd docs
+rem del modules\Goulib.rst
+del _build\html\index.html
 call make html
 start _build\html\index.html
 cd ..
