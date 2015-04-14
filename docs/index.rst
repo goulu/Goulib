@@ -32,11 +32,19 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 :notebook: http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb
 :source: https://github.com/goulu/Goulib
 
+Requirements
+-------
+
+Goulib uses "lazy" requirements.
+Many modules and functions do not require any other packages,
+packages listed in requirements.txt are needed only by some classes or functions
+
 Modules
 -------
 
 .. autosummary::
    Goulib.colors
+   Goulib.container
    Goulib.datetime2
    Goulib.decorators
    Goulib.drawing
@@ -50,15 +58,24 @@ Modules
    Goulib.motion
    Goulib.optim
    Goulib.piecewise
+   Goulib.plot
    Goulib.polynomial
    Goulib.stats
    Goulib.table
    Goulib.tests
    Goulib.workdays
    
-Requirements
+Classes
 -------
 
-Goulib uses "lazy" requirements.
-Many modules and functions do not require any other packages,
-packages listed in requirements.txt are needed only by some Goulib classes or functions
+.. inheritance-diagram:: colors container datetime2 decorators drawing expr geom
+    graph interval itertools2 markup math2 motion optim piecewise plot polynomial
+    stats table tests workdays
+
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+* :doc:`changes`

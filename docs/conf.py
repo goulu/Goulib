@@ -41,6 +41,8 @@ sys.path.insert(0, os.path.abspath('..'))
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary','sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.intersphinx']
 
 autosummary_generate = True
+
+inheritance_graph_attrs = dict(fontsize=14)
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -248,7 +250,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'goulib', u'Goulib Documentation',
+    ('index', 'Goulib', u'Goulib Documentation',
      [u'Ph. Guglielmetti, https://github.com/goulu/Goulib'], 1)
 ]
 
