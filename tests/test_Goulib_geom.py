@@ -1218,6 +1218,16 @@ class TestCopy:
         # assert_equal(expected, copy(object))
         raise SkipTest # TODO: implement your test here
 
+class TestCircleFrom3Points:
+    def test_circle_from_3_points(self):
+        # assert_equal(expected, circle_from_3_points(p1, p2, p3))
+        raise SkipTest # TODO: implement your test here
+
+class TestArcFrom3Points:
+    def test_arc_from_3_points(self):
+        # assert_equal(expected, arc_from_3_points(p1, p2, p3))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
 

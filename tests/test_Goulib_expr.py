@@ -117,5 +117,15 @@ class TestExpr:
         assert_false(Expr(1)==Expr(2))
         assert_true(Expr(1)==1)
 
+    def test___truediv__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__truediv__(right))
+        raise SkipTest # TODO: implement your test here
+
+    def test_plot(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.plot(fmt, x))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

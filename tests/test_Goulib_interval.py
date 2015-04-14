@@ -32,7 +32,6 @@ class TestIntersectlen:
         assert_equal(intersectlen([1,5],(3,2)),1)
         assert_equal(intersectlen((1,2),[2,4]),0)
         assert_equal(intersectlen((1,2),[3,4],None),None)
-        
 
 class TestInterval:
     @classmethod
@@ -154,7 +153,7 @@ class TestIntervals:
         assert_equal(self.intervals(4),None)
         assert_equal(self.intervals(5),Interval(5,6))
 
-    def test_append(self):
+    def test_insert(self):
         pass #tested above
     
     def test_extend(self):
@@ -169,8 +168,10 @@ class TestIntervals:
         i+=Interval(-1,-3)
         assert_equal(str(i),'[[-3,-1), [1,4), [5,6)]')
 
-    def test_insert(self):
-        assert_raises(IndexError, Intervals.insert, self.intervals,1,Interval(2,3))
+    def test___repr__(self):
+        # intervals = Intervals()
+        # assert_equal(expected, intervals.__repr__())
+        raise SkipTest # TODO: implement your test here
 
 class TestBox:
     @classmethod
