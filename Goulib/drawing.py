@@ -314,7 +314,7 @@ class Entity(object):
         elif e.dxftype == 'SOLID':
             return None #TODO : implement
         elif e.dxftype == 'POINT':
-            return None #ignore
+            return None #TODO : implement
         elif e.dxftype == 'TEXT':
             p=trans(Point2(e.insert[:2]))
             res=Text(e.text,p,size=e.height,rotation=e.rotation)
@@ -359,8 +359,14 @@ class Entity(object):
             kwargs.setdefault('fill',False)
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
         if isinstance(self,Point2):
+            try:
+                ms=self.width
+            except:
+                ms=0.01
+            kwargs.setdefault('clip_on',False)
             kwargs.setdefault('fill',True)
-            return [patches.Circle(self.xy,0,**kwargs)]
+            kwargs.setdefault('facecolor','red')
+            return [patches.Circle(self.xy,ms,**kwargs)]
         if isinstance(self,Spline):
             kwargs.setdefault('fill',False)
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
