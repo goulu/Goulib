@@ -2424,10 +2424,13 @@ class Segment2(Line2):
         self.v *= -1
         return self
     
-def circle_from_3_points(p1,p2,p3):
-    #TODO : implement
-    raise NotImplementedError('TODO')
-    return Circle(c,r)
+    def midpoint(self):
+        return self.point(0.5)
+    
+    def bisect(self):
+        res=Line2(self.midpoint(),self.v.cross())
+        res.v.normalize() #because usually we do geometry with it
+        return res 
 
 class Circle(Geometry):
     """
@@ -2530,8 +2533,18 @@ class Circle(Geometry):
     def swap(self):
         pass #for consistency
     
+def circle_from_3_points(a,b,c):
+    """
+    :Return: the unique circle through the three points a, b, c 
+    """
+    l1=Segment2(a,b).bisect()
+    l2=Segment2(a,c).bisect()
+    c = l1.intersect(l2)
+    r = c.distance(a)
+    return Circle(c, r)
+    
 def arc_from_3_points(p1,p2,p3):
-    #TODO : implement, ideally from Ian Galton, "An efficient three-point arc algorithm"
+    #TODO: implement, ideally from Ian Galton, "An efficient three-point arc algorithm"
     #see http://petrified.ucsd.edu/~ispg-adm/pubs/j_icga_89_1.pdf
     raise NotImplementedError('TODO')
     return Arc2(c,p1,p3)
