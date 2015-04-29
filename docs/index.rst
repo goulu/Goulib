@@ -18,7 +18,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
   :target: https://coveralls.io/r/goulu/Goulib
   :alt: Tests
 .. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
-  :target: http://readthedocs.org/en/latest/
+  :target: http://goulib.readthedocs.org/en/latest/
   :alt: Doc
 .. image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
 	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
