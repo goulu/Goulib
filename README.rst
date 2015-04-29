@@ -37,6 +37,8 @@ Modules
 
 **colors**
 	hex RGB colors and related functions
+**container**
+    sorted collection
 **datetime2**
 	additions to datetime standard library
 **decorators**
@@ -63,6 +65,8 @@ Modules
 	optimization algorithms : knapsack, traveling salesman, simulated annealing
 **piecewise**
 	piecewise-defined functions
+**plot**
+    plot utilities
 **polynomial**
 	manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by Rick Muller
 **stats**
