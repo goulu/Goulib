@@ -120,12 +120,12 @@ class TestExpr:
     def test___truediv__(self):
         # expr = Expr(f, left, right, name)
         # assert_equal(expected, expr.__truediv__(right))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_plot(self):
         # expr = Expr(f, left, right, name)
         # assert_equal(expected, expr.plot(fmt, x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

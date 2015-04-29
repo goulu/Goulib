@@ -40,103 +40,103 @@ class TestSortedCollection:
     def test___contains__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__contains__(item))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___getitem__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__getitem__(i))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___init__(self):
         # sorted_collection = SortedCollection(iterable, key)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___iter__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__iter__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___len__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__len__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___reduce__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__reduce__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___repr__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___reversed__(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.__reversed__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_clear(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.clear())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_copy(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.copy())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_count(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.count(item))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_find(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find(k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_find_ge(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find_ge(k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_find_gt(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find_gt(k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_find_le(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find_le(k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_find_lt(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find_lt(k))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 
 
     def test_insert(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.insert(item))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_insert_right(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.insert_right(item))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_pop(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.pop(i))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_remove(self):
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.remove(item))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
     
 if __name__ == "__main__":
     runmodule()

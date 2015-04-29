@@ -36,12 +36,12 @@ class TestGeometry:
 
     def test___init__(self):
         # geometry = Geometry(*args)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___contains__(self):
         # geometry = Geometry(*args)
         # assert_equal(expected, geometry.__contains__(pt))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPoint2:
     @classmethod
@@ -201,12 +201,12 @@ class TestVector2:
     def test___pos__(self):
         # vector2 = Vector2(*args)
         # assert_equal(expected, vector2.__pos__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___hash__(self):
         # vector2 = Vector2(*args)
         # assert_equal(expected, vector2.__hash__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestVector3:
     @classmethod
@@ -350,7 +350,7 @@ class TestVector3:
     def test___pos__(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.__pos__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestMatrix3:
     @classmethod
@@ -499,7 +499,7 @@ class TestMatrix3:
     def test___iter__(self):
         # matrix3 = Matrix3(*args)
         # assert_equal(expected, matrix3.__iter__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestMatrix4:
     @classmethod
@@ -682,7 +682,7 @@ class TestMatrix4:
     def test___iter__(self):
         # matrix4 = Matrix4(*args)
         # assert_equal(expected, matrix4.__iter__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestQuaternion:
     @classmethod
@@ -978,12 +978,12 @@ class TestCircle:
     def test___contains__(self):
         # circle = Circle(*args)
         # assert_equal(expected, circle.__contains__(pt))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_swap(self):
         # circle = Circle(*args)
         # assert_equal(expected, circle.swap())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestArc2:
     @classmethod
@@ -1053,12 +1053,12 @@ class TestArc2:
     def test___contains__(self):
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.__contains__(pt))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_intersect(self):
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.intersect(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPoint3:
     @classmethod
@@ -1216,17 +1216,17 @@ class TestArgPair:
 class TestCopy:
     def test_copy(self):
         # assert_equal(expected, copy(object))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCircleFrom3Points:
     def test_circle_from_3_points(self):
         # assert_equal(expected, circle_from_3_points(p1, p2, p3))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestArcFrom3Points:
     def test_arc_from_3_points(self):
         # assert_equal(expected, arc_from_3_points(p1, p2, p3))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

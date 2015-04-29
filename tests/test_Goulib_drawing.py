@@ -41,9 +41,26 @@ class TestBBox:
         assert_equal(self.unit.ymax, 1)
         assert_equal(self.box.ymax, 4)
 
+    def test_xmed(self):
+        assert_equal(self.unit.xmed, 0.5)
+        assert_equal(self.box.xmed, 1)
+
+    def test_ymed(self):
+        assert_equal(self.unit.ymed, 0.5)
+        assert_equal(self.box.ymed, 1)
+        
+    def test_width(self):
+        assert_equal(self.unit.width, 1)
+        assert_equal(self.box.width, 4)
+
+    def test_height(self):
+        assert_equal(self.unit.height, 1)
+        assert_equal(self.box.height, 6)
+
     def test___add__(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.__add__(other))
+        b1=self.unit+self.box
+        b2=self.box+self.unit
+        assert_equal(b1,b2)
         raise SkipTest
 
     def test___call__(self):
@@ -83,27 +100,9 @@ class TestBBox:
     def test___contains__(self):
         # b_box = BBox(p1, p2)
         # assert_equal(expected, b_box.__contains__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
-    def test_height(self):
-        # b_box = BBox(p1, p2)
-        # assert_equal(expected, b_box.height())
-        raise SkipTest # TODO: implement your test here
 
-    def test_width(self):
-        # b_box = BBox(p1, p2)
-        # assert_equal(expected, b_box.width())
-        raise SkipTest # TODO: implement your test here
-
-    def test_xmed(self):
-        # b_box = BBox(p1, p2)
-        # assert_equal(expected, b_box.xmed())
-        raise SkipTest # TODO: implement your test here
-
-    def test_ymed(self):
-        # b_box = BBox(p1, p2)
-        # assert_equal(expected, b_box.ymed())
-        raise SkipTest # TODO: implement your test here
 
 class TestRint:
     def test_rint(self):
@@ -123,6 +122,7 @@ class TestEntity:
         self.seg=Segment2((1,0),(2,3))
         self.arc=Arc2((1,1),(0,0),radians(120))
         self.circle=Circle((1,1),2)
+        self.point=Point2(0,0)
 
     def test___init__(self):
         pass
@@ -217,17 +217,20 @@ class TestEntity:
     def test_draw(self):
         # entity = Entity()
         # assert_equal(expected, entity.draw(fig, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_figure(self):
         # entity = Entity()
         # assert_equal(expected, entity.figure(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_render(self):
-        # entity = Entity()
-        # assert_equal(expected, entity.render(format, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        a=Point2(0,1)
+        b=Point2(1,1)
+        c=Point2(1,0)
+        g=Group([a,b,c])
+        r=g.render('svg')
+        pass
 
 class TestGroup:
     @classmethod
@@ -249,37 +252,37 @@ class TestGroup:
     def test_append(self):
         # group = Group()
         # assert_equal(expected, group.append(entity, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_extend(self):
         # group = Group()
         # assert_equal(expected, group.extend(entities, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_from_dxf(self):
         # group = Group()
         # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, flatten))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_swap(self):
         # group = Group()
         # assert_equal(expected, group.swap())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___copy__(self):
         # group = Group()
         # assert_equal(expected, group.__copy__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_color(self):
         # group = Group()
         # assert_equal(expected, group.color())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_color_case_2(self):
         # group = Group()
         # assert_equal(expected, group.color(c))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestChain:
     def test___repr__(self):
@@ -464,124 +467,62 @@ class TestRect:
     def test___repr__(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestText:
     def test___init__(self):
         # text = Text(text, point, size, rotation)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_bbox(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.bbox())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_patches(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_to_dxf(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.to_dxf(**attr))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_intersect(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.intersect(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_length(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.length())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestInstance:
     def test___init__(self):
         # instance = Instance(group, trans, name)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___iter__(self):
         # instance = Instance(group, trans, name)
         # assert_equal(expected, instance.__iter__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___repr__(self):
         # instance = Instance(group, trans, name)
         # assert_equal(expected, instance.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_from_dxf(self):
         # instance = Instance()
         # assert_equal(expected, instance.from_dxf(blocks, mat3))
-        raise SkipTest # TODO: implement your test here
-
-class test__Group:
-    def test_bbox(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.bbox())
-        raise SkipTest # TODO: implement your test here
-
-    def test_connect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.connect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_intersect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_length(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.length())
-        raise SkipTest # TODO: implement your test here
-
-    def test_patches(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-    def test_to_dxf(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-class test__Group:
-    def test_bbox(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.bbox(filter))
-        raise SkipTest # TODO: implement your test here
-
-    def test_connect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.connect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_intersect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_length(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.length())
-        raise SkipTest # TODO: implement your test here
-
-    def test_patches(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-    def test_to_dxf(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCalcBulge:
     def test_calc_bulge(self):
         # assert_equal(expected, calcBulge(p1, bulge, p2))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
     import logging

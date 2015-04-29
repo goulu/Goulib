@@ -279,17 +279,17 @@ class TestIndexMax:
 class TestTakeevery:
     def test_takeevery(self):
         # assert_equal(expected, takeevery(n, iterable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 class TestSortIndexes:
     def test_sort_indexes(self):
         # assert_equal(expected, sort_indexes(iterable, key, reverse))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 class TestSubdict:
     def test_subdict(self):
         # assert_equal(expected, subdict(d, keys))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 if __name__ == "__main__":
     runmodule()

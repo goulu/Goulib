@@ -76,12 +76,12 @@ class TestColor:
 class TestColorToAci:
     def test_color_to_aci(self):
         # assert_equal(expected, color_to_aci(x, nearest))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestAciToColor:
     def test_aci_to_color(self):
         # assert_equal(expected, aci_to_color(x, block_color, layer_color))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()
