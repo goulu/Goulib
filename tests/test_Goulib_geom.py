@@ -50,27 +50,26 @@ class TestPoint2:
         self.p10=Point2(1,0)
         self.p01=Point2(0,1)
         self.p11=Point2(1,1)
+        self.diag=Segment2(self.p10,self.p01)
 
     def test___repr__(self):
         assert_equal(repr(self.p10),'Point2(1, 0)')
 
     def test_connect(self):
-        assert_equal(self.p10.connect(self.p01),Segment2(self.p10,self.p01))
+        assert_equal(self.p10.connect(self.p01),self.diag)
 
     def test_distance(self):
         assert_equal(self.p10.distance(self.p10),0)
         assert_equal(self.p10.distance(self.p00),1)
         assert_equal(self.p10.distance(self.p01),sqrt(2))
+        
+        assert_equal(self.p00.distance(self.diag),sqrt(2)/2)
+        assert_equal(self.p11.distance(self.diag),sqrt(2)/2)
 
     def test_intersect(self):
-        # point2 = Point2()
-        # assert_equal(expected, point2.intersect(other))
-        raise SkipTest
-
-    def test_dist(self):
-        # point2 = Point2()
-        # assert_equal(expected, point2.dist(other))
-        raise SkipTest
+        p=self.p11.intersect(self.p11) #Point2 intersects with itself
+        assert_equal(p,self.p11)
+        assert_false(p is self.p11) #but intersect should return a COPY
 
 class TestVector2:
 

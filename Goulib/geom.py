@@ -509,7 +509,7 @@ class Vector3(object):
 
     def __mul__(self, other):
         try:
-            # TODO component-wise mul/div in-place and on Vector2; docs.
+            # TODO: component-wise mul/div in-place and on Vector2; docs.
             if self.__class__ is Point3 or other.__class__ is Point3:
                 _class = Point3
             else:
@@ -2035,6 +2035,7 @@ class Geometry(object):
         this constructor is called by descendant classes at copy
         it is replaced to copy some graphics attributes in module drawings
         """
+        return #TODO : do not do this anymore. It causes trouble when creating objects
         try: #copy constructor
             self.__dict__.update(args[0].__dict__)
         except:
@@ -2048,14 +2049,12 @@ class Geometry(object):
         raise AttributeError('Cannot intersect %s and %s' % \
             (self.__class__, other.__class__))
 
-    _intersect_point2 = _intersect_unimplemented
     _intersect_line2 = _intersect_unimplemented
     _intersect_circle = _intersect_unimplemented
     _connect_point2 = _connect_unimplemented
     _connect_line2 = _connect_unimplemented
     _connect_circle = _connect_unimplemented
 
-    _intersect_point3 = _intersect_unimplemented
     _intersect_line3 = _intersect_unimplemented
     _intersect_sphere = _intersect_unimplemented
     _intersect_plane = _intersect_unimplemented
@@ -2121,6 +2120,11 @@ def _intersect_line2_line2(A, B):
                   A.p.y + ua * A.v.y)
 
 def _intersect_line2_circle(L, C):
+    """Line2/Circle intersection
+    :param L: Line2 (or derived class)
+    :param C: Circle (or derived class)
+    :return: None, single Point2 or [Point2,Point2]
+    """
     a = L.v.mag2()
     b = 2 * (L.v.x * (L.p.x - C.c.x) + \
              L.v.y * (L.p.y - C.c.y))
@@ -2220,34 +2224,44 @@ class Point2(Vector2, Geometry):
     >>> Point2(2.0, 3.0) - Point2(1.0, 0.0)
     Vector2(1.00, 3.00)
 
-    The following methods are also defined:
-
     ``connect(other)``
-        Returns a **LineSegment2** which is the minimum length line segment
+        Returns a **Segment2** which is the minimum length line segment
         that can connect the two shapes.  *other* may be a **Point2**, **Line2**,
-        **Ray2**, **LineSegment2** or **Circle**.
+        **Ray2**, **Segment2** or **Circle**.
 
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
     """
 
     def distance(self,other):
-        try:
+        """
+        absolute minimum distance to other object
+        :param other: Point2, Line2 or Circle
+        :return: float positive distance between self and other
+        """
+        try: #quick for other Point2
             dx,dy=self.x-other.x,self.y-other.y
         except:
-            try:
+            try: #also quick for
                 dx,dy=self.x-other[0],self.y-other[1]
-            except:
-                return (self-other).mag()
+            except: # for all other objects
+                return self.connect(other).length
         return hypot(dx,dy)
-
+    
+    def __contains__(self,pt):
+        """
+        :return: True if self and pt are the same point, False otherwise
+        needed for coherency
+        """
+        if not isinstance(pt,Point2): return False
+        return self.distance(pt)<precision
 
     def intersect(self, other):
-        return self in other #calls other.__contains__
+        """Point2/object intersection
+        :return: Point2 copy of self if on other object, None if not
+        """
+        return Point2(self) if self in other else None
 
-    def _intersect_circle(self, other):
-        return _intersect_point2_circle(self, other)
+    def _intersect_circle(self, circle):
+        return self.intersect(circle)
 
     def connect(self, other):
         return other._connect_point2(self)
@@ -2273,7 +2287,7 @@ class Line2(Geometry):
     """
     A **Line2** is a line on a 2D plane extending to infinity in both directions;
     a **Ray2** has a finite end-point and extends to infinity in a single
-    direction; a **LineSegment2** joins two points.
+    direction; a **Segment2** joins two points.
 
     All three classes support the same constructors, operators and methods,
     but may behave differently when calculating intersections etc.
@@ -2301,24 +2315,24 @@ class Line2(Geometry):
     The following methods are supported by all three classes:
 
     ``intersect(other)``
-        If *other* is a **Line2**, **Ray2** or **LineSegment2**, returns
+        If *other* is a **Line2**, **Ray2** or **Segment2**, returns
         a **Point2** of intersection, or None if the lines are parallel.
 
-        If *other* is a **Circle**, returns a **LineSegment2** or **Point2** giving
+        If *other* is a **Circle**, returns a **Segment2** or **Point2** giving
         the part of the line that intersects the circle, or None if there
         is no intersection.
 
     ``connect(other)``
-        Returns a **LineSegment2** which is the minimum length line segment
+        Returns a **Segment2** which is the minimum length line segment
         that can connect the two shapes.  For two parallel lines, this
         line segment may be in an arbitrary position.  *other* may be
-        a **Point2**, **Line2**, **Ray2**, **LineSegment2** or **Circle**.
+        a **Point2**, **Line2**, **Ray2**, **Segment2** or **Circle**.
 
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
 
-    **LineSegment2** also has a *length* property which is read-only.
+    **Segment2** also has a *length* property which is read-only.
     """
 
     def __init__(self, *args):
@@ -2372,11 +2386,14 @@ class Line2(Geometry):
     def intersect(self, other):
         return other._intersect_line2(self)
 
-    def _intersect_line2(self, other):
-        return _intersect_line2_line2(self, other)
+    def _intersect_line2(self, line):
+        return _intersect_line2_line2(self, line)
 
-    def _intersect_circle(self, other):
-        return _intersect_line2_circle(self, other)
+    def _intersect_circle(self, circle):
+        """Line2/Circle intersection
+        :return: None, Point2 or [Point2,Point2]
+        """
+        return _intersect_line2_circle(self, circle)
 
     def connect(self, other):
         return other._connect_line2(self)
@@ -2389,8 +2406,6 @@ class Line2(Geometry):
 
     def _connect_circle(self, other):
         return _connect_circle_line2(other, self)
-
-
 
 class Ray2(Line2):
 
@@ -2442,15 +2457,12 @@ class Circle(Geometry):
 
     The following methods are supported:
 
-    ``intersect(other)``
-        If *other* is a **Line2**, **Ray2** or **LineSegment2**, returns
-        a **LineSegment2** giving the part of the line that intersects the
-        circle, or None if there is no intersection.
+    
 
     ``connect(other)``
-        Returns a **LineSegment2** which is the minimum length line segment
+        Returns a **Segment2** which is the minimum length line segment
         that can connect the two shapes. *other* may be a **Point2**, **Line2**,
-        **Ray2**, **LineSegment2** or **Circle**.
+        **Ray2**, **Segment2** or **Circle**.
 
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
@@ -2508,6 +2520,11 @@ class Circle(Geometry):
         return self.c.distance(pt)<=self.r+precision
 
     def intersect(self, other):
+        """
+        :param other: Line2, Ray2 or Segment2**, **Ray2** or **Segment2**, returns
+        a **Segment2** giving the part of the line that intersects the
+        circle, or None if there is no intersection.
+        """
         return other._intersect_circle(self)
 
     def _intersect_line2(self, other):
@@ -2784,6 +2801,12 @@ def _connect_line3_plane(L, P):
     return None
 
 def _connect_sphere_line3(S, L):
+    """
+        Sphere/Line shortest joining segment
+        :param S: Sphere
+        :param L: Line
+        :return: LineSegment3 of minimal length
+        """
     d = L.v.mag2()
     # assert d != 0
     u = ((S.c.x - L.p.x) * L.v.x + \
@@ -2791,12 +2814,11 @@ def _connect_sphere_line3(S, L):
          (S.c.z - L.p.z) * L.v.z) / d
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
-    point = Point3(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z)
+    point = L.point(u)
     v = (point - S.c)
     v.normalize()
     v *= S.r
-    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
-                        point)
+    return Segment3(S.c+v,point)
 
 def _connect_sphere_sphere(A, B):
     v = B.c - A.c
@@ -2921,10 +2943,10 @@ class Point3(Vector3, Geometry):
     """
 
     def intersect(self, other):
-        return other._intersect_point3(self)
-
-    def _intersect_sphere(self, other):
-        return _intersect_point3_sphere(self, other)
+        """Point3/object intersection
+        :return: self Point3 if on other object, None if not
+        """
+        return self if self in other else None
 
     def connect(self, other):
         return other._connect_point3(self)
@@ -3117,11 +3139,7 @@ class Sphere(Geometry):
         a **LineSegment3** giving the intersection, or ``None`` if the
         line does not intersect the sphere.
 
-    ``connect(other)``
-        Returns a **LineSegment3** which is the minimum length line segment
-        that can connect the two shapes. *other* may be a **Point3**, **Line3**,
-        **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-
+    
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
@@ -3154,20 +3172,23 @@ class Sphere(Geometry):
     def intersect(self, other):
         return other._intersect_sphere(self)
 
-    def _intersect_point3(self, other):
-        return _intersect_point3_sphere(other, self)
-
     def _intersect_line3(self, other):
         return _intersect_line3_sphere(other, self)
 
     def connect(self, other):
+        """
+        minimal joining segment between Sphere and other 3D Object
+        :param other: Point3, Line3, Sphere, Plane
+        :return: LineSegment3 of minimal length
+        """
+
         return other._connect_sphere(self)
 
     def _connect_point3(self, other):
         return _connect_point3_sphere(other, self)
 
-    def _connect_line3(self, other):
-        c = _connect_sphere_line3(self, other)
+    def _connect_line3(self, sphere):
+        c = _connect_sphere_line3(self, sphere)
         if c:
             return c.swap()
 
