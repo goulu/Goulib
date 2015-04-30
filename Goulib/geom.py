@@ -18,7 +18,7 @@ __revision__ = '$Revision$'
 
 import operator, six
 
-from math import pi,sin,cos,tan,acos,asin,atan2,sqrt
+from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot
 from . import math2
 
 precision = 1e-9 #for equality comparisons
@@ -242,10 +242,12 @@ class Vector2(object):
     def __eq__(self, other):
         try: #quick
             if self.xy == other.xy : return True
-        except: pass
+        except:
+            pass
         try:
             if self.x == other[0] and self.y == other[1]: return True
-        except: pass
+        except:
+            pass
         return (self-Vector2(other)).mag()<precision
 
     def __bool__(self):
@@ -347,14 +349,14 @@ class Vector2(object):
         return Vector2(self)
 
     def __abs__(self):
-        return sqrt(self.x**2 + self.y**2)
+        return hypot(self.x,self.y)
 
     mag = __abs__
 
     length = property(lambda self: abs(self))
 
     def mag2(self):
-        return self.x**2 + self.y**2
+        return self.x*self.x + self.y*self.y
 
     def normalize(self):
         d = self.mag()
@@ -426,10 +428,11 @@ class Vector3(object):
         try:
             return self.xyz == other.xyz
         except:
-            # assert hasattr(other, '__len__') and len(other) == 3
-            return self.x == other[0] and \
-                   self.y == other[1] and \
-                   self.z == other[2]
+            pass
+        # assert hasattr(other, '__len__') and len(other) == 3
+        return self.x == other[0] and \
+               self.y == other[1] and \
+               self.z == other[2]
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -576,16 +579,12 @@ class Vector3(object):
         return Vector3(self)
 
     def __abs__(self):
-        return sqrt(self.x ** 2 + \
-                         self.y ** 2 + \
-                         self.z ** 2)
+        return sqrt(self.mag2())
 
     mag = __abs__
 
     def mag2(self):
-        return self.x ** 2 + \
-               self.y ** 2 + \
-               self.z ** 2
+        return self.x ** 2 + self.y ** 2 + self.z ** 2
 
     def normalize(self):
         d = self.mag()
@@ -601,9 +600,7 @@ class Vector3(object):
 
     def dot(self, other):
         # assert isinstance(other, Vector3)
-        return self.x * other.x + \
-               self.y * other.y + \
-               self.z * other.z
+        return self.x * other.x + self.y * other.y + self.z * other.z
 
     def cross(self, other):
         return Vector3(self.y * other.z - self.z * other.y,
@@ -2243,7 +2240,7 @@ class Point2(Vector2, Geometry):
                 dx,dy=self.x-other[0],self.y-other[1]
             except:
                 return (self-other).mag()
-        return sqrt(dx*dx+dy*dy)
+        return hypot(dx,dy)
 
 
     def intersect(self, other):
@@ -2508,7 +2505,7 @@ class Circle(Geometry):
 
     def __contains__(self,pt):
         ":return: True if pt is ON or IN the circle"
-        return self.c.dist(pt)<=self.r
+        return self.c.distance(pt)<=self.r+precision
 
     def intersect(self, other):
         return other._intersect_circle(self)
@@ -2533,21 +2530,52 @@ class Circle(Geometry):
     def swap(self):
         pass #for consistency
     
+def _center_of_circle_from_3_points(a,b,c):
+    """
+    constructs circle passing through 3 distinct points
+    :param a,b,c: Point2 
+    :return: x,y coordinates of center of circle
+
+    geometrical implementation for reference:
+    
+        l1=Segment2(a,b).bisect()
+        l2=Segment2(a,c).bisect()
+        return = l1.intersect(l2).xy
+    """
+    #this implementation is much faster
+    d = (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) * 2.0
+    if d == 0.0:
+        return None
+    
+    a2,b2,c2=a.mag2(),b.mag2(),c.mag2()
+    
+    x = (a2 * (b.y - c.y) + b2 * (c.y - a.y) + c2 * (a.y - b.y)) / d
+    y = (a2 * (c.x - b.x) + b2 * (a.x - c.x) + c2 * (b.x - a.x)) / d
+    return x, y
+    
 def circle_from_3_points(a,b,c):
     """
-    :Return: the unique circle through the three points a, b, c 
+    constructs Circle passing through 3 distinct points
+    :param a,b,c: Point2 
+    :return: the unique Circle through the three points a, b, c 
     """
-    l1=Segment2(a,b).bisect()
-    l2=Segment2(a,c).bisect()
-    c = l1.intersect(l2)
-    r = c.distance(a)
-    return Circle(c, r)
+    # future generalization : http://stackoverflow.com/questions/27673463/smallest-enclosing-circle-in-python-error-in-the-code
+    x,y = _center_of_circle_from_3_points(a,b,c)
+    return Circle((x, y), hypot(x - a.x, y - a.y))
     
-def arc_from_3_points(p1,p2,p3):
-    #TODO: implement, ideally from Ian Galton, "An efficient three-point arc algorithm"
+def arc_from_3_points(a,b,c):
+    """
+    constructs Arc2 starting in a, going through b and ending in c
+    :param a,b,c: Point2 
+    :return: the unique Arc2 starting in a, going through b and ending in c
+    """
+    #more efficient method Ian Galton, "An efficient three-point arc algorithm"
     #see http://petrified.ucsd.edu/~ispg-adm/pubs/j_icga_89_1.pdf
-    raise NotImplementedError('TODO')
-    return Arc2(c,p1,p3)
+    x,y = _center_of_circle_from_3_points(a,b,c)
+    res=Arc2((x,y),a,c)
+    if not b in res:
+        res.dir=-res.dir
+    return res
 
 class Arc2(Circle):
 
@@ -2635,11 +2663,12 @@ class Arc2(Circle):
 
     def _u(self,pt):
         a=(pt-self.c).angle()
-        return self.angle(a)/self.angle()
+        res=self.angle(a)/self.angle()
+        return None if res<0 or res>1 else res
 
     def __contains__(self,pt):
         ":return: True if pt is ON the Arc"
-        return Geometry.__contains__(self,pt)
+        return super(Arc2,self).__contains__(pt) and self._u(pt) is not None
 
     def intersect(self, other):
         inters= other._intersect_circle(self)

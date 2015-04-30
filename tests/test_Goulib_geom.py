@@ -1220,13 +1220,46 @@ class TestCopy:
 
 class TestCircleFrom3Points:
     def test_circle_from_3_points(self):
-        # assert_equal(expected, circle_from_3_points(p1, p2, p3))
-        raise SkipTest 
+        p1=Point2(-1,0) 
+        p2=Point2(0,1) 
+        p3=Point2(1,0) 
+        c=circle_from_3_points(p1,p2,p3)
+        assert_equal(c.c.xy,(0,0))
+        assert_equal(c.r,1)
 
 class TestArcFrom3Points:
     def test_arc_from_3_points(self):
-        # assert_equal(expected, arc_from_3_points(p1, p2, p3))
-        raise SkipTest 
+        p1=Point2(-1,0) 
+        p2=Point2(0,1) 
+        p3=Point2(1,0) 
+        a=arc_from_3_points(p1,p2,p3)
+        assert_equal(a.c.xy,(0,0))
+        assert_equal(a.r,1)
+        assert_equal(a.point(0.5),p2)
+        
+        p1=Point2(-1,0) 
+        p2=Point2(0,-1) 
+        p3=Point2(1,0) 
+        a=arc_from_3_points(p1,p2,p3)
+        assert_equal(a.c.xy,(0,0))
+        assert_equal(a.r,1)
+        assert_equal(a.point(0.5),p2)
+        
+        p1=Point2(1,0) 
+        p2=Point2(0,1) 
+        p3=Point2(-1,0) 
+        a=arc_from_3_points(p1,p2,p3)
+        assert_equal(a.c.xy,(0,0))
+        assert_equal(a.r,1)
+        assert_equal(a.point(0.5),p2)
+        
+        p1=Point2(1,0) 
+        p2=Point2(0,-1) 
+        p3=Point2(-1,0) 
+        a=arc_from_3_points(p1,p2,p3)
+        assert_equal(a.c.xy,(0,0))
+        assert_equal(a.r,1)
+        assert_equal(a.point(0.5),p2)
 
 if __name__ == "__main__":
     runmodule()
