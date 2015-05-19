@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-various container data structure
+sorted collection
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-efficient Euclidian Graphs for :ref:`NetworkX <http://networkx.github.io/>` and related algorithms
+efficient Euclidian Graphs for :mod:`networkx` and related algorithms
 """
 
 __author__ = "Philippe Guglielmetti"
