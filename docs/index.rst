@@ -58,6 +58,7 @@ Modules
     expr
     geom
     graph
+    image
     interval
     itertools2
     math2
@@ -83,6 +84,7 @@ Classes
     expr
     geom
     graph
+    image
     interval
     itertools2
     math2

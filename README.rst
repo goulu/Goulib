@@ -51,6 +51,8 @@ Modules
 	2D + 3D geometry
 **graph**
 	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>`_ and related algorithms
+**image**
+    image processing and conversion
 **interval**
 	operations on [x..y[ intervals
 **itertools2**
