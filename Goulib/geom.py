@@ -525,8 +525,7 @@ def _intersect_line2_circle(L, C):
     :return: None, single Point2 or [Point2,Point2]
     """
     a = L.v.mag2()
-    b = 2 * (L.v.x * (L.p.x - C.c.x) + \
-             L.v.y * (L.p.y - C.c.y))
+    b = 2 * (L.v.x * (L.p.x - C.c.x) + L.v.y * (L.p.y - C.c.y))
     c = C.c.mag2() + L.p.mag2() - 2 * C.c.dot(L.p) - C.r ** 2
     det = b ** 2 - 4 * a * c
     if det < 0:
@@ -543,6 +542,28 @@ def _intersect_line2_circle(L, C):
     if p2 is None:
         return p1
     return [p1,p2]
+
+def _intersect_circle_circle(c1,c2):
+    """Circle/Circle intersection
+    :param c1: Line2 (or derived class)
+    :param c2: Circle (or derived class)
+    :return: None, single Point2 or [Point2,Point2]
+    """
+    # http://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+    
+    v=c2.c-c1.c #vector between centers
+    
+    d = abs(v)
+    if d>(c1.r+c2.r): return None
+    
+    a = (c1.r*c1.r - c2.r*c2.r + d*d)/(2*d)
+    h = sqrt(c1.r*c1.r - a*a)
+    
+    v.normalize()
+    p=c1.c+a*v
+    v=v.cross()
+    return [p+h*v,p-h*v]
+
 
 def _connect_point2_line2(P, L):
     # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
@@ -605,8 +626,7 @@ def _connect_circle_circle(A, B):
     elif d >= A.r and d >= B.r:
         s1,s2 = +1, -1
     v.normalize()
-    return Segment2(Point2(A.c.x + s1 * v.x * A.r, A.c.y + s1 * v.y * A.r),
-                        Point2(B.c.x + s2 * v.x * B.r, B.c.y + s2 * v.y * B.r))
+    return Segment2(Point2(A.c + s1 * v * A.r), Point2(B.c + s2 * v * B.r))
 
 class Point2(Vector2, Geometry):
     """
@@ -927,6 +947,9 @@ class Circle(Geometry):
 
     def _intersect_line2(self, other):
         return _intersect_line2_circle(other, self)
+    
+    def _intersect_circle(self, other):
+        return _intersect_circle_circle(other, self)
 
     def connect(self, other):
         return other._connect_circle(self)
