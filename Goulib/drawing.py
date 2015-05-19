@@ -520,31 +520,33 @@ class _Group(Entity, Geometry):
         :param other: `geom.Entity`
         :result: generate tuples (Point2,Entity_self) of intersections between other and each Entity
         """
+        # recurse in structures by swapping Entities to intersect
+        # in order to ensure we call geom intersect methods only with
+        # "atomic" Entities
         try:
             iter(other)
         except:
-            other=[other]
+            recurse=False
+        else:
+            recurse=True
+            
         for e in self:
-            for o in other:
-                inter=e.intersect(o)
-                if inter is None: 
-                    continue
-                if isinstance(inter,Point2) :
-                    yield (inter,e)
-                elif isinstance(inter,Segment2) :
-                    yield (inter.p,e)
-                    yield (inter.p2,e)
-                elif isinstance(inter,list) : # list of multiple points
-                    for i in inter:
-                        yield (i,e)
-                else:
-                    try:
-                        for i,e2 in inter:
-                            e2.group=e
-                            yield (i,e2)
-                    except:
-                        logging.error('strange intersection %s'%inter)
-
+            inter=other.intersect(e) if recurse else e.intersect(other)
+                
+            if inter is None: 
+                continue
+            if isinstance(inter,Point2) :
+                yield (inter,e)
+            elif isinstance(inter,Segment2) :
+                yield (inter.p,e)
+                yield (inter.p2,e)
+            elif isinstance(inter,list) : # list of multiple points
+                for i in inter:
+                    yield (i,e)
+            else: #recursive call
+                for i,e2 in inter:
+                    e2.group=e
+                    yield (i,e2)
 
     def connect(self, other):
         for (inter, _) in self.intersect(other):
@@ -556,8 +558,10 @@ class _Group(Entity, Geometry):
         try:
             iter(other)
         except:
-            other=[other]
-        return min((e.connect(o) for e in self for o in other), key=lambda e:e.length)
+            recurse=False
+        else:
+            recurse=True
+        return min((other.connect(e).swap() if recurse else e.connect(other) for e in self), key=lambda e:e.length)
 
     def patches(self, **kwargs):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""

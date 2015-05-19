@@ -244,10 +244,29 @@ class TestGroup:
         pts=Group([i[0] for i in lines.intersect(a)]) # list of intersection points
         self.group=Group([lines,a,pts])
         self.group.render('svg')
+        
+        #second example from notebook
+        r1=Rect((0,0),(-1,1))
+        r2=Rect((1,-1),(2,2))
+        c1=Circle(Point2(4,4),1)
+        c2=Circle(Point2(0,2),.5)
+        s1=r1.connect(r2)
+        s1.color='red'
+        s2=r2.connect(c1)
+        s2.color='red'
+        s3=c1.connect(c2)
+        s3.color='red'
+
+        self.group=Group([r1,r2,c1,c2,s1,s2,s3])
 
         self.dxf= Drawing(path+'/Homer_Simpson_by_CyberDrone.dxf')
         self.blocks= self.dxf.block
         assert_true('hand 1' in self.blocks)
+        
+    def test_distance(self):
+        g2=Trans(scale=2, offset=(10,1), rotation=30)*copy(self.group)
+        g2.color='blue'
+        assert_equal(self.group.distance(g2),2.026833782163534)
 
     def test_append(self):
         # group = Group()
@@ -448,7 +467,7 @@ class TestRect:
     @classmethod
     def setup_class(self):
         # see IPython notebook for graphical examples
-        self.r1=r1=Rect((0,0),(-1,1))
+        self.r1=Rect((0,0),(-1,1))
         self.r2=Rect((1,-1),(2,2))
 
     def test___init__(self):
