@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, six
+import operator, six, abc
 
 from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot
 from . import math2
@@ -24,6 +24,7 @@ from . import math2
 precision = 1e-9 #for equality comparisons
 
 def _hash(v):
+    """hash function for vectors"""
     # http://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
     primes=[73856093, 19349663, 83492791]
     res=0
@@ -31,14 +32,113 @@ def _hash(v):
         res=res^int(x*p) # ^ is xor
     return res
 
-def copy(object):
-    #in fact it is a deepcopy
-    try:
-        return object.__class__(object) #call copy constructor
-    except:
-        import copy
-        return copy.deepcopy(object)
+import copy as copier
+copy=copier.deepcopy
 
+# Geometry
+# Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
+# --------------------------------------------------------------------------
+
+@six.add_metaclass(abc.ABCMeta)
+class Geometry(object):
+    """
+    The following classes are available for dealing with simple 2D geometry.
+    The interface to each shape is similar; in particular, the ``connect``
+    and ``distance`` methods are defined identically for each.
+
+    For example, to find the closest point on a line to a circle::
+
+        >>> circ = Circle(Point2(3., 2.), 2.)
+        >>> line = Line2(Point2(0., 0.), Point2(-1., 1.))
+        >>> line.connect(circ).p1
+        Point2(0.50, -0.50)
+
+    To find the corresponding closest point on the circle to the line::
+
+        >>> line.connect(circ).p2
+        Point2(1.59, 0.59)
+    """
+    def __init__(self,*args):
+        """
+        this constructor is called by descendant classes at copy
+        it is replaced to copy some graphics attributes in module drawings
+        """
+        return #TODO : do not do this anymore. It causes trouble when creating objects
+        try: #copy constructor
+            self.__dict__.update(args[0].__dict__)
+        except:
+            pass
+
+    def _connect_unimplemented(self, other):
+        raise AttributeError('Cannot connect %s to %s' % \
+            (self.__class__, other.__class__))
+
+    def _intersect_unimplemented(self, other):
+        raise AttributeError('Cannot intersect %s and %s' % \
+            (self.__class__, other.__class__))
+
+    _intersect_line2 = _intersect_unimplemented
+    _intersect_circle = _intersect_unimplemented
+    _connect_point2 = _connect_unimplemented
+    _connect_line2 = _connect_unimplemented
+    _connect_circle = _connect_unimplemented
+
+    _intersect_line3 = _intersect_unimplemented
+    _intersect_sphere = _intersect_unimplemented
+    _intersect_plane = _intersect_unimplemented
+    _connect_point3 = _connect_unimplemented
+    _connect_line3 = _connect_unimplemented
+    _connect_sphere = _connect_unimplemented
+    _connect_plane = _connect_unimplemented
+
+    def point(self, u):
+        ":return: Point2 or Point3 at parameter u"
+        raise NotImplementedError
+
+    def tangent(self, u):
+        ":return: Vector2 or Vector3 tangent at parameter u"
+        raise NotImplementedError
+
+    def intersect(self, other):
+        raise NotImplementedError
+
+    def connect(self, other):
+        ":return: Geometry shortest (Segment2 or Segment3) that connects self to other"
+        raise NotImplementedError
+
+    def distance(self, other):
+        c = self.connect(other)
+        if c:
+            return c.length
+        else:
+            return None
+
+    def _u(self, pt):
+        """:return: float parameter corresponding to pt"""
+        raise NotImplementedError
+
+    def _u_in(self, u):
+        """:return: bool true if u is a valid parameter of geometry"""
+        raise NotImplementedError
+
+    def __contains__(self,pt):
+        return self.distance(pt)<precision
+
+def argPair(x,y=None):
+    """Process a pair of values passed in various ways."""
+    if y is None:
+        try:
+            return (x[0], x[1])
+        except:
+            pass
+    
+        try:
+            return x.xy
+        except:
+            pass
+    else:
+        return (x,y)
+    
 class Vector2(object):
     """
     Mutable 2D vector:
@@ -196,30 +296,6 @@ class Vector2(object):
             >>> v.rotate_around(axes,math.pi/4)
             Vector3(2.65, 0.35, 2.62)
 
-    ``angle(other)``
-        Return the angle between two vectors.
-
-    ``project(other)``
-        Return the projection (the component) of the vector on other.
-
-    Tests for equality include comparing against other sequences::
-
-        >>> v2 = Vector2(1, 2)
-        >>> v2 == Vector2(3, 4)
-        False
-        >>> v2 != Vector2(1, 2)
-        False
-        >>> v2 == (1, 2)
-        True
-
-        >>> v3 = Vector3(1, 2, 3)
-        >>> v3 == Vector3(3, 4, 5)
-        False
-        >>> v3 != Vector3(1, 2, 3)
-        False
-        >>> v3 == (1, 2, 3)
-        True
-
     """
 
     def __init__ ( self, *args ):
@@ -240,6 +316,25 @@ class Vector2(object):
         return _hash(self.xy)
 
     def __eq__(self, other):
+        """
+        Tests for equality include comparing against other sequences::
+
+        >>> v2 = Vector2(1, 2)
+        >>> v2 == Vector2(3, 4)
+        False
+        >>> v2 != Vector2(1, 2)
+        False
+        >>> v2 == (1, 2)
+        True
+
+        >>> v3 = Vector3(1, 2, 3)
+        >>> v3 == Vector3(3, 4, 5)
+        False
+        >>> v3 != Vector3(1, 2, 3)
+        False
+        >>> v3 == (1, 2, 3)
+        True
+        """
         try: #quick
             if self.xy == other.xy : return True
         except:
@@ -293,6 +388,10 @@ class Vector2(object):
         return _class(self.x - x, self.y - y)
 
     def __rsub__(self, other):
+        """ Point2 - Vector 2 substraction
+        :param other: Point2 or (x,y) tuple
+        :return: Vector2
+        """
         x,y=argPair(other)
         return Vector2(x - self.x, y - self.y)
 
@@ -346,7 +445,7 @@ class Vector2(object):
         return Vector2(-self.x, -self.y)
 
     def __pos__(self):
-        return Vector2(self)
+        return copy(self)
 
     def __abs__(self):
         return hypot(self.x,self.y)
@@ -383,8 +482,8 @@ class Vector2(object):
         return Vector2(self.x - d * normal.x,
                        self.y - d * normal.y)
 
-    def angle(self, other=None,unit=False):
-        """
+    def angle(self, other=None, unit=False):
+        """angle between two vectors.
         :param unit: bool True if vectors are unit vectors. False increases computations
         :return: float angle in radians to the other vector, or self direction if other=None
         """
@@ -394,9 +493,822 @@ class Vector2(object):
             return math2.angle(self,other,unit=unit)
 
     def project(self, other):
-        """Return one vector projected on the vector other"""
+        """Return the projection (the component) of the vector on other."""
         n = other.normalized()
         return self.dot(n)*n
+
+
+def _intersect_line2_line2(A, B):
+    d = B.v.y * A.v.x - B.v.x * A.v.y
+    if d == 0: #both lines are parallel
+        if A.distance(B.p)==0: #colinear
+            return A if isinstance(A,Segment2) else B
+        else:
+            return None
+
+    dy = A.p.y - B.p.y
+    dx = A.p.x - B.p.x
+    ua = (B.v.x * dy - B.v.y * dx) / d
+    if not A._u_in(ua):
+        return None
+    ub = (A.v.x * dy - A.v.y * dx) / d
+    if not B._u_in(ub):
+        return None
+
+    return Point2(A.p.x + ua * A.v.x,
+                  A.p.y + ua * A.v.y)
+
+def _intersect_line2_circle(L, C):
+    """Line2/Circle intersection
+    :param L: Line2 (or derived class)
+    :param C: Circle (or derived class)
+    :return: None, single Point2 or [Point2,Point2]
+    """
+    a = L.v.mag2()
+    b = 2 * (L.v.x * (L.p.x - C.c.x) + \
+             L.v.y * (L.p.y - C.c.y))
+    c = C.c.mag2() + L.p.mag2() - 2 * C.c.dot(L.p) - C.r ** 2
+    det = b ** 2 - 4 * a * c
+    if det < 0:
+        return None
+    sq = sqrt(det)
+    u1 = (-b + sq) / (2 * a)
+    u2 = (-b - sq) / (2 * a)
+
+    p1 = L.point(u1)
+    p2 = L.point(u2)
+
+    if p1 is None:
+        return p2
+    if p2 is None:
+        return p1
+    return [p1,p2]
+
+def _connect_point2_line2(P, L):
+    # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    d = L.v.mag2()
+    if d==0: #L is degenerate to a point
+        return Segment2(P,L.p)
+    u=float(L.v.dot(P-L.p))/d
+    if not L._u_in(u):
+        u = math2.sat(u,0,1)
+    return Segment2(P,L.point(u))
+
+def _connect_point2_circle(P, C):
+    v = P - C.c
+    v.normalize()
+    v *= C.r
+    return Segment2(P, Point2(C.c.x + v.x, C.c.y + v.y))
+
+def _connect_line2_line2(A, B):
+    d = B.v.y * A.v.x - B.v.x * A.v.y
+    if d == 0:
+        # Parallel, connect an endpoint with a line
+        if isinstance(B, (Ray2,Segment2)):
+            return _connect_point2_line2(B.p, A)
+        # No endpoint (or endpoint is on A), possibly choose arbitrary point
+        # on line.
+        return _connect_point2_line2(A.p, B)
+
+    dy = A.p.y - B.p.y
+    dx = A.p.x - B.p.x
+    ua = (B.v.x * dy - B.v.y * dx) / d
+    if not A._u_in(ua):
+        ua = max(min(ua, 1.0), 0.0)
+    ub = (A.v.x * dy - A.v.y * dx) / d
+    if not B._u_in(ub):
+        ub = max(min(ub, 1.0), 0.0)
+
+    return Segment2(Point2(A.p + ua * A.v), Point2(B.p + ub * B.v))
+
+def _connect_circle_line2(C, L):
+    d = L.v.mag2()
+    # assert d != 0
+    u = ((C.c.x - L.p.x) * L.v.x + (C.c.y - L.p.y) * L.v.y) / d
+    if not L._u_in(u):
+        u = max(min(u, 1.0), 0.0)
+    point = Point2(L.p.x + u * L.v.x, L.p.y + u * L.v.y)
+    v = (point - C.c)
+    v.normalize()
+    v *= C.r
+    return Segment2(Point2(C.c.x + v.x, C.c.y + v.y), point)
+
+def _connect_circle_circle(A, B):
+    v = B.c - A.c
+    d = v.mag()
+    if A.r >= B.r and d < A.r:
+        #centre B inside A
+        s1,s2 = +1, +1
+    elif B.r > A.r and d < B.r:
+        #centre A inside B
+        s1,s2 = -1, -1
+    elif d >= A.r and d >= B.r:
+        s1,s2 = +1, -1
+    v.normalize()
+    return Segment2(Point2(A.c.x + s1 * v.x * A.r, A.c.y + s1 * v.y * A.r),
+                        Point2(B.c.x + s2 * v.x * B.r, B.c.y + s2 * v.y * B.r))
+
+class Point2(Vector2, Geometry):
+    """
+    A point on a 2D plane.  Construct in the obvious way::
+
+    >>> p = Point2(1.0, 2.0)
+    >>> p
+    Point2(1.00, 2.00)
+
+    **Point2** subclasses **Vector2**, so all of **Vector2** operators and
+    methods apply.  In particular, subtracting two points gives a vector::
+
+    >>> Point2(2.0, 3.0) - Point2(1.0, 0.0)
+    Vector2(1.00, 3.00)
+
+    ``connect(other)``
+        Returns a **Segment2** which is the minimum length line segment
+        that can connect the two shapes.  *other* may be a **Point2**, **Line2**,
+        **Ray2**, **Segment2** or **Circle**.
+
+    """
+
+    def distance(self,other):
+        """
+        absolute minimum distance to other object
+        :param other: Point2, Line2 or Circle
+        :return: float positive distance between self and other
+        """
+        try: #quick for other Point2
+            dx,dy=self.x-other.x,self.y-other.y
+        except:
+            try: #also quick for
+                dx,dy=self.x-other[0],self.y-other[1]
+            except: # for all other objects
+                return self.connect(other).length
+        return hypot(dx,dy)
+    
+    def __contains__(self,pt):
+        """
+        :return: True if self and pt are the same point, False otherwise
+        needed for coherency
+        """
+        if not isinstance(pt,Point2): return False
+        return self.distance(pt)<precision
+
+    def intersect(self, other):
+        """Point2/object intersection
+        :return: Point2 copy of self if on other object, None if not
+        """
+        return Point2(self) if self in other else None
+
+    def _intersect_circle(self, circle):
+        return self.intersect(circle)
+
+    def connect(self, other):
+        return other._connect_point2(self)
+
+    def _connect_point2(self, other):
+        return Segment2(other, self)
+
+    def _connect_line2(self, other):
+        c = _connect_point2_line2(self, other)
+        if c:
+            return c.swap()
+
+    def _connect_circle(self, other):
+        c = _connect_point2_circle(self, other)
+        if c:
+            return c.swap()
+
+def Polar(mag,angle):
+    return Vector2(mag*cos(angle),mag*sin(angle))
+
+
+class Line2(Geometry):
+    """
+    A **Line2** is a line on a 2D plane extending to infinity in both directions;
+    a **Ray2** has a finite end-point and extends to infinity in a single
+    direction; a **Segment2** joins two points.
+
+    All three classes support the same constructors, operators and methods,
+    but may behave differently when calculating intersections etc.
+
+    You may construct a line, ray or line segment using any of:
+
+    * another line, ray or line segment
+    * two points
+    * a point and a vector
+    * a point, a vector and a length
+
+    For example::
+
+        >>> Line2(Point2(1.0, 1.0), Point2(2.0, 3.0))
+        Line2(<1.00, 1.00> + u<1.00, 2.00>)
+        >>> Line2(Point2(1.0, 1.0), Vector2(1.0, 2.0))
+        Line2(<1.00, 1.00> + u<1.00, 2.00>)
+        >>> Ray2(Point2(1.0, 1.0), Vector2(1.0, 2.0), 1.0)
+        Ray2(<1.00, 1.00> + u<0.45, 0.89>)
+
+    Internally, lines, rays and line segments store a Point2 *p* and a
+    Vector2 *v*.  You can also access (but not set) the two endpoints
+    *p1* and *p2*.  These may or may not be meaningful for all types of lines.
+
+    The following methods are supported by all three classes:
+
+    ``intersect(other)``
+        If *other* is a **Line2**, **Ray2** or **Segment2**, returns
+        a **Point2** of intersection, or None if the lines are parallel.
+
+        If *other* is a **Circle**, returns a **Segment2** or **Point2** giving
+        the part of the line that intersects the circle, or None if there
+        is no intersection.
+
+    ``connect(other)``
+        Returns a **Segment2** which is the minimum length line segment
+        that can connect the two shapes.  For two parallel lines, this
+        line segment may be in an arbitrary position.  *other* may be
+        a **Point2**, **Line2**, **Ray2**, **Segment2** or **Circle**.
+
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+
+    **Segment2** also has a *length* property which is read-only.
+    """
+
+    def __init__(self, *args):
+        super(Line2,self).__init__(*args)
+        if len(args) == 1: # Line2 or derived class
+            self.p = Point2(args[0].p)
+            self.v = Vector2(args[0].v)
+        else:
+            self.p = Point2(args[0])
+            if type(args[1]) is Vector2:
+                self.v = Vector2(args[1])
+            else:
+                self.v = Point2(args[1]) - self.p
+
+            if len(args) == 3:
+                self.v=self.v*args[2]/abs(self.v)
+
+    def __eq__(self, other):
+        """lines are "equal" only if base points and vector are strictly equal.
+        to compare if lines are "same", use line1.distance(line2)==0
+        """
+        try:
+            return self.p==other.p and self.v==other.v
+        except:
+            return False
+
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
+
+    def _u_in(self, u):
+        return True
+
+    def point(self, u):
+        ":return: Point2 at parameter u"
+        if self._u_in(u):
+            return self.p+u*self.v
+        else:
+            return None
+
+    def tangent(self, u):
+        ":return: Vector2 tangent at parameter u. Warning : tangent is generally not a unit vector"
+        if self._u_in(u):
+            return self.v
+        else:
+            return None
+
+    def _apply_transform(self, t):
+        self.p = t * self.p
+        self.v = t * self.v
+
+    def intersect(self, other):
+        return other._intersect_line2(self)
+
+    def _intersect_line2(self, line):
+        return _intersect_line2_line2(self, line)
+
+    def _intersect_circle(self, circle):
+        """Line2/Circle intersection
+        :return: None, Point2 or [Point2,Point2]
+        """
+        return _intersect_line2_circle(self, circle)
+
+    def connect(self, other):
+        return other._connect_line2(self)
+
+    def _connect_point2(self, other):
+        return _connect_point2_line2(other, self)
+
+    def _connect_line2(self, other):
+        return _connect_line2_line2(other, self)
+
+    def _connect_circle(self, other):
+        return _connect_circle_line2(other, self)
+
+class Ray2(Line2):
+
+    def _u_in(self, u):
+        return u >= 0.0
+
+class Segment2(Line2):
+    p1 = property(lambda self: self.p)
+    p2 = property(lambda self: Point2(self.p.x + self.v.x, self.p.y + self.v.y))
+
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
+
+    def _u_in(self, u):
+        return u >= 0.0 and u <= 1.0
+
+    def __abs__(self):
+        return abs(self.v)
+
+    def mag2(self):
+        return self.v.mag2()
+
+    length = property(lambda self: abs(self.v))
+
+    def swap(self):
+        # used by connect methods to switch order of points
+        self.p = self.p2
+        self.v *= -1
+        return self
+    
+    def midpoint(self):
+        return self.point(0.5)
+    
+    def bisect(self):
+        res=Line2(self.midpoint(),self.v.cross())
+        res.v.normalize() #because usually we do geometry with it
+        return res 
+
+class Circle(Geometry):
+    """
+    Circles are constructed with a center **Point2** and a radius::
+
+    >>> c = Circle(Point2(1.0, 1.0), 0.5)
+    >>> c
+    Circle(<1.00, 1.00>, radius=0.50)
+
+    Internally there are two attributes: *c*, giving the center point and
+    *r*, giving the radius.
+
+    The following methods are supported:
+
+    
+
+    ``connect(other)``
+        Returns a **Segment2** which is the minimum length line segment
+        that can connect the two shapes. *other* may be a **Point2**, **Line2**,
+        **Ray2**, **Segment2** or **Circle**.
+
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+    """
+    def __init__(self, *args):
+        """:param args: can be
+        * Circle
+        * center, point on circle
+        * center, radius
+        """
+        if len(args) == 1: # Circle or derived class
+            super(Circle,self).__init__(*args)
+            self.c = Point2(args[0].c)
+            self.p = Point2(args[0].p)
+            self.r = args[0].r
+        else: #2 first params are used to stay compatible with Arc2
+            self.c = Point2(args[0])
+            if isinstance(args[1],(float,int)):
+                self.r = args[1]
+                self.p = self.c+Vector2(args[1],0) #for coherency + transform
+            else:
+                self.p=Point2(args[1]) #one point on circle
+                self.r=self.p.distance(self.c)
+
+    def __eq__(self, other):
+        if not isinstance(other,Circle):
+            return False
+        return self.c==other.c and self.r==other.r
+
+    def __repr__(self):
+        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
+
+    def _apply_transform(self, t):
+        self.c = t * self.c
+        self.p = t * self.p
+        self.r=abs(self.p-self.c)
+
+    def __abs__(self):
+        """:return: float perimeter"""
+        return 2.0*pi*self.r
+
+    length = property(lambda self: abs(self))
+
+    def point(self, u):
+        ":return: Point2 at angle u radians"
+        return self.c+Polar(self.r,u)
+
+    def tangent(self, u):
+        ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
+        return Polar(self.r,u+pi/2.)
+
+    def __contains__(self,pt):
+        ":return: True if pt is ON or IN the circle"
+        return self.c.distance(pt)<=self.r+precision
+
+    def intersect(self, other):
+        """
+        :param other: Line2, Ray2 or Segment2**, **Ray2** or **Segment2**, returns
+        a **Segment2** giving the part of the line that intersects the
+        circle, or None if there is no intersection.
+        """
+        return other._intersect_circle(self)
+
+    def _intersect_line2(self, other):
+        return _intersect_line2_circle(other, self)
+
+    def connect(self, other):
+        return other._connect_circle(self)
+
+    def _connect_point2(self, other):
+        return _connect_point2_circle(other, self)
+
+    def _connect_line2(self, other):
+        c = _connect_circle_line2(self, other)
+        if c:
+            return c.swap()
+
+    def _connect_circle(self, other):
+        return _connect_circle_circle(other, self)
+
+    def swap(self):
+        pass #for consistency
+    
+def _center_of_circle_from_3_points(a,b,c):
+    """
+    constructs circle passing through 3 distinct points
+    :param a,b,c: Point2 
+    :return: x,y coordinates of center of circle
+
+    geometrical implementation for reference:
+    
+        l1=Segment2(a,b).bisect()
+        l2=Segment2(a,c).bisect()
+        return = l1.intersect(l2).xy
+    """
+    #this implementation is much faster
+    d = (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) * 2.0
+    if d == 0.0:
+        return None
+    
+    a2,b2,c2=a.mag2(),b.mag2(),c.mag2()
+    
+    x = (a2 * (b.y - c.y) + b2 * (c.y - a.y) + c2 * (a.y - b.y)) / d
+    y = (a2 * (c.x - b.x) + b2 * (a.x - c.x) + c2 * (b.x - a.x)) / d
+    return x, y
+    
+def circle_from_3_points(a,b,c):
+    """
+    constructs Circle passing through 3 distinct points
+    :param a,b,c: Point2 
+    :return: the unique Circle through the three points a, b, c 
+    """
+    # future generalization : http://stackoverflow.com/questions/27673463/smallest-enclosing-circle-in-python-error-in-the-code
+    x,y = _center_of_circle_from_3_points(a,b,c)
+    return Circle((x, y), hypot(x - a.x, y - a.y))
+    
+def arc_from_3_points(a,b,c):
+    """
+    constructs Arc2 starting in a, going through b and ending in c
+    :param a,b,c: Point2 
+    :return: the unique Arc2 starting in a, going through b and ending in c
+    """
+    #more efficient method Ian Galton, "An efficient three-point arc algorithm"
+    #see http://petrified.ucsd.edu/~ispg-adm/pubs/j_icga_89_1.pdf
+    x,y = _center_of_circle_from_3_points(a,b,c)
+    res=Arc2((x,y),a,c)
+    if not b in res:
+        res.dir=-res.dir
+    return res
+
+class Arc2(Circle):
+
+    def __init__(self, center, p1=0, p2=2*pi, r=None, dir=1):
+        """
+        :param center: Point2 or (x,y) tuple
+        :param p1: starting Point2 or angle in radians
+        :param p2: ending Point2 or angle in radians
+        :param r: float radius, needed only if p1 or p2 is an angle
+        .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
+
+        """
+        if isinstance(center,Arc2): #copy constructor
+            super(Arc2,self).__init__(center)
+            self.p2=Point2(center.p2)
+            self.dir=center.dir
+        else:
+            c=Point2(center)
+            if isinstance(p1,(int,float)):
+                p=c+Polar(r,p1)
+            else:
+                p=Point2(p1)
+                r=c.distance(p)
+            super(Arc2,self).__init__(c,p)
+            if isinstance(p2,(int,float)):
+                self.p2=c+Polar(r,p2)
+            else:
+                self.p2=Point2(p2)
+            self.dir=dir
+
+        self._apply_transform(None) #to set start/end angles
+        # self.a is now start angle in [-pi,pi]
+        # self.b is now end angle in [-pi,pi]
+
+    def angle(self,b=None):
+        """:return: float signed arc angle"""
+        a=self.a
+        if b is None: b=self.b 
+        if abs(b-a)<precision: b=a #handle complete arcs
+        res=b-a
+        if math2.sign(res)==self.dir:
+            return res
+        else: #return complementary angle
+            return self.dir*(2*pi-abs(res))
+
+    def __abs__(self):
+        """:return: float arc length"""
+        return abs(self.r*self.angle())
+
+    def _u_in(self, u): #unlike Circle, Arc2 is parametrized on [0,1] for coherency with Segment2
+        return u >= 0.0 and u <= 1.0
+
+    def point(self, u):
+        ":return: Point2 at parameter u"
+        a=self.a+u*self.angle()
+        return self.c+Polar(self.r,a)
+
+    def tangent(self, u):
+        """:return: Vector2 tangent at parameter u"""
+        a=self.a+u*self.angle()
+        res=Polar(self.r,a).cross()
+        return -res if self.dir>0 else res
+
+    def _apply_transform(self, t):
+        if t:
+            super(Arc2,self)._apply_transform(t)
+            self.p2 = t * self.p2
+        self.a=(self.p-self.c).angle(None) #start angle
+        self.b=(self.p2-self.c).angle(None) #end angle
+
+    def __eq__(self, other):
+        if not super(Arc2,self).__eq__(other): #support Circles must be the same
+            return False
+        return self.p==other.p and self.p2==other.p2 and self.dir==other.dir
+
+    def __repr__(self):
+        return '%s(center=%s,p1=%s,p2=%s,r=%s)' % (self.__class__.__name__,self.c,self.p,self.p2,self.r)
+
+    def swap(self):
+        # used by connect methods to switch order of points
+        self.p,self.p2 = self.p2,self.p
+        self.a,self.b = self.b,self.a
+        self.dir=-self.dir
+        return self
+
+    def _u(self,pt):
+        a=(pt-self.c).angle()
+        res=self.angle(a)/self.angle()
+        return None if res<0 or res>1 else res
+
+    def __contains__(self,pt):
+        ":return: True if pt is ON the Arc"
+        return super(Arc2,self).__contains__(pt) and self._u(pt) is not None
+
+    def intersect(self, other):
+        inters= other._intersect_circle(self)
+        if not inters: return None
+        try:
+            inters[1]
+        except:
+            inters=tuple(inters)
+        res=[]
+        for pt in inters:
+            if pt in self:
+                res.append(pt)
+        if len(res)==0:
+            return None
+        elif len(res)==1:
+            return res[0]
+        else:
+            return res
+
+    def _intersect_line2(self, other):
+        return self.intersect(other)
+
+# 3D Geometry
+# -------------------------------------------------------------------------
+
+"""
+**3D Geometry**
+
+The following classes are available for dealing with simple 3D geometry.
+The interfaces are very similar to the 2D classes (but note that you
+cannot mix and match 2D and 3D operations).
+
+For example, to find the closest point on a line to a sphere::
+
+    >>> sphere = Sphere(Point3(1., 2., 3.,), 2.)
+    >>> line = Line3(Point3(0., 0., 0.), Point3(-1., -1., 0.))
+    >>> line.connect(sphere).p1
+    Point3(1.50, 1.50, 0.00)
+
+To find the corresponding closest point on the sphere to the line::
+
+    >>> line.connect(sphere).p2
+    Point3(1.32, 1.68, 1.05)
+
+XXX I have not checked if these are correct.
+"""
+
+def _connect_point3_line3(P, L):
+    d = L.v.mag2()
+    # assert d != 0
+    u = ((P.x - L.p.x) * L.v.x + \
+         (P.y - L.p.y) * L.v.y + \
+         (P.z - L.p.z) * L.v.z) / d
+    if not L._u_in(u):
+        u = max(min(u, 1.0), 0.0)
+    return Segment3(P, Point3(L.p.x + u * L.v.x,
+                                  L.p.y + u * L.v.y,
+                                  L.p.z + u * L.v.z))
+
+def _connect_point3_sphere(P, S):
+    v = P - S.c
+    v.normalize()
+    v *= S.r
+    return Segment3(P, Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z))
+
+def _connect_point3_plane(p, plane):
+    n = plane.n.normalized()
+    d = p.dot(plane.n) - plane.k
+    return Segment3(p, Point3(p.x - n.x * d, p.y - n.y * d, p.z - n.z * d))
+
+def _connect_line3_line3(A, B):
+    # assert A.v and B.v
+    p13 = A.p - B.p
+    d1343 = p13.dot(B.v)
+    d4321 = B.v.dot(A.v)
+    d1321 = p13.dot(A.v)
+    d4343 = B.v.mag2()
+    denom = A.v.mag2() * d4343 - d4321 ** 2
+    if denom == 0:
+        # Parallel, connect an endpoint with a line
+        if isinstance(B, Ray3) or isinstance(B, Segment3):
+            return _connect_point3_line3(B.p, A).swap()
+        # No endpoint (or endpoint is on A), possibly choose arbitrary
+        # point on line.
+        return _connect_point3_line3(A.p, B)
+
+    ua = (d1343 * d4321 - d1321 * d4343) / denom
+    if not A._u_in(ua):
+        ua = max(min(ua, 1.0), 0.0)
+    ub = (d1343 + d4321 * ua) / d4343
+    if not B._u_in(ub):
+        ub = max(min(ub, 1.0), 0.0)
+    return Segment3(Point3(A.p.x + ua * A.v.x,
+                               A.p.y + ua * A.v.y,
+                               A.p.z + ua * A.v.z),
+                        Point3(B.p.x + ub * B.v.x,
+                               B.p.y + ub * B.v.y,
+                               B.p.z + ub * B.v.z))
+
+def _connect_line3_plane(L, P):
+    d = P.n.dot(L.v)
+    if not d:
+        # Parallel, choose an endpoint
+        return _connect_point3_plane(L.p, P)
+    u = (P.k - P.n.dot(L.p)) / d
+    if not L._u_in(u):
+        # intersects out of range, choose nearest endpoint
+        u = max(min(u, 1.0), 0.0)
+        return _connect_point3_plane(Point3(L.p.x + u * L.v.x,
+                                            L.p.y + u * L.v.y,
+                                            L.p.z + u * L.v.z), P)
+    # Intersection
+    return None
+
+def _connect_sphere_line3(S, L):
+    """
+        Sphere/Line shortest joining segment
+        :param S: Sphere
+        :param L: Line
+        :return: LineSegment3 of minimal length
+        """
+    d = L.v.mag2()
+    # assert d != 0
+    u = ((S.c.x - L.p.x) * L.v.x + \
+         (S.c.y - L.p.y) * L.v.y + \
+         (S.c.z - L.p.z) * L.v.z) / d
+    if not L._u_in(u):
+        u = max(min(u, 1.0), 0.0)
+    point = L.point(u)
+    v = (point - S.c)
+    v.normalize()
+    v *= S.r
+    return Segment3(S.c+v,point)
+
+def _connect_sphere_sphere(A, B):
+    v = B.c - A.c
+    d = v.mag()
+    if A.r >= B.r and d < A.r:
+        #centre B inside A
+        s1,s2 = +1, +1
+    elif B.r > A.r and d < B.r:
+        #centre A inside B
+        s1,s2 = -1, -1
+    elif d >= A.r and d >= B.r:
+        s1,s2 = +1, -1
+
+    v.normalize()
+    return Segment3(Point3(A.c.x + s1* v.x * A.r,
+                               A.c.y + s1* v.y * A.r,
+                               A.c.z + s1* v.z * A.r),
+                        Point3(B.c.x + s2* v.x * B.r,
+                               B.c.y + s2* v.y * B.r,
+                               B.c.z + s2* v.z * B.r))
+
+def _connect_sphere_plane(S, P):
+    c = _connect_point3_plane(S.c, P)
+    if not c:
+        return None
+    p2 = c.p2
+    v = p2 - S.c
+    v.normalize()
+    v *= S.r
+    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
+                        p2)
+
+def _connect_plane_plane(A, B):
+    if A.n.cross(B.n):
+        # Planes intersect
+        return None
+    else:
+        # Planes are parallel, connect to arbitrary point
+        return _connect_point3_plane(A._get_point(), B)
+
+def _intersect_line3_sphere(L, S):
+    a = L.v.mag2()
+    b = 2 * (L.v.x * (L.p.x - S.c.x) + \
+             L.v.y * (L.p.y - S.c.y) + \
+             L.v.z * (L.p.z - S.c.z))
+    c = S.c.mag2() + \
+        L.p.mag2() - \
+        2 * S.c.dot(L.p) - \
+        S.r ** 2
+    det = b ** 2 - 4 * a * c
+    if det < 0:
+        return None
+    sq = sqrt(det)
+    u1 = (-b + sq) / (2 * a)
+    u2 = (-b - sq) / (2 * a)
+    if not L._u_in(u1):
+        u1 = max(min(u1, 1.0), 0.0)
+    if not L._u_in(u2):
+        u2 = max(min(u2, 1.0), 0.0)
+    return Segment3(Point3(L.p.x + u1 * L.v.x,
+                               L.p.y + u1 * L.v.y,
+                               L.p.z + u1 * L.v.z),
+                        Point3(L.p.x + u2 * L.v.x,
+                               L.p.y + u2 * L.v.y,
+                               L.p.z + u2 * L.v.z))
+
+def _intersect_line3_plane(L, P):
+    d = P.n.dot(L.v)
+    if not d:
+        # Parallel
+        return None
+    u = (P.k - P.n.dot(L.p)) / d
+    if not L._u_in(u):
+        return None
+    return Point3(L.p.x + u * L.v.x,
+                  L.p.y + u * L.v.y,
+                  L.p.z + u * L.v.z)
+
+def _intersect_plane_plane(A, B):
+    n1_m = A.n.mag2()
+    n2_m = B.n.mag2()
+    n1d2 = A.n.dot(B.n)
+    det = n1_m * n2_m - n1d2 ** 2
+    if det == 0:
+        # Parallel
+        return None
+    c1 = (A.k * n2_m - B.k * n1d2) / det
+    c2 = (B.k * n1_m - A.k * n1d2) / det
+    return Line3(Point3(c1 * A.n.x + c2 * B.n.x,
+                        c1 * A.n.y + c2 * B.n.y,
+                        c1 * A.n.z + c2 * B.n.z),
+                 A.n.cross(B.n))
 
 class Vector3(object):
     """ Mutable 3D Vector.
@@ -486,7 +1398,7 @@ class Vector3(object):
                 _class = Vector3
             else:
                 _class = Point3
-            return Vector3(self.x - other.x,
+            return _class(self.x - other.x,
                            self.y - other.y,
                            self.z - other.z)
         except:
@@ -634,7 +1546,10 @@ class Vector3(object):
                        (w * dt + z * ct + (-v * x + u * y) * st))
 
     def angle(self, other):
-        """Return the angle to the vector other"""
+        """angle between two vectors.
+        :param other: Vector3
+        :return: float angle in radians to the other vector, or self direction if other=None
+        """
         return acos(self.dot(other) / (self.mag()*other.mag()))
 
     def project(self, other):
@@ -643,6 +1558,387 @@ class Vector3(object):
         return self.dot(n)*n
 
 
+class Point3(Vector3, Geometry):
+    """
+    A point on a 3D plane.  Construct in the obvious way::
+
+        >>> p = Point3(1.0, 2.0, 3.0)
+        >>> p
+        Point3(1.00, 2.00, 3.00)
+
+    **Point3** subclasses **Vector3**, so all of **Vector3** operators and
+    methods apply.  In particular, subtracting two points gives a vector::
+
+        >>> Point3(1.0, 2.0, 3.0) - Point3(1.0, 0.0, -2.0)
+        Vector3(0.00, 2.00, 5.00)
+
+    The following methods are also defined:
+
+    ``intersect(other)``
+        If *other* is a **Sphere**, returns ``True`` iff the point lies within
+        the sphere.
+
+    ``connect(other)``
+        Returns a **LineSegment3** which is the minimum length line segment
+        that can connect the two shapes.  *other* may be a **Point3**, **Line3**,
+        **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
+
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+    """
+
+    def intersect(self, other):
+        """Point3/object intersection
+        :return: self Point3 if on other object, None if not
+        """
+        return self if self in other else None
+
+    def connect(self, other):
+        return other._connect_point3(self)
+
+    def _connect_point3(self, other):
+        if self != other:
+            return Segment3(other, self)
+        return None
+
+    def _connect_line3(self, other):
+        c = _connect_point3_line3(self, other)
+        if c:
+            return c.swap()
+
+    def _connect_sphere(self, other):
+        c = _connect_point3_sphere(self, other)
+        if c:
+            return c.swap()
+
+    def _connect_plane(self, other):
+        c = _connect_point3_plane(self, other)
+        if c:
+            return c.swap()
+
+class Line3(Geometry):
+    """
+    A **Line3** is a line on a 3D plane extending to infinity in both directions;
+    a **Ray3** has a finite end-point and extends to infinity in a single
+    direction; a **LineSegment3** joins two points.
+
+    All three classes support the same constructors, operators and methods,
+    but may behave differently when calculating intersections etc.
+
+    You may construct a line, ray or line segment using any of:
+
+    * another line, ray or line segment
+    * two points
+    * a point and a vector
+    * a point, a vector and a length
+
+    For example::
+
+        >>> Line3(Point3(1.0, 1.0, 1.0), Point3(1.0, 2.0, 3.0))
+        Line3(<1.00, 1.00, 1.00> + u<0.00, 1.00, 2.00>)
+        >>> Line3(Point3(0.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0))
+        Line3(<0.00, 1.00, 1.00> + u<1.00, 1.00, 2.00>)
+        >>> Ray3(Point3(1.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0), 1.0)
+        Ray3(<1.00, 1.00, 1.00> + u<0.41, 0.41, 0.82>)
+
+    Internally, lines, rays and line segments store a Point3 *p* and a
+    Vector3 *v*.  You can also access (but not set) the two endpoints
+    *p1* and *p2*.  These may or may not be meaningful for all types of lines.
+
+    The following methods are supported by all three classes:
+
+    ``intersect(other)``
+        If *other* is a **Sphere**, returns a **LineSegment3** which is the
+        intersection of the sphere and line, or ``None`` if there is no
+        intersection.
+
+        If *other* is a **Plane**, returns a **Point3** of intersection, or
+        ``None``.
+
+    ``connect(other)``
+        Returns a **LineSegment3** which is the minimum length line segment
+        that can connect the two shapes.  For two parallel lines, this
+        line segment may be in an arbitrary position.  *other* may be
+        a **Point3**, **Line3**, **Ray3**, **LineSegment3**, **Sphere** or
+        **Plane**.
+
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+
+    **LineSegment3** also has a *length* property which is read-only.
+    """
+
+    def __init__(self, *args):
+        if len(args) == 3:
+            # assert isinstance(args[0], Point3) and isinstance(args[1], Vector3) and type(args[2]) == float
+            self.p = Point3(args[0])
+            self.v = args[1] * args[2] / abs(args[1])
+        elif len(args) == 2:
+            if isinstance(args[0], Point3) and isinstance(args[1], Point3):
+                self.p = Point3(args[0])
+                self.v = Vector3(args[1] - args[0])
+            elif isinstance(args[0], Point3) and isinstance(args[1], Vector3):
+                self.p = Point3(args[0])
+                self.v = Vector3(args[1])
+            else:
+                raise AttributeError('%r' % (args,))
+        elif len(args) == 1: #copy constructor
+            if isinstance(args[0], Line3):
+                super(Line3,self).__init__(*args)
+                self.p = Point3(args[0])
+                self.v = Vector3(args[0])
+            else:
+                raise AttributeError('%r' % (args,))
+        else:
+            raise AttributeError('%r' % (args,))
+
+        # XXX This is annoying.
+        #if not self.v:
+        #    raise AttributeError, 'Line has zero-length vector'
+
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
+
+    p1 = property(lambda self: self.p)
+    p2 = property(lambda self: Point3(self.p.x + self.v.x,
+                                      self.p.y + self.v.y,
+                                      self.p.z + self.v.z))
+
+    def _apply_transform(self, t):
+        self.p = t * self.p
+        self.v = t * self.v
+
+    def _u_in(self, u):
+        return True
+
+    def intersect(self, other):
+        return other._intersect_line3(self)
+
+    def _intersect_sphere(self, other):
+        return _intersect_line3_sphere(self, other)
+
+    def _intersect_plane(self, other):
+        return _intersect_line3_plane(self, other)
+
+    def connect(self, other):
+        return other._connect_line3(self)
+
+    def _connect_point3(self, other):
+        return _connect_point3_line3(other, self)
+
+    def _connect_line3(self, other):
+        return _connect_line3_line3(other, self)
+
+    def _connect_sphere(self, other):
+        return _connect_sphere_line3(other, self)
+
+    def _connect_plane(self, other):
+        c = _connect_line3_plane(self, other)
+        if c:
+            return c
+
+class Ray3(Line3):
+    def _u_in(self, u):
+        return u >= 0.0
+
+class Segment3(Line3):
+    def __repr__(self):
+        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
+
+    def _u_in(self, u):
+        return u >= 0.0 and u <= 1.0
+
+    def __abs__(self):
+        return abs(self.v)
+
+    def mag2(self):
+        return self.v.mag2()
+
+    def swap(self):
+        # used by connect methods to switch order of points
+        self.p = self.p2
+        self.v *= -1
+        return self
+
+    length = property(lambda self: abs(self.v))
+
+class Sphere(Geometry):
+    """
+    Spheres are constructed with a center **Point3** and a radius::
+
+    >>> s = Sphere(Point3(1.0, 1.0, 1.0), 0.5)
+    >>> s
+    Sphere(<1.00, 1.00, 1.00>, radius=0.50)
+
+    Internally there are two attributes: *c*, giving the center point and
+    *r*, giving the radius.
+
+    The following methods are supported:
+
+    ``intersect(other)``:
+        If *other* is a **Point3**, returns ``True`` iff the point lies
+        within the sphere.
+
+        If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns
+        a **LineSegment3** giving the intersection, or ``None`` if the
+        line does not intersect the sphere.
+
+    
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+    """
+
+    def __init__(self, *args):
+        """:param args: can be
+        * Sphere
+        * center, point on sphere
+        * center, radius
+        """
+        if len(args) == 1: # Circle or derived class
+            super(Sphere,self).__init__(*args)
+            self.c = Point2(args[0].c)
+            self.r = args[0].r
+        else: #2 first params are used to stay compatible with Arc2
+            self.c = Point2(args[0])
+            if isinstance(args[1],(float,int)):
+                self.r = args[1]
+            else:
+                p=Point2(args[1]) #one point on sphere
+                self.r=abs(p-self.c)
+
+    def __repr__(self):
+        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
+
+    def _apply_transform(self, t):
+        self.c = t * self.c
+
+    def intersect(self, other):
+        return other._intersect_sphere(self)
+
+    def _intersect_line3(self, other):
+        return _intersect_line3_sphere(other, self)
+
+    def connect(self, other):
+        """
+        minimal joining segment between Sphere and other 3D Object
+        :param other: Point3, Line3, Sphere, Plane
+        :return: LineSegment3 of minimal length
+        """
+
+        return other._connect_sphere(self)
+
+    def _connect_point3(self, other):
+        return _connect_point3_sphere(other, self)
+
+    def _connect_line3(self, sphere):
+        c = _connect_sphere_line3(self, sphere)
+        if c:
+            return c.swap()
+
+    def _connect_sphere(self, other):
+        return _connect_sphere_sphere(other, self)
+
+    def _connect_plane(self, other):
+        c = _connect_sphere_plane(self, other)
+        if c:
+            return c
+
+class Plane(Geometry):
+    """
+    Planes can be constructed with any of:
+
+    * three **Point3**'s lying on the plane
+    * a **Point3** on the plane and the **Vector3** normal
+    * a **Vector3** normal and *k*, described below.
+
+    Internally, planes are stored with the normal *n* and constant *k* such
+    that *n.p* = *k* for any point on the plane *p*.
+
+    The following methods are supported:
+
+    ``intersect(other)``
+        If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns a
+        **Point3** of intersection, or ``None`` if there is no intersection.
+
+        If *other* is a **Plane**, returns the **Line3** of intersection.
+
+    ``connect(other)``
+        Returns a **LineSegment3** which is the minimum length line segment
+        that can connect the two shapes. *other* may be a **Point3**, **Line3**,
+        **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
+
+    ``distance(other)``
+        Returns the absolute minimum distance to *other*.  Internally this
+        simply returns the length of the result of ``connect``.
+    """
+    # n.p = k, where n is normal, p is point on plane, k is constant scalar
+
+    def __init__(self, *args):
+        if len(args) == 3:
+            self.n = (Point3(args[1]) - Point3(args[0])).cross(Point3(args[2]) - Point3(args[0]))
+            self.n.normalize()
+            self.k = self.n.dot(Point3(args[0]))
+        elif len(args) == 2:
+            if isinstance(args[0], Point3) and isinstance(args[1], Vector3):
+                self.n = args[1].normalized()
+                self.k = self.n.dot(args[0])
+            elif isinstance(args[0], Vector3) and type(args[1]) == float:
+                self.n = args[0].normalized()
+                self.k = args[1]
+            else:
+                raise AttributeError('%r' % (args,))
+
+        else:
+            raise AttributeError('%r' % (args,))
+
+        if not self.n:
+            raise AttributeError('Points on plane are colinear')
+
+    def __repr__(self):
+        return 'Plane(<%.2f, %.2f, %.2f>.p = %.2f)' % \
+            (self.n.x, self.n.y, self.n.z, self.k)
+
+    def _get_point(self):
+        # Return an arbitrary point on the plane
+        if self.n.z:
+            return Point3(0., 0., self.k / self.n.z)
+        elif self.n.y:
+            return Point3(0., self.k / self.n.y, 0.)
+        else:
+            return Point3(self.k / self.n.x, 0., 0.)
+
+    def _apply_transform(self, t):
+        p = t * self._get_point()
+        self.n = t * self.n
+        self.k = self.n.dot(p)
+
+    def intersect(self, other):
+        return other._intersect_plane(self)
+
+    def _intersect_line3(self, other):
+        return _intersect_line3_plane(other, self)
+
+    def _intersect_plane(self, other):
+        return _intersect_plane_plane(self, other)
+
+    def connect(self, other):
+        return other._connect_plane(self)
+
+    def _connect_point3(self, other):
+        return _connect_point3_plane(other, self)
+
+    def _connect_line3(self, other):
+        return _connect_line3_plane(other, self)
+
+    def _connect_sphere(self, other):
+        return _connect_sphere_plane(other, self)
+
+    def _connect_plane(self, other):
+        return _connect_plane_plane(other, self)
+    
 class Matrix3(object):
     """
     Two matrix classes are supplied, *Matrix3*, a 3x3 matrix for working with 2D
@@ -2005,1307 +3301,5 @@ class Quaternion:
         Q.y = q1.y * ratio1 + q2.y * ratio2
         Q.z = q1.z * ratio1 + q2.z * ratio2
         return Q
-
-# Geometry
-# Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
-# --------------------------------------------------------------------------
-
-import six,abc
-@six.add_metaclass(abc.ABCMeta)
-class Geometry(object):
-    """
-    The following classes are available for dealing with simple 2D geometry.
-    The interface to each shape is similar; in particular, the ``connect``
-    and ``distance`` methods are defined identically for each.
-
-    For example, to find the closest point on a line to a circle::
-
-        >>> circ = Circle(Point2(3., 2.), 2.)
-        >>> line = Line2(Point2(0., 0.), Point2(-1., 1.))
-        >>> line.connect(circ).p1
-        Point2(0.50, -0.50)
-
-    To find the corresponding closest point on the circle to the line::
-
-        >>> line.connect(circ).p2
-        Point2(1.59, 0.59)
-    """
-    def __init__(self,*args):
-        """
-        this constructor is called by descendant classes at copy
-        it is replaced to copy some graphics attributes in module drawings
-        """
-        return #TODO : do not do this anymore. It causes trouble when creating objects
-        try: #copy constructor
-            self.__dict__.update(args[0].__dict__)
-        except:
-            pass
-
-    def _connect_unimplemented(self, other):
-        raise AttributeError('Cannot connect %s to %s' % \
-            (self.__class__, other.__class__))
-
-    def _intersect_unimplemented(self, other):
-        raise AttributeError('Cannot intersect %s and %s' % \
-            (self.__class__, other.__class__))
-
-    _intersect_line2 = _intersect_unimplemented
-    _intersect_circle = _intersect_unimplemented
-    _connect_point2 = _connect_unimplemented
-    _connect_line2 = _connect_unimplemented
-    _connect_circle = _connect_unimplemented
-
-    _intersect_line3 = _intersect_unimplemented
-    _intersect_sphere = _intersect_unimplemented
-    _intersect_plane = _intersect_unimplemented
-    _connect_point3 = _connect_unimplemented
-    _connect_line3 = _connect_unimplemented
-    _connect_sphere = _connect_unimplemented
-    _connect_plane = _connect_unimplemented
-
-    def point(self, u):
-        ":return: Point2 or Point3 at parameter u"
-        raise NotImplementedError
-
-    def tangent(self, u):
-        ":return: Vector2 or Vector3 tangent at parameter u"
-        raise NotImplementedError
-
-    def intersect(self, other):
-        raise NotImplementedError
-
-    def connect(self, other):
-        ":return: Geometry shortest (Segment2 or Segment3) that connects self to other"
-        raise NotImplementedError
-
-    def distance(self, other):
-        c = self.connect(other)
-        if c:
-            return c.length
-        else:
-            return None
-
-    def _u(self, pt):
-        """:return: float parameter corresponding to pt"""
-        raise NotImplementedError
-
-    def _u_in(self, u):
-        """:return: bool true if u is a valid parameter of geometry"""
-        raise NotImplementedError
-
-    def __contains__(self,pt):
-        d=self.distance(pt)
-        if d is None or d>precision:
-            return False
-        return self._u_in(self._u(pt))
-
-def _intersect_line2_line2(A, B):
-    d = B.v.y * A.v.x - B.v.x * A.v.y
-    if d == 0: #both lines are parallel
-        if A.distance(B.p)==0: #colinear
-            return A if isinstance(A,Segment2) else B
-        else:
-            return None
-
-    dy = A.p.y - B.p.y
-    dx = A.p.x - B.p.x
-    ua = (B.v.x * dy - B.v.y * dx) / d
-    if not A._u_in(ua):
-        return None
-    ub = (A.v.x * dy - A.v.y * dx) / d
-    if not B._u_in(ub):
-        return None
-
-    return Point2(A.p.x + ua * A.v.x,
-                  A.p.y + ua * A.v.y)
-
-def _intersect_line2_circle(L, C):
-    """Line2/Circle intersection
-    :param L: Line2 (or derived class)
-    :param C: Circle (or derived class)
-    :return: None, single Point2 or [Point2,Point2]
-    """
-    a = L.v.mag2()
-    b = 2 * (L.v.x * (L.p.x - C.c.x) + \
-             L.v.y * (L.p.y - C.c.y))
-    c = C.c.mag2() + L.p.mag2() - 2 * C.c.dot(L.p) - C.r ** 2
-    det = b ** 2 - 4 * a * c
-    if det < 0:
-        return None
-    sq = sqrt(det)
-    u1 = (-b + sq) / (2 * a)
-    u2 = (-b - sq) / (2 * a)
-
-    p1 = L.point(u1)
-    p2 = L.point(u2)
-
-    if p1 is None:
-        return p2
-    if p2 is None:
-        return p1
-    return [p1,p2]
-
-def _connect_point2_line2(P, L):
-    # http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-    d = L.v.mag2()
-    if d==0: #L is degenerate to a point
-        return Segment2(P,L.p)
-    u=float(L.v.dot(P-L.p))/d
-    if not L._u_in(u):
-        u = math2.sat(u,0,1)
-    return Segment2(P,L.point(u))
-
-def _connect_point2_circle(P, C):
-    v = P - C.c
-    v.normalize()
-    v *= C.r
-    return Segment2(P, Point2(C.c.x + v.x, C.c.y + v.y))
-
-def _connect_line2_line2(A, B):
-    d = B.v.y * A.v.x - B.v.x * A.v.y
-    if d == 0:
-        # Parallel, connect an endpoint with a line
-        if isinstance(B, (Ray2,Segment2)):
-            return _connect_point2_line2(B.p, A)
-        # No endpoint (or endpoint is on A), possibly choose arbitrary point
-        # on line.
-        return _connect_point2_line2(A.p, B)
-
-    dy = A.p.y - B.p.y
-    dx = A.p.x - B.p.x
-    ua = (B.v.x * dy - B.v.y * dx) / d
-    if not A._u_in(ua):
-        ua = max(min(ua, 1.0), 0.0)
-    ub = (A.v.x * dy - A.v.y * dx) / d
-    if not B._u_in(ub):
-        ub = max(min(ub, 1.0), 0.0)
-
-    return Segment2(Point2(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y),
-                        Point2(B.p.x + ub * B.v.x, B.p.y + ub * B.v.y))
-
-def _connect_circle_line2(C, L):
-    d = L.v.mag2()
-    # assert d != 0
-    u = ((C.c.x - L.p.x) * L.v.x + (C.c.y - L.p.y) * L.v.y) / d
-    if not L._u_in(u):
-        u = max(min(u, 1.0), 0.0)
-    point = Point2(L.p.x + u * L.v.x, L.p.y + u * L.v.y)
-    v = (point - C.c)
-    v.normalize()
-    v *= C.r
-    return Segment2(Point2(C.c.x + v.x, C.c.y + v.y), point)
-
-def _connect_circle_circle(A, B):
-    v = B.c - A.c
-    d = v.mag()
-    if A.r >= B.r and d < A.r:
-        #centre B inside A
-        s1,s2 = +1, +1
-    elif B.r > A.r and d < B.r:
-        #centre A inside B
-        s1,s2 = -1, -1
-    elif d >= A.r and d >= B.r:
-        s1,s2 = +1, -1
-    v.normalize()
-    return Segment2(Point2(A.c.x + s1 * v.x * A.r, A.c.y + s1 * v.y * A.r),
-                        Point2(B.c.x + s2 * v.x * B.r, B.c.y + s2 * v.y * B.r))
-
-class Point2(Vector2, Geometry):
-    """
-    A point on a 2D plane.  Construct in the obvious way::
-
-    >>> p = Point2(1.0, 2.0)
-    >>> p
-    Point2(1.00, 2.00)
-
-    **Point2** subclasses **Vector2**, so all of **Vector2** operators and
-    methods apply.  In particular, subtracting two points gives a vector::
-
-    >>> Point2(2.0, 3.0) - Point2(1.0, 0.0)
-    Vector2(1.00, 3.00)
-
-    ``connect(other)``
-        Returns a **Segment2** which is the minimum length line segment
-        that can connect the two shapes.  *other* may be a **Point2**, **Line2**,
-        **Ray2**, **Segment2** or **Circle**.
-
-    """
-
-    def distance(self,other):
-        """
-        absolute minimum distance to other object
-        :param other: Point2, Line2 or Circle
-        :return: float positive distance between self and other
-        """
-        try: #quick for other Point2
-            dx,dy=self.x-other.x,self.y-other.y
-        except:
-            try: #also quick for
-                dx,dy=self.x-other[0],self.y-other[1]
-            except: # for all other objects
-                return self.connect(other).length
-        return hypot(dx,dy)
-    
-    def __contains__(self,pt):
-        """
-        :return: True if self and pt are the same point, False otherwise
-        needed for coherency
-        """
-        if not isinstance(pt,Point2): return False
-        return self.distance(pt)<precision
-
-    def intersect(self, other):
-        """Point2/object intersection
-        :return: Point2 copy of self if on other object, None if not
-        """
-        return Point2(self) if self in other else None
-
-    def _intersect_circle(self, circle):
-        return self.intersect(circle)
-
-    def connect(self, other):
-        return other._connect_point2(self)
-
-    def _connect_point2(self, other):
-        return Segment2(other, self)
-
-    def _connect_line2(self, other):
-        c = _connect_point2_line2(self, other)
-        if c:
-            return c.swap()
-
-    def _connect_circle(self, other):
-        c = _connect_point2_circle(self, other)
-        if c:
-            return c.swap()
-
-def Polar(mag,angle):
-    return Vector2(mag*cos(angle),mag*sin(angle))
-
-
-class Line2(Geometry):
-    """
-    A **Line2** is a line on a 2D plane extending to infinity in both directions;
-    a **Ray2** has a finite end-point and extends to infinity in a single
-    direction; a **Segment2** joins two points.
-
-    All three classes support the same constructors, operators and methods,
-    but may behave differently when calculating intersections etc.
-
-    You may construct a line, ray or line segment using any of:
-
-    * another line, ray or line segment
-    * two points
-    * a point and a vector
-    * a point, a vector and a length
-
-    For example::
-
-        >>> Line2(Point2(1.0, 1.0), Point2(2.0, 3.0))
-        Line2(<1.00, 1.00> + u<1.00, 2.00>)
-        >>> Line2(Point2(1.0, 1.0), Vector2(1.0, 2.0))
-        Line2(<1.00, 1.00> + u<1.00, 2.00>)
-        >>> Ray2(Point2(1.0, 1.0), Vector2(1.0, 2.0), 1.0)
-        Ray2(<1.00, 1.00> + u<0.45, 0.89>)
-
-    Internally, lines, rays and line segments store a Point2 *p* and a
-    Vector2 *v*.  You can also access (but not set) the two endpoints
-    *p1* and *p2*.  These may or may not be meaningful for all types of lines.
-
-    The following methods are supported by all three classes:
-
-    ``intersect(other)``
-        If *other* is a **Line2**, **Ray2** or **Segment2**, returns
-        a **Point2** of intersection, or None if the lines are parallel.
-
-        If *other* is a **Circle**, returns a **Segment2** or **Point2** giving
-        the part of the line that intersects the circle, or None if there
-        is no intersection.
-
-    ``connect(other)``
-        Returns a **Segment2** which is the minimum length line segment
-        that can connect the two shapes.  For two parallel lines, this
-        line segment may be in an arbitrary position.  *other* may be
-        a **Point2**, **Line2**, **Ray2**, **Segment2** or **Circle**.
-
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-
-    **Segment2** also has a *length* property which is read-only.
-    """
-
-    def __init__(self, *args):
-        super(Line2,self).__init__(*args)
-        if len(args) == 1: # Line2 or derived class
-            self.p = Point2(args[0].p)
-            self.v = Vector2(args[0].v)
-        else:
-            self.p = Point2(args[0])
-            if type(args[1]) is Vector2:
-                self.v = Vector2(args[1])
-            else:
-                self.v = Point2(args[1]) - self.p
-
-            if len(args) == 3:
-                self.v=self.v*args[2]/abs(self.v)
-
-    def __eq__(self, other):
-        """lines are "equal" only if base points and vector are strictly equal.
-        to compare if lines are "same", use line1.distance(line2)==0
-        """
-        try:
-            return self.p==other.p and self.v==other.v
-        except:
-            return False
-
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
-
-    def _u_in(self, u):
-        return True
-
-    def point(self, u):
-        ":return: Point2 at parameter u"
-        if self._u_in(u):
-            return self.p+u*self.v
-        else:
-            return None
-
-    def tangent(self, u):
-        ":return: Vector2 tangent at parameter u. Warning : tangent is generally not a unit vector"
-        if self._u_in(u):
-            return self.v
-        else:
-            return None
-
-    def _apply_transform(self, t):
-        self.p = t * self.p
-        self.v = t * self.v
-
-    def intersect(self, other):
-        return other._intersect_line2(self)
-
-    def _intersect_line2(self, line):
-        return _intersect_line2_line2(self, line)
-
-    def _intersect_circle(self, circle):
-        """Line2/Circle intersection
-        :return: None, Point2 or [Point2,Point2]
-        """
-        return _intersect_line2_circle(self, circle)
-
-    def connect(self, other):
-        return other._connect_line2(self)
-
-    def _connect_point2(self, other):
-        return _connect_point2_line2(other, self)
-
-    def _connect_line2(self, other):
-        return _connect_line2_line2(other, self)
-
-    def _connect_circle(self, other):
-        return _connect_circle_line2(other, self)
-
-class Ray2(Line2):
-
-    def _u_in(self, u):
-        return u >= 0.0
-
-class Segment2(Line2):
-    p1 = property(lambda self: self.p)
-    p2 = property(lambda self: Point2(self.p.x + self.v.x, self.p.y + self.v.y))
-
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
-
-    def _u_in(self, u):
-        return u >= 0.0 and u <= 1.0
-
-    def __abs__(self):
-        return abs(self.v)
-
-    def mag2(self):
-        return self.v.mag2()
-
-    length = property(lambda self: abs(self.v))
-
-    def swap(self):
-        # used by connect methods to switch order of points
-        self.p = self.p2
-        self.v *= -1
-        return self
-    
-    def midpoint(self):
-        return self.point(0.5)
-    
-    def bisect(self):
-        res=Line2(self.midpoint(),self.v.cross())
-        res.v.normalize() #because usually we do geometry with it
-        return res 
-
-class Circle(Geometry):
-    """
-    Circles are constructed with a center **Point2** and a radius::
-
-    >>> c = Circle(Point2(1.0, 1.0), 0.5)
-    >>> c
-    Circle(<1.00, 1.00>, radius=0.50)
-
-    Internally there are two attributes: *c*, giving the center point and
-    *r*, giving the radius.
-
-    The following methods are supported:
-
-    
-
-    ``connect(other)``
-        Returns a **Segment2** which is the minimum length line segment
-        that can connect the two shapes. *other* may be a **Point2**, **Line2**,
-        **Ray2**, **Segment2** or **Circle**.
-
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-    """
-    def __init__(self, *args):
-        """:param args: can be
-        * Circle
-        * center, point on circle
-        * center, radius
-        """
-        if len(args) == 1: # Circle or derived class
-            super(Circle,self).__init__(*args)
-            self.c = Point2(args[0].c)
-            self.p = Point2(args[0].p)
-            self.r = args[0].r
-        else: #2 first params are used to stay compatible with Arc2
-            self.c = Point2(args[0])
-            if isinstance(args[1],(float,int)):
-                self.r = args[1]
-                self.p = self.c+Vector2(args[1],0) #for coherency + transform
-            else:
-                self.p=Point2(args[1]) #one point on circle
-                self.r=self.p.distance(self.c)
-
-    def __eq__(self, other):
-        if not isinstance(other,Circle):
-            return False
-        return self.c==other.c and self.r==other.r
-
-    def __repr__(self):
-        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
-
-    def _apply_transform(self, t):
-        self.c = t * self.c
-        self.p = t * self.p
-        self.r=abs(self.p-self.c)
-
-    def __abs__(self):
-        """:return: float perimeter"""
-        return 2.0*pi*self.r
-
-    length = property(lambda self: abs(self))
-
-    def point(self, u):
-        ":return: Point2 at angle u radians"
-        return self.c+Polar(self.r,u)
-
-    def tangent(self, u):
-        ":return: Vector2 tangent at angle u. Warning : tangent has magnitude r != 1"
-        return Polar(self.r,u+pi/2.)
-
-    def __contains__(self,pt):
-        ":return: True if pt is ON or IN the circle"
-        return self.c.distance(pt)<=self.r+precision
-
-    def intersect(self, other):
-        """
-        :param other: Line2, Ray2 or Segment2**, **Ray2** or **Segment2**, returns
-        a **Segment2** giving the part of the line that intersects the
-        circle, or None if there is no intersection.
-        """
-        return other._intersect_circle(self)
-
-    def _intersect_line2(self, other):
-        return _intersect_line2_circle(other, self)
-
-    def connect(self, other):
-        return other._connect_circle(self)
-
-    def _connect_point2(self, other):
-        return _connect_point2_circle(other, self)
-
-    def _connect_line2(self, other):
-        c = _connect_circle_line2(self, other)
-        if c:
-            return c.swap()
-
-    def _connect_circle(self, other):
-        return _connect_circle_circle(other, self)
-
-    def swap(self):
-        pass #for consistency
-    
-def _center_of_circle_from_3_points(a,b,c):
-    """
-    constructs circle passing through 3 distinct points
-    :param a,b,c: Point2 
-    :return: x,y coordinates of center of circle
-
-    geometrical implementation for reference:
-    
-        l1=Segment2(a,b).bisect()
-        l2=Segment2(a,c).bisect()
-        return = l1.intersect(l2).xy
-    """
-    #this implementation is much faster
-    d = (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) * 2.0
-    if d == 0.0:
-        return None
-    
-    a2,b2,c2=a.mag2(),b.mag2(),c.mag2()
-    
-    x = (a2 * (b.y - c.y) + b2 * (c.y - a.y) + c2 * (a.y - b.y)) / d
-    y = (a2 * (c.x - b.x) + b2 * (a.x - c.x) + c2 * (b.x - a.x)) / d
-    return x, y
-    
-def circle_from_3_points(a,b,c):
-    """
-    constructs Circle passing through 3 distinct points
-    :param a,b,c: Point2 
-    :return: the unique Circle through the three points a, b, c 
-    """
-    # future generalization : http://stackoverflow.com/questions/27673463/smallest-enclosing-circle-in-python-error-in-the-code
-    x,y = _center_of_circle_from_3_points(a,b,c)
-    return Circle((x, y), hypot(x - a.x, y - a.y))
-    
-def arc_from_3_points(a,b,c):
-    """
-    constructs Arc2 starting in a, going through b and ending in c
-    :param a,b,c: Point2 
-    :return: the unique Arc2 starting in a, going through b and ending in c
-    """
-    #more efficient method Ian Galton, "An efficient three-point arc algorithm"
-    #see http://petrified.ucsd.edu/~ispg-adm/pubs/j_icga_89_1.pdf
-    x,y = _center_of_circle_from_3_points(a,b,c)
-    res=Arc2((x,y),a,c)
-    if not b in res:
-        res.dir=-res.dir
-    return res
-
-class Arc2(Circle):
-
-    def __init__(self, center, p1=0, p2=2*pi, r=None, dir=1):
-        """
-        :param center: Point2 or (x,y) tuple
-        :param p1: starting Point2 or angle in radians
-        :param p2: ending Point2 or angle in radians
-        :param r: float radius, needed only if p1 or p2 is an angle
-        .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
-
-        """
-        if isinstance(center,Arc2): #copy constructor
-            super(Arc2,self).__init__(center)
-            self.p2=Point2(center.p2)
-            self.dir=center.dir
-        else:
-            c=Point2(center)
-            if isinstance(p1,(int,float)):
-                p=c+Polar(r,p1)
-            else:
-                p=Point2(p1)
-                r=c.distance(p)
-            super(Arc2,self).__init__(c,p)
-            if isinstance(p2,(int,float)):
-                self.p2=c+Polar(r,p2)
-            else:
-                self.p2=Point2(p2)
-            self.dir=dir
-
-        self._apply_transform(None) #to set start/end angles
-        # self.a is now start angle in [-pi,pi]
-        # self.b is now end angle in [-pi,pi]
-
-    def angle(self,b=None):
-        """:return: float signed arc angle"""
-        a=self.a
-        if b is None: b=self.b 
-        if abs(b-a)<precision: b=a #handle complete arcs
-        res=b-a
-        if math2.sign(res)==self.dir:
-            return res
-        else: #return complementary angle
-            return self.dir*(2*pi-abs(res))
-
-    def __abs__(self):
-        """:return: float arc length"""
-        return abs(self.r*self.angle())
-
-    def _u_in(self, u): #unlike Circle, Arc2 is parametrized on [0,1] for coherency with Segment2
-        return u >= 0.0 and u <= 1.0
-
-    def point(self, u):
-        ":return: Point2 at parameter u"
-        a=self.a+u*self.angle()
-        return self.c+Polar(self.r,a)
-
-    def tangent(self, u):
-        """:return: Vector2 tangent at parameter u"""
-        a=self.a+u*self.angle()
-        res=Polar(self.r,a).cross()
-        return -res if self.dir>0 else res
-
-    def _apply_transform(self, t):
-        if t:
-            super(Arc2,self)._apply_transform(t)
-            self.p2 = t * self.p2
-        self.a=(self.p-self.c).angle(None) #start angle
-        self.b=(self.p2-self.c).angle(None) #end angle
-
-    def __eq__(self, other):
-        if not super(Arc2,self).__eq__(other): #support Circles must be the same
-            return False
-        return self.p==other.p and self.p2==other.p2 and self.dir==other.dir
-
-    def __repr__(self):
-        return '%s(center=%s,p1=%s,p2=%s,r=%s)' % (self.__class__.__name__,self.c,self.p,self.p2,self.r)
-
-    def swap(self):
-        # used by connect methods to switch order of points
-        self.p,self.p2 = self.p2,self.p
-        self.a,self.b = self.b,self.a
-        self.dir=-self.dir
-        return self
-
-    def _u(self,pt):
-        a=(pt-self.c).angle()
-        res=self.angle(a)/self.angle()
-        return None if res<0 or res>1 else res
-
-    def __contains__(self,pt):
-        ":return: True if pt is ON the Arc"
-        return super(Arc2,self).__contains__(pt) and self._u(pt) is not None
-
-    def intersect(self, other):
-        inters= other._intersect_circle(self)
-        if not inters: return None
-        try:
-            inters[1]
-        except:
-            inters=tuple(inters)
-        res=[]
-        for pt in inters:
-            if pt in self:
-                res.append(pt)
-        if len(res)==0:
-            return None
-        elif len(res)==1:
-            return res[0]
-        else:
-            return res
-
-    def _intersect_line2(self, other):
-        return self.intersect(other)
-
-# 3D Geometry
-# -------------------------------------------------------------------------
-
-"""
-**3D Geometry**
-
-The following classes are available for dealing with simple 3D geometry.
-The interfaces are very similar to the 2D classes (but note that you
-cannot mix and match 2D and 3D operations).
-
-For example, to find the closest point on a line to a sphere::
-
-    >>> sphere = Sphere(Point3(1., 2., 3.,), 2.)
-    >>> line = Line3(Point3(0., 0., 0.), Point3(-1., -1., 0.))
-    >>> line.connect(sphere).p1
-    Point3(1.50, 1.50, 0.00)
-
-To find the corresponding closest point on the sphere to the line::
-
-    >>> line.connect(sphere).p2
-    Point3(1.32, 1.68, 1.05)
-
-XXX I have not checked if these are correct.
-"""
-
-def _connect_point3_line3(P, L):
-    d = L.v.mag2()
-    # assert d != 0
-    u = ((P.x - L.p.x) * L.v.x + \
-         (P.y - L.p.y) * L.v.y + \
-         (P.z - L.p.z) * L.v.z) / d
-    if not L._u_in(u):
-        u = max(min(u, 1.0), 0.0)
-    return Segment3(P, Point3(L.p.x + u * L.v.x,
-                                  L.p.y + u * L.v.y,
-                                  L.p.z + u * L.v.z))
-
-def _connect_point3_sphere(P, S):
-    v = P - S.c
-    v.normalize()
-    v *= S.r
-    return Segment3(P, Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z))
-
-def _connect_point3_plane(p, plane):
-    n = plane.n.normalized()
-    d = p.dot(plane.n) - plane.k
-    return Segment3(p, Point3(p.x - n.x * d, p.y - n.y * d, p.z - n.z * d))
-
-def _connect_line3_line3(A, B):
-    # assert A.v and B.v
-    p13 = A.p - B.p
-    d1343 = p13.dot(B.v)
-    d4321 = B.v.dot(A.v)
-    d1321 = p13.dot(A.v)
-    d4343 = B.v.mag2()
-    denom = A.v.mag2() * d4343 - d4321 ** 2
-    if denom == 0:
-        # Parallel, connect an endpoint with a line
-        if isinstance(B, Ray3) or isinstance(B, Segment3):
-            return _connect_point3_line3(B.p, A).swap()
-        # No endpoint (or endpoint is on A), possibly choose arbitrary
-        # point on line.
-        return _connect_point3_line3(A.p, B)
-
-    ua = (d1343 * d4321 - d1321 * d4343) / denom
-    if not A._u_in(ua):
-        ua = max(min(ua, 1.0), 0.0)
-    ub = (d1343 + d4321 * ua) / d4343
-    if not B._u_in(ub):
-        ub = max(min(ub, 1.0), 0.0)
-    return Segment3(Point3(A.p.x + ua * A.v.x,
-                               A.p.y + ua * A.v.y,
-                               A.p.z + ua * A.v.z),
-                        Point3(B.p.x + ub * B.v.x,
-                               B.p.y + ub * B.v.y,
-                               B.p.z + ub * B.v.z))
-
-def _connect_line3_plane(L, P):
-    d = P.n.dot(L.v)
-    if not d:
-        # Parallel, choose an endpoint
-        return _connect_point3_plane(L.p, P)
-    u = (P.k - P.n.dot(L.p)) / d
-    if not L._u_in(u):
-        # intersects out of range, choose nearest endpoint
-        u = max(min(u, 1.0), 0.0)
-        return _connect_point3_plane(Point3(L.p.x + u * L.v.x,
-                                            L.p.y + u * L.v.y,
-                                            L.p.z + u * L.v.z), P)
-    # Intersection
-    return None
-
-def _connect_sphere_line3(S, L):
-    """
-        Sphere/Line shortest joining segment
-        :param S: Sphere
-        :param L: Line
-        :return: LineSegment3 of minimal length
-        """
-    d = L.v.mag2()
-    # assert d != 0
-    u = ((S.c.x - L.p.x) * L.v.x + \
-         (S.c.y - L.p.y) * L.v.y + \
-         (S.c.z - L.p.z) * L.v.z) / d
-    if not L._u_in(u):
-        u = max(min(u, 1.0), 0.0)
-    point = L.point(u)
-    v = (point - S.c)
-    v.normalize()
-    v *= S.r
-    return Segment3(S.c+v,point)
-
-def _connect_sphere_sphere(A, B):
-    v = B.c - A.c
-    d = v.mag()
-    if A.r >= B.r and d < A.r:
-        #centre B inside A
-        s1,s2 = +1, +1
-    elif B.r > A.r and d < B.r:
-        #centre A inside B
-        s1,s2 = -1, -1
-    elif d >= A.r and d >= B.r:
-        s1,s2 = +1, -1
-
-    v.normalize()
-    return Segment3(Point3(A.c.x + s1* v.x * A.r,
-                               A.c.y + s1* v.y * A.r,
-                               A.c.z + s1* v.z * A.r),
-                        Point3(B.c.x + s2* v.x * B.r,
-                               B.c.y + s2* v.y * B.r,
-                               B.c.z + s2* v.z * B.r))
-
-def _connect_sphere_plane(S, P):
-    c = _connect_point3_plane(S.c, P)
-    if not c:
-        return None
-    p2 = c.p2
-    v = p2 - S.c
-    v.normalize()
-    v *= S.r
-    return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
-                        p2)
-
-def _connect_plane_plane(A, B):
-    if A.n.cross(B.n):
-        # Planes intersect
-        return None
-    else:
-        # Planes are parallel, connect to arbitrary point
-        return _connect_point3_plane(A._get_point(), B)
-
-def _intersect_line3_sphere(L, S):
-    a = L.v.mag2()
-    b = 2 * (L.v.x * (L.p.x - S.c.x) + \
-             L.v.y * (L.p.y - S.c.y) + \
-             L.v.z * (L.p.z - S.c.z))
-    c = S.c.mag2() + \
-        L.p.mag2() - \
-        2 * S.c.dot(L.p) - \
-        S.r ** 2
-    det = b ** 2 - 4 * a * c
-    if det < 0:
-        return None
-    sq = sqrt(det)
-    u1 = (-b + sq) / (2 * a)
-    u2 = (-b - sq) / (2 * a)
-    if not L._u_in(u1):
-        u1 = max(min(u1, 1.0), 0.0)
-    if not L._u_in(u2):
-        u2 = max(min(u2, 1.0), 0.0)
-    return Segment3(Point3(L.p.x + u1 * L.v.x,
-                               L.p.y + u1 * L.v.y,
-                               L.p.z + u1 * L.v.z),
-                        Point3(L.p.x + u2 * L.v.x,
-                               L.p.y + u2 * L.v.y,
-                               L.p.z + u2 * L.v.z))
-
-def _intersect_line3_plane(L, P):
-    d = P.n.dot(L.v)
-    if not d:
-        # Parallel
-        return None
-    u = (P.k - P.n.dot(L.p)) / d
-    if not L._u_in(u):
-        return None
-    return Point3(L.p.x + u * L.v.x,
-                  L.p.y + u * L.v.y,
-                  L.p.z + u * L.v.z)
-
-def _intersect_plane_plane(A, B):
-    n1_m = A.n.mag2()
-    n2_m = B.n.mag2()
-    n1d2 = A.n.dot(B.n)
-    det = n1_m * n2_m - n1d2 ** 2
-    if det == 0:
-        # Parallel
-        return None
-    c1 = (A.k * n2_m - B.k * n1d2) / det
-    c2 = (B.k * n1_m - A.k * n1d2) / det
-    return Line3(Point3(c1 * A.n.x + c2 * B.n.x,
-                        c1 * A.n.y + c2 * B.n.y,
-                        c1 * A.n.z + c2 * B.n.z),
-                 A.n.cross(B.n))
-
-class Point3(Vector3, Geometry):
-    """
-    A point on a 3D plane.  Construct in the obvious way::
-
-        >>> p = Point3(1.0, 2.0, 3.0)
-        >>> p
-        Point3(1.00, 2.00, 3.00)
-
-    **Point3** subclasses **Vector3**, so all of **Vector3** operators and
-    methods apply.  In particular, subtracting two points gives a vector::
-
-        >>> Point3(1.0, 2.0, 3.0) - Point3(1.0, 0.0, -2.0)
-        Vector3(0.00, 2.00, 5.00)
-
-    The following methods are also defined:
-
-    ``intersect(other)``
-        If *other* is a **Sphere**, returns ``True`` iff the point lies within
-        the sphere.
-
-    ``connect(other)``
-        Returns a **LineSegment3** which is the minimum length line segment
-        that can connect the two shapes.  *other* may be a **Point3**, **Line3**,
-        **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-    """
-
-    def intersect(self, other):
-        """Point3/object intersection
-        :return: self Point3 if on other object, None if not
-        """
-        return self if self in other else None
-
-    def connect(self, other):
-        return other._connect_point3(self)
-
-    def _connect_point3(self, other):
-        if self != other:
-            return Segment3(other, self)
-        return None
-
-    def _connect_line3(self, other):
-        c = _connect_point3_line3(self, other)
-        if c:
-            return c.swap()
-
-    def _connect_sphere(self, other):
-        c = _connect_point3_sphere(self, other)
-        if c:
-            return c.swap()
-
-    def _connect_plane(self, other):
-        c = _connect_point3_plane(self, other)
-        if c:
-            return c.swap()
-
-class Line3(Geometry):
-    """
-    A **Line3** is a line on a 3D plane extending to infinity in both directions;
-    a **Ray3** has a finite end-point and extends to infinity in a single
-    direction; a **LineSegment3** joins two points.
-
-    All three classes support the same constructors, operators and methods,
-    but may behave differently when calculating intersections etc.
-
-    You may construct a line, ray or line segment using any of:
-
-    * another line, ray or line segment
-    * two points
-    * a point and a vector
-    * a point, a vector and a length
-
-    For example::
-
-        >>> Line3(Point3(1.0, 1.0, 1.0), Point3(1.0, 2.0, 3.0))
-        Line3(<1.00, 1.00, 1.00> + u<0.00, 1.00, 2.00>)
-        >>> Line3(Point3(0.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0))
-        Line3(<0.00, 1.00, 1.00> + u<1.00, 1.00, 2.00>)
-        >>> Ray3(Point3(1.0, 1.0, 1.0), Vector3(1.0, 1.0, 2.0), 1.0)
-        Ray3(<1.00, 1.00, 1.00> + u<0.41, 0.41, 0.82>)
-
-    Internally, lines, rays and line segments store a Point3 *p* and a
-    Vector3 *v*.  You can also access (but not set) the two endpoints
-    *p1* and *p2*.  These may or may not be meaningful for all types of lines.
-
-    The following methods are supported by all three classes:
-
-    ``intersect(other)``
-        If *other* is a **Sphere**, returns a **LineSegment3** which is the
-        intersection of the sphere and line, or ``None`` if there is no
-        intersection.
-
-        If *other* is a **Plane**, returns a **Point3** of intersection, or
-        ``None``.
-
-    ``connect(other)``
-        Returns a **LineSegment3** which is the minimum length line segment
-        that can connect the two shapes.  For two parallel lines, this
-        line segment may be in an arbitrary position.  *other* may be
-        a **Point3**, **Line3**, **Ray3**, **LineSegment3**, **Sphere** or
-        **Plane**.
-
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-
-    **LineSegment3** also has a *length* property which is read-only.
-    """
-
-    def __init__(self, *args):
-        if len(args) == 3:
-            # assert isinstance(args[0], Point3) and isinstance(args[1], Vector3) and type(args[2]) == float
-            self.p = Point3(args[0])
-            self.v = args[1] * args[2] / abs(args[1])
-        elif len(args) == 2:
-            if isinstance(args[0], Point3) and isinstance(args[1], Point3):
-                self.p = Point3(args[0])
-                self.v = Vector3(args[1] - args[0])
-            elif isinstance(args[0], Point3) and isinstance(args[1], Vector3):
-                self.p = Point3(args[0])
-                self.v = Vector3(args[1])
-            else:
-                raise AttributeError('%r' % (args,))
-        elif len(args) == 1: #copy constructor
-            if isinstance(args[0], Line3):
-                super(Line3,self).__init__(*args)
-                self.p = Point3(args[0])
-                self.v = Vector3(args[0])
-            else:
-                raise AttributeError('%r' % (args,))
-        else:
-            raise AttributeError('%r' % (args,))
-
-        # XXX This is annoying.
-        #if not self.v:
-        #    raise AttributeError, 'Line has zero-length vector'
-
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
-
-    p1 = property(lambda self: self.p)
-    p2 = property(lambda self: Point3(self.p.x + self.v.x,
-                                      self.p.y + self.v.y,
-                                      self.p.z + self.v.z))
-
-    def _apply_transform(self, t):
-        self.p = t * self.p
-        self.v = t * self.v
-
-    def _u_in(self, u):
-        return True
-
-    def intersect(self, other):
-        return other._intersect_line3(self)
-
-    def _intersect_sphere(self, other):
-        return _intersect_line3_sphere(self, other)
-
-    def _intersect_plane(self, other):
-        return _intersect_line3_plane(self, other)
-
-    def connect(self, other):
-        return other._connect_line3(self)
-
-    def _connect_point3(self, other):
-        return _connect_point3_line3(other, self)
-
-    def _connect_line3(self, other):
-        return _connect_line3_line3(other, self)
-
-    def _connect_sphere(self, other):
-        return _connect_sphere_line3(other, self)
-
-    def _connect_plane(self, other):
-        c = _connect_line3_plane(self, other)
-        if c:
-            return c
-
-class Ray3(Line3):
-    def _u_in(self, u):
-        return u >= 0.0
-
-class Segment3(Line3):
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
-
-    def _u_in(self, u):
-        return u >= 0.0 and u <= 1.0
-
-    def __abs__(self):
-        return abs(self.v)
-
-    def mag2(self):
-        return self.v.mag2()
-
-    def swap(self):
-        # used by connect methods to switch order of points
-        self.p = self.p2
-        self.v *= -1
-        return self
-
-    length = property(lambda self: abs(self.v))
-
-class Sphere(Geometry):
-    """
-    Spheres are constructed with a center **Point3** and a radius::
-
-    >>> s = Sphere(Point3(1.0, 1.0, 1.0), 0.5)
-    >>> s
-    Sphere(<1.00, 1.00, 1.00>, radius=0.50)
-
-    Internally there are two attributes: *c*, giving the center point and
-    *r*, giving the radius.
-
-    The following methods are supported:
-
-    ``intersect(other)``:
-        If *other* is a **Point3**, returns ``True`` iff the point lies
-        within the sphere.
-
-        If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns
-        a **LineSegment3** giving the intersection, or ``None`` if the
-        line does not intersect the sphere.
-
-    
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-    """
-
-    def __init__(self, *args):
-        """:param args: can be
-        * Sphere
-        * center, point on sphere
-        * center, radius
-        """
-        if len(args) == 1: # Circle or derived class
-            super(Sphere,self).__init__(*args)
-            self.c = Point2(args[0].c)
-            self.r = args[0].r
-        else: #2 first params are used to stay compatible with Arc2
-            self.c = Point2(args[0])
-            if isinstance(args[1],(float,int)):
-                self.r = args[1]
-            else:
-                p=Point2(args[1]) #one point on sphere
-                self.r=abs(p-self.c)
-
-    def __repr__(self):
-        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
-
-    def _apply_transform(self, t):
-        self.c = t * self.c
-
-    def intersect(self, other):
-        return other._intersect_sphere(self)
-
-    def _intersect_line3(self, other):
-        return _intersect_line3_sphere(other, self)
-
-    def connect(self, other):
-        """
-        minimal joining segment between Sphere and other 3D Object
-        :param other: Point3, Line3, Sphere, Plane
-        :return: LineSegment3 of minimal length
-        """
-
-        return other._connect_sphere(self)
-
-    def _connect_point3(self, other):
-        return _connect_point3_sphere(other, self)
-
-    def _connect_line3(self, sphere):
-        c = _connect_sphere_line3(self, sphere)
-        if c:
-            return c.swap()
-
-    def _connect_sphere(self, other):
-        return _connect_sphere_sphere(other, self)
-
-    def _connect_plane(self, other):
-        c = _connect_sphere_plane(self, other)
-        if c:
-            return c
-
-class Plane(Geometry):
-    """
-    Planes can be constructed with any of:
-
-    * three **Point3**'s lying on the plane
-    * a **Point3** on the plane and the **Vector3** normal
-    * a **Vector3** normal and *k*, described below.
-
-    Internally, planes are stored with the normal *n* and constant *k* such
-    that *n.p* = *k* for any point on the plane *p*.
-
-    The following methods are supported:
-
-    ``intersect(other)``
-        If *other* is a **Line3**, **Ray3** or **LineSegment3**, returns a
-        **Point3** of intersection, or ``None`` if there is no intersection.
-
-        If *other* is a **Plane**, returns the **Line3** of intersection.
-
-    ``connect(other)``
-        Returns a **LineSegment3** which is the minimum length line segment
-        that can connect the two shapes. *other* may be a **Point3**, **Line3**,
-        **Ray3**, **LineSegment3**, **Sphere** or **Plane**.
-
-    ``distance(other)``
-        Returns the absolute minimum distance to *other*.  Internally this
-        simply returns the length of the result of ``connect``.
-    """
-    # n.p = k, where n is normal, p is point on plane, k is constant scalar
-
-    def __init__(self, *args):
-        if len(args) == 3:
-            self.n = (Point3(args[1]) - Point3(args[0])).cross(Point3(args[2]) - Point3(args[0]))
-            self.n.normalize()
-            self.k = self.n.dot(Point3(args[0]))
-        elif len(args) == 2:
-            if isinstance(args[0], Point3) and isinstance(args[1], Vector3):
-                self.n = args[1].normalized()
-                self.k = self.n.dot(args[0])
-            elif isinstance(args[0], Vector3) and type(args[1]) == float:
-                self.n = args[0].normalized()
-                self.k = args[1]
-            else:
-                raise AttributeError('%r' % (args,))
-
-        else:
-            raise AttributeError('%r' % (args,))
-
-        if not self.n:
-            raise AttributeError('Points on plane are colinear')
-
-    def __repr__(self):
-        return 'Plane(<%.2f, %.2f, %.2f>.p = %.2f)' % \
-            (self.n.x, self.n.y, self.n.z, self.k)
-
-    def _get_point(self):
-        # Return an arbitrary point on the plane
-        if self.n.z:
-            return Point3(0., 0., self.k / self.n.z)
-        elif self.n.y:
-            return Point3(0., self.k / self.n.y, 0.)
-        else:
-            return Point3(self.k / self.n.x, 0., 0.)
-
-    def _apply_transform(self, t):
-        p = t * self._get_point()
-        self.n = t * self.n
-        self.k = self.n.dot(p)
-
-    def intersect(self, other):
-        return other._intersect_plane(self)
-
-    def _intersect_line3(self, other):
-        return _intersect_line3_plane(other, self)
-
-    def _intersect_plane(self, other):
-        return _intersect_plane_plane(self, other)
-
-    def connect(self, other):
-        return other._connect_plane(self)
-
-    def _connect_point3(self, other):
-        return _connect_point3_plane(other, self)
-
-    def _connect_line3(self, other):
-        return _connect_line3_plane(other, self)
-
-    def _connect_sphere(self, other):
-        return _connect_sphere_plane(other, self)
-
-    def _connect_plane(self, other):
-        return _connect_plane_plane(other, self)
-
-def argPair(x,y=None):
-    """Process a pair of values passed in various ways."""
-    if y is None:
-        try:
-            return (x[0], x[1])
-        except:
-            pass
-    
-        try:
-            return x.xy
-        except:
-            pass
-    else:
-        return (x,y)
 
 
