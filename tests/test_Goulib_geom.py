@@ -7,6 +7,7 @@ from Goulib.geom import *
 
 from math import *
 
+
 class TestGeometry:
     #tested in derived classes
     @raises(NotImplementedError)
@@ -51,12 +52,16 @@ class TestPoint2:
         self.p01=Point2(0,1)
         self.p11=Point2(1,1)
         self.diag=Segment2(self.p10,self.p01)
+        self.circle=Circle((1,2),1)
 
     def test___repr__(self):
         assert_equal(repr(self.p10),'Point2(1, 0)')
 
     def test_connect(self):
         assert_equal(self.p10.connect(self.p01),self.diag)
+        assert_equal(self.p10.connect(self.circle),Segment2(self.p10,self.p11))
+        assert_equal(self.circle.connect(self.p10),Segment2(self.p11,self.p10))
+
 
     def test_distance(self):
         assert_equal(self.p10.distance(self.p10),0)
@@ -70,6 +75,21 @@ class TestPoint2:
         p=self.p11.intersect(self.p11) #Point2 intersects with itself
         assert_equal(p,self.p11)
         assert_false(p is self.p11) #but intersect should return a COPY
+        
+        assert_equal(self.p11.intersect(self.p10),None)
+        
+        assert_true(self.p10 in self.diag)
+        assert_true(self.p01 in self.diag)
+        assert_false(self.p11 in self.diag)
+        
+        assert_true(self.p11 in self.circle)
+        
+
+
+    def test___contains__(self):
+        assert_true(self.p01 in self.p01)
+        assert_false(Vector2(0,1) in self.p01) #Vector2 is not a Point2
+        assert_false(self.p10 in self.p01)
 
 class TestVector2:
 
@@ -102,6 +122,8 @@ class TestVector2:
     def test___eq__(self):
         assert_true(self.v11 == self.v11)
         assert_false(self.v11 == self.v01)
+        
+        assert_true(self.v10 == (1,0))
         #more tests embedded below
 
     def test___ne__(self):
@@ -115,7 +137,7 @@ class TestVector2:
     def test___copy__(self):
         v10 = copy(self.v10)
         assert_true(v10==self.v10)
-        assert_false(v10 is self.v10) #copy is a deepcopy
+        assert_false(v10 is self.v10) #make sure copy is a deepcopy
 
     def test_mag2(self):
         assert_equal(self.v11.mag2(), 2)
@@ -151,7 +173,7 @@ class TestVector2:
         assert_equal(Point2(1,1)-Point2(1,0),self.v01) # Point - Point -> Vector
 
     def test___rsub__(self):
-        assert_equal(Point2(1,1)-self.v10,Point2(0,1)) # Point - Vector -> Point
+        assert_equal((1,1)-self.v10,Point2(0,1)) # Point - Vector -> Point
 
     def test___mul__(self):
         assert_equal(2*self.v11,Vector2(2,2))
@@ -198,14 +220,12 @@ class TestVector2:
         assert_equal(self.v11.reflect(self.v10),Vector2(-1,1))
 
     def test___pos__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__pos__())
-        raise SkipTest 
+        v10 = +self.v10 #copy
+        assert_true(v10==self.v10)
+        assert_false(v10 is self.v10)
 
     def test___hash__(self):
-        # vector2 = Vector2(*args)
-        # assert_equal(expected, vector2.__hash__())
-        raise SkipTest 
+        assert Vector2(1,0) in (self.v00, self.v01, self.v10, self.v11)
 
 class TestVector3:
     @classmethod
@@ -239,6 +259,7 @@ class TestVector3:
         assert_equal(self.v11.xyz,(1,1,1))
 
     def test___eq__(self):
+        assert_true(self.v11 == (1,1,1))
         assert_true(self.v11 == self.v11)
         assert_false(self.v11 == self.v01)
         #more tests embedded below
@@ -889,9 +910,10 @@ class TestSegment2:
         assert_equal(repr(self.s3),"Segment2(Point2(-1, -1),Point2(-1.0, 0.0))")
 
     def test___abs__(self):
-        # segment2 = Segment2()
-        # assert_equal(expected, segment2.__abs__())
-        raise SkipTest
+        assert_equal(abs(self.s1),sqrt(2))
+        
+    def test_mag2(self):
+        assert_equal(self.s1.mag2(),2)
 
     def test_intersect(self):
         """TODO : implement intersect of colinear segments
@@ -919,15 +941,18 @@ class TestSegment2:
         assert_equal(self.s1.tangent(1),self.s1.v)
         assert_equal(self.s1.tangent(1.001),None)
 
-    def test_mag2(self):
-        # segment2 = Segment2()
-        # assert_equal(expected, segment2.mag2())
-        raise SkipTest
-
     def test_swap(self):
         # segment2 = Segment2()
         # assert_equal(expected, segment2.swap())
         raise SkipTest
+
+    def test_bisect(self):
+        l=self.s1.bisect()
+        assert_equal(l.intersect(self.s1),self.s1.midpoint())
+        assert_equal(l.v.dot(self.s1.v),0)
+
+    def test_midpoint(self):
+        pass #tested above
 
 class TestCircle:
     @classmethod
