@@ -1268,16 +1268,5 @@ class Drawing(Group):
         drawing.save()
 
 
-def img2base64(img, fmt='PNG'):
-    """
-    :param img: :class:`PIL:Image`
-    :result: string base64 encoded image content in specified format
-    :see: http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template
-    """
-    import io, base64
-    output = io.StringIO()
-    img.save(output, fmt)
-    output.seek(0)
-    output_s = output.read()
-    return base64.b64encode(output_s)
+
 
