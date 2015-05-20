@@ -18,7 +18,7 @@ __revision__ = '$Revision$'
 
 import operator, six, abc
 
-from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot
+from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot,copysign
 from . import math2
 
 precision = 1e-9 #for equality comparisons
@@ -1023,7 +1023,7 @@ class Arc2(Circle):
         :param p1: starting Point2 or angle in radians
         :param p2: ending Point2 or angle in radians
         :param r: float radius, needed only if p1 or p2 is an angle
-        .param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
+        :param dir: arc direction. +1 is trig positive (CCW) and -1 is Clockwise
 
         """
         if isinstance(center,Arc2): #copy constructor
@@ -1079,10 +1079,11 @@ class Arc2(Circle):
 
     def _apply_transform(self, t):
         if t:
-            super(Arc2,self)._apply_transform(t)
+            super(Arc2,self)._apply_transform(t) #TODO: support ellipsification
             self.p2 = t * self.p2
-        self.a=(self.p-self.c).angle(None) #start angle
-        self.b=(self.p2-self.c).angle(None) #end angle
+            self.dir=self.dir*t.orientation() #to handle symmetries...
+        self.a=(self.p-self.c).angle() #start angle
+        self.b=(self.p2-self.c).angle() #end angle
 
     def __eq__(self, other):
         if not super(Arc2,self).__eq__(other): #support Circles must be the same
@@ -2455,6 +2456,15 @@ class Matrix3(object):
             tmp.k = d * (self.a*self.f - self.b*self.e)
 
             return tmp
+        
+    def orientation(self):
+        """
+        :return: 1 if matrix is right handed, -1 if left handed
+        """
+        v1=Vector3(self.a,self.b,self.c)
+        v2=Vector3(self.e,self.f,self.g)
+        v3=Vector3(self.i,self.j,self.k)
+        return copysign(1,v1.cross(v2).dot(v3))
 
 # a b c d
 # e f g h
