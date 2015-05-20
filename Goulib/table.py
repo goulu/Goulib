@@ -42,7 +42,7 @@ class Cell():
         :param align: string for HTML align attribute
         :param fmt: format string applied applied to data
         :param tag: called to build each cell. defaults to 'td'
-        :param style: string for HTML style attribute
+        :param style: dict for HTML style attribute
         """
         
         if isinstance(data,Element):
@@ -57,7 +57,7 @@ class Cell():
         self.align=align
         self.fmt=fmt
         self.tag=tag if tag else 'td'
-        self.style=style 
+        self.style=style if style else {}
         
     def __repr__(self):
         return str(self.data)
@@ -87,7 +87,7 @@ class Cell():
         args={}
         args.update(kwargs) #copy needed to avoid side effects
         v=self.data
-        a=args.get('align',self.align)
+        a=args.pop('align',self.align)
         f=self.fmt
         if isinstance(v,int):
             if not a: a="right"
@@ -107,16 +107,15 @@ class Cell():
             v=strftimedelta(v,f)
             f=None #don't reformat below
             
-        attr='' #tag attributes
         if a:
-            args['align']=a #side effect warning
+            self.style['text-align']=a
             
         if not v or v=='':
             v="&nbsp;" #for IE8
         else:
             v=f%v if f else six.text_type(v)
         if self.style:
-            args.setdefault('style',self.style)
+            args['style']=' '.join('%s:%s;'%(k,v) for k,v in six.iteritems(self.style))
         return tag(self.tag,v,**args)
 
 class Row():

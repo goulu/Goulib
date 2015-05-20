@@ -37,7 +37,7 @@ class TestTable:
         assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))
         assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
         
-        ref='<tr><td align="right">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td align="right">2</td><td align="right">125.00</td><td align="right">250.00</td></tr>'
+        ref='<tr><td style="text-align:right;">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td style="text-align:right;">2</td><td style="text-align:right;">125.00</td><td style="text-align:right;">250.00</td></tr>'
         t=Row(self.t2[14]).html()
         assert_equal(t,ref)
         
