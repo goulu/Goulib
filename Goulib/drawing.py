@@ -49,6 +49,8 @@ def Trans(scale=1, offset=None, rotation=None):
         res = res.translate(offset)
     return res
 
+identity=Trans()
+
 class BBox(Box):
     """bounding box"""
     def __init__(self, p1=None, p2=None):
@@ -141,9 +143,6 @@ class BBox(Box):
         res += trans(self.xmax, self.ymin)
         return res
 
-def rpoint(pt,decimals=3): # rounds coordinates to number of decimals
-    return Point2([round(x,decimals) for x in pt.xy])
-
 def calcBulge(p1,bulge,p2):
     #taken from http://free-cad.sourceforge.net/SrcDocu/de/d1f/importDXF_8py_source.html
     """
@@ -179,7 +178,7 @@ class Entity(object):
 
     @property
     def center(self):
-        return rpoint(self.bbox().center)
+        return self.bbox().center
 
     def bbox(self):
         """
@@ -291,11 +290,10 @@ class Entity(object):
         :param mat3: Matrix3 transform
         :return: Entity of correct subtype
         """
-        def trans(pt): return rpoint(mat3(Point2(pt)))
 
         if e.dxftype=='LINE':
-            start=trans(Point2(e.start[:2]))
-            end=trans(Point2(e.end[:2]))
+            start=Point2(e.start[:2])
+            end=Point2(e.end[:2])
             res=Segment2(start,end)
         elif e.dxftype == 'ARC':
             c=Point2(e.center[:2])
@@ -303,24 +301,24 @@ class Entity(object):
             start=c+Polar(e.radius,startangle)
             endangle=radians(e.endangle)
             end=c+Polar(e.radius,endangle)
-            res=Arc2(trans(c),trans(start),trans(end))
+            res=Arc2(c,start,end)
         elif e.dxftype == 'CIRCLE':
-            c=Point2(e.center[:2])
-            res=Circle(trans(c), e.radius)
+            res=Circle(Point2(e.center[:2]), e.radius)
         elif e.dxftype == 'POLYLINE':
-            res=Chain.from_dxf(e,trans)
+            res=Chain.from_dxf(e,mat3)
         elif e.dxftype == 'LWPOLYLINE':
-            res=Chain.from_dxf(e,trans)
+            res=Chain.from_dxf(e,mat3)
         elif e.dxftype == 'SOLID':
             return None #TODO : implement
         elif e.dxftype == 'POINT':
             return None #TODO : implement
         elif e.dxftype == 'TEXT':
-            p=trans(Point2(e.insert[:2]))
+            p=Point2(e.insert[:2])
             res=Text(e.text,p,size=e.height,rotation=e.rotation)
         else:
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
+        res._apply_transform(mat3)
         res.dxf=e #keep link to source entity
         res.color=aci_to_color(e.color)
         res.layer=e.layer
@@ -631,7 +629,7 @@ class Group(list, _Group):
         for e in self:
             e.swap()
 
-    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=None, flatten=True):
+    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=identity, flatten=True):
         #TODO : make it work properly with flatten=False
         """
         :param dxf: dxf.entity
@@ -642,9 +640,6 @@ class Group(list, _Group):
         :parm flatten: bool flatten block structure
         :return: :class:`Entity` of correct subtype
         """
-        if trans is None:
-            trans=Trans()
-
         self.dxf=dxf
 
         for e in dxf:
@@ -655,7 +650,7 @@ class Group(list, _Group):
             elif only and  e.dxftype not in only:
                 continue
             elif e.dxftype == 'INSERT': #TODO : improve insertion on correct layer
-                t2 = trans*Trans(1, e.insert[:2], e.rotation)
+                t2 = trans*Trans(e.scale[:2], e.insert[:2], e.rotation)
                 if flatten:
                     self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, flatten=flatten)
                 else:
@@ -837,7 +832,6 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         :param mat3: Matrix3 transform
         :return: Entity of correct subtype
         """
-        def trans(pt): return rpoint(mat3(Point2(pt)))
 
         def arc_from_bulge(start,end,bulge):
             #formula from http://www.afralisp.net/archive/lisp/Bulges1.htm
@@ -849,10 +843,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
             gamma=(pi-theta)/2
             angle=chord.v.angle()+(gamma if bulge>=0 else -gamma)
             center=start+Polar(r,angle)
-            return Arc2(
-                trans(center),
-                trans(start),
-                trans(end),
+            return Arc2(center, start, end,
                 # dir=1 if bulge>=0 else -1
             )
 
@@ -863,25 +854,29 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
                 end=e.vertices[i].location[:2] #2D only
                 bulge=e.vertices[i-1].bulge
                 if bulge==0:
-                    res.append(Segment2(trans(start),trans(end)))
+                    res.append(Segment2(start,end))
                 else:
                     res.append(arc_from_bulge(start,end,bulge))
             if e.is_closed:
-                res.append(Segment2(trans(e.vertices[-1].location[:2]),trans(e.vertices[0].location[:2])))
+                res.append(
+                    Segment2(e.vertices[-1].location[:2],
+                            e.vertices[0].location[:2])
+                )
         elif e.dxftype == 'LWPOLYLINE':
             res=Chain()
             for i in range(1,len(e.points)):
                 start=e.points[i-1]
                 end=e.points[i]
                 if len(end)==2:
-                    res.append(Segment2(trans(start),trans(end)))
+                    res.append(Segment2(start,end))
                 else:
                     res.append(arc_from_bulge(start,end,bulge=end[2]))
             if e.is_closed:
-                res.append(Segment2(trans(e.points[-1]),trans(e.points[0])))
+                res.append(Segment2(e.points[-1],e.points[0]))
         else:
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
+        res._apply_transform(mat3)
         res.dxf=e #keep link to source entity
         res.color=aci_to_color(e.color)
         res.layer=e.layer

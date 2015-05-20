@@ -337,15 +337,15 @@ $TDCREATE
   9
 $TDUPDATE
  40
-2456525.542983935
+2457162.663221562
   9
 $TDINDWG
  40
-0.0000000116
+0.0029541435
   9
 $TDUSRTIMER
  40
-2456930.558916065
+2457162.576934641
   9
 $USRTIMER
  70
@@ -401,7 +401,7 @@ $HANDLING
   9
 $HANDSEED
   5
-63B
+6FA
   9
 $SURFTAB1
  70
@@ -567,9 +567,9 @@ $PLIMMIN
   9
 $PLIMMAX
  10
-12.0
+0.0
  20
-9.0
+0.0
   9
 $UNITMODE
  70
@@ -1372,6 +1372,8 @@ INSERT
 0
   6
 BYBLOCK
+ 62
+     5
   2
 ARC
  10
@@ -1475,7 +1477,7 @@ BYBLOCK
   0
 VERTEX
   5
-5EB
+6AB
   8
 0
   6
@@ -1491,7 +1493,7 @@ BYBLOCK
   0
 VERTEX
   5
-5EC
+6AC
   8
 0
   6
@@ -1507,7 +1509,7 @@ BYBLOCK
   0
 VERTEX
   5
-5ED
+6AD
   8
 0
   6
@@ -1523,7 +1525,7 @@ BYBLOCK
   0
 VERTEX
   5
-5EE
+6AE
   8
 0
   6
@@ -1539,7 +1541,7 @@ BYBLOCK
   0
 VERTEX
   5
-5EF
+6AF
   8
 0
   6
@@ -1555,7 +1557,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F0
+6B0
   8
 0
   6
@@ -1571,7 +1573,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F1
+6B1
   8
 0
   6
@@ -1587,7 +1589,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F2
+6B2
   8
 0
   6
@@ -1603,7 +1605,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F3
+6B3
   8
 0
   6
@@ -1619,7 +1621,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F4
+6B4
   8
 0
   6
@@ -1635,7 +1637,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F5
+6B5
   8
 0
   6
@@ -1651,7 +1653,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F6
+6B6
   8
 0
   6
@@ -1667,7 +1669,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F7
+6B7
   8
 0
   6
@@ -1683,7 +1685,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F8
+6B8
   8
 0
   6
@@ -1699,7 +1701,7 @@ BYBLOCK
   0
 VERTEX
   5
-5F9
+6B9
   8
 0
   6
@@ -1715,7 +1717,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FA
+6BA
   8
 0
   6
@@ -1731,7 +1733,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FB
+6BB
   8
 0
   6
@@ -1747,7 +1749,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FC
+6BC
   8
 0
   6
@@ -1763,7 +1765,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FD
+6BD
   8
 0
   6
@@ -1779,7 +1781,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FE
+6BE
   8
 0
   6
@@ -1795,7 +1797,7 @@ BYBLOCK
   0
 VERTEX
   5
-5FF
+6BF
   8
 0
   6
@@ -1811,7 +1813,7 @@ BYBLOCK
   0
 VERTEX
   5
-600
+6C0
   8
 0
   6
@@ -1827,7 +1829,7 @@ BYBLOCK
   0
 VERTEX
   5
-601
+6C1
   8
 0
   6
@@ -1843,7 +1845,7 @@ BYBLOCK
   0
 VERTEX
   5
-602
+6C2
   8
 0
   6
@@ -1859,7 +1861,7 @@ BYBLOCK
   0
 VERTEX
   5
-603
+6C3
   8
 0
   6
@@ -1875,7 +1877,7 @@ BYBLOCK
   0
 VERTEX
   5
-604
+6C4
   8
 0
   6
@@ -1891,7 +1893,7 @@ BYBLOCK
   0
 VERTEX
   5
-605
+6C5
   8
 0
   6
@@ -1907,7 +1909,7 @@ BYBLOCK
   0
 VERTEX
   5
-606
+6C6
   8
 0
   6
@@ -1923,7 +1925,7 @@ BYBLOCK
   0
 VERTEX
   5
-607
+6C7
   8
 0
   6
@@ -1939,7 +1941,7 @@ BYBLOCK
   0
 VERTEX
   5
-608
+6C8
   8
 0
   6
@@ -1955,7 +1957,7 @@ BYBLOCK
   0
 VERTEX
   5
-609
+6C9
   8
 0
   6
@@ -1971,7 +1973,7 @@ BYBLOCK
   0
 VERTEX
   5
-60A
+6CA
   8
 0
   6
@@ -1987,7 +1989,7 @@ BYBLOCK
   0
 SEQEND
   5
-63A
+6F7
   8
 0
   6
@@ -2015,7 +2017,7 @@ BYBLOCK
   0
 VERTEX
   5
-60B
+6CB
   8
 0
   6
@@ -2031,7 +2033,7 @@ BYBLOCK
   0
 VERTEX
   5
-60C
+6CC
   8
 0
   6
@@ -2049,7 +2051,7 @@ BYBLOCK
   0
 VERTEX
   5
-60D
+6CD
   8
 0
   6
@@ -2065,7 +2067,7 @@ BYBLOCK
   0
 SEQEND
   5
-639
+6F8
   8
 0
   6
@@ -2093,7 +2095,7 @@ BYBLOCK
   0
 VERTEX
   5
-60E
+6CE
   8
 0
   6
@@ -2109,7 +2111,7 @@ BYBLOCK
   0
 VERTEX
   5
-60F
+6CF
   8
 0
   6
@@ -2125,7 +2127,7 @@ BYBLOCK
   0
 VERTEX
   5
-610
+6D0
   8
 0
   6
@@ -2141,7 +2143,7 @@ BYBLOCK
   0
 VERTEX
   5
-611
+6D1
   8
 0
   6
@@ -2157,7 +2159,7 @@ BYBLOCK
   0
 VERTEX
   5
-612
+6D2
   8
 0
   6
@@ -2173,7 +2175,7 @@ BYBLOCK
   0
 VERTEX
   5
-613
+6D3
   8
 0
   6
@@ -2189,7 +2191,7 @@ BYBLOCK
   0
 VERTEX
   5
-614
+6D4
   8
 0
   6
@@ -2205,7 +2207,7 @@ BYBLOCK
   0
 VERTEX
   5
-615
+6D5
   8
 0
   6
@@ -2221,7 +2223,7 @@ BYBLOCK
   0
 VERTEX
   5
-616
+6D6
   8
 0
   6
@@ -2237,7 +2239,7 @@ BYBLOCK
   0
 VERTEX
   5
-617
+6D7
   8
 0
   6
@@ -2253,7 +2255,7 @@ BYBLOCK
   0
 VERTEX
   5
-618
+6D8
   8
 0
   6
@@ -2269,7 +2271,7 @@ BYBLOCK
   0
 VERTEX
   5
-619
+6D9
   8
 0
   6
@@ -2285,7 +2287,7 @@ BYBLOCK
   0
 VERTEX
   5
-61A
+6DA
   8
 0
   6
@@ -2301,7 +2303,7 @@ BYBLOCK
   0
 VERTEX
   5
-61B
+6DB
   8
 0
   6
@@ -2317,7 +2319,7 @@ BYBLOCK
   0
 VERTEX
   5
-61C
+6DC
   8
 0
   6
@@ -2333,7 +2335,7 @@ BYBLOCK
   0
 VERTEX
   5
-61D
+6DD
   8
 0
   6
@@ -2349,7 +2351,7 @@ BYBLOCK
   0
 VERTEX
   5
-61E
+6DE
   8
 0
   6
@@ -2365,7 +2367,7 @@ BYBLOCK
   0
 VERTEX
   5
-61F
+6DF
   8
 0
   6
@@ -2381,7 +2383,7 @@ BYBLOCK
   0
 VERTEX
   5
-620
+6E0
   8
 0
   6
@@ -2397,7 +2399,7 @@ BYBLOCK
   0
 VERTEX
   5
-621
+6E1
   8
 0
   6
@@ -2413,7 +2415,7 @@ BYBLOCK
   0
 VERTEX
   5
-622
+6E2
   8
 0
   6
@@ -2429,7 +2431,7 @@ BYBLOCK
   0
 VERTEX
   5
-623
+6E3
   8
 0
   6
@@ -2445,7 +2447,7 @@ BYBLOCK
   0
 VERTEX
   5
-624
+6E4
   8
 0
   6
@@ -2461,7 +2463,7 @@ BYBLOCK
   0
 VERTEX
   5
-625
+6E5
   8
 0
   6
@@ -2477,7 +2479,7 @@ BYBLOCK
   0
 VERTEX
   5
-626
+6E6
   8
 0
   6
@@ -2493,7 +2495,7 @@ BYBLOCK
   0
 VERTEX
   5
-627
+6E7
   8
 0
   6
@@ -2509,7 +2511,7 @@ BYBLOCK
   0
 VERTEX
   5
-628
+6E8
   8
 0
   6
@@ -2525,7 +2527,7 @@ BYBLOCK
   0
 VERTEX
   5
-629
+6E9
   8
 0
   6
@@ -2541,7 +2543,7 @@ BYBLOCK
   0
 VERTEX
   5
-62A
+6EA
   8
 0
   6
@@ -2557,7 +2559,7 @@ BYBLOCK
   0
 VERTEX
   5
-62B
+6EB
   8
 0
   6
@@ -2573,7 +2575,7 @@ BYBLOCK
   0
 VERTEX
   5
-62C
+6EC
   8
 0
   6
@@ -2589,7 +2591,7 @@ BYBLOCK
   0
 VERTEX
   5
-62D
+6ED
   8
 0
   6
@@ -2605,7 +2607,7 @@ BYBLOCK
   0
 VERTEX
   5
-62E
+6EE
   8
 0
   6
@@ -2621,7 +2623,7 @@ BYBLOCK
   0
 VERTEX
   5
-62F
+6EF
   8
 0
   6
@@ -2637,7 +2639,7 @@ BYBLOCK
   0
 VERTEX
   5
-630
+6F0
   8
 0
   6
@@ -2653,7 +2655,7 @@ BYBLOCK
   0
 VERTEX
   5
-631
+6F1
   8
 0
   6
@@ -2669,7 +2671,7 @@ BYBLOCK
   0
 VERTEX
   5
-632
+6F2
   8
 0
   6
@@ -2685,7 +2687,7 @@ BYBLOCK
   0
 VERTEX
   5
-633
+6F3
   8
 0
   6
@@ -2701,7 +2703,7 @@ BYBLOCK
   0
 VERTEX
   5
-634
+6F4
   8
 0
   6
@@ -2717,7 +2719,7 @@ BYBLOCK
   0
 VERTEX
   5
-635
+6F5
   8
 0
   6
@@ -2733,7 +2735,7 @@ BYBLOCK
   0
 VERTEX
   5
-636
+6F6
   8
 0
   6
@@ -2749,7 +2751,7 @@ BYBLOCK
   0
 SEQEND
   5
-638
+6F9
   8
 0
   6
