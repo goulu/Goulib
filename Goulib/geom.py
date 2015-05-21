@@ -2288,24 +2288,24 @@ class Matrix3(object):
             C.j = Ai * Bb + Aj * Bf + Ak * Bj
             C.k = Ai * Bc + Aj * Bg + Ak * Bk
             return C
-        elif isinstance(other, Point2):
-            A = self
-            B = other
-            P = Point2(0, 0)
-            P.x = A.a * B.x + A.b * B.y + A.c
-            P.y = A.e * B.x + A.f * B.y + A.g
-            return P
-        elif isinstance(other, Vector2):
-            A = self
-            B = other
-            V = Vector2(0, 0)
-            V.x = A.a * B.x + A.b * B.y
-            V.y = A.e * B.x + A.f * B.y
-            return V
-        else:
-            other = copy(other)
-            other._apply_transform(self)
-            return other
+                
+        res = copy(other)
+        try:
+            res._apply_transform(self)
+            return res
+        except: 
+            pass
+    
+        x,y=argPair(other)
+        Ax = self.a * x + self.b * y + self.c
+        Ay = self.e * x + self.f * y + self.g
+        try:
+            res.x=Ax
+            res.y=Ay
+        except:
+            res=(Ax,Ay)
+        return res
+
 
     def __call__(self,other):
         return self*other
