@@ -102,9 +102,8 @@ class BBox(Box):
         if isinstance(other,Entity):    
             return super(BBox,self).__contains__(other.bbox())
             
-        #if we reached till here, suppose other is an iterable    
-        return all(x in i for i,x in zip(self,other))
-        
+        #suppose other is an iterable    
+        return all(o in self for o in other)
 
     def __iadd__(self, pt):
         """
