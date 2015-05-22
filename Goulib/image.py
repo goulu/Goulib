@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 image processing and conversion
+:requires:
+* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
 """
 
 __author__ = "Philippe Guglielmetti"
