@@ -495,6 +495,7 @@ def Spline(pts):
     c=Point2(p0)-t0.cross()
     return Arc2(c,p0,p3)
 '''
+        
 class _Group(Entity, Geometry):
     """ abstract class for iterable Entities"""
     def bbox(self, filter=None):
@@ -604,9 +605,6 @@ class Group(list, _Group):
         return self
 
     def extend(self,entities,**kwargs):
-        if not kwargs:
-            return super(Group,self).extend(entities)
-
         for entity in entities:
             self.append(entity,**kwargs)
 
@@ -697,11 +695,12 @@ class Instance(_Group):
     def _apply_transform(self,trans):
         self.trans=trans*self.trans
 
-class Chain(Group): #inherit in this order for overloaded methods to work correctly
+class Chain(Group): 
     """ group of contiguous Entities (Polyline or similar)"""
 
     def __init__(self,data=[]):
-        Group.__init__(self,data)
+        Group.__init__(self)
+        self.extend(data)
 
     @property
     def start(self):
@@ -715,7 +714,7 @@ class Chain(Group): #inherit in this order for overloaded methods to work correc
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
 
-    def append(self, edge, tol=1E6, allow_swap=True, **attrs):
+    def append(self, edge, tol=1E-6, allow_swap=True, **attrs):
         """
         append edge to chain, ensuring contiguity
         :param edge: :class:`Entity` to append
@@ -1136,106 +1135,6 @@ class Drawing(Group):
             self.block[block.name]=Group().from_dxf(block._entities, **kwargs)
 
         super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
-
-    def img(self, size=[256, 256], border=5, box=None, layers=None, ignore=[], forcelayercolor=False, antialias=1,background='white'):
-        """
-        :param size: [x,y] max size of image in pixels. if one coord is None, the other one will be enforced
-        :param border: int border width in pixels
-        :param box: class:`BBox` bounding box. if None, box is calculated to contain all drawn entities
-        :param layers: list or dictionary of layers to draw. None = all layers
-        :param ignore: list of strings of entity types to ignore
-        :result: :class:`PIL:Image` rasterized image
-        """
-
-        from PIL import Image, ImageDraw, ImageFont  # PIL or Pillow
-
-        def _draw(entities):
-            for e, trans in entities:
-                i = e.color  # color index
-                if not i or forcelayercolor:
-                    try:
-                        i = self.layers[e.layer].color
-                    except:
-                        pass  # no layer
-                pen = aci_to_color(i)
-                if pen==background:
-                    pen=aci_to_color(255-i) #TODO: Check
-                if e.dxftype == 'LINE':
-                    b = list((trans * Point2(e.start[:2])).xy)
-                    b+=list(trans(Point2(e.end[:2])).xy)
-                    draw.line(b, fill=pen)
-                elif e.dxftype == 'CIRCLE':
-                    b = cbox(Point2(e.center[:2]), e.radius)
-                    b = b.trans(trans)
-                    draw.ellipse(b(), outline=pen)
-                elif e.dxftype == 'ARC':
-                    c = Point2(e.center[:2])
-                    b = cbox(c, e.radius)
-                    b = b.trans(trans)
-                    b = list(map(rint, b()))
-                    startangle = degrees(trans.angle(radians(e.startangle)))
-                    endangle = degrees(trans.angle(radians(e.endangle)))
-                    startangle, endangle = endangle, startangle  # swap start/end because of Y symmetry
-                    draw.arc(b, int(startangle), int(endangle), fill=pen)
-                elif e.dxftype == 'POLYLINE':
-                    b = []
-                    for v in e.vertices:
-                        b+=list(trans(Point2(v.location[:2])).xy)
-                    draw.line(b, fill=pen)
-                elif e.dxftype == 'SPLINE':
-                    b = []
-                    for v in e.controlpoints:
-                        b+=list(trans(Point2(v[:2])).xy)
-                    draw.line(b, fill=pen) # splines are drawn as lines for now...
-                elif e.dxftype == 'TEXT':
-                    h = e.height * trans.mag()  # [pixels]
-                    if h < 4:
-                        continue  # too small
-                    font = None
-                    try:
-                        font = ImageFont.truetype("c:/windows/fonts/Courier New.ttf", h)
-                        print("font loaded !")
-                    except:
-                        pass
-                    if not font:
-                        h = h * 1.4  # magic factor (TODO : calculate DPI of image and conversions...)
-                        fh = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 36, 40, 48, 60]
-                        i, h = min(enumerate(fh), key=lambda x: abs(x[1] - h))  # http://stackoverflow.com/questions/9706041/finding-index-of-an-item-closest-to-the-value-in-a-list-thats-not-entirely-sort
-                        import os
-                        path=os.path.dirname(os.path.abspath(__file__))
-                        font = ImageFont.load(path + '/base_pil/72/Courier New_%s_72.pil' % h)
-                    pt = Point2(e.insert[0], e.insert[1] + e.height)  # ACAD places texts by top left point...
-                    draw.text(trans(pt).xy, e.text, font=font, fill=pen)
-
-                elif e.dxftype == 'INSERT':
-                    t2 = trans * Trans(1, e.insert[:2], e.rotation)
-                    _draw(self.iter(self.blocks[e.name]._entities, layers=None, ignore=ignore, trans=t2))
-                elif e.dxftype == 'BLOCK':
-                    pass  # block definition is automatically stored in dxf.blocks dictionary
-                else:
-                    logging.warning('Unknown entity %s' % e)
-        # img
-        if not box:
-            box = self.bbox(layers, ignore)
-
-        if not product(box.size().xy):  # either x or y ==0
-            return None
-
-        s = list(map(operator.div, [float(x - border) * antialias if x else 1E9 for x in size ], box.size().xy))
-        trans = Trans(scale=min(s))
-        size = trans * box.size() + Point2(2 * antialias * border, 2 * antialias * border)  # add borders as an offset
-        offset = size / 2 - trans(box.center())  # offset in pixel coordinates
-        trans = trans.translate(offset)
-        trans = trans.scale(1, -1)  # invert y axis
-        trans = trans.translate(0, size.y)  # origin is lower left corner
-
-        img = Image.new("RGB", list(map(rint, size.xy)), background)
-        draw = ImageDraw.Draw(img)
-        _draw(self.iter(layers=layers, ignore=ignore, trans=trans, flatten=False))
-        if antialias > 1:
-            size = size / antialias
-            img = img.resize(list(map(rint, size.xy)), Image.ANTIALIAS)
-        return img
 
     def save(self,filename,**kwargs):
         """ save graph in various formats"""

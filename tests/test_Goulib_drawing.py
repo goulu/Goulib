@@ -100,20 +100,6 @@ class TestBBox:
         t=Trans(offset=(-1,-2),scale=(4,6), rotation=0)
         assert_equal(self.unit.trans(t),self.box)
 
-
-
-class TestRint:
-    def test_rint(self):
-        assert_equal(rint(0.4),0)
-        assert_equal(rint(0.9),1)
-        assert_equal(rint(-0.4),0)
-        assert_equal(rint(-0.9),-1)
-
-class TestRpoint:
-    def test_rpoint(self):
-        # assert_equal(expected, rpoint(pt, decimals))
-        raise SkipTest
-
 class TestEntity:
     @classmethod
     def setup_class(self):
@@ -302,43 +288,44 @@ class TestGroup:
         raise SkipTest 
 
 class TestChain:
-    def test___repr__(self):
-        # chain = Chain()
-        # assert_equal(expected, chain.__repr__())
-        raise SkipTest
-
+    @classmethod
+    def setup_class(self):
+        group=Group()
+        group.append(Segment2((0,0),(1,1)))
+        group.append(Segment2((2,0),Point2(1,1)))
+        self.chain=Chain(group)
+        
+    def test___init__(self):
+        pass #tested above
+    
     def test_append(self):
-        # chain = Chain()
-        # assert_equal(expected, chain.append(edge, tol))
-        raise SkipTest
+        chain=Chain(self.chain) #copy
+        assert_false(chain.isclosed())
+        chain.append(Segment2((0,0),(2,0)))
+        assert_true(chain.isclosed())
+    
+    def test___repr__(self):
+        assert_equal(repr(self.chain),'Chain(Point2(0, 0),Point2(2, 0),2)')
 
     def test_bbox(self):
         # chain = Chain()
         # assert_equal(expected, chain.bbox())
         raise SkipTest
+    
+    def test_start(self):
+        assert_equal(self.chain.start,Point2(0,0))
 
     def test_end(self):
-        # chain = Chain()
-        # assert_equal(expected, chain.end())
-        raise SkipTest
+        assert_equal(self.chain.end,Point2(2,0))
 
     def test_from_dxf(self):
         # chain = Chain()
         # assert_equal(expected, chain.from_dxf(trans))
         raise SkipTest
 
-    def test_start(self):
-        # chain = Chain()
-        # assert_equal(expected, chain.start())
-        raise SkipTest
-
     def test_to_dxf(self):
         # chain = Chain()
         # assert_equal(expected, chain.to_dxf(split, **attr))
-        raise SkipTest
-
-    def test___init__(self):
-        # chain = Chain(data)
         raise SkipTest
 
     def test_from_svg(self):
@@ -384,19 +371,13 @@ class TestDrawing:
         raise SkipTest
 
     def test_read_dxf(self):
-        # drawing = Drawing(filename, options, **kwargs)
-        # assert_equal(expected, drawing.read_dxf(filename, options, **kwargs))
-        raise SkipTest
-
+        pass # tested above
+    
     def test_read_svg(self):
-        # drawing = Drawing(filename, options, **kwargs)
-        # assert_equal(expected, drawing.read_svg(filename, options, **kwargs))
-        raise SkipTest
+        pass # tested above
 
     def test_read_pdf(self):
-        # drawing = Drawing(filename, options, **kwargs)
-        # assert_equal(expected, drawing.read_pdf(filename, **kwargs))
-        raise SkipTest
+        pass # tested above
 
     def test_draw(self):
         # drawing = Drawing(filename, **kwargs)
@@ -410,16 +391,6 @@ class TestDrawing:
 
     def test_render(self):
         assert_true(b'!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render('svg'))
-
-    def test_img(self):
-        # drawing = Drawing(filename, **kwargs)
-        # assert_equal(expected, drawing.img(size, border, box, layers, ignore, forcelayercolor, antialias, background))
-        raise SkipTest
-
-class TestImg2base64:
-    def test_img2base64(self):
-        # assert_equal(expected, img2base64(img, fmt))
-        raise SkipTest
 
 class TestSpline:
     def test___init__(self):
