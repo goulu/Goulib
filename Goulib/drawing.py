@@ -626,7 +626,7 @@ class Group(list, _Group):
         for e in self:
             e.swap()
 
-    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=identity, flatten=True):
+    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=identity, flatten=False):
         #TODO : make it work properly with flatten=False
         """
         :param dxf: dxf.entity
