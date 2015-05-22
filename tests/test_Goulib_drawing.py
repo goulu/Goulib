@@ -24,6 +24,24 @@ class TestBBox:
         self.empty=BBox()
         self.unit=BBox((0,1),(1,0))
         self.box=BBox((-1,-2),(3,4))
+        
+    def test___init__(self):
+        pass
+    
+    def test___repr__(self):
+        assert_equal(repr(self.box),"[[-1,3), [-2,4)]")
+                     
+    def test___call__(self):
+        assert_equal(self.box(),[-1, -2, 3, 4])
+
+    def test___iadd__(self):
+        self.box+=None # must pass
+        
+    def test___add__(self):
+        b1=self.unit+self.box
+        b2=self.box+self.unit
+        assert_equal(b1,b2)
+        raise SkipTest
 
     def test_xmin(self):
         assert_equal(self.unit.xmin, 0)
@@ -56,51 +74,31 @@ class TestBBox:
     def test_height(self):
         assert_equal(self.unit.height, 1)
         assert_equal(self.box.height, 6)
-
-    def test___add__(self):
-        b1=self.unit+self.box
-        b2=self.box+self.unit
-        assert_equal(b1,b2)
-        raise SkipTest
-
-    def test___call__(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.__call__())
-        raise SkipTest
-
-    def test___iadd__(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.__iadd__(pt))
-        raise SkipTest
-
-    def test___init__(self):
-        # b_box = BBox(pt1, pt2)
-        raise SkipTest
-
-    def test___repr__(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.__repr__())
-        raise SkipTest
-
+    
     def test_center(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.center())
-        raise SkipTest
+        assert_equal(self.box.center(),Point2(1,1))
 
     def test_size(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.size())
-        raise SkipTest
-
-    def test_trans(self):
-        # b_box = BBox(pt1, pt2)
-        # assert_equal(expected, b_box.trans(trans))
-        raise SkipTest
+        assert_equal(self.box.size(),(4,6))
 
     def test___contains__(self):
-        # b_box = BBox(p1, p2)
-        # assert_equal(expected, b_box.__contains__(other))
-        raise SkipTest 
+        
+        p1=(.5,.5)
+        p2=Point2(.99,1.01)
+        
+        assert_true(p1 in self.unit)
+        assert_false(p2 in self.unit)
+        assert_false(Segment2(p1,p2) in self.unit)
+        assert_false([p1,p2] in self.unit)
+        
+        assert_false(Circle(p1,0.5) in self.unit) #tangent to box is not in box ...
+        assert_true(Circle(p1,0.4999999) in self.unit) 
+        
+        assert_true(self.unit in self.box)
+        
+    def test_trans(self):
+        t=Trans(offset=(-1,-2),scale=(4,6), rotation=0)
+        assert_equal(self.unit.trans(t),self.box)
 
 
 

@@ -121,8 +121,7 @@ class BBox(Box):
 
     def __call__(self):
         """:return: list of flatten corners"""
-        l = list(self.p1.xy)+list(self.p2.xy)
-        return l
+        return list(self.start)+list(self.end)
 
     def size(self):
         """:return: :class:`geom.Vector2` with xy sizes"""
@@ -137,10 +136,10 @@ class BBox(Box):
         :param trans: Xform
         :return: :class:`BBox` = self transformed by trans
         """
-        res = BBox(trans(self.min), trans(self.max))
-        # add 2 more corners as they matter if we rotate the box
-        res += trans(self.xmin, self.ymax)
-        res += trans(self.xmax, self.ymin)
+        res = BBox()
+        for i in range(4): # add all corners as they matter if we rotate the box
+            res+=trans(self.corner(i))
+
         return res
 
 def calcBulge(p1,bulge,p2):
