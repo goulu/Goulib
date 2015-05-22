@@ -225,6 +225,13 @@ class Box(list):
             for pt in args:
                 self+=pt
                 
+    def corner(self,n):
+        """return n-th corner of box
+        0-th corner is "start" made of all minimal values of intervals
+        -1.th corner is "end", made of all maximal values of intervals
+        """
+        return tuple(inter.end if n&(1<<i) else inter.start for i,inter in enumerate(self))
+        
     @property
     def start(self):
         return tuple(i.start for i in self)
