@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 """
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
@@ -9,7 +10,6 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 * `svg.path <http://pypi.python.org/pypisvg.path/>`_ for svg input
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg and pdf output
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
-
 """
 from __future__ import division #"true division" everywhere
 
@@ -18,13 +18,12 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
-from math import  radians, degrees, tan, atan, pi, copysign
+from math import  radians, degrees, atan
 import logging, operator
 
-from .math2 import rint, product
 from .itertools2 import split, filter2, subdict
 from .geom import *
-from .colors import color_to_aci, aci_to_color, color_lookup
+from .colors import color_to_aci, aci_to_color
 from .interval import Box
 
 from . import plot #set matplotlib backend
@@ -644,14 +643,13 @@ class Group(list, _Group):
 
 class Instance(_Group):
     
-    def __init__(self, group, p, trans=None):
+    def __init__(self, group, trans):
         """
         :param group: Group
-        :param p: Point2 of insertion
         :param trans: optional mat3 of transformation
         """
         self.group=group
-        self.trans=trans.translate(p) if trans else Trans().translate(p)
+        self.trans=trans
 
     @staticmethod
     def from_dxf(e, blocks, mat3):
@@ -660,7 +658,7 @@ class Instance(_Group):
         :param blocks: dict of Groups indexed by name
         :param mat3: Matrix3 transform
         """
-        res=Instance(blocks[e.name],Point2(e.insert[:2]),mat3)
+        res=Instance(blocks[e.name],mat3)
         res.name=e.name
         # code below copied from Entity.from_dxf. TODO : merge
         res.dxf=e #keep link to source entity
@@ -964,7 +962,7 @@ class Text(Entity):
 
         kwargs.setdefault('family','sans-serif')
 
-        from matplotlib.text import Annotation
+        # from matplotlib.text import Annotation
         from matplotlib.text import Text as Text_pdf
 
         return [Text_pdf(self.p.x,self.p.y, self.text, size=self.size, rotation=self.rotation,**kwargs)]
