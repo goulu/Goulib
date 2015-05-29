@@ -63,11 +63,7 @@ class Geometry(object):
         this constructor is called by descendant classes at copy
         it is replaced to copy some graphics attributes in module drawings
         """
-        return #TODO: do not do this anymore. It causes trouble when creating objects
-        try: #copy constructor
-            self.__dict__.update(args[0].__dict__)
-        except:
-            pass
+        return
 
     def _connect_unimplemented(self, other):
         raise AttributeError('Cannot connect %s to %s' % \
