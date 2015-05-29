@@ -10,13 +10,13 @@ __credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.p
 __license__ = "LGPL"
 
 import six
-from six.moves import filter, zip_longest
+from six.moves import filter, zip_longest #TODO: find a way to remove error in Eclipse
 
 import operator,cmath
-from math import pi, sqrt, log, sin, asin, factorial
+from math import pi, sqrt, log, sin, asin
 
 from itertools import count, groupby, product as cartesian_product
-from .itertools2 import drop, ireduce, ilen, compact, flatten
+from .itertools2 import drop, ireduce, ilen, compact
 
 import fractions
 
@@ -32,12 +32,13 @@ def sign(number):
         return 1
     return 0
 
-if six.PY3:
-    def cmp(x,y):
-        """Compare the two objects x and y and return an integer according to the outcome.
-        The return value is negative if x < y, zero if x == y and strictly positive if x > y.
-        """
-        return sign(x-y)
+def _cmp(x,y):
+    """Compare the two objects x and y and return an integer according to the outcome.
+    The return value is negative if x < y, zero if x == y and strictly positive if x > y.
+    """
+    return sign(x-y)
+
+six.add_move(six.MovedAttribute("cmp", "__builtin__", "goulib.math2", "cmp", "_cmp"))
 
 def lcm(a,b):
     """least common multiple"""
@@ -457,8 +458,11 @@ def binomial_coefficient(n,k):
     if k == 0 or k == n:
         return 1
     k = min(k, n - k) # take advantage of symmetry
+    if k>1e6:
+        import logging
+        logging.warning("binomial_coefficient(%d,%d) is large and slow..."%(n,k))
     c = 1
-    for i in range(k):
+    for i in xrange(k):
         c = c * (n - i) // (i + 1)
     return int(c)
 
