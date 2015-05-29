@@ -3,10 +3,11 @@ from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 
-import os, sys
+
 from Goulib.geom import *
 from Goulib.drawing import *
 
+import os
 path=os.path.dirname(os.path.abspath(__file__))
 
 class TestTrans:
@@ -213,8 +214,7 @@ class TestEntity:
         b=Point2(1,1)
         c=Point2(1,0)
         g=Group([a,b,c])
-        r=g.render('svg')
-        pass
+        g.render('svg')
 
 class TestGroup:
     @classmethod
@@ -248,8 +248,9 @@ class TestGroup:
         assert_true('hand 1' in self.blocks)
         
     def test_distance(self):
-        g2=Trans(scale=2, offset=(10,1), rotation=30)*copy(self.group)
+        g2=Trans(scale=2, offset=(10,1), rotation=30)*self.group
         g2.color='blue'
+        Drawing([self.group,g2]).save('gg2.png')
         assert_equal(self.group.distance(g2),2.026833782163534)
 
     def test_append(self):
@@ -271,6 +272,9 @@ class TestGroup:
         # group = Group()
         # assert_equal(expected, group.swap())
         raise SkipTest 
+        
+    def test_length(self):
+        assert_equal(self.group.length,27.22534104051515)
 
     def test___copy__(self):
         # group = Group()
@@ -513,5 +517,4 @@ class TestCalcBulge:
         raise SkipTest 
 
 if __name__=="__main__":
-    import logging
     runmodule(level=logging.WARNING)

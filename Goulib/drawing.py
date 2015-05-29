@@ -136,7 +136,7 @@ class BBox(Box):
         """
         res = BBox()
         for i in range(4): # add all corners as they matter if we rotate the box
-            res+=trans(self.corner(i))
+            res+=trans(Point2(self.corner(i)))
 
         return res
 
@@ -293,9 +293,9 @@ class Entity(object):
         elif e.dxftype == 'LWPOLYLINE':
             res=Chain.from_dxf(e,mat3)
         elif e.dxftype == 'SOLID':
-            return None #TODO : implement
+            return None #TODO: implement
         elif e.dxftype == 'POINT':
-            return None #TODO : implement
+            return None #TODO: implement
         elif e.dxftype == 'TEXT':
             p=Point2(e.insert[:2])
             res=Text(e.text,p,size=e.height,rotation=e.rotation)
@@ -595,7 +595,7 @@ class Group(list, _Group):
 
     def __copy__(self):
         #in fact it is a deepcopy...
-        #TODO : make this clearer
+        #TODO: make this clearer
         res=self.__class__()
         for e in self:
             res.append(copy(e))
@@ -612,7 +612,7 @@ class Group(list, _Group):
             e.swap()
 
     def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=identity, flatten=False):
-        #TODO : make it work properly with flatten=False
+        #TODO: make it work properly with flatten=False
         """
         :param dxf: dxf.entity
         :param layers: list of layer names to consider. entities not on these layers are ignored. default=None: all layers are read
@@ -631,7 +631,7 @@ class Group(list, _Group):
                 continue
             elif only and  e.dxftype not in only:
                 continue
-            elif e.dxftype == 'INSERT': #TODO : improve insertion on correct layer
+            elif e.dxftype == 'INSERT': #TODO: improve insertion on correct layer
                 t2 = trans*Trans(e.scale[:2], e.insert[:2], e.rotation)
                 if flatten:
                     self.from_dxf(self.block[e.name].dxf, layers=None, ignore=ignore, only=None, trans=t2, flatten=flatten)
@@ -660,7 +660,7 @@ class Instance(_Group):
         """
         res=Instance(blocks[e.name],mat3)
         res.name=e.name
-        # code below copied from Entity.from_dxf. TODO : merge
+        # code below copied from Entity.from_dxf. TODO: merge
         res.dxf=e #keep link to source entity
         res.color=aci_to_color(e.color)
         res.layer=e.layer
@@ -670,7 +670,7 @@ class Instance(_Group):
         return '%s %s' % (self.__class__.__name__, self.group)
 
     def __iter__(self):
-        #TODO : optimize when trans is identity
+        #TODO: optimize when trans is identity
         for e in self.group:
             res=self.trans*e
             # res.copy_attrs_from(e)
@@ -910,8 +910,14 @@ class Rect(Chain):
         self.append(Segment2((p2.x,p1.y),p2))
         self.append(Segment2(p2,(p1.x,p2.y)))
         self.append(Segment2((p1.x,p2.y),p1))
-        self.p1=p1
-        self.p2=p2
+        
+    @property
+    def p1(self):
+        return self[0].p
+    
+    @property
+    def p2(self):
+        return self[2].p
 
     def __repr__(self):
         return '%s(%s,%s)' % (self.__class__.__name__,self.p1,self.p2)
@@ -936,11 +942,11 @@ class Text(Entity):
         self.p=t*self.p
         self.rotation+=degrees(t.angle())
 
-    def bbox(self): #TODO : improve this very rough approximation
+    def bbox(self): #TODO: improve this very rough approximation
         return BBox(self.p,self.p+Vector2(0.8*len(self.text)*self.size*dtp,self.size*dtp))
     
     @property
-    def length(self): #TODO : improve this very rough approximation
+    def length(self): #TODO: improve this very rough approximation
         """:return: float length of the text contour in mm"""
         return len(self.text)*3.6*self.size*dtp
     
