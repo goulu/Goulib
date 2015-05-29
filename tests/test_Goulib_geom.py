@@ -916,7 +916,7 @@ class TestSegment2:
         assert_equal(self.s1.mag2(),2)
 
     def test_intersect(self):
-        """TODO : implement intersect of colinear segments
+        """TODO: implement intersect of colinear segments
         inter=self.s1.intersect(self.s2)
         assert_equal(self.s1.distance(inter),0)
         assert_equal(self.s2.distance(inter),0)

@@ -63,7 +63,7 @@ class Geometry(object):
         this constructor is called by descendant classes at copy
         it is replaced to copy some graphics attributes in module drawings
         """
-        return #TODO : do not do this anymore. It causes trouble when creating objects
+        return #TODO: do not do this anymore. It causes trouble when creating objects
         try: #copy constructor
             self.__dict__.update(args[0].__dict__)
         except:
@@ -496,7 +496,12 @@ class Vector2(object):
         """Return the projection (the component) of the vector on other."""
         n = other.normalized()
         return self.dot(n)*n
-
+    
+    def _apply_transform(self, mat3):
+        x = mat3.a * self.x + mat3.b * self.y
+        y = mat3.e * self.x + mat3.f * self.y
+        self.x,self.y=x,y
+        return self
 
 def _intersect_line2_line2(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
@@ -696,6 +701,12 @@ class Point2(Vector2, Geometry):
         c = _connect_point2_circle(self, other)
         if c:
             return c.swap()
+        
+    def _apply_transform(self, mat3):
+        x = mat3.a * self.x + mat3.b * self.y + mat3.c
+        y = mat3.e * self.x + mat3.f * self.y + mat3.g
+        self.x,self.y=x,y
+        return self
 
 def Polar(mag,angle):
     return Vector2(mag*cos(angle),mag*sin(angle))
@@ -2255,61 +2266,6 @@ class Matrix3(object):
     def __sub__(self, other):
         return Matrix3(*(ai-bi for ai,bi in zip(self[:],other[:])))
 
-    def __mul__(self, other):
-        if isinstance(other, Matrix3):
-            # Caching repeatedly accessed attributes in local variables
-            # apparently increases performance by 20%.  Attrib: Will McGugan.
-            Aa = self.a
-            Ab = self.b
-            Ac = self.c
-            Ae = self.e
-            Af = self.f
-            Ag = self.g
-            Ai = self.i
-            Aj = self.j
-            Ak = self.k
-            Ba = other.a
-            Bb = other.b
-            Bc = other.c
-            Be = other.e
-            Bf = other.f
-            Bg = other.g
-            Bi = other.i
-            Bj = other.j
-            Bk = other.k
-            C = Matrix3()
-            C.a = Aa * Ba + Ab * Be + Ac * Bi
-            C.b = Aa * Bb + Ab * Bf + Ac * Bj
-            C.c = Aa * Bc + Ab * Bg + Ac * Bk
-            C.e = Ae * Ba + Af * Be + Ag * Bi
-            C.f = Ae * Bb + Af * Bf + Ag * Bj
-            C.g = Ae * Bc + Af * Bg + Ag * Bk
-            C.i = Ai * Ba + Aj * Be + Ak * Bi
-            C.j = Ai * Bb + Aj * Bf + Ak * Bj
-            C.k = Ai * Bc + Aj * Bg + Ak * Bk
-            return C
-                
-        res = copy(other)
-        try:
-            res._apply_transform(self)
-            return res
-        except: 
-            pass
-    
-        x,y=argPair(other)
-        Ax = self.a * x + self.b * y + self.c
-        Ay = self.e * x + self.f * y + self.g
-        try:
-            res.x=Ax
-            res.y=Ay
-        except:
-            res=(Ax,Ay)
-        return res
-
-
-    def __call__(self,other):
-        return self*other
-
     def __imul__(self, other):
         # assert isinstance(other, Matrix3)
         # Cache attributes in local vars (see Matrix3.__mul__).
@@ -2341,7 +2297,21 @@ class Matrix3(object):
         self.j = Ai * Bb + Aj * Bf + Ak * Bj
         self.k = Ai * Bc + Aj * Bg + Ak * Bk
         return self
+        
+    
+    def __mul__(self, other):
+        if isinstance(other,Matrix3):
+            res = copy(self)
+            res*=other
+        else:
+            res = copy(other)
+            res._apply_transform(self)
+        return res
 
+    def __call__(self,other):
+        return self*other
+    
+    
     def identity(self):
         self.a = self.f = self.k = 1.
         self.b = self.c = self.e = self.g = self.i = self.j = 0
@@ -3040,7 +3010,7 @@ class Quaternion:
     # w is the real part, (x, y, z) are the imaginary parts
 
     def __init__(self, w=1, x=0, y=0, z=0):
-        super(Quaternion,self).__init__() #TODO : add a copy constructor one day
+        super(Quaternion,self).__init__() #TODO: add a copy constructor one day
         self.w = w
         self.x = x
         self.y = y
