@@ -141,19 +141,6 @@ class BBox(Box):
 
         return res
 
-def calcBulge(p1,bulge,p2):
-    #taken from http://free-cad.sourceforge.net/SrcDocu/de/d1f/importDXF_8py_source.html
-    """
-    calculates intermediary vertex for curved segments.
-    algorithm from http://www.afralisp.net/lisp/Bulges1.htm
-    """
-    chord = p2-p1
-    sagitta = (bulge * chord.length)/2
-    startpoint = p1+chord/2
-    perp = chord.cross()
-    perp.normalize()
-    endpoint = perp*sagitta
-    return startpoint+endpoint
 
 class Entity(object):
     """Base class for all drawing entities"""
