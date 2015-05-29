@@ -153,7 +153,7 @@ class Expr(plot.Plot):
                     return self.y==other.y
             except:
                 return self.y==other
-        raise NotImplementedError #TODO : implement for general expressions...
+        raise NotImplementedError #TODO: implement for general expressions...
     
     def __lt__(self,other):
         if self.isconstant:
@@ -162,7 +162,7 @@ class Expr(plot.Plot):
                     return self.y<other.y
             except:
                 return self.y<other
-        raise NotImplementedError #TODO : implement for general expressions...
+        raise NotImplementedError #TODO: implement for general expressions...
 
     def __add__(self,right):
         return self.apply(operator.add,right,'+')

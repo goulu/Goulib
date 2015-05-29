@@ -204,7 +204,7 @@ class TestGeoGraph:
 
 class TestRender:
     def test_render(self):
-        pass # tested in test_save TODO : more tests with attributes
+        pass # tested in test_save TODO: more tests with attributes
 
 class TestDelauneyTriangulation:
     def test_delauney_triangulation(self):
