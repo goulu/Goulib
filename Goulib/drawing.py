@@ -145,6 +145,13 @@ class Entity(object):
     """Base class for all drawing entities"""
     
     color='black' # by default
+    
+    def setattr(self,  **kwargs):
+        """ set (graphic) attributes to entity
+        :param kwargs: dict of attributes copied to entity
+        """
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
 
     @property
     def start(self):
@@ -303,6 +310,8 @@ class Entity(object):
             logging.warning('unhandled entity type %s'%e.dxftype)
             return None
         res._apply_transform(mat3)
+        if res.length==0:
+            res=Point2(res.p)
         res.dxf=e #keep link to source entity
         res.color=aci_to_color(e.color)
         res.layer=e.layer
@@ -567,26 +576,35 @@ class Group(list, _Group):
     """group of Entities
     but it is a Geometry since we can intersect, connect and compute distances between Groups
     """
-    _color='black'
     
     @property
     def color(self):
-        return self._color
+        return self[0].color
     
     @color.setter
     def color(self, c):
-        self._color=c
         for e in self:
             e.color=c
+            
+    @property
+    def layer(self):
+        return self[0].layer
+    
+    @layer.setter
+    def layer(self, l):
+        for e in self:
+            e.layer=l
 
-    def append(self,entity,**kwargs):
-        if entity is not None:
-            if isinstance(entity,Entity):
-                for key in kwargs:
-                    setattr(entity, key, kwargs[key])
-                super(Group,self).append(entity)
-            else: #ignore invalid items
-                logging.warning('skipped object %s'%entity)
+    def append(self,entity, **kwargs):
+        """ append entity to group
+        :param entity: Entity
+        :param kwargs: dict of attributes copied to entity
+        :return: Group (or Chain) to which the entity was added, or None if entity was None
+        """
+        if entity is None:
+            return None #to show nothing was done
+        entity.setattr(**kwargs)
+        super(Group,self).append(entity)
         return self
 
     def extend(self,entities,**kwargs):
@@ -610,14 +628,19 @@ class Group(list, _Group):
         super(Group,self).reverse() #reverse in place
         for e in self:
             e.swap()
+            
+    def chainify(self, fallow):
+        """merge all possible entities into chains"""
+        c=chains(self, fallow=fallow)
+        del self[:] #clear
+        self.extend(c)
 
-    def from_dxf(self, dxf, layers=None, only=[], ignore=[], trans=identity, flatten=False):
-        #TODO: make it work properly with flatten=False
+    def from_dxf(self, dxf, layers=None, only=[], ignore=['POINT'], trans=identity, flatten=False):
         """
         :param dxf: dxf.entity
         :param layers: list of layer names to consider. entities not on these layers are ignored. default=None: all layers are read
         :param only: list of dxf entity types names that are read. default=[]: all are read
-        :param ignore: list of dxf entity types names that are ignored. default=[]: none is ignored
+        :param ignore: list of dxf entity types names that are ignored. default=['POINT']: points and null length segments are ignored
         :param trans: :class:`Trans` optional transform matrix
         :parm flatten: bool flatten block structure
         :return: :class:`Entity` of correct subtype
@@ -638,7 +661,10 @@ class Group(list, _Group):
                 else:
                     self.append(Instance.from_dxf(e, self.block, t2))
             else:
-                self.append(Entity.from_dxf(e, trans))
+                e=Entity.from_dxf(e, trans)
+                if type(e) is Point2 and 'POINT' in ignore:
+                    continue
+                self.append(e)
         return self
 
 class Instance(_Group):
@@ -673,7 +699,6 @@ class Instance(_Group):
         #TODO: optimize when trans is identity
         for e in self.group:
             res=self.trans*e
-            # res.copy_attrs_from(e)
             yield res
 
     def _apply_transform(self,trans):
@@ -697,40 +722,58 @@ class Chain(Group):
     def __repr__(self):
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
-
-    def append(self, edge, tol=1E-6, allow_swap=True, **attrs):
+    
+    def contiguous(self, edge, tol=1E-6, allow_swap=True):
         """
-        append edge to chain, ensuring contiguity
+        check if edge can be appended to the chain
         :param edge: :class:`Entity` to append
         :param tol: float tolerance on contiguity
         :param allow_swap: if True (default), tries to swap edge or self to find contiguity
+        :return: int,bool index where to append in chain, swap of edge required
+        """
+        
+        if len(self)==0: #init the chain with edge
+            return -1,False
+        
+        if self.end.distance(edge.start)<=tol:
+            return -1,False #append
+        
+        if self.start.distance(edge.end)<=tol: 
+            return 0,False #prepend
+        
+        if not allow_swap:
+            return None,False
+        
+        if self.end.distance(edge.end)<=tol:
+            return -1,True #append swapped
+        if self.start.distance(edge.start)<=tol:
+            return 0,True #prepend swapped
+        
+        return None, False
+        
+    def append(self, entity, tol=1E-6, allow_swap=True, fallowed=None,  **attrs):
+        """
+        append entity to chain, ensuring contiguity
+        :param entity: :class:`Entity` to append
+        :param tol: float tolerance on contiguity
+        :param allow_swap: if True (default), tries to swap edge or self to find contiguity
+        :param fallowed: function of the form f(e1,e2) returning True if entities e1,e2 can be merged
         :param attrs: attributes passed to Group.append
         :return: self, or None if edge is not contiguous
         """
-
-        if len(self)==0: #init the chain with edge
-            return super(Chain,self).append(edge,**attrs)
-        if self.end.distance(edge.start)<=tol:
-            return super(Chain,self).append(edge,**attrs)
-        if allow_swap and self.end.distance(edge.end)<=tol:
-            edge.swap()
-            return super(Chain,self).append(edge,**attrs)
-        
-        if not allow_swap:
+        i,s=self.contiguous(entity, tol, allow_swap)
+        if i is None or fallowed and not fallowed(self,entity):
             return None
+        if s:
+            entity.swap()
+            
+        if i==-1:
+            return super(Chain,self).append(entity,**attrs)
+        if i==0: #prepend
+            entity.setattr(**attrs)
+            self.insert(0,entity)
+            return self
         
-        #try to swap the first edge
-        
-        if len(self)>1 : #but if chain already contains more than 1 edge, game is over
-            return None
-
-        if self.start.distance(edge.start)<=tol:
-            self[0].swap()
-            return super(Chain,self).append(edge,**attrs)
-        if self.start.distance(edge.end)<=tol:
-            self[0].swap()
-            edge.swap()
-            return super(Chain,self).append(edge,**attrs)
         return None
 
     @staticmethod
@@ -791,7 +834,6 @@ class Chain(Group):
         """
         from svg.path import Line, CubicBezier
         chain=Chain()
-        chain.color=color
         def _point(svg):
             return Point2(svg.real, svg.imag)
 
@@ -803,7 +845,7 @@ class Chain(Group):
             else:
                 logging.error('unknown segment %s'%seg)
                 entity=None #will crash below
-            entity.color=chain.color
+            entity.color=color
             chain.append(entity)
         return chain
 
@@ -868,14 +910,24 @@ class Chain(Group):
             edge.layer=res.layer
         return res
 
-    def to_dxf(self, split=True, **attr):
-        """:return: polyline or list of entities along the chain"""
+    def to_dxf(self, split=False, **attr):
+        """
+        :param split: bool if True, each segment in Chain is saved separately
+        :param attr: dict of graphic attributes
+        :return: polyline or list of entities along the chain
+        """
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
+        
+        if len(self)==1:
+            return self[0].to_dxf(**attr)
 
         #if no color specified assume chain color is the same as the first element's
-        color=attr.get('color', self.color or self[0].color)
+        color=attr.get('color', self.color)
         attr['color']=color_to_aci(color)
+        try:
+            attr.setdefault('layer',self.layer)
+        except : pass #no layer defined
         from dxfwrite.entities import Polyline
         attr['flags']=1 if self.isclosed() else 0
         res=Polyline(**attr)
@@ -895,6 +947,31 @@ class Chain(Group):
         if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
+    
+def chains(group, tol=1E-6, fallow=None):
+    """build chains from all possible segments in group
+    :param fallow: function(e1,e2) returning True if entities e1,e2 can be merged
+    """
+    
+    #sweep drawing to favor nearby segments
+    group.sort(key=lambda e:e.bbox().ymin)
+    group.sort(key=lambda e:e.bbox().xmin)
+    
+    res=Group()
+    for e in group:
+        if e is None or e.length<tol:
+            continue #will not be present in res
+        ok=False
+        for c in res:
+            if c.isclosed(): continue #avoid to reopen closed chains
+            if c.append(e,tol=tol,fallow=fallow):
+                ok=True
+                break
+        if ok: #chain c was modified. 
+            pass # TODO: see if we can merge it  to other chains
+        else:
+            res.append(Chain([e]))
+    return res
 
 class Rect(Chain):
     """a rectangle starting at low/left and going trigowise through top/right"""
