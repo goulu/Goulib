@@ -629,9 +629,9 @@ class Group(list, _Group):
         for e in self:
             e.swap()
             
-    def chainify(self, fallow):
+    def chainify(self, mergeable):
         """merge all possible entities into chains"""
-        c=chains(self, fallow=fallow)
+        c=chains(self, mergeable=mergeable)
         del self[:] #clear
         self.extend(c)
 
@@ -751,27 +751,33 @@ class Chain(Group):
         
         return None, False
         
-    def append(self, entity, tol=1E-6, allow_swap=True, fallowed=None,  **attrs):
+    def append(self, entity, tol=1E-6, allow_swap=True, mergeable=None,  **attrs):
         """
         append entity to chain, ensuring contiguity
         :param entity: :class:`Entity` to append
         :param tol: float tolerance on contiguity
         :param allow_swap: if True (default), tries to swap edge or self to find contiguity
-        :param fallowed: function of the form f(e1,e2) returning True if entities e1,e2 can be merged
+        :param mergeable: function of the form f(e1,e2) returning True if entities e1,e2 can be merged
         :param attrs: attributes passed to Group.append
         :return: self, or None if edge is not contiguous
         """
         i,s=self.contiguous(entity, tol, allow_swap)
-        if i is None or fallowed and not fallowed(self,entity):
+        if i is None or mergeable and not mergeable(self,entity):
             return None
         if s:
             entity.swap()
             
+        if not isinstance(entity, Chain):
+            entity=[entity]
+            
         if i==-1:
-            return super(Chain,self).append(entity,**attrs)
+            for e in entity:
+                super(Chain,self).append(e,**attrs)
+            return self
         if i==0: #prepend
-            entity.setattr(**attrs)
-            self.insert(0,entity)
+            for e in reversed(entity):
+                e.setattr(**attrs)
+                self.insert(0,e)
             return self
         
         return None
@@ -948,29 +954,32 @@ class Chain(Group):
             res.add_vertex(self.end.xy)
         return res
     
-def chains(group, tol=1E-6, fallow=None):
+def chains(group, tol=1E-6, mergeable=None):
     """build chains from all possible segments in group
-    :param fallow: function(e1,e2) returning True if entities e1,e2 can be merged
+    :param mergeable: function(e1,e2) returning True if entities e1,e2 can be merged
     """
     
-    #sweep drawing to favor nearby segments
-    group.sort(key=lambda e:e.bbox().ymin)
-    group.sort(key=lambda e:e.bbox().xmin)
-    
     res=Group()
+    changed=False
+    #step 1 : add all entities in group to chains in res
     for e in group:
         if e is None or e.length<tol:
             continue #will not be present in res
         ok=False
         for c in res:
-            if c.isclosed(): continue #avoid to reopen closed chains
-            if c.append(e,tol=tol,fallow=fallow):
+            # if c.isclosed(): continue #reopen closed chains might be good
+            if c.append(e,tol=tol,mergeable=mergeable):
                 ok=True
                 break
-        if ok: #chain c was modified. 
-            pass # TODO: see if we can merge it  to other chains
-        else:
-            res.append(Chain([e]))
+        if not ok:
+            if isinstance(e,Chain):
+                res.append(e)
+            else:
+                res.append(Chain([e]))
+        changed=changed or ok
+    #step 2 : try to merge chains
+    if changed:
+        res=chains(res,tol,mergeable)    
     return res
 
 class Rect(Chain):
