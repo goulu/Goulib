@@ -341,11 +341,6 @@ class Vector2(object):
             pass
         return (self-Vector2(other)).mag()<precision
 
-    def __bool__(self):
-        return self.x != 0 or self.y != 0
-
-    __nonzero__=__bool__
-
     def __len__(self):
         return 2
 

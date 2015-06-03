@@ -130,10 +130,6 @@ class TestVector2:
         assert_false(self.v11 != self.v11)
         assert_true(self.v11 != self.v01)
 
-    def test___bool__(self):
-        assert_true(self.v11)
-        assert_false(self.v00)
-
     def test___copy__(self):
         v10 = copy(self.v10)
         assert_true(v10==self.v10)
