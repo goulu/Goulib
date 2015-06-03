@@ -312,7 +312,14 @@ class TestBinomialCoefficient:
         assert_equal(binomial_coefficient(5,2),10)
         assert_equal(binomial_coefficient(10,3),120)
         assert_equal(binomial_coefficient(87,28) % 142857,141525)
-        # assert_equal(binomial_coefficient(961173600,386223045) % 142857,0) # much too large for now
+        assert_equal(
+            binomial_coefficient(100000,4000),
+            binomial_coefficient(100000,96000) #same because 100000-96000=4000
+        )
+        
+    @raises(OverflowError)
+    def test_binomial_coefficient_overflow(self):
+        assert_equal(binomial_coefficient(961173600,386223045)%142857,0)
 
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):

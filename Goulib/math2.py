@@ -458,9 +458,8 @@ def binomial_coefficient(n,k):
     if k == 0 or k == n:
         return 1
     k = min(k, n - k) # take advantage of symmetry
-    if k>1e6:
-        import logging
-        logging.warning("binomial_coefficient(%d,%d) is large and slow..."%(n,k))
+    if k>1e8:
+        raise OverflowError('k=%d too large'%k)
     c = 1
     for i in xrange(k):
         c = c * (n - i) // (i + 1)
