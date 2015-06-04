@@ -241,20 +241,19 @@ def rint(v):
 
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12"""
+    if n==1: return [1] #simple way to circumvent the [1,1] bug ...
     all_factors = [[f**p for p in range(fp+1)] for (f, fp) in factorize(n)]
     return (product(ns) for ns in cartesian_product(*all_factors))
 
 def proper_divisors(n):
     """:return: all divisors of n except n itself."""
     return (divisor for divisor in divisors(n) if divisor != n)
-
-
  
-def is_prime(n, _precision_for_huge_n=16):
-    """:return: True if n is a prime number (1 is not considered prime)."""
+def is_prime(n, oneisprime=False, _precision_for_huge_n=16):
+    """:return: True if n is a prime number (1 is no more considered prime)."""
     # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
-    if n in (0, 1):
-        return False
+    if n == 0: return False
+    if n == 1: return oneisprime
     if n in _known_primes:
         return True
     if any((n % p) == 0 for p in _known_primes):
@@ -263,6 +262,7 @@ def is_prime(n, _precision_for_huge_n=16):
     while not d % 2:
         d, s = d >> 1, s + 1
     # Returns exact according to http://primes.utm.edu/prove/prove2_3.html
+    # TODO: see if memoization can help here
     def _try_composite(a, d, n, s):
         if pow(a, d, n) == 1:
             return False
@@ -292,12 +292,10 @@ def is_prime(n, _precision_for_huge_n=16):
 _known_primes = [2, 3]
 _known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
 
-def get_primes(start=2, memoized=False):
-    from .decorators import memoize
+def get_primes(start=2):
     """Yield prime numbers from 'start'"""
-    is_prime_fun = (memoize(is_prime) if memoized else is_prime)
+    def is_prime_fun(n): return is_prime(n,oneisprime=start==1)
     return filter(is_prime_fun, count(start))
-
 
 def digits_from_num(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
