@@ -5,13 +5,13 @@ library of useful Python code for scientific + technical applications
 
 see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
-.. image:: https://pypip.in/license/Goulib/badge.png
+.. image:: https://pypip.in/license/Goulib/badge.svg
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
     :alt: License
 .. image:: https://pypip.in/version/Goulib/badge.png
     :target: https://pypi.python.org/pypi/Goulib/
     :alt: Version
-.. image:: https://travis-ci.org/goulu/Goulib.png?branch=master
+.. image:: https://travis-ci.org/goulu/Goulib.png
     :target: https://travis-ci.org/goulu/Goulib
     :alt: Build
 .. image:: https://coveralls.io/repos/goulu/Goulib/badge.png
