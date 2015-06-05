@@ -134,7 +134,7 @@ def runmodule(redirect=True, level=logging.INFO):
     try:
         root.handlers[0].setFormatter(fmt)
     except:
-        logging.basicConfig(format=fmt)
+        logging.basicConfig(format=fmt._fmt)
     """ ensures stdout is printed after the tests results"""
     import sys
     from io import StringIO
