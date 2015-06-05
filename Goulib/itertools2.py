@@ -12,9 +12,9 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
-import random, operator, collections
+import random, operator, collections, heapq
 
-from itertools import islice, repeat, count, tee, starmap, chain
+from itertools import islice, repeat, count, tee, starmap, chain, groupby
 from functools import reduce
 
 #reciepes from Python manual
@@ -138,6 +138,21 @@ def iterate(func, arg):
     while True:
         yield arg
         arg = func(arg)
+        
+def accumulate(iterable, func=operator.add):
+    'Return running totals'
+    # https://docs.python.org/dev/library/itertools.html#itertools.accumulate
+    # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
+    # accumulate([1,2,3,4,5], operator.mul) --> 1 2 6 24 120
+    it = iter(iterable)
+    try:
+        total = six.next(it)
+    except StopIteration:
+        return
+    yield total
+    for element in it:
+        total = func(total, element)
+        yield total
 
 def tails(seq):
     """Get tails of a sequence: tails([1,2,3]) -> [1,2,3], [2,3], [3], []."""
@@ -466,4 +481,30 @@ def subdict(d,keys):
     # http://stackoverflow.com/questions/5352546/best-way-to-extract-subset-of-key-value-pairs-from-python-dictionary-object/5352649#5352649
     """
     return dict([(i, d[i]) for i in keys if i in d])
+
+# operations on sorted iterators
+
+def unique_sorted(iterable):
+    """generates items in sorted iterable without repetition"""
+    prev=None
+    for x in iterable:
+        if x!=prev:
+            yield x
+        prev=x
     
+def diff(iterable1,iterable2):
+    """generate items in sorted iterable1 that are not in sorted iterable2"""
+    b=six.next(iterable2)
+    for a in iterable1:
+        while b<a:
+            b=six.next(iterable2)
+        if a==b: continue
+        yield a
+        
+#http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
+def intersect(*its):
+    for key, values in groupby(heapq.merge(*its)):
+        if len(list(values)) == len(its):
+            yield key
+        
+        
