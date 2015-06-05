@@ -12,7 +12,7 @@ __license__ = "LGPL"
 import six
 from six.moves import filter, zip_longest #TODO: find a way to remove error in Eclipse
 
-import operator,cmath
+import operator, cmath
 from math import pi, sqrt, log, sin, asin
 
 from itertools import count, groupby, product as cartesian_product
@@ -221,12 +221,22 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
+def recurrence(factors,values):
+    """general generator for recurrences
+    :param values: list of initial values
+    :param factors: list of factors defining the recurrence
+    """
+    for n in values:
+        yield n
+    while True:
+        n=dot(factors,values)
+        yield n
+        values=values[1:]
+        values.append(n)
+
 def fibonacci():
     """Generate fibonacci serie"""
-    a,b=0,1
-    while True:
-        yield a
-        a,b=b,a+b
+    return recurrence([1,1],[0,1])
 
 def is_integer(x, epsilon=1e-6):
     """:return: True if the float x "seems" an integer"""
@@ -252,7 +262,7 @@ def proper_divisors(n):
 def is_prime(n, oneisprime=False, _precision_for_huge_n=16):
     """:return: True if n is a prime number (1 is no more considered prime)."""
     # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
-    if n == 0: return False
+    if n <= 0: return False
     if n == 1: return oneisprime
     if n in _known_primes:
         return True
