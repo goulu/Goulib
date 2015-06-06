@@ -155,7 +155,7 @@ class TestGetPrimes:
         from itertools import islice
         a=[p for p in islice(get_primes(),10)]
         assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
-        a=[p for p in islice(get_primes(29,True),10)]
+        a=[p for p in islice(get_primes(29),10)]
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
 
 class TestStrBase:
