@@ -38,9 +38,9 @@ def last(iterable):
     for x in iterable: pass
     return x
 
-def takeevery(n, iterable):
+def takeevery(n, iterable, first=0):
     """Take an element from iterator every n elements"""
-    return islice(iterable, 0, None, n)
+    return islice(iterable, first, None, n)
 
 every=takeevery
 
