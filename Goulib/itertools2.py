@@ -501,6 +501,8 @@ def diff(iterable1,iterable2):
         if a==b: continue
         yield a
         
+merge=heapq.merge
+        
 #http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
 def intersect(*its):
     for key, values in groupby(heapq.merge(*its)):
