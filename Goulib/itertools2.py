@@ -109,7 +109,7 @@ def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n)
-    onestepit = zip(*(starmap(drop, enumerate(itlist))))
+    onestepit = six.moves.zip(*(starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
 def pairwise(iterable,loop=False):
