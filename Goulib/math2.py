@@ -359,9 +359,21 @@ def is_palindromic(num, base=10):
     digitslst = digits_from_num(num, base)
     return digitslst == list(reversed(digitslst))
 
+def isqrt(n):
+    """integer square root
+    :return: largest int x for which x * x <= n
+    """
+    #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
+    x = n
+    y = (x + 1) // 2
+    while y < x:
+        x = y
+        y = (x + n // x) // 2
+    return x
+
 def prime_factors(num, start=2):
     """Return all prime factors (ordered) of num in a list"""
-    candidates = range(start, int(sqrt(num)) + 1)
+    candidates = range(start, isqrt(num) + 1)
     factor = next((x for x in candidates if (num % x == 0)), None)
     return ([factor] + prime_factors(num // factor, factor) if factor else [num])
 
@@ -437,14 +449,17 @@ def get_cardinal_name(num):
         res=' '.join(_get_hundreds(hdu))+word+res
     return res
 
-def is_perfect(num):
+def abundance(n):
+    return sum(divisors(n))-2*n
+
+def is_perfect(n):
     """
-    :return: -1 if num is deficient, 0 if perfect, 1 if abundant
+    :return: -1 if n is deficient, 0 if perfect, 1 if abundant
     :see: https://en.wikipedia.org/wiki/Perfect_number,
     https://en.wikipedia.org/wiki/Abundant_number,
     https://en.wikipedia.org/wiki/Deficient_number
     """
-    return cmp(sum(proper_divisors(num)), num)
+    return sign(abundance(n))
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
