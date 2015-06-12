@@ -117,7 +117,9 @@ class Cell():
                 style['text-align']=a
             
         # create style dict by merging default Cell style + parameters
-        args['style']=dict(self.style,**style) #http://stackoverflow.com/questions/9819602/union-of-dict-objects-in-python
+        style=dict(self.style,**style) #http://stackoverflow.com/questions/9819602/union-of-dict-objects-in-python
+        if style:
+            args['style']=style
         
         if not v or v=='':
             v="&nbsp;" #for IE8
