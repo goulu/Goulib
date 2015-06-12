@@ -139,10 +139,12 @@ class TestQuantify:
 class TestPairwise:
     def test_pairwise(self):
         assert_equal(pairwise([1,2,3]),[(1,2),(2,3)])
-        assert_equal(pairwise([1,2,3],True),[(1,2),(2,3),(3,1)])
+        assert_equal(pairwise([1,2,3],operator.add),[3,5])
+        assert_equal(pairwise([1,2,3],loop=True),[(1,2),(2,3),(3,1)])
+        assert_equal(pairwise([1,2,3],operator.add,loop=True),[3,5,4])
         assert_equal(pairwise([]),[])
         assert_equal(pairwise([1]),[])
-        assert_equal(pairwise([1],True),[(1,1)])
+        assert_equal(pairwise([1],loop=True),[(1,1)])
     
 class TestInterleave:
     def test_interleave(self):
