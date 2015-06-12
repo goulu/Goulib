@@ -24,20 +24,38 @@ def cgiprint(line='', unbuff=True, line_end='\r\n'):
     if unbuff:
         sys.stdout.flush()
         
+def style_dict2str(style):
+    return ' '.join('%s:%s;'%(k,v) for k,v in six.iteritems(style))
+
+def style_str2dict(style):
+    res={}
+    for s in style.split(';'):
+        try:
+            k,v=s.split(':')
+            k=k.lstrip().rstrip()
+            v=v.lstrip().rstrip()
+            res[k]=v
+        except: #pro
+            pass
+    return res
+        
 def tag( tag, between, **kwargs ):
     """generate full tag."""
     single=kwargs.pop('single',False)
     out = "<%s" % tag
     for key, value in list(kwargs.items()):
-        if value is not None:               # when value is None that means stuff like <... checked>
+        if value is None:               # when value is None that means stuff like <... checked>
+            out = "%s %s" % ( out, key )
+        else:
             key = key.strip('_')            # strip this so class_ will mean class, etc.
             if key == 'http_equiv':         # special cases, maybe change _ to - overall?
                 key = 'http-equiv'
             elif key == 'accept_charset':
                 key = 'accept-charset'
+            elif key == 'style' and isinstance(value,dict):
+                value=style_dict2str(value)
             out = '%s %s="%s"' % ( out, key, escape( value ) )
-        else:
-            out = "%s %s" % ( out, key )
+           
     if between is not None:
         if isinstance(between,six.text_type): #unicode
             between=between.encode('ascii', 'xmlcharrefreplace').decode('unicode_escape')
