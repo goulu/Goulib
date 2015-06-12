@@ -112,18 +112,21 @@ def groups(iterable, n, step=None):
     onestepit = six.moves.zip(*(starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
-def pairwise(iterable,loop=False):
+def pairwise(iterable,op=None,loop=False):
     """
     iterates through consecutive pairs
     :param iterable: input iterable s1,s2,s3, .... sn
+    :param op: optional operator to apply to each pair
     :param loop: boolean True if last pair should be (sn,s1) to close the loop
     :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
     """
 
     i=chain(iterable,[first(iterable)]) if loop else iterable
-    i=list(i)
     for x in groups(i,2,1):
-        yield x[0],x[1]
+        if op:
+            yield op(x[1],x[0]) #reversed ! (for sub or div)
+        else:
+            yield x[0],x[1]
         
 
 def compose(f, g):
@@ -139,7 +142,7 @@ def iterate(func, arg):
         yield arg
         arg = func(arg)
         
-def accumulate(iterable, func=operator.add):
+def accumulate(iterable, func=operator.add, skip_first=False):
     'Return running totals'
     # https://docs.python.org/dev/library/itertools.html#itertools.accumulate
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
@@ -149,7 +152,8 @@ def accumulate(iterable, func=operator.add):
         total = six.next(it)
     except StopIteration:
         return
-    yield total
+    if not skip_first:
+        yield total
     for element in it:
         total = func(total, element)
         yield total
