@@ -25,7 +25,7 @@ except: #ElementTree
 Element=ElementTree._Element
 
 from .datetime2 import datef, datetimef,strftimedelta
-from .markup import tag
+from .markup import tag, style_str2dict
 
 def attr(args):
     res=''
@@ -57,7 +57,7 @@ class Cell():
         self.align=align
         self.fmt=fmt
         self.tag=tag if tag else 'td'
-        self.style=style if style else {}
+        self.style=style_str2dict(style) if style else {}
         
     def __repr__(self):
         return str(self.data)
@@ -84,38 +84,45 @@ class Cell():
         * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
         
         """
+        v=self.data
+        f=self.fmt
+        
         args={}
         args.update(kwargs) #copy needed to avoid side effects
-        v=self.data
-        a=args.pop('align',self.align)
-        f=self.fmt
-        if isinstance(v,int):
-            if not a: a="right"
-        elif isinstance(v,float):
-            if not a: a="right"
-            if not f: f='%0.2f'
-            v=f%v
-            f=None #don't reformat below
-        elif isinstance(v,date):
-            if not a: a="right"
-            if not f: f='%Y-%m-%d'
-            v=v.strftime(f)
-            f=None #don't reformat below
-        elif isinstance(v,timedelta):
-            if not a: a="right"
-            if not f: f='%H:%M:%S'
-            v=strftimedelta(v,f)
-            f=None #don't reformat below
+        style=args.get('style',{})
+        if not isinstance(style,dict):
+            style=style_str2dict(style)
             
-        if a:
-            self.style['text-align']=a
+        if not 'text-align' in style: #HTML 4 and befo
+            a=args.pop('align',self.align)           
+            if isinstance(v,int):
+                if not a: a="right"
+            elif isinstance(v,float):
+                if not a: a="right"
+                if not f: f='%0.2f'
+                v=f%v
+                f=None #don't reformat below
+            elif isinstance(v,date):
+                if not a: a="right"
+                if not f: f='%Y-%m-%d'
+                v=v.strftime(f)
+                f=None #don't reformat below
+            elif isinstance(v,timedelta):
+                if not a: a="right"
+                if not f: f='%H:%M:%S'
+                v=strftimedelta(v,f)
+                f=None #don't reformat below
+                
+            if a:
+                style['text-align']=a
             
+        # create style dict by merging default Cell style + parameters
+        args['style']=dict(self.style,**style) #http://stackoverflow.com/questions/9819602/union-of-dict-objects-in-python
+        
         if not v or v=='':
             v="&nbsp;" #for IE8
         else:
             v=f%v if f else six.text_type(v)
-        if self.style:
-            args['style']=' '.join('%s:%s;'%(k,v) for k,v in six.iteritems(self.style))
         return tag(self.tag,v,**args)
 
 class Row():
@@ -302,7 +309,7 @@ class Table(list):
         data_line=kwargs.pop('data_line',2)-1
         dialect=kwargs.setdefault('dialect',csv.excel)
         delimiter=kwargs.setdefault('delimiter',';')
-        encoding=kwargs.pop('encoding','utf-8') #was iso-8859-15 earlier
+        encoding=kwargs.pop('encoding','utf-8') #must be iso-8859-15 in some cases
         errors=kwargs.pop('errors','strict')
         
         def csv_reader2(): # version for Python 2
