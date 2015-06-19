@@ -15,8 +15,9 @@ from six.moves import filter, zip_longest #TODO: find a way to remove error in E
 import operator, cmath
 from math import pi, sqrt, log, sin, asin
 
-from itertools import count, groupby, product as cartesian_product
-from .itertools2 import drop, ireduce, ilen, compact
+from itertools import count, chain
+from .itertools2 import drop, ilen, ireduce, irange, compact, accumulate
+from .itertools2 import compress, cartesian_product, arange
 
 import fractions
 
@@ -41,7 +42,7 @@ if six.PY3:
 
 def lcm(a,b):
     """least common multiple"""
-    return float(abs(a * b)) / fractions.gcd(a,b) if a and b else 0
+    return abs(a * b) / fractions.gcd(a,b) if a and b else 0
 
 def quad(a, b, c, allow_complex=False):
     """ solves quadratic equations
@@ -237,11 +238,28 @@ def fibonacci():
     """Generate fibonacci serie"""
     return recurrence([1,1],[0,1])
 
+def catalan():
+    """Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
+    Also called Segner numbers.
+    """
+    yield 1
+    last=1
+    yield last
+    for n in count(1):
+        last=last*(4*n+2)/(n+2)
+        yield last
+
 def is_integer(x, epsilon=1e-6):
-    """:return: True if the float x "seems" an integer"""
+    """
+    :return: True if  float x is almost an integer
+    """
     return (abs(round(x) - x) < epsilon)
 
 def int_or_float(x, epsilon=1e-6):
+    """
+    :param x: int or float
+    :return: int if x is (almost) an integer, otherwise float
+    """
     return int(x) if is_integer(x, epsilon) else x
 
 def rint(v):
@@ -249,10 +267,16 @@ def rint(v):
     return int(round(v))
 
 def divisors(n):
-    """:return: all divisors of n: divisors(12) -> 1,2,3,6,12"""
-    if n==1: return [1] #simple way to circumvent the [1,1] bug ...
-    all_factors = [[f**p for p in range(fp+1)] for (f, fp) in factorize(n)]
-    return (product(ns) for ns in cartesian_product(*all_factors))
+    """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
+    including 1 and n, 
+    except for 1 which returns a single 1 to avoid messing with sum of divisors...
+    """
+    if n==1:
+        yield 1
+    else:
+        all_factors = [[f**p for p in irange(0,fp)] for (f, fp) in factorize(n)]
+        for ns in cartesian_product(*all_factors):
+            yield product(ns) 
 
 def proper_divisors(n):
     """:return: all divisors of n except n itself."""
@@ -301,10 +325,53 @@ def is_prime(n, oneisprime=False, _precision_for_huge_n=16):
 _known_primes = [2, 3]
 _known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
 
-def get_primes(start=2):
+def next_even(n):
+    return n+1 if n%2==0 else n+2
+
+def prev_even(n):
+    return n-1 if n%2==0 else n-2
+
+def get_primes(start=2,stop=None):
     """Yield prime numbers from 'start'"""
     def is_prime_fun(n): return is_prime(n,oneisprime=start==1)
-    return filter(is_prime_fun, count(start))
+    if stop is None:
+        candidates=count(next_even(start),2)
+    elif stop>start:
+        candidates=arange(next_even(start),stop+1,2)
+    else: #
+        candidates=arange(prev_even(start),stop-1,-2)
+    return filter(is_prime_fun, chain([start],candidates))
+
+def lucas_lehmer (p):
+    """Lucas Lehmer primality test for Mersenne exponent p
+    :param p: int 
+    :return: True if 2^p-1 is prime
+    """
+    # http://rosettacode.org/wiki/Lucas-Lehmer_test#Python
+    if p == 2:
+        return True
+    elif not is_prime(p):
+        return False
+    else:
+        m_p = (1 << p) - 1 # 2^p-1
+    s = 4
+    for i in range(3, p + 1): 
+        s = (s*s - 2) % m_p
+    return s == 0
+
+def euler_phi_over_n(n): 
+    """Euler totient function
+    http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
+    """
+    if n<=1: return 1
+    res=product((1 - 1.0 / p for p, _ in factorize(n)),1)
+    return res
+
+def euler_phi(n): 
+    """Euler totient function
+    http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
+    """
+    return round(n*euler_phi_over_n(n))
 
 def digits_from_num(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
@@ -316,7 +383,8 @@ def digits_from_num(num, base=10, rev=False):
                 return [num]+current
             return recursive(num//base, base, [num%base]+current)
         res=recursive(num, base, [])
-    if rev: res=reversed(list(res))
+    if rev:
+        res=reversed(list(res))
     return list(res)
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
@@ -359,6 +427,16 @@ def is_palindromic(num, base=10):
     digitslst = digits_from_num(num, base)
     return digitslst == list(reversed(digitslst))
 
+def is_permutation(num1, num2, base=10):
+    """Check if 'num1' and 'num2' have the same digits in base"""
+    if base==10:
+        digits1=sorted(str(num1))
+        digits2=sorted(str(num2))
+    else:
+        digits1 = sorted(digits_from_num(num1, base))
+        digits2 = sorted(digits_from_num(num2, base))
+    return digits1==digits2
+
 def isqrt(n):
     """integer square root
     :return: largest int x for which x * x <= n
@@ -372,14 +450,24 @@ def isqrt(n):
     return x
 
 def prime_factors(num, start=2):
-    """Return all prime factors (ordered) of num in a list"""
-    candidates = range(start, isqrt(num) + 1)
-    factor = next((x for x in candidates if (num % x == 0)), None)
-    return ([factor] + prime_factors(num // factor, factor) if factor else [num])
+    """gwenerates all prime factors (ordered) of num in a list"""
+    for p in get_primes(start):
+        if num==1:
+            break
+        if is_prime(num): #because it's fast
+            yield num
+            break
+        if p>num:
+            break
+        while num % p==0:
+            yield p
+            num=num//p
 
 def factorize(num):
     """Factorize a number returning occurrences of its prime factors"""
-    return ((factor, ilen(fs)) for (factor, fs) in groupby(prime_factors(num)))
+    if num==1: #allows to make many things quite simpler...
+        return [(1,1)]
+    return compress(prime_factors(num))
 
 def greatest_common_divisor(a, b):
     """:return: greatest common divisor of a and b"""
@@ -446,7 +534,10 @@ def get_cardinal_name(num):
     res=''
     for hdu,word in zip(blocks,['',' thousand ',' million ',' billion ']):
         if hdu==0: continue #skip
-        res=' '.join(_get_hundreds(hdu))+word+res
+        try:
+            res=' '.join(_get_hundreds(hdu))+word+res
+        except:
+            pass
     return res
 
 def abundance(n):
@@ -459,7 +550,12 @@ def is_perfect(n):
     https://en.wikipedia.org/wiki/Abundant_number,
     https://en.wikipedia.org/wiki/Deficient_number
     """
-    return sign(abundance(n))
+    # return sign(abundance(n)) #simple, but might be slow for large n
+    for s in accumulate(divisors(n)):
+        if s>2*n:
+            return 1
+    return 0 if s==2*n else -1
+    
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
@@ -471,9 +567,19 @@ def is_pandigital(num, base=10):
 
 #combinatorics
 
+def factorial():
+    """Generator of factorial"""
+    last=1
+    yield last
+    for n in count(1):
+        last=last*n
+        yield last
+
 def binomial_coefficient(n,k):
-    """https://en.wikipedia.org/wiki/Binomial_coefficient"""
-    #return factorial(n) // (factorial(k) * factorial(n - k)) # is slow
+    """
+    https://en.wikipedia.org/wiki/Binomial_coefficient
+    """
+    #return factorial(n) // (factorial(k) * factorial(n - k)) # is very slow
     # code from https://en.wikipedia.org/wiki/Binomial_coefficient#Binomial_coefficient_in_programming_languages
     if k < 0 or k > n:
         return 0

@@ -153,10 +153,12 @@ class TestIntOrFloat:
 class TestGetPrimes:
     def test_get_primes(self):
         from itertools import islice
-        a=[p for p in islice(get_primes(),10)]
+        a=list(islice(get_primes(),10))
         assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
-        a=[p for p in islice(get_primes(29),10)]
+        a=list(islice(get_primes(29),10))
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
+        a=list(islice(get_primes(67,29),10))
+        assert_equal(a,reversed([29, 31, 37, 41, 43, 47, 53, 59, 61, 67]))
 
 class TestStrBase:
     def test_str_base(self):
@@ -222,16 +224,24 @@ class TestPrimeFactors:
 
 class TestFactorize:
     def test_factorize(self):
-        assert_equal(factorize(2014),[(2, 1), (19, 1), (53, 1)])
+        d=list(factorize(1))
+        assert_equal(factorize(1),[(1,1)])
+        d=list(factorize(2014))
+        assert_equal(d,[(2, 1), (19, 1), (53, 1)])
+        d=list(factorize(2048))
         assert_equal(factorize(2048),[(2,11)])
 
 class TestDivisors:
     def test_divisors(self):
-        assert_equal(divisors(2014),[1, 53, 19, 1007, 2, 106, 38, 2014])
+        d=list(divisors(1))
+        assert_equal(d,[1])
+        d=list(divisors(2014))
+        assert_equal(d,[1, 53, 19, 1007, 2, 106, 38, 2014])
 
 class TestProperDivisors:
     def test_proper_divisors(self):
-        assert_equal(proper_divisors(2014),[1, 53, 19, 1007, 2, 106, 38])
+        d=list(proper_divisors(2014))
+        assert_equal(d,[1, 53, 19, 1007, 2, 106, 38])
 
 class TestGreatestCommonDivisor:
     def test_greatest_common_divisor(self):
@@ -274,6 +284,8 @@ class TestGetCardinalName:
        
 class TestIsPerfect:
     def test_is_perfect(self):
+        d=list(factorize(496))
+        d=list(divisors(496))
         assert_equal(is_perfect(496),0) #perfect
         assert_equal(is_perfect(54),1) #abundant
         assert_equal(is_perfect(2),-1) #deficient
@@ -445,6 +457,10 @@ class TestLogFactorial:
 class TestLogBinomialCoefficient:
     def test_log_binomial_coefficient(self):
         assert_equal(log_binomial_coefficient(87,28),log(49848969000742658237160))
+        
+class TestEulerPhi:
+    def test_euler_phi(self):
+        assert_equal(euler_phi(8849513),8843520)
 
 if __name__ == "__main__":
     runmodule()
