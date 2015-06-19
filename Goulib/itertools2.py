@@ -60,7 +60,7 @@ def irange(start_or_end, optional_end=None):
         start, end = start_or_end, optional_end
     return take(max(end - start + 1, 0), count(start))
 
-def arange(start,stop,step=1.):
+def arange(start,stop,step=1):
     """range for floats or other types"""
     r = start
     step=abs(step)
@@ -101,9 +101,26 @@ def flatten(l, donotrecursein=six.string_types):
             for sub in flatten(el,donotrecursein):
                 yield sub
 
-def compact(iterable):
+def compact(iterable,f=bool):
     """:returns: iterator skipping None values from iterable"""
-    return filter(bool, iterable)
+    return filter(f, iterable)
+
+def compress(iterable):
+    """
+    generates (item,count) paris by counting the number of consecutive items in iterable)
+    """
+    prev,count=None,0
+    for item in iterable:
+        if item==prev and count:
+            count+=1
+        else:
+            if count: #to skip initial junk
+                yield prev,count
+            prev=item
+            count=1
+    if count:
+        yield prev,count
+        
 
 def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
