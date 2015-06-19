@@ -5,8 +5,15 @@ from Goulib.tests import *
 
 from Goulib.optim import *
 
-import logging
+import logging, math
 
+class TestNelderMead:
+    def test_nelder_mead(self):
+        def f(x):
+            return math.sin(x[0])*math.cos(x[1])*(1./(abs(x[2])+1))
+
+        logging.info(nelder_mead(f, [0.,0.,0.]))
+        
 class TestBinDict:
 
     def setup(self):
