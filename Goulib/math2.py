@@ -221,7 +221,7 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(factors,values):
+def recurrence(factors,values,max=None):
     """general generator for recurrences
     :param values: list of initial values
     :param factors: list of factors defining the recurrence
@@ -230,13 +230,14 @@ def recurrence(factors,values):
         yield n
     while True:
         n=dot(factors,values)
+        if max and n>max: break
         yield n
         values=values[1:]
         values.append(n)
 
-def fibonacci():
+def fibonacci(max=None):
     """Generate fibonacci serie"""
-    return recurrence([1,1],[0,1])
+    return recurrence([1,1],[0,1],max)
 
 def catalan():
     """Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
@@ -325,22 +326,22 @@ def is_prime(n, oneisprime=False, _precision_for_huge_n=16):
 _known_primes = [2, 3]
 _known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
 
-def next_even(n):
-    return n+1 if n%2==0 else n+2
-
-def prev_even(n):
-    return n-1 if n%2==0 else n-2
 
 def get_primes(start=2,stop=None):
-    """Yield prime numbers from 'start'"""
-    def is_prime_fun(n): return is_prime(n,oneisprime=start==1)
+    """generate prime numbers from 'start'"""
+    if start==1:
+        yield 1 #if we asked for it explicitely
+    if start<=2:
+        yield 2
     if stop is None:
-        candidates=count(next_even(start),2)
+        candidates=count(max(start,3),2)
     elif stop>start:
-        candidates=arange(next_even(start),stop+1,2)
+        candidates=arange(max(start,3),stop+1,2)
     else: #
-        candidates=arange(prev_even(start),stop-1,-2)
-    return filter(is_prime_fun, chain([start],candidates))
+        candidates=arange(start if start%2 else start-1,stop-1,-2)
+    for n in candidates:
+        if is_prime(n):
+            yield n
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
@@ -421,9 +422,14 @@ def num_from_digits(digits, base=10):
     """
     return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
 
+def reverse(i): 
+    return int(str(i)[::-1])
+
 def is_palindromic(num, base=10):
     """Check if 'num' in base 'base' is a palindrome, that's it, if it can be
     read equally from left to right and right to left."""
+    if base==10:
+        return num==reverse(num)
     digitslst = digits_from_num(num, base)
     return digitslst == list(reversed(digitslst))
 
@@ -436,6 +442,37 @@ def is_permutation(num1, num2, base=10):
         digits1 = sorted(digits_from_num(num1, base))
         digits2 = sorted(digits_from_num(num2, base))
     return digits1==digits2
+
+def lychrel_seq(n):
+    while True:
+        r = reverse(n)
+        yield n,r
+        if n==r : break
+        n += r
+
+def lychrel_count(n, limit=96):
+    """number of lychrel iterations before n becomes palindromic
+    :param n: int number to test
+    :param limit: int max number of loops.
+        default 96 corresponds to the known most retarded non lychrel number
+    :warning: there are palindrom lychrel numbers such as 4994
+    """
+    for i in count():
+        r=reverse(n)
+        if r == n or i==limit:
+            return i
+        n=n+r
+
+def is_lychrel(n,limit=96):
+    """
+    :warning: there are palindrom lychrel numbers such as 4994
+    """
+    r=lychrel_count(n, limit)
+    if r>=limit:
+        return True
+    if r==0: #palindromic number...
+        return lychrel_count(n+reverse(n),limit)+1>=limit #... can be lychrel !
+    return False
 
 def isqrt(n):
     """integer square root
