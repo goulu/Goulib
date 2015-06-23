@@ -25,7 +25,9 @@ def take(n, iterable):
 
 def index(n, iterable):
     "Returns the nth item"
-    return six.next(islice(iterable, n, n+1))
+    for i,x in enumerate(iterable):
+        if i==n: return x
+    raise IndexError
 
 def first(iterable):
     """:return: first element in the iterable"""
@@ -164,15 +166,14 @@ def accumulate(iterable, func=operator.add, skip_first=False):
     # https://docs.python.org/dev/library/itertools.html#itertools.accumulate
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
     # accumulate([1,2,3,4,5], operator.mul) --> 1 2 6 24 120
-    it = iter(iterable)
-    try:
-        total = six.next(it)
-    except StopIteration:
-        return
-    if not skip_first:
-        yield total
-    for element in it:
-        total = func(total, element)
+    first=True
+    for x in iterable:
+        if first:
+            total=x
+            first=False
+            if skip_first: continue
+        else:
+            total = func(total, x)
         yield total
 
 def tails(seq):
