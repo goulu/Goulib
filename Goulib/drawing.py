@@ -58,8 +58,8 @@ class BBox(Box):
         :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
         super(BBox,self).__init__(2)
-        if p1 : self+=p1
-        if p2 : self+=p2
+        if p1 is not None : self+=p1
+        if p2 is not None : self+=p2
 
     @property
     def xmin(self): return self[0].start
@@ -1200,8 +1200,8 @@ class Drawing(Group):
         import dxfgrabber
         try:
             self.dxf = dxfgrabber.readfile(filename,options)
-        except:
-            logging.error('could not read %s'%filename)
+        except Exception as e:
+            logging.error('could not read %s : %s'%(filename,e))
             return
         self.name = filename
 
