@@ -293,5 +293,25 @@ class TestSubdict:
         # assert_equal(expected, subdict(d, keys))
         raise SkipTest
 
+class TestCompress:
+    def test_compress(self):
+        # assert_equal(expected, compress(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestAccumulate:
+    def test_accumulate(self):
+        # assert_equal(expected, accumulate(iterable, func, skip_first))
+        raise SkipTest # TODO: implement your test here
+
+class TestUniqueSorted:
+    def test_unique_sorted(self):
+        # assert_equal(expected, unique_sorted(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestDiff:
+    def test_diff(self):
+        # assert_equal(expected, diff(iterable1, iterable2))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

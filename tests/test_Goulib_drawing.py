@@ -216,6 +216,11 @@ class TestEntity:
         g=Group([a,b,c])
         g.render('svg')
 
+    def test_setattr(self):
+        # entity = Entity()
+        # assert_equal(expected, entity.setattr(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestGroup:
     @classmethod
     def setup_class(self):
@@ -291,6 +296,21 @@ class TestGroup:
         # assert_equal(expected, group.color(c))
         raise SkipTest 
 
+    def test_chainify(self):
+        # group = Group()
+        # assert_equal(expected, group.chainify(mergeable))
+        raise SkipTest # TODO: implement your test here
+
+    def test_layer(self):
+        # group = Group()
+        # assert_equal(expected, group.layer())
+        raise SkipTest # TODO: implement your test here
+
+    def test_layer_case_2(self):
+        # group = Group()
+        # assert_equal(expected, group.layer(l))
+        raise SkipTest # TODO: implement your test here
+
 class TestChain:
     @classmethod
     def setup_class(self):
@@ -341,6 +361,11 @@ class TestChain:
         # chain = Chain(data)
         # assert_equal(expected, chain.from_pdf(color))
         raise SkipTest
+
+    def test_contiguous(self):
+        # chain = Chain(data)
+        # assert_equal(expected, chain.contiguous(edge, tol, allow_swap))
+        raise SkipTest # TODO: implement your test here
 
 class TestDrawing:
     @classmethod
@@ -461,6 +486,16 @@ class TestRect:
         # assert_equal(expected, rect.__repr__())
         raise SkipTest 
 
+    def test_p1(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.p1())
+        raise SkipTest # TODO: implement your test here
+
+    def test_p2(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.p2())
+        raise SkipTest # TODO: implement your test here
+
 class TestText:
     def test___init__(self):
         # text = Text(text, point, size, rotation)
@@ -515,6 +550,42 @@ class TestCalcBulge:
     def test_calc_bulge(self):
         # assert_equal(expected, calcBulge(p1, bulge, p2))
         raise SkipTest 
+
+class test__Group:
+    def test_bbox(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.bbox(filter))
+        raise SkipTest # TODO: implement your test here
+
+    def test_connect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.connect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_intersect(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.intersect(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_length(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.length())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.patches(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_dxf(self):
+        # __group = _Group()
+        # assert_equal(expected, __group.to_dxf(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestChains:
+    def test_chains(self):
+        # assert_equal(expected, chains(group, tol, mergeable))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule(level=logging.WARNING)

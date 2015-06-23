@@ -198,6 +198,11 @@ class TestIsPalindromic:
     def test_is_palindromic(self):
         assert_true(is_palindromic(4352534))
         assert_true(is_palindromic(17,2))
+        
+class TestIsLychrel:
+    def test_is_lychrel(self):
+        assert_true(is_lychrel(196))
+        assert_true(is_lychrel(4994))
 
 class TestIsPrime:
     def test_is_prime(self):
@@ -461,6 +466,61 @@ class TestLogBinomialCoefficient:
 class TestEulerPhi:
     def test_euler_phi(self):
         assert_equal(euler_phi(8849513),8843520)
+
+class TestRecurrence:
+    def test_recurrence(self):
+        # assert_equal(expected, recurrence(factors, values, max))
+        raise SkipTest # TODO: implement your test here
+
+class TestCatalan:
+    def test_catalan(self):
+        # assert_equal(expected, catalan())
+        raise SkipTest # TODO: implement your test here
+
+class TestLucasLehmer:
+    def test_lucas_lehmer(self):
+        # assert_equal(expected, lucas_lehmer(p))
+        raise SkipTest # TODO: implement your test here
+
+class TestEulerPhiOverN:
+    def test_euler_phi_over_n(self):
+        # assert_equal(expected, euler_phi_over_n(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestReverse:
+    def test_reverse(self):
+        # assert_equal(expected, reverse(i))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsPermutation:
+    def test_is_permutation(self):
+        # assert_equal(expected, is_permutation(num1, num2, base))
+        raise SkipTest # TODO: implement your test here
+
+class TestLychrelSeq:
+    def test_lychrel_seq(self):
+        # assert_equal(expected, lychrel_seq(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestLychrelCount:
+    def test_lychrel_count(self):
+        # assert_equal(expected, lychrel_count(n, limit))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsqrt:
+    def test_isqrt(self):
+        # assert_equal(expected, isqrt(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestAbundance:
+    def test_abundance(self):
+        # assert_equal(expected, abundance(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestFactorial:
+    def test_factorial(self):
+        # assert_equal(expected, factorial())
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
