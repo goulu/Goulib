@@ -3,7 +3,7 @@
 """
 various optimization algorithms : knapsack, traveling salesman, simulated annealing, differential evolution
 """
-from colorama.initialise import init
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = [
@@ -41,7 +41,7 @@ def nelder_mead(f, x_start,
         step=0.1, no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
         alpha = 1., gamma = 2., rho = -0.5, sigma = 0.5):
     '''
-        Pure Python/Numpy implementation of the Nelder-Mead algorithm.
+        Pure Python implementation of the Nelder-Mead algorithm.
         Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
         @param f (function): function to optimize, must return a scalar score 
             and operate over a numpy array of the same dimensions as x_start
