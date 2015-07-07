@@ -132,7 +132,7 @@ class TestFibonacci:
 
         def problem2(n):
             """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
-            even_fibonacci = (x for x in fibonacci() if x % 2 ==0)
+            even_fibonacci = (x for x in fibonacci_gen() if x % 2 ==0)
             l=list(takewhile(lambda x: x < n, even_fibonacci))
             return sum(l)
 
@@ -150,14 +150,24 @@ class TestIntOrFloat:
         assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
         assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
 
-class TestGetPrimes:
-    def test_get_primes(self):
+class TestSieve:
+    def test_sieve(self):
+        # assert_equal(expected, sieve(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestPrimes:
+    def test_primes(self):
+        # assert_equal(expected, primes(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestPrimesGen:
+    def test_primes_gen(self):
         from itertools import islice
-        a=list(islice(get_primes(),10))
+        a=list(islice(primes_gen(),10))
         assert_equal(a,[2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
-        a=list(islice(get_primes(29),10))
+        a=list(islice(primes_gen(29),10))
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
-        a=list(islice(get_primes(67,29),10))
+        a=list(islice(primes_gen(67,29),10))
         assert_equal(a,reversed([29, 31, 37, 41, 43, 47, 53, 59, 61, 67]))
 
 class TestStrBase:
@@ -520,6 +530,81 @@ class TestAbundance:
 class TestFactorial:
     def test_factorial(self):
         # assert_equal(expected, factorial())
+        raise SkipTest # TODO: implement your test here
+
+class TestCeildiv:
+    def test_ceildiv(self):
+        # assert_equal(expected, ceildiv(a, b))
+        raise SkipTest # TODO: implement your test here
+
+class TestFibonacciGen:
+    def test_fibonacci_gen(self):
+        # assert_equal(expected, fibonacci_gen(max))
+        raise SkipTest # TODO: implement your test here
+
+class TestCatalanGen:
+    def test_catalan_gen(self):
+        # assert_equal(expected, catalan_gen())
+        raise SkipTest # TODO: implement your test here
+
+class TestTriples:
+    def test_triples(self):
+        # assert_equal(expected, triples())
+        raise SkipTest # TODO: implement your test here
+
+class TestPrimitiveTriples:
+    def test_primitive_triples(self):
+        # assert_equal(expected, primitive_triples(sort_xy))
+        raise SkipTest # TODO: implement your test here
+
+class TestPolygonal:
+    def test_polygonal(self):
+        # assert_equal(expected, polygonal(s, n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSquare:
+    def test_square(self):
+        # assert_equal(expected, square(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsSquare:
+    def test_is_square(self):
+        # assert_equal(expected, is_square(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsHexagonal:
+    def test_is_hexagonal(self):
+        # assert_equal(expected, is_hexagonal(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestHeptagonal:
+    def test_heptagonal(self):
+        # assert_equal(expected, heptagonal(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsHeptagonal:
+    def test_is_heptagonal(self):
+        # assert_equal(expected, is_heptagonal(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestOctagonal:
+    def test_octagonal(self):
+        # assert_equal(expected, octagonal(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsOctagonal:
+    def test_is_octagonal(self):
+        # assert_equal(expected, is_octagonal(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestPartition:
+    def test_partition(self):
+        # assert_equal(expected, partition(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestChakravala:
+    def test_chakravala(self):
+        # assert_equal(expected, chakravala(n))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

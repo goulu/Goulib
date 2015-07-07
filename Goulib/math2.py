@@ -17,7 +17,8 @@ from math import pi, sqrt, log, sin, asin
 
 from itertools import count, chain
 from .itertools2 import drop, ilen, ireduce, irange, compact, accumulate
-from .itertools2 import compress, cartesian_product, arange
+from .itertools2 import compress, cartesian_product, arange, take
+from .decorators import memoize
 
 import fractions
 
@@ -40,9 +41,11 @@ if six.PY3:
         """
         return sign(x-y)
 
+gcd=fractions.gcd
+
 def lcm(a,b):
     """least common multiple"""
-    return abs(a * b) / fractions.gcd(a,b) if a and b else 0
+    return abs(a * b) / gcd(a,b) if a and b else 0
 
 def quad(a, b, c, allow_complex=False):
     """ solves quadratic equations
@@ -62,6 +65,20 @@ def equal(a,b,epsilon=1e-6):
     """
     return abs(a-b)<epsilon
 
+def ceildiv(a, b): 
+    return -(-a // b) #simple and clever
+
+def isqrt(n):
+    """integer square root
+    :return: largest int x for which x * x <= n
+    """
+    #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
+    x = n
+    y = (x + 1) // 2
+    while y < x:
+        x = y
+        y = (x + n // x) // 2
+    return x
 
 #vector operations
 
@@ -235,11 +252,44 @@ def recurrence(factors,values,max=None):
         values=values[1:]
         values.append(n)
 
-def fibonacci(max=None):
+def fibonacci_gen(max=None):
     """Generate fibonacci serie"""
     return recurrence([1,1],[0,1],max)
 
-def catalan():
+def fibonacci(n):
+    #http://blog.dreamshire.com/common-functions-routines-project-euler/
+    """
+    Find the nth number in the Fibonacci series.  Example:
+    
+    >>>fibonacci(100)
+    354224848179261915075
+
+    Algorithm & Python source: Copyright (c) 2013 Nayuki Minase
+    Fast doubling Fibonacci algorithm
+    http://nayuki.eigenstate.org/page/fast-fibonacci-algorithms
+    """
+    # Returns a tuple (F(n), F(n+1))
+    def _fib(n):
+        if n == 0:
+            return (0, 1)
+        else:
+            a, b = _fib(n // 2)
+            c = a * (2 * b - a)
+            d = b * b + a * a
+            if n % 2 == 0:
+                return (c, d)
+            else:
+                return (d, c + d)
+    if n < 0:
+        raise ValueError("Negative arguments not implemented")
+    return _fib(n)[0]
+
+def catalan(n):
+    """Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
+    """
+    return binomial_coefficient(2*n,n)/(n+1)
+
+def catalan_gen():
     """Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
     Also called Segner numbers.
     """
@@ -249,6 +299,38 @@ def catalan():
     for n in count(1):
         last=last*(4*n+2)/(n+2)
         yield last
+
+def triples():
+    """ generates Pythagorean triples sorted by z,y,x with x<y<z
+    """
+    for z in count(5):
+        for y in range(z-1,3,-1):
+            x=sqrt(z*z-y*y)
+            if x<y and is_integer(x,1e-12):
+                yield (int(x),y,z)
+                    
+def primitive_triples(sort_xy=True):
+    """ generates primitive Pythagorean triples
+    through Berggren's matrices and breadth first traversal of ternary tree
+    :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
+    triples are "almost sorted". use itertools2.iterator_sort if required
+    :param sort_xy: bool to ensure x<y<z
+    """
+    triples = [[3,4,5]]
+    A = [[ 1,-2, 2], [ 2,-1, 2], [ 2,-2, 3]]
+    B = [[ 1, 2, 2], [ 2, 1, 2], [ 2, 2, 3]]
+    C = [[-1, 2, 2], [-2, 1, 2], [-2, 2, 3]]
+
+    while triples:
+        (a,b,c) = triples.pop(0)
+        yield (a,b,c)
+
+        # expand this triple to 3 new triples using Berggren's matrices
+        for X in [A,B,C]:
+            triple=[sum(x*y for (x,y) in zip([a,b,c],X[i])) for i in range(3)]
+            if sort_xy and triple[0]>triple[1]:
+                triple[0],triple[1]=triple[1],triple[0]
+            triples.append(triple)
 
 def is_integer(x, epsilon=1e-6):
     """
@@ -269,7 +351,7 @@ def rint(v):
 
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
-    including 1 and n, 
+    including 1 and n,
     except for 1 which returns a single 1 to avoid messing with sum of divisors...
     """
     if n==1:
@@ -277,60 +359,105 @@ def divisors(n):
     else:
         all_factors = [[f**p for p in irange(0,fp)] for (f, fp) in factorize(n)]
         for ns in cartesian_product(*all_factors):
-            yield product(ns) 
+            yield product(ns)
 
 def proper_divisors(n):
     """:return: all divisors of n except n itself."""
     return (divisor for divisor in divisors(n) if divisor != n)
- 
-def is_prime(n, oneisprime=False, _precision_for_huge_n=16):
-    """:return: True if n is a prime number (1 is no more considered prime)."""
-    # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
+
+_sieve=list() # array of bool indicating primality
+
+def sieve(n):
+    """
+    Return a list of prime numbers from 2 to a prime < n.
+    Very fast (n<10,000,000) in 0.4 sec.
+    
+    Example:
+    >>>prime_sieve(25)
+    [2, 3, 5, 7, 11, 13, 17, 19, 23]
+
+    Algorithm & Python source: Robert William Hanks
+    http://stackoverflow.com/questions/17773352/python-sieve-prime-numbers
+    """
+    global _sieve
+    if n>len(_sieve): #recompute the sieve
+        #TODO: enlarge the sieve...
+        # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
+        _sieve = [False,False,True,True]+[False,True] * ((n-4)//2)
+        assert(len(_sieve)==n)
+        for i in xrange(3,int(n**0.5)+1,2):
+            if _sieve[i]:
+                _sieve[i*i::2*i]=[False]*((n-i*i-1)/(2*i)+1)
+    return [2] + [i for i in xrange(3,n,2) if _sieve[i]]
+
+_primes=sieve(1000) # primes up to 1000
+_primes_set = set(_primes) # to speed us primality tests below
+
+def primes(n):
+    """memoized list of n first primes
+    :warning: do not call with large n, use prime_gen instead
+    """
+    m=n-len(_primes)
+    if m>0:
+        more=list(take(m,primes_gen(_primes[-1]+1)))
+        _primes.extend(more)
+        _primes_set.union(set(more))
+    
+    return _primes[:n] 
+
+def is_prime(n, oneisprime=False, precision_for_huge_n=16):
+    """primality test. Uses Miller-Rabin for large n
+    :param n: int number to test
+    :param oneisprime: bool True if 1 should be considered prime (it was, a long time ago)
+    :param precision_for_huge_n: int number of primes to use in Miller
+    :return: True if n is a prime number"""
+    
     if n <= 0: return False
     if n == 1: return oneisprime
-    if n in _known_primes:
+    if n<len(_sieve):
+        return _sieve[n]
+    if n in _primes_set:
         return True
-    if any((n % p) == 0 for p in _known_primes):
+    if any((n % p) == 0 for p in _primes_set):
         return False
+    
+    # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
+    
     d, s = n - 1, 0
     while not d % 2:
         d, s = d >> 1, s + 1
-    # Returns exact according to http://primes.utm.edu/prove/prove2_3.html
-    # TODO: see if memoization can help here
+    
     def _try_composite(a, d, n, s):
+        # exact according to http://primes.utm.edu/prove/prove2_3.html
         if pow(a, d, n) == 1:
             return False
         for i in range(s):
             if pow(a, 2**i * d, n) == n-1:
                 return False
         return True # n  is definitely composite
-    
-    if n < 1373653: 
+
+    if n < 1373653:
         return not any(_try_composite(a, d, n, s) for a in (2, 3))
-    if n < 25326001: 
+    if n < 25326001:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5))
-    if n < 118670087467: 
-        if n == 3215031751: 
+    if n < 118670087467:
+        if n == 3215031751:
             return False
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7))
-    if n < 2152302898747: 
+    if n < 2152302898747:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11))
-    if n < 3474749660383: 
+    if n < 3474749660383:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
-    if n < 341550071728321: 
+    if n < 341550071728321:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
     # otherwise
-    return not any(_try_composite(a, d, n, s) 
-        for a in _known_primes[:_precision_for_huge_n])
- 
-_known_primes = [2, 3]
-_known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
+    return not any(_try_composite(a, d, n, s)
+        for a in _primes[:precision_for_huge_n])
 
-
-def get_primes(start=2,stop=None):
+def primes_gen(start=2,stop=None):
     """generate prime numbers from 'start'"""
     if start==1:
-        yield 1 #if we asked for it explicitely
+        yield 1 #if we asked for it explicitly
     if start<=2:
         yield 2
     if stop is None:
@@ -345,7 +472,7 @@ def get_primes(start=2,stop=None):
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
-    :param p: int 
+    :param p: int
     :return: True if 2^p-1 is prime
     """
     # http://rosettacode.org/wiki/Lucas-Lehmer_test#Python
@@ -356,11 +483,11 @@ def lucas_lehmer (p):
     else:
         m_p = (1 << p) - 1 # 2^p-1
     s = 4
-    for i in range(3, p + 1): 
+    for i in range(3, p + 1):
         s = (s*s - 2) % m_p
     return s == 0
 
-def euler_phi_over_n(n): 
+def euler_phi_over_n(n):
     """Euler totient function
     http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
@@ -368,7 +495,7 @@ def euler_phi_over_n(n):
     res=product((1 - 1.0 / p for p, _ in factorize(n)),1)
     return res
 
-def euler_phi(n): 
+def euler_phi(n):
     """Euler totient function
     http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
@@ -422,7 +549,7 @@ def num_from_digits(digits, base=10):
     """
     return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
 
-def reverse(i): 
+def reverse(i):
     return int(str(i)[::-1])
 
 def is_palindromic(num, base=10):
@@ -474,21 +601,9 @@ def is_lychrel(n,limit=96):
         return lychrel_count(n+reverse(n),limit)+1>=limit #... can be lychrel !
     return False
 
-def isqrt(n):
-    """integer square root
-    :return: largest int x for which x * x <= n
-    """
-    #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
-    x = n
-    y = (x + 1) // 2
-    while y < x:
-        x = y
-        y = (x + n // x) // 2
-    return x
-
 def prime_factors(num, start=2):
     """gwenerates all prime factors (ordered) of num in a list"""
-    for p in get_primes(start):
+    for p in primes_gen(start):
         if num==1:
             break
         if is_prime(num): #because it's fast
@@ -514,23 +629,33 @@ def least_common_multiple(a, b):
     """:return: least common multiples of a and b"""
     return (a * b) / greatest_common_divisor(a, b)
 
+def polygonal(s, n):
+    #https://en.wikipedia.org/wiki/Polygonal_number
+    return ((s-2)*n*n-(s-4)*n)/2
+
 def triangle(n):
     """
-    :return: nth triangle number, defined as the sum of [1,n] values. 
+    :return: nth triangle number, defined as the sum of [1,n] values.
     :see: http://en.wikipedia.org/wiki/Triangular_number
     """
-    return (n*(n+1))/2
+    return polygonal(3,n) # (n*(n+1))/2
 
 def is_triangle(x):
     """:return: True if x is a triangle number"""
     return is_integer((-1 + sqrt(1 + 8*x)) / 2.)
+
+def square(n):
+    return polygonal(4,n) # n*n
+
+def is_square(n):
+    return is_integer(sqrt(n))
 
 def pentagonal(n):
     """
     :return: nth pentagonal number
     :see: https://en.wikipedia.org/wiki/Pentagonal_number
     """
-    return n*(3*n - 1)/2
+    return polygonal(5,n) # n*(3*n - 1)/2
 
 def is_pentagonal(n):
     """:return: True if x is a pentagonal number"""
@@ -541,7 +666,40 @@ def hexagonal(n):
     :return: nth hexagonal number
     :see: https://en.wikipedia.org/wiki/Hexagonal_number
     """
-    return n*(2*n - 1)
+    return polygonal(6,n) # n*(2*n - 1)
+
+def is_hexagonal(n):
+    return (1 + sqrt(1 + (8 * n))) % 4 == 0
+
+def heptagonal(n):
+    return polygonal(7,n) # (n * (5 * n - 3)) / 2
+
+def is_heptagonal(n):
+    return (3 + sqrt(9 + (40 * n))) % 10 == 0
+
+def octagonal(n):
+    return polygonal(8,n) # (n * (3 * n - 2))
+
+def is_octagonal(n):
+    return (2 + sqrt(4 + (12 * n))) % 6 == 0
+
+@memoize
+def partition(n):
+    def non_zero_integers(n):
+        for k in range(1, n):
+            yield k
+            yield -k
+
+    if n == 0:
+        return 1
+    elif n < 0:
+        return 0
+
+    result = 0
+    for k in non_zero_integers(n + 1):
+        sign = (-1) ** ((k - 1) % 2)
+        result += sign * partition(n - pentagonal(k))
+    return result
 
 def get_cardinal_name(num):
     """Get cardinal name for number (0 to 1 million)"""
@@ -556,7 +714,7 @@ def get_cardinal_name(num):
     def _get_tens(n):
         a, b = divmod(n, 10)
         return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10*a], numbers[b]))
-    
+
     def _get_hundreds(n):
         tens = n % 100
         hundreds = (n // 100) % 10
@@ -566,7 +724,7 @@ def get_cardinal_name(num):
             hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
           ]))
-        
+
     blocks=digits_from_num(num,1000,rev=True) #group by 1000
     res=''
     for hdu,word in zip(blocks,['',' thousand ',' million ',' billion ']):
@@ -592,7 +750,7 @@ def is_perfect(n):
         if s>2*n:
             return 1
     return 0 if s==2*n else -1
-    
+
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
@@ -601,6 +759,32 @@ def number_of_digits(num, base=10):
 def is_pandigital(num, base=10):
     """:Return: True if num contains all digits in specified base"""
     return set(sorted(digits_from_num(num,base))) == set(range(base))
+
+def chakravala(n):
+    """
+    solves x^2 - n*y^2 = 1
+    for x,y integers
+    https://en.wikipedia.org/wiki/Pell%27s_equation
+    https://en.wikipedia.org/wiki/Chakravala_method
+    """
+    # https://github.com/timothy-reasa/Python-Project-Euler/blob/master/solutions/euler66.py
+
+    m = 1
+    k = 1
+    a = 1
+    b = 0
+
+    while k != 1 or b == 0:
+        m = k * (m/k+1) - m
+        m = m - int((m - sqrt(n))/k) * k
+
+        tempA = (a*m + n*b) / abs(k)
+        b = (a + b*m) / abs(k)
+        k = (m*m - n) / k
+
+        a = tempA
+
+    return a,b
 
 #combinatorics
 
