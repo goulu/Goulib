@@ -123,18 +123,28 @@ raises=nose.tools.raises
 SkipTest=nose.SkipTest
 
 import logging
-def runmodule(redirect=True, level=logging.INFO):
-    if not redirect:
-        return nose.runmodule()
-    
-    # enable logging
+
+def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(message)s'):
+    """initializes logging
+    :param level: logging level
+    :param fmt: string
+    """
     root=logging.getLogger()
     root.setLevel(level)
-    fmt = logging.Formatter('%(levelname)s:%(filename)s:%(funcName)s: %(message)s')
+    fmt = logging.Formatter(fmt)
     try:
         root.handlers[0].setFormatter(fmt)
     except:
         logging.basicConfig(format=fmt._fmt)
+        
+setlog()
+        
+def runmodule(redirect=True, level=logging.INFO):
+    if not redirect:
+        return nose.runmodule()
+    
+    setlog(level)
+
     """ ensures stdout is printed after the tests results"""
     import sys
     from io import StringIO

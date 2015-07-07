@@ -44,5 +44,10 @@ class TestDummy:
     def test_nop(self):
         pass
 
+class TestSetlog:
+    def test_setlog(self):
+        # assert_equal(expected, setlog(level, fmt))
+        raise SkipTest # TODO: implement your test here
+
 if __name__=="__main__":
     runmodule()
