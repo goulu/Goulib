@@ -17,6 +17,8 @@ import random, operator, collections, heapq
 from itertools import islice, repeat, count, tee, starmap, chain, groupby
 from functools import reduce
 
+from .container import SortedCollection
+
 #reciepes from Python manual
 
 def take(n, iterable):
@@ -31,14 +33,18 @@ def index(n, iterable):
 
 def first(iterable):
     """:return: first element in the iterable"""
-    for x in iterable: return x # works in all cases by definition of iterable 
+    for x in iterable:
+        return x # works in all cases by definition of iterable 
     raise IndexError
     
 
 def last(iterable):
     """Take last element in the iterable"""
-    for x in iterable: pass
-    return x
+    found=False
+    for x in iterable: 
+        found=True
+    if found: return x
+    raise IndexError
 
 def takeevery(n, iterable, first=0):
     """Take an element from iterator every n elements"""
@@ -503,6 +509,18 @@ def subdict(d,keys):
     # http://stackoverflow.com/questions/5352546/best-way-to-extract-subset-of-key-value-pairs-from-python-dictionary-object/5352649#5352649
     """
     return dict([(i, d[i]) for i in keys if i in d])
+
+def sorted_iterable(iterable, key=None, buffer=100):
+    """sorts an almost sorted infinite iterable
+    :param iterable: iterable
+    :param key: function used as sort key
+    :param buffer: int size of buffer. elements to swap should not be further than that
+    """
+    b=SortedCollection(key=key)
+    for x in iterable:
+        if len(b)>=buffer:
+            yield b.pop(0)
+        b.insert(x)
 
 # operations on sorted iterators
 

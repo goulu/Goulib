@@ -313,5 +313,10 @@ class TestDiff:
         # assert_equal(expected, diff(iterable1, iterable2))
         raise SkipTest # TODO: implement your test here
 
+class TestSortedIterable:
+    def test_sorted_iterable(self):
+        # assert_equal(expected, sorted_iterable(iterable, key, buffer))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
