@@ -78,7 +78,7 @@ class Interval(object):
     end = property(fget=lambda self: self._end, doc="The interval's end")
     
     def __call__(self):
-        return (self.start, self.end)
+        return tuple(self.start, self.end)
      
     def __str__(self):
         "As string."
@@ -249,6 +249,10 @@ class Box(list):
     @property
     def center(self):
         return tuple(i.center for i in self)
+    
+    def __call__(self):
+        """:return: tuple of all intervals as tuples"""
+        return tuple(i() for i in self)
             
     def __iadd__(self, other):
         """
