@@ -32,6 +32,7 @@ except:
     SCIPY=False
 
 from . import math2
+from . import itertools2
     
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -41,7 +42,6 @@ except: #fallback, especially because I couldn't manage to install rtree on trav
     
 if not RTREE:
     logging.warning('rtree not available, falling back to slow version')
-    from Goulib import itertools2 #lazy import
     
     class index: #mimics rtree.index module
 
@@ -166,9 +166,11 @@ class _Geo(object):
     
     __bool__ = __nonzero__
     
+    '''
     def __getattr__(self,name):
         """called if name attribute is not found in self"""
         return self.graph.get(name)
+    '''
     
     def clear(self): 
         #saves some graph attributes cleared by convert._prep_create_using
@@ -378,7 +380,6 @@ class _Geo(object):
     def add_edge(self, u, v, attr_dict={}, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
-        side effect: updates largest merge in self.max_merge
         """
         
         #adjust to existing nodes within tolerance and keep track of actual precision
@@ -434,7 +435,10 @@ class _Geo(object):
             u,v=u[0],u[1]
         
         if self.is_multigraph():
-            data=self.edge[u][v][key or 0]
+            if key is None:
+                key=self.edge[u][v]
+                key=itertools2.first(key)
+            data=self.edge[u][v][key]
         else:
             data=self.edge[u][v]
         self.parent.remove_edge(self,u,v,key)   
@@ -529,17 +533,19 @@ class GeoGraph(_Geo, nx.MultiGraph):
         _Geo.__init__(self,nx.MultiGraph,data,nodes)
     
     
-def figure(g,box=None,**kwargs):
-    """:return: matplotlib axis suitable for drawing graph g"""
+def figure(g, box=None,**kwargs):
+    """
+    :param g: _Geo derived Graph
+    :param box: optional interval.Box if g has no box
+    :return: matplotlib axis suitable for drawing graph g
+    """
     fig=plt.figure(**kwargs)
-    if box:
-        a,b=box
-    else:
-        a,b=g.box()
     try:
-        plt.plot((a[0],b[0]),(a[1],b[1]),alpha=0) #draw a transparent diagonal to size everything
+        box=g.box()
     except:
-        return None
+        pass #use 2nd parameter
+
+    plt.plot(box[0],box[1],alpha=0) #draw a transparent diagonal to size everything
     plt.axis('equal')
     import pylab
     pylab.axis('off') # turn off axis
