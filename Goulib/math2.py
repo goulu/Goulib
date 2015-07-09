@@ -6,17 +6,20 @@ additions to :mod:`math` standard library
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
-__credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
+__credits__ = [
+    "https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
+    "http://blog.dreamshire.com/common-functions-routines-project-euler/",
+    ]
 __license__ = "LGPL"
 
 import six
-from six.moves import filter, zip_longest #TODO: find a way to remove error in Eclipse
+from six.moves import filter, zip_longest #TODO: find a way to remove red in Eclipse
 
-import operator, cmath
-from math import pi, sqrt, log, sin, asin
+from math import pi, log, sqrt, sin, asin
+import math, cmath, operator
 
-from itertools import count, chain
-from .itertools2 import drop, ilen, ireduce, irange, compact, accumulate
+from itertools import count
+from .itertools2 import drop, ireduce, irange, compact, accumulate
 from .itertools2 import compress, cartesian_product, arange, take
 from .decorators import memoize
 
@@ -103,10 +106,9 @@ def dot(a,b):
     res=[dot(a,col) for col in zip(*b)]
     return list(map(list,list(zip(*res))))
 
-def product(nums,init=1):
+def mul(nums,init=1):
     """
     :return: Product of nums
-    :warning: there is also a itertools2.product
     """
     return reduce(operator.mul, nums, init)
 
@@ -238,15 +240,15 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(factors,values,max=None):
+def recurrence(coefficients,values,max=None):
     """general generator for recurrences
     :param values: list of initial values
-    :param factors: list of factors defining the recurrence
+    :param coefficients: list of factors defining the recurrence
     """
     for n in values:
         yield n
     while True:
-        n=dot(factors,values)
+        n=dot(coefficients,values)
         if max and n>max: break
         yield n
         values=values[1:]
@@ -359,7 +361,7 @@ def divisors(n):
     else:
         all_factors = [[f**p for p in irange(0,fp)] for (f, fp) in factorize(n)]
         for ns in cartesian_product(*all_factors):
-            yield product(ns)
+            yield mul(ns)
 
 def proper_divisors(n):
     """:return: all divisors of n except n itself."""
@@ -492,7 +494,7 @@ def euler_phi_over_n(n):
     http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
     if n<=1: return 1
-    res=product((1 - 1.0 / p for p, _ in factorize(n)),1)
+    res=mul((1 - 1.0 / p for p, _ in factorize(n)),1)
     return res
 
 def euler_phi(n):
@@ -602,7 +604,7 @@ def is_lychrel(n,limit=96):
     return False
 
 def prime_factors(num, start=2):
-    """gwenerates all prime factors (ordered) of num in a list"""
+    """generates all prime factors (ordered) of num in a list"""
     for p in primes_gen(start):
         if num==1:
             break
@@ -615,11 +617,43 @@ def prime_factors(num, start=2):
             yield p
             num=num//p
 
-def factorize(num):
-    """Factorize a number returning occurrences of its prime factors"""
-    if num==1: #allows to make many things quite simpler...
-        return [(1,1)]
-    return compress(prime_factors(num))
+def trial_division(n, bound=None):
+    if n == 1: return 1
+    for p in [2, 3, 5]:
+        if n%p == 0: return p
+    if bound == None: bound = n
+    dif = [6, 4, 2, 4, 2, 4, 6, 2]
+    m = 7; i = 1
+    while m <= bound and m*m <= n:
+        if n%m == 0:
+            return m
+        m += dif[i%8]
+        i += 1
+    return n
+
+def factorize(n):
+    """find the prime factors of n along with their frequencies. Example:
+
+    >>> factor(786456)
+    [(2,3), (3,3), (11,1), (331,1)]
+    """
+    if n==0: return
+    if n < 0: n = -n
+    if n==1: yield (1,1) #for coherency
+    while n != 1:
+        p = trial_division(n)
+        e = 1
+        n /= p
+        while n%p == 0:
+            e += 1; n /= p
+        yield (p,e)
+        
+def number_of_divisors(n):
+    #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
+    res=1
+    for (p,e) in factorize(n):
+        res=res*(e+1)
+    return res
 
 def greatest_common_divisor(a, b):
     """:return: greatest common divisor of a and b"""
@@ -788,7 +822,9 @@ def chakravala(n):
 
 #combinatorics
 
-def factorial():
+factorial=math.factorial #didn't knew it was there...
+
+def factorial_gen():
     """Generator of factorial"""
     last=1
     yield last
