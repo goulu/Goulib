@@ -19,9 +19,9 @@ class TestCmp:
         assert_equal(cmp(0.0001, 0.0002),-1)
         assert_equal(cmp(0.0000, 0.0000),0)
 
-class TestProduct(unittest.TestCase):
-    def test_product(self):
-        assert_equal(product(range(1,10)),362880)
+class TestMul(unittest.TestCase):
+    def test_mul(self):
+        assert_equal(mul(range(1,10)),362880)
 
 class TestRint(unittest.TestCase):
     def test_rint(self):
