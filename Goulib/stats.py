@@ -4,12 +4,20 @@
 very basic statistics functions
 """
 
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
-__credits__ = ["https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",]
+__credits__ = []
 __license__ = "LGPL"
 
-import logging, six, math
+import six, math, logging, matplotlib
+
+from . import plot #sets matplotlib backend
+import matplotlib.pyplot as plt # after import .plot
+
+from . import itertools2
+from .math2 import vecmul, vecadd, vecsub
 
 def mean(data):
     """:return: mean of data"""
@@ -88,6 +96,139 @@ def stats(l):
         avg=None
         var=None
     return lo,hi,sum1,sum2,avg,var
+
+class Normal(list,plot.Plot):
+    """represents a normal distributed variable 
+    the base class (list) optionally contains data
+    """
+    def __init__(self,data=[],mean=0,var=1):
+        self.lo=float("inf")
+        self.hi=float("-inf")
+        if data:
+            self.n=0
+            self.sum1=0
+            self.sum2=0
+            self.extend(data)
+        else:
+            self.n=1
+            self.sum1=self.n*mean
+            self.sum2=self.n*(var+mean**2)
+        
+    @property
+    def mean(self):
+        return self.sum1/self.n
+    
+    avg=mean #alias
+    average=mean #alias
+    mu=mean #alias
+    
+    @property
+    def variance(self):
+        return self.sum2/self.n-self.mean**2
+    
+    var=variance #alias
+    @property
+    def stddev(self):
+        return math.sqrt(self.variance)
+    
+    sigma=stddev
+    
+    def pdf(self, x):
+        """Return the probability density function at x"""
+        return 1./(math.sqrt(2*math.pi)*self.sigma)*math.exp(-0.5 * (1./self.sigma*(x - self.mu))**2)
+    
+    def __call__(self,x):
+        try: #is x iterable ?
+            return [self(x) for x in x]
+        except: pass
+        return self.pdf(x)
+    
+    def __repr__(self):
+        return "%s(μ=%s, σ=%s)"%(self.__class__.__name__,self.mean,self.stddev)
+    
+    def _repr_latex_(self):
+        return "\mathcal{N}(\mu=%s, \sigma=%s)"%(self.mean,self.stddev)
+    
+    def plot(self, fmt='svg', x=None):
+        from IPython.core.pylabtools import print_figure
+
+        # plt.rc('text', usetex=True)
+        fig, ax = plt.subplots()
+        if x is None:
+            x=itertools2.ilinear(self.mu-3*self.sigma,self.mu+3*self.sigma, 101)
+        x=list(x)
+        y=self(x)
+        ax.plot(x,y)
+        ax.set_title(self._repr_latex_())
+        data = print_figure(fig, fmt)
+        plt.close(fig)
+        return data
+    
+    def _repr_png_(self):
+        return self.plot(fmt='png')
+
+    def _repr_svg_(self):
+        return self.plot(fmt='svg')
+    
+    def append(self,x):
+        super(Normal,self).append(x)
+        self.n+=1
+        self.sum1+=x
+        self.sum2+=x*x
+        if x<self.lo: self.lo=x
+        if x>self.hi: self.hi=x
+        
+    def extend(self,data):
+        for x in data:
+            self.append(x)
+            
+    def linear(self,a,b=0):
+        """
+        :return: a*self+b 
+        """
+        return Normal(
+            data=[a*x+b for x in self],
+            mean=self.mean*a+b, 
+            var=abs(self.var*a)
+        )
+    
+    def __mul__(self,a):
+        return self.linear(a,0)
+    
+    def __div__(self,a):
+        return self.linear(1./a,0)
+
+    def __add__(self, other):
+        if isinstance(other,(int,float)):
+            return self.linear(1,other)
+        # else: assume other is a Normal variable
+        mean=self.mean+other.mean
+        var=self.var+other.var+2*self.cov(other)
+        data=vecadd(self,other) if len(self)==len(other) else []
+        return Normal(data=data, mean=mean, var=var)
+        
+    def __sub__(self, other):
+        return self+other*(-1) #keep this syntax to call self.__mul__(-1)
+    
+    def covariance(self,other):
+        if len(self)!=len(other):
+            return 0 # consider decorrelated
+        return mean(
+            vecmul(
+                vecsub(self,[],self.mean),
+                vecsub(other,[],other.mean)
+            )
+        )
+    
+    cov=covariance #alias
+    
+    def pearson(self,other):
+        return self.cov(other)/(self.stddev*other.stddev)
+    
+    correlation=pearson #alias
+    corr=pearson #alias
+        
+
 
 def linear_regression(x, y, conf=None):
     """

@@ -75,5 +75,51 @@ class TestLinearRegression:
         assert_equal(bi,(1,1))
         assert_equal(ci,(0,0))
 
+class TestNormal:
+    @classmethod
+    def setup_class(self):
+        self.gauss=Normal(mean=1)
+        self.two=Normal(mean=2,var=0)
+        self.data=Normal([64630,11735,14216,99233,14470,4978,73429,38120,51135,67060])
+        
+    def test___init__(self):
+        pass # tested above
+    
+    def test_append(self):
+        pass # tested above
+
+    def test_extend(self):
+        pass # tested above
+    
+    def test___repr__(self):
+        assert_equal(str(self.gauss),'Normal(1.0,1.0)')
+    
+    def test_linear(self):
+        pass # tested below
+        
+    def test___add__(self):
+        twogauss=self.gauss+self.gauss
+        assert_equal(twogauss.avg,2)
+        assert_equal(twogauss.var,2)
+
+    def test___mul__(self):
+        twogauss=self.gauss*2
+        assert_equal(twogauss.avg,2)
+        assert_equal(twogauss.var,2)
+
+    def test___sub__(self):
+        zero=self.gauss-self.gauss
+        assert_equal(zero.avg,0)
+        assert_equal(zero.var,2)
+
+    def test_mean(self):
+        assert_equal(self.data.avg,43900.6)
+
+    def test_variance(self):
+        assert_equal(self.data.var,928234891.64,6)
+        
+    def test_stddev(self):
+        assert_equal(self.data.stddev,math.sqrt(928234891.64))
+
 if __name__ == "__main__":
     runmodule()
