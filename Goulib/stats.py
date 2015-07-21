@@ -206,19 +206,29 @@ class Normal(list,plot.Plot):
         var=self.var+other.var+2*self.cov(other)
         data=vecadd(self,other) if len(self)==len(other) else []
         return Normal(data=data, mean=mean, var=var)
+    
+    def __radd__(self, other):
+        return self+other
+    
+    def __neg__(self):
+        return self*(-1)
         
     def __sub__(self, other):
-        return self+other*(-1) #keep this syntax to call self.__mul__(-1)
+        return self+(-other)
+    
+    def __rsub__(self, other):
+        return -(self-other)
     
     def covariance(self,other):
-        if len(self)!=len(other):
-            return 0 # consider decorrelated
-        return mean(
-            vecmul(
-                vecsub(self,[],self.mean),
-                vecsub(other,[],other.mean)
+        try:
+            return mean(
+                vecmul(
+                    vecsub(self,[],self.mean),
+                    vecsub(other,[],other.mean)
+                )
             )
-        )
+        except:
+            return 0 # consider decorrelated
     
     cov=covariance #alias
     

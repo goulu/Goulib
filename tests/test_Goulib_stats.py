@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -92,7 +95,7 @@ class TestNormal:
         pass # tested above
     
     def test___repr__(self):
-        assert_equal(str(self.gauss),'Normal(1.0,1.0)')
+        assert_equal(str(self.gauss),'Normal(μ=1.0, σ=1.0)')
     
     def test_linear(self):
         pass # tested below
@@ -101,6 +104,15 @@ class TestNormal:
         twogauss=self.gauss+self.gauss
         assert_equal(twogauss.avg,2)
         assert_equal(twogauss.var,2)
+        
+        n=self.gauss+1
+        assert_equal(n.avg,2)
+        assert_equal(n.var,1)
+        
+    def test___radd__(self):
+        n=1+self.gauss
+        assert_equal(n.avg,2)
+        assert_equal(n.var,1)
 
     def test___mul__(self):
         twogauss=self.gauss*2
