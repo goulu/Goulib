@@ -1131,6 +1131,37 @@ class Arc2(Circle):
 
     def _intersect_line2(self, other):
         return self.intersect(other)
+    
+class Ellipse(Circle):
+ 
+    def __init__(self, *args):
+        """:param args: can be
+        * Ellipse
+        * center, corner point
+        * center, r1,r2,angle
+        """
+        super(Ellipse,self).__init__(*args)
+        if len(args) == 1: # Circle or derived class
+            try:
+                self.r2 = args[0].r2
+            except:
+                self.r2 = self.r
+        else: #2 first params are used to stay compatible with Arc2
+            try:
+                self.r2 = args[2]
+                self.p = self.c+Vector2(self.r,self.r2) #for coherency + transform
+            except:
+                self.p=Point2(args[1]) #point at ellipse "corner"
+                self.r,self.r2=(self.p-self.c).xy
+
+    def __repr__(self):
+        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
+
+    def _apply_transform(self, t):
+        self.c = t * self.c
+        self.p = t * self.p
+        self.r,self.r2=(self.p-self.c).xy
+
 
 # 3D Geometry
 # -------------------------------------------------------------------------
