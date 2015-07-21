@@ -607,5 +607,30 @@ class TestChakravala:
         # assert_equal(expected, chakravala(n))
         raise SkipTest # TODO: implement your test here
 
+class TestBouncy:
+    def test_bouncy(self):
+        # assert_equal(expected, bouncy(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSosDigits:
+    def test_sos_digits(self):
+        # assert_equal(expected, sos_digits(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsHappy:
+    def test_is_happy(self):
+        # assert_equal(expected, is_happy(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestNumberOfDivisors:
+    def test_number_of_divisors(self):
+        # assert_equal(expected, number_of_divisors(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestFactorialGen:
+    def test_factorial_gen(self):
+        # assert_equal(expected, factorial_gen())
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

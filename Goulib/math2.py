@@ -68,7 +68,7 @@ def equal(a,b,epsilon=1e-6):
     """
     return abs(a-b)<epsilon
 
-def ceildiv(a, b): 
+def ceildiv(a, b):
     return -(-a // b) #simple and clever
 
 def isqrt(n):
@@ -82,6 +82,34 @@ def isqrt(n):
         x = y
         y = (x + n // x) // 2
     return x
+
+
+def multiply(x, y):
+    """
+    Karatsuba fast multiplication algorithm
+    https://en.wikipedia.org/wiki/Karatsuba_algorithm
+
+    Copyright (c) 2014 Project Nayuki
+    http://www.nayuki.io/page/karatsuba-multiplication
+    """
+    _CUTOFF = 1536 #_CUTOFF >= 64, or else there will be infinite recursion.
+    if x.bit_length() <= _CUTOFF or y.bit_length() <= _CUTOFF:  # Base case
+        return x * y
+
+    else:
+        n = max(x.bit_length(), y.bit_length())
+        half = (n + 32) // 64 * 32
+        mask = (1 << half) - 1
+        xlow = x & mask
+        ylow = y & mask
+        xhigh = x >> half
+        yhigh = y >> half
+
+        a = multiply(xhigh, yhigh)
+        b = multiply(xlow + xhigh, ylow + yhigh)
+        c = multiply(xlow, ylow)
+        d = b - a - c
+        return (((a << half) + d) << half) + c
 
 #vector operations
 
@@ -136,11 +164,11 @@ def minimum(m):
 
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return [reduce(operator.add,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]+l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [reduce(operator.sub,l) for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]-l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     """unary negation"""
@@ -262,7 +290,7 @@ def fibonacci(n):
     #http://blog.dreamshire.com/common-functions-routines-project-euler/
     """
     Find the nth number in the Fibonacci series.  Example:
-    
+
     >>>fibonacci(100)
     354224848179261915075
 
@@ -310,7 +338,7 @@ def triples():
             x=sqrt(z*z-y*y)
             if x<y and is_integer(x,1e-12):
                 yield (int(x),y,z)
-                    
+
 def primitive_triples(sort_xy=True):
     """ generates primitive Pythagorean triples
     through Berggren's matrices and breadth first traversal of ternary tree
@@ -373,7 +401,7 @@ def sieve(n):
     """
     Return a list of prime numbers from 2 to a prime < n.
     Very fast (n<10,000,000) in 0.4 sec.
-    
+
     Example:
     >>>prime_sieve(25)
     [2, 3, 5, 7, 11, 13, 17, 19, 23]
@@ -404,8 +432,8 @@ def primes(n):
         more=list(take(m,primes_gen(_primes[-1]+1)))
         _primes.extend(more)
         _primes_set.union(set(more))
-    
-    return _primes[:n] 
+
+    return _primes[:n]
 
 def is_prime(n, oneisprime=False, precision_for_huge_n=16):
     """primality test. Uses Miller-Rabin for large n
@@ -413,7 +441,7 @@ def is_prime(n, oneisprime=False, precision_for_huge_n=16):
     :param oneisprime: bool True if 1 should be considered prime (it was, a long time ago)
     :param precision_for_huge_n: int number of primes to use in Miller
     :return: True if n is a prime number"""
-    
+
     if n <= 0: return False
     if n == 1: return oneisprime
     if n<len(_sieve):
@@ -422,13 +450,13 @@ def is_prime(n, oneisprime=False, precision_for_huge_n=16):
         return True
     if any((n % p) == 0 for p in _primes_set):
         return False
-    
+
     # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
-    
+
     d, s = n - 1, 0
     while not d % 2:
         d, s = d >> 1, s + 1
-    
+
     def _try_composite(a, d, n, s):
         # exact according to http://primes.utm.edu/prove/prove2_3.html
         if pow(a, d, n) == 1:
@@ -524,6 +552,8 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     :param numerals: string with all chars representing numbers in base base. chars after the base-th are ignored
     :return: string representation of num in base
     """
+    if base==10 and numerals[:10]=='0123456789':
+        return str(num)
     if base < 2 or base > len(numerals):
         raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
 
@@ -572,6 +602,31 @@ def is_permutation(num1, num2, base=10):
         digits2 = sorted(digits_from_num(num2, base))
     return digits1==digits2
 
+def is_pandigital(num, base=10):
+    """:Return: True if num contains all digits in specified base"""
+    n=str_base(num,base)
+    return len(n)>=base and not '123456789abcdefghijklmnopqrstuvwxyz'[:base-1].strip(n)
+    # return set(sorted(digits_from_num(num,base))) == set(range(base)) #slow
+    
+def bouncy(n):
+    #http://oeis.org/A152054
+    s=str(n)
+    s1=''.join(sorted(s))
+    return s==s1,s==s1[::-1] #increasing,decreasing
+
+def sos_digits(n):
+    """:return: int sum of square of digits of n"""
+    s = 0
+    while n > 0:
+        s, n = s + (n % 10)**2, n // 10
+    return s
+
+def is_happy(n):
+    #https://en.wikipedia.org/wiki/Happy_number
+    while n > 1 and n != 89 and n != 4:
+        n = sos_digits(n)
+    return n==1
+
 def lychrel_seq(n):
     while True:
         r = reverse(n)
@@ -617,26 +672,35 @@ def prime_factors(num, start=2):
             yield p
             num=num//p
 
-def trial_division(n, bound=None):
-    if n == 1: return 1
-    for p in [2, 3, 5]:
-        if n%p == 0: return p
-    if bound == None: bound = n
-    dif = [6, 4, 2, 4, 2, 4, 6, 2]
-    m = 7; i = 1
-    while m <= bound and m*m <= n:
-        if n%m == 0:
-            return m
-        m += dif[i%8]
-        i += 1
-    return n
-
 def factorize(n):
     """find the prime factors of n along with their frequencies. Example:
 
     >>> factor(786456)
     [(2,3), (3,3), (11,1), (331,1)]
     """
+
+    if n==1: #allows to make many things quite simpler...
+        return [(1,1)]
+    return compress(prime_factors(n))
+
+    #TODO: check if code below is faster for "small" n
+
+    """
+    def trial_division(n, bound=None):
+        if n == 1: return 1
+        for p in [2, 3, 5]:
+            if n%p == 0: return p
+        if bound == None: bound = n
+        dif = [6, 4, 2, 4, 2, 4, 6, 2]
+        m = 7; i = 1
+        while m <= bound and m*m <= n:
+            if n%m == 0:
+                return m
+            m += dif[i%8]
+            i += 1
+        return n
+
+
     if n==0: return
     if n < 0: n = -n
     if n==1: yield (1,1) #for coherency
@@ -647,7 +711,8 @@ def factorize(n):
         while n%p == 0:
             e += 1; n /= p
         yield (p,e)
-        
+    """
+
 def number_of_divisors(n):
     #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
     res=1
@@ -790,10 +855,6 @@ def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
     return int(log(num)/log(base)) + 1
 
-def is_pandigital(num, base=10):
-    """:Return: True if num contains all digits in specified base"""
-    return set(sorted(digits_from_num(num,base))) == set(range(base))
-
 def chakravala(n):
     """
     solves x^2 - n*y^2 = 1
@@ -849,6 +910,8 @@ def binomial_coefficient(n,k):
     for i in range(k):
         c = c * (n - i) // (i + 1)
     return int(c)
+
+
 
 ncombinations=binomial_coefficient #alias
 
