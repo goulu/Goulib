@@ -184,14 +184,20 @@ class Row():
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
-    def __init__(self,filename=None,titles=None,data=[],**kwargs):
+    def __init__(self,filename=None,titles=[],data=[],**kwargs):
         """inits a table, optionally by reading a Excel, csv or html file"""
         list.__init__(self, data)
-        self.titles=titles if titles else []
+        
+        self.titles=titles
+            
         self.footer=[]
         if filename:
-            if titles: #were specified
-                kwargs['titles_line']=0 
+            if titles: #explicitely set
+                kwargs.setdefault('titles_line',0)
+                kwargs.setdefault('data_line',1)
+            else: #read titles from the file
+                kwargs.setdefault('titles_line',1) 
+                kwargs.setdefault('data_line',2)
             ext=filename.split('.')[-1].lower()
             if ext=='xls':
                 self.read_xls(filename,**kwargs)
@@ -291,8 +297,8 @@ class Table(list):
     
     def read_xls(self, filename, **kwargs):
         """appends an Excel table"""
-        titles_line=kwargs.get('titles_line',1)-1
-        data_line=kwargs.get('data_line',2)-1
+        titles_line=kwargs.pop('titles_line',1)-1
+        data_line=kwargs.pop('data_line',2)-1
         
         from xlrd import open_workbook
         wb = open_workbook(filename)
@@ -309,6 +315,7 @@ class Table(list):
         """appends a .csv or similar file to the table"""
         titles_line=kwargs.pop('titles_line',1)-1
         data_line=kwargs.pop('data_line',2)-1
+        
         dialect=kwargs.setdefault('dialect',csv.excel)
         delimiter=kwargs.setdefault('delimiter',';')
         encoding=kwargs.pop('encoding','utf-8') #must be iso-8859-15 in some cases
