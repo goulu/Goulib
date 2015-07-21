@@ -346,7 +346,10 @@ class Entity(object):
         #entities below may be filled, so let's handle the color first
         if 'color' in kwargs: # color attribute refers to edgecolor for coherency
             kwargs.setdefault('edgecolor',kwargs.pop('color'))
-        if isinstance(self,Circle): #must be after isinstance(self,Arc2)
+        if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
+            kwargs.setdefault('fill',False)
+            return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
+        if isinstance(self,Circle): #must be after Arc2 and Ellipse
             kwargs.setdefault('fill',False)
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
         if isinstance(self,Point2):
@@ -423,19 +426,27 @@ class Entity(object):
         """ render graph to bitmap stream
         :return: matplotlib figure as a byte stream in specified format
         """
-
+        transparent=kwargs.pop('transparent',True)
+        facecolor=kwargs.pop('facecolor',None)
+        background=kwargs.pop('background',None)
+        
         fig,_=self.draw(**kwargs)
 
         from io import BytesIO
         output = BytesIO()
-        fig.savefig(output, format=format, transparent=kwargs.get('transparent',True))
+        fig.savefig(
+            output, 
+            format=format, 
+            transparent=transparent,
+            facecolor=facecolor or background,
+        )
         res=output.getvalue()
         plt.close(fig)
         return res
 
     # for IPython notebooks
-    def _repr_png_(self): return self.render('png')
-    def _repr_svg_(self): return self.render('svg')
+    def _repr_png_(self): return self.render('png',facecolor='white')
+    def _repr_svg_(self): return self.render('svg',facecolor='white')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Point2.__bases__ += (Entity,)
@@ -1213,7 +1224,8 @@ class Drawing(Group):
         super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
 
     def save(self,filename,**kwargs):
-        """ save graph in various formats"""
+        """ save graph in various formats
+        """
         ext=filename.split('.')[-1].lower()
         if ext!='dxf':
             kwargs.setdefault('dpi',600) #force good quality
