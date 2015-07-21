@@ -129,13 +129,11 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
     :param level: logging level
     :param fmt: string
     """
-    root=logging.getLogger()
-    root.setLevel(level)
-    fmt = logging.Formatter(fmt)
-    try:
-        root.handlers[0].setFormatter(fmt)
-    except:
-        logging.basicConfig(format=fmt._fmt)
+    logging.basicConfig(level=level, format=fmt)
+    logger=logging.getLogger()
+    logger.setLevel(level)
+    logger.handlers[0].setFormatter(logging.Formatter(fmt))
+    return logger
         
 setlog()
         
@@ -153,8 +151,19 @@ def runmodule(redirect=True, level=logging.INFO):
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
     
+    if level==logging.DEBUG:
+        verbosity,level=4,'DEBUG'
+    elif level==logging.INFO:
+        verbosity,level=3,'INFO'
+    else:
+        verbosity,level=2,'WARNING'
+    
     result = nose.run(
-        argv=[sys.argv[0], module_name, '-s', '--nologcapture'],
+        argv=[sys.argv[0], module_name, '-s',
+            '--nologcapture',
+            #'--logging-level=%s'%level,
+            #'--verbosity=%d'%verbosity,
+        ],
     )
     
     sys.stdout = old_stdout
