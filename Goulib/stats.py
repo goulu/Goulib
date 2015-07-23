@@ -21,7 +21,7 @@ from .math2 import vecmul, vecadd, vecsub
 
 def mean(data):
     """:return: mean of data"""
-    return float(sum(data))/len(data)
+    return sum(data)/len(data)
 
 avg=mean #alias
 
@@ -30,7 +30,7 @@ def variance(data,avg=None):
     if avg==None:
         avg=mean(data)
     s = sum(((value - avg)**2) for value in data)
-    var = float(s)/len(data)
+    var = s/len(data)
     return var
 
 var=variance #alias
@@ -197,6 +197,8 @@ class Normal(list,plot.Plot):
     
     def __div__(self,a):
         return self.linear(1./a,0)
+    
+    __truediv__ = __div__
 
     def __add__(self, other):
         if isinstance(other,(int,float)):

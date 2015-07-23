@@ -96,6 +96,15 @@ class TestNormal:
     
     def test___repr__(self):
         assert_equal(str(self.gauss),'Normal(μ=1.0, σ=1.0)')
+        
+    def test_mean(self):
+        assert_equal(self.data.avg,43900.6)
+
+    def test_variance(self):
+        assert_equal(self.data.var,928234891.64,6)
+        
+    def test_stddev(self):
+        assert_equal(self.data.stddev,math.sqrt(928234891.64))
     
     def test_linear(self):
         pass # tested below
@@ -114,24 +123,20 @@ class TestNormal:
         assert_equal(n.avg,2)
         assert_equal(n.var,1)
 
-    def test___mul__(self):
-        twogauss=self.gauss*2
-        assert_equal(twogauss.avg,2)
-        assert_equal(twogauss.var,2)
-
     def test___sub__(self):
         zero=self.gauss-self.gauss
         assert_equal(zero.avg,0)
         assert_equal(zero.var,2)
-
-    def test_mean(self):
-        assert_equal(self.data.avg,43900.6)
-
-    def test_variance(self):
-        assert_equal(self.data.var,928234891.64,6)
         
-    def test_stddev(self):
-        assert_equal(self.data.stddev,math.sqrt(928234891.64))
+    def test___mul__(self):
+        twogauss=self.gauss*2
+        assert_equal(twogauss.avg,2)
+        assert_equal(twogauss.var,2)
+        
+    def test___div__(self):
+        halfgauss=self.gauss/2
+        assert_equal(halfgauss.avg,.5)
+        assert_equal(halfgauss.var,.5)
 
 if __name__ == "__main__":
     runmodule()
