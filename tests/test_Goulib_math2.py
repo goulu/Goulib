@@ -195,6 +195,8 @@ class TestDigitsFromNum:
 
 class TestNumFromDigits:
     def test_num_from_digits(self):
+        assert_equal(num_from_digits('1234'),1234)
+        assert_equal(num_from_digits('11111011110',2),2014)
         assert_equal(num_from_digits([1,2,3,4]),1234)
         assert_equal(num_from_digits([1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],2),2014)
 

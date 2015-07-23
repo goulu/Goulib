@@ -586,11 +586,12 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
 
 def num_from_digits(digits, base=10):
     """
-    :param digits: string representing a number in given base
+    :param digits: string or list of digits representing a number in given base
     :param base: int base, 10 by default
     :return: int number
     """
-    return int(digits,base)
+    if isinstance(digits,six.string_types):
+        return int(digits,base)
     return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
 
 def reverse(i):
