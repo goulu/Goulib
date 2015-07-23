@@ -1820,6 +1820,9 @@ class Segment3(Line3):
         return self
 
     length = property(lambda self: abs(self.v))
+    
+def Spherical(r,theta,phi):
+    return Vector3(r*sin(theta)*cos(phi),r*sin(theta)*sin(phi),r*cos(phi))
 
 class Sphere(Geometry):
     """
@@ -1868,6 +1871,18 @@ class Sphere(Geometry):
 
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
+    
+    def __contains__(self,pt):
+        ":return: True if pt is ON or IN the sphere"
+        return self.c.distance(pt)<=self.r+precision
+    
+    def point(self, u, v):
+        """
+        :param u: float angle from "north pole" (=radians(90-lat) in radians
+        :param v: float angle from 0 meridian
+        :return: Point3 on sphere at specified coordinates
+        """
+        return self.c+Spherical(self.r,u,v)
 
     def _apply_transform(self, t):
         self.c = t * self.c
@@ -1902,6 +1917,18 @@ class Sphere(Geometry):
         c = _connect_sphere_plane(self, other)
         if c:
             return c
+        
+    def distance_on_sphere(self, phi1,theta1,phi2,theta2):
+        """
+        :param phi1: float angle from "north pole" (=radians(90-lat) in radians
+        :param theta1: float angle from 0 meridian
+        :param phi2: float angle from "north pole" (=radians(90-lat) in radians
+        :param theta2: float angle from 0 meridian
+        """
+        # http://www.johndcook.com/blog/python_longitude_latitude/ 
+         
+        c = (sin(phi1)*sin(phi2)*cos(theta1 - theta2) + cos(phi1)*cos(phi2))
+        return self.r*acos( c )
 
 class Plane(Geometry):
     """
