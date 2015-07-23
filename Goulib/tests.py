@@ -52,7 +52,7 @@ class TestCase(unittest.TestCase):
         class End: pass
         end=End() #a special object
         
-        for item1,item2 in six.moves.zip(chain(seq1,end),chain(seq2,end)):
+        for item1,item2 in six.moves.zip(chain(seq1,[end]),chain(seq2,[end])):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
