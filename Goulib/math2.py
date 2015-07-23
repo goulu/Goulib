@@ -499,6 +499,13 @@ def primes_gen(start=2,stop=None):
     for n in candidates:
         if is_prime(n):
             yield n
+            
+def euclid_gen():
+    """Euclid numbers: 1 + product of the first n primes"""
+    n = 1
+    for p in primes_gen():
+        n = n * p
+        yield n+1
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
@@ -529,7 +536,9 @@ def euler_phi(n):
     """Euler totient function
     http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
-    return round(n*euler_phi_over_n(n))
+    return rint(n*euler_phi_over_n(n))
+
+totient=euler_phi #alias. totient is available in sympy
 
 def digits_from_num(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
@@ -554,6 +563,8 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
     if base==10 and numerals[:10]=='0123456789':
         return str(num)
+    if base==2 and numerals[:2]=='01':
+        return "{0:b}".format(int(num))
     if base < 2 or base > len(numerals):
         raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
 
@@ -579,6 +590,7 @@ def num_from_digits(digits, base=10):
     :param base: int base, 10 by default
     :return: int number
     """
+    return int(digits,base)
     return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
 
 def reverse(i):
