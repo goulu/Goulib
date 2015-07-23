@@ -4,6 +4,7 @@
 utilities for unit tests (using nose)
 """
 from __future__ import division #"true division" everywhere
+from itertools import chain
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
@@ -48,7 +49,10 @@ class TestCase(unittest.TestCase):
         differing = '%ss differ: %s != %s\n' % elements
 
         i=0
-        for item1,item2 in six.moves.zip_longest(seq1,seq2):
+        class End: pass
+        end=End() #a special object
+        
+        for item1,item2 in six.moves.zip(chain(seq1,end),chain(seq2,end)):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
@@ -131,13 +135,14 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
     """
     logging.basicConfig(level=level, format=fmt)
     logger=logging.getLogger()
+    
     logger.setLevel(level)
     logger.handlers[0].setFormatter(logging.Formatter(fmt))
     return logger
         
 setlog()
         
-def runmodule(redirect=True, level=logging.INFO):
+def runmodule(level=logging.INFO, redirect=True):
     if not redirect:
         return nose.runmodule()
     
