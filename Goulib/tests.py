@@ -142,8 +142,12 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
         
 setlog()
         
-def runmodule(level=logging.INFO, redirect=True):
-    if not redirect:
+def runmodule(level=logging.INFO, argv=[]):
+    """
+    :param argv: optional list of string with additional options passed to nose.run
+    see http://nose.readthedocs.org/en/latest/usage.html
+    """
+    if argv is None:
         return nose.runmodule()
     
     setlog(level)
@@ -156,19 +160,8 @@ def runmodule(level=logging.INFO, redirect=True):
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
     
-    if level==logging.DEBUG:
-        verbosity,level=4,'DEBUG'
-    elif level==logging.INFO:
-        verbosity,level=3,'INFO'
-    else:
-        verbosity,level=2,'WARNING'
-    
     result = nose.run(
-        argv=[sys.argv[0], module_name, '-s',
-            '--nologcapture',
-            #'--logging-level=%s'%level,
-            #'--verbosity=%d'%verbosity,
-        ],
+        argv=[sys.argv[0], module_name,'-s','--nologcapture']+argv
     )
     
     sys.stdout = old_stdout
