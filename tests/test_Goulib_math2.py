@@ -153,12 +153,12 @@ class TestIntOrFloat:
 class TestSieve:
     def test_sieve(self):
         # assert_equal(expected, sieve(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 class TestPrimes:
     def test_primes(self):
         # assert_equal(expected, primes(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestPrimesGen:
     def test_primes_gen(self):
@@ -189,9 +189,9 @@ class TestStrBase:
 
 class TestDigitsFromNum:
     def test_digits_from_num(self):
-        assert_equal(digits_from_num(1234),[1,2,3,4])
-        assert_equal(digits_from_num(1234, rev=True),[4,3,2,1])
-        assert_equal(digits_from_num(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
+        assert_equal(digits(1234),[1,2,3,4])
+        assert_equal(digits(1234, rev=True),[4,3,2,1])
+        assert_equal(digits(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
 
 class TestNumFromDigits:
     def test_num_from_digits(self):
@@ -482,157 +482,157 @@ class TestEulerPhi:
 class TestRecurrence:
     def test_recurrence(self):
         # assert_equal(expected, recurrence(factors, values, max))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestCatalan:
     def test_catalan(self):
         # assert_equal(expected, catalan())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestLucasLehmer:
     def test_lucas_lehmer(self):
         # assert_equal(expected, lucas_lehmer(p))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestEulerPhiOverN:
     def test_euler_phi_over_n(self):
         # assert_equal(expected, euler_phi_over_n(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestReverse:
     def test_reverse(self):
         # assert_equal(expected, reverse(i))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsPermutation:
     def test_is_permutation(self):
         # assert_equal(expected, is_permutation(num1, num2, base))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestLychrelSeq:
     def test_lychrel_seq(self):
         # assert_equal(expected, lychrel_seq(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestLychrelCount:
     def test_lychrel_count(self):
         # assert_equal(expected, lychrel_count(n, limit))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsqrt:
     def test_isqrt(self):
         # assert_equal(expected, isqrt(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestAbundance:
     def test_abundance(self):
         # assert_equal(expected, abundance(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestFactorial:
     def test_factorial(self):
         # assert_equal(expected, factorial())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestCeildiv:
     def test_ceildiv(self):
         # assert_equal(expected, ceildiv(a, b))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestFibonacciGen:
     def test_fibonacci_gen(self):
         # assert_equal(expected, fibonacci_gen(max))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestCatalanGen:
     def test_catalan_gen(self):
         # assert_equal(expected, catalan_gen())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestTriples:
     def test_triples(self):
         # assert_equal(expected, triples())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
         # assert_equal(expected, primitive_triples(sort_xy))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestPolygonal:
     def test_polygonal(self):
         # assert_equal(expected, polygonal(s, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestSquare:
     def test_square(self):
         # assert_equal(expected, square(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsSquare:
     def test_is_square(self):
         # assert_equal(expected, is_square(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsHexagonal:
     def test_is_hexagonal(self):
         # assert_equal(expected, is_hexagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestHeptagonal:
     def test_heptagonal(self):
         # assert_equal(expected, heptagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsHeptagonal:
     def test_is_heptagonal(self):
         # assert_equal(expected, is_heptagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestOctagonal:
     def test_octagonal(self):
         # assert_equal(expected, octagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsOctagonal:
     def test_is_octagonal(self):
         # assert_equal(expected, is_octagonal(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestPartition:
     def test_partition(self):
         # assert_equal(expected, partition(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestChakravala:
     def test_chakravala(self):
         # assert_equal(expected, chakravala(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestBouncy:
     def test_bouncy(self):
         # assert_equal(expected, bouncy(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestSosDigits:
     def test_sos_digits(self):
         # assert_equal(expected, sos_digits(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestIsHappy:
     def test_is_happy(self):
         # assert_equal(expected, is_happy(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestNumberOfDivisors:
     def test_number_of_divisors(self):
         # assert_equal(expected, number_of_divisors(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestFactorialGen:
     def test_factorial_gen(self):
         # assert_equal(expected, factorial_gen())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 if __name__ == "__main__":
     runmodule()
