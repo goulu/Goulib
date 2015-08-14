@@ -520,7 +520,7 @@ class TestMatrix3:
     def test_orientation(self):
         # matrix3 = Matrix3(*args)
         # assert_equal(expected, matrix3.orientation())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # 
 
 class TestMatrix4:
     @classmethod

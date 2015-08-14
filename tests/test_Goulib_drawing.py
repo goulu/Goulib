@@ -219,7 +219,7 @@ class TestEntity:
     def test_setattr(self):
         # entity = Entity()
         # assert_equal(expected, entity.setattr(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestGroup:
     @classmethod
@@ -299,17 +299,17 @@ class TestGroup:
     def test_chainify(self):
         # group = Group()
         # assert_equal(expected, group.chainify(mergeable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_layer(self):
         # group = Group()
         # assert_equal(expected, group.layer())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_layer_case_2(self):
         # group = Group()
         # assert_equal(expected, group.layer(l))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestChain:
     @classmethod
@@ -365,7 +365,7 @@ class TestChain:
     def test_contiguous(self):
         # chain = Chain(data)
         # assert_equal(expected, chain.contiguous(edge, tol, allow_swap))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestDrawing:
     @classmethod
@@ -489,12 +489,12 @@ class TestRect:
     def test_p1(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.p1())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_p2(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.p2())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestText:
     def test___init__(self):
@@ -555,37 +555,37 @@ class test__Group:
     def test_bbox(self):
         # __group = _Group()
         # assert_equal(expected, __group.bbox(filter))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_connect(self):
         # __group = _Group()
         # assert_equal(expected, __group.connect(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_intersect(self):
         # __group = _Group()
         # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_length(self):
         # __group = _Group()
         # assert_equal(expected, __group.length())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_patches(self):
         # __group = _Group()
         # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_to_dxf(self):
         # __group = _Group()
         # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestChains:
     def test_chains(self):
         # assert_equal(expected, chains(group, tol, mergeable))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
     runmodule(level=logging.WARNING)

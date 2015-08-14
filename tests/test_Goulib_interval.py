@@ -242,7 +242,7 @@ class TestBox:
     def test_corner(self):
         # box = Box(*args)
         # assert_equal(expected, box.corner(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 if __name__ == "__main__":
     runmodule()

@@ -45,7 +45,7 @@ class TestPurePilAlphaToColorV2(unittest.TestCase):
 class TestImg2base64:
     def test_img2base64(self):
         # assert_equal(expected, img2base64(img, fmt))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest
 
 if __name__=="__main__":
     runmodule()
