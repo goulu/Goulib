@@ -13,7 +13,7 @@ __credits__ = [
 __license__ = "LGPL"
 
 import six
-from six.moves import filter, zip_longest #TODO: find a way to remove red in Eclipse
+from six.moves import zip_longest, filter
 
 from math import pi, log, sqrt, sin, asin
 import math, cmath, operator
@@ -503,7 +503,7 @@ def primes_gen(start=2,stop=None):
 def euclid_gen():
     """Euclid numbers: 1 + product of the first n primes"""
     n = 1
-    for p in primes_gen():
+    for p in primes_gen(1):
         n = n * p
         yield n+1
 
@@ -540,19 +540,23 @@ def euler_phi(n):
 
 totient=euler_phi #alias. totient is available in sympy
 
-def digits_from_num(num, base=10, rev=False):
+def digits_gen(num, base=10):
+    """generates int digits of num in base BACKWARDS"""
+    if num == 0:
+        yield 0
+    while num:
+        yield num % base
+        num //= base
+    
+
+def digits(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
-    if base==10:
-        res=map(int, str(num))
-    else:
-        def recursive(num, base, current):
-            if num < base:
-                return [num]+current
-            return recursive(num//base, base, [num%base]+current)
-        res=recursive(num, base, [])
-    if rev:
-        res=reversed(list(res))
-    return list(res)
+    res=list(digits_gen(num,base))
+    return res if rev else reversed(res)
+
+def digsum(num, base=10):
+    """return: sum of digits of num"""
+    return sum(digits_gen(num,base))
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
@@ -568,9 +572,6 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     if base < 2 or base > len(numerals):
         raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
 
-    if num == 0:
-        return '0'
-
     if num < 0:
         sign = '-'
         num = -num
@@ -578,11 +579,11 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
         sign = ''
 
     result = ''
-    while num:
-        result = numerals[num % (base)] + result
-        num //= base
+    for d in digits_gen(num,base):
+        result = numerals[d] + result
 
     return sign + result
+
 
 def num_from_digits(digits, base=10):
     """
@@ -602,7 +603,7 @@ def is_palindromic(num, base=10):
     read equally from left to right and right to left."""
     if base==10:
         return num==reverse(num)
-    digitslst = digits_from_num(num, base)
+    digitslst = list(digits_gen(num, base))
     return digitslst == list(reversed(digitslst))
 
 def is_permutation(num1, num2, base=10):
@@ -837,7 +838,7 @@ def get_cardinal_name(num):
             (not hundreds or tens > 0) and _get_tens(tens),
           ]))
 
-    blocks=digits_from_num(num,1000,rev=True) #group by 1000
+    blocks=digits(num,1000,rev=True) #group by 1000
     res=''
     for hdu,word in zip(blocks,['',' thousand ',' million ',' billion ']):
         if hdu==0: continue #skip
