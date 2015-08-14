@@ -511,7 +511,7 @@ def subdict(d,keys):
     return dict([(i, d[i]) for i in keys if i in d])
 
 def sorted_iterable(iterable, key=None, buffer=100):
-    """sorts an almost sorted infinite iterable
+    """sorts an almost sorted (infinite) iterable
     :param iterable: iterable
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
@@ -521,6 +521,7 @@ def sorted_iterable(iterable, key=None, buffer=100):
         if len(b)>=buffer:
             yield b.pop(0)
         b.insert(x)
+    for x in b: yield x # this never happens if iterable is infinite
 
 # operations on sorted iterators
 
