@@ -52,6 +52,11 @@ class TestEqual:
 class TestLcm:
     def test_lcm(self):
         assert_equal(lcm(101, -3),-303)
+        assert_equal(lcm(4,6),12)
+        
+class TestGcd:
+    def test_gcd(self):
+        assert_equal(gcd(54,24),6)
 
 class TestAccsum:
     def test_accsum(self):
@@ -186,12 +191,33 @@ class TestStrBase:
         assert_equal(str_base(41,4,shadok),"ZOZOBU")
         assert_equal(str_base(1681,4,shadok),"BUZOZOBUGABU")
          
-
-class TestDigitsFromNum:
-    def test_digits_from_num(self):
+class TestDigitsGen:
+    def test_digits_gen(self):
+        pass #used below
+    
+class TestDigits:
+    def test_digits(self):
         assert_equal(digits(1234),[1,2,3,4])
         assert_equal(digits(1234, rev=True),[4,3,2,1])
         assert_equal(digits(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
+        
+class TestDigsum:
+    def test_digsum(self):
+        assert_equal(digsum(1234567890),45)
+        
+class TestIntegerExponent:
+    def test_integer_exponent(self):
+        assert_equal(integer_exponent(1000),3)
+        assert_equal(integer_exponent(1024,2),10)
+        assert_equal(integer_exponent(binomial(1000,373),2),6) #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_3.html
+        
+class TestCarries:
+    def test_carries(self):
+        assert_equal(carries(127, 123),1)
+        assert_equal(carries(127, 173),2)
+        assert_equal(carries(1, 999),3)
+        assert_equal(carries(999, 1),3)
+        assert_equal(carries(127, 127,2),7)
 
 class TestNumFromDigits:
     def test_num_from_digits(self):
@@ -205,6 +231,7 @@ class TestNumberOfDigits:
         assert_equal(number_of_digits(1234),4)
         assert_equal(number_of_digits(2014,2),11)
         assert_equal(number_of_digits(65535,16),4)
+        
 
 class TestIsPalindromic:
     def test_is_palindromic(self):
@@ -259,14 +286,6 @@ class TestProperDivisors:
     def test_proper_divisors(self):
         d=list(proper_divisors(2014))
         assert_equal(d,[1, 53, 19, 1007, 2, 106, 38])
-
-class TestGreatestCommonDivisor:
-    def test_greatest_common_divisor(self):
-        assert_equal(greatest_common_divisor(54,24),6)
-
-class TestLeastCommonMultiple:
-    def test_least_common_multiple(self):
-        assert_equal(least_common_multiple(4,6),12)
 
 class TestTriangle:
     def test_triangle(self):
@@ -332,24 +351,36 @@ class TestLevenshtein:
     def test_levenshtein(self):
         assert_equal(levenshtein('hello','world'),4)
 
-class TestBinomialCoefficient:
-    def test_binomial_coefficient(self):
+class TestBinomial:
+    def test_binomial(self):
         # https://www.hackerrank.com/challenges/ncr
-        assert_equal(binomial_coefficient(1,2),0)
-        assert_equal(binomial_coefficient(2,1),2)
-        assert_equal(binomial_coefficient(4,0),1)
-        assert_equal(binomial_coefficient(5,2),10)
-        assert_equal(binomial_coefficient(10,3),120)
-        assert_equal(binomial_coefficient(87,28) % 142857,141525)
+        assert_equal(binomial(1,2),0)
+        assert_equal(binomial(2,1),2)
+        assert_equal(binomial(4,0),1)
+        assert_equal(binomial(5,2),10)
+        assert_equal(binomial(10,3),120)
+        assert_equal(binomial(87,28) % 142857,141525)
         assert_equal(
-            binomial_coefficient(100000,4000),
-            binomial_coefficient(100000,96000) #same because 100000-96000=4000
+            binomial(100000,4000),
+            binomial(100000,96000) #same because 100000-96000=4000
         )
         
     @raises(OverflowError)
-    def test_binomial_coefficient_overflow(self):
-        assert_equal(binomial_coefficient(961173600,386223045)%142857,0)
-
+    def test_binomial_overflow(self):
+        assert_equal(binomial(961173600,386223045)%142857,0)
+        
+class TestBinomialExponent:
+    def test_binomial_exponent(self):
+        assert_equal(binomial_exponent(88,50,3),3) # https://www.math.upenn.edu/~wilf/website/dm36.pdf
+        
+        #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_3.html
+        assert_equal(binomial_exponent(1000,373,2),6) 
+        for b in range(2,11):
+            for n in range(1,20):
+                for k in range(1,n):
+                    assert_equal(binomial_exponent(n,k,b), integer_exponent(binomial(n,k),b))
+                     
+                                       
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         assert_equal(combinations_with_replacement('ABC', 2),
@@ -472,8 +503,18 @@ class TestLogFactorial:
         assert_equal(log_factorial(100),363.73937555556349014408) 
 
 class TestLogBinomialCoefficient:
-    def test_log_binomial_coefficient(self):
-        assert_equal(log_binomial_coefficient(87,28),log(49848969000742658237160))
+    def test_log_binomial(self):
+        assert_equal(log_binomial(87,28),log(49848969000742658237160))
+        
+class Moebius:
+    def test_moebius(self):
+        assert_equal(moebius(3),-1)
+    
+class Omega:
+    def test_omega(self):
+        assert_equal(omega(3),0)
+        assert_equal(omega(4),1)
+        assert_equal(omega(6),2)
         
 class TestEulerPhi:
     def test_euler_phi(self):
@@ -494,10 +535,6 @@ class TestLucasLehmer:
         # assert_equal(expected, lucas_lehmer(p))
         raise SkipTest # 
 
-class TestEulerPhiOverN:
-    def test_euler_phi_over_n(self):
-        # assert_equal(expected, euler_phi_over_n(n))
-        raise SkipTest # 
 
 class TestReverse:
     def test_reverse(self):
@@ -633,6 +670,66 @@ class TestFactorialGen:
     def test_factorial_gen(self):
         # assert_equal(expected, factorial_gen())
         raise SkipTest # 
+
+class TestEuclidGen:
+    def test_euclid_gen(self):
+        # assert_equal(expected, euclid_gen())
+        raise SkipTest # TODO: implement your test here
+
+class TestModPow:
+    def test_mod_pow(self):
+        assert_equal( mod_pow(2,10,100),24)
+        assert_equal( mod_pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
+        assert_equal( mod_pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
+
+class TestEgcd:
+    def test_egcd(self):
+        pass #tested below
+
+class TestModInv:
+    def test_mod_inv(self):
+        assert_equal(mod_inv(3,11),4)
+
+class TestModDiv:
+    def test_mod_div(self):
+        assert_equal( mod_div(3,16,53),30)
+        assert_equal( mod_div(3,16,53),30)
+        assert_equal( mod_div(5,5,12),25)
+
+class TestModFact:
+    def test_mod_fact(self):
+        assert_equal( mod_fact(10,71),61)
+        assert_equal( mod_fact(11,71),32)
+
+class TestChineseRemainder:
+    def test_chinese_remainder(self):
+        assert_equal( chinese_remainder([3,5,7],[2,3,2]),23)
+        assert_equal( chinese_remainder([3,4,5],[2,3,1]),11) #http://en.wikipedia.org/wiki/Chinese_remainder_theorem
+
+class TestModBinomial:
+    def test_mod_binomial(self):
+        assert_equal( mod_binomial(456, 51, 30),28) #http://math.stackexchange.com/questions/95491/n-choose-k-bmod-m-using-chinese-remainder-theorem
+        
+        assert_equal( mod_binomial(1000, 729, 19),13) #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_4.html
+        
+        res=binomial(16, 5) % 9
+        #http://math.stackexchange.com/questions/222637/binomial-coefficient-modulo-prime-power
+        assert_equal(  mod_binomial(16, 5, 9),res)
+        
+        m=142857
+        
+        assert_equal(  mod_binomial(5,2,m),binomial(5,2))
+        assert_equal(  mod_binomial(10,3,m),binomial(10,3))
+        
+        assert_equal(  mod_binomial(27,3,27),binomial(27, 3) % 27) #==9
+        assert_equal(  mod_binomial(27,3,m),binomial(27,3)%m) #== 2925
+        
+        return #tests below are too large for now
+        
+        assert_equal(  mod_binomial(961173600,386223045,m),0)
+        assert_equal(  mod_binomial(938977945,153121024,m),47619)
+        assert_equal(  mod_binomial(906601285,527203335,m),0)
+        assert_equal(  mod_binomial(993051461,841624879,m),104247)
 
 if __name__ == "__main__":
     runmodule()

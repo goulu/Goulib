@@ -19,7 +19,7 @@ from math import pi, log, sqrt, sin, asin
 import math, cmath, operator
 
 from itertools import count
-from .itertools2 import drop, ireduce, irange, compact, accumulate
+from .itertools2 import drop, ireduce, irange, ilen, compact, accumulate, count_unique
 from .itertools2 import compress, cartesian_product, arange, take
 from .decorators import memoize
 
@@ -317,7 +317,7 @@ def fibonacci(n):
 def catalan(n):
     """Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
     """
-    return binomial_coefficient(2*n,n)/(n+1)
+    return binomial(2*n,n)/(n+1)
 
 def catalan_gen():
     """Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
@@ -524,19 +524,96 @@ def lucas_lehmer (p):
         s = (s*s - 2) % m_p
     return s == 0
 
-def euler_phi_over_n(n):
-    """Euler totient function
-    http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
+def prime_factors(num, start=2):
+    """generates all prime factors (ordered) of num in a list"""
+    for p in primes_gen(start):
+        if num==1:
+            break
+        if is_prime(num): #because it's fast
+            yield num
+            break
+        if p>num:
+            break
+        while num % p==0:
+            yield p
+            num=num//p
+
+def factorize(n):
+    """find the prime factors of n along with their frequencies. Example:
+
+    >>> factor(786456)
+    [(2,3), (3,3), (11,1), (331,1)]
     """
-    if n<=1: return 1
-    res=mul((1 - 1.0 / p for p, _ in factorize(n)),1)
+
+    if n==1: #allows to make many things quite simpler...
+        return [(1,1)]
+    return compress(prime_factors(n))
+
+    #TODO: check if code below is faster for "small" n
+
+    """
+    def trial_division(n, bound=None):
+        if n == 1: return 1
+        for p in [2, 3, 5]:
+            if n%p == 0: return p
+        if bound == None: bound = n
+        dif = [6, 4, 2, 4, 2, 4, 6, 2]
+        m = 7; i = 1
+        while m <= bound and m*m <= n:
+            if n%m == 0:
+                return m
+            m += dif[i%8]
+            i += 1
+        return n
+
+
+    if n==0: return
+    if n < 0: n = -n
+    if n==1: yield (1,1) #for coherency
+    while n != 1:
+        p = trial_division(n)
+        e = 1
+        n /= p
+        while n%p == 0:
+            e += 1; n /= p
+        yield (p,e)
+    """
+
+def number_of_divisors(n):
+    #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
+    res=1
+    for (p,e) in factorize(n):
+        res=res*(e+1)
+    return res
+
+def omega(n):
+    """Number of distinct primes dividing n"""
+    return count_unique(prime_factors(n))
+
+def bigomega(n):
+    """Number of prime divisors of n counted with multiplicity"""
+    return ilen(prime_factors(n))
+
+def moebius(n):
+    """Möbius (or Moebius) function mu(n). 
+    mu(1) = 1; 
+    mu(n) = (-1)^k if n is the product of k different primes; 
+    otherwise mu(n) = 0.
+    """
+    if n==1: return 1
+    res=1
+    for p,q in factorize(n):
+        if q>1: return 0
+        res=-res
     return res
 
 def euler_phi(n):
     """Euler totient function
     http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
-    return rint(n*euler_phi_over_n(n))
+    if n<=1:
+        return n
+    return int(mul((1 - 1.0 / p for p, _ in factorize(n)),n))
 
 totient=euler_phi #alias. totient is available in sympy
 
@@ -545,8 +622,8 @@ def digits_gen(num, base=10):
     if num == 0:
         yield 0
     while num:
-        yield num % base
-        num //= base
+        num,rem=divmod(num,base)
+        yield rem
     
 
 def digits(num, base=10, rev=False):
@@ -555,8 +632,29 @@ def digits(num, base=10, rev=False):
     return res if rev else reversed(res)
 
 def digsum(num, base=10):
-    """return: sum of digits of num"""
+    """:return: sum of digits of num"""
     return sum(digits_gen(num,base))
+
+def integer_exponent(a,b=10):
+    """:returns: int highest power of b that divides a.
+    https://reference.wolfram.com/language/ref/IntegerExponent.html
+    """
+    res=0
+    for d in digits_gen(a, b):
+        if d>0 : break
+        res+=1
+    return res
+    
+trailing_zeros= integer_exponent
+
+def carries(a,b,base=10,pos=0):
+    """ :return: int number of carries required to add a+b in base
+    """
+    carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
+    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0): 
+        carry = (one+two+carry)//base
+        answer += carry>0 # increment the number of carry terms, if we will carry again
+    return answer
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
@@ -672,76 +770,6 @@ def is_lychrel(n,limit=96):
         return lychrel_count(n+reverse(n),limit)+1>=limit #... can be lychrel !
     return False
 
-def prime_factors(num, start=2):
-    """generates all prime factors (ordered) of num in a list"""
-    for p in primes_gen(start):
-        if num==1:
-            break
-        if is_prime(num): #because it's fast
-            yield num
-            break
-        if p>num:
-            break
-        while num % p==0:
-            yield p
-            num=num//p
-
-def factorize(n):
-    """find the prime factors of n along with their frequencies. Example:
-
-    >>> factor(786456)
-    [(2,3), (3,3), (11,1), (331,1)]
-    """
-
-    if n==1: #allows to make many things quite simpler...
-        return [(1,1)]
-    return compress(prime_factors(n))
-
-    #TODO: check if code below is faster for "small" n
-
-    """
-    def trial_division(n, bound=None):
-        if n == 1: return 1
-        for p in [2, 3, 5]:
-            if n%p == 0: return p
-        if bound == None: bound = n
-        dif = [6, 4, 2, 4, 2, 4, 6, 2]
-        m = 7; i = 1
-        while m <= bound and m*m <= n:
-            if n%m == 0:
-                return m
-            m += dif[i%8]
-            i += 1
-        return n
-
-
-    if n==0: return
-    if n < 0: n = -n
-    if n==1: yield (1,1) #for coherency
-    while n != 1:
-        p = trial_division(n)
-        e = 1
-        n /= p
-        while n%p == 0:
-            e += 1; n /= p
-        yield (p,e)
-    """
-
-def number_of_divisors(n):
-    #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
-    res=1
-    for (p,e) in factorize(n):
-        res=res*(e+1)
-    return res
-
-def greatest_common_divisor(a, b):
-    """:return: greatest common divisor of a and b"""
-    return (greatest_common_divisor(b, a % b) if b else a)
-
-def least_common_multiple(a, b):
-    """:return: least common multiples of a and b"""
-    return (a * b) / greatest_common_divisor(a, b)
-
 def polygonal(s, n):
     #https://en.wikipedia.org/wiki/Polygonal_number
     return ((s-2)*n*n-(s-4)*n)/2
@@ -796,7 +824,7 @@ def octagonal(n):
 def is_octagonal(n):
     return (2 + sqrt(4 + (12 * n))) % 6 == 0
 
-@memoize
+#@memoize
 def partition(n):
     def non_zero_integers(n):
         for k in range(1, n):
@@ -867,7 +895,7 @@ def is_perfect(n):
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
-    return int(log(num)/log(base)) + 1
+    return int(log(num,base)) + 1
 
 def chakravala(n):
     """
@@ -907,12 +935,12 @@ def factorial_gen():
         last=last*n
         yield last
 
-def binomial_coefficient(n,k):
+def binomial(n,k):
     """
-    https://en.wikipedia.org/wiki/Binomial_coefficient
+    https://en.wikipedia.org/wiki/binomial
     """
     #return factorial(n) // (factorial(k) * factorial(n - k)) # is very slow
-    # code from https://en.wikipedia.org/wiki/Binomial_coefficient#Binomial_coefficient_in_programming_languages
+    # code from https://en.wikipedia.org/wiki/binomial#binomial_in_programming_languages
     if k < 0 or k > n:
         return 0
     if k == 0 or k == n:
@@ -925,9 +953,15 @@ def binomial_coefficient(n,k):
         c = c * (n - i) // (i + 1)
     return int(c)
 
+ncombinations=binomial #alias
 
+def binomial_exponent(n,k,p):
+    """:return: int largest power of p that divides binomial(n,k)"""
+    if is_prime(p):
+        return carries(k,n-k,p) # https://en.wikipedia.org/wiki/Kummer%27s_theorem
 
-ncombinations=binomial_coefficient #alias
+    return min(binomial_exponent(n,k,a)//b for a,b in factorize(p))
+
 
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
@@ -941,8 +975,8 @@ def log_factorial(n):
     """:return: float approximation of ln(n!) by Ramanujan formula"""
     return n*log(n) - n + (log(n*(1+4*n*(1+2*n))))/6 + log(pi)/2
 
-def log_binomial_coefficient(n,k):
-    """:return: float approximation of ln(binomial_coefficient(n,k))"""
+def log_binomial(n,k):
+    """:return: float approximation of ln(binomial(n,k))"""
     return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
@@ -1039,6 +1073,131 @@ def rectangular_repartition(x,n,h):
             return  float(o*(xa-x1)+h*(w-(xa-x1)))/w
         else: # x1<=xb
             return  float(h*(xb-x1)+o*(w-(xb-x1)))/w
-
+        
     return [_integral(i*w,(i+1)*w) for i in range(n)]
+        
+"""modular arithmetic
+initial motivation: https://www.hackerrank.com/challenges/ncr
+
+code translated from http://comeoncodeon.wordpress.com/2011/07/31/combination/
+see also http://userpages.umbc.edu/~rcampbel/Computers/Python/lib/numbthy.py
+
+mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients.m
+"""
+
+def mod_pow(a,b,m):
+    """:return: (a^b) mod m"""
+    return pow(a,b,m)
+    x,y=1,a
+    while b>0:
+        if b%2 == 1:
+            x=(x*y)%m
+        y = (y*y)%m;
+        b=b//2
+    return x
+
+""" this code is wrong and not used anymore
+def egcd(a, b):
+    # http://www.algorithmist.com/index.php/Modular_inverse
+    x,y, u,v = 0,1, 1,0
+    while a >1:
+        q,r = divmod(a,b) # b//a, b%a # use x//y for floor "floor division"
+        m,n = x-u*q, y-v*q 
+        b,a, x,y, u,v = a,r, u,v, m,n
+    return b, x, y
+"""
+
+def mod_inv(a,b):
+     # http://rosettacode.org/wiki/Chinese_remainder_theorem#Python
+    if is_prime(b): #Use Euler's Theorem
+        return mod_pow(a,b-2,b)
+    b0 = b
+    x0, x1 = 0, 1
+    if b == 1: return 1
+    while a > 1:
+        q = a / b
+        a, b = b, a%b
+        x0, x1 = x1 - q * x0, x0
+    if x1 < 0: x1 += b0
+    return x1
+    
+def mod_div(a,b,m):
+    """:return: x such that (b*x) mod m = a mod m """
+    return a*mod_inv(b,m)
+
+def mod_fact(n,m):
+    """:return: n! mod m"""
+    res = 1
+    while n > 0:
+        for i in range(2,n%m+1):
+            res = (res * i) % m
+        n=n//m
+        if n%2 > 0 :
+            res = m - res
+    return res%m
+
+def chinese_remainder(m, a):
+    """
+    http://en.wikipedia.org/wiki/Chinese_remainder_theorem
+    :param m: list of int moduli
+    :param a: list of int remainders
+    :return: smallest int x such that x mod ni=ai
+    """
+    # http://rosettacode.org/wiki/Chinese_remainder_theorem#Python
+    res = 0
+    prod=mul(m)
+    for m_i, a_i in zip(m, a):
+        p = prod // m_i
+        res += a_i * mod_inv(p, m_i) * p
+    return res % prod
+
+def _count(n, p):
+    """:return: power of p in n"""
+    k=0;
+    while n>=p:
+        k+=n//p
+        n=n//p
+    return k;
+
+def mod_binomial(n,k,m,q=None):
+    """
+    calculates C(n,k) mod m for large n,k,m
+    :param n: int total number of elements
+    :param k: int number of elements to pick
+    :param m: int modulo (or iterable of (m,p) tuples used internally)
+    :param q: optional int power of m for prime m, used internally
+    """
+    # the function implements 3 cases which are called recursively:
+    # 1 : m is factorized in powers of primes pi^qi
+    # 2 : Chinese remainder theorem is used to combine all C(n,k) mod pi^qi
+    # 3 : Lucas or Andrew Granville's theorem is used to calculate  C(n,k) mod pi^qi
+    
+    if type(m) is int:
+        if q is None:
+            return mod_binomial(n,k,factorize(m))
+        
+        #3
+        elif q==1: #use http://en.wikipedia.org/wiki/Lucas'_theorem
+            ni=digits_gen(n,m)
+            ki=digits_gen(k,m)
+            res=1
+            for a,b in zip(ni,ki):
+                res*=binomial(a,b)
+                if res==0: break
+            return res
+        #see http://codechef17.rssing.com/chan-12597213/all_p5.html 
+        """
+        elif q==3:
+            return mod_binomial(n*m,k*m,m)
+        """
+        #no choice for the moment....
+        return binomial(n,k)%(m**q)
+    
+    else:  #2
+        #use http://en.wikipedia.org/wiki/Chinese_remainder_theorem
+        r,f=[],[]
+        for p,q in m:
+            r.append(mod_binomial(n,k,p,q))
+            f.append(p**q)
+        return chinese_remainder(f,r)
 
