@@ -57,6 +57,13 @@ class TestLcm:
 class TestGcd:
     def test_gcd(self):
         assert_equal(gcd(54,24),6)
+        assert_equal(gcd(68, 14, 9, 36, 126),1)
+        assert_equal(gcd(7, 14, 35, 7000),7)
+        
+class TestCoprime:
+    def test_coprime(self):
+        assert_true(coprime(68, 14, 9, 36, 126))
+        assert_false(coprime(7, 14, 35, 7000))
 
 class TestAccsum:
     def test_accsum(self):

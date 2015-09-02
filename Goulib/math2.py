@@ -44,7 +44,31 @@ if six.PY3:
         """
         return sign(x-y)
 
-gcd=fractions.gcd
+def gcd(*args):
+    """greatest common divisor of an arbitrary list"""
+    #http://code.activestate.com/recipes/577512-gcd-of-an-arbitrary-list/
+    if len(args) == 2:
+        return fractions.gcd(args[0],args[1])
+    
+    if len(args) == 1:
+        return args[0]
+
+    L = list(args)
+
+    while len(L) > 1:
+        a = L[-2]
+        b = L[-1]
+        L = L[:-2]
+
+        while a:
+            a, b = b%a, a
+
+        L.append(b)
+
+    return abs(b)
+
+def coprime(*args):
+    return gcd(*args)==1
 
 def lcm(a,b):
     """least common multiple"""
@@ -268,7 +292,7 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(coefficients,values,max=None):
+def recurrence(coefficients,values,cst=0, max=None):
     """general generator for recurrences
     :param values: list of initial values
     :param coefficients: list of factors defining the recurrence
@@ -278,13 +302,13 @@ def recurrence(coefficients,values,max=None):
     while True:
         n=dot(coefficients,values)
         if max and n>max: break
-        yield n
+        yield n+cst
         values=values[1:]
-        values.append(n)
+        values.append(n+cst)
 
 def fibonacci_gen(max=None):
     """Generate fibonacci serie"""
-    return recurrence([1,1],[0,1],max)
+    return recurrence([1,1],[0,1],0,max)
 
 def fibonacci(n):
     #http://blog.dreamshire.com/common-functions-routines-project-euler/
@@ -499,7 +523,7 @@ def primes_gen(start=2,stop=None):
     for n in candidates:
         if is_prime(n):
             yield n
-            
+
 def euclid_gen():
     """Euclid numbers: 1 + product of the first n primes"""
     n = 1
@@ -595,9 +619,9 @@ def bigomega(n):
     return ilen(prime_factors(n))
 
 def moebius(n):
-    """Möbius (or Moebius) function mu(n). 
-    mu(1) = 1; 
-    mu(n) = (-1)^k if n is the product of k different primes; 
+    """Möbius (or Moebius) function mu(n).
+    mu(1) = 1;
+    mu(n) = (-1)^k if n is the product of k different primes;
     otherwise mu(n) = 0.
     """
     if n==1: return 1
@@ -624,7 +648,7 @@ def digits_gen(num, base=10):
     while num:
         num,rem=divmod(num,base)
         yield rem
-    
+
 
 def digits(num, base=10, rev=False):
     """:return: list of digits of num expressed in base, optionally reversed"""
@@ -644,14 +668,14 @@ def integer_exponent(a,b=10):
         if d>0 : break
         res+=1
     return res
-    
+
 trailing_zeros= integer_exponent
 
 def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base
     """
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
-    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0): 
+    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
@@ -719,7 +743,7 @@ def is_pandigital(num, base=10):
     n=str_base(num,base)
     return len(n)>=base and not '123456789abcdefghijklmnopqrstuvwxyz'[:base-1].strip(n)
     # return set(sorted(digits_from_num(num,base))) == set(range(base)) #slow
-    
+
 def bouncy(n):
     #http://oeis.org/A152054
     s=str(n)
@@ -1073,9 +1097,9 @@ def rectangular_repartition(x,n,h):
             return  float(o*(xa-x1)+h*(w-(xa-x1)))/w
         else: # x1<=xb
             return  float(h*(xb-x1)+o*(w-(xb-x1)))/w
-        
+
     return [_integral(i*w,(i+1)*w) for i in range(n)]
-        
+
 """modular arithmetic
 initial motivation: https://www.hackerrank.com/challenges/ncr
 
@@ -1102,7 +1126,7 @@ def egcd(a, b):
     x,y, u,v = 0,1, 1,0
     while a >1:
         q,r = divmod(a,b) # b//a, b%a # use x//y for floor "floor division"
-        m,n = x-u*q, y-v*q 
+        m,n = x-u*q, y-v*q
         b,a, x,y, u,v = a,r, u,v, m,n
     return b, x, y
 """
@@ -1120,7 +1144,7 @@ def mod_inv(a,b):
         x0, x1 = x1 - q * x0, x0
     if x1 < 0: x1 += b0
     return x1
-    
+
 def mod_div(a,b,m):
     """:return: x such that (b*x) mod m = a mod m """
     return a*mod_inv(b,m)
@@ -1171,11 +1195,11 @@ def mod_binomial(n,k,m,q=None):
     # 1 : m is factorized in powers of primes pi^qi
     # 2 : Chinese remainder theorem is used to combine all C(n,k) mod pi^qi
     # 3 : Lucas or Andrew Granville's theorem is used to calculate  C(n,k) mod pi^qi
-    
+
     if type(m) is int:
         if q is None:
             return mod_binomial(n,k,factorize(m))
-        
+
         #3
         elif q==1: #use http://en.wikipedia.org/wiki/Lucas'_theorem
             ni=digits_gen(n,m)
@@ -1185,14 +1209,14 @@ def mod_binomial(n,k,m,q=None):
                 res*=binomial(a,b)
                 if res==0: break
             return res
-        #see http://codechef17.rssing.com/chan-12597213/all_p5.html 
+        #see http://codechef17.rssing.com/chan-12597213/all_p5.html
         """
         elif q==3:
             return mod_binomial(n*m,k*m,m)
         """
         #no choice for the moment....
         return binomial(n,k)%(m**q)
-    
+
     else:  #2
         #use http://en.wikipedia.org/wiki/Chinese_remainder_theorem
         r,f=[],[]
