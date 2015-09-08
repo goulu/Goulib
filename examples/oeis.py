@@ -75,7 +75,7 @@ class Sequence(object):
         return self.generator
 
     def __repr__(self):        
-        return self.name
+        #return self.name
     
         from threading import Timer
         def _pass():pass
@@ -85,8 +85,9 @@ class Sequence(object):
         s=[]
         try: 
             for i,item in enumerate(self()):
+                if item>1e80: break
                 s.append(item)
-                if i>=10: break
+                if i>=20: break
                 if timer.finished.is_set(): break
         except:
             pass
@@ -264,7 +265,7 @@ A004169=Sequence(
     desc='Values of n for which a regular polygon with n sides cannot be constructed with ruler and compass'
 )
 
-A000292=Sequence(None,lambda n:n*(n+1)*(n+2)/6, desc='Tetrahedral (or triangular pyramidal) numbers')
+A000292=Sequence(None,lambda n:n*(n+1)*(n+2)//6, desc='Tetrahedral (or triangular pyramidal) numbers')
 
 def cullen(n):return n*2**n+1
 
