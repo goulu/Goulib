@@ -377,10 +377,13 @@ class _Geo(object):
         else:
             return edge[max(edge.keys())]                
 
-    def add_edge(self, u, v, attr_dict={}, **attrs):
+    def add_edge(self, u, v, k=None, attr_dict=None, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         """
+        
+        if type(k) is dict: #old syntax : previous versions of NetworkX didn't require a key
+            attr_dict,k=k,None
         
         #adjust to existing nodes within tolerance and keep track of actual precision
         u=self.add_node(u)
@@ -407,17 +410,19 @@ class _Geo(object):
                 pass #and add the edge normally below
 
         
-        #if no length is explicitely defined, we calculate it and set it as parameter
+        #if no length is explicitly defined, we calculate it and set it as parameter
         #therefore all edges in a GeoGraph have a length attribute
         a.setdefault('length',self.dist(u,v))
+        if k is None: #try to guess the key
+            try:
+                keys=set(self[u][v].keys()) #existing keys
+                k=0 if len(keys)==0 else None #if k=None, it will be determined below
+            except:
+                keys=set()
+                k=0
         
-        try:
-            keys=set(self[u][v].keys()) #existing keys
-            k=0 if len(keys)==0 else None #if k=None, it will be determined below
-        except:
-            keys=set()
-            k=0
-        self.parent.add_edge(self,u, v, attr_dict=a) #doesn't return created data... what a pity ...
+        self.parent.add_edge(self,u, v, k, attr_dict=a) #doesn't return created data... what a pity ...
+
         if k is None:
             k=next(iter(set(self[u][v].keys())-keys))
         return self[u][v][k]
