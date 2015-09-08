@@ -13,9 +13,7 @@ from bisect import bisect_left
 
 def _order(interval):
     """:return: (a,b) interval such that a<=b"""
-    if interval[0]==interval[1]:
-        return (interval[0], interval[1])
-    elif interval[0]<interval[1]:
+    if interval[0]<=interval[1]:
         return (interval[0], interval[1])
     else:
         return (interval[1], interval[0])
@@ -56,7 +54,7 @@ def intersectlen(t1, t2, none=0):
         return none #the parameter...
     return i[1]-i[0]
 
-class Interval(object):
+class Interval(list):
     """
     Represents an interval. 
     Defined as half-open interval [start,end), 
@@ -72,13 +70,10 @@ class Interval(object):
     
     def __init__(self, start, end):
         "Construct, start must be <= end."
-        self._start, self._end = _order((start,end))
+        self[0:1] = _order((start,end))
         
-    start = property(fget=lambda self: self._start, doc="The interval's start")
-    end = property(fget=lambda self: self._end, doc="The interval's end")
-    
-    def __call__(self):
-        return tuple(self.start, self.end)
+    start = property(fget=lambda self: self[0], doc="The interval's start")
+    end = property(fget=lambda self: self[1], doc="The interval's end")
      
     def __str__(self):
         "As string."
@@ -138,8 +133,8 @@ class Interval(object):
             s,e=other.start,other.end
         else:
             s,e=other,other
-        self._start=s if self.start is None else min(self.start,s)
-        self._end=e if self.end is None else max(self.end,e)
+        self[0]=s if self.start is None else min(self.start,s)
+        self[1]=e if self.end is None else max(self.end,e)
         return self
     
     def hull(self, other):

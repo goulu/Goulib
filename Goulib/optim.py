@@ -40,20 +40,23 @@ class ObjectiveFunction:
 def nelder_mead(f, x_start, 
         step=0.1, no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
         alpha = 1., gamma = 2., rho = -0.5, sigma = 0.5):
-    '''
+    """
         Pure Python implementation of the Nelder-Mead algorithm.
+        also called "downhill simplex method" taken from https://github.com/fchollet/nelder-mead
+        
         Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
-        @param f (function): function to optimize, must return a scalar score 
+        :param f: function to optimize, must return a scalar score 
             and operate over a numpy array of the same dimensions as x_start
-        @param x_start (numpy array): initial position
-        @param step (float): look-around radius in initial step
-        @no_improv_thr,  no_improv_break (float, int): break after no_improv_break iterations with 
+        :param x_start: (numpy array) initial position
+        :param step: (float) look-around radius in initial step
+        :param no_improv_thr, no_improv_break: (float,int): 
+            break after no_improv_break iterations with 
             an improvement lower than no_improv_thr
-        @max_iter (int): always break after this number of iterations.
+        :param max_iter: (int): always break after this number of iterations.
             Set it to 0 to loop indefinitely.
-        @alpha, gamma, rho, sigma (floats): parameters of the algorithm 
+        :param alpha, gamma, rho, sigma: (floats): parameters of the algorithm 
             (see Wikipedia page for reference)
-    '''
+    """
 
     # init
     dim = len(x_start)
