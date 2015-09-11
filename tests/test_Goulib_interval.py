@@ -214,9 +214,6 @@ class TestBox:
         assert_equal(repr(box),'[[0,2), [0,1)]')
         box+=Box((-2,-1),(.5,.5))
         assert_equal(repr(box),'[[-2,2), [-1,1)]')
-
-    def test___call__(self):
-        pass #tested in other tests...
         
     def test_end(self):
         pass #tested in other tests...
