@@ -18,7 +18,10 @@ elif sys.gettrace(): #http://stackoverflow.com/questions/333995/how-to-detect-th
 else:
     pass
     # matplotlib.use('pdf') #for high quality pdf, but doesn't work for png, svg ...
-logging.info('matplotlib backend is '+matplotlib.get_backend())
+try:
+    logging.info('matplotlib backend is '+matplotlib.get_backend())
+except: #fails if matplotlib is a mock for ReadTheDocs
+    logging.info('matplotlib is a mock')
 
 class Plot(object):
     """base class for rich object display on IPython notebooks

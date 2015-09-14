@@ -14,11 +14,13 @@
 import sys, os
 
 #http://blog.rtwilson.com/how-to-make-your-sphinx-documentation-compile-with-readthedocs-when-youre-using-numpy-and-scipy/
+
 import mock
+mock.Mock.__all__ = []
 MOCK_MODULES = [
     'numpy', 'scipy', 'matplotlib','matplotlib.pyplot',
     'xlrd','lxml','dxfgrabber','dxfwrite',
-    'svg.path','pdfminer.six','pillow','networkx',
+    'svg.path','pdfminer.six','pillow',
 ]
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
