@@ -62,7 +62,6 @@ import threading
 import weakref
  
 thread_pool = None
-TimeoutError=multiprocessing.TimeoutError
  
 def get_thread_pool():
     global thread_pool
@@ -84,3 +83,21 @@ def timeout(timeout):
                 return func(*args, **kwargs)
         return __wrapper
     return wrap_function
+
+#https://gist.github.com/goulu/45329ef041a368a663e5
+from threading import Timer
+from multiprocessing import TimeoutError
+    
+def itimeout(iterable,timeout):
+    """timeout for loops
+    :param iterable: any iterable
+    :param timeout: float max running time in seconds 
+    :yield: items in iterator until timeout occurs
+    :raise: multiprocessing.TimeoutError if timeout occured
+    """
+    timer=Timer(timeout,lambda:None)
+    timer.start()
+    for i in iterable:
+        yield i
+        if timer.finished.is_set(): 
+            raise TimeoutError
