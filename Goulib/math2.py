@@ -74,6 +74,20 @@ def lcm(a,b):
     """least common multiple"""
     return abs(a * b) / gcd(a,b) if a and b else 0
 
+def xgcd(a,b):
+    """Extended GCD:
+    Returns (gcd, x, y) where gcd is the greatest common divisor of a and b
+    with the sign of b if b is nonzero, and with the sign of a if b is 0.
+    The numbers x,y are such that gcd = ax+by."""
+    #taken from http://anh.cs.luc.edu/331/code/xgcd.py
+    prevx, x = 1, 0;  prevy, y = 0, 1
+    while b:
+        q, r = divmod(a,b)
+        x, prevx = prevx - q*x, x  
+        y, prevy = prevy - q*y, y
+        a, b = b, r
+    return a, prevx, prevy
+
 def quad(a, b, c, allow_complex=False):
     """ solves quadratic equations
         form aX^2+bX+c, inputs a,b,c,
@@ -1003,6 +1017,21 @@ def log_binomial(n,k):
     """:return: float approximation of ln(binomial(n,k))"""
     return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
+def ilog(a,b,upper_bound=False):
+    """discrete logarithm x such that b^x=a
+    :parameter a,b: integer
+    :parameter upper_bound: bool. if True, returns smallest x such that b^x>=a
+    :return: x integer such that b^x=a, or upper_bound, or None
+    https://en.wikipedia.org/wiki/Discrete_logarithm
+    """  
+    # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
+    #for now it's brute force...
+    p=1
+    for x in count():
+        if p==a: return x
+        if p>a: return x if upper_bound else None
+        p=b*p
+
 #from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
 
 def angle(u,v,unit=True):
@@ -1108,6 +1137,7 @@ see also http://userpages.umbc.edu/~rcampbel/Computers/Python/lib/numbthy.py
 
 mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients.m
 """
+#see http://anh.cs.luc.edu/331/code/mod.py for a MOD class
 
 def mod_pow(a,b,m):
     """:return: (a^b) mod m"""
@@ -1224,4 +1254,14 @@ def mod_binomial(n,k,m,q=None):
             r.append(mod_binomial(n,k,p,q))
             f.append(p**q)
         return chinese_remainder(f,r)
+    
+def baby_step_giant_step(y, a, n):
+    #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
+    #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html 
+    s = int(ceil(sqrt(n)))
+    A = [y * pow(a, r, n) % n for r in xrange(s)]
+    for t in xrange(1,s+1):
+        value = pow(a, t*s, n)
+        if value in A:
+            return (t * s - A.index(value)) % n
 
