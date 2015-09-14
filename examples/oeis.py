@@ -18,7 +18,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import six, logging, operator
+import six, logging, operator, math
 
 from itertools import count, repeat, tee, islice
 
@@ -54,8 +54,23 @@ class Sequence(object):
 
         self.desc=desc
 
+    def __repr__(self):      
+        s=[]
+        try: 
+            i=0
+            for item in decorators.itimeout(self,1): #must be quick for debugger
+                if item>1e80: break
+                s.append(item)
+                i+=1
+                if i>=20: break
+        except decorators.TimeoutError:
+            pass
 
-    def __call__(self):
+        if s:
+            s=str(s)[1:-1] # remove []
+        return '%s (%s ...)'%(self.name,s)
+
+    def __iter__(self):
         """reset the generator
         :return: a tee-ed copy of iterf
         """
@@ -74,34 +89,12 @@ class Sequence(object):
             self.generator=_()
         return self.generator
 
-    def __repr__(self):        
-        #return self.name
-    
-        from threading import Timer
-        def _pass():pass
-        timer=Timer(0.1,_pass)
-        timer.start()
-        
-        s=[]
-        try: 
-            for i,item in enumerate(self()):
-                if item>1e80: break
-                s.append(item)
-                if i>=20: break
-                if timer.finished.is_set(): break
-        except:
-            pass
-        timer.cancel()
-
-        if s:
-            s=str(s)[1:-1] # remove []
-        return '%s (%s ...)'%(self.name,s)
-
     def __getitem__(self, i):
         if not isinstance(i,slice):
             if self.itemf :
                 return self.itemf(i)
-            for j,v in enumerate(self()):
+            else:
+                return itertools2.index(i,self)
                 if j==i: return v
         else:
             return islice(self(),i.start,i.stop,i.step)
@@ -126,7 +119,7 @@ class Sequence(object):
                 desc='%s+%d'%(self.name,other)
             )
         return Sequence(
-            itertools2.merge(self(),other()), None,
+            itertools2.merge(self,other), None,
             lambda x:x in self or x in other
         )
 
@@ -138,7 +131,7 @@ class Sequence(object):
                 desc='%s-%d'%(self.name,other)
             )
         return Sequence(
-            itertools2.diff(self(),other()), None,
+            itertools2.diff(self.__iter__(),other.__iter__()), None,
             lambda x:x in self and x not in other
         )
 
@@ -159,12 +152,12 @@ class Sequence(object):
         )
 
     def accumulate(self,op,skip_first=False):
-        return Sequence(itertools2.accumulate(self(),op,skip_first))
+        return Sequence(itertools2.accumulate(self,op,skip_first))
 
     def pairwise(self,op,skip_first=False):
         return Sequence(itertools2.pairwise(self(),op))
 
-    def sort(self,key=None,buffer=100):
+    def sort(self,key=None,buffer=1000):
         return Sequence(itertools2.sorted_iterable(self, key, buffer))
 
     def unique(self):
@@ -245,7 +238,7 @@ A051875=Sequence(None,lambda n:math2.polygonal(23,n))
 
 A051876=Sequence(None,lambda n:math2.polygonal(24,n))
 
-A167149=Sequence(1,lambda n:math2.polygonal(10000,n),'myriagonal')
+A167149=Sequence(0,lambda n:math2.polygonal(10000,n),'myriagonal')
 
 A001110=A000217.filter(math2.is_square,'Square triangular numbers: numbers that are both triangular and square')
 A001110.iterf=math2.recurrence([-1,34],[0,1],2)  #http://www.johndcook.com/blog/2015/08/21/computing-square-triangular-numbers/
@@ -278,7 +271,7 @@ A000005=Sequence(1,lambda n:len(list(math2.divisors(n))),
     desc='d(n) (also called tau(n) or sigma_0(n)), the number of divisors of n.'
 )
 
-A002182=Sequence(record(A000005(),count(1)),
+A002182=Sequence(record(A000005,count(1)),
     desc='Highly composite numbers, definition (1): where d(n), the number of divisors of n (A000005), increases to a record.'
 )
 
@@ -292,7 +285,7 @@ A005101=Sequence(1,None,lambda x:math2.abundance(x)>0,
     desc='Abundant numbers (sum of divisors of n exceeds 2n).'
 )
 
-A002093=Sequence(record(A000203(),count(1)),
+A002093=Sequence(record(A000203,count(1)),
     desc='Highly abundant numbers: numbers n such that sigma(n) > sigma(m) for all m < n.'
 )
 
@@ -334,6 +327,31 @@ A000396=A000043.apply(lambda p:A000079[p-1]*(A000079[p] - 1),
     containf=lambda x:math2.is_perfect(x)==0,
     desc='Perfect numbers n: n is equal to the sum of the proper divisors of n.'
 )
+
+def exp_sequences(a,b,c,desc_s1=None,desc_s2=None,desc_s3=None,start=0):
+    def _gen():
+        p=b**start
+        for _ in decorators.itimeout(count(),10):
+            yield a*p+c
+            p=p*b
+            
+    s1=Sequence(_gen,lambda n:a*b**n+c,desc=desc_s1 or "a(n)=%d*%d^n%+d"%(a,b,c))
+    s2=s1.filter(math2.is_prime,desc=desc_s2 or "Primes of the form %d*%d^n%+d"%(a,b,c))
+    s3=s2.apply(lambda n:math2.ilog((n-c)//a,b), desc=desc_s3 or "Numbers n such that %d*%d^n%+d is prime"%(a,b,c))
+    return s1,s2,s3
+
+A033484=exp_sequences(3,2,-2)[0]
+_,A007505,A002235=exp_sequences(3,2,-1,desc_s2='Thabit primes of form 3*2^n -1.')
+
+A046865=exp_sequences(4,5,-1)[2]
+A079906=exp_sequences(5,6,-1)[2]
+A046866=exp_sequences(6,7,-1,start=1)[2]
+_,A050523,A001771=exp_sequences(7,2,-1)
+A005541=exp_sequences(8,3,-1)[2]
+A056725=exp_sequences(9,10,-1)[2]
+A046867=exp_sequences(10,11,-1)[2]
+A079907=exp_sequences(11,12,-1)[2]
+
 
 A019434=A000215.filter(math2.is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
 
@@ -377,11 +395,11 @@ def primes_couples(d=2):
 
 A077800=Sequence(primes_couples)
 
-A001097=Sequence(itertools2.unique_sorted(A077800()))
+A001097=Sequence(itertools2.unique_sorted(A077800))
 
-A001359=Sequence(itertools2.takeevery(2, A077800(), 0)) #Lesser of twin primes.
+A001359=Sequence(itertools2.takeevery(2, A077800, 0)) #Lesser of twin primes.
 
-A006512=Sequence(itertools2.takeevery(2, A077800(), 1)) #Greater of twin primes.
+A006512=Sequence(itertools2.takeevery(2, A077800, 1)) #Greater of twin primes.
 
 def count_10_exp(iterable):
     """generates number of iterable up to 10^n."""
@@ -393,10 +411,10 @@ def count_10_exp(iterable):
             l=10*l
         c+=1
 
-A007508=Sequence(count_10_exp(A006512())) #Number of twin prime pairs below 10^n.
+A007508=Sequence(count_10_exp(A006512)) #Number of twin prime pairs below 10^n.
 
 A007510=A000040-A001097 #Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime
-
+            
 A023200=Sequence(itertools2.takeevery(2, primes_couples(4), 0)) # Lesser of cousin primes.
 
 A046132=Sequence(itertools2.takeevery(2, primes_couples(4), 1)) #Greater of cousin primes
@@ -426,7 +444,7 @@ A006881=Sequence(1,None,is_product_of_2_primes,"Numbers that are the product of 
 A030513=A030078+A006881 #Numbers with 4 divisors
 A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4,"Numbers with 4 divisors")
 
-A035533=Sequence(count_10_exp(A030513()),desc="Number of numbers up to 10^n with exactly 4 divisors")
+A035533=Sequence(count_10_exp(A030513),desc="Number of numbers up to 10^n with exactly 4 divisors")
 
 A000006=A000040.apply(math2.isqrt,desc="Integer part of square root of n-th prime.")
 
@@ -582,6 +600,8 @@ A000796=Sequence(pi_generate) #Decimal expansion of Pi (or, digits of Pi).
 
 # pythagorean triples
 
+"""problems with .sort
+
 A009096=Sequence(math2.triples).apply(sum).sort() # not .unique()
 
 desc="Sum of legs of Pythagorean triangles (without multiple entries)."
@@ -598,6 +618,9 @@ A020882=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[2]).sort()
 
 desc="Smallest member 'a' of the primitive Pythagorean triples (a,b,c) ordered by increasing c, then b"
 A046086=Sequence(math2.primitive_triples,desc=desc).sort(key=lambda x:x[2]).apply(lambda x:x[0])
+
+"""
+
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()

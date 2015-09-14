@@ -13,30 +13,25 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import sys, six, logging
-from threading import Timer
+
+import Goulib.decorators
 
 from Goulib.tests import *
 
 from examples.oeis import *
 
-def assert_generator(f,l,name,time_limit=0.1):
-
-    def _pass():pass
-    timer=Timer(time_limit,_pass)
-    timer.start()
+def assert_generator(f,l,name,time_limit=10):
     i=0
-    for item1,item2 in six.moves.zip(f(),l):
-        m='%s : First differing element %d: %s != %s\n' %(name, i, item1, item2)
-        assert_equal(item1,item2, msg=m)
-
-        i+=1
-        if timer.finished.is_set():
-            if i<min(100,len(l)/2):
-                logging.warning('%s timeout after only %d loops'%(name,i))
-            else:
-                logging.debug('%s timeout after %d loops'%(name,i))
-            break
-    timer.cancel()
+    try:
+        for item1,item2 in decorators.itimeout(six.moves.zip(f,l),time_limit):
+            m='%s : First differing element %d: %s != %s\n' %(name, i, item1, item2)
+            assert_equal(item1,item2, msg=m)
+            i+=1
+    except decorators.TimeoutError:
+        if i<min(100,len(l)/2):
+            logging.warning('%s timeout after only %d loops'%(name,i))
+        else:
+            logging.debug('%s timeout after %d loops'%(name,i))
 
 import shelve
 database = shelve.open('oeis.db')
