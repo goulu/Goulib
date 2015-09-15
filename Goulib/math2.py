@@ -453,10 +453,10 @@ def sieve(n):
         # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
         _sieve = [False,False,True,True]+[False,True] * ((n-4)//2)
         assert(len(_sieve)==n)
-        for i in xrange(3,int(n**0.5)+1,2):
+        for i in range(3,int(n**0.5)+1,2):
             if _sieve[i]:
                 _sieve[i*i::2*i]=[False]*((n-i*i-1)/(2*i)+1)
-    return [2] + [i for i in xrange(3,n,2) if _sieve[i]]
+    return [2] + [i for i in range(3,n,2) if _sieve[i]]
 
 _primes=sieve(1000) # primes up to 1000
 _primes_set = set(_primes) # to speed us primality tests below
@@ -1259,8 +1259,8 @@ def baby_step_giant_step(y, a, n):
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html 
     s = int(ceil(sqrt(n)))
-    A = [y * pow(a, r, n) % n for r in xrange(s)]
-    for t in xrange(1,s+1):
+    A = [y * pow(a, r, n) % n for r in range(s)]
+    for t in range(1,s+1):
         value = pow(a, t*s, n)
         if value in A:
             return (t * s - A.index(value)) % n

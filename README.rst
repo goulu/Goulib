@@ -5,23 +5,23 @@ library of useful Python code for scientific + technical applications
 
 see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
-.. image:: https://pypip.in/license/Goulib/badge.svg
+.. image:: http://img.shields.io/badge/license-LGPL-green.svg
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
     :alt: License
-.. image:: https://pypip.in/version/Goulib/badge.png
+.. image:: https://badge.fury.io/py/goulib.svg
     :target: https://pypi.python.org/pypi/Goulib/
     :alt: Version
-.. image:: https://travis-ci.org/goulu/Goulib.png
+.. image:: https://travis-ci.org/goulu/Goulib.svg
     :target: https://travis-ci.org/goulu/Goulib
     :alt: Build
-.. image:: https://coveralls.io/repos/goulu/Goulib/badge.png
-  :target: https://coveralls.io/r/goulu/Goulib
-  :alt: Tests
+.. image:: https://coveralls.io/repos/goulu/Goulib/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/goulu/Goulib?branch=master
+    :alt: Tests
 .. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
   :target: http://goulib.readthedocs.org/en/latest/
   :alt: Doc
-.. image:: https://www.ohloh.net/accounts/543923/widgets/account_tiny.gif
-	:target: https://www.ohloh.net/accounts/543923?ref=Tiny
+.. image:: https://www.openhub.net/accounts/Goulu/widgets/account_tiny?format=gif
+    :target: https://www.openhub.net/accounts/Goulu
 .. image:: https://api.coderwall.com/goulu/endorsecount.png
     :target: https://coderwall.com/goulu
   
