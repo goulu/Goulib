@@ -57,7 +57,7 @@ def nodebug(func):
 
 import multiprocessing
 from multiprocessing.pool import ThreadPool
-import thread
+import six.moves._thread as thread
 import threading
 import weakref
  

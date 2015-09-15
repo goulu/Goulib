@@ -1,1 +1,4 @@
 six
+xlrd
+pillow
+dxfgrabber
