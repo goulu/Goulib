@@ -15,17 +15,9 @@ Classes
     Drawing
     :parts: 1
 
-.. autosummary::
-    BBox
-    Entity
-    Spline
-    Group
-    Chain
-    Drawing
-
-....
-
 .. automodule:: Goulib.drawing
+    :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

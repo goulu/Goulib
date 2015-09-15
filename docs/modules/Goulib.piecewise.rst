@@ -4,5 +4,6 @@ Goulib.piecewise module
 .. automodule:: Goulib.piecewise
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

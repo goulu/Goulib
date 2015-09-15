@@ -1,7 +1,7 @@
-Goulib.table module
+Goulib.image module
 ===================
 
-.. automodule:: Goulib.table
+.. automodule:: Goulib.image
     :show-inheritance:
     :members:
     :inherited-members:

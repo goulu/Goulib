@@ -1,7 +1,7 @@
-Goulib.table module
-===================
+Goulib.container module
+=======================
 
-.. automodule:: Goulib.table
+.. automodule:: Goulib.container
     :show-inheritance:
     :members:
     :inherited-members:

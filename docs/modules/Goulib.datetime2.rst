@@ -4,5 +4,6 @@ Goulib.datetime2 module
 .. automodule:: Goulib.datetime2
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

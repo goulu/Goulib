@@ -2,6 +2,8 @@ Goulib.workdays module
 ======================
 
 .. automodule:: Goulib.workdays
-    :members:
-    :undoc-members:
     :show-inheritance:
+    :members:
+    :inherited-members:
+    :special-members:
+    :undoc-members:

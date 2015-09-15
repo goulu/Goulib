@@ -4,5 +4,6 @@ Goulib.optim module
 .. automodule:: Goulib.optim
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

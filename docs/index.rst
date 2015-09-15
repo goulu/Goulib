@@ -61,6 +61,7 @@ Modules
     image
     interval
     itertools2
+    markup
     math2
     motion
     optim

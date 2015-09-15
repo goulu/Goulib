@@ -4,5 +4,6 @@ Goulib.expr module
 .. automodule:: Goulib.expr
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

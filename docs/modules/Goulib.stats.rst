@@ -2,6 +2,8 @@ Goulib.stats module
 ===================
 
 .. automodule:: Goulib.stats
-    :members:
-    :undoc-members:
     :show-inheritance:
+    :members:
+    :inherited-members:
+    :special-members:
+    :undoc-members:

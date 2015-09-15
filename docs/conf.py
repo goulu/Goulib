@@ -15,15 +15,19 @@ import sys, os
 
 #http://blog.rtwilson.com/how-to-make-your-sphinx-documentation-compile-with-readthedocs-when-youre-using-numpy-and-scipy/
 
-import mock
-mock.Mock.__all__ = []
-MOCK_MODULES = [
-    'numpy', 'scipy', 'matplotlib','matplotlib.pyplot',
-    'xlrd','lxml','dxfgrabber','dxfwrite',
-    'svg.path','pdfminer.six','pillow',
-]
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+import os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+if on_rtd:
+    import mock
+    mock.Mock.__all__ = []
+    MOCK_MODULES = [
+        'numpy', 'scipy', 'matplotlib','matplotlib.pyplot',
+        'xlrd','lxml','dxfgrabber','dxfwrite',
+        'svg.path','pdfminer.six','pillow',
+    ]
+    for mod_name in MOCK_MODULES:
+        sys.modules[mod_name] = mock.Mock()
 
 
 def read(*parts):
@@ -44,8 +48,6 @@ def get_version():
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('modules'))
 
-import os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # -- General configuration -----------------------------------------------------
 
@@ -88,15 +90,21 @@ copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/Goulib'
 autodoc_member_order = 'bysource'
 autoclass_content = 'both'
 
-def skip(app, what, name, obj, skip, options):
-    if name == "__module__":
-        return True
-    if name == "__dict__":
-        return True
-    return skip
+autodoc_default_flags = [
+    'show-inheritance',
+    'members', 'inherited_members', 'special-members','undoc-members',
+]
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    exclusions = ('__weakref__',  # special-members
+                  '__doc__', '__module__', '__dict__',  # undoc-members
+                  )
+    exclude = name in exclusions
+    if exclude: print name
+    return skip or exclude
 
 def setup(app):
-    app.connect("autodoc-skip-member", skip)
+    app.connect('autodoc-skip-member', autodoc_skip_member)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

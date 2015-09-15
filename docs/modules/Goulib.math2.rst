@@ -4,5 +4,6 @@ Goulib.math2 module
 .. automodule:: Goulib.math2
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:

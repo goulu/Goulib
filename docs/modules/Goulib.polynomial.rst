@@ -4,5 +4,6 @@ Goulib.polynomial module
 .. automodule:: Goulib.polynomial
     :show-inheritance:
     :members:
-    :undoc-members:
+    :inherited-members:
     :special-members:
+    :undoc-members:
