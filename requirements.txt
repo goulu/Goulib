@@ -1,5 +1,8 @@
 six
+lxml
 xlrd
 pillow
 dxfgrabber
+dxfwrite
 svg.path
+pdfminer.six

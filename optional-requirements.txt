@@ -1,7 +1,5 @@
-lxml
-dxfwrite
-pdfminer.six
 networkx
-rtree
 scipy
+matplotlib
+rtree
 pygraphviz
