@@ -96,8 +96,8 @@ autodoc_default_flags = [
 ]
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
-    exclusions = ('__weakref__',  # special-members
-                  '__doc__', '__module__', '__dict__',  # undoc-members
+    exclusions = ('__weakref__',  '__subclasshook__',
+                  '__doc__', '__module__', '__dict__',  
                   )
     exclude = name in exclusions
     if exclude: print name
