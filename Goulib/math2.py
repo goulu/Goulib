@@ -455,7 +455,7 @@ def sieve(n):
         assert(len(_sieve)==n)
         for i in range(3,int(n**0.5)+1,2):
             if _sieve[i]:
-                _sieve[i*i::2*i]=[False]*((n-i*i-1)/(2*i)+1)
+                _sieve[i*i::2*i]=[False]*int((n-i*i-1)/(2*i)+1)
     return [2] + [i for i in range(3,n,2) if _sieve[i]]
 
 _primes=sieve(1000) # primes up to 1000
