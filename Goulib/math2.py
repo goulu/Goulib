@@ -49,7 +49,7 @@ def gcd(*args):
     #http://code.activestate.com/recipes/577512-gcd-of-an-arbitrary-list/
     if len(args) == 2:
         return fractions.gcd(args[0],args[1])
-    
+
     if len(args) == 1:
         return args[0]
 
@@ -83,7 +83,7 @@ def xgcd(a,b):
     prevx, x = 1, 0;  prevy, y = 0, 1
     while b:
         q, r = divmod(a,b)
-        x, prevx = prevx - q*x, x  
+        x, prevx = prevx - q*x, x
         y, prevy = prevy - q*y, y
         a, b = b, r
     return a, prevx, prevy
@@ -186,6 +186,7 @@ def maximum(m):
     """
     Compare N arrays and returns a new array containing the element-wise maxima
     http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html
+
     :param m: list of arrays (matrix)
     :return: list of maximal values found in each column of m
     """
@@ -278,7 +279,7 @@ def sets_dist(a,b):
 
 def sets_levenshtein(a,b):
     """levenshtein distance on sets
-    @see: http://en.wikipedia.org/wiki/Levenshtein_distance
+    :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
     c = a.intersection(b)
     return len(a-c)+len(b-c)
@@ -355,7 +356,7 @@ def fibonacci(n):
 def catalan(n):
     """Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
     """
-    return binomial(2*n,n)/(n+1)
+    return binomial(2*n,n)//(n+1) #result is always int
 
 def catalan_gen():
     """Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
@@ -365,7 +366,7 @@ def catalan_gen():
     last=1
     yield last
     for n in count(1):
-        last=last*(4*n+2)/(n+2)
+        last=last*(4*n+2)//(n+2)
         yield last
 
 def triples():
@@ -1023,7 +1024,7 @@ def ilog(a,b,upper_bound=False):
     :parameter upper_bound: bool. if True, returns smallest x such that b^x>=a
     :return: x integer such that b^x=a, or upper_bound, or None
     https://en.wikipedia.org/wiki/Discrete_logarithm
-    """  
+    """
     # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
     #for now it's brute force...
     p=1
@@ -1141,7 +1142,7 @@ mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoeff
 
 def mod_pow(a,b,m):
     """:return: (a^b) mod m"""
-    return pow(a,b,m)
+    # return pow(a,b,m) #switches to floats in Py3...
     x,y=1,a
     while b>0:
         if b%2 == 1:
@@ -1169,7 +1170,7 @@ def mod_inv(a,b):
     x0, x1 = 0, 1
     if b == 1: return 1
     while a > 1:
-        q = a / b
+        q = a // b
         a, b = b, a%b
         x0, x1 = x1 - q * x0, x0
     if x1 < 0: x1 += b0
@@ -1254,10 +1255,10 @@ def mod_binomial(n,k,m,q=None):
             r.append(mod_binomial(n,k,p,q))
             f.append(p**q)
         return chinese_remainder(f,r)
-    
+
 def baby_step_giant_step(y, a, n):
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
-    #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html 
+    #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
     s = int(ceil(sqrt(n)))
     A = [y * pow(a, r, n) % n for r in range(s)]
     for t in range(1,s+1):

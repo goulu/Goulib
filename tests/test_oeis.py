@@ -33,7 +33,7 @@ def assert_generator(f,l,name,time_limit=10):
             logging.debug('%s timeout after %d loops'%(name,i))
 
 import shelve
-database = shelve.open('oeis.db')
+database = shelve.open('oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
 
 def data(s):
     s2=s[1:]
@@ -49,7 +49,7 @@ def data(s):
     logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
-        m=re.search('(\d+)\s+(-?\d+)',line)
+        m=re.search(b'(\d+)\s+(-?\d+)',line)
         if m:
             m=m.groups()
             if len(m)==2:
