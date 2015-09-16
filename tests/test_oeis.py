@@ -14,8 +14,6 @@ __revision__ = '$Revision$'
 
 import sys, six, logging, re
 
-import six.moves.urllib as urllib
-
 import Goulib.decorators
 from Goulib.tests import *
 
@@ -45,8 +43,9 @@ def data(s):
         return database[s]
     except:
         pass
-
-    file = urllib.urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
+    
+    from six.moves.urllib.request import urlopen
+    file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
     logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
