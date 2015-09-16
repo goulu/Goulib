@@ -1,6 +1,5 @@
 lxml
 dxfwrite
-svg.path
 pdfminer.six
 networkx
 rtree
