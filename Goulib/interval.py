@@ -13,7 +13,9 @@ from bisect import bisect_left
 
 def _order(interval):
     """:return: (a,b) interval such that a<=b"""
-    if interval[0]<=interval[1]:
+    if interval[0]==interval[1]: #allows to order None,None in Py3
+        return (interval[0], interval[1])
+    elif interval[0]<interval[1]:
         return (interval[0], interval[1])
     else:
         return (interval[1], interval[0])
