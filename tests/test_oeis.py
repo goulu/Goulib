@@ -12,10 +12,11 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import sys, six, logging
+import sys, six, logging, re
+
+import six.moves.urllib as urllib
 
 import Goulib.decorators
-
 from Goulib.tests import *
 
 from examples.oeis import *
@@ -45,8 +46,7 @@ def data(s):
     except:
         pass
 
-    import urllib2, re
-    file = urllib2.urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
+    file = urllib.urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
     logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
