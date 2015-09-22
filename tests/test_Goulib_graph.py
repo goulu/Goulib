@@ -101,7 +101,7 @@ class TestGeoGraph:
         assert_equal(g.number_of_nodes(),8)
         assert_equal(g.number_of_edges(),12)
         
-        for edge in g.edges((0,0,0)):
+        for edge in list(g.edges((0,0,0))):
             g.remove_edge(edge,clean=True)
             
         assert_equal(g.number_of_nodes(),7)
@@ -131,12 +131,12 @@ class TestGeoGraph:
     def test_closest_edges(self):
         close,d=self.cube.closest_edges((0,0,0))
         assert_equal(d,0)
-        assert_equal(len(close),3)
+        assert_equal(len(list(close)),3)
         
         g=self.test_remove_node()
         close,d=g.closest_edges((0,0,0))
         assert_equal(d,1)
-        assert_equal(len(close),6)
+        assert_equal(len(list(close)),6)
 
     def test_box(self):
         assert_equal(self.cube.box(),((0,0,0),(1,1,1)))

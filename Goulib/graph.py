@@ -517,6 +517,8 @@ class _Geo(object):
         ext=filename.split('.')[-1].lower()
         if ext=='dxf':
             write_dxf(self,filename)
+        elif ext=='dot':
+            nx.write_dot(self, filename)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
             
@@ -593,7 +595,7 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     except:
         pass
         
-    edgelist=kwargs.setdefault('edgelist',g.edges(data=True))
+    edgelist=kwargs.pop('edgelist',g.edges(data=True))
         
     edge_color=kwargs.get('edge_color',None)
     if edge_color is None:
@@ -628,7 +630,8 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     if kwargs.get('node_size',300)>0:
         nx.draw_networkx_nodes(g, pos, **kwargs)
         
-    nx.draw_networkx_edges(g, pos, **kwargs)
+    edgelist=list(edgelist)
+    nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
     if with_labels:
         nx.draw_networkx_labels(g, pos, **kwargs)
         
