@@ -6,6 +6,7 @@ _svn
 dist
 .pythoscope
 .ipynb_checkpoints
+.settings
 _update.bat
 docs/_build
 /Goulib.egg-info/

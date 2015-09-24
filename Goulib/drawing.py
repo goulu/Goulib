@@ -445,7 +445,7 @@ class Entity(object):
         return res
 
     # for IPython notebooks
-    def _repr_png_(self): return self.render('png',facecolor='white')
+    def _repr_png_(self): return self.render('png',facecolor='white') #TODO: find why we need to specify white here
     def _repr_svg_(self): return self.render('svg',facecolor='white')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
