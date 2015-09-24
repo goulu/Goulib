@@ -19,6 +19,9 @@ class TestExpr:
         self.fb1=Expr(lambda x:x>1,name='x>1')
         self.fb2=Expr(lambda x:x>2,name='x>2')
         
+        self.e1=Expr(lambda x:3*x+2,name='3x+2') #a very simple expression
+        self.e2=Expr(sin)
+        
     def test___init__(self):
         pass #teste in setup
     
@@ -33,15 +36,13 @@ class TestExpr:
         assert_equal(repr(self.fs),'sin(x)')    
         assert_equal(repr(self.fb1),'x>1')    
         
-    def test__repr_latex_(self):
-        assert_equal(self.f1._repr_latex_(),'1')     
-        assert_equal(self.fx._repr_latex_(),'x')    
-        assert_equal(self.fs._repr_latex_(),'\sin(x)')    
-        assert_equal(self.fb1._repr_latex_(),'x>1')      
-        assert_equal(self.fs(self.fx2)._repr_latex_(),'\sin(x^2)') 
+    def test__latex(self):
+        assert_equal(self.f1._latex(),'1')     
+        assert_equal(self.fx._latex(),'x')    
+        assert_equal(self.fs._latex(),'\sin(x)')    
+        assert_equal(self.fb1._latex(),'x>1')      
+        assert_equal(self.fs(self.fx2)._latex(),'\sin(x^2)') 
         
-    def test_latex(self):
-        pass #tested above
 
     def test___add__(self):
         f=self.fx+self.f1
@@ -122,10 +123,8 @@ class TestExpr:
         # assert_equal(expected, expr.__truediv__(right))
         raise SkipTest 
 
-    def test_plot(self):
-        # expr = Expr(f, left, right, name)
-        # assert_equal(expected, expr.plot(fmt, x))
-        raise SkipTest 
+    def test_save(self):
+        self.e2(self.e1).save('expr.png')
 
 if __name__ == "__main__":
     runmodule()

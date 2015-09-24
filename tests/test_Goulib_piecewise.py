@@ -5,6 +5,7 @@ from Goulib.tests import *
 
 from Goulib.piecewise import *
 from Goulib.itertools2 import arange
+from Goulib.math2 import inf
 from math import *
 
 class TestPiecewise:
@@ -120,6 +121,9 @@ class TestPiecewise:
         # piecewise = Piecewise(init, default, start)
         # assert_equal(expected, piecewise.iapply(f, right, name))
         raise SkipTest 
+    
+    def test_save(self):
+        self.p2.save('piecewise.p2.png',xmax=7,ylim=(-1,5))
 
 if __name__ == "__main__":
     runmodule()

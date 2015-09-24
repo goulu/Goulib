@@ -35,6 +35,9 @@ class TestSegmentPoly:
     def setup_class(self):
         self.seg=SegmentPoly(1,2,[1,2,3])
         
+    def test___init__(self):
+        pass #tested above
+        
     def test_start(self):
         pva=self.seg.start()
         assert_equal(pva,(1,2,6,0))
@@ -49,9 +52,8 @@ class TestSegmentPoly:
         pva_almost_equal(self.seg(2-1e-12),(6,8,6,0))
         assert_equal(self.seg(2),(0,0,0,0))
         
-    def test___init__(self):
-        # segment_poly = SegmentPoly(t0, t1, p)
-        raise SkipTest 
+    def test_save(self):
+        self.seg.save('motion.SegmentPoly.png')
 
 class TestSegment2ndDegree:
     @classmethod

@@ -8,20 +8,20 @@ __author__ = "Philippe Guglielmetti"
 __cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-from .expr import Expr
 import bisect
-from .math2 import inf
-
-class Piecewise(Expr):
+import expr, math2
+    
+class Piecewise(expr.Expr):
     """
     piecewise function defined by a sorted list of (startx, Expr)
     """
-    def __init__(self,init=[],default=0,start=-inf):
+    def __init__(self,init=[],default=0,start=-math2.inf):
         #Note : started by deriving a list of (point,value), but this leads to a problem:
         # the value is taken into account in sort order by bisect
         # so instead of defining one more class with a __cmp__ method, I split both lists
         super(Piecewise, self).__init__(default)
         self.isconstant=False #just to be coherent
+        self.name=self.__class__.__name__
         try: #copy constructor ?
             self.x=list(init.x)
             self.y=list(init.y)
@@ -71,8 +71,8 @@ class Piecewise(Expr):
     def append(self, item):
         """appends a (x,y) item. In fact inserts it at correct position and returns the corresponding index"""
         f=item[1]
-        if not isinstance(f,Expr):
-            f=Expr(f)
+        if not isinstance(f,expr.Expr):
+            f=expr.Expr(f)
         return self.index(item[0],f)
 
 
@@ -126,7 +126,7 @@ class Piecewise(Expr):
     def __rshift__(self,dx):
         return Piecewise(self).applx(lambda x:x+dx)
 
-    def points(self,min=0,max=None,eps=0):
+    def points(self,min=0, xmax=None,eps=0):
         """@return x and y for a line plot"""
         for x in self: pass #traverse to simplify through __iter__
         resx=[]
@@ -143,7 +143,14 @@ class Piecewise(Expr):
             x=self.x[i]
             resx.append(x)
             resy.append(self.y[i](x))
-        if max and max>self.x[-1]:
-            resx.append(max)
-            resy.append(self(max))
+        if xmax and xmax>self.x[-1]:
+            resx.append(xmax)
+            resy.append(self(xmax))
         return resx,resy
+    
+    def _plot(self,ax, xmax=None,**kwargs):
+        """plots function"""
+        (x,y)=self.points(xmax=xmax)
+        return super(Piecewise,self)._plot (ax, x, y, **kwargs)
+        
+

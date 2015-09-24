@@ -9,12 +9,11 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-from .piecewise import *
-from .polynomial import Polynomial
-from .itertools2 import any
-from .math2 import quad, equal
+import six, operator, logging, matplotlib
 
-class PVA(object):
+import plot, piecewise, polynomial, itertools2, math2
+
+class PVA(plot.Plot): #TODO: make it an Expr
     """represents a function of time returning position, velocity, and acceleration
     """
     
@@ -47,16 +46,36 @@ class Segment(PVA):
             return super(Segment, self).__call__(t, self.t0)
         else:
             return (0,)*len(self.funcs)
+        
+    def _plot(self, ax, t0=None,t1=None, ylim=None, **kwargs):
+        if t0 is None: t0=self.t0
+        if t1 is None: t1=self.t1
+        step=(t1-t0)/100.
+        x=[ t for t in itertools2.arange(t0,t1,step)  ]
+        y = [self(t) for t in x]
+        y=map(list, zip(*y)) #transpose because of 
+        labels=['pos','vel','acc','jrk']
+        for y_arr, label in zip(y, labels):
+            ax.plot(x, y_arr, label=label)
+        ax.legend()
+        return ax
     
 class SegmentPoly(Segment):
     """ a segment defined by a polynomial position law
     """
     def __init__(self,t0,t1,p):
-        p=Polynomial(p)
+        p=polynomial.Polynomial(p)
         v=p.derivative()
         a=v.derivative()
         j=a.derivative()
         super(SegmentPoly, self).__init__(t0,t1,(p,v,a,j))
+        
+    def _latex(self):
+        """:return: string LaTex formula"""
+        return 'pos(t)=%s'%self.funcs[0]._latex(x='t')
+    
+    def _repr_latex_(self):
+        return '$%s$'%self._latex()
         
 def _pva(val):
     try: p=val[0]
@@ -86,10 +105,10 @@ def ramp(dp,v0,v1,a):
     if dv:
         dt.append(dv/a) #time to accelerate
     try: # solve a.t^2/2+v0.t == dp
-        dt.extend(list(quad(a/2.,v0,-dp)))
+        dt.extend(list(math2.quad(a/2.,v0,-dp)))
     except: 
         try: # solve v1.t-a.t^2/2 == dp
-            dt.extend(list(quad(-a/2.,v1, -dp)))
+            dt.extend(list(math2.quad(-a/2.,v1, -dp)))
         except: pass
     return min(t for t in dt if t > 0) #return smallest positive
 
@@ -152,14 +171,14 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
         dp=_delta(p0,p1)
         dv=_delta(v0,v1)
         
-        if not any((dt,p0,v0,a0),lambda x:x is None): #we have all required data
+        if not itertools2.any((dt,p0,v0,a0),lambda x:x is None): #we have all required data
             res=SegmentPoly(t0,t1,[p0,v0,a0/2.])
             end=res.end()
-            if p1 is not None and not equal(end[0],p1): #consider p1 as max position
+            if p1 is not None and not math2.equal(end[0],p1): #consider p1 as max position
                 res2=Segment2ndDegree(t0,None,(p0,v0,a0),p1)
                 if res2.dt()<res.dt(): #this case arises earlier
                     res=res2
-            if v1 is not None and not equal(end[1],v1): #consider v1 as max velocity
+            if v1 is not None and not math2.equal(end[1],v1): #consider v1 as max velocity
                 res2=Segment2ndDegree(t0,None,(p0,v0,a0),(None,v1))
                 if res2.dt()<res.dt(): #this case arises earlier
                     res=res2

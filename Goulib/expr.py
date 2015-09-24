@@ -17,7 +17,9 @@ from . import itertools2
 
 class Expr(plot.Plot):
     """
-    Math expressions that can be evaluated like standard functions and combined using standard operators
+    Math expressions that can be evaluated like standard functions 
+    combined using standard operators
+    and plotted in Jupyter
     """
     def __init__(self,f,left=None,right=None,name=None):
         """
@@ -61,7 +63,7 @@ class Expr(plot.Plot):
         if isinstance(x,Expr): #composition
             return self.applx(x)
         try: #is x iterable ?
-            return [self(x) for x in x]
+            return (self(x) for x in x)
         except: pass
         if self.isconstant:
             return self.y  
@@ -85,20 +87,20 @@ class Expr(plot.Plot):
             res=self.name
         return res.replace('\\','') #remove latex prefix if any
     
-    def _repr_latex_(self):
-        """:return: LaTex string for IPython Notebook"""
+    def _latex(self):
+        """:return: string LaTex formula"""
         if self.isconstant:
             res=repr(self.y)
         else:
             name=self.name
             left=''
             if self.left:
-                left=self.left._repr_latex_()
+                left=self.left._latex()
                 if self.left.left: #complex
                     left='{'+left+'}'
             right=''
             if self.right:
-                right=self.right._repr_latex_()
+                right=self.right._latex()
                 if self.right.left: #complex
                     right='{'+right+'}'
             if right: #dyadic operator
@@ -112,26 +114,26 @@ class Expr(plot.Plot):
                 res=name
         return res
     
-    def plot(self, fmt='svg', x=None):
-        from IPython.core.pylabtools import print_figure
-        import matplotlib.pyplot as plt
-        # plt.rc('text', usetex=True)
-        fig, ax = plt.subplots()
+    def _repr_latex_(self):
+        return '$%s$'%self._latex()
+    
+    @property
+    def latex(self):
+        return self._repr_latex_()
+    
+    def _plot(self, ax, x=None, y=None, **kwargs):
         if x is None:
             x=itertools2.arange(-1,1,.1)
         x=list(x)
-        y=self(x)
-        ax.plot(x,y)
-        ax.set_title(self._repr_latex_())
-        data = print_figure(fig, fmt)
-        plt.close(fig)
-        return data
-    
-    def _repr_png_(self):
-        return self.plot(fmt='png')
-
-    def _repr_svg_(self):
-        return self.plot(fmt='svg')
+        if y is None:
+            y=self(x)
+        y=list(y)
+            
+        offset=kwargs.pop('offset',0) #slightly shift the points to make superimposed curves more visible
+        x=[_+offset for _ in x] # listify at the same time
+        y=[_+offset for _ in y] # listify at the same time
+        ax.plot(x,y, **kwargs)
+        return ax
 
     def apply(self,f,right=None,name=None):
         """function composition self o f = f(self(x)) or f(self,right)"""

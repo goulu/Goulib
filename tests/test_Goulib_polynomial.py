@@ -55,7 +55,7 @@ class TestPolynomial:
         assert_equal(self.p.integral(),'x^3+x^2+x')
 
     def test___repr__(self):
-        pass # tested in all comparizons above
+        pass # tested in several comparizons above
     
     def test__repr_latex_(self):
         assert_equal(self.p._repr_latex_(), '$3x^2 + 2x + 1$')

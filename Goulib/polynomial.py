@@ -15,7 +15,7 @@ __license__ = "LGPL"
 import six #python 2+3 compatibility
 import re
 
-from .expr import Expr
+from expr import Expr
 
 class Polynomial(Expr):
     def __init__(self,val):
@@ -39,10 +39,8 @@ class Polynomial(Expr):
         """:return: a string we can cut/paste in a calculator"""
         return tostring(self.plist,mul='*')
     
-    def _repr_latex_(self):
-        """:return: LaTex string for IPython Notebook"""
-        return r'$%s$'%tostring(self.plist)
-    
+    def _latex(self,**kwargs):
+        return tostring(self.plist,**kwargs)
 
     def __lt__(self,other): 
         try:

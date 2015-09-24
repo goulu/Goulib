@@ -26,7 +26,36 @@ from IPython.display import SVG, Image
 
 import itertools2
 
+class Plot(object):
+    """base class for plotable rich object display on IPython notebooks
+    inspired from http://nbviewer.ipython.org/github/ipython/ipython/blob/3607712653c66d63e0d7f13f073bde8c0f209ba8/docs/examples/notebooks/display_protocol.ipynb
+    """
+    
+    def _plot(self, **kwargs):
+        raise NotImplementedError('objects derived from plot.PLot must define a _plot method')
+    
+    def render(self, fmt='svg', **kwargs):
+        return render([self],fmt, **kwargs) # call global function
+    
+    def save(self,filename,**kwargs):
+        ext=filename.split('.')[-1].lower()
+        kwargs.setdefault('dpi',600) #force good quality
+        return open(filename,'wb').write(self.render(ext,**kwargs))
+    
+    def _repr_png_(self,**kwargs):
+        return self.render(fmt='png',**kwargs)
+
+    def _repr_svg_(self,**kwargs):
+        return self.render(fmt='svg',**kwargs)
+    
+    def png(self,**kwargs):
+        return Image(self._repr_png_(**kwargs), embed=True)
+    
+    def svg(self,**kwargs):
+        return SVG(self._repr_svg_(**kwargs))
+    
 def render(plotables, fmt='svg', **kwargs):
+    """renders several Plot objects"""
     from IPython.core.pylabtools import print_figure
     import matplotlib.pyplot as plt
 
@@ -71,32 +100,4 @@ def png(plotables, **kwargs):
 def svg(plotables, **kwargs):
     return SVG(render(plotables,'svg',**kwargs))
 
-class Plot(object):
-    """base class for plotable rich object display on IPython notebooks
-    inspired from http://nbviewer.ipython.org/github/ipython/ipython/blob/3607712653c66d63e0d7f13f073bde8c0f209ba8/docs/examples/notebooks/display_protocol.ipynb
-    """
-    
-    def _plot(self, **kwargs):
-        raise NotImplementedError('objects derived from plot.PLot must define a _plot method')
-    
-    def render(self, fmt='svg', **kwargs):
-        return render([self],fmt, **kwargs) # call global function
-    
-    def save(self,filename,**kwargs):
-        ext=filename.split('.')[-1].lower()
-        kwargs.setdefault('dpi',600) #force good quality
-        return open(filename,'wb').write(self.render(ext,**kwargs))
-    
-    def _repr_png_(self,**kwargs):
-        return self.render(fmt='png',**kwargs)
-
-    def _repr_svg_(self,**kwargs):
-        return self.render(fmt='svg',**kwargs)
-    
-    def png(self,**kwargs):
-        return Image(self._repr_png_(**kwargs), embed=True)
-    
-    def svg(self,**kwargs):
-        return SVG(self._repr_svg_(**kwargs))
-    
     
