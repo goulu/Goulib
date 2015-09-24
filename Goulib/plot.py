@@ -22,9 +22,7 @@ else:
     
 logging.info('matplotlib backend is %s'%matplotlib.get_backend())
 
-from IPython.display import SVG, Image
-
-import itertools2
+from Goulib import itertools2
 
 class Plot(object):
     """base class for plotable rich object display on IPython notebooks
@@ -49,9 +47,11 @@ class Plot(object):
         return self.render(fmt='svg',**kwargs)
     
     def png(self,**kwargs):
+        from IPython.display import Image
         return Image(self._repr_png_(**kwargs), embed=True)
     
     def svg(self,**kwargs):
+        from IPython.display import SVG
         return SVG(self._repr_svg_(**kwargs))
     
 def render(plotables, fmt='svg', **kwargs):
@@ -95,9 +95,11 @@ def render(plotables, fmt='svg', **kwargs):
     return data
 
 def png(plotables, **kwargs):
+    from IPython.display import Image
     return Image(render(plotables,'png',**kwargs), embed=True)
     
 def svg(plotables, **kwargs):
+    from IPython.display import SVG
     return SVG(render(plotables,'svg',**kwargs))
 
     

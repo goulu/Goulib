@@ -10,10 +10,10 @@ __license__ = "LGPL"
 
 import six, operator, logging, matplotlib
 
-from . import plot #sets matplotlib backend
+from Goulib import plot #sets matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
-from . import itertools2
+from Goulib import itertools2
 
 class Expr(plot.Plot):
     """

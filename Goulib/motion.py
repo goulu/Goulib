@@ -11,7 +11,7 @@ __license__ = "LGPL"
 
 import six, operator, logging, matplotlib
 
-import plot, piecewise, polynomial, itertools2, math2
+from Goulib import plot, piecewise, polynomial, itertools2, math2
 
 class PVA(plot.Plot): #TODO: make it an Expr
     """represents a function of time returning position, velocity, and acceleration
