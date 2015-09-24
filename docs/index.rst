@@ -1,5 +1,5 @@
-Goulib 1.9.5
-============
+Goulib
+======
 
 library of useful Python code for scientific + technical applications
 

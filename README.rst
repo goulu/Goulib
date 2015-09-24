@@ -70,7 +70,7 @@ Modules
 **plot**
     plot utilities
 **polynomial**
-	manipulation of polynomials, forked from http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/ by Rick Muller
+	manipulation of polynomials
 **stats**
     very basic statistics functions
 **table**
