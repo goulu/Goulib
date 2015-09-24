@@ -383,7 +383,9 @@ def removef(iterable,f):
     :param f: function of the form lambda line:bool returning True if item should be removed
     :return: list of removed items.
     """
-    return reversed(iremove(iterable,f))
+    res=list(iremove(iterable,f))
+    res.reverse()
+    return res
 
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
