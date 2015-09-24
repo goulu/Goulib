@@ -56,10 +56,8 @@ class Plot(object):
     
 def render(plotables, fmt='svg', **kwargs):
     """renders several Plot objects"""
-    from IPython.core.pylabtools import print_figure
     import matplotlib.pyplot as plt
 
-    
     #extract optional arguments used for rasterization
     printargs,kwargs=itertools2.dictsplit(
         kwargs,
@@ -90,7 +88,10 @@ def render(plotables, fmt='svg', **kwargs):
     if len(labels)>1:
         ax.legend()
         
-    data = print_figure(fig, fmt, **printargs)
+    from io import BytesIO
+    output = BytesIO()
+    fig.savefig(output, format=fmt, **printargs)
+    data=output.getvalue()
     plt.close(fig)
     return data
 
