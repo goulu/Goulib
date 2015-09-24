@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
 """
 functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
 """

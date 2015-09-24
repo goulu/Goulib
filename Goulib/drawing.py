@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
 
 """
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats

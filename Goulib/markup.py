@@ -1,5 +1,6 @@
-#!/usr/bin/python -u
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
+
 # This code is in the public domain, it comes
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.

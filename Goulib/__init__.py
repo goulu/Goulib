@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
 
 """
 Goulib is my Python Library of useful code, 

@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
 """
 Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
 """

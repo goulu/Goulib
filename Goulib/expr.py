@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf8
 """
 simple symbolic math expressions
 """
@@ -115,11 +115,12 @@ class Expr(plot.Plot):
         return res
     
     def _repr_latex_(self):
-        return '$%s$'%self._latex()
+        return r'$%s$'%self._latex()
     
     @property
     def latex(self):
-        return self._repr_latex_()
+        from IPython.display import Math
+        return Math(self._latex())
     
     def _plot(self, ax, x=None, y=None, **kwargs):
         if x is None:

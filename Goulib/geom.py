@@ -1,5 +1,5 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python
+# coding: utf8
 """
 2D + 3D geometry
 """

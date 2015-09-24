@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# coding: utf8
 """
 simple manipulation of polynomials (without SimPy)
 see http://docs.sympy.org/dev/modules/polys/reference.html if you need more ...
