@@ -365,6 +365,16 @@ def ifind(iterable,f,reverse=False):
         for i,item in enumerate(reversed(iterable)):
             if f(item):
                 yield (l-i,item)
+                
+def iremove(iterable,f):
+    """
+    removes items from an iterable based on condition
+    :param iterable: iterable . will be modified in place
+    :param f: function of the form lambda line:bool returning True if item should be removed
+    :yield: removed items backwards
+    """
+    for i,_ in ifind(iterable,f,reverse=True):
+        yield iterable.pop(i) 
 
 def removef(iterable,f):
     """
@@ -373,10 +383,7 @@ def removef(iterable,f):
     :param f: function of the form lambda line:bool returning True if item should be removed
     :return: list of removed items.
     """
-    res=[]
-    for i,_ in ifind(iterable,f,reverse=True):
-        res.insert(0,iterable.pop(i)) #prepend since we traverse iterable backwards :-)
-    return res
+    return reversed(iremove(iterable,f))
 
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
@@ -388,13 +395,11 @@ def isplit(iterable,sep,include_sep=False):
     :param include_sep: bool. If True the separators items are included in output, at beginning of each sub-iterator
     :return: iterates through slices before, between, and after separators
     """
-    indexes=[i for i,_ in ifind(iterable,sep)]
-    indexes.append(None) # will be the last j
-    indexes.insert(0,0 if include_sep else -1)
+    indexes=(i for i,_ in ifind(iterable,sep))
+    indexes=chain([0 if include_sep else -1],indexes,[None]) # will be the last j
     for i,j in pairwise(indexes):
         yield islice(iterable,i if include_sep else i+1,j)
 
-# WARNING : "split" was the former name of "filter2" before v.1.7.0
 def split(iterable,sep,include_sep=False):
     """ like https://docs.python.org/2/library/stdtypes.html#str.split, but for iterable
     :param sep: value or function(item) returning True for items that separate
@@ -402,6 +407,18 @@ def split(iterable,sep,include_sep=False):
     :return: list of iterable slices before, between, and after separators
     """
     return [list(x) for x in isplit(iterable,sep,include_sep)]
+
+def dictsplit(dic,keys):
+    """ extract keys from dic
+    :param dic: dict source
+    :param keys: iterable of dict keys
+    :return: dict,dict : the first contains entries present in source, the second the remaining entries
+    """
+    yes,no={},dic.copy()
+    for k in keys:
+        if k in no:
+            yes[k]=no.pop(k)
+    return yes,no
 
 def next_permutation(seq, pred=lambda x,y:-1 if x<y else 0):
     """Like C++ std::next_permutation() but implemented as generator.
