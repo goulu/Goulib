@@ -22,7 +22,7 @@ else:
     
 logging.info('matplotlib backend is %s'%matplotlib.get_backend())
 
-import .itertools2
+from . import itertools2
 
 class Plot(object):
     """base class for plotable rich object display on IPython notebooks
