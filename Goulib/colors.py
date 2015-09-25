@@ -307,7 +307,7 @@ def _nearest(x,l):
         rgb=hex_to_rgb(x,1./255)
     else:
         rgb=math2.sat(x,0,1)
-    from Goulib.itertools2 import index_min
+    from .itertools2 import index_min
     return index_min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
 
 def nearest_color(x,l=None):

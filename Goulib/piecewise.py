@@ -9,7 +9,7 @@ __cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import bisect
-import expr, math2
+from . import expr, math2
     
 class Piecewise(expr.Expr):
     """

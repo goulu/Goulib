@@ -3,7 +3,6 @@
 """
 plot utilities
 """
-import itertools2
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
@@ -23,7 +22,7 @@ else:
     
 logging.info('matplotlib backend is %s'%matplotlib.get_backend())
 
-from Goulib import itertools2
+import .itertools2
 
 class Plot(object):
     """base class for plotable rich object display on IPython notebooks
