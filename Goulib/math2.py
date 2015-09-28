@@ -730,7 +730,11 @@ def num_from_digits(digits, base=10):
     """
     if isinstance(digits,six.string_types):
         return int(digits,base)
-    return sum(x*(base**n) for (n, x) in enumerate(reversed(list(digits))) if x)
+    res,f=0,1
+    for x in reversed(list(digits)):
+        res=res+int(x*f)
+        f=f*base
+    return res
 
 def reverse(i):
     return int(str(i)[::-1])
