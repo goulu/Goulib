@@ -15,6 +15,8 @@ from PIL import Image # PIL or Pillow
 import numpy as np
 import math
 
+from . import math2
+
 def normalizeArray(a):
     ''' I normalize the given array to values between 0 and 1.
         Return a numpy array of floats (of the same shape as given) 
@@ -246,5 +248,20 @@ def img2base64(img, fmt='PNG'):
     output.seek(0)
     output_s = output.read()
     return base64.b64encode(output_s)
+
+def average_hash(image, hash_size=8):
+    """
+    Average Hash computation
+    Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+    @image must be a PIL instance.
+    """
+    # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
+    image = image.convert("L").resize((hash_size, hash_size), Image.ANTIALIAS)
+    pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
+    avg = pixels.mean()
+    diff = pixels > avg
+    # make a hash
+    return math2.num_from_digits(diff,2)
+
 
  
