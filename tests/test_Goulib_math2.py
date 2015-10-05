@@ -220,6 +220,10 @@ class TestIntegerExponent:
         assert_equal(integer_exponent(1024,2),10)
         assert_equal(integer_exponent(binomial(1000,373),2),6) #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_3.html
         
+class TestPowerTower:
+    def test_power_tower(self):
+        assert_equal(power_tower([3,2,2,2]),43046721)
+        
 class TestCarries:
     def test_carries(self):
         assert_equal(carries(127, 123),1)
@@ -334,6 +338,8 @@ class TestIsPerfect:
         assert_equal(is_perfect(496),0) #perfect
         assert_equal(is_perfect(54),1) #abundant
         assert_equal(is_perfect(2),-1) #deficient
+        
+        assert_equal(is_perfect(2305843008139952128),0) #Millenium 4, page 326
 
 class TestIsPandigital:
     def test_is_pandigital(self):
@@ -482,10 +488,10 @@ class TestVecneg:
 
 class TestAngle:
     def test_angle(self):
-        assert_equal(angle((1,0),(0,1)),pi/2)
-        assert_equal(angle((1,0),(-1,0)),pi)
-        assert_equal(angle((1,1),(0,1),unit=False),pi/4)
-        assert_equal(angle(vecunit((2,1)),vecunit((1,-2))),pi/2)
+        assert_equal(angle((1,0),(0,1)),math.pi/2)
+        assert_equal(angle((1,0),(-1,0)),math.pi)
+        assert_equal(angle((1,1),(0,1),unit=False),math.pi/4)
+        assert_equal(angle(vecunit((2,1)),vecunit((1,-2))),math.pi/2)
 
 class TestVecunit:
     def test_vecunit(self):
@@ -494,7 +500,7 @@ class TestVecunit:
 
 class TestSinOverX:
     def test_sin_over_x(self):
-        assert_equal(sin_over_x(1),sin(1))
+        assert_equal(sin_over_x(1),math.sin(1))
         assert_equal(sin_over_x(0),1)
         assert_equal(sin_over_x(1e-9),1)
 
@@ -513,7 +519,7 @@ class TestLogFactorial:
 
 class TestLogBinomialCoefficient:
     def test_log_binomial(self):
-        assert_equal(log_binomial(87,28),log(49848969000742658237160))
+        assert_equal(log_binomial(87,28),math.log(49848969000742658237160))
         
 class Moebius:
     def test_moebius(self):

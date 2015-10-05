@@ -15,13 +15,9 @@ __license__ = "LGPL"
 import six
 from six.moves import zip_longest, filter
 
-from math import pi, log, sqrt, sin, asin
-import math, cmath, operator
+import math, cmath, operator, itertools
 
-from itertools import count
-from .itertools2 import drop, ireduce, irange, ilen, compact, accumulate, count_unique
-from .itertools2 import compress, cartesian_product, arange, take
-from .decorators import memoize
+from Goulib import itertools2
 
 import fractions
 
@@ -97,7 +93,7 @@ def quad(a, b, c, allow_complex=False):
     if allow_complex:
         d=cmath.sqrt(discriminant)
     else:
-        d=sqrt(discriminant)
+        d=math.sqrt(discriminant)
     return (-b + d) / (2. * a), (-b - d) / (2. * a)
 
 def equal(a,b,epsilon=1e-6):
@@ -153,7 +149,7 @@ def multiply(x, y):
 
 def accsum(it):
     """Yield accumulated sums of iterable: accsum(count(1)) -> 1,3,6,10,..."""
-    return drop(1, ireduce(operator.add, it, 0))
+    return itertools2.drop(1, itertools2.ireduce(operator.add, it, 0))
 
 cumsum=accsum #numpy alias
 
@@ -251,7 +247,7 @@ def sat(x,low=0,high=None):
 
 def norm_2(v):
     """:return: "normal" euclidian norm of vector v"""
-    return sqrt(sum(x*x for x in v))
+    return math.sqrt(sum(x*x for x in v))
 
 def norm_1(v):
     """:return: "manhattan" norm of vector v"""
@@ -275,7 +271,7 @@ def vecunit(v,norm=norm_2):
 def sets_dist(a,b):
     """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
     c = a.intersection(b)
-    return sqrt(len(a-c)*2 + len(b-c)*2)
+    return math.sqrt(len(a-c)*2 + len(b-c)*2)
 
 def sets_levenshtein(a,b):
     """levenshtein distance on sets
@@ -365,16 +361,16 @@ def catalan_gen():
     yield 1
     last=1
     yield last
-    for n in count(1):
+    for n in itertools.count(1):
         last=last*(4*n+2)//(n+2)
         yield last
 
 def triples():
     """ generates Pythagorean triples sorted by z,y,x with x<y<z
     """
-    for z in count(5):
+    for z in itertools.count(5):
         for y in range(z-1,3,-1):
-            x=sqrt(z*z-y*y)
+            x=math.sqrt(z*z-y*y)
             if x<y and is_integer(x,1e-12):
                 yield (int(x),y,z)
 
@@ -426,8 +422,8 @@ def divisors(n):
     if n==1:
         yield 1
     else:
-        all_factors = [[f**p for p in irange(0,fp)] for (f, fp) in factorize(n)]
-        for ns in cartesian_product(*all_factors):
+        all_factors = [[f**p for p in itertools2.irange(0,fp)] for (f, fp) in factorize(n)]
+        for ns in itertools2.cartesian_product(*all_factors):
             yield mul(ns)
 
 def proper_divisors(n):
@@ -436,7 +432,7 @@ def proper_divisors(n):
 
 _sieve=list() # array of bool indicating primality
 
-def sieve(n):
+def sieve(n, oneisprime=False):
     """
     Return a list of prime numbers from 2 to a prime < n.
     Very fast (n<10,000,000) in 0.4 sec.
@@ -448,6 +444,8 @@ def sieve(n):
     Algorithm & Python source: Robert William Hanks
     http://stackoverflow.com/questions/17773352/python-sieve-prime-numbers
     """
+    if n<2: return []
+    if n==2: return [1] if oneisprime else []
     global _sieve
     if n>len(_sieve): #recompute the sieve
         #TODO: enlarge the sieve...
@@ -457,7 +455,7 @@ def sieve(n):
         for i in range(3,int(n**0.5)+1,2):
             if _sieve[i]:
                 _sieve[i*i::2*i]=[False]*int((n-i*i-1)/(2*i)+1)
-    return [2] + [i for i in range(3,n,2) if _sieve[i]]
+    return ([1,2] if oneisprime else [2]) + [i for i in range(3,n,2) if _sieve[i]]
 
 _primes=sieve(1000) # primes up to 1000
 _primes_set = set(_primes) # to speed us primality tests below
@@ -468,7 +466,7 @@ def primes(n):
     """
     m=n-len(_primes)
     if m>0:
-        more=list(take(m,primes_gen(_primes[-1]+1)))
+        more=list(itertools2.take(m,primes_gen(_primes[-1]+1)))
         _primes.extend(more)
         _primes_set.union(set(more))
 
@@ -530,11 +528,11 @@ def primes_gen(start=2,stop=None):
     if start<=2:
         yield 2
     if stop is None:
-        candidates=count(max(start,3),2)
+        candidates=itertools.count(max(start,3),2)
     elif stop>start:
-        candidates=arange(max(start,3),stop+1,2)
+        candidates=itertools2.arange(max(start,3),stop+1,2)
     else: #
-        candidates=arange(start if start%2 else start-1,stop-1,-2)
+        candidates=itertools2.arange(start if start%2 else start-1,stop-1,-2)
     for n in candidates:
         if is_prime(n):
             yield n
@@ -545,23 +543,6 @@ def euclid_gen():
     for p in primes_gen(1):
         n = n * p
         yield n+1
-
-def lucas_lehmer (p):
-    """Lucas Lehmer primality test for Mersenne exponent p
-    :param p: int
-    :return: True if 2^p-1 is prime
-    """
-    # http://rosettacode.org/wiki/Lucas-Lehmer_test#Python
-    if p == 2:
-        return True
-    elif not is_prime(p):
-        return False
-    else:
-        m_p = (1 << p) - 1 # 2^p-1
-    s = 4
-    for i in range(3, p + 1):
-        s = (s*s - 2) % m_p
-    return s == 0
 
 def prime_factors(num, start=2):
     """generates all prime factors (ordered) of num in a list"""
@@ -586,7 +567,7 @@ def factorize(n):
 
     if n==1: #allows to make many things quite simpler...
         return [(1,1)]
-    return compress(prime_factors(n))
+    return itertools2.compress(prime_factors(n))
 
     #TODO: check if code below is faster for "small" n
 
@@ -627,11 +608,11 @@ def number_of_divisors(n):
 
 def omega(n):
     """Number of distinct primes dividing n"""
-    return count_unique(prime_factors(n))
+    return itertools2.count_unique(prime_factors(n))
 
 def bigomega(n):
     """Number of prime divisors of n counted with multiplicity"""
-    return ilen(prime_factors(n))
+    return itertools2.ilen(prime_factors(n))
 
 def moebius(n):
     """Möbius (or Moebius) function mu(n).
@@ -655,6 +636,50 @@ def euler_phi(n):
     return int(mul((1 - 1.0 / p for p, _ in factorize(n)),n))
 
 totient=euler_phi #alias. totient is available in sympy
+
+def prime_ktuple(constellation):
+    """
+    generates tuples of primes with specified differences
+    https://en.wikipedia.org/wiki/Prime_k-tuple
+    :param constellation: iterable of int differences betwwen primes to return:
+    (0, 2)    twin primes
+    (0, 4)    cousin primes
+    (0, 6)    sexy primes
+    (0, 2, 6), (0, 4, 6)    prime triplets
+    (0, 6, 12)    sexy prime triplets
+    (0, 2, 6, 8)    prime quadruplets
+    (0, 6, 12, 18)    sexy prime quadruplets
+    (0, 2, 6, 8, 12), (0, 4, 6, 10, 12)    quintuplet primes
+    (0, 4, 6, 10, 12, 16)    sextuplet primes
+    """
+    diffs=constellation[1:]
+    for res in itertools2.groups(primes_gen(),len(constellation),1):
+        d=itertools2.pairwise(res,operator.sub)
+        if d==diffs:
+            yield res
+    
+twin_primes=prime_ktuple((0, 2))
+cousin_primes=prime_ktuple((0, 4))
+sexy_primes=prime_ktuple((0, 6))
+sexy_prime_triplets=prime_ktuple((0, 6, 12))
+sexy_prime_quadruplets=prime_ktuple((0, 6, 12, 18))
+
+def lucas_lehmer (p):
+    """Lucas Lehmer primality test for Mersenne exponent p
+    :param p: int
+    :return: True if 2^p-1 is prime
+    """
+    # http://rosettacode.org/wiki/Lucas-Lehmer_test#Python
+    if p == 2:
+        return True
+    elif not is_prime(p):
+        return False
+    else:
+        m_p = (1 << p) - 1 # 2^p-1
+    s = 4
+    for i in range(3, p + 1):
+        s = (s*s - 2) % m_p
+    return s == 0
 
 def digits_gen(num, base=10):
     """generates int digits of num in base BACKWARDS"""
@@ -685,6 +710,13 @@ def integer_exponent(a,b=10):
     return res
 
 trailing_zeros= integer_exponent
+
+def power_tower(v):
+    """
+    :return: v[0]**v[1]**v[2] ...
+    :see: http://ajcr.net//Python-power-tower/
+    """
+    return reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base
@@ -753,8 +785,8 @@ def is_permutation(num1, num2, base=10):
         digits1=sorted(str(num1))
         digits2=sorted(str(num2))
     else:
-        digits1 = sorted(digits_from_num(num1, base))
-        digits2 = sorted(digits_from_num(num2, base))
+        digits1 = sorted(digits(num1, base))
+        digits2 = sorted(digits(num2, base))
     return digits1==digits2
 
 def is_pandigital(num, base=10):
@@ -796,7 +828,7 @@ def lychrel_count(n, limit=96):
         default 96 corresponds to the known most retarded non lychrel number
     :warning: there are palindrom lychrel numbers such as 4994
     """
-    for i in count():
+    for i in itertools.count():
         r=reverse(n)
         if r == n or i==limit:
             return i
@@ -826,13 +858,13 @@ def triangle(n):
 
 def is_triangle(x):
     """:return: True if x is a triangle number"""
-    return is_integer((-1 + sqrt(1 + 8*x)) / 2.)
+    return is_integer((-1 + math.sqrt(1 + 8*x)) / 2.)
 
 def square(n):
     return polygonal(4,n) # n*n
 
 def is_square(n):
-    return is_integer(sqrt(n))
+    return is_integer(math.sqrt(n))
 
 def pentagonal(n):
     """
@@ -843,7 +875,7 @@ def pentagonal(n):
 
 def is_pentagonal(n):
     """:return: True if x is a pentagonal number"""
-    return (n >= 1) and is_integer((1+sqrt(1+24*n))/6.0)
+    return (n >= 1) and is_integer((1+math.sqrt(1+24*n))/6.0)
 
 def hexagonal(n):
     """
@@ -853,19 +885,19 @@ def hexagonal(n):
     return polygonal(6,n) # n*(2*n - 1)
 
 def is_hexagonal(n):
-    return (1 + sqrt(1 + (8 * n))) % 4 == 0
+    return (1 + math.sqrt(1 + (8 * n))) % 4 == 0
 
 def heptagonal(n):
     return polygonal(7,n) # (n * (5 * n - 3)) / 2
 
 def is_heptagonal(n):
-    return (3 + sqrt(9 + (40 * n))) % 10 == 0
+    return (3 + math.sqrt(9 + (40 * n))) % 10 == 0
 
 def octagonal(n):
     return polygonal(8,n) # (n * (3 * n - 2))
 
 def is_octagonal(n):
-    return (2 + sqrt(4 + (12 * n))) % 6 == 0
+    return (2 + math.sqrt(4 + (12 * n))) % 6 == 0
 
 #@memoize
 def partition(n):
@@ -902,7 +934,7 @@ def get_cardinal_name(num):
     def _get_hundreds(n):
         tens = n % 100
         hundreds = (n // 100) % 10
-        return list(compact([
+        return list(itertools2.compact([
             hundreds > 0 and numbers[hundreds],
             hundreds > 0 and "hundred",
             hundreds > 0 and tens and "and",
@@ -930,7 +962,7 @@ def is_perfect(n):
     https://en.wikipedia.org/wiki/Deficient_number
     """
     # return sign(abundance(n)) #simple, but might be slow for large n
-    for s in accumulate(divisors(n)):
+    for s in itertools2.accumulate(divisors(n)):
         if s>2*n:
             return 1
     return 0 if s==2*n else -1
@@ -938,7 +970,7 @@ def is_perfect(n):
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
-    return int(log(num,base)) + 1
+    return int(math.log(num,base)) + 1
 
 def chakravala(n):
     """
@@ -956,7 +988,7 @@ def chakravala(n):
 
     while k != 1 or b == 0:
         m = k * (m/k+1) - m
-        m = m - int((m - sqrt(n))/k) * k
+        m = m - int((m - math.sqrt(n))/k) * k
 
         tempA = (a*m + n*b) / abs(k)
         b = (a + b*m) / abs(k)
@@ -974,7 +1006,7 @@ def factorial_gen():
     """Generator of factorial"""
     last=1
     yield last
-    for n in count(1):
+    for n in itertools.count(1):
         last=last*n
         yield last
 
@@ -1010,13 +1042,13 @@ def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
     pool = tuple(iterable)
     n = len(pool)
-    for indices in cartesian_product(list(range(n)), repeat=r):
+    for indices in itertools2.cartesian_product(list(range(n)), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
 
 def log_factorial(n):
     """:return: float approximation of ln(n!) by Ramanujan formula"""
-    return n*log(n) - n + (log(n*(1+4*n*(1+2*n))))/6 + log(pi)/2
+    return n*math.log(n) - n + (math.log(n*(1+4*n*(1+2*n))))/6 + math.log(math.pi)/2
 
 def log_binomial(n,k):
     """:return: float approximation of ln(binomial(n,k))"""
@@ -1032,7 +1064,7 @@ def ilog(a,b,upper_bound=False):
     # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
     #for now it's brute force...
     p=1
-    for x in count():
+    for x in itertools.count():
         if p==a: return x
         if p>a: return x if upper_bound else None
         p=b*p
@@ -1049,16 +1081,16 @@ def angle(u,v,unit=True):
         u=vecunit(u)
         v=vecunit(v)
     if dot(u,v) >=0:
-        return 2.*asin(dist(v,u)/2)
+        return 2.*math.asin(dist(v,u)/2)
     else:
-        return pi - 2.*asin(dist(vecneg(v),u)/2)
+        return math.pi - 2.*math.asin(dist(vecneg(v),u)/2)
 
 def sin_over_x(x):
     """numerically safe sin(x)/x"""
     if 1. + x*x == 1.:
         return 1.
     else:
-        return sin(x)/x
+        return math.sin(x)/x
 
 def slerp(u,v,t):
     """spherical linear interpolation
@@ -1263,7 +1295,7 @@ def mod_binomial(n,k,m,q=None):
 def baby_step_giant_step(y, a, n):
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
-    s = int(ceil(sqrt(n)))
+    s = int(math.ceil(math.sqrt(n)))
     A = [y * pow(a, r, n) % n for r in range(s)]
     for t in range(1,s+1):
         value = pow(a, t*s, n)
