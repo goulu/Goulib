@@ -95,7 +95,6 @@ class Sequence(object):
                 return self.itemf(i)
             else:
                 return itertools2.index(i,self)
-                if j==i: return v
         else:
             return islice(self(),i.start,i.stop,i.step)
 
@@ -155,7 +154,7 @@ class Sequence(object):
         return Sequence(itertools2.accumulate(self,op,skip_first))
 
     def pairwise(self,op,skip_first=False):
-        return Sequence(itertools2.pairwise(self(),op))
+        return Sequence(itertools2.pairwise(self,op))
 
     def sort(self,key=None,buffer=1000):
         return Sequence(itertools2.sorted_iterable(self, key, buffer))
@@ -367,39 +366,44 @@ A002110=A006862-1
 A002110.desc="Primorial numbers (first definition): product of first n primes"
 
 A057588=(A002110-1).filter(bool) #remove leading 0 ...  
+A057588.desc="Kummer numbers: -1 + product of first n consecutive primes."
 
 A005234=A000040.filter(
     lambda n:math2.is_prime(math2.mul(math2.sieve(n+1))+1), #TODO: find a simple way to reuse A006862 or euclid_gen
     desc='Primorial primes: primes p such that 1 + product of primes up to p is prime'
 )
 
+A034386=Sequence(
+    0,
+    lambda n:math2.mul(math2.sieve(n+1,oneisprime=True)),
+    desc="Primorial numbers (second definition): n# = product of primes <= n"
+)
+
+
+#TODO: understand why A000720 creates a hudge bad side effect on myna other serquences
+"""
+A000720=Sequence(
+    1,
+    lambda n:len(math2.sieve(n+1,oneisprime=True)),
+    lambda n:True, #all integers are in this sequence.
+    desc="pi(n), the number of primes <= n. Sometimes called PrimePi(n)"
+)
+"""
+
 A018239=A006862.filter(
     math2.is_prime,
     desc='Primorial primes: form product of first k primes and add 1, then reject unless prime.'
 )
 
+A001223=A000040.pairwise(operator.sub)
 
-def primes_couples(d=2):
-    p1=2
-    for p2 in math2.primes_gen():
-        if d==2:
-            if p2-p1==d:
-                yield p1
-                yield p2
-            p1=p2
-        else:
-            p1=p2-d
-            if math2.is_prime(p1):
-                yield p1
-                yield p2
-
-A077800=Sequence(primes_couples)
+A077800=Sequence(itertools2.flatten(math2.twin_primes))
 
 A001097=Sequence(itertools2.unique_sorted(A077800))
 
-A001359=Sequence(itertools2.takeevery(2, A077800, 0)) #Lesser of twin primes.
+A001359=Sequence(itertools2.takeevery(2, A077800, 0),desc="Lesser of twin primes.")
 
-A006512=Sequence(itertools2.takeevery(2, A077800, 1)) #Greater of twin primes.
+A006512=Sequence(itertools2.takeevery(2, A077800, 1),desc="Greater of twin primes.")
 
 def count_10_exp(iterable):
     """generates number of iterable up to 10^n."""
@@ -411,20 +415,22 @@ def count_10_exp(iterable):
             l=10*l
         c+=1
 
-A007508=Sequence(count_10_exp(A006512)) #Number of twin prime pairs below 10^n.
+A007508=Sequence(count_10_exp(A006512), desc="Number of twin prime pairs below 10^n.")
 
-A007510=A000040-A001097 #Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime
+A007510=A000040-A001097
+A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime"
+
+flat_cousins=itertools2.flatten(math2.cousin_primes)
             
-A023200=Sequence(itertools2.takeevery(2, primes_couples(4), 0)) # Lesser of cousin primes.
+A023200=Sequence(itertools2.takeevery(2, flat_cousins, 0), desc="Lesser of cousin primes.")
+A046132=Sequence(itertools2.takeevery(2, flat_cousins, 1),desc="Greater of cousin primes")
 
-A046132=Sequence(itertools2.takeevery(2, primes_couples(4), 1)) #Greater of cousin primes
+flat_sexy=itertools2.flatten(math2.sexy_primes)
 
-def op_pairs(iterable,op):
-    """ apply op to pairs of iterable"""
-    for p1,p2 in itertools2.groups(iterable,2):
-        yield op(p1,p2)
+A023201=Sequence(itertools2.takeevery(2, flat_sexy, 0), desc="Numbers n such that n and n + 6 are both prime (sexy primes)")
+A046117=Sequence(itertools2.takeevery(2, flat_sexy, 1), desc="Values of p+6 such that p and p+6 are both prime (sexy primes)")
 
-A037074=Sequence(op_pairs(primes_couples(2),operator.mul))#Numbers that are the product of a pair of twin primes."""
+A037074=Sequence(map(operator.mul,math2.twin_primes))#Numbers that are the product of a pair of twin primes."""
 
 def is_squarefree(n):
     for p,q in math2.factorize(n):
