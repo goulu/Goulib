@@ -401,9 +401,11 @@ A077800=Sequence(itertools2.flatten(math2.twin_primes))
 
 A001097=Sequence(itertools2.unique_sorted(A077800))
 
-A001359=Sequence(itertools2.takeevery(2, A077800, 0),desc="Lesser of twin primes.")
+A001359=Sequence(itertools2.itemgetter(math2.twin_primes(),0),desc="Lesser of twin primes.")
 
-A006512=Sequence(itertools2.takeevery(2, A077800, 1),desc="Greater of twin primes.")
+A006512=Sequence(itertools2.itemgetter(math2.twin_primes(),1),desc="Greater of twin primes.")
+
+A037074=Sequence(six.moves.map(math2.mul,math2.twin_primes()), desc="Numbers that are the product of a pair of twin primes")
 
 def count_10_exp(iterable):
     """generates number of iterable up to 10^n."""
@@ -419,18 +421,12 @@ A007508=Sequence(count_10_exp(A006512), desc="Number of twin prime pairs below 1
 
 A007510=A000040-A001097
 A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime"
-
-flat_cousins=itertools2.flatten(math2.cousin_primes)
             
-A023200=Sequence(itertools2.takeevery(2, flat_cousins, 0), desc="Lesser of cousin primes.")
-A046132=Sequence(itertools2.takeevery(2, flat_cousins, 1),desc="Greater of cousin primes")
+A023200=Sequence(itertools2.itemgetter(math2.cousin_primes(), 0), desc="Lesser of cousin primes.")
+A046132=Sequence(itertools2.itemgetter(math2.cousin_primes(), 1),desc="Greater of cousin primes")
 
-flat_sexy=itertools2.flatten(math2.sexy_primes)
-
-A023201=Sequence(itertools2.takeevery(2, flat_sexy, 0), desc="Numbers n such that n and n + 6 are both prime (sexy primes)")
-A046117=Sequence(itertools2.takeevery(2, flat_sexy, 1), desc="Values of p+6 such that p and p+6 are both prime (sexy primes)")
-
-A037074=Sequence(map(operator.mul,math2.twin_primes))#Numbers that are the product of a pair of twin primes."""
+A023201=Sequence(itertools2.itemgetter(math2.sexy_primes(), 0), desc="Numbers n such that n and n + 6 are both prime (sexy primes)")
+A046117=Sequence(itertools2.itemgetter(math2.sexy_primes(), 1), desc="Values of p+6 such that p and p+6 are both prime (sexy primes)")
 
 def is_squarefree(n):
     for p,q in math2.factorize(n):

@@ -654,15 +654,15 @@ def prime_ktuple(constellation):
     """
     diffs=constellation[1:]
     for res in itertools2.groups(primes_gen(),len(constellation),1):
-        d=itertools2.pairwise(res,operator.sub)
+        d=tuple(itertools2.pairwise(res,operator.sub))
         if d==diffs:
             yield res
     
-twin_primes=prime_ktuple((0, 2))
-cousin_primes=prime_ktuple((0, 4))
-sexy_primes=prime_ktuple((0, 6))
-sexy_prime_triplets=prime_ktuple((0, 6, 12))
-sexy_prime_quadruplets=prime_ktuple((0, 6, 12, 18))
+def twin_primes(): return prime_ktuple((0, 2))
+def cousin_primes(): return prime_ktuple((0, 4))
+def sexy_primes(): return prime_ktuple((0, 6))
+def sexy_prime_triplets(): return prime_ktuple((0, 6, 12))
+def sexy_prime_quadruplets(): return prime_ktuple((0, 6, 12, 18))
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
