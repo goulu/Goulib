@@ -108,6 +108,10 @@ def flatten(l, donotrecursein=six.string_types):
         else:
             for sub in flatten(el,donotrecursein):
                 yield sub
+                
+def itemgetter(iterable,i):
+    for item in iterable:
+        yield item[i]
 
 def compact(iterable,f=bool):
     """:returns: iterator skipping None values from iterable"""
