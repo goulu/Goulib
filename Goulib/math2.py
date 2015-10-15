@@ -12,16 +12,10 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six
-from six.moves import zip_longest, filter
-
-import math, cmath, operator, itertools
+import six, math, cmath, operator, itertools, fractions
 
 from Goulib import itertools2
 
-import fractions
-
-from functools import reduce
 
 inf=float('Inf') #infinity
 
@@ -199,11 +193,11 @@ def minimum(m):
 
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return [l[0]+l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]+l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [l[0]-l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]-l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     """unary negation"""
@@ -653,16 +647,31 @@ def prime_ktuple(constellation):
     (0, 4, 6, 10, 12, 16)    sextuplet primes
     """
     diffs=constellation[1:]
-    for res in itertools2.groups(primes_gen(),len(constellation),1):
-        d=tuple(itertools2.pairwise(res,operator.sub))
-        if d==diffs:
-            yield res
+    for p in primes_gen():
+        res=[p]
+        for d in diffs:
+            if not is_prime(p+d):
+                res=None
+                break
+            res.append(p+d)
+            
+        if res:
+            yield tuple(res)
     
-def twin_primes(): return prime_ktuple((0, 2))
-def cousin_primes(): return prime_ktuple((0, 4))
-def sexy_primes(): return prime_ktuple((0, 6))
-def sexy_prime_triplets(): return prime_ktuple((0, 6, 12))
-def sexy_prime_quadruplets(): return prime_ktuple((0, 6, 12, 18))
+def twin_primes(): 
+    return prime_ktuple((0, 2))
+
+def cousin_primes(): 
+    return prime_ktuple((0, 4))
+
+def sexy_primes(): 
+    return prime_ktuple((0, 6))
+
+def sexy_prime_triplets(): 
+    return prime_ktuple((0, 6, 12))
+
+def sexy_prime_quadruplets(): 
+    return prime_ktuple((0, 6, 12, 18))
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
@@ -722,7 +731,7 @@ def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base
     """
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
-    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
+    for one,two in six.moves.zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
