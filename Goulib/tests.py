@@ -50,7 +50,10 @@ def pprint(iterable,indices=[0,1,2,3,4,5,6,7,8,9,-3,-2,-1],timeout=1):
     try:
         items=pprint_gen(iterable, indices, sep)
         for item in decorators.itimeout(items, timeout): 
-            s.append('%s'%item)
+            if isinstance(item,six.string_types):
+                s.append(item) #to keep unicode untouched
+            else:
+                s.append(str(item))
     except decorators.TimeoutError:
         if s[-1]!=sep:
             s.append(sep)
