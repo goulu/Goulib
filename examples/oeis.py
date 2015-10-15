@@ -22,7 +22,7 @@ import six, logging, operator, math
 
 from itertools import count, repeat, tee, islice
 
-from Goulib import math2, itertools2, decorators, table
+from Goulib import math2, itertools2, decorators, table, tests
 
 class Sequence(object):
     """combines a generator and a read-only list
@@ -54,20 +54,8 @@ class Sequence(object):
 
         self.desc=desc
 
-    def __repr__(self):      
-        s=[]
-        try: 
-            i=0
-            for item in decorators.itimeout(self,1): #must be quick for debugger
-                if item>1e80: break
-                s.append(item)
-                i+=1
-                if i>=20: break
-        except decorators.TimeoutError:
-            pass
-
-        if s:
-            s=str(s)[1:-1] # remove []
+    def __repr__(self):     
+        s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
         return '%s (%s ...)'%(self.name,s)
 
     def __iter__(self):
@@ -421,7 +409,9 @@ A007508=Sequence(count_10_exp(A006512), desc="Number of twin prime pairs below 1
 
 A007510=A000040-A001097
 A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime"
-            
+        
+print A007510
+    
 A023200=Sequence(itertools2.itemgetter(math2.cousin_primes(), 0), desc="Lesser of cousin primes.")
 A046132=Sequence(itertools2.itemgetter(math2.cousin_primes(), 1),desc="Greater of cousin primes")
 
