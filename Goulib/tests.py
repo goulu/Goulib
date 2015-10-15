@@ -4,15 +4,60 @@
 utilities for unit tests (using nose)
 """
 from __future__ import division #"true division" everywhere
-from itertools import chain
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import six
+import six, types, re, itertools
 
-import unittest
+import unittest, nose
+import nose.tools
+
+from Goulib import itertools2, decorators
+
+def pprint_gen(iterable,indices=[0,1,2,-3,-2,-1],sep='...'):
+    """generates items at specified indices"""
+    try:
+        l=len(iterable)
+        indices=(i if i>=0 else l+i for i in indices if i<l)
+    except: #infinite iterable
+        l=None
+        indices=six.moves.filter(lambda x:x>=0,indices)
+    indices=list(itertools2.unique(indices)) #to remove overlaps
+    indices.sort() 
+    
+    j=0
+    hole=0
+    for i,item in enumerate(iterable):
+        if i==indices[j]:
+            yield item
+            j+=1
+            hole=0
+            if j==len(indices):
+                if l is None:
+                    yield sep
+                break #finished
+        else:
+            hole+=1
+            if hole==1:
+                if sep : 
+                    yield sep 
+
+def pprint(iterable,indices=[0,1,2,3,4,5,6,7,8,9,-3,-2,-1],timeout=1000):
+    sep='...'
+    s=[]
+    try:
+        items=pprint_gen(iterable, indices, sep)
+        for item in items: #decorators.itimeout(items, timeout): 
+            s.append(str(item))
+    except decorators.TimeoutError:
+        if s[-1]!=sep:
+            s.append(sep)
+    except Exception as e:
+        s.append(str(e))
+    return ','.join(s)
+    
 
 class TestCase(unittest.TestCase):
 
@@ -21,38 +66,39 @@ class TestCase(unittest.TestCase):
         An equality assertion for ordered sequences (like lists and tuples).
         constraints on seq1,seq2 from unittest.TestCase.assertSequenceEqual are mostly removed
         
-        :param seq1, seq2: sequences to compare for (quasi) equality
+        :param seq1, seq2: iterables to compare for (quasi) equality
         :param msg: optional string message to use on failure instead of a list of differences
         :param places: int number of digits to consider in float comparisons.
                 If None, enforces strict equality
         :param delta: optional float absolute tolerance value
         :param reltol: optional float relative tolerance value
         """
+        
+        #tee or copy sequences in order to exhaust generators in pprint
+        #TODO: find a way (if any...) to move this in pprint
+        seq1,p1=itertools2.tee(seq1,copy=None)
+        seq2,p2=itertools2.tee(seq2,copy=None)
+        seq1_repr = pprint(p1)
+        seq2_repr = pprint(p2)
 
         if seq_type is not None:
             seq_type_name = seq_type.__name__
             if not isinstance(seq1, seq_type):
-                raise self.failureException('First sequence is not a %s: %s' % (seq_type_name, str(seq1)))
+                raise self.failureException('First sequence is not a %s: %s' % (seq_type_name, seq1_repr))
             if not isinstance(seq2, seq_type):
-                raise self.failureException('Second sequence is not a %s: %s' % (seq_type_name, str(seq2)))
+                raise self.failureException('Second sequence is not a %s: %s' % (seq_type_name, seq2_repr))
         else:
             seq_type_name = "sequence"
-
-        seq1_repr = str(seq1)
-        seq2_repr = str(seq2)
-        MAXLEN=30
-        if len(seq1_repr) > MAXLEN:
-            seq1_repr = seq1_repr[:MAXLEN] + '...'
-        if len(seq2_repr) > MAXLEN:
-            seq2_repr = seq2_repr[:MAXLEN] + '...'
+            
         elements = (seq_type_name.capitalize(), seq1_repr, seq2_repr)
         differing = '%ss differ: %s != %s\n' % elements
 
-        i=0
-        class End: pass
-        end=End() #a special object
+        class End:
+            def __repr__(self) : return '(end)'
+        end=End() #a special object is appended to detect mismatching lengths
         
-        for item1,item2 in six.moves.zip(chain(seq1,[end]),chain(seq2,[end])):
+        i=0
+        for item1,item2 in six.moves.zip(itertools.chain(seq1,[end]),itertools.chain(seq2,[end])):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
@@ -85,15 +131,14 @@ class TestCase(unittest.TestCase):
                 super(TestCase,self).assertEqual(first, second,msg=msg)
 
 
-import nose
-import nose.tools
+
 
 #
 # Expose assert* from unittest.TestCase
 # - give them pep8 style names
 # (copied from nose.trivial)
 
-import re
+
 caps = re.compile('([A-Z])')
 
 def pep8(name):

@@ -3,10 +3,16 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
-from Goulib.tests import *
 
 from Goulib.tests import * #a module that tests itself using itself... cool :-)
 
+class TestPprint:
+    def test_pprint(self):
+        import itertools
+        assert_equal(pprint(range(101)),'0,1,2,3,4,5,6,7,8,9,...,98,99,100')
+        assert_equal(pprint(range(4)),'0,1,2,3')
+        assert_equal(pprint(itertools.count()),'0,1,2,3,4,5,6,7,8,9,...')
+        
 class TestAssertEqual:
     def test_assert_equal(self):
         
