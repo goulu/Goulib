@@ -166,7 +166,7 @@ def mul(nums,init=1):
     """
     :return: Product of nums
     """
-    return reduce(operator.mul, nums, init)
+    return six.moves.reduce(operator.mul, nums, init)
 
 def transpose(m):
     """:return: matrix m transposed"""
@@ -209,13 +209,13 @@ def vecmul(a,b):
         return [x*a for x in b]
     if isinstance(b,(int,float)):
         return [x*b for x in a]
-    return [reduce(operator.mul,l) for l in zip(a,b)]
+    return [six.moves.reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
     if isinstance(b,(int,float)):
         return [float(x)/b for x in a]
-    return [reduce(operator.truediv,l) for l in zip(a,b)]
+    return [six.moves.reduce(operator.truediv,l) for l in zip(a,b)]
 
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
@@ -725,7 +725,7 @@ def power_tower(v):
     :return: v[0]**v[1]**v[2] ...
     :see: http://ajcr.net//Python-power-tower/
     """
-    return reduce(lambda x,y:y**x, reversed(v))
+    return six.moves.reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base

@@ -247,7 +247,7 @@ def identity(x):
 
 def occurrences(it, exchange=False):
     """Return dictionary with occurrences from iterable"""
-    return reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
+    return six.moves.reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
 def cartesian_product(*iterables, **kwargs):
     """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
