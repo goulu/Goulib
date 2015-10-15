@@ -12,12 +12,14 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import sys, six, logging, re
+import os, sys, six, logging, re
 
-import Goulib.decorators
+from Goulib import itertools2, decorators
 from Goulib.tests import *
 
 from examples.oeis import *
+
+path=os.path.dirname(os.path.abspath(__file__))
 
 def assert_generator(f,l,name,time_limit=10):
     i=0
@@ -33,7 +35,7 @@ def assert_generator(f,l,name,time_limit=10):
             logging.debug('%s timeout after %d loops'%(name,i))
 
 import shelve
-database = shelve.open('oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
+database = shelve.open(path+'/oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
 
 def data(s):
     s2=s[1:]
@@ -79,6 +81,12 @@ class TestOEIS:
             d.pop(0)
             database['A009994']=d
             database.sync()
+            
+    def test_repeat(self):
+        #check that we can iterate twice in the same Sequence
+        l1=list(itertools2.take(20,A000040))
+        l2=list(itertools2.take(20,A000040))
+        assert_equal(l1,l2)
 
     def test_A000040(self):
         assert_equal(A000040[0],2)

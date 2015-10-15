@@ -55,6 +55,7 @@ class Sequence(object):
         self.desc=desc
 
     def __repr__(self):     
+        return self.name
         s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
         return '%s (%s ...)'%(self.name,s)
 
@@ -105,6 +106,8 @@ class Sequence(object):
                 containf=lambda n:n-other in self,
                 desc='%s+%d'%(self.name,other)
             )
+            
+    def __and__(self,other):
         return Sequence(
             itertools2.merge(self,other), None,
             lambda x:x in self or x in other
@@ -117,6 +120,8 @@ class Sequence(object):
                 containf=lambda n:n+other in self,
                 desc='%s-%d'%(self.name,other)
             )
+    
+    def __mod__(self,other):
         return Sequence(
             itertools2.diff(self.__iter__(),other.__iter__()), None,
             lambda x:x in self and x not in other
@@ -385,7 +390,7 @@ A018239=A006862.filter(
 
 A001223=A000040.pairwise(operator.sub)
 
-A077800=Sequence(itertools2.flatten(math2.twin_primes))
+A077800=Sequence(itertools2.flatten(math2.twin_primes()))
 
 A001097=Sequence(itertools2.unique_sorted(A077800))
 
@@ -407,10 +412,8 @@ def count_10_exp(iterable):
 
 A007508=Sequence(count_10_exp(A006512), desc="Number of twin prime pairs below 10^n.")
 
-A007510=A000040-A001097
+A007510=A000040 % A001097
 A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime"
-        
-print A007510
     
 A023200=Sequence(itertools2.itemgetter(math2.cousin_primes(), 0), desc="Lesser of cousin primes.")
 A046132=Sequence(itertools2.itemgetter(math2.cousin_primes(), 1),desc="Greater of cousin primes")
