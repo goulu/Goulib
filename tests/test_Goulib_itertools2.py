@@ -70,6 +70,7 @@ class TestCompact:
 
 class TestGroups:
     def test_groups(self):
+        assert_equal(groups(irange(1,6),3,2),[[1,2,3],[3,4,5]])
         assert_equal(groups([1,2,3,4,5,6],3,2),[[1,2,3],[3,4,5]])
         assert_equal(groups([1,2,3,4,5,6],3),[[1,2,3],[4,5,6]]) 
         assert_equal(groups([1,2,3,4,5,6],4),[[1,2,3,4]]) 
