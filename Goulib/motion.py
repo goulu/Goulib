@@ -40,6 +40,9 @@ class Segment(PVA):
     
     def end(self):
         return super(Segment, self).__call__(self.t1, self.t0)
+    
+    def endTime(self):
+        return(self.t1)
         
     def __call__(self,t):
         if t>=self.t0 and t<self.t1:
@@ -57,9 +60,82 @@ class Segment(PVA):
         labels=['pos','vel','acc','jrk']
         for y_arr, label in zip(y, labels):
             ax.plot(x, y_arr, label=label)
-        ax.legend()
+        ax.legend(loc='best')
         return ax
     
+class Segments(Segment):
+    def __init__(self,segments=[],label='Segments'):
+        """
+          can be initialized with a list of segment (that of course can also be a Segments)
+          :parameter label: a label can be given
+        """
+        self.label = label
+        self.t0 = 0
+        self.t1 = 0
+        self.segments = []
+        self.add(segments)
+        
+    def __str__(self):
+        return self.label
+    
+    def update(self):
+        """ yet only calculates t0 and t1 """
+        for s in self.segments:
+            if s.t0 < self.t0:
+                self.t0 = s.t0
+            if s.t1 > self.t1:
+                self.t1 = s.t1
+
+    def insert(self,segment):
+        """ insert a segment into Segments """
+        t0 = segment.t0
+        t1 = segment.t1
+        if self.segments == []:
+            self.segments = [segment]
+            self.t0 = segment.t0
+            self.t1 = segment.t1
+            return
+        if t0 >= self.segments[-1].t1:
+            self.segments.append(segment)
+            return
+        if t1 <= self.segments[0].t0:
+            self.segments.insert(0,segment)
+            return
+        for i in range(0,len(self.segments)-1):
+            if self.segments[i].t1 <= t0 and self.segments[i+1].t0 >= t1:
+                self.segments.insert(i+1, segment)
+                return
+        raise ValueError('impossible to add the segment t0='+str(segment.t0)+' t1='+str(segment.t1))
+    
+    def add(self,segments):
+        """ add a segment or a list of segment to the segments """
+        if type(segments) is not list:
+            self.insert(segments)
+        else:
+            for s in segments:
+                self.insert(s)
+        self.update()
+        self.label = 'Segments starts='+str(self.t0)+' ends='+str(self.t1)
+        
+    def start(self):
+        if self.segments != []:
+            return self.segments[0].start()
+        else:
+            return (0,0,0,0)
+        
+    def end(self):
+        if self.segments != []:
+            return self.segments[-1].end()
+        else:
+            return (0,0,0,0)
+                
+    def __call__(self,t):
+        for s in self.segments:
+            if t>=s.t0 and t<s.t1:
+                return s(t)
+        return (0,0,0,0)  #oversimplified: assuming PVAJ; should check that all segments are of the same nature
+    
+                
 class SegmentPoly(Segment):
     """ a segment defined by a polynomial position law
     """
@@ -166,7 +242,7 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
     p1,v1,a1=_pva(end)
     if a0 is None: a0=a1
     #to handle the many possible cases, we evaluate missing information in a loop
-    for retries in range(2): #two loops are enough to solve all cases , according to tests   
+    for _retries in range(2): #two loops are enough to solve all cases , according to tests   
         dt=_delta(t0,t1)
         dp=_delta(p0,p1)
         dv=_delta(v0,v1)
@@ -228,13 +304,40 @@ def Segment4thDegree(t0,t1,start,end):
     return SegmentPoly(t0,t1,[p0,v0,0,float(v1-v0)/(dt*dt),-float(v1-v0)/(2*dt*dt*dt)]) #truediv
 
 
-def SegmentTrapezoidalSpeed(t0,p0,p1,a,T=0,vmax=float('inf')):
+def SegmentsTrapezoidalSpeed(t0,p0,p3,a,T=0,vmax=float('inf'),v0=0,v3=0):
     """
     :param t0: float start time
     :param p0: float start position
-    :param p1: float end position
+    :param p3: float end position
     :param a: float specified acceleration. if =0, use specified time
     :param T: float specified time. if =0 (default), use specified acceleration
     :param vmax: float max speed. default is infinity (i.e. triangular speed)
+    :param v0: initial speed
+    :param v3: final speed    if T <> 0 then v3 = v0
+       v1  +-------+    
+          /         \
+         /           +  v3
+    v0  +
+        |  |       | |
+       t0  t1     t2 t3 
     """
-    return
+    dp = p3-p0
+    if T != 0:
+        assert t0 == 0.0, 'must fix this bug'
+        assert v3==v0,'if T is the constraint, v0 must equal v3'
+        t1 = T/2
+        v1 = dp/t1 -v0 # (v0+v1)/2 *t1 = dp/2  ==> v0*t1 + v1*t1 =dp
+        if v1 > vmax:
+            RuntimeError('vmax not yet implemented: must be infinite')
+        else:
+            a = (v1-v0)/t1
+    (t1,p1,v1,t2,p2,t3) = trapeze(dp,vmax,a,v0,v3)
+    label = 'Trapeze start={0}, end={1}'.format(t0,t0+t3) 
+    acc = Segment2ndDegree(t0,t1+t0,(p0,v0,a))
+    cst = SegmentPoly(t1+t0,t2+t0,[p1+p0,v1])
+    dec = Segment2ndDegree(t2+t0,t3+t0,(p2+p0,v1,-a))
+    trap = Segments([acc,cst,dec],label=label)
+    return trap
+            
+    raise RuntimeError('constraint by T is not yet implemented')
+
