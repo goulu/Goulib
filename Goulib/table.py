@@ -11,7 +11,6 @@ __license__ = "LGPL"
 import csv, itertools, operator, string, codecs, six, logging
 
 from datetime import datetime, date, timedelta
-from functools import reduce
 
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
@@ -381,7 +380,7 @@ class Table(list):
     
     def ncols(self):
         """return number of columns, ignoring title"""
-        return reduce(max,list(map(len,self)))
+        return six.moves.reduce(max,list(map(len,self)))
                 
     def find_col(self,title):
         """finds a column from a part of the title"""

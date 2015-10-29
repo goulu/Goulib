@@ -12,21 +12,16 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
-import random, operator, collections, heapq
-
-from itertools import islice, repeat, count, tee, starmap, chain, groupby
-from functools import reduce
-
-from .container import SortedCollection
+import random, operator, collections, heapq, itertools
 
 #reciepes from Python manual
 
 def take(n, iterable):
-    """Take first n elements from iterable"""
-    return islice(iterable, n)
+    """:return: first n items from iterable"""
+    return itertools.islice(iterable, n)
 
 def index(n, iterable):
-    "Returns the nth item"
+    """:return: nth item"""
     for i,x in enumerate(iterable):
         if i==n: return x
     raise IndexError
@@ -34,27 +29,30 @@ def index(n, iterable):
 def first(iterable):
     """:return: first element in the iterable"""
     for x in iterable:
-        return x # works in all cases by definition of iterable 
+        return x # works in all cases by definition of iterable
     raise IndexError
-    
+
 
 def last(iterable):
-    """Take last element in the iterable"""
+    """
+    :return: last element in the iterable
+    """
     found=False
-    for x in iterable: 
+    for x in iterable:
         found=True
-    if found: return x
+    if found:
+        return x
     raise IndexError
 
 def takeevery(n, iterable, first=0):
     """Take an element from iterator every n elements"""
-    return islice(iterable, first, None, n)
+    return itertools.islice(iterable, first, None, n)
 
 every=takeevery
 
 def drop(n, iterable):
     """Drop n elements from iterable and return the rest"""
-    return islice(iterable, n, None)
+    return itertools.islice(iterable, n, None)
 
 def ilen(it):
     """Return length exhausing an iterator"""
@@ -66,7 +64,7 @@ def irange(start_or_end, optional_end=None):
         start, end = 0, start_or_end
     else:
         start, end = start_or_end, optional_end
-    return take(max(end - start + 1, 0), count(start))
+    return take(max(end - start + 1, 0), itertools.count(start))
 
 def arange(start,stop,step=1):
     """range for floats or other types"""
@@ -85,7 +83,7 @@ def ilinear(start,end,n):
     """return iterator over n values linearly interpolated between (and including) start and end"""
     if isinstance(start,(int,float)):
         if start==end: #generate n times the same value for consistency
-            return repeat(start,n)
+            return itertools.repeat(start,n)
         else: #make sure we generate n values including start and end
             step=float(end-start)/(n-1)
             return arange(start,end+step/2,step)
@@ -109,6 +107,10 @@ def flatten(l, donotrecursein=six.string_types):
             for sub in flatten(el,donotrecursein):
                 yield sub
 
+def itemgetter(iterable,i):
+    for item in iterable:
+        yield item[i]
+
 def compact(iterable,f=bool):
     """:returns: iterator skipping None values from iterable"""
     return filter(f, iterable)
@@ -128,13 +130,30 @@ def compress(iterable):
             count=1
     if count:
         yield prev,count
-        
+
+def tee(iterable, n=2, copy=None):
+    """tee or copy depending on type and goal
+    :param iterable: any iterable
+    :param n: int number of tees/copies to return
+    :param copy: optional copy function, for exemple copy.copy or copy.deepcopy
+    :return: tee of iterable if it's an iterator or generator, or (deep)copies for other types
+    
+    this function is useful to avoid side effects at a lower memory cost
+    depending on the case
+    """
+    if isinstance(iterable,(list,tuple,set,dict)):
+        if copy is None: # same object replicated n times
+            res=[iterable]*n
+        else:
+            res=[copy(iterable) for _ in range(n)]
+        return tuple(res)
+    return itertools.tee(iterable,n) # make independent iterators
 
 def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
-    itlist = tee(iterable, n)
-    onestepit = six.moves.zip(*(starmap(drop, enumerate(itlist))))
+    itlist = tee(iterable, n=n, copy=None)
+    onestepit = six.moves.zip(*(itertools.starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
 def pairwise(iterable,op=None,loop=False):
@@ -146,13 +165,13 @@ def pairwise(iterable,op=None,loop=False):
     :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
     """
 
-    i=chain(iterable,[first(iterable)]) if loop else iterable
+    i=itertools.chain(iterable,[first(iterable)]) if loop else iterable
     for x in groups(i,2,1):
         if op:
             yield op(x[1],x[0]) #reversed ! (for sub or div)
         else:
             yield x[0],x[1]
-        
+
 
 def compose(f, g):
     """Compose two functions -> compose(f, g)(x) -> f(g(x))"""
@@ -166,7 +185,7 @@ def iterate(func, arg):
     while True:
         yield arg
         arg = func(arg)
-        
+
 def accumulate(iterable, func=operator.add, skip_first=False):
     'Return running totals'
     # https://docs.python.org/dev/library/itertools.html#itertools.accumulate
@@ -201,7 +220,7 @@ def ireduce(func, iterable, init=None):
         yield curr
 
 def unique(iterable, key=None):
-    """List unique elements, preserving order. Remember all elements ever seen.
+    """generate unique elements, preserving order. Remember all elements ever seen.
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
     """
@@ -228,7 +247,7 @@ def identity(x):
 
 def occurrences(it, exchange=False):
     """Return dictionary with occurrences from iterable"""
-    return reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
+    return six.moves.reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
 def cartesian_product(*iterables, **kwargs):
     """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
@@ -260,7 +279,7 @@ def no(seq, pred=bool):
 def takenth(n, iterable, default=None):
     "Returns the nth item"
     # https://docs.python.org/2/library/itertools.html#recipes
-    return six.next(islice(iterable, n, n+1),default)
+    return six.next(itertools.islice(iterable, n, n+1),default)
 
 nth=takenth
 
@@ -311,7 +330,7 @@ def all_pairs(size):
     for i in rand_seq(size):
         for j in rand_seq(size):
             yield (i,j)
-            
+
 def index_min(values, key=identity):
     """:return: min_index, min_value"""
     return min(enumerate(values), key=lambda v:key(v[1]))
@@ -334,7 +353,7 @@ def best(iterable, key=None, n=1, reverse=False):
             i+=1
             if i>n: break #end
             yield x
-            
+
 def sort_indexes(iterable, key=identity, reverse=False):
     """return list of indexes of iterable that correspond to the sorted iterable"""
     # http://stackoverflow.com/questions/6422700/how-to-get-indices-of-a-sorted-array-in-python
@@ -365,7 +384,7 @@ def ifind(iterable,f,reverse=False):
         for i,item in enumerate(reversed(iterable)):
             if f(item):
                 yield (l-i,item)
-                
+
 def iremove(iterable,f):
     """
     removes items from an iterable based on condition
@@ -374,7 +393,7 @@ def iremove(iterable,f):
     :yield: removed items backwards
     """
     for i,_ in ifind(iterable,f,reverse=True):
-        yield iterable.pop(i) 
+        yield iterable.pop(i)
 
 def removef(iterable,f):
     """
@@ -398,9 +417,9 @@ def isplit(iterable,sep,include_sep=False):
     :return: iterates through slices before, between, and after separators
     """
     indexes=(i for i,_ in ifind(iterable,sep))
-    indexes=chain([0 if include_sep else -1],indexes,[None]) # will be the last j
+    indexes=itertools.chain([0 if include_sep else -1],indexes,[None]) # will be the last j
     for i,j in pairwise(indexes):
-        yield islice(iterable,i if include_sep else i+1,j)
+        yield itertools.islice(iterable,i if include_sep else i+1,j)
 
 def split(iterable,sep,include_sep=False):
     """ like https://docs.python.org/2/library/stdtypes.html#str.split, but for iterable
@@ -502,15 +521,15 @@ class iter2(object):
         self._iter = iter(iterable)
 
     def append(self, iterable):
-        self._iter = chain(self._iter, iter(iterable))
+        self._iter = itertools.chain(self._iter, iter(iterable))
 
     def insert(self, place, iterable):
         if place != 0:
             raise ValueError('Can only insert at index of 0')
-        self._iter = chain(iter(iterable), self._iter)
+        self._iter = itertools.chain(iter(iterable), self._iter)
 
     def __add__(self, iterable):
-        return chain(self._iter, iter(iterable))
+        return itertools.chain(self._iter, iter(iterable))
 
     def __next__(self):
         return six.next(self._iter)
@@ -535,6 +554,7 @@ def sorted_iterable(iterable, key=None, buffer=100):
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
     """
+    from Goulib.container import SortedCollection
     b=SortedCollection(key=key)
     for x in iterable:
         if len(b)>=buffer:
@@ -551,7 +571,7 @@ def unique_sorted(iterable):
         if x!=prev:
             yield x
         prev=x
-    
+
 def diff(iterable1,iterable2):
     """generate items in sorted iterable1 that are not in sorted iterable2"""
     b=six.next(iterable2)
@@ -560,13 +580,13 @@ def diff(iterable1,iterable2):
             b=six.next(iterable2)
         if a==b: continue
         yield a
-        
+
 merge=heapq.merge
-        
+
 #http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
 def intersect(*its):
-    for key, values in groupby(heapq.merge(*its)):
+    for key, values in itertools.groupby(heapq.merge(*its)):
         if len(list(values)) == len(its):
             yield key
-        
-        
+
+

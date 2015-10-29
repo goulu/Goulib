@@ -17,20 +17,44 @@ import math
 
 from . import math2
 
-def normalizeArray(a):
-    ''' I normalize the given array to values between 0 and 1.
-        Return a numpy array of floats (of the same shape as given) 
-    '''
-    w,h = a.shape
-    minval = a.min()
-    if minval < 0: # shift to positive...
-        a = a + abs(minval)
-    maxval = a.max() # THEN, get max value!
-    new_a = np.zeros(a.shape, 'd')
-    for x in range(0,w):
-        for y in range(0,h):
-            new_a[x,y] = float(a[x,y])/maxval
-    return new_a
+#some useful numpy functions first
+
+def normalize(X, norm='max', axis=0, copy=True, positive=True):
+    """Scale input vectors individually to unit norm (vector length).
+    
+    borrowed from http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html
+    (support for sparse matrices removed, default values changed, positive added)
+    
+    Parameters
+    ----------
+    X : array or scipy.sparse matrix with shape [n_samples, n_features]
+        The data to normalize, element by element.
+    norm : 'l1', 'l2', or 'max', optional ('max' by default)
+        The norm to use to normalize each non zero sample (or each non-zero
+        feature if axis is 0).
+    axis : 0 or 1, optional (0 by default)
+        axis used to normalize the data along. If 1, independently normalize
+        each sample, otherwise (if 0) normalize each feature.
+    copy : boolean, optional, default True
+        set to False to perform inplace
+    """
+        
+    if norm == 'l1':
+        norms = np.abs(X).sum(axis=axis)
+    elif norm == 'l2':
+        norms = np.einsum('ij,ij->i', X, X) # http://ajcr.net/Basic-guide-to-einsum/
+    elif norm == 'max':
+        norms = np.max(X, axis=axis)
+    else:
+        raise ValueError("'%s' is not a supported norm" % norm)
+            
+        norms = _handle_zeros_in_scale(norms)
+        X /= norms[:, np.newaxis]
+
+    if axis == 0:
+        X = X.T
+
+    return X
 
 def pil2array(im):
     ''' Convert a PIL image to a numpy ndarray '''

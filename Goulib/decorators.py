@@ -101,3 +101,4 @@ def itimeout(iterable,timeout):
         yield i
         if timer.finished.is_set(): 
             raise TimeoutError
+    timer.cancel() #don't forget it, otherwise it threads never finish...
