@@ -32,6 +32,30 @@ class TestSegment:
     def test_start(self):
         pass # tested below
     
+class TestSegments:
+    def test___init__(self):
+        s1 = Segment2ndDegree(0,2,(0,0,2))
+        s2 = Segment2ndDegree(2,4,(4.0,4.0,-2.0))
+        segs = Segments([s1,s2])
+        assert_equal(segs.t0, 0)
+        assert_equal(segs.t1, 4)
+        assert_equal(segs(2),(4.0,4.0,-2.0,0))
+        assert_equal(segs.end(),(8.0,0.0,-2.0,0))
+        s3 = Segment2ndDegree(4,6,(8,0,1))
+        segs.add(s3)
+        assert_equal(segs.t1, 6)
+        assert_equal(segs.end(),(10.0,2.0,1.0,0)) 
+        
+    def test_add(self):
+        s1 = Segment2ndDegree(0,2,(0,0,2))
+        segs = Segments([s1])
+        s2 = Segment2ndDegree(2,4,(4.0,4.0,-2.0))
+        segs.add(s2)
+        s3 = Segment2ndDegree(4,6,(8,0,1))
+        segs.add(s3)
+        assert_equal(segs.t1, 6)
+        assert_equal(segs.end(),(10.0,2.0,1.0,0))
+                
 class TestSegmentPoly:
     @classmethod
     def setup_class(self):
@@ -143,16 +167,22 @@ class TestTrapeze:
 
 
 class TestSegmentTrapezoidalSpeed:
-    def setup(self):
-        self.t0, self.t1 = 1,2      
-        self.p0, self.v0, self.a = -1,1,2
-        self.start=(self.p0, self.v0, self.a, 0)
-        self.p1, self.v1, self.a1 = 1,3,self.a
-        self.end=(self.p1, self.v1, self.a1, 0)
-    def test_segment_trapezoidal_speed(self):
-        # assert_equal(expected, SegmentTrapezoidalSpeed(t0, p0, p1, a, T, vmax))
-        raise SkipTest 
-
+    def test_segmentTrapezoidalSpeed(self):
+        trap = SegmentsTrapezoidalSpeed(t0=0,p0=0,p3=10.25,a=2.0,vmax=3.0,v0=1,v3=0) #start @t0 = 0
+        assert_equal(trap.t1, 4.5)
+        assert_equal(trap.end(),(10.25,0,-2,0))
+        trap = SegmentsTrapezoidalSpeed(t0=1,p0=0,p3=10.25,a=2.0,vmax=3.0,v0=1,v3=0) #start @t0 != 0
+        assert_equal(trap.endTime(), 5.5)
+        assert_equal(trap.t0,1)
+        assert_equal(trap.t1,5.5)
+        assert_equal(trap.segments[0].t1, 2.0)
+        assert_equal(trap.segments[1].t1, 4.0)
+        assert_equal(trap.segments[2].t1, 5.5)
+        assert_equal(trap.end(),(10.25,0,-2,0))
+        trap = SegmentsTrapezoidalSpeed(t0=0,p0=0,p3=6.0,T=2.0,a=0.0,v0=2,v3=2) #time constraint with t0 = 0
+        assert_equal(trap.end(),(6.0,2,-2,0))
+        #time constraint with t0 != 0 not yet implemented
+        
 class TestSegment4thDegree:
     def setup(self):
         self.t0, self.t1 = 1,2      

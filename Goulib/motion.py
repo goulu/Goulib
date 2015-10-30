@@ -105,7 +105,10 @@ class Segments(Segment):
             if self.segments[i].t1 <= t0 and self.segments[i+1].t0 >= t1:
                 self.segments.insert(i+1, segment)
                 return
-        raise ValueError('impossible to add the segment t0='+str(segment.t0)+' t1='+str(segment.t1))
+        l = ''
+        for s in self.segments:
+            l += '\n'+str(s.t0)+'-->'+str(s.t1)
+        raise ValueError('impossible to add the segment t0='+str(segment.t0)+' t1='+str(segment.t1)+' to already existing segments'+l)
     
     def add(self,segments):
         """ add a segment or a list of segment to the segments """
