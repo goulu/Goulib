@@ -65,6 +65,7 @@ def render(plotables, fmt='svg', **kwargs):
     )
     
     ylim=kwargs.pop('ylim',None)
+    xlim=kwargs.pop('xlim',None)
     title=kwargs.pop('title',None)
     
     fig, ax = plt.subplots()
@@ -81,6 +82,7 @@ def render(plotables, fmt='svg', **kwargs):
         ax = obj._plot(ax, label=labels[i], offset=i*offset, **kwargs)       
     
     if ylim: plt.ylim(ylim)
+    if xlim: plt.xlim(xlim)
     
     if not title and len(labels)==1:
         title=labels[0]

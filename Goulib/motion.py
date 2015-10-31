@@ -78,6 +78,13 @@ class Segments(Segment):
     def __str__(self):
         return self.label
     
+    def html(self):
+        t = self.label+'<br/>'
+        for s in self.segments:
+            t += 't=%f (%f,%f,%f,%f) --> t=%f (%f,%f,%f,%f)<br/>'%(s.t0,s.start()[0],s.start()[1],s.start()[2],s.start()[3],
+                                                                   s.t1,s.end()[0],s.end()[1],s.end()[2],s.end()[3])
+        return t
+            
     def update(self):
         """ yet only calculates t0 and t1 """
         for s in self.segments:
@@ -86,8 +93,13 @@ class Segments(Segment):
             if s.t1 > self.t1:
                 self.t1 = s.t1
 
-    def insert(self,segment):
-        """ insert a segment into Segments """
+    def insert(self,segment,autoJoin=True):
+        """ insert a segment into Segments
+            :parameter autoJoin: if True and the added segment has the same starting position as the last segment's end
+                                 and both velocity are 0 then a segment of (pos,v=0,a=0) is automatically added.
+                                 this help discribing movements only where there is curently a movement
+        """
+        
         t0 = segment.t0
         t1 = segment.t1
         if self.segments == []:
@@ -96,6 +108,10 @@ class Segments(Segment):
             self.t1 = segment.t1
             return
         if t0 >= self.segments[-1].t1:
+            previous = self.segments[-1]
+            if autoJoin and t0 > previous.t1 and previous.end()[0] == segment.start()[0] and previous.end()[1] == 0 and segment.start()[1] == 0:
+                self.segments.append(SegmentPoly(previous.t1,t0,[previous.end()[0]]))
+                print('autojoin')
             self.segments.append(segment)
             return
         if t1 <= self.segments[0].t0:
@@ -110,13 +126,13 @@ class Segments(Segment):
             l += '\n'+str(s.t0)+'-->'+str(s.t1)
         raise ValueError('impossible to add the segment t0='+str(segment.t0)+' t1='+str(segment.t1)+' to already existing segments'+l)
     
-    def add(self,segments):
+    def add(self,segments,autoJoin=True):
         """ add a segment or a list of segment to the segments """
         if type(segments) is not list:
-            self.insert(segments)
+            self.insert(segments,autoJoin)
         else:
             for s in segments:
-                self.insert(s)
+                self.insert(s,autoJoin)
         self.update()
         self.label = 'Segments starts='+str(self.t0)+' ends='+str(self.t1)
         

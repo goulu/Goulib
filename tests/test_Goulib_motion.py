@@ -55,6 +55,12 @@ class TestSegments:
         segs.add(s3)
         assert_equal(segs.t1, 6)
         assert_equal(segs.end(),(10.0,2.0,1.0,0))
+        
+    def test_html(self):
+        s1 = Segment2ndDegree(0,2,(0,0,2))
+        s2 = Segment2ndDegree(2,4,(4.0,4.0,-2.0))
+        segs = Segments([s1,s2])    
+        assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
 class TestSegmentPoly:
     @classmethod
