@@ -51,10 +51,17 @@ class TestSegments:
         segs = Segments([s1])
         s2 = Segment2ndDegree(2,4,(4.0,4.0,-2.0))
         segs.add(s2)
-        s3 = Segment2ndDegree(4,6,(8,0,1))
-        segs.add(s3)
-        assert_equal(segs.t1, 6)
+        s3 = Segment2ndDegree(6,8,(8,0,1))
+        segs.add(s3)  #should autoJoin
+        assert_equal(segs.endTime(), 8)
         assert_equal(segs.end(),(10.0,2.0,1.0,0))
+        assert_equal(len(segs.segments), 4, 'must have 4 segments: 3 added and one from the autojoin')
+        
+    def test_add_bug(self):
+        s1 = SegmentsTrapezoidalSpeed(t0=0,p0=0,p3=1.8,a=0.5,vmax=1)
+        s1.add(SegmentsTrapezoidalSpeed(t0=25.688904 , p0=1.8, p3=3.6, a=1))
+        assert_equal(len(s1.segments), 5, 's1 is initally 3 + 1 autojoin + 1 Segments')
+        s1.svg(xlim=(0,50),ylim=(-10,10))
         
     def test_html(self):
         s1 = Segment2ndDegree(0,2,(0,0,2))

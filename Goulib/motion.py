@@ -12,6 +12,7 @@ __license__ = "LGPL"
 import six, operator, logging, matplotlib
 
 from . import plot, piecewise, polynomial, itertools2, math2
+from numpy import allclose
 
 class PVA(plot.Plot): #TODO: make it an Expr
     """represents a function of time returning position, velocity, and acceleration
@@ -109,9 +110,14 @@ class Segments(Segment):
             return
         if t0 >= self.segments[-1].t1:
             previous = self.segments[-1]
-            if autoJoin and t0 > previous.t1 and previous.end()[0] == segment.start()[0] and previous.end()[1] == 0 and segment.start()[1] == 0:
+            previousP = previous.end()[0]
+            previousT = previous.endTime()
+            previousV = previous.end()[1]
+            segmentP = segment.start()[0]
+            segmentT = segment.t0
+            segmentV = segment.start()[1]
+            if autoJoin and t0 > previous.t1 and allclose([previousP,previousV,segmentV],[segmentP,0,0]):
                 self.segments.append(SegmentPoly(previous.t1,t0,[previous.end()[0]]))
-                print('autojoin')
             self.segments.append(segment)
             return
         if t1 <= self.segments[0].t0:
