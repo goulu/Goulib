@@ -61,7 +61,6 @@ class TestSegments:
         s1 = SegmentsTrapezoidalSpeed(t0=0,p0=0,p3=1.8,a=0.5,vmax=1)
         s1.add(SegmentsTrapezoidalSpeed(t0=25.688904 , p0=1.8, p3=3.6, a=1))
         assert_equal(len(s1.segments), 5, 's1 is initally 3 + 1 autojoin + 1 Segments')
-        s1.svg(xlim=(0,50),ylim=(-10,10))
         
     def test_html(self):
         s1 = Segment2ndDegree(0,2,(0,0,2))

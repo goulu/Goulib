@@ -67,8 +67,8 @@ class Segment(PVA):
 class Segments(Segment):
     def __init__(self,segments=[],label='Segments'):
         """
-          can be initialized with a list of segment (that of course can also be a Segments)
-          :parameter label: a label can be given
+        can be initialized with a list of segment (that of course can also be a Segments)
+        :param label: a label can be given
         """
         self.label = label
         self.t0 = 0
@@ -96,9 +96,10 @@ class Segments(Segment):
 
     def insert(self,segment,autoJoin=True):
         """ insert a segment into Segments
-            :parameter autoJoin: if True and the added segment has the same starting position as the last segment's end
-                                 and both velocity are 0 then a segment of (pos,v=0,a=0) is automatically added.
-                                 this help discribing movements only where there is curently a movement
+        :param segment: the segment to add. must be in a range that is not already defined or it will rise a value error exception
+        :param autoJoin: if True and the added segment has the same starting position as the last segment's end
+                         and both velocity are 0 then a segment of (pos,v=0,a=0) is automatically added.
+                         this help discribing movements only where there is curently a movement
         """
         
         t0 = segment.t0
