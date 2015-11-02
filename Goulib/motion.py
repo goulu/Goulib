@@ -39,8 +39,35 @@ class Segment(PVA):
     def start(self):
         return super(Segment, self).__call__(self.t0, self.t0)
     
+    def startPos(self):
+        return self.start()[0]
+    
+    def startSpeed(self):
+        return self.start()[1]
+    
+    def startAcc(self):
+        return self.start()[2]
+    
+    def startJerk(self):
+        return self.start()[3]
+    
+    def startTime(self):
+        return self.t0
+    
     def end(self):
         return super(Segment, self).__call__(self.t1, self.t0)
+    
+    def endPos(self):
+        return self.end()[0]
+    
+    def endSpeed(self):
+        return self.end()[1]
+    
+    def endAcc(self):
+        return self.end()[2]
+    
+    def endJerk(self):
+        return self.end()[3]
     
     def endTime(self):
         return(self.t1)
@@ -83,7 +110,7 @@ class Segments(Segment):
         t = self.label+'<br/>'
         for s in self.segments:
             t += 't=%f (%f,%f,%f,%f) --> t=%f (%f,%f,%f,%f)<br/>'%(s.t0,s.start()[0],s.start()[1],s.start()[2],s.start()[3],
-                                                                   s.t1,s.end()[0],s.end()[1],s.end()[2],s.end()[3])
+                                                                   s.t1,s.endPos(),s.endSpeed(),s.endAcc(),s.end()[3])
         return t
             
     def update(self):
@@ -111,14 +138,13 @@ class Segments(Segment):
             return
         if t0 >= self.segments[-1].t1:
             previous = self.segments[-1]
-            previousP = previous.end()[0]
+            previousP = previous.endPos()
             previousT = previous.endTime()
-            previousV = previous.end()[1]
+            previousV = previous.endSpeed()
             segmentP = segment.start()[0]
-            segmentT = segment.t0
             segmentV = segment.start()[1]
-            if autoJoin and t0 > previous.t1 and allclose([previousP,previousV,segmentV],[segmentP,0,0]):
-                self.segments.append(SegmentPoly(previous.t1,t0,[previous.end()[0]]))
+            if autoJoin and t0 > previousT and allclose([previousP,previousV,segmentV],[segmentP,0,0]):
+                self.segments.append(SegmentPoly(previous.t1,t0,[previous.endPos()]))
             self.segments.append(segment)
             return
         if t1 <= self.segments[0].t0:
@@ -319,8 +345,8 @@ def Segment4thDegree(t0,t1,start,end):
     """smooth trajectory from an initial position and initial speed (p0,v0) to a final position and speed (p1,v1)
     * if t1<=t0, t1 is calculated
     """
-    p0,v0,a0=_pva(start)
-    p1,v1,a1=_pva(end)
+    p0,v0,_a0=_pva(start)
+    p1,v1,_a1=_pva(end)
     
     if t1<=t0:
         dt=float(p1-p0)/((v1-v0)/2. + v0) #truediv

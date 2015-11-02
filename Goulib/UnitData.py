@@ -43,8 +43,13 @@ class Row():
             style = 'style="background-color: #f1f1c1" title="'+ getsource(c)+'"'
         else:
             style = ''
-        disp = self[col] if convertToUnits=='' else self[col].to(convertToUnits)
-        return '<td align="right" '+style+'>{0.magnitude}</td><td>{0.units}</td>'.format(disp)
+            
+        try:
+            disp = self[col] if convertToUnits=='' else self[col].to(convertToUnits)
+            return '<td align="right" '+style+'>{0.magnitude}</td><td>{0.units}</td>'.format(disp)
+        except:
+            return '<td colspan=2>'+str(self[col])+'</td>'            
+        
 
      
 class Table():
@@ -86,7 +91,7 @@ class Table():
                 tableOk = True
         except StopIteration:
             if not tableOk:
-                raise Exception('the cells array has inconsitent number of cells regarding the number of colums passed in cols')
+                raise Exception('the cells array has inconsistent number of cells regarding the number of columns passed in cols')
             
     def __getitem__(self,key):
         return self.rows[key]
