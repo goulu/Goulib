@@ -14,6 +14,7 @@ maxDiff = None
 
 class StateMachine:
     def __init__(self):
+        self.displayNotebook = False
         self.time = V(0.0,'s')
         self.name = self.__class__.__name__
         self.states = {}
@@ -49,7 +50,7 @@ class StateMachine:
         return html
                 
         
-    def run(self,start=0,stops=[],maxState=100,maxTime=100,displayNotebook=False):
+    def run(self,start=0,stops=[],maxState=100,maxTime=V(100,'s'),displayNotebook=False):
         """ runs the behavioral simulation 
             :params start: is the starting state of the simulation
             :params stops: a list of states that will stop the simulation (after having simulated this last state)
@@ -57,7 +58,8 @@ class StateMachine:
             :params maxTime: is the virtual time at which the simulation ends_in_comment_or_string
         """
         
-        self.time = 0
+        self.time = V(0,'s')
+        self.displayNotebook = displayNotebook
         currentState = start
         self.log = []
         while len(self.log) < maxState and self.time < maxTime:

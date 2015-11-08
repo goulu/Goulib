@@ -70,18 +70,18 @@ class TestSegments:
                 
 class SM:
     def __init__(self):
-        self.time = 0
+        self.time = V(0,'s')
+        self.displayNotebook = False
                     
 class TestActuator:
     def test_move(self):
         sm = SM()
-        a = Actuator(sm,1,1)
-        time = a.move(3).endTime()
+        a = Actuator(sm,V(1,'m/s^2'),V(1,'m/s'))
+        time = a.move(V(3000,'mm')).endTime()
         assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
         assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
-        assert_equal(sm.time,4)
-        a.move(0)
+        a.move(V(0,'m'))
         assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))
                         
 class TestSegmentPoly:

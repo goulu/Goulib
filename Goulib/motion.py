@@ -217,7 +217,7 @@ class Actuator():
     
     def __init__(self,StateMachine,acc,vmax,pos=0):
         """
-        :params StateMachine: a StateMachine. the only requirement for the StateMachine is to have a .time variable (in s)
+        :params StateMachine: a StateMachine. the only requirement for the StateMachine is to have a .time as V(time,'s') and a .displayNotebook boolean
         :params acc: the default acceleration of the actuator
         :params vmax: the default vmax
         :params pos: the initial position
@@ -229,19 +229,24 @@ class Actuator():
         self.SM = StateMachine
         
     def move(self,newpos):
-        if type(newpos) is not V: newpos = V(newpos,'m')
-        if newpos > self.pos:
-            acc = self.acc
-            vmax = self.vmax
+        if type(newpos) is V:
+            newpos = newpos('m')
+        pos = self.pos('m')
+        if newpos > pos:
+            acc = self.acc('m/s^2')
+            vmax = self.vmax('m/s')
         else:
-            acc = - self.acc
-            vmax= - self.vmax
-            
-        m = SegmentsTrapezoidalSpeed(self.SM.time, self.pos('m'), newpos('m'),  a=acc('m/s^2'), vmax=vmax('m/s'))
+            acc = - self.acc('m/s^2')
+            vmax= - self.vmax('m/s')
+        print(self.SM.time)
+        time = self.SM.time('s')    
+        m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
         self.lastmove = m
-        self.pos = newpos
+        self.pos = V(newpos,'m')
         self.Segs.add(m)        
-        self.SM.time = m.endTime()
+        self.SM.time = V(m.endTime(),'s')
+        if self.SM.displayNotebook:
+            display(m.svg())
         return m
     
     def displayLast(self):
