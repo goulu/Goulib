@@ -3,6 +3,8 @@
 """
 functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
 """
+from test.test_math import acc_check
+from IPython.core.display import display
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -205,6 +207,46 @@ class SegmentPoly(Segment):
     def _repr_latex_(self):
         return '$%s$'%self._latex()
         
+class Actuator():
+    """ simulate an actuator. each movements are recorded in a Segments object
+        the goal of this class is to simplify the writing in most common cases
+      
+    """
+    
+    def __init__(self,StateMachine,acc,vmax,pos=0):
+        """
+        :params StateMachine: a StateMachine. the only requirement for the StateMachine is to have a .time variable (in s)
+        :params acc: the default acceleration of the actuator
+        :params vmax: the default vmax
+        :params pos: the initial position
+        """
+        self.Segs = Segments([])
+        self.acc = acc
+        self.vmax = vmax
+        self.pos = pos
+        self.SM = StateMachine
+        
+    def move(self,newpos):
+        if newpos > self.pos:
+            acc = self.acc
+            vmax = self.vmax
+        else:
+            acc = - self.acc
+            vmax= - self.vmax
+            
+        m = SegmentsTrapezoidalSpeed(self.SM.time, self.pos, newpos,  a=acc, vmax=vmax)
+        self.lastmove = m
+        self.pos = newpos
+        self.Segs.add(m)        
+        self.SM.time = m.endTime()
+        return m
+    
+    def displayLast(self):
+        display(self.lastmove.svg())
+        
+    def display(self):
+        display(self.Segs.svg())
+    
 def _pva(val):
     try: p=val[0]
     except: p=val

@@ -68,6 +68,22 @@ class TestSegments:
         segs = Segments([s1,s2])    
         assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
+class SM:
+    def __init__(self):
+        self.time = 0
+                    
+class TestActuator:
+    def test_move(self):
+        sm = SM()
+        a = Actuator(sm,1,1)
+        time = a.move(3).endTime()
+        assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
+        assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
+        assert_equal(time,4.0)
+        assert_equal(sm.time,4)
+        a.move(0)
+        assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))
+                        
 class TestSegmentPoly:
     @classmethod
     def setup_class(self):
