@@ -6,16 +6,15 @@ Created on 5 nov. 2015
 @author: Marc
 ''' 
 
-from IPython.display import display, HTML, Image
+from IPython.display import display, HTML
 import inspect
-from bokeh.state import State
-from IPython.core.inputtransformer import ends_in_comment_or_string
+from Goulib.UnitData import V
 
 maxDiff = None
 
 class StateMachine:
     def __init__(self):
-        self.time = 0.0
+        self.time = V(0.0,'s')
         self.name = self.__class__.__name__
         self.states = {}
         funcs = inspect.getmembers(self,predicate=inspect.ismethod)

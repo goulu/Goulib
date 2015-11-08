@@ -14,6 +14,8 @@ __license__ = "LGPL"
 import six, operator, logging, matplotlib
 
 from . import plot, piecewise, polynomial, itertools2, math2
+from Goulib.UnitData import V
+
 from numpy import allclose
 
 class PVA(plot.Plot): #TODO: make it an Expr
@@ -221,12 +223,13 @@ class Actuator():
         :params pos: the initial position
         """
         self.Segs = Segments([])
-        self.acc = acc
-        self.vmax = vmax
-        self.pos = pos
+        self.acc = acc if type(acc) is V else V(acc,'m/s^2')
+        self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
+        self.pos = pos if type(pos) is V else V(pos,'m')
         self.SM = StateMachine
         
     def move(self,newpos):
+        if type(newpos) is not V: newpos = V(newpos,'m')
         if newpos > self.pos:
             acc = self.acc
             vmax = self.vmax
@@ -234,7 +237,7 @@ class Actuator():
             acc = - self.acc
             vmax= - self.vmax
             
-        m = SegmentsTrapezoidalSpeed(self.SM.time, self.pos, newpos,  a=acc, vmax=vmax)
+        m = SegmentsTrapezoidalSpeed(self.SM.time, self.pos('m'), newpos('m'),  a=acc('m/s^2'), vmax=vmax('m/s'))
         self.lastmove = m
         self.pos = newpos
         self.Segs.add(m)        
