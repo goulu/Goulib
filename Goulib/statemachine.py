@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf8__author__ = "Marc Nicole"
+# coding: utf8
 
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
@@ -83,7 +83,7 @@ class StateMachine:
         currentState = start
         self.log = []
         while len(self.log) < maxState and self.time < maxTime:
-            self.log.append((currentState,self.time))
+            self.log.append((currentState,self.time.magnitude))
             if displayNotebook:
                 display(HTML('<h3>{0} {1}</h3>'.format(currentState,self.states[currentState]['title'])))
             self.next = self.states[currentState]['transitions'][0][0]  #by default the next state is the first transition

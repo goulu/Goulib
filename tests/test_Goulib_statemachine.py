@@ -4,8 +4,7 @@ from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
-from Goulib.StateMachine import StateMachine
-from Goulib.UnitData import V
+from Goulib.statemachine import *
 
 class SM_Test(StateMachine):
     def state000(self):
@@ -13,7 +12,7 @@ class SM_Test(StateMachine):
            actions
            --> 001: time out
         """
-        print('000')
+        logging.debug('000')
         self.time += V(3,'s')
     
     def state001(self):
@@ -21,7 +20,7 @@ class SM_Test(StateMachine):
            actions
            --> 000: condition :to move
         """ 
-        print('001')
+        logging.debug('001')
         self.time += V(7,'s')
 
 
@@ -29,7 +28,7 @@ class TestSM_test:
     
     def test___init__(self):
         sm = SM_Test()
-        print(sm.states)
+        logging.debug(sm.states)
     
     def test__html_repr_(self):
         sm = SM_Test()
@@ -40,8 +39,6 @@ class TestSM_test:
         sm = SM_Test()
         sm.run(start=0,maxState=4)
         assert_equal(sm.log, [(0, 0), (1, 3), (0, 10), (1, 13)])
-        
-        
  
 if __name__ == "__main__":
     runmodule()           
