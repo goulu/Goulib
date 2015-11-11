@@ -8,11 +8,12 @@ __license__ = "LGPL"
 
 from IPython.display import display, HTML
 import inspect
+
 from Goulib.units import V
 
-from graphviz import Digraph
+from networkx import DiGraph #higher level than graphviz.Digraph and already imported
 
-class StateDiagram(Digraph):
+class StateDiagram(DiGraph):
     """
     helper to write State Diagrams graph in iPython notebook
     This library uses Graphviz that has to be installed separately (http://www.graphviz.org/)
