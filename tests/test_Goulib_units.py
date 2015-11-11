@@ -24,7 +24,7 @@ class Tests:
         assert_equal(str(time),'100.0 second')
         hourlyRate = V(50,'USD/hour')
         cost = hourlyRate*time
-        assert_equal(str(cost.to('CHF')),'1.29166666667 CHF')
+        assert_equal('{:f}'.format(cost.to('CHF')),'1.291667 CHF') #warning : Py2 and Py3 have different precision for str(float)
 
     def test002_table(self):
         t = Table(   'mytable',      ['car',          'bus',                                     'pedestrian'],
