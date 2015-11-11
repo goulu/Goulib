@@ -4,7 +4,7 @@ Created on 8 oct. 2014
 @author: Marc Nicole
 '''
 import unittest
-from pint import UnitRegistry
+from pint import UnitRegistry #https://pypi.python.org/pypi/Pint/
 from pprint import pprint
 from inspect import isfunction,getsource
 

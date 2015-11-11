@@ -1,14 +1,33 @@
 #!/usr/bin/env python
-# coding: utf8
-'''
-Created on 5 nov. 2015
+# coding: utf8__author__ = "Marc Nicole"
 
-@author: Marc
-''' 
+__author__ = "Marc Nicole"
+__copyright__ = "Copyright 2015, Marc Nicole"
+__credits__= [""]
+__license__ = "LGPL"
 
 from IPython.display import display, HTML
 import inspect
-from Goulib.UnitData import V
+from Goulib.units import V
+
+from graphviz import Digraph
+
+class StateDiagram(Digraph):
+    """
+    helper to write State Diagrams graph in iPython notebook
+    This library uses Graphviz that has to be installed separately (http://www.graphviz.org/)
+    it uses graphviz python libraray http://graphviz.readthedocs.org/en/latest/
+    """
+    def state(self,number,descr,actions,transitions):
+        """ :parameter number: the state number (int)
+            :parameter descr: a string describing the state
+            :parameter actions: a string describing the various actions. use <br/> to make a new line
+            :parameter transitions: a dict of {<new_state>:"condition",...}
+        """
+        html= '<<table border="0" cellspacing="0" cellborder="1"><tr><td>'+str(number)+'</td><td>'+descr+'</td></tr><tr><td colspan="2" align="left">'+actions+'</td></tr></table>>'
+        self.node(str(number),html,shape='none')
+        for newState in transitions:
+            self.edge(str(number),str(newState),transitions[newState])
 
 maxDiff = None
 
