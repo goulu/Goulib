@@ -3,8 +3,6 @@
 """
 functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
 """
-from test.test_math import acc_check
-from IPython.core.display import display
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -14,7 +12,7 @@ __license__ = "LGPL"
 import six, operator, logging, matplotlib
 
 from . import plot, piecewise, polynomial, itertools2, math2
-from Goulib.UnitData import V
+from Goulib.units import V
 
 from numpy import allclose
 
@@ -238,7 +236,7 @@ class Actuator():
         else:
             acc = - self.acc('m/s^2')
             vmax= - self.vmax('m/s')
-        print(self.SM.time)
+        logging.debug(self.SM.time)
         time = self.SM.time('s')    
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
         self.lastmove = m
