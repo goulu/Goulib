@@ -1,11 +1,12 @@
-'''
-Created on 8 oct. 2014
+#!/usr/bin/env python
+# coding: utf8
 
-@author: Marc Nicole
-'''
-import unittest
+__author__ = "Marc Nicole"
+__copyright__ = "Copyright 2015, Marc Nicole"
+__credits__= [""]
+__license__ = "LGPL"
+
 from pint import UnitRegistry #https://pypi.python.org/pypi/Pint/
-from pprint import pprint
 from inspect import isfunction,getsource
 
 
@@ -150,48 +151,4 @@ class View():
         html += '</table>'
         return html        
         
-        
-        
-class Test(unittest.TestCase):
     
-
-    def test001_simple_value(self):
-        ureg.define('CHF = [Currency]')
-        ureg.define('EUR = 1.21*CHF')
-        ureg.define('USD = 0.93*CHF')
-        dist = V(1000,'m')
-        self.assertEqual(str(dist),'1000 meter')
-        speed = V(10,'m/s')
-        self.assertEqual(str(speed),'10 meter / second')
-        time = dist/speed
-        self.assertEqual(str(time),'100.0 second')
-        hourlyRate = V(50,'USD/hour')
-        cost = hourlyRate*time
-        self.assertEqual(str(cost.to('CHF')),'1.2916666666666667 CHF')
-
-    def test002_table(self):
-        t = Table(   'mytable',      ['car',          'bus',                                     'pedestrian'],
-                  [  'speed',        V(120,'km/hour'), V(100,'km/hour'),                          V(5,'km/hour'),
-                     'acceleration', V(1,'m/s^2'),     V(0.1,'m/s^2'),                            V(0.2,'m/s^2'),
-                     'autonomy',     V(600,'km'),      lambda: t['autonomy']['pedestrian']*10,    lambda: t['speed']['pedestrian']*V(6,'hour') #coucou
-                  ])
-        self.assertCountEqual(t.cols,['car',        'bus',         'pedestrian'])
-        self.assertCountEqual(t.rowLabels,['speed','acceleration','autonomy'])
-        pprint(t.rows)
-        self.assertEqual(t['speed']['bus'],V(100,'km/hour'))
-        print(t._repr_html_())
-        
-        v = View(t,rows=['autonomy','speed'],cols=['car','pedestrian'],rowUnits={'speed':'mile/hour'},name='my view')
-        print(v._repr_html_())
-        
-        t.appendCol('cheval',{'speed':V(60,'km/hour'),'acceleration':V(0.3,'m/s^2'),'autonomy':V(40,'km')})
-        print(t._repr_html_())
-        
-    def test003_m(self):
-        v = V(60,'m/min')
-        self.assertEqual(v('m/s'), 1)
-        
-        
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

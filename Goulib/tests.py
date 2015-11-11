@@ -120,7 +120,10 @@ class TestCase(unittest.TestCase):
         if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
             super(TestCase,self).assertEqual(first, second,msg=msg)
         elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
-            self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
+            try:
+                self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
+            except TypeError: #for some classes like pint.Quantity
+                super(TestCase,self).assertEqual(first, second,msg=msg)
         elif reltol:
             ratio=first/second if second else second/first
             msg='%s != %s within %.2f%%'%(first,second,reltol*100)
@@ -130,6 +133,10 @@ class TestCase(unittest.TestCase):
                 super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
             except TypeError: # unsupported operand type(s) for -
                 super(TestCase,self).assertEqual(first, second,msg=msg)
+                
+    def assertCountEqual(self, seq1, seq2, msg=None):
+        """compare iterables converted to sets : order has no importance"""
+        self.assertEqual(set(seq1), set(seq2), msg=msg)
 
 
 
@@ -163,6 +170,7 @@ assert_equal = _t.assertEqual
 assert_almost_equal = _t.assertAlmostEqual
 assert_not_equal = _t.assertNotEqual
 assert_raises = _t.assertRaises
+assert_count_equal = _t.assertCountEqual
 
 del Dummy
 del _t
