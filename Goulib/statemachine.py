@@ -6,7 +6,7 @@ __copyright__ = "Copyright 2015, Marc Nicole"
 __credits__= [""]
 __license__ = "LGPL"
 
-from IPython.display import display, HTML
+
 import inspect
 
 from Goulib.units import V
@@ -85,6 +85,7 @@ class StateMachine:
         while len(self.log) < maxState and self.time < maxTime:
             self.log.append((currentState,self.time.magnitude))
             if displayNotebook:
+                from IPython.display import display, HTML
                 display(HTML('<h3>{0} {1}</h3>'.format(currentState,self.states[currentState]['title'])))
             self.next = self.states[currentState]['transitions'][0][0]  #by default the next state is the first transition
             self.states[currentState]['action']()
