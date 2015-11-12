@@ -114,6 +114,9 @@ class Expr(plot.Plot):
                 res=name
         return res
     
+    def _repr_svg_(self):
+        pass #to "remove" parent's method
+    
     def _repr_latex_(self):
         return r'$%s$'%self._latex()
     
