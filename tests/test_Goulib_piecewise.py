@@ -131,9 +131,9 @@ class TestPiecewise:
         self.p2.save(path+'/piecewise.p2.png',xmax=7,ylim=(-1,5))
         
     def test_svg(self):
-        svg=self.p2.svg(xmax=7,ylim=(-1,5)) # return IPython object
+        svg=self.p2._repr_svg_(xmax=7,ylim=(-1,5)) # return IPython object
         with open(path+'/piecewise.p2.svg','w') as f:
-            f.write(svg.data.encode('utf-8'))
+            f.write(svg.encode('utf-8'))
 
 if __name__ == "__main__":
     runmodule()
