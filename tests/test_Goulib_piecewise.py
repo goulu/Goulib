@@ -8,7 +8,10 @@ from Goulib.tests import *
 from Goulib.piecewise import *
 from Goulib.itertools2 import arange
 from Goulib.math2 import inf
+
 from math import *
+import os
+path=os.path.dirname(os.path.abspath(__file__))
 
 class TestPiecewise:
     @classmethod
@@ -125,7 +128,12 @@ class TestPiecewise:
         raise SkipTest 
     
     def test_save(self):
-        self.p2.save('piecewise.p2.png',xmax=7,ylim=(-1,5))
+        self.p2.save(path+'/piecewise.p2.png',xmax=7,ylim=(-1,5))
+        
+    def test_svg(self):
+        svg=self.p2.svg(xmax=7,ylim=(-1,5)) # return IPython object
+        with open(path+'/piecewise.p2.svg','w') as f:
+            f.write(svg.data.encode('utf-8'))
 
 if __name__ == "__main__":
     runmodule()
