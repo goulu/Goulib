@@ -1175,10 +1175,17 @@ class Drawing(Group):
             break #handle one page only
         return
 
-    def read_svg(self,filename, **kwargs):
+    def read_svg(self,content, **kwargs):
+        """appends svg content to drawing
+        :param content: string, either filename or svg content
+        """
         #from http://stackoverflow.com/questions/15857818/python-svg-parser
         from xml.dom import minidom
-        doc = minidom.parse(filename)  # parseString also exists
+        try:
+            doc = minidom.parse(content)  # parseString also exists
+        except IOError:
+            doc = minidom.parseString(content.encode('utf-8'))
+            
         trans=Trans()
         trans.f=-1 #flip y axis
         for path in doc.getElementsByTagName('path'):
@@ -1201,6 +1208,7 @@ class Drawing(Group):
             e=trans*e
             self.append(e)
         doc.unlink()
+        return self
 
     def read_dxf(self, filename, options=None, **kwargs):
         """reads a .dxf file
@@ -1222,6 +1230,7 @@ class Drawing(Group):
             self.block[block.name]=Group().from_dxf(block._entities, **kwargs)
 
         super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
+        return self
 
     def save(self,filename,**kwargs):
         """ save graph in various formats
