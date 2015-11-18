@@ -132,7 +132,7 @@ class TestPiecewise:
         
     def test_svg(self):
         svg=self.p2._repr_svg_(xmax=7,ylim=(-1,5)) # return IPython object
-        with open(path+'/piecewise.p2.svg','w') as f:
+        with open(path+'/piecewise.p2.svg','wb') as f:
             f.write(svg.encode('utf-8'))
 
 if __name__ == "__main__":
