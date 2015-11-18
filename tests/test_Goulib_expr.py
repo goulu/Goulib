@@ -9,6 +9,9 @@ from Goulib.tests import *
 from Goulib.expr import *
 from math import *
 
+import os
+path=os.path.dirname(os.path.abspath(__file__))
+
 class TestExpr:
     
     @classmethod
@@ -126,7 +129,8 @@ class TestExpr:
         raise SkipTest 
 
     def test_save(self):
-        self.e2(self.e1).save('expr.png')
+        self.e2(self.e1).save(path+'/expr.png')
+        self.e2(self.e1).save(path+'/expr.svg')
 
 if __name__ == "__main__":
     runmodule()

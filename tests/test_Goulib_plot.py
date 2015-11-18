@@ -3,6 +3,10 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 
+from Goulib.tests import *
+
+from Goulib.plot import *
+
 class TestPlot:
     def test_latex(self):
         # plot = Plot()
@@ -19,3 +23,5 @@ class TestPlot:
         # assert_equal(expected, plot.svg())
         raise SkipTest 
 
+if __name__=="__main__":
+    runmodule()

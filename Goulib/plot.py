@@ -10,7 +10,7 @@ __credits__ = []
 __license__ = "LGPL"
 
 #import matplotlib and set backend once for all
-import matplotlib, os, sys, logging
+import matplotlib, os, sys, logging, six
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
@@ -44,7 +44,7 @@ class Plot(object):
         return self.render(fmt='png',**kwargs)
 
     def _repr_svg_(self,**kwargs):
-        return self.render(fmt='svg',**kwargs)
+        return self.render(fmt='svg',**kwargs).decode('utf-8')
     
     def png(self,**kwargs):
         from IPython.display import Image
@@ -53,6 +53,13 @@ class Plot(object):
     def svg(self,**kwargs):
         from IPython.display import SVG
         return SVG(self._repr_svg_(**kwargs))
+    
+    def plot(self,**kwargs):
+        """ renders on IPython Notebook
+        (alias to make usage more straightforward)
+        """
+        return self.svg(**kwargs)
+    
     
 def render(plotables, fmt='svg', **kwargs):
     """renders several Plot objects"""
@@ -104,5 +111,7 @@ def png(plotables, **kwargs):
 def svg(plotables, **kwargs):
     from IPython.display import SVG
     return SVG(render(plotables,'svg',**kwargs))
+
+plot=svg
 
     
