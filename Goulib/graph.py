@@ -499,8 +499,7 @@ class _Geo(object):
         """
         
         self.render_args.update(kwargs)
-        self.draw(**self.render_args)
-        fig=plt.gcf()
+        fig=self.draw(**self.render_args)
         
         from io import BytesIO
         output = BytesIO()
@@ -509,8 +508,11 @@ class _Geo(object):
         return output.getvalue()
     
     # for IPython notebooks
-    def _repr_svg_(self): return self.render('svg')
-    def _repr_png_(self): return self.render('png')
+    def _repr_svg_(self):
+        return self.render('svg').decode('utf-8')
+    
+    def _repr_png_(self): 
+        return self.render('png')
     
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
@@ -595,7 +597,11 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     except:
         pass
         
-    edgelist=kwargs.pop('edgelist',g.edges(data=True))
+    try:
+        edgelist=kwargs.pop('edgelist')
+    except:
+        edgelist=g.edges(data=True)
+    edgelist=list(edgelist)
         
     edge_color=kwargs.get('edge_color',None)
     if edge_color is None:
@@ -630,7 +636,6 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     if kwargs.get('node_size',300)>0:
         nx.draw_networkx_nodes(g, pos, **kwargs)
         
-    edgelist=list(edgelist)
     nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
     if with_labels:
         nx.draw_networkx_labels(g, pos, **kwargs)
