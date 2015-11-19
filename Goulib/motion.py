@@ -213,18 +213,20 @@ class Actuator():
       
     """
     
-    def __init__(self,StateMachine,acc,vmax,pos=0):
+    def __init__(self,stateMachine,acc,vmax,name='',pos=0):
         """
-        :params StateMachine: a StateMachine. the only requirement for the StateMachine is to have a .time as V(time,'s') and a .displayNotebook boolean
+        :params simulation: a simulation. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayNotebook boolean
         :params acc: the default acceleration of the actuator
         :params vmax: the default vmax
+        :params name: name of the actuator
         :params pos: the initial position
         """
         self.Segs = Segments([])
+        self.name = name
         self.acc = acc if type(acc) is V else V(acc,'m/s^2')
         self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
         self.pos = pos if type(pos) is V else V(pos,'m')
-        self.SM = StateMachine
+        self.stateMachine = stateMachine
         
     def move(self,newpos):
         if type(newpos) is V:
@@ -236,21 +238,24 @@ class Actuator():
         else:
             acc = - self.acc('m/s^2')
             vmax= - self.vmax('m/s')
-        logging.debug(self.SM.time)
-        time = self.SM.time('s')    
+        logging.debug(self.stateMachine.time)
+        time = self.stateMachine.time('s')    
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
         self.lastmove = m
         self.pos = V(newpos,'m')
         self.Segs.add(m)        
-        self.SM.time = V(m.endTime(),'s')
-        if self.SM.displayNotebook:
+        self.stateMachine.time = V(m.endTime(),'s')
+        if self.stateMachine.displayNotebook:
+            from IPython.display import display
             display(m.svg())
         return m
     
     def displayLast(self):
+        from IPython.display import display
         display(self.lastmove.svg())
         
     def display(self):
+        from IPython.display import display
         display(self.Segs.svg())
     
 def _pva(val):
