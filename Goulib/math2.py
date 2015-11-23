@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-additions to :mod:`math` standard library
+more math than :mod:`math` standard library, without numpy
 """
 
 __author__ = "Philippe Guglielmetti"

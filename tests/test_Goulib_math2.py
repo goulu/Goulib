@@ -547,9 +547,8 @@ class TestCatalan:
 
 class TestLucasLehmer:
     def test_lucas_lehmer(self):
-        # assert_equal(expected, lucas_lehmer(p))
-        raise SkipTest # 
-
+        assert_true(lucas_lehmer(11213)) # found on Illiac 2, 1963)
+        assert_false(lucas_lehmer(239))
 
 class TestReverse:
     def test_reverse(self):
