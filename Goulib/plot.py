@@ -41,10 +41,16 @@ class Plot(object):
         return open(filename,'wb').write(self.render(ext,**kwargs))
     
     def _repr_png_(self,**kwargs):
-        return self.render(fmt='png',**kwargs)
+        try:
+            return self.render(fmt='png',**kwargs)
+        except: #maybe this object is not plotable
+            return None
 
     def _repr_svg_(self,**kwargs):
-        return self.render(fmt='svg',**kwargs).decode('utf-8')
+        try:
+            return self.render(fmt='svg',**kwargs).decode('utf-8')
+        except: #maybe this object is not plotable
+            return None
     
     def png(self,**kwargs):
         from IPython.display import Image
