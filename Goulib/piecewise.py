@@ -19,9 +19,6 @@ class Piecewise(expr.Expr):
         #Note : started by deriving a list of (point,value), but this leads to a problem:
         # the value is taken into account in sort order by bisect
         # so instead of defining one more class with a __cmp__ method, I split both lists
-        super(Piecewise, self).__init__(default)
-        self.isconstant=False #just to be coherent
-        self.name=self.__class__.__name__
         try: #copy constructor ?
             self.x=list(init.x)
             self.y=list(init.y)
@@ -46,9 +43,9 @@ class Piecewise(expr.Expr):
         i=bisect.bisect_left(self.x,x)
         if i<len(self) and x==self.x[i]:
             return i
-        #insert either the v value, or cfy the current value at x
+        #insert either the v value, or copy the current value at x
         #note : we might have consecutive tuples with the same y value
-        self.y.insert(i,v if v is not None else self.y[i-1])
+        self.y.insert(i,expr.Expr(v) if v else self.y[i-1])
         self.x.insert(i,x)
         return i
 

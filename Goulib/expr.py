@@ -43,7 +43,7 @@ operators = {
     ast.Mult: (op.mul, 1200,'*',' \\cdot '),
     ast.Div: (op.truediv, 1200,'/','/'),
     ast.Mod: (op.mod, 1200,'%','\\bmod'),
-    ast.Invert: (op.invert,1300,'~','\\sim'),
+    ast.Invert: (op.not_,1300,'~','\\sim'),
     ast.UAdd: (op.pos,1300,'+','+'),
     ast.USub: (op.neg,1300,'-','-'),
     ast.Pow: (op.pow,1400,'**','^'),
@@ -143,12 +143,11 @@ class Expr(plot.Plot):
 
     def apply(self,f,right=None):
         """function composition self o f = f(self(x))"""
-        try:
-            f=f.body
-        except:
-            pass
+        
         if right is None:
-            node = ast.UnaryOp(f,self.body)
+            if not isinstance(f,Expr):
+                f=Expr(f)
+            return f.applx(self)
         else:
             if not isinstance(right,Expr):
                 right=Expr(right)
@@ -173,7 +172,7 @@ class Expr(plot.Plot):
     @property
     def isconstant(self):
         try:
-            self.y=eval(self.body)
+            self._y=eval(self.body)
             return True
         except:
             return False
@@ -182,18 +181,18 @@ class Expr(plot.Plot):
         if self.isconstant:
             try:
                 if other.isconstant:
-                    return self.y==other.y
+                    return self._y==other._y
             except:
-                return self.y==other
+                return self._y==other
         raise NotImplementedError #TODO: implement for general expressions...
 
     def __lt__(self,other):
         if self.isconstant:
             try:
                 if other.isconstant:
-                    return self.y<other.y
+                    return self._y<other._y
             except:
-                return self.y<other
+                return self._y<other
         raise NotImplementedError #TODO: implement for general expressions...
 
     def __add__(self,right):
@@ -203,7 +202,7 @@ class Expr(plot.Plot):
         return self.apply(ast.Sub(),right)
 
     def __neg__(self):
-        return self.apply(ast.USub())
+        return self.apply('-x')
 
     def __mul__(self,right):
         return self.apply(ast.Mult(),right)
@@ -217,7 +216,7 @@ class Expr(plot.Plot):
     __div__=__truediv__
 
     def __invert__(self):
-        return self.apply(ast.Not(),None)
+        return self.apply('~x')
 
     def __and__(self,right):
         return self.apply(ast.And(),right)
@@ -254,7 +253,7 @@ class TextVisitor(ast.NodeVisitor):
     def visit_Call(self, n):
         func = self.visit(n.func)
         args = ', '.join(map(self.visit, n.args))
-        return r'%s(%s)' % (func, args)
+        return '%s(%s)' % (func, args)
 
     def visit_Name(self, n):
         return n.id
@@ -266,15 +265,20 @@ class TextVisitor(ast.NodeVisitor):
             return r'%s%s' % (operators[type(n.op)][2], self.visit(n.operand))
 
     def _Bin(self, left,op,right):
+        # commute x*2 as 2*X for clarity
+        if isinstance(op, ast.Mult):
+            if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
+                return self._Bin(right,op,left) 
+        
+        l,r = self.visit(left),self.visit(right)
+            
+        #handle precedence (parenthesis) if needed
         if self.prec(op) > self.prec(left):
-            left = r'(%s)' % self.visit(left)
-        else:
-            left = self.visit(left)
+            l = '(%s)' % l
         if self.prec(op) > self.prec(right):
-            right = r'(%s)' % self.visit(right)
-        else:
-            right = self.visit(right)
-        return r'%s%s%s' % (left, operators[type(op)][2], right)
+            r = '(%s)' % r
+            
+        return l+operators[type(op)][2]+r
     
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
@@ -315,33 +319,32 @@ class LatexVisitor(TextVisitor):
             return r'%s %s' % (operators[type(op)][3], self.visit(n.operand))
 
     def _Bin(self, left,op,right):
-        #handle divisions and power first as precedence doesn't matter
-        if isinstance(op, ast.Div):
-            return r'\frac{%s}{%s}' % (self.visit(left), self.visit(right))
-        if isinstance(op, ast.FloorDiv):
-            return r'\left\lfloor\frac{%s}{%s}\right\rfloor' % (self.visit(left), self.visit(right))
-        if isinstance(op, ast.Pow):
-            return r'%s^{%s}' % (left, self.visit(right))
- 
-         # commute x*2 as 2*X for clarity
+        # commute x*2 as 2*X for clarity
         if isinstance(op, ast.Mult):
             if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
                 return self._Bin(right,op,left) 
+        
+        l,r = self.visit(left),self.visit(right)
             
-        #handle precedence
-        l = self.visit(left)
+        #handle divisions and power first as precedence doesn't matter
+        if isinstance(op, ast.Div):
+            return r'\frac{%s}{%s}' % (l, r)
+        if isinstance(op, ast.FloorDiv):
+            return r'\left\lfloor\frac{%s}{%s}\right\rfloor' % (l,r)
+        if isinstance(op, ast.Pow):
+            return r'%s^{%s}' % (l,r)
+            
+        #handle precedence (parenthesis) if needed
         if self.prec(op) > self.prec(left):
             l = r'\left(%s\right)' % l
-            
-        r = self.visit(right)
         if self.prec(op) > self.prec(right):
             r = r'\left(%s\right)' % r
             
         if isinstance(op, ast.Mult):
             if isinstance(left, ast.Num) and not isinstance(right, ast.Num):
-                return r'%s%s' % (l,r) 
+                return l+r
             
-        return r'%s%s%s' % (l, operators[type(op)][3], r)
+        return l+operators[type(op)][3]+r
 
 
 

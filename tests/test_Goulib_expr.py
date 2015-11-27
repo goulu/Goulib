@@ -48,6 +48,9 @@ class TestExpr:
         assert_equal(str(self.fs),'sin(x)')    
         assert_equal(str(self.fb1),'x > 1')    
         
+        #test multiplication commutativity and simplification
+        assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
+        
     def test__latex(self):
         assert_equal(self.f._latex(),'3x+2')   
         assert_equal(self.f1._latex(),'1')     
@@ -99,7 +102,7 @@ class TestExpr:
         f2=self.fs(self.fx)
         assert_equal(f2([-1,0,1]),[sin(-1),0,sin(1)])
     
-    def test___invert__(self):
+    def test___not__(self):
         fb=~self.fb1
         assert_equal(fb([0,1,2]),[True,True,False])
 
