@@ -9,9 +9,9 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-import six, operator, logging, matplotlib
+import  logging
 
-from . import plot, piecewise, polynomial, itertools2, math2
+from . import plot, polynomial, itertools2, math2
 from Goulib.units import V
 
 from numpy import allclose
@@ -244,7 +244,7 @@ class Actuator():
             newpos = pos + newpos
 
         if newpos == pos:
-            return
+            return self.Segs
         elif newpos > pos:
             acc = self.acc('m/s^2')
             vmax = self.vmax('m/s')
@@ -261,6 +261,7 @@ class Actuator():
             from IPython.display import display,HTML
             display(HTML('<h4>{0}</h4>'.format(self.name)))
             display(m.svg())
+        return m
     
     def displayLast(self):
         from IPython.display import display

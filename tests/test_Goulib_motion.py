@@ -68,21 +68,25 @@ class TestSegments:
         segs = Segments([s1,s2])    
         assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
-class SM:
-    def __init__(self):
-        self.time = V(0,'s')
-        self.displayNotebook = False
-                    
+
+from Goulib.statemachine import StateMachine
 class TestActuator:
     def test_move(self):
-        sm = SM()
-        a = Actuator(sm,V(1,'m/s^2'),V(1,'m/s'))
+        sm = StateMachine()
+        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'))
+        # tests that if no move at the beginning, nothing crashes
+        time = a.move(V(0,'m')).endTime()
+        assert_equal(time,0.0)     
+        
         time = a.move(V(3000,'mm')).endTime()
         assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
         assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
         a.move(V(0,'m'))
         assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))
+        #test that if no real move we get the same result
+        a.move(V(0,'m'))
+        assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))        
                         
 class TestSegmentPoly:
     @classmethod
