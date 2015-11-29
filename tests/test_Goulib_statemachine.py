@@ -5,15 +5,20 @@ from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 from Goulib.statemachine import *
+from Goulib.motion import Actuator
 
 class SM_Test(StateMachine):
+    def __init__(self):
+        StateMachine.__init__(self)
+        self.m1 = Actuator(self,V(1,'m/s'),V(1,'m/s^2'),'m1')
+        
     def state000(self):
         """titre
            actions
            --> 001: time out
         """
         logging.debug('000')
-        self.time += V(3,'s')
+        self.m1.move(V(2,'m'))
     
     def state001(self):
         """titre
@@ -37,8 +42,9 @@ class TestSM_test:
 
     def test_run(self):
         sm = SM_Test()
-        sm.run(start=0,maxState=4)
-        assert_equal(sm.log, [(0, 0), (1, 3), (0, 10), (1, 13)])
+        sm.run(start=0,maxSteps=4)
+        assert_equal(sm.log, [(0, 0), (1, 3), (0, 10), (1, 10)])
+        assert_equal(sm.lastExitTime(0), 10)
  
 if __name__ == "__main__":
     runmodule()           
