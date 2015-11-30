@@ -41,7 +41,7 @@ except: #fallback, especially because I couldn't manage to install rtree on trav
     RTREE=False
     
 if not RTREE:
-    logging.warning('rtree not available, falling back to slow version')
+    logging.warning('rtree not available')
     
     class index: #mimics rtree.index module
 
@@ -73,7 +73,7 @@ try:
     from pygraphviz import AGraph # http://pygraphviz.github.io/
     PYGRAPHVIZ=True
 except: #fallback since I couldn't manage to install graphviz on travis-ci ...
-    logging.warning('pygraphviz module not available')
+    logging.warning('pygraphviz not available')
     PYGRAPHVIZ=False
     class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 

@@ -139,8 +139,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(set(seq1), set(seq2), msg=msg)
 
 
-
-
 #
 # Expose assert* from unittest.TestCase
 # - give them pep8 style names

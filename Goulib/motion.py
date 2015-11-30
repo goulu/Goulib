@@ -9,9 +9,9 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-import six, operator, logging, matplotlib
+import  logging
 
-from . import plot, piecewise, polynomial, itertools2, math2
+from . import plot, polynomial, itertools2, math2
 from Goulib.units import V
 
 from numpy import allclose
@@ -145,7 +145,7 @@ class Segments(Segment):
             previousV = previous.endSpeed()
             segmentP = segment.start()[0]
             segmentV = segment.start()[1]
-            if autoJoin and t0 > previousT and allclose([previousP,previousV,segmentV],[segmentP,0,0]):
+            if autoJoin and t0 > previousT and allclose([previousP,previousV,segmentV],[segmentP,0,0],atol=0.001):
                 self.segments.append(SegmentPoly(previous.t1,t0,[previous.endPos()]))
             self.segments.append(segment)
             return
@@ -213,45 +213,69 @@ class Actuator():
       
     """
     
-    def __init__(self,StateMachine,acc,vmax,pos=0):
+    def __init__(self,stateMachine,vmax,acc,name='',pos=0):
         """
-        :params StateMachine: a StateMachine. the only requirement for the StateMachine is to have a .time as V(time,'s') and a .displayNotebook boolean
+        :params simulation: a simulation. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayMove boolean
         :params acc: the default acceleration of the actuator
         :params vmax: the default vmax
+        :params name: name of the actuator
         :params pos: the initial position
         """
         self.Segs = Segments([])
+        self.name = name
         self.acc = acc if type(acc) is V else V(acc,'m/s^2')
         self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
         self.pos = pos if type(pos) is V else V(pos,'m')
-        self.SM = StateMachine
+        self.stateMachine = stateMachine
         
-    def move(self,newpos):
-        if type(newpos) is V:
-            newpos = newpos('m')
-        pos = self.pos('m')
-        if newpos > pos:
+    def move(self,newpos,relative=False,time = None):
+        """ moves the actuator to newpos
+        :params newpos: the new absolute position
+        :params time: the starting time of the move. by default (None) the state machine time will be used but
+                      one can force the starting poing in the past typically to do parallel moves of 
+                      different actuators
+        """
+        if time is None:
+            time = self.stateMachine.time
+        time = time('s')
+        pos = self.pos('m') 
+        newpos = newpos('m')               
+        if relative:
+            newpos = pos + newpos
+
+        if newpos == pos:
+            return self.Segs
+        elif newpos > pos:
             acc = self.acc('m/s^2')
             vmax = self.vmax('m/s')
         else:
             acc = - self.acc('m/s^2')
             vmax= - self.vmax('m/s')
-        logging.debug(self.SM.time)
-        time = self.SM.time('s')    
+        logging.debug(self.stateMachine.time)
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
         self.lastmove = m
         self.pos = V(newpos,'m')
         self.Segs.add(m)        
-        self.SM.time = V(m.endTime(),'s')
-        if self.SM.displayNotebook:
+        self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
+        if self.stateMachine.displayMove:
+            from IPython.display import display,HTML
+            display(HTML('<h4>{0}</h4>'.format(self.name)))
             display(m.svg())
         return m
     
     def displayLast(self):
+        from IPython.display import display
         display(self.lastmove.svg())
         
-    def display(self):
-        display(self.Segs.svg())
+    def display(self,fromTime=None,toTime=None):
+        from IPython.display import display,HTML
+        display(HTML('<h4>{0}</h4>'.format(self.name)))
+        if fromTime is not None:
+            fromTime = fromTime('s')
+        if toTime is not None:
+            toTime =toTime('s')
+             
+        display(self.Segs.svg(xlim=(fromTime,toTime)))
     
 def _pva(val):
     try: p=val[0]
@@ -439,5 +463,4 @@ def SegmentsTrapezoidalSpeed(t0,p0,p3,a,T=0,vmax=float('inf'),v0=0,v3=0):
     trap = Segments([acc,cst,dec],label=label)
     return trap
             
-    raise RuntimeError('constraint by T is not yet implemented')
 
