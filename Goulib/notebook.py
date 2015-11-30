@@ -16,14 +16,16 @@ __license__ = "LGPL"
 
 from IPython.display import display, HTML
 
-def h1(*args,sep=' '):
+sep=' ' # Python2 doesn't allow named param after list of optional ones...
+
+def h1(*args):
     display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
     
-def h2(*args,sep=' '):
+def h2(*args):
     display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
     
-def h3(*args,sep=' '):
-    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h3>'))
+def h3(*args):
+    display(HTML('<h3>'+sep.join(str(a) for a in args)+'</h3>'))
     
-def h(*args,sep=' '):
+def h(*args):
     display(HTML(sep.join(str(a) for a in args)))       
