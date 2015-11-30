@@ -20,10 +20,10 @@ def h1(*args,sep=' '):
     display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
     
 def h2(*args,sep=' '):
-    display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h2>'))
+    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
     
 def h3(*args,sep=' '):
-    display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h3>'))
+    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h3>'))
     
 def h(*args,sep=' '):
     display(HTML(sep.join(str(a) for a in args)))       
