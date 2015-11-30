@@ -16,66 +16,55 @@ class TestExpr:
     
     @classmethod
     def setup_class(self):
-        self.f=Expr('3*x+2')
         self.f1=Expr(1)
-        self.fx=Expr('x')
-        self.fx2=Expr('x**2')
-        self.fs=Expr('sin(x)')
+        self.fx=Expr(lambda x:x,name='x')
+        self.fx2=Expr(lambda x:x*x,name='x^2')
+        self.fs=Expr(sin)
         
-        self.fb1=Expr('x>1')
-        self.fb2=Expr('x>2')
+        self.fb1=Expr(lambda x:x>1,name='x>1')
+        self.fb2=Expr(lambda x:x>2,name='x>2')
         
-        self.e1=Expr('3*x+2') #a very simple expression
-        self.e2=Expr(self.fs)
-        
-        self.xy=Expr('x*y')
-        
+        self.e1=Expr(lambda x:3*x+2,name='3x+2') #a very simple expression
+        self.e2=Expr(sin)
         
     def test___init__(self):
         pass #teste in setup
     
     def test___call__(self):
-        assert_equal(self.f1(),1) # constant function
+        assert_equal(self.f1(0),1) # constant function
         assert_equal(self.fx([-1,0,1]),[-1,0,1])
         assert_equal(self.fb1([0,1,2]),[False,False,True])
-        
-        assert_equal(self.xy(x=2,y=3),6)
 
-    def test___str__(self):
-        assert_equal(str(self.f),'3*x+2')   
-        assert_equal(str(self.f1),'1')     
-        assert_equal(str(self.fx),'x')    
-        assert_equal(str(self.fs),'sin(x)')    
-        assert_equal(str(self.fb1),'x > 1')    
-        
-        #test multiplication commutativity and simplification
-        assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
+    def test___repr__(self):
+        assert_equal(repr(self.f1),'1')     
+        assert_equal(repr(self.fx),'x')    
+        assert_equal(repr(self.fs),'sin(x)')    
+        assert_equal(repr(self.fb1),'x>1')    
         
     def test__latex(self):
-        assert_equal(self.f._latex(),'3x+2')   
         assert_equal(self.f1._latex(),'1')     
         assert_equal(self.fx._latex(),'x')    
-        assert_equal(self.fs._latex(),'\\sin\\left(x\\right)')    
-        assert_equal(self.fb1._latex(),'x \\gtr 1')      
-        assert_equal(self.fs(self.fx2)._latex(),'\\sin\\left(x^{2}\\right)') 
+        assert_equal(self.fs._latex(),'\sin(x)')    
+        assert_equal(self.fb1._latex(),'x>1')      
+        assert_equal(self.fs(self.fx2)._latex(),'\sin(x^2)') 
         
 
     def test___add__(self):
         f=self.fx+self.f1
         assert_equal(f([-1,0,1]),[0,1,2])
-        assert_equal(str(f),'x+1')        
+        assert_equal(repr(f),'+(x,1)')        
         
     def test___neg__(self):
         f=-self.f1
-        assert_equal(str(f),'-1')        
+        assert_equal(repr(f),'-1')        
         f=-self.fx
         assert_equal(f([-1,0,1]),[1,0,-1])
-        assert_equal(str(f),'-x')
+        assert_equal(repr(f),'-(x)')
         
     def test___sub__(self):
         f=self.f1-self.fx
         assert_equal(f([-1,0,1]),[2,1,0])
-        assert_equal(str(f),'1-x')   
+        assert_equal(repr(f),'-(1,x)')   
         
     def test___mul__(self):
         f2=self.f1*2
@@ -102,7 +91,7 @@ class TestExpr:
         f2=self.fs(self.fx)
         assert_equal(f2([-1,0,1]),[sin(-1),0,sin(1)])
     
-    def test___not__(self):
+    def test___invert__(self):
         fb=~self.fb1
         assert_equal(fb([0,1,2]),[True,True,False])
 
@@ -133,6 +122,11 @@ class TestExpr:
     def test___eq__(self):
         assert_false(Expr(1)==Expr(2))
         assert_true(Expr(1)==1)
+
+    def test___truediv__(self):
+        # expr = Expr(f, left, right, name)
+        # assert_equal(expected, expr.__truediv__(right))
+        raise SkipTest 
 
     def test_save(self):
         self.e2(self.e1).save(path+'/expr.png')

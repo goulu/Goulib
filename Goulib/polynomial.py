@@ -14,9 +14,9 @@ __license__ = "LGPL"
 import six #python 2+3 compatibility
 import re
 
-from . import expr
+from .expr import Expr
 
-class Polynomial(expr.Expr):
+class Polynomial(Expr):
     def __init__(self,val):
         """:param: val can be:
         - an iterable of the factors in ascending powers order : Polynomial([1,2,3]) holds 3*x^2+2*x+1
@@ -26,8 +26,7 @@ class Polynomial(expr.Expr):
           
         """
         self.plist = plist(val)
-        s=''.join('%+f*x**%d'%(f,i) for i,f in enumerate(self.plist))
-        super(Polynomial,self).__init__(s)
+        super(Polynomial,self).__init__(lambda x:peval(self.plist,x))
         return
 
     
