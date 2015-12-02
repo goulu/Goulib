@@ -17,34 +17,51 @@ from . import plot #sets matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
 
 from . import itertools2
-from .math2 import vecmul, vecadd, vecsub
+from . import math2 
+
+def mean_var(data):
+    """mean and variance by stable algorithm
+    :param
+    :return: float (mean, variance) of data
+    uses a stable algo by Knuth
+    """
+    # https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
+    n = 0
+    mean = 0
+    M2 = 0
+     
+    for x in data:
+        n += 1
+        delta = x - mean
+        mean += delta/n
+        M2 += delta*(x - mean)
+
+    if n < 2:
+        return mean, float('nan')
+    else:
+        return mean, M2 / (n - 1)
 
 def mean(data):
     """:return: mean of data"""
-    return sum(data)/len(data)
+    return mean_var(data)[0]
 
 avg=mean #alias
 
-def variance(data,avg=None):
-    """:return: variance of data"""
-    if avg==None:
-        avg=mean(data)
-    s = sum(((value - avg)**2) for value in data)
-    var = s/len(data)
-    return var
+def variance(data):
+    """:return: variance of data, faster (?) if mean is already available"""
+    return mean_var(data)[1]
 
 var=variance #alias
 
-def stddev(data,avg=None):
+def stddev(data):
     """:return: standard deviation of data"""
-    return math.sqrt(variance(data,avg))
+    return math.sqrt(variance(data))
 
-def confidence_interval(data,conf=0.95, avg=None):
+def confidence_interval(data,conf=0.95):
     """:return: (low,high) bounds of 95% confidence interval of data"""
-    if avg is None:
-        avg=mean(data)
-    e = 1.96 * stddev(data,avg) / math.sqrt(len(data))
-    return avg-e,avg+e
+    m,v=mean_var(data)
+    e = 1.96 * math.sqrt(v) / math.sqrt(len(data))
+    return m-e,m+e
 
 def median(data, is_sorted=False):
     """:return: median of data"""
@@ -96,6 +113,29 @@ def stats(l):
         avg=None
         var=None
     return lo,hi,sum1,sum2,avg,var
+
+def kurtosis(data):
+    # https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+    n = 0
+    mean = 0
+    M2 = 0
+    M3 = 0
+    M4 = 0
+
+    for x in data:
+        n1 = n
+        n = n + 1
+        delta = x - mean
+        delta_n = delta / n
+        delta_n2 = delta_n * delta_n
+        term1 = delta * delta_n * n1
+        mean = mean + delta_n
+        M4 = M4 + term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3
+        M3 = M3 + term1 * delta_n * (n - 2) - 3 * delta_n * M2
+        M2 = M2 + term1
+
+    kurtosis = (n*M4) / (M2*M2) - 3
+    return kurtosis
 
 class Normal(list,plot.Plot):
     """represents a normal distributed variable 
@@ -206,7 +246,7 @@ class Normal(list,plot.Plot):
         # else: assume other is a Normal variable
         mean=self.mean+other.mean
         var=self.var+other.var+2*self.cov(other)
-        data=vecadd(self,other) if len(self)==len(other) else []
+        data=math2.vecadd(self,other) if len(self)==len(other) else []
         return Normal(data=data, mean=mean, var=var)
     
     def __radd__(self, other):

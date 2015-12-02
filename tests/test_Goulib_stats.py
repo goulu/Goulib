@@ -21,15 +21,16 @@ class TestMean:
 
 class TestVariance:
     def test_variance(self):
+        assert_equal(variance(h),1031372102,0)
         assert_equal(variance(r),0.082,places=2)
 
 class TestStddev:
     def test_stddev(self):
-        assert_equal(stddev(h),30466.9,1)
+        assert_equal(stddev(h),32115,1)
 
 class TestConfidenceInterval:
     def test_confidence_interval(self):
-        assert_equal(confidence_interval(h),(25017.0,62784.2),1)
+        assert_equal(confidence_interval(h),(23996,63806),0)
 
 class TestMedian:
     def test_median(self):
