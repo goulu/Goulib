@@ -374,11 +374,11 @@ def Segment2ndDegree(t0,t1,start,end=(None)):
         if not itertools2.any((dt,p0,v0,a0),lambda x:x is None): #we have all required data
             res=SegmentPoly(t0,t1,[p0,v0,a0/2.])
             end=res.end()
-            if p1 is not None and not math2.equal(end[0],p1): #consider p1 as max position
+            if p1 is not None and not math2.isclose(end[0],p1): #consider p1 as max position
                 res2=Segment2ndDegree(t0,None,(p0,v0,a0),p1)
                 if res2.dt()<res.dt(): #this case arises earlier
                     res=res2
-            if v1 is not None and not math2.equal(end[1],v1): #consider v1 as max velocity
+            if v1 is not None and not math2.isclose(end[1],v1): #consider v1 as max velocity
                 res2=Segment2ndDegree(t0,None,(p0,v0,a0),(None,v1))
                 if res2.dt()<res.dt(): #this case arises earlier
                     res=res2
