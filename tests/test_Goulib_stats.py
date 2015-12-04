@@ -10,23 +10,64 @@ from Goulib.stats import *
 from random import random
 
 h=[64630,11735,14216,99233,14470,4978,73429,38120,51135,67060] # data from https://www.hackerrank.com/challenges/stat-warmup
+hmean=43900.6 
+hvar=1031372102 #variance of h computed in Matlab
+
 r=[random() for _ in range(5000)]
 n=10000
+
 f=[float(_)/n for _ in range(n+1)]
+fvar=1./12 #variance of f, theoretical
 
 class TestMean:
     def test_mean(self):
-        assert_equal(mean(h),43900.6)
+        assert_equal(avg(f),0.5)
+        assert_equal(mean(h),hmean)
         assert_equal(mean(r),0.5,places=1)
 
 class TestVariance:
     def test_variance(self):
-        assert_equal(variance(h),1031372102,0)
+        assert_equal(var(f),1./12,4)
+        assert_equal(variance(h),hvar,0)
         assert_equal(variance(r),0.082,places=2)
+
+class TestStats:
+    @classmethod
+    def setup_class(self):
+        self.f=Stats(f)
+        self.h=Stats(h)
+        
+    def test___init__(self):
+        pass #tested above
+
+    def test_append(self):
+        pass #tested above
+
+    def test_extend(self):
+        pass #tested above
+    
+    def test_remove(self):
+        # Stats = Stats(data, mean, var)
+        # assert_equal(expected, Stats.remove(data))
+        raise SkipTest # TODO: implement your test here
+
+    def test_mean(self):
+        assert_equal(self.f.mean,0.5)
+        assert_equal(self.h.avg,hmean)
+        
+    def test_variance(self):
+        assert_equal(self.f.variance,fvar)
+        assert_equal(self.h.var,hvar)
+
+
+    def test_stddev(self):
+        # Stats = Stats(data, mean, var)
+        # assert_equal(expected, Stats.stddev())
+        raise SkipTest # TODO: implement your test here
 
 class TestStddev:
     def test_stddev(self):
-        assert_equal(stddev(h),32115,1)
+        assert_equal(stddev(h),math.sqrt(hvar),1)
 
 class TestConfidenceInterval:
     def test_confidence_interval(self):
@@ -47,14 +88,13 @@ class TestMode:
 class TestStats:
     def test_stats(self):
         # https://www.hackerrank.com/challenges/stat-warmup
-        r=[64630,11735,14216,99233,14470,4978,73429,38120,51135,67060]
-        min,max,sum,sum2,avg,var=stats(r)
+        min,max,sum,sum2,avg,var=stats(h)
         assert_equal(min,4978)
         assert_equal(max,99233)
         assert_equal(sum,439006)
-        assert_equal(sum2,28554975720)
-        assert_equal(avg,43900.6)
-        assert_equal(var,928234891.64,3)
+        assert_equal(sum2,math2.dot(h,h))
+        assert_equal(avg,hmean)
+        assert_equal(var,hvar,0)
 
         min,max,sum,sum2,avg,var=stats(f)
         assert_equal(min,0.,1)
@@ -84,7 +124,7 @@ class TestNormal:
     def setup_class(self):
         self.gauss=Normal(mean=1)
         self.two=Normal(mean=2,var=0)
-        self.data=Normal([64630,11735,14216,99233,14470,4978,73429,38120,51135,67060])
+        self.h=Normal(h)
         
     def test___init__(self):
         pass # tested above
@@ -95,29 +135,31 @@ class TestNormal:
     def test_extend(self):
         pass # tested above
     
-    def test___repr__(self):
-        assert_equal(str(self.gauss),'Normal(μ=1.0, σ=1.0)')
+    def test___str__(self):
+        assert_equal(str(self.gauss),'Normal(mean=1.0, var=1.0)')
         
     def test_mean(self):
-        assert_equal(self.data.avg,43900.6)
+        assert_equal(self.h.avg,hmean)
 
     def test_variance(self):
-        assert_equal(self.data.var,928234891.64,6)
+        assert_equal(self.gauss.var,1)
+        assert_equal(self.two.var,0)
+        assert_equal(self.h.var,hvar,0)
         
     def test_stddev(self):
-        assert_equal(self.data.stddev,math.sqrt(928234891.64))
+        assert_equal(self.h.stddev,math.sqrt(hvar),5)
     
     def test_linear(self):
         pass # tested below
         
     def test___add__(self):
         twogauss=self.gauss+self.gauss
-        assert_equal(twogauss.avg,2)
         assert_equal(twogauss.var,2)
+        assert_equal(twogauss.avg,2)
         
         n=self.gauss+1
-        assert_equal(n.avg,2)
         assert_equal(n.var,1)
+        assert_equal(n.avg,2)
         
     def test___radd__(self):
         n=1+self.gauss
@@ -138,6 +180,68 @@ class TestNormal:
         halfgauss=self.gauss/2
         assert_equal(halfgauss.avg,.5)
         assert_equal(halfgauss.var,.5)
+
+    def test___call__(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.__call__(x))
+        raise SkipTest # TODO: implement your test here
+
+    def test___neg__(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.__neg__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___rsub__(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.__rsub__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_covariance(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.covariance(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pdf(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.pdf(x))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pearson(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.pearson(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_plot(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.plot(fmt, x))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pop(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.pop(i, n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_remove(self):
+        # normal = Normal()
+        # assert_equal(expected, normal.remove(x))
+        raise SkipTest # TODO: implement your test here
+
+class TestMeanVar:
+    def test_mean_var(self):
+        # assert_equal(expected, mean_var(data))
+        raise SkipTest # TODO: implement your test here
+
+class TestKurtosis:
+    def test_kurtosis(self):
+        # assert_equal(expected, kurtosis(data))
+        raise SkipTest # TODO: implement your test here
+
+class TestCovariance:
+    def test_covariance(self):
+        # assert_equal(expected, covariance(data1, data2))
+        raise SkipTest # TODO: implement your test here
+
+
 
 if __name__ == "__main__":
     runmodule()
