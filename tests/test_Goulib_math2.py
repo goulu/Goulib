@@ -45,11 +45,11 @@ class TestQuad:
         assert_equal(sum(quad(1,2,3,allow_complex=True)),-2) #complex results
 
 class TestEqual:
-    def test_equal(self):
+    def test_isclose(self):
         a=1E6
-        d=0.99e-6
-        assert_true(equal(a, a+d))
-        assert_false(equal(a, a+2*d))
+        d=0.99e-3
+        assert_true(isclose(a, a+d))
+        assert_false(isclose(a, a+2*d))
 
 class TestLcm:
     def test_lcm(self):
