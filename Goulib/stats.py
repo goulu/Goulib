@@ -143,7 +143,7 @@ class Stats(object):
         self.extend(data)
         
     def __repr__(self):
-        return "%s(mean=%s, var=%s)"%(self.__class__.__name__,self.mu,self.var)
+        return "{}(mean={:.12g}, var={:.12g})".format(self.__class__.__name__,self.mu,self.var)
 
     def append(self,x):
         """add data x to Stats"""

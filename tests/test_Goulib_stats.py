@@ -136,7 +136,7 @@ class TestNormal:
         pass # tested above
     
     def test___str__(self):
-        assert_equal(str(self.gauss),'Normal(mean=1.0, var=1.0)')
+        assert_equal(str(self.gauss),'Normal(mean=1, var=1)')
         
     def test_mean(self):
         assert_equal(self.h.avg,hmean)
