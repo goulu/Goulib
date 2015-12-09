@@ -504,8 +504,9 @@ class _Geo(object):
         from io import BytesIO
         output = BytesIO()
         fig.savefig(output, format=fmt, transparent=kwargs.get('transparent',True))
+        res=output.getvalue()
         plt.close(fig)
-        return output.getvalue()
+        return res
     
     # for IPython notebooks
     def _repr_svg_(self):
