@@ -83,18 +83,39 @@ def quad(a, b, c, allow_complex=False):
         form aX^2+bX+c, inputs a,b,c,
         works for all roots(real or complex)
     """
-    discriminant = (b ** 2) -  4  * a * c
+    discriminant = b*b - 4 *a*c
     if allow_complex:
         d=cmath.sqrt(discriminant)
     else:
         d=math.sqrt(discriminant)
-    return (-b + d) / (2. * a), (-b - d) / (2. * a)
+    return (-b + d) / (2*a), (-b - d) / (2*a)
 
 def equal(a,b,epsilon=1e-6):
     """approximately equal. Use this instead of a==b in floating point ops
     :return: True if a and b are less than epsilon apart
     """
-    return abs(a-b)<epsilon
+    raise DeprecationWarning('use isclose instead')
+
+def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
+    #https://www.python.org/dev/peps/pep-0485/
+    return abs(a-b) <= max( rel_tol * max(abs(a), abs(b)), abs_tol )
+
+def is_integer(x, epsilon=1e-6):
+    """
+    :return: True if  float x is almost an integer
+    """
+    return isclose(x,round(x),0,epsilon)
+
+def rint(v):
+    """:return: int value nearest to float v"""
+    return int(round(v))
+
+def int_or_float(x, epsilon=1e-6):
+    """
+    :param x: int or float
+    :return: int if x is (almost) an integer, otherwise float
+    """
+    return rint(x) if is_integer(x, epsilon) else x
 
 def ceildiv(a, b):
     return -(-a // b) #simple and clever
@@ -110,7 +131,6 @@ def isqrt(n):
         x = y
         y = (x + n // x) // 2
     return x
-
 
 def multiply(x, y):
     """
@@ -390,23 +410,6 @@ def primitive_triples(sort_xy=True):
             if sort_xy and triple[0]>triple[1]:
                 triple[0],triple[1]=triple[1],triple[0]
             triples.append(triple)
-
-def is_integer(x, epsilon=1e-6):
-    """
-    :return: True if  float x is almost an integer
-    """
-    return (abs(round(x) - x) < epsilon)
-
-def int_or_float(x, epsilon=1e-6):
-    """
-    :param x: int or float
-    :return: int if x is (almost) an integer, otherwise float
-    """
-    return int(x) if is_integer(x, epsilon) else x
-
-def rint(v):
-    """:return: int value nearest to float v"""
-    return int(round(v))
 
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
