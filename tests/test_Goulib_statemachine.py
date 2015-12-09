@@ -26,7 +26,7 @@ class SM_Test(StateMachine):
            --> 000: condition :to move
         """ 
         logging.debug('001')
-        self.time += V(7,'s')
+        self.wait(self.time +V(7,'s'))
 
 
 class TestSM_test:
@@ -43,8 +43,8 @@ class TestSM_test:
     def test_run(self):
         sm = SM_Test()
         sm.run(start=0,maxSteps=4)
-        assert_equal(sm.log, [(0, 0), (1, 3), (0, 10), (1, 10)])
-        assert_equal(sm.lastExitTime(0), 10)
+        assert_equal(sm.log, [(0, 0), (3,1), (10,0), (10, 1)])
+        assert_equal(sm.lastExitTime(0), V(10,'s'))
  
 if __name__ == "__main__":
     runmodule()           

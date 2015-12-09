@@ -62,6 +62,11 @@ class TestSegments:
         s1.add(SegmentsTrapezoidalSpeed(t0=25.688904 , p0=1.8, p3=3.6, a=1))
         assert_equal(len(s1.segments), 5, 's1 is initally 3 + 1 autojoin + 1 Segments')
         
+    def test_timeWhenPosBiggerThan(self):
+        s1 = SegmentsTrapezoidalSpeed(t0=0,p0=0,p3=1.8,a=0.5,vmax=1)
+        t = s1.timeWhenPosBiggerThan(1,resolution=0.01)
+        assert_equal(t,2.01)
+        
     def test_html(self):
         s1 = Segment2ndDegree(0,2,(0,0,2))
         s2 = Segment2ndDegree(2,4,(4.0,4.0,-2.0))
@@ -82,11 +87,11 @@ class TestActuator:
         assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
         assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
-        a.move(V(0,'m'))
-        assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))
+        a.move(V(0,'m'),acc=V(2,'m/s^2'))  #test overriding default acc
+        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))
         #test that if no real move we get the same result
         a.move(V(0,'m'))
-        assert_equal(a.Segs.end(),(0.0, 0.0, 1.0, 0.0))        
+        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))        
                         
 class TestSegmentPoly:
     @classmethod

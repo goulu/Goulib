@@ -34,6 +34,7 @@ class Segment(PVA):
         super(Segment, self).__init__(funcs)
         self.t0=t0
         self.t1=t1
+        self.ticks= []
         
     def dt(self):
         return self.t1-self.t0
@@ -73,6 +74,16 @@ class Segment(PVA):
     
     def endTime(self):
         return(self.t1)
+    
+    def timeWhenPosBiggerThan(self,pos,resolution=0.010):
+        """ search the first time when the position is bigger than pos
+        :params pos: the pos that must at least be reached
+        :params resolution: the time resolution in sec"""
+        #brute force and stupid!!!
+        for t in itertools2.arange(self.t0,self.t1,resolution):
+            if self(t)[0] >= pos:
+                break
+        return t
         
     def __call__(self,t):
         if t>=self.t0 and t<self.t1:
@@ -81,9 +92,12 @@ class Segment(PVA):
             return (0,)*len(self.funcs)
         
     def _plot(self, ax, t0=None,t1=None, ylim=None, **kwargs):
+        """
+        :params ticks: a list of (time,state) to add ticks
+        """
         if t0 is None: t0=self.t0
         if t1 is None: t1=self.t1
-        step=(t1-t0)/100.
+        step=(t1-t0)/500.
         x=[ t for t in itertools2.arange(t0,t1,step)  ]
         y = [self(t) for t in x]
         y=map(list, zip(*y)) #transpose because of 
@@ -91,6 +105,8 @@ class Segment(PVA):
         for y_arr, label in zip(y, labels):
             ax.plot(x, y_arr, label=label)
         ax.legend(loc='best')
+#        for tick in self.ticks:
+#            ax.axvline(x=tick[0],color='0.5')
         return ax
     
 class Segments(Segment):
@@ -189,7 +205,8 @@ class Segments(Segment):
                 return s(t)
         return (0,0,0,0)  #oversimplified: assuming PVAJ; should check that all segments are of the same nature
     
-                
+
+            
 class SegmentPoly(Segment):
     """ a segment defined by a polynomial position law
     """
@@ -228,12 +245,14 @@ class Actuator():
         self.pos = pos if type(pos) is V else V(pos,'m')
         self.stateMachine = stateMachine
         
-    def move(self,newpos,relative=False,time = None):
+    def move(self,newpos,relative=False,time = None, vmax=None,acc=None):
         """ moves the actuator to newpos
         :params newpos: the new absolute position
         :params time: the starting time of the move. by default (None) the state machine time will be used but
                       one can force the starting poing in the past typically to do parallel moves of 
                       different actuators
+        :params vmax: by default the values given at initialisation, but a value for this move can be given
+        :params acc:  by default the values given at initialisation, but a value for this move can be given
         """
         if time is None:
             time = self.stateMachine.time
@@ -242,15 +261,19 @@ class Actuator():
         newpos = newpos('m')               
         if relative:
             newpos = pos + newpos
-
+        
         if newpos == pos:
+            if self.stateMachine.displayMove:
+                from IPython.display import display,HTML
+                display(HTML('<h4>{0}</h4> already in place @ {1}[m]'.format(self.name,newpos)))            
             return self.Segs
         elif newpos > pos:
-            acc = self.acc('m/s^2')
-            vmax = self.vmax('m/s')
+            acc = self.acc('m/s^2') if acc is None else acc('m/s^2')
+            vmax = self.vmax('m/s') if vmax is None else vmax('m/s')
         else:
-            acc = - self.acc('m/s^2')
-            vmax= - self.vmax('m/s')
+            acc = - self.acc('m/s^2') if acc is None else -acc('m/s^2')
+            vmax= - self.vmax('m/s') if vmax is None else -vmax('m/s')
+            
         logging.debug(self.stateMachine.time)
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
         self.lastmove = m
@@ -274,7 +297,7 @@ class Actuator():
             fromTime = fromTime('s')
         if toTime is not None:
             toTime =toTime('s')
-             
+        self.Segs.ticks = self.stateMachine.log
         display(self.Segs.svg(xlim=(fromTime,toTime)))
     
 def _pva(val):
