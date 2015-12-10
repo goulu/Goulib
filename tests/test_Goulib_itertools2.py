@@ -47,14 +47,14 @@ class TestArange:
     def test_arange(self):
         assert_equal(arange(-1,2.5,.5),[-1,-0.5,0,0.5,1,1.5,2])
         assert_equal(arange(2,-1.5,.5),reversed([-1,-0.5,0,0.5,1,1.5,2]))
-        l=list(arange(0,1,.01))
+        l=list(arange(1,step=.01))
         assert_equal(len(l),100)
 
-class TestIlinear:
-    def test_ilinear(self):
-        assert_equal(ilinear(-1,2,7),[-1,-0.5,0,0.5,1,1.5,2])
-        assert_equal(ilinear(1,1,7),[1,1,1,1,1,1,1])
-        assert_equal(ilinear((1,0),(0,1),3),[(1,0),(.5,.5),(0,1)])
+class TestLinspace:
+    def test_linspace(self):
+        assert_equal(linspace(-1,2,7),[-1,-0.5,0,0.5,1,1.5,2])
+        assert_equal(linspace(1,1,7),[1,1,1,1,1,1,1])
+        assert_equal(linspace((1,0),(0,1),3),[(1,0),(.5,.5),(0,1)])
 
 class TestFlatten:
     def test_flatten(self):

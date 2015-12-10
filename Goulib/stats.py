@@ -253,7 +253,7 @@ class Normal(Stats, list,plot.Plot):
         # plt.rc('text', usetex=True)
         fig, ax = plt.subplots()
         if x is None:
-            x=itertools2.ilinear(self.mu-3*self.sigma,self.mu+3*self.sigma, 101)
+            x=itertools2.linspace(self.mu-3*self.sigma,self.mu+3*self.sigma, 101)
         x=list(x)
         y=self(x)
         ax.plot(x,y)

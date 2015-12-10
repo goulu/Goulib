@@ -52,7 +52,7 @@ def color_range(n,start,end):
     :result: list of n hexcolors interpolated between start and end, included
     """
     import colorsys
-    from .itertools2 import ilinear
+    from .itertools2 import linspace
     if start in color: start=color[start]
     start=hex_to_rgb(start,1./255)
     start=colorsys.rgb_to_hsv(*start)
@@ -60,7 +60,7 @@ def color_range(n,start,end):
     end=hex_to_rgb(end,1./255)
     end=colorsys.rgb_to_hsv(*end)
     res=[]
-    for hsv in ilinear(start,end,n):
+    for hsv in linspace(start,end,n):
         rgb=colorsys.hsv_to_rgb(*hsv)
         hex=rgb_to_hex(tuple(int(255*x) for x in rgb))
         res.append(hex)
