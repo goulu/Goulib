@@ -7,6 +7,9 @@ from Goulib.tests import *
 
 from Goulib.polynomial import *
 
+import os
+path=os.path.dirname(os.path.abspath(__file__))
+
 class TestPolynomial:
     @classmethod
     def setup_class(self):
@@ -83,6 +86,10 @@ class TestPolynomial:
         assert_true(self.p>self.p2)
         assert_equal(self.p3,[1,2,-4,0,0,7])
         assert_equal(self.p3,'7x^5 - 4x^2 + 2x + 1')
+        
+    def test_save(self):
+        self.p3.save(path+'/polynomial.png')
+        self.p3.save(path+'/polynomial.svg')
 
 class TestPlist:
     def test_plist(self):
