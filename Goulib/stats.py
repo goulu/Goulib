@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt # after import .plot
 
 from . import itertools2
 from . import math2
+from . import expr
 
 def mean_var(data):
     """mean and variance by stable algorithm
@@ -195,6 +196,8 @@ class Stats(object):
 
     @property
     def variance(self):
+        if self.n<2: #variance of a single data...
+            return 0
         return (self._dsum2 - (self._dsum1*self._dsum1)/self.n) / (self.n-1)
 
     var=variance #alias
@@ -203,15 +206,23 @@ class Stats(object):
         return math.sqrt(self.variance)
 
     sigma=stddev
+    
+def normal_pdf(x,mu,sigma):
+    """Return the probability density function at x"""
+    try:
+        return 1./(math.sqrt(2*math.pi)*sigma)*math.exp(-0.5 * (1./sigma*(x - mu))**2)
+    except ZeroDivisionError:
+        return 1 if math2.isclose(x,mean) else 0
 
 
-class Normal(Stats, list,plot.Plot):
+class Normal(Stats, list, expr.Expr):
     """represents a normal distributed variable
     the base class (list) optionally contains data
     """
     
     def __init__(self,data=[],mean=0,var=1):
-        super(Normal,self).__init__(data)
+        Stats.__init__(self,data)
+        expr.Expr.__init__(self,lambda x:normal_pdf(x,self.mu,self.sigma))
         if not data: #cheat 
             s=math.sqrt(var/2)
             Stats.append(self,mean-s)
@@ -234,39 +245,15 @@ class Normal(Stats, list,plot.Plot):
             x=list.pop(self,i)
             Stats.remove(self,x)
 
-    def pdf(self, x):
-        """Return the probability density function at x"""
-        return 1./(math.sqrt(2*math.pi)*self.sigma)*math.exp(-0.5 * (1./self.sigma*(x - self.mu))**2)
-
-    def __call__(self,x):
-        try: #is x iterable ?
-            return [self(x) for x in x]
-        except: pass
-        return self.pdf(x)
-
-    def _repr_latex_(self):
+    def _latex(self):
         return "\mathcal{N}(\mu=%s, \sigma=%s)"%(self.mean,self.stddev)
 
-    def plot(self, fmt='svg', x=None):
-        from IPython.core.pylabtools import print_figure
-
-        # plt.rc('text', usetex=True)
-        fig, ax = plt.subplots()
+    def _plot(self, ax, x=None, **kwargs):
         if x is None:
             x=itertools2.linspace(self.mu-3*self.sigma,self.mu+3*self.sigma, 101)
         x=list(x)
-        y=self(x)
-        ax.plot(x,y)
-        ax.set_title(self._repr_latex_())
-        data = print_figure(fig, fmt)
-        plt.close(fig)
-        return data
-
-    def _repr_png_(self):
-        return self.plot(fmt='png')
-
-    def _repr_svg_(self):
-        return self.plot(fmt='svg')
+        y=list(self(x))
+        return expr.Expr._plot(self,ax,x,y,**kwargs)
 
     def linear(self,a,b=0):
         """
