@@ -29,16 +29,20 @@ class Plot(object):
     inspired from http://nbviewer.ipython.org/github/ipython/ipython/blob/3607712653c66d63e0d7f13f073bde8c0f209ba8/docs/examples/notebooks/display_protocol.ipynb
     """
     
-    def _plot(self, **kwargs):
+    def _plot(self, ax, **kwargs):
+        """abstract method, must be overriden
+        
+        :param ax: `matplotlib.axis` 
+        :return ax: `matplotlib.axis` after plot
+        """
         raise NotImplementedError('objects derived from plot.PLot must define a _plot method')
+        return ax
     
     def render(self, fmt='svg', **kwargs):
         return render([self],fmt, **kwargs) # call global function
     
     def save(self,filename,**kwargs):
-        ext=filename.split('.')[-1].lower()
-        kwargs.setdefault('dpi',600) #force good quality
-        return open(filename,'wb').write(self.render(ext,**kwargs))
+        return save([self],filename, **kwargs) # call global function
     
     def _repr_png_(self,**kwargs):
         try:
@@ -88,17 +92,18 @@ def render(plotables, fmt='svg', **kwargs):
         
     for i,obj in enumerate(plotables):
         if labels[i] is None:
+            labels[i]=str(obj)
+        if not title:
             try:
-                labels[i]=obj._repr_latex_()
+                title=obj._repr_latex_()
             except:
-                labels[i]=str(obj)
+                title=labels[i]
         ax = obj._plot(ax, label=labels[i], offset=i*offset, **kwargs)       
     
     if ylim: plt.ylim(ylim)
     if xlim: plt.xlim(xlim)
     
-    if not title and len(labels)==1:
-        title=labels[0]
+
     if title: ax.set_title(title) 
     if len(labels)>1:
         ax.legend()
@@ -119,5 +124,10 @@ def svg(plotables, **kwargs):
     return SVG(render(plotables,'svg',**kwargs))
 
 plot=svg
+
+def save(plotables,filename,**kwargs):
+    ext=filename.split('.')[-1].lower()
+    kwargs.setdefault('dpi',600) #force good quality
+    return open(filename,'wb').write(render(plotables, ext,**kwargs))
 
     
