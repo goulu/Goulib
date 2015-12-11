@@ -57,6 +57,7 @@ Modules
     drawing
     expr
     geom
+    geom3d
     graph
     image
     interval
@@ -68,6 +69,7 @@ Modules
     piecewise
     plot
     polynomial
+    statemachine
     stats
     table
     tests
@@ -84,6 +86,7 @@ Classes
     drawing
     expr
     geom
+    geom3d
     graph
     image
     interval
@@ -94,6 +97,7 @@ Classes
     piecewise
     plot
     polynomial
+    statemachine
     stats
     table
     tests
