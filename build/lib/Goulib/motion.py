@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-functions of time which evaluate to (position, velocity, acceleration, jerk) tuples
+motion simulation (kinematics)
 """
 
 __author__ = "Philippe Guglielmetti"

@@ -45,14 +45,13 @@ class Expr(plot.Plot):
         else:              
             self.left=None
             self.right=None
-            try: #is f a function ?
-                f(1)
+            if hasattr(f, '__call__'):
                 self.isconstant=False
                 if not name:
                     name='\\%s(x)'%f.__name__ #try to build LateX name
                 elif name.isalpha() and name!='x':
                     name='\\'+name
-            except: #f is a constant 
+            else: #f is a constant 
                 self.isconstant=True
                 name=str(f)
         self.name=name

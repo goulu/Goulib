@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf8
 
+"""
+state machines with graph representation
+"""
+
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
 __credits__= [""]
@@ -139,13 +143,6 @@ class StateMachine:
             toTime =toTime('s')
         display(p.svg(xlim=(fromTime,toTime)))
         
-        
-class Simulation:
-    def __init__(self):
-        self.setGlobals()
-        
-    def setGlobals(self):
-        pass
-    
+
     
         

@@ -128,11 +128,11 @@ class TestPiecewise:
         raise SkipTest 
     
     def test_save(self):
-        self.p2.save(path+'/piecewise.p2.png',xmax=7,ylim=(-1,5))
+        self.p2.save(path+'/results/piecewise.p2.png',xmax=7,ylim=(-1,5))
         
     def test_svg(self):
         svg=self.p2._repr_svg_(xmax=7,ylim=(-1,5)) # return IPython object
-        with open(path+'/piecewise.p2.svg','wb') as f:
+        with open(path+'/results/piecewise.p2.svg','wb') as f:
             f.write(svg.encode('utf-8'))
 
 if __name__ == "__main__":

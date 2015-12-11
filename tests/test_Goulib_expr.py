@@ -129,8 +129,8 @@ class TestExpr:
         raise SkipTest 
 
     def test_save(self):
-        self.e2(self.e1).save(path+'/expr.png')
-        self.e2(self.e1).save(path+'/expr.svg')
+        self.e2(self.e1).save(path+'/results/expr.png')
+        self.e2(self.e1).save(path+'/results/expr.svg')
 
 if __name__ == "__main__":
     runmodule()

@@ -98,7 +98,10 @@ def equal(a,b,epsilon=1e-6):
 
 def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
     #https://www.python.org/dev/peps/pep-0485/
-    return abs(a-b) <= max( rel_tol * max(abs(a), abs(b)), abs_tol )
+    if a==0 or b==0: #reltol probably makes no sense
+        abs_tol=max(abs_tol, rel_tol)
+    tol=max( rel_tol * max(abs(a), abs(b)), abs_tol )
+    return abs(a-b) <= tol
 
 def is_integer(x, epsilon=1e-6):
     """

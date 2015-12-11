@@ -18,13 +18,14 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
-from math import  radians, degrees, atan
+from math import  radians, degrees, tan, atan
 import logging, operator
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
 from .colors import color_to_aci, aci_to_color
 from .interval import Box
+from .math2 import isclose
 
 from . import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
@@ -203,10 +204,10 @@ class Entity(object):
         return isinstance(self,Line2) #or derived
 
     def isvertical(self,tol=0.01):
-        return self.isline() and abs(self.start.x-self.end.x)<tol
+        return self.isline() and isclose(self.start.x,self.end.x,tol)
 
     def ishorizontal(self,tol=0.01):
-        return self.isline() and abs(self.start.y-self.end.y)<tol
+        return self.isline() and isclose(self.start.y,self.end.y,tol)
 
     def _dxf_attr(self,attr):
         """
@@ -746,18 +747,18 @@ class Chain(Group):
         if len(self)==0: #init the chain with edge
             return -1,False
         
-        if self.end.distance(edge.start)<=tol:
+        if isclose(self.end.distance(edge.start),0,tol):
             return -1,False #append
         
-        if self.start.distance(edge.end)<=tol: 
+        if isclose(self.start.distance(edge.end),0,tol):
             return 0,False #prepend
         
         if not allow_swap:
             return None,False
         
-        if self.end.distance(edge.end)<=tol:
+        if isclose(self.end.distance(edge.end),0,tol):
             return -1,True #append swapped
-        if self.start.distance(edge.start)<=tol:
+        if isclose(self.start.distance(edge.start),0,tol):
             return 0,True #prepend swapped
         
         return None, False
@@ -974,7 +975,7 @@ def chains(group, tol=1E-6, mergeable=None):
     changed=False
     #step 1 : add all entities in group to chains in res
     for e in group:
-        if e is None or e.length<tol:
+        if e is None or isclose(e.length,0,tol):
             continue #will not be present in res
         ok=False
         for c in res:

@@ -2,13 +2,15 @@
 # coding: utf8
 """
 efficient Euclidian Graphs for :mod:`networkx` and related algorithms
-
+"""
+# 
+"""
 :requires:
 * `networkx <http://networkx.github.io/>`_ 
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ 
 
 :optional:
-* `scipy <http://www.scipy.org/>`_ for delauney traingulation
+* `scipy <http://www.scipy.org/>`_ for delauney triangulation
 * `rtree <http://toblerity.org/rtree/>`_ for faster GeoGraph algorithms
 """
 

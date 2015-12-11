@@ -47,7 +47,7 @@ Modules
 	Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 **expr**
 	simple symbolic math expressions
-**geom**
+**geom**, **geom3d**
 	2D + 3D geometry
 **graph**
 	efficient Euclidian Graphs for `NetworkX <http://networkx.github.io/>`_ and related algorithms
@@ -62,15 +62,17 @@ Modules
 **math2**
 	additions to math standard library
 **motion**
-	functions of time which provide (position, velocity, acceleration, jerk) tuples
+	motion simulation (kinematics)
 **optim**
 	optimization algorithms : knapsack, traveling salesman, simulated annealing
 **piecewise**
 	piecewise-defined functions
 **plot**
-    plot utilities
+    plotable rich object display on IPython notebooks
 **polynomial**
 	manipulation of polynomials
+**statemachine**
+    state machines with graph representation
 **stats**
     very basic statistics functions
 **table**
@@ -78,7 +80,7 @@ Modules
 **tests**
     utilities for unit tests (using nose)
 **workdays**
-	WorkCalendar class with datetime operations on working hours
+	WorkCalendar class with datetime operations on working hours, handling holidays
 	merges and improves `BusinessHours <http://pypi.python.org/pypi/BusinessHours/>`_ and `workdays <http://pypi.python.org/pypi/workdays/>`_ packages
 
 Requirements

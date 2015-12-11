@@ -6,6 +6,9 @@ from nose import SkipTest
 from Goulib.tests import *
 from Goulib.motion import *
 
+import os
+path=os.path.dirname(os.path.abspath(__file__))
+
 def pva_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
     list(map(lambda x:assert_almost_equal(x[0],x[1],precision),list(zip(a,b))))
     
@@ -116,7 +119,7 @@ class TestSegmentPoly:
         assert_equal(self.seg(2),(0,0,0,0))
         
     def test_save(self):
-        self.seg.save('motion.SegmentPoly.png')
+        self.seg.save(path+'/results/motion.SegmentPoly.png')
 
 class TestSegment2ndDegree:
     @classmethod
