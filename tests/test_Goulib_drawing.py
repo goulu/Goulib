@@ -250,14 +250,14 @@ class TestGroup:
 
         self.group=Group([r1,r2,c1,c2,s1,s2,s3])
 
-        self.dxf= Drawing(path+'/Homer_Simpson_by_CyberDrone.dxf')
+        self.dxf= Drawing(path+'/data/Homer_Simpson_by_CyberDrone.dxf')
         self.blocks= self.dxf.block
         assert_true('hand 1' in self.blocks)
         
     def test_distance(self):
         g2=Trans(scale=2, offset=(10,1), rotation=30)*self.group
         g2.color='blue'
-        Drawing([self.group,g2]).save('gg2.png')
+        Drawing([self.group,g2]).save(path+'/results/drawing.Group.distance.png')
         assert_equal(self.group.distance(g2),2.026833782163534)
 
     def test_append(self):
@@ -372,9 +372,9 @@ class TestChain:
 class TestDrawing:
     @classmethod
     def setup_class(self):
-        self.dxf= Drawing(path+'/drawing.dxf')
-        self.svg= Drawing(path+'/drawing.svg')
-        self.pdf= Drawing(path+'/drawing.pdf')
+        self.dxf= Drawing(path+'/data/drawing.dxf')
+        self.svg= Drawing(path+'/data/drawing.svg')
+        self.pdf= Drawing(path+'/data/drawing.pdf')
 
         seg=Segment2((1,0),(2,3))
         arc=Arc2((1,1),(0,0),radians(120))
@@ -383,15 +383,14 @@ class TestDrawing:
 
     def test_load(self):
         return
-        cube=Drawing(path+'/cubeecraft_template.pdf')
-        cube.save(path+'/cubeecraft.dxf')
+        cube=Drawing(path+'/data/cubeecraft_template.pdf')
+        cube.save(path+'/results/cubeecraft.dxf')
 
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
-            self.svg.save(path+'/drawing.svg.%s'%ext)
-            self.dxf.save(path+'/drawing.dxf.%s'%ext)
-            self.pdf.save(path+'/drawing.pdf.%s'%ext)
-
+            self.svg.save(path+'/results/drawing.svg.%s'%ext)
+            self.dxf.save(path+'/results/drawing.dxf.%s'%ext)
+            self.pdf.save(path+'/results/drawing.pdf.%s'%ext)
 
     def test___init__(self):
         pass # tested above

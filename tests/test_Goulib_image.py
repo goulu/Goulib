@@ -55,8 +55,8 @@ class TestImg2base64:
     
 class TestAveragehash:
     def test_average_hash(self):
-        lena = Image.open(path+'/lena.png')
-        lena_bw = Image.open(path+'/lena_bw.png')
+        lena = Image.open(path+'/data/lena.png')
+        lena_bw = Image.open(path+'/data/lena_bw.png')
         diff=average_hash(lena)^average_hash(lena_bw)
         diff=math2.digsum(diff,2) #number of different pixels
         assert_true(diff<2)

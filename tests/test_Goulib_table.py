@@ -17,14 +17,14 @@ class TestTable:
         self.path=os.path.dirname(os.path.abspath(__file__))
         
         #test reading an Excel file
-        self.t=Table(self.path+'/test.xls') # from http://www.contextures.com/xlSampleData01.html
+        self.t=Table(self.path+'/data/test.xls') # from http://www.contextures.com/xlSampleData01.html
         assert_equal(self.t.titles,['OrderDate', u'Région', 'Rep', 'Item', u'Unités', 'Cost', 'Total'])
         
         #test that t can be written to csv, then re-read in t2 without loss
-        self.t.write_csv(self.path+'/test.csv')
+        self.t.write_csv(self.path+'/results/table.test.csv')
         
         self.t2=Table(None) #empty table
-        self.t2.read_csv(self.path+'/test.csv')
+        self.t2.read_csv(self.path+'/results/table.test.csv')
         
         assert_equal(repr(self.t),repr(self.t2))
         assert_equal(str(self.t),str(self.t2))

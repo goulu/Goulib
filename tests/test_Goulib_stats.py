@@ -233,7 +233,7 @@ class TestNormal:
         n1=Normal()
         n2=Normal([],2,2)
         n3=Normal([2]) # TODO find why it does not show
-        plot.save([n1,n2,n1+n2],path+'/stats.gauss.png')
+        plot.save([n1,n2,n1+n2],path+'/results/stats.gauss.png')
 
 class TestMeanVar:
     def test_mean_var(self):

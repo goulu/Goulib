@@ -88,8 +88,8 @@ class TestPolynomial:
         assert_equal(self.p3,'7x^5 - 4x^2 + 2x + 1')
         
     def test_save(self):
-        self.p3.save(path+'/polynomial.png')
-        self.p3.save(path+'/polynomial.svg')
+        self.p3.save(path+'/results/polynomial.png')
+        self.p3.save(path+'/results/polynomial.svg')
 
 class TestPlist:
     def test_plist(self):
