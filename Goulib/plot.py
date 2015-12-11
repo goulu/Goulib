@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-plot utilities
+plotable rich object display on IPython notebooks 
 """
 
 __author__ = "Philippe Guglielmetti"

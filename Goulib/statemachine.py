@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # coding: utf8
 
-"state machines with graph representation"
+"""
+state machines with graph representation
+"""
 
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-sorted collection
+SortedCollection
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
