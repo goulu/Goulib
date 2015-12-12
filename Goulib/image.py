@@ -2,22 +2,53 @@
 # coding: utf8
 """
 image processing and conversion
-:requires:
-* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
 """
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
-from PIL import Image # PIL or Pillow
+"""
+:requires:
+* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
+"""
+
+from PIL import Image as PILImage
 import numpy as np
 import math
 
 from . import math2
 
-#some useful numpy functions first
+class Image(PILImage.Image):
+    def __init__(self, data):
+        self.path=data
+        im=PILImage.open(data)
+        try:
+            im.load()
+            self.error=None
+        except IOError as error: #truncated file ?
+            self.error=error
+        self.im = im.im
+        self.mode = im.mode
+        self.size = im.size
+        self.palette = im.palette
+        self.info = im.info
+        self.category = im.category
+        self.readonly = im.readonly
+        self.pyaccess = im.pyaccess
+        
+    def __repr__(self):
+        return "<%s path=%s mode=%s size=%dx%d>" % (
+            self.__class__.__name__, self.path,
+            self.mode, self.size[0], self.size[1],
+            )
+        
+    def __hash__(self):
+        return average_hash(self)
+    
+    def __lt__(self, other):
+        return math2.mul(self.size) < math2.mul(other.size)
+        
 
 def normalize(X, norm='max', axis=0, copy=True, positive=True):
     """Scale input vectors individually to unit norm (vector length).
@@ -76,7 +107,7 @@ def array2pil(A,mode='L'):
     # make sure the array only contains values from 0-255
     # if not... fix them.
     if A.max() > 255 or A.min() < 0: 
-        A = normalizeArray(A) # normalize between 0-1
+        A = normalize(A) # normalize between 0-1
         A = A * 255 # shift values to range 0-255
     if A.min() >= 0.0 and A.max() <= 1.0: # values are already between 0-1
         A = A * 255 # shift values to range 0-255
@@ -280,7 +311,7 @@ def average_hash(image, hash_size=8):
     @image must be a PIL instance.
     """
     # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
-    image = image.convert("L").resize((hash_size, hash_size), Image.ANTIALIAS)
+    image = image.convert("L").resize((hash_size, hash_size), PILImage.ANTIALIAS)
     pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
     avg = pixels.mean()
     diff = pixels > avg
