@@ -37,10 +37,11 @@ maxDiff = None
 
         
 class StateMachine:
-    def __init__(self,name=None,background_color="#F5ECCE"):
+    def __init__(self,simulation=None,name=None,background_color="#F5ECCE"):
         self.displayMove = False
         self.time = V(0.0,'s')
         self.background_color = background_color
+        self.simulation = simulation
         if name is None:
             self.name = self.__class__.__name__
         else:
@@ -141,4 +142,7 @@ class StateMachine:
         if toTime is not None:
             toTime =toTime('s')
         display(p.svg(xlim=(fromTime,toTime)))
+        
+
+    
         

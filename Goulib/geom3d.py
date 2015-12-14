@@ -625,15 +625,6 @@ class Line3(Geometry):
 
     def _u_in(self, u):
         return True
-    
-    def point(self, u):
-        """
-        :return: Point3 at parameter u
-        """
-        if self._u_in(u):
-            return self.p+u*self.v
-        else:
-            return None
 
     def intersect(self, other):
         return other._intersect_line3(self)
