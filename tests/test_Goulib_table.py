@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf8
 
 from nose.tools import assert_equal
@@ -70,11 +69,11 @@ class TestTable:
 
     def test_html(self):
         t=self.t2.html()
-        f = open(self.path+'/test.htm', 'w')
+        f = open(self.path+'/results/test.htm', 'w')
         f.write(t)
         f.close()
         
-        t=Table(self.path+'/test.htm')
+        t=Table(self.path+'/results/test.htm')
         assert_equal(t._i('OrderDate'),0) #check the column exists
         
         t.to_date('OrderDate')
