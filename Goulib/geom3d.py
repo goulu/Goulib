@@ -187,16 +187,14 @@ def _intersect_line3_sphere(L, S):
     sq = sqrt(det)
     u1 = (-b + sq) / (2 * a)
     u2 = (-b - sq) / (2 * a)
-    if not L._u_in(u1):
-        u1 = max(min(u1, 1.0), 0.0)
-    if not L._u_in(u2):
-        u2 = max(min(u2, 1.0), 0.0)
-    return Segment3(Point3(L.p.x + u1 * L.v.x,
-                               L.p.y + u1 * L.v.y,
-                               L.p.z + u1 * L.v.z),
-                        Point3(L.p.x + u2 * L.v.x,
-                               L.p.y + u2 * L.v.y,
-                               L.p.z + u2 * L.v.z))
+    p1 = L.point(u1)
+    p2 = L.point(u2)
+    if p1 and p2:
+        return Segment3(p1,p2)
+    elif p1:
+        return p1
+    else:
+        return p2
 
 def _intersect_line3_plane(L, P):
     d = P.n.dot(L.v)
@@ -717,14 +715,14 @@ class Sphere(Geometry):
         """
         if len(args) == 1: # Circle or derived class
             super(Sphere,self).__init__(*args)
-            self.c = Point2(args[0].c)
+            self.c = Point3(args[0].c)
             self.r = args[0].r
         else: #2 first params are used to stay compatible with Arc2
-            self.c = Point2(args[0])
+            self.c = Point3(args[0])
             if isinstance(args[1],(float,int)):
                 self.r = args[1]
             else:
-                p=Point2(args[1]) #one point on sphere
+                p=Point3(args[1]) #one point on sphere
                 self.r=abs(p-self.c)
 
     def __repr__(self):
