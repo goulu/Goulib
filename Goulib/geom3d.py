@@ -625,6 +625,15 @@ class Line3(Geometry):
 
     def _u_in(self, u):
         return True
+    
+    def point(self, u):
+        """
+        :return: Point3 at parameter u
+        """
+        if self._u_in(u):
+            return self.p+u*self.v
+        else:
+            return None
 
     def intersect(self, other):
         return other._intersect_line3(self)
@@ -715,14 +724,14 @@ class Sphere(Geometry):
         """
         if len(args) == 1: # Circle or derived class
             super(Sphere,self).__init__(*args)
-            self.c = Point2(args[0].c)
+            self.c = Point3(args[0].c)
             self.r = args[0].r
         else: #2 first params are used to stay compatible with Arc2
-            self.c = Point2(args[0])
+            self.c = Point3(args[0])
             if isinstance(args[1],(float,int)):
                 self.r = args[1]
             else:
-                p=Point2(args[1]) #one point on sphere
+                p=Point3(args[1]) #one point on sphere
                 self.r=abs(p-self.c)
 
     def __repr__(self):
