@@ -51,6 +51,10 @@ class TestEqual:
         assert_true(isclose(a, a+d))
         assert_false(isclose(a, a+2*d))
 
+    def test_equal(self):
+        # assert_equal(expected, equal(a, b, epsilon))
+        raise SkipTest 
+
 class TestLcm:
     def test_lcm(self):
         assert_equal(lcm(101, -3),-303)
@@ -688,7 +692,7 @@ class TestFactorialGen:
 class TestEuclidGen:
     def test_euclid_gen(self):
         # assert_equal(expected, euclid_gen())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestModPow:
     def test_mod_pow(self):
@@ -744,6 +748,76 @@ class TestModBinomial:
         assert_equal(  mod_binomial(938977945,153121024,m),47619)
         assert_equal(  mod_binomial(906601285,527203335,m),0)
         assert_equal(  mod_binomial(993051461,841624879,m),104247)
+
+class TestXgcd:
+    def test_xgcd(self):
+        # assert_equal(expected, xgcd(a, b))
+        raise SkipTest 
+
+class TestIsclose:
+    def test_isclose(self):
+        # assert_equal(expected, isclose(a, b, rel_tol, abs_tol))
+        raise SkipTest 
+
+class TestOmega:
+    def test_omega(self):
+        # assert_equal(expected, omega(n))
+        raise SkipTest 
+
+class TestBigomega:
+    def test_bigomega(self):
+        # assert_equal(expected, bigomega(n))
+        raise SkipTest 
+
+class TestMoebius:
+    def test_moebius(self):
+        # assert_equal(expected, moebius(n))
+        raise SkipTest 
+
+class TestPrimeKtuple:
+    def test_prime_ktuple(self):
+        # assert_equal(expected, prime_ktuple(constellation))
+        raise SkipTest 
+
+class TestTwinPrimes:
+    def test_twin_primes(self):
+        # assert_equal(expected, twin_primes())
+        raise SkipTest 
+
+class TestCousinPrimes:
+    def test_cousin_primes(self):
+        # assert_equal(expected, cousin_primes())
+        raise SkipTest 
+
+class TestSexyPrimes:
+    def test_sexy_primes(self):
+        # assert_equal(expected, sexy_primes())
+        raise SkipTest 
+
+class TestSexyPrimeTriplets:
+    def test_sexy_prime_triplets(self):
+        # assert_equal(expected, sexy_prime_triplets())
+        raise SkipTest 
+
+class TestSexyPrimeQuadruplets:
+    def test_sexy_prime_quadruplets(self):
+        # assert_equal(expected, sexy_prime_quadruplets())
+        raise SkipTest 
+
+class TestLogBinomial:
+    def test_log_binomial(self):
+        # assert_equal(expected, log_binomial(n, k))
+        raise SkipTest 
+
+class TestIlog:
+    def test_ilog(self):
+        # assert_equal(expected, ilog(a, b, upper_bound))
+        raise SkipTest 
+
+class TestBabyStepGiantStep:
+    def test_baby_step_giant_step(self):
+        # assert_equal(expected, baby_step_giant_step(y, a, n))
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

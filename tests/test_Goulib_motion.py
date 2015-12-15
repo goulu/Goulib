@@ -35,6 +35,61 @@ class TestSegment:
     def test_start(self):
         pass # tested below
     
+    def test_endAcc(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endAcc())
+        raise SkipTest 
+
+    def test_endJerk(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endJerk())
+        raise SkipTest 
+
+    def test_endPos(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endPos())
+        raise SkipTest 
+
+    def test_endSpeed(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endSpeed())
+        raise SkipTest 
+
+    def test_endTime(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endTime())
+        raise SkipTest 
+
+    def test_startAcc(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startAcc())
+        raise SkipTest 
+
+    def test_startJerk(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startJerk())
+        raise SkipTest 
+
+    def test_startPos(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startPos())
+        raise SkipTest 
+
+    def test_startSpeed(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startSpeed())
+        raise SkipTest 
+
+    def test_startTime(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startTime())
+        raise SkipTest 
+
+    def test_timeWhenPosBiggerThan(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.timeWhenPosBiggerThan(pos, resolution))
+        raise SkipTest 
+
 class TestSegments:
     def test___init__(self):
         s1 = Segment2ndDegree(0,2,(0,0,2))
@@ -76,6 +131,36 @@ class TestSegments:
         segs = Segments([s1,s2])    
         assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
+
+    def test___call__(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.__call__(t))
+        raise SkipTest 
+
+    def test___str__(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.__str__())
+        raise SkipTest 
+
+    def test_end(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.end())
+        raise SkipTest 
+
+    def test_insert(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.insert(segment, autoJoin))
+        raise SkipTest 
+
+    def test_start(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.start())
+        raise SkipTest 
+
+    def test_update(self):
+        # segments = Segments(segments, label)
+        # assert_equal(expected, segments.update())
+        raise SkipTest 
 
 from Goulib.statemachine import StateMachine
 class TestActuator:
@@ -255,6 +340,26 @@ class TestSegment4thDegree:
         assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
         assert_equal(seg((self.t0+self.t1)/2.),(-0.3125, 2.0, 3.0, 0.0)) #truediv
 
+
+class TestMove:
+    def test_move(self):
+        # assert_equal(expected, move(self, newpos, relative, time, vmax, acc))
+        raise SkipTest 
+
+class TestDisplayLast:
+    def test_display_last(self):
+        # assert_equal(expected, displayLast(self))
+        raise SkipTest 
+
+class TestDisplay:
+    def test_display(self):
+        # assert_equal(expected, display(self, fromTime, toTime))
+        raise SkipTest 
+
+class TestSegmentsTrapezoidalSpeed:
+    def test_segments_trapezoidal_speed(self):
+        # assert_equal(expected, SegmentsTrapezoidalSpeed(t0, p0, p3, a, T, vmax, v0, v3))
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()
