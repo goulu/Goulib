@@ -174,6 +174,11 @@ class TestTable:
         # assert_equal(expected, table.total(funcs))
         raise SkipTest 
 
+    def test_index(self):
+        # table = Table(filename, titles, data, **kwargs)
+        # assert_equal(expected, table.index(value, column))
+        raise SkipTest
+
 class TestAttr:
     def test_attr(self):
         # assert_equal(expected, attr(args))

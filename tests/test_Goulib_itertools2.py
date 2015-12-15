@@ -321,5 +321,30 @@ class TestSortedIterable:
         # assert_equal(expected, sorted_iterable(iterable, key, buffer))
         raise SkipTest 
 
+class TestIsiterable:
+    def test_isiterable(self):
+        # assert_equal(expected, isiterable(obj))
+        raise SkipTest 
+
+class TestItemgetter:
+    def test_itemgetter(self):
+        # assert_equal(expected, itemgetter(iterable, i))
+        raise SkipTest 
+
+class TestTee:
+    def test_tee(self):
+        # assert_equal(expected, tee(iterable, n, copy))
+        raise SkipTest 
+
+class TestIremove:
+    def test_iremove(self):
+        # assert_equal(expected, iremove(iterable, f))
+        raise SkipTest 
+
+class TestDictsplit:
+    def test_dictsplit(self):
+        # assert_equal(expected, dictsplit(dic, keys))
+        raise SkipTest 
+
 if __name__ == "__main__":
     runmodule()

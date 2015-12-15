@@ -10,7 +10,7 @@ from Goulib.units import *
 class Tests:
     def test_append_col(self):
         # assert_equal(expected, appendCol(self, colname, values))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test001_simple_value(self):
         ureg.define('CHF = [Currency]')
@@ -49,5 +49,20 @@ class Tests:
         v = V(60,'m/min')
         assert_equal(v('m/s'), 1)
         
+class TestMagnitudeIn:
+    def test_magnitude_in(self):
+        # assert_equal(expected, magnitudeIn(self, unit))
+        raise SkipTest 
+
+class TestIsfunc:
+    def test_isfunc(self):
+        # assert_equal(expected, isfunc(self, col))
+        raise SkipTest 
+
+class TestAppendCol:
+    def test_append_col(self):
+        # assert_equal(expected, appendCol(self, colname, values))
+        raise SkipTest 
+
 if __name__ == "__main__":
     runmodule()

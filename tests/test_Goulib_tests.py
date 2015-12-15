@@ -55,7 +55,12 @@ class TestDummy:
 class TestSetlog:
     def test_setlog(self):
         # assert_equal(expected, setlog(level, fmt))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
+
+class TestPprintGen:
+    def test_pprint_gen(self):
+        # assert_equal(expected, pprint_gen(iterable, indices, sep))
+        raise SkipTest 
 
 if __name__=="__main__":
     runmodule()
