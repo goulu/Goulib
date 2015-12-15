@@ -14,37 +14,97 @@ __license__ = "LGPL"
 """
 
 from PIL import Image as PILImage
+from PIL import ImagePalette
+
 import numpy as np
 import math
 
 from . import math2
 
 class Image(PILImage.Image):
-    def __init__(self, data):
-        self.path=data
-        im=PILImage.open(data)
+    def __init__(self, data=None):
+        """
+        :param data: can be either:
+        * None : creates an empty image
+        * `PIL.Image` : makes a copy
+        * string : path of image to load
+        """
+        if data is None:
+            self._initfrom(PILImage.Image())
+        elif isinstance(data,PILImage.Image):
+            self._initfrom(data)
+        else: #assume a path
+            self.open(data)
+
+        
+    def open(self,path):
+        self.path=path
+        im=PILImage.open(path)
         try:
             im.load()
             self.error=None
         except IOError as error: #truncated file ?
             self.error=error
-        self.im = im.im
-        self.mode = im.mode
-        self.size = im.size
-        self.palette = im.palette
-        self.info = im.info
-        self.category = im.category
-        self.readonly = im.readonly
-        self.pyaccess = im.pyaccess
+        self._initfrom(im)
+        return self
+    
+    def _initfrom(self,other):
+        #does `PIL.Image.Image._new` "reversed"
+        self.im = other.im
+        self.mode=other.mode
+        self.size=other.size
+        if other.palette:
+            self.palette = other.palette.copy()
+        elif self.im and self.im.mode == "P":
+            self.palette = ImagePalette.ImagePalette()
+        else:
+            self.palette=None
+
+        self.info = other.info.copy()
+        #
+        #are lines below useful ? they are inited in PIL.Image.__init__
+        self.category = other.category
+        self.readonly = other.readonly
+        self.pyaccess = other.pyaccess
+        
+    def _new(self, im):
+        #overloads `PIL.Image.Image._new`
+        #so that it is called by most usual PIL(low) functions
+        #that will therefore return a Goulib.Image instead of a PIL.Image
+        new=Image(self)
+        new.im = im
+        new.mode=im.mode
+        new.size=im.size
+        return new
+    
+    def thumbnail(self, size, resample=PILImage.BICUBIC):
+        im=Image(self)
+        super(Image,im).thumbnail(size,resample)
+        return im
         
     def __repr__(self):
+        path=getattr(self,'path',None)
         return "<%s path=%s mode=%s size=%dx%d>" % (
-            self.__class__.__name__, self.path,
+            self.__class__.__name__, path,
             self.mode, self.size[0], self.size[1],
             )
         
     def __hash__(self):
-        return average_hash(self)
+        return self.average_hash()
+    
+    def average_hash(self, hash_size=8):
+        """
+        Average Hash computation
+        Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+        @image must be a PIL instance.
+        """
+        # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
+        self.load()
+        image = self.convert("L").resize((hash_size, hash_size), PILImage.ANTIALIAS)
+        pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
+        avg = pixels.mean()
+        diff = pixels > avg
+        return math2.num_from_digits(diff,2)
     
     def __lt__(self, other):
         return math2.mul(self.size) < math2.mul(other.size)
@@ -304,19 +364,7 @@ def img2base64(img, fmt='PNG'):
     output_s = output.read()
     return base64.b64encode(output_s)
 
-def average_hash(image, hash_size=8):
-    """
-    Average Hash computation
-    Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
-    @image must be a PIL instance.
-    """
-    # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
-    image = image.convert("L").resize((hash_size, hash_size), PILImage.ANTIALIAS)
-    pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
-    avg = pixels.mean()
-    diff = pixels > avg
-    # make a hash
-    return math2.num_from_digits(diff,2)
+
 
 
  
