@@ -79,6 +79,12 @@ class TestTable:
         t.to_date('OrderDate')
         assert_equal(t,self.t2)
         
+        #a table with objects in cells
+        from Goulib.stats import Normal
+        t=Table(titles=['A','B'],data=[[Normal(),2],[3,'last']])
+        h=t.html()
+        assert_true(h)
+        
     def test_append(self):
         ta = Table(None)
         ta.append({'col1':1,'col2':2})
