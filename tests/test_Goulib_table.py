@@ -22,7 +22,7 @@ class TestTable:
         #test that t can be written to csv, then re-read in t2 without loss
         self.t.write_csv(self.path+'/results/table.test.csv')
         
-        self.t2=Table(None) #empty table
+        self.t2=Table() #empty table
         self.t2.read_csv(self.path+'/results/table.test.csv')
         
         assert_equal(repr(self.t),repr(self.t2))
@@ -86,7 +86,7 @@ class TestTable:
         assert_true(h)
         
     def test_append(self):
-        ta = Table(None)
+        ta = Table()
         ta.append({'col1':1,'col2':2})
         assert_true(len(ta)==1 and ta.ncols()==2)
         ta.append([3,4])
