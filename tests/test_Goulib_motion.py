@@ -81,7 +81,7 @@ from Goulib.statemachine import StateMachine
 class TestActuator:
     def test_move(self):
         sm = StateMachine()
-        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'))
+        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))
         # tests that if no move at the beginning, nothing crashes
         time = a.move(V(0,'m')).endTime()
         assert_equal(time,0.0)     
@@ -94,7 +94,15 @@ class TestActuator:
         assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))
         #test that if no real move we get the same result
         a.move(V(0,'m'))
-        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))        
+        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))  
+        assert_equal(a.maxAbsAcc(),V(2,'m/s^2'))
+        assert_equal(a.maxAbsSpeed(),V(1,'m/s'))
+        assert_equal(a.maxRpm(),V(1,'1/s'))
+        assert_equal(a.maxTork(),V(2/6.28,'N m'))
+        #assert_equal(a.varNames(),[])
+
+    
+              
                         
 class TestSegmentPoly:
     @classmethod

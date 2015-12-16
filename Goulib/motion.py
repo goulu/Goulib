@@ -12,7 +12,7 @@ __license__ = "LGPL"
 import  logging
 
 from . import plot, polynomial, itertools2, math2
-from Goulib.units import V
+from Goulib.units import V,Table, View
 
 from numpy import allclose
 
@@ -230,7 +230,7 @@ class Actuator():
       
     """
     
-    def __init__(self,stateMachine,vmax,acc,name='',pos=0):
+    def __init__(self,stateMachine,vmax,acc,name='',pos=0,distPerTurn=V(1,'mm'),mass=V(1,'kg'),friction=V(0,'N')):
         """
         :params simulation: a simulation. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayMove boolean
         :params acc: the default acceleration of the actuator
@@ -244,6 +244,11 @@ class Actuator():
         self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
         self.pos = pos if type(pos) is V else V(pos,'m')
         self.stateMachine = stateMachine
+        self.distPerTurn = distPerTurn
+        self.mass = mass
+        self._maxAbsAcc = 0
+        self._maxAbsSpeed = 0
+        self.friction = friction
         
     def move(self,newpos,relative=False,time = None, vmax=None,acc=None):
         """ moves the actuator to newpos
@@ -270,12 +275,14 @@ class Actuator():
         elif newpos > pos:
             acc = self.acc('m/s^2') if acc is None else acc('m/s^2')
             vmax = self.vmax('m/s') if vmax is None else vmax('m/s')
+            self._maxAbsAcc = max(acc,self._maxAbsAcc)
         else:
             acc = - self.acc('m/s^2') if acc is None else -acc('m/s^2')
             vmax= - self.vmax('m/s') if vmax is None else -vmax('m/s')
-            
-        logging.debug(self.stateMachine.time)
+            self._maxAbsAcc = max(-acc,self._maxAbsAcc)            
+
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
+        self._maxAbsSpeed = max(self._maxAbsSpeed,abs(m.segments[0].endSpeed()))
         self.lastmove = m
         self.pos = V(newpos,'m')
         self.Segs.add(m)        
@@ -285,6 +292,18 @@ class Actuator():
             display(HTML('<h4>{0}</h4>'.format(self.name)))
             display(m.svg())
         return m
+    
+    def maxAbsAcc(self):
+        return V(self._maxAbsAcc,'m/s^2')
+    
+    def maxAbsSpeed(self):
+        return V(self._maxAbsSpeed,'m/s')
+    
+    def maxTork(self):
+        return (((self.mass*self.maxAbsAcc())+self.friction)*self.distPerTurn/6.28).to('N m')
+    
+    def maxRpm(self):
+        return self.maxAbsSpeed()/self.distPerTurn
     
     def displayLast(self):
         from IPython.display import display
@@ -299,7 +318,46 @@ class Actuator():
             toTime =toTime('s')
         self.Segs.ticks = self.stateMachine.log
         display(self.Segs.svg(xlim=(fromTime,toTime)))
+        table = Table(self.name,[],self.varNames())
+        table.appendCol('values',self.varDict())
+        v = View(table,rowUnits=self.varRowUnits())
+        display(v)
     
+    def varNames(self):
+        """ returns a list of internal variables. intended to be used in the Table.__init__ """
+        return [self.name+'.mass',
+                self.name+'.friction',
+                self.name+'.dist/turn', 
+                self.name+'.maxSpeed',
+                self.name+'.maxAcc',               
+                self.name+'.maxForce',
+                self.name+'.maxRpm',
+                self.name+'.maxTork',
+                ]
+    
+    def varRowUnits(self):
+        return {self.name+'.mass'     : 'kg',
+                self.name+'.friction' : 'N',
+                self.name+'.dist/turn': 'mm',
+                self.name+'.maxSpeed' : 'm/s', 
+                self.name+'.maxAcc'   : 'm/s^2',               
+                self.name+'.maxForce' : 'N',
+                self.name+'.maxRpm'   : 'rpm',
+                self.name+'.maxTork'  : 'N m',
+                }
+            
+    def varDict(self):
+        return {self.name+'.mass'    : self.mass,
+                self.name+'.friction': self.friction,
+                self.name+'.dist/turn': self.distPerTurn,
+                self.name+'.maxSpeed' : self.maxAbsSpeed(),
+                self.name+'.maxAcc'   : self.maxAbsAcc(),               
+                self.name+'.maxForce' : self.mass*self.maxAbsAcc()+self.friction,
+                self.name+'.maxRpm'  : self.maxRpm(),
+                self.name+'.maxTork' : self.maxTork(),
+                }
+    
+        
 def _pva(val):
     try: p=val[0]
     except: p=val
