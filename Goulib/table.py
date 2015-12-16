@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
+"mini pandas.DataFrame" 
 Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
 """
 __author__ = "Philippe Guglielmetti"
@@ -83,16 +84,20 @@ class Cell():
         * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
         
         """
+        args={}
+        args.update(kwargs) #copy needed to avoid side effects
+        
         v=self.data
         f=self.fmt
         
-        args={}
-        args.update(kwargs) #copy needed to avoid side effects
+        if hasattr(v,'_repr_html_'):
+            return tag(self.tag,v._repr_html_(),**args)
+        
         style=args.get('style',{})
         if not isinstance(style,dict):
             style=style_str2dict(style)
             
-        if not 'text-align' in style: #HTML 4 and befo
+        if not 'text-align' in style: #HTML 4 and before
             a=args.pop('align',self.align)           
             if isinstance(v,int):
                 if not a: a="right"
@@ -144,7 +149,8 @@ class Row():
             data=line
         
         
-        if not isinstance(data,list) : data=list(data)
+        if not isinstance(data,list) : 
+            data=[data]
         #ensure params have the same length as data
         
         if not isinstance(style,list): style=[style]
@@ -225,12 +231,9 @@ class Table(list):
         """:return: string HTML representation of table"""
                 
         def TR(data,align=None,fmt=None,tag=None,style=None):
-            if not isinstance(data[0],list):
-                data=[data]
             res=''
-            for line in data:
-                row=Row(data=line,align=align,fmt=fmt,tag=tag,style=style)
-                res+=row.html()+'\n'
+            row=Row(data=data,align=align,fmt=fmt,tag=tag,style=style)
+            res+=row.html()+'\n'
             return res
             
         def THEAD(data,fmt=None,style=None):
