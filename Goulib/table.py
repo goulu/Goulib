@@ -189,15 +189,23 @@ class Row():
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
-    def __init__(self,filename=None,titles=[],data=[],**kwargs):
-        """inits a table, optionally by reading a Excel, csv or html file"""
-        list.__init__(self, data)
+    def __init__(self,data=[],**kwargs):
+        """inits a table, optionally by reading a Excel, csv or html file
+        :param data: list of list of cells, or string as filename
+        :param titles: optional list of strings used as column id
+        :param footer: optional list of functions used as column reducers
+        """
+        if isinstance(data,six.string_types):
+            filename=data
+            data=[]
+        else:
+            filename=None
+        super(Table,self).__init__(data)
         
-        self.titles=titles
-            
-        self.footer=[]
+        self.titles=kwargs.pop('titles',[])
+        self.footer=kwargs.pop('footer',[])
         if filename:
-            if titles: #explicitely set
+            if self.titles: #explicitely set
                 kwargs.setdefault('titles_line',0)
                 kwargs.setdefault('data_line',1)
             else: #read titles from the file
