@@ -28,7 +28,7 @@ class TestImage:
         h2=hash(self.lena_bw)
         diff=h1^h2 #XOR
         diff=math2.digsum(diff,2) #number of different pixels
-        assert_true(diff<2)
+        assert_equal(h1,h2,msg='difference is %d pixels'%diff)
 
     def test___lt__(self):
         # image = Image(data)
@@ -53,27 +53,9 @@ class TestImage:
         # split the image into individual bands
         source = self.lena.split()
         
-        R, G, B = 0, 1, 2
-        
-        # select regions where red is less than 100
-        mask = source[R].point(lambda i: 0 if i < 100 else 255)
-        mask.save(path+'/results/lena_R100.png')
-        
-        # process the green band
-        out = source[G].point(lambda i: i * 0.7)
-        
-        # paste the processed band back, but only where red was < 100
-        source[R].paste(out, None, mask)
-        
-        # build a new multiband image
-        res=PILImage.merge(self.lena.mode, source)
-        res
-
-
-    def test_thumbnail(self):
-        thumb=self.lena.thumbnail((8,8))
-        assert_equal(thumb.size,(8,8))
-        assert_equal(self.lena.size,(512,512))
+    def test_html(self):
+        h=self.lena.html()
+        assert_true(h)
 
 class TestNormalizeArray(unittest.TestCase):
     def test_normalize_array(self):
@@ -111,10 +93,6 @@ class TestPurePilAlphaToColorV2(unittest.TestCase):
     def test_pure_pil_alpha_to_color_v2(self):
         raise SkipTest 
 
-class TestImg2base64:
-    def test_img2base64(self):
-        # assert_equal(expected, img2base64(img, fmt))
-        raise SkipTest
 
 class TestNormalize:
     def test_normalize(self):
