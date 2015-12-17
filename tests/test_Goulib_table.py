@@ -41,7 +41,16 @@ class TestTable:
         assert_equal(t,ref)
         
     def test___init__(self):
-        pass #tested in setup
+        #most tests are above, but some more are here:
+        #lists or tuples can be used
+        t1=Table(([1,2],(3,4)))
+        t2=Table([(1,2),[3,4]])
+        assert_equal(t1,t2)
+        #check Table is mutable even if instantiated with tuples
+        t2[0][0]=2 
+        assert_not_equal(t1,t2)
+        #and also generators, even for a single column
+        assert_equal(Table((i for i in range(10))),Table((range(10))))
 
     def test___repr__(self):
         pass #tested in setup

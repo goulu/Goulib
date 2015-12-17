@@ -4,6 +4,8 @@
 more math than :mod:`math` standard library, without numpy
 """
 
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = [
@@ -62,7 +64,7 @@ def coprime(*args):
 
 def lcm(a,b):
     """least common multiple"""
-    return abs(a * b) / gcd(a,b) if a and b else 0
+    return abs(a * b) // gcd(a,b) if a and b else 0
 
 def xgcd(a,b):
     """Extended GCD:

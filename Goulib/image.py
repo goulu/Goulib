@@ -3,6 +3,8 @@
 """
 image processing and conversion
 """
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Brad Montgomery http://bradmontgomery.net']
@@ -14,15 +16,15 @@ __license__ = "LGPL"
 """
 
 from PIL import Image as PILImage
-from PIL import ImagePalette
+from PIL import ImagePalette, ImageOps
 
 import numpy as np
-import math
+import six, math
 
 from . import math2
 
 class Image(PILImage.Image):
-    def __init__(self, data=None):
+    def __init__(self, data=None, **kwargs):
         """
         :param data: can be either:
         * None : creates an empty image
@@ -33,9 +35,33 @@ class Image(PILImage.Image):
             self._initfrom(PILImage.Image())
         elif isinstance(data,PILImage.Image):
             self._initfrom(data)
-        else: #assume a path
+        elif isinstance(data,six.string_types): #assume a path
             self.open(data)
+        else: #assume a np.ndarray
+            # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
+            data = normalize(data) # normalize between 0-1
+            colormap=kwargs.pop('colormap',None)
+            if colormap:
+                data=colormap(data)
+            self._initfrom(PILImage.fromarray(np.uint8(data*255)))
+            return
+            """alternate, more complex solution:
+            w,h = data.shape
+             self._initfrom(PILImage.new('L', (w,h))) #Only grayscale images (PIL mode 'L') are supported.
 
+            # make sure the array only contains values from 0-255
+            # if not... fix them.
+            if data.max() > 255 or data.min() < 0: 
+                data = normalize(data) # normalize between 0-1
+            if data.min() >= 0.0 and data.max() <= 1.0: # values are already between 0-1
+                data = data * 255 # shift values to range 0-255
+            data = data.flatten()
+            array = []
+            for val in data:
+                if val is np.nan: val = 0 
+                array.append(int(val)) # make sure they're all int's
+            self.putdata(array)
+            """
         
     def open(self,path):
         self.path=path
@@ -77,38 +103,105 @@ class Image(PILImage.Image):
         new.size=im.size
         return new
     
-    def thumbnail(self, size, resample=PILImage.BICUBIC):
-        im=Image(self)
-        super(Image,im).thumbnail(size,resample)
-        return im
-        
+    # representations, data extraction and conversions
+    
     def __repr__(self):
         path=getattr(self,'path',None)
         return "<%s path=%s mode=%s size=%dx%d>" % (
             self.__class__.__name__, path,
             self.mode, self.size[0], self.size[1],
             )
+    
         
-    def __hash__(self):
-        return self.average_hash()
+    def base64(self, fmt='PNG'):
+        """
+        :param fmt: string file format ('PNG', 'JPEG', ... 
+                    see http://pillow.readthedocs.org/en/3.0.x/handbook/image-file-formats.html )
+        :result: string base64 encoded image content in specified format
+        """
+        # http://stackoverflow.com/questions/31826335/how-to-convert-pil-image-image-object-to-base64-string
+
+        import base64
+        import cStringIO
+        
+        buffer = cStringIO.StringIO()
+        self.save(buffer, format=fmt)
+        return base64.b64encode(buffer.getvalue())
+        
+    def to_html(self):
+        return r'<img src="data:image/png;base64,{0}">'.format(self.base64('PNG'))
+    
+    def html(self):
+        from IPython.display import HTML
+        return HTML(self.to_html())
+    
+    def _repr_html_(self):
+        #this returns exactly the same as _repr_png_, but is Table compatible
+        return self.to_html()
+    
+    def ndarray(self):
+        """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
+        
+        :return: `numpy.ndarray` of image
+        """
+        data = list(self.getdata())
+        w,h = self.size
+        A = np.zeros((w*h), 'd')
+        i=0
+        for val in data:
+            A[i] = val
+            i=i+1
+        A=A.reshape(w,h)
+        return A
+    
+    # hash and distance
     
     def average_hash(self, hash_size=8):
         """
         Average Hash computation
         Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
-        @image must be a PIL instance.
+        
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: list of hash_size*hash_size bool (=bits)
         """
         # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
-        self.load()
         image = self.convert("L").resize((hash_size, hash_size), PILImage.ANTIALIAS)
         pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
         avg = pixels.mean()
-        diff = pixels > avg
+        diff=pixels > avg
         return math2.num_from_digits(diff,2)
+    
+    def __hash__(self):
+        return self.average_hash(8)
+    
+    def dist(self,other, hash_size=8):
+        """ distance between images
+        
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: float 
+            =0 if images are equal or very similar (same average_hash)
+            =1 if images are completely decorrelated (half of the hash bits are the same by luck)
+            =2 if images are inverted
+        """
+        h1=self.average_hash(hash_size)
+        h2=other.average_hash(hash_size)
+        # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
+        diff=bin(h1^h2).count("1") # ^is XOR
+        diff=2*diff/(hash_size*hash_size)
+        return diff
     
     def __lt__(self, other):
         return math2.mul(self.size) < math2.mul(other.size)
         
+    
+    def invert(self):
+        # http://stackoverflow.com/questions/2498875/how-to-invert-colors-of-image-with-pil-python-imaging
+        return ImageOps.invert(self)
+    
+    __neg__=__inv__=invert #aliases
+    
+    def grayscale(self):
+        return self.convert("L")
 
 def normalize(X, norm='max', axis=0, copy=True, positive=True):
     """Scale input vectors individually to unit norm (vector length).
@@ -139,46 +232,14 @@ def normalize(X, norm='max', axis=0, copy=True, positive=True):
     else:
         raise ValueError("'%s' is not a supported norm" % norm)
             
-        norms = _handle_zeros_in_scale(norms)
+       #norms = _handle_zeros_in_scale(norms)
         X /= norms[:, np.newaxis]
 
     if axis == 0:
         X = X.T
 
     return X
-
-def pil2array(im):
-    ''' Convert a PIL image to a numpy ndarray '''
-    data = list(im.getdata())
-    w,h = im.size
-    A = np.zeros((w*h), 'd')
-    i=0
-    for val in data:
-        A[i] = val
-        i=i+1
-    A=A.reshape(w,h)
-    return A
-
-def array2pil(A,mode='L'):
-    ''' Convert a numpy ndarray to a PIL image.
-        Only grayscale images (PIL mode 'L') are supported.
-    '''
-    w,h = A.shape
-    # make sure the array only contains values from 0-255
-    # if not... fix them.
-    if A.max() > 255 or A.min() < 0: 
-        A = normalize(A) # normalize between 0-1
-        A = A * 255 # shift values to range 0-255
-    if A.min() >= 0.0 and A.max() <= 1.0: # values are already between 0-1
-        A = A * 255 # shift values to range 0-255
-    A = A.flatten()
-    data = []
-    for val in A:
-        if val is np.nan: val = 0 
-        data.append(int(val)) # make sure they're all int's
-    im = Image.new(mode, (w,h))
-    im.putdata(data)
-    return im
+    
 
 def correlation(input, match):
     """Compute the correlation between two, single-channel, grayscale input images.
@@ -351,18 +412,7 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
     return background
 
-def img2base64(img, fmt='PNG'):
-    """
-    :param img: :class:`PIL:Image`
-    :result: string base64 encoded image content in specified format
-    :see: http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template
-    """
-    import io, base64
-    output = io.StringIO()
-    img.save(output, fmt)
-    output.seek(0)
-    output_s = output.read()
-    return base64.b64encode(output_s)
+
 
 
 

@@ -26,6 +26,7 @@ Element=ElementTree._Element
 
 from .datetime2 import datef, datetimef,strftimedelta
 from .markup import tag, style_str2dict
+from .itertools2 import isiterable
 
 def attr(args):
     res=''
@@ -195,12 +196,15 @@ class Table(list):
         :param titles: optional list of strings used as column id
         :param footer: optional list of functions used as column reducers
         """
+        filename=None
         if isinstance(data,six.string_types):
             filename=data
             data=[]
-        else:
-            filename=None
-        super(Table,self).__init__(data)
+        else: #ensure data is 2D and mutable
+            for row in data:
+                if not isiterable(row): #build a column
+                    row=[row]
+                self.append(list(row))
         
         self.titles=kwargs.pop('titles',[])
         self.footer=kwargs.pop('footer',[])
