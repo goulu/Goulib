@@ -238,7 +238,7 @@ class Actuator():
         :params name: name of the actuator
         :params pos: the initial position
         """
-        self.Segs = Segments([])
+        self.segs = Segments([])
         self.name = name
         self.acc = acc if type(acc) is V else V(acc,'m/s^2')
         self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
@@ -271,7 +271,7 @@ class Actuator():
             if self.stateMachine.displayMove:
                 from IPython.display import display,HTML
                 display(HTML('<h4>{0}</h4> already in place @ {1}[m]'.format(self.name,newpos)))            
-            return self.Segs
+            return self.segs
         elif newpos > pos:
             acc = self.acc('m/s^2') if acc is None else acc('m/s^2')
             vmax = self.vmax('m/s') if vmax is None else vmax('m/s')
@@ -285,7 +285,7 @@ class Actuator():
         self._maxAbsSpeed = max(self._maxAbsSpeed,abs(m.segments[0].endSpeed()))
         self.lastmove = m
         self.pos = V(newpos,'m')
-        self.Segs.add(m)        
+        self.segs.add(m)        
         self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
         if self.stateMachine.displayMove:
             from IPython.display import display,HTML
@@ -316,8 +316,8 @@ class Actuator():
             fromTime = fromTime('s')
         if toTime is not None:
             toTime =toTime('s')
-        self.Segs.ticks = self.stateMachine.log
-        display(self.Segs.svg(xlim=(fromTime,toTime)))
+        self.segs.ticks = self.stateMachine.log
+        display(self.segs.svg(xlim=(fromTime,toTime)))
         table = Table(self.name,[],self.varNames())
         table.appendCol('values',self.varDict())
         v = View(table,rowUnits=self.varRowUnits())
@@ -357,6 +357,45 @@ class Actuator():
                 self.name+'.maxTork' : self.maxTork(),
                 }
     
+class TimeDiagram(plot.Plot):        
+    def __init__(self,actuators,fromTime=None,toTime=None):
+        self.actuators = actuators
+        self.t0 = min(a.segs.startTime() for a in actuators) if fromTime is None else fromTime('s')
+        self.t1 = max(a.segs.endTime() for a in actuators) if toTime is None else toTime('s')
+        
+        
+    def __repr__(self):
+        return 'Time Diagram from {0:f}[s] to {1:f}[s]'.format(self.t0,self.t1)
+        
+    def _plot(self, ax, **kwargs):
+        """
+        plots a list of actuators
+        """
+        linewidth = kwargs.pop('linewidth',0)
+        (t0,t1) = kwargs.setdefault('xlim',(self.t0,self.t1))
+
+        step=(t1-t0)/500.
+        x=[ t for t in itertools2.arange(self.t0,self.t1,step)  ]
+        for a in self.actuators:
+            y = [a.segs(t)[0] for t in x]
+            ax.plot(x, y, label=a.name, linewidth=linewidth)
+        
+        
+        from matplotlib.font_manager import FontProperties
+
+        fontP = FontProperties()
+        fontP.set_size('xx-small')
+        #legend([plot1], "title", prop = fontP)
+        
+        
+        # Shrink current axis by 20%
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        
+        # Put a legend to the right of the current axis
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),prop = fontP)
+        return ax
+        
         
 def _pva(val):
     try: p=val[0]

@@ -87,22 +87,32 @@ class TestActuator:
         assert_equal(time,0.0)     
         
         time = a.move(V(3000,'mm')).endTime()
-        assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
-        assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
+        assert_equal(a.segs.start(),(0.0, 0.0, 1.0, 0))
+        assert_equal(a.segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
         a.move(V(0,'m'),acc=V(2,'m/s^2'))  #test overriding default acc
-        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))
+        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))
         #test that if no real move we get the same result
         a.move(V(0,'m'))
-        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))  
+        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))  
         assert_equal(a.maxAbsAcc(),V(2,'m/s^2'))
         assert_equal(a.maxAbsSpeed(),V(1,'m/s'))
         assert_equal(a.maxRpm(),V(1,'1/s'))
         assert_equal(a.maxTork(),V(2/6.28,'N m'))
         #assert_equal(a.varNames(),[])
 
-    
-              
+class TestTimeDiagram:
+        sm = StateMachine()
+        a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+        a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+        a1.move(V(3000,'mm'))
+        a2.move(V(3000,'mm'))
+        assert_equal(sm.time,V(8.0,'s'))
+        t = TimeDiagram([a1,a2])
+        assert_equal(t.t0,0)
+        assert_equal(t.t1,8)
+        t.save('.\\tests\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
+        
                         
 class TestSegmentPoly:
     @classmethod
