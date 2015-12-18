@@ -23,6 +23,10 @@ class TestImage:
         lena3=Image().open(path+'/data/lena.png')
         assert_equal(self.lena,lena3)
         
+        #from matrix
+        a=[[(x-64)*y for x in range(128)] for y in range(128)]
+        a=Image(a)
+        
     def test___hash__(self):
         h1=hash(self.lena)
         h2=hash(self.lena_bw)
@@ -41,9 +45,7 @@ class TestImage:
         raise SkipTest 
 
     def test_mode(self):
-        # image = Image(data)
-        # assert_equal(expected, image.mode())
-        raise SkipTest 
+        pass #useless ? 
 
     def test_open(self):
         pass #tested above
@@ -57,47 +59,70 @@ class TestImage:
         h=self.lena.html()
         assert_true(h)
 
-class TestNormalizeArray(unittest.TestCase):
-    def test_normalize_array(self):
-        raise SkipTest 
+    def test_average_hash(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.average_hash(hash_size))
+        raise SkipTest # TODO: implement your test here
 
-class TestPil2array(unittest.TestCase):
-    def test_pil2array(self):
-        raise SkipTest 
+    def test_base64(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.base64(fmt))
+        raise SkipTest # TODO: implement your test here
 
-class TestArray2pil(unittest.TestCase):
-    def test_array2pil(self):
-        raise SkipTest 
+    def test_dist(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.dist(other, hash_size))
+        raise SkipTest # TODO: implement your test here
 
-class TestCorrelation(unittest.TestCase):
+    def test_grayscale(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.grayscale())
+        raise SkipTest # TODO: implement your test here
+
+    def test_invert(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.invert())
+        raise SkipTest # TODO: implement your test here
+
+    def test_ndarray(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.ndarray())
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_html(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.to_html())
+        raise SkipTest # TODO: implement your test here
+
+class TestCorrelation:
     def test_correlation(self):
-        raise SkipTest 
+        # assert_equal(expected, correlation(input, match))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaToColor(unittest.TestCase):
+class TestAlphaToColor:
     def test_alpha_to_color(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_to_color(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaComposite(unittest.TestCase):
+class TestAlphaComposite:
     def test_alpha_composite(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_composite(front, back))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaCompositeWithColor(unittest.TestCase):
+class TestAlphaCompositeWithColor:
     def test_alpha_composite_with_color(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_composite_with_color(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestPurePilAlphaToColorV1(unittest.TestCase):
+class TestPurePilAlphaToColorV1:
     def test_pure_pil_alpha_to_color_v1(self):
-        raise SkipTest 
+        # assert_equal(expected, pure_pil_alpha_to_color_v1(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestPurePilAlphaToColorV2(unittest.TestCase):
+class TestPurePilAlphaToColorV2:
     def test_pure_pil_alpha_to_color_v2(self):
-        raise SkipTest 
-
-
-class TestNormalize:
-    def test_normalize(self):
-        # assert_equal(expected, normalize(X, norm, axis, copy, positive))
-        raise SkipTest 
+        # assert_equal(expected, pure_pil_alpha_to_color_v2(image, color))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()

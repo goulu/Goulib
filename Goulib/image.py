@@ -32,36 +32,23 @@ class Image(PILImage.Image):
         * string : path of image to load
         """
         if data is None:
-            self._initfrom(PILImage.Image())
+            self._initfrom(PILImage.Image(**kwargs))
         elif isinstance(data,PILImage.Image):
             self._initfrom(data)
         elif isinstance(data,six.string_types): #assume a path
-            self.open(data)
+            self.open(data,**kwargs)
         else: #assume a np.ndarray
             # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
-            data = normalize(data) # normalize between 0-1
+            data=np.asarray(data, dtype=np.float32) #force ints to float
+            if data.min()<0:
+                data -=data.min()
+            if data.max()>1:
+                data *= 1./data.max() # normalize between 0-1
             colormap=kwargs.pop('colormap',None)
             if colormap:
                 data=colormap(data)
             self._initfrom(PILImage.fromarray(np.uint8(data*255)))
             return
-            """alternate, more complex solution:
-            w,h = data.shape
-             self._initfrom(PILImage.new('L', (w,h))) #Only grayscale images (PIL mode 'L') are supported.
-
-            # make sure the array only contains values from 0-255
-            # if not... fix them.
-            if data.max() > 255 or data.min() < 0: 
-                data = normalize(data) # normalize between 0-1
-            if data.min() >= 0.0 and data.max() <= 1.0: # values are already between 0-1
-                data = data * 255 # shift values to range 0-255
-            data = data.flatten()
-            array = []
-            for val in data:
-                if val is np.nan: val = 0 
-                array.append(int(val)) # make sure they're all int's
-            self.putdata(array)
-            """
         
     def open(self,path):
         self.path=path
@@ -203,42 +190,7 @@ class Image(PILImage.Image):
     def grayscale(self):
         return self.convert("L")
 
-def normalize(X, norm='max', axis=0, copy=True, positive=True):
-    """Scale input vectors individually to unit norm (vector length).
-    
-    borrowed from http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html
-    (support for sparse matrices removed, default values changed, positive added)
-    
-    Parameters
-    ----------
-    X : array or scipy.sparse matrix with shape [n_samples, n_features]
-        The data to normalize, element by element.
-    norm : 'l1', 'l2', or 'max', optional ('max' by default)
-        The norm to use to normalize each non zero sample (or each non-zero
-        feature if axis is 0).
-    axis : 0 or 1, optional (0 by default)
-        axis used to normalize the data along. If 1, independently normalize
-        each sample, otherwise (if 0) normalize each feature.
-    copy : boolean, optional, default True
-        set to False to perform inplace
-    """
-        
-    if norm == 'l1':
-        norms = np.abs(X).sum(axis=axis)
-    elif norm == 'l2':
-        norms = np.einsum('ij,ij->i', X, X) # http://ajcr.net/Basic-guide-to-einsum/
-    elif norm == 'max':
-        norms = np.max(X, axis=axis)
-    else:
-        raise ValueError("'%s' is not a supported norm" % norm)
-            
-       #norms = _handle_zeros_in_scale(norms)
-        X /= norms[:, np.newaxis]
 
-    if axis == 0:
-        X = X.T
-
-    return X
     
 
 def correlation(input, match):
