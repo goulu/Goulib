@@ -141,6 +141,20 @@ class Image(PILImage.Image):
         A=A.reshape(w,h)
         return A
     
+    def __getitem__(self,slice):
+        try:
+            return self.getpixel(slice)
+        except TypeError:
+            pass
+        left, upper, right, lower=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
+        # calculate box module size so we handle negative coords like in slices
+        w,h = self.size
+        upper,lower=upper%h,lower%h
+        left,right=left%w,right%w
+        im=self.crop((left, upper, right, lower))
+        im.load()
+        return Image(im)
+    
     # hash and distance
     
     def average_hash(self, hash_size=8):
@@ -189,67 +203,18 @@ class Image(PILImage.Image):
     
     def grayscale(self):
         return self.convert("L")
-
-
     
+    def correlation(self, other):
+        """Compute the correlation between two, single-channel, grayscale input images.
+        The second image must be smaller than the first.
+        :param other: the Image we're looking for
+        """
+        from scipy import signal
+        input = self.ndarray()
+        match = other.ndarray()
+        c=signal.correlate2d(input,match)
+        return Image(c)
 
-def correlation(input, match):
-    """Compute the correlation between two, single-channel, grayscale input images.
-    The second image must be smaller than the first.
-    :param input: a PIL Image 
-    :para, match: the PIL image we're looking for in input
-    """
-    input = pil2array(input)
-    match = pil2array(match)
-    
-    assert match.shape < input.shape, "Match Template must be Smaller than the input"
-    c = np.zeros(input.shape) # store the coefficients...
-    mfmean = match.mean()
-    iw, ih = input.shape # get input image width and height
-    mw, mh = match.shape # get match image width and height
-    
-
-    for i in range(0, iw):
-        for j in range(0, ih):
-
-            # find the left, right, top 
-            # and bottom of the sub-image
-            if i-mw/2 <= 0:
-                left = 0
-            elif iw - i < mw:
-                left = iw - mw
-            else:
-                left = i
-                
-            right = left + mw 
-
-            if j - mh/2 <= 0:
-                top = 0
-            elif ih - j < mh:
-                top = ih - mh
-            else:
-                top = j
-
-            bottom = top + mh
-
-            # take a slice of the input image as a sub image
-            sub = input[left:right, top:bottom]
-            assert sub.shape == match.shape, "SubImages must be same size!"
-            localmean = sub.mean()
-            temp = (sub - localmean) * (match - mfmean)
-            s1 = temp.sum()
-            temp = (sub - localmean) * (sub - localmean)
-            s2 = temp.sum()
-            temp = (match - mfmean) * (match - mfmean)
-            s3 = temp.sum() 
-            denom = s2*s3
-            if denom == 0: 
-                temp = 0
-            else: 
-                temp = s1 / math.sqrt(denom)
-            
-            c[i,j] = temp
-    return array2pil(c)
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 
