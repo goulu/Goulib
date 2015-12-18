@@ -358,7 +358,7 @@ class Actuator():
                 }
     
 class TimeDiagram(plot.Plot):        
-    def __init__(self,actuators,fromTime=None,toTime=None):
+    def __init__(self,actuators,stateMachines=[],fromTime=None,toTime=None):
         self.actuators = actuators
         self.t0 = min(a.segs.startTime() for a in actuators) if fromTime is None else fromTime('s')
         self.t1 = max(a.segs.endTime() for a in actuators) if toTime is None else toTime('s')
