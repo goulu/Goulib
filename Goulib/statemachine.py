@@ -4,7 +4,6 @@
 """
 state machines with graph representation
 """
-from Goulib.notebook import hinfo
 
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
@@ -17,6 +16,7 @@ import inspect
 from Goulib.units import V
 from Goulib.piecewise import Piecewise
 from graphviz import Digraph
+
 
 class StateDiagram(Digraph):
     """
@@ -98,8 +98,7 @@ class StateMachine:
     def wait(self,time,cause='unknown cause'):
         if time > self.time:
             self.time = time
-            from Goulib.notebook import hinfo
-            hinfo(self.name+' waits for ',cause)
+            #TODO rethink how to display info .....hinfo(self.name+' waits for ',cause)
             
     def run(self,start=0,stops=[],startTime=V(0,'s'),maxSteps=100000,maxTime=V(1000,'s'),displayStates=False,displayMove=False):
         """ runs the behavioral simulation 
