@@ -14,8 +14,8 @@ class TestImage:
     @classmethod
     def setup_class(self):
         self.lena=Image(path+'/data/lena.png')
-        self.lena.convert('L').save(path+'/results/lena_bw.png')
-        self.lena_bw=Image(path+'/results/lena_bw.png')
+        self.lena.grayscale().save(path+'/results/lena_gray.png')
+        self.lena_gray=Image(path+'/results/lena_gray.png')
         
     def test___init__(self):
         lena2=Image(self.lena)
@@ -29,10 +29,22 @@ class TestImage:
         
     def test___hash__(self):
         h1=hash(self.lena)
-        h2=hash(self.lena_bw)
+        h2=hash(self.lena_gray)
         diff=h1^h2 #XOR
         diff=math2.digsum(diff,2) #number of different pixels
         assert_equal(h1,h2,msg='difference is %d pixels'%diff)
+        
+    def test___getitem__(self):
+        pixel=self.lena_gray[256,256]
+        assert_equal(pixel,100)
+        pixel=self.lena[256,256]
+        assert_equal(pixel,(180,65,72))
+        face=self.lena[246:374,225:353]
+        face.save(path+"/results/image.lena.face.png")
+        face=face.grayscale()
+        eye=face[3:35,-35:-3] # negative indexes are handy in some cases
+        c=face.correlation(eye)
+        c.save(path+"/results/image.correlation.png")
 
     def test___lt__(self):
         # image = Image(data)
