@@ -25,7 +25,7 @@ from .itertools2 import split, filter2, subdict
 from .geom import *
 from .colors import color_to_aci, aci_to_color
 from .interval import Box
-from .math2 import isclose
+from .math2 import rint, isclose
 
 from . import plot #set matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
@@ -1148,21 +1148,23 @@ class Drawing(Group):
             def do_RG(self, r, g, b):
                 from pdfminer.pdfcolor import LITERAL_DEVICE_RGB
                 self.do_CS(LITERAL_DEVICE_RGB)
-                self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+                r,g,b=rint(r*255),rint(g*255),rint(b*255)
+                self.scs.color='#%02x%02x%02x' % (r,g,b)
 
             # setcolor stroking
             def do_sc(self):
                 r,g,b=self.pop(self.scs.ncomponents)
-                self.scs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+                r,g,b=rint(r*255),rint(g*255),rint(b*255)
+                self.scs.color='#%02x%02x%02x' % (r,g,b)
 
             # setcolor nonstroking
             def do_scn(self):
                 try:
                     r,g,b=self.pop(self.ncs.ncomponents)
-                    self.ncs.color='#%02x%02x%02x' % (r*255,g*255,b*255)
+                    r,g,b=rint(r*255),rint(g*255),rint(b*255)
+                    self.ncs.color='#%02x%02x%02x' % (r,g,b)
                 except:
                     pass
-
 
         #then all we have to do is to launch PDFMiner's parser on the file
         fp = open(filename, 'rb')
