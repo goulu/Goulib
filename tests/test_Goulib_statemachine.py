@@ -56,6 +56,13 @@ class TestSM_test:
         sm.run(start=0,maxSteps=4)
         assert_equal(sm.log, [(0, 0), (3,1), (10,0), (10, 1)])
         assert_equal(sm.lastExitTime(0), V(10,'s'))
+        assert_equal(sm(-1),None)
+        assert_equal(sm(2),0)
+        assert_equal(sm(3),1)
+        assert_equal(sm(4),1)
+        assert_equal(sm(10),1)
+        assert_equal(sm(11),1)
+        
  
 if __name__ == "__main__":
     runmodule()           

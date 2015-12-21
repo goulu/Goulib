@@ -79,6 +79,14 @@ class StateMachine:
                 actions.append(d)
         self.states[state]['actions']=actions
             
+    def __call__(self,time):
+        """ find the state at time.  time must be in seconds """
+        for t,state in reversed(self.log):
+            if t <= time:
+                return state
+        return None
+            
+        
             
     def _repr_html_(self):
         html = '<table border="1"><caption>'+self.name+'</caption>'

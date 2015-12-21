@@ -41,3 +41,4 @@ def hwarning(*args):
 
 def herror(*args):   
     display(HTML('<div style="background-color:#d9534f;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    

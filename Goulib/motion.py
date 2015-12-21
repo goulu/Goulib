@@ -418,10 +418,6 @@ class TimeDiagram(plot.Plot):
                             verticalalignment='center')
                     shift = not shift
                 ax.text(t1,pos,s.name)
-            
-        
-        
-        
         # Shrink current axis by 20%
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -429,7 +425,7 @@ class TimeDiagram(plot.Plot):
         # Put a legend to the right of the current axis
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),prop = fontP)
         return ax
-        
+
         
 def _pva(val):
     try: p=val[0]
