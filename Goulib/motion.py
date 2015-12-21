@@ -5,6 +5,8 @@ motion simulation (kinematics)
 """
 from docutils.statemachine import StateMachine
 from test.test_math import acc_check
+from bokeh.sampledata.gapminder import filename
+import Goulib.table
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -311,6 +313,12 @@ class Actuator():
             display(m.svg())
         return m
     
+    def P(self,t):
+        if isinstance(t, V):
+            t = t('s')
+        _p = self.segs(t)[0]
+        return V(_p,'m')
+    
     def maxAbsAcc(self):
         return self._maxAbsAcc
     
@@ -425,6 +433,18 @@ class TimeDiagram(plot.Plot):
         # Put a legend to the right of the current axis
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),prop = fontP)
         return ax
+    
+    def saveAsCsv(self,filename):
+        step=(self.t1-self.t0)/500.
+        x=[ t for t in itertools2.arange(self.t0,self.t1,step)]
+        data=[['time']+x]
+        
+        for sm,_p,_sp in self.stateMachines:
+            data.append(["'"+sm.name]+[sm(t) for t in x]) 
+        for a in self.actuators:
+            data.append(["'"+a.name]+[(a.P(t))('m') for t in x]) 
+        tab = Goulib.table.Table(data=data)    
+        tab.write_csv(filename)
 
         
 def _pva(val):
