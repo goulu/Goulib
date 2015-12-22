@@ -189,12 +189,11 @@ def _intersect_line3_sphere(L, S):
     u2 = (-b - sq) / (2 * a)
     p1 = L.point(u1)
     p2 = L.point(u2)
-    if p1 and p2:
-        return Segment3(p1,p2)
-    elif p1:
-        return p1
-    else:
+    if p1 is None:
         return p2
+    if p2 is None:
+        return p1
+    return Segment3(p1,p2)
 
 def _intersect_line3_plane(L, P):
     d = P.n.dot(L.v)
@@ -625,6 +624,13 @@ class Line3(Geometry):
 
     def _u_in(self, u):
         return True
+        
+    def point(self, u):
+        ":return: Point3 at parameter u"
+        if self._u_in(u):
+            return self.p+u*self.v
+        else:
+            return None
 
     def intersect(self, other):
         return other._intersect_line3(self)
