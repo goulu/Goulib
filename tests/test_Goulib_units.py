@@ -45,6 +45,9 @@ class Tests:
         t.appendCol('cheval',{'speed':V(60,'km/hour'),'acceleration':V(0.3,'m/s^2'),'autonomy':V(40,'km')})
         logging.debug(t._repr_html_())
         
+        t.appendRow('length', [V(4552,'mm'), V(20,'m'), V(50,'cm'),V(100,'inch')], unit = 'm')
+        logging.debug(t._repr_html_())        
+        
     def test003_m(self):
         v = V(60,'m/min')
         assert_equal(v('m/s'), 1)

@@ -252,6 +252,7 @@ class Actuator():
         even if it might be compensated by the mass in the case we go down
         """
         self.segs = Segments([])
+        self.log = [] #list of (startTime,startPos,endTime,endPos) one tuple per move
         self.name = name
         self.stateMachine = stateMachine
         self.vmax = vmax
@@ -304,13 +305,16 @@ class Actuator():
         m = SegmentsTrapezoidalSpeed(time('s'), self.pos('m'), newpos('m'),  a=acc('m/s^2'), vmax=vmax('m/s'))
         self._maxAbsSpeed = max(self._maxAbsSpeed,V(abs(m.segments[0].endSpeed()),'m/s'))
         self.lastmove = m
-        self.pos = newpos
-        self.segs.add(m)        
-        self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
+        self.log.append((time,self.pos,V(m.endTime(),'s'),newpos))
+
         if self.stateMachine.displayMove:
             from IPython.display import display,HTML
             display(HTML('<h4>{0}</h4>'.format(self.name)))
             display(m.svg())
+        
+        self.pos = newpos
+        self.segs.add(m)        
+        self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
         return m
     
     def P(self,t):
@@ -351,7 +355,11 @@ class Actuator():
         table.appendCol('values',self.varDict())
         v = View(table,rowUnits=self.varRowUnits())
         display(v)
-    
+        timeTable = Table('timing',[self.stateMachine.name+' cycle',('start time','s'),('start pos','mm'),('stop time','s'),('stop pos','mm')],[])
+        for i,l in enumerate(self.log):
+            timeTable.appendRow('move {:0>4d}'.format(i), [self.stateMachine(l[0]('s')),l[0],l[1],l[2],l[3]])
+        display(timeTable)
+        
     def varNames(self):
         """ returns a list of internal variables. intended to be used in the Table.__init__ """
         return [self.name+'.mass',

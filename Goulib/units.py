@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
+from skimage.viewer.plugins import labelplugin
 
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
@@ -8,7 +9,6 @@ __license__ = "LGPL"
 
 from pint import UnitRegistry #https://pypi.python.org/pypi/Pint/
 from inspect import isfunction,getsource
-
 
 #defines V as a way to express any physical value (and Currency)
 ureg = UnitRegistry()
@@ -41,28 +41,31 @@ class Row():
     def _repr_html_(self,col,convertToUnits='',withoutUnits=False):
         if self.isfunc(col):
             c = self.row[col]
-            style = 'style="background-color: #f1f1c1" title="'+ getsource(c)+'"'
+            background = 'background-color: #f1f1c1;'
+            title = 'title="'+getsource(c)+'"'
         else:
-            style = ''
+            background = ''
+            title = ''
             
         try:
             disp = self[col] if convertToUnits=='' else self[col].to(convertToUnits)
             if withoutUnits:
-                return '<td colspan=2 align="right" '+style+'>{0.magnitude}</td>'.format(disp)
+                return '<td colspan=2 style="text-align:right;'+background+'" '+title+'>%f</td>' % disp.magnitude
             else: 
-                return '<td align="right" '+style+'>{0.magnitude}</td><td>{0.units}</td>'.format(disp)
-        except:
-            return '<td colspan=2>'+str(self[col])+'</td>'            
+                return '<td style="text-align:right;'+background+'" '+title+'>%f</td><td>%s</td>' % (disp.magnitude,disp.units)
+        except Exception as e:
+            return '<td colspan=2 style="background-color:#ffe5e5;" title="'+str(e)+'">'+str(self[col])+'</td>'            
      
 class Table():
     """
     to create a table, use the following syntax
     
-    t =  Table ('myTable', ['col1',          'col2',            'col3'],
-            [ 'distance',   V(20,'m'),       V(30,'m'),         V(40,'m'),
-              'speed',      V(2,'m/min'),    V(5,'m/s'),        V(10,'inch/s')
+    t =  Table ('myTable',   ['col1',          'col2',            'col3'],
+            [ 'distance',     V(20,'m'),       V(30,'m'),         V(40,'m'),
+              ('speed','m/s'),V(2,'m/min'),    V(5,'m/s'),        V(10,'inch/s')
             ])
             
+    the row label can be a tuple of ('label','unit'). in that case, all the values of the row will be converted to 'unit' (if possible) and the cells won't diplay the units saving space 
     in the future, the label could be replaced by a dictionary having more properties like 
     {'label':<label>, 'comment':<comment>....}
     
@@ -74,16 +77,30 @@ class Table():
     """
     def __init__(self,name,cols,cells):
         self.name = name
-        self.cols = cols
+        self.cols = []
+        self.colUnits = {}
         self.rows = {}
+        self.rowUnits = {}
         self.rowLabels = [] # in order to keep the natural order of the table
+        self.format = format
         
+        for c in cols:
+            if isinstance(c, tuple):
+                unit = c[1]
+                c = c[0]
+                self.colUnits[c] = unit
+            self.cols.append(c)
+                
         i = iter(cells)
         tableOk = False  #just here to check consistency of rows
         try:
             while True:
                 tableOk = True
                 label = next(i)
+                if isinstance(label,tuple):
+                    unit = label[1]
+                    label = label[0]
+                    self.rowUnits[label]=unit
                 self.rowLabels.append(label)
                 row = {}
                 tableOk = False
@@ -99,19 +116,32 @@ class Table():
         return self.rows[key]
         
     def _repr_html_(self):
-        html = '<table border="1"><caption>'+self.name+'</caption><tr><th></th>'
+        html = '<table border="1"><caption> '+self.name+'</caption><tr><th></th>'
         for col in self.cols:
-            html += '<th colspan="2">'+col+'</th>'
+            unit = ' ['+self.colUnits[col]+']' if col in self.colUnits else ''
+            html += '<th colspan="2">'+col+unit+'</th>'
         html += '</tr><tr>'
-        for row in self.rowLabels:
-            html += '<td>'+row+'</td>'
-            r = self.rows[row]
+        for label in self.rowLabels:
+            if label in self.rowUnits:
+                units = self.rowUnits[label] 
+                html += '<td>'+label+'['+units+']</td>'
+            else:
+                units = '' 
+                html += '<td>'+label+'</td>'
+            r = self.rows[label]    
             for col in self.cols:
-                html += r._repr_html_(col)
+                noUnits = False
+                if label in self.rowUnits:
+                    units = self.rowUnits[label]  
+                    noUnits = True               
+                if col in self.colUnits:
+                    units = self.colUnits[col]
+                    noUnits = True
+                html += r._repr_html_(col,convertToUnits=units,withoutUnits=noUnits)
             html += '</tr>'
         html += '</table>'
-        return html
-        
+        return html        
+       
          
     def appendCol(self,colname,values):
         """ appends a column at the right of the table
@@ -121,6 +151,28 @@ class Table():
         for rowname in values:
             self.rows[rowname][colname] = values[rowname]
             
+    def appendRow(self,label,values,unit=None,):
+        """ appends a new row of data
+        :params label: the label of the row
+        :params values: an array of values. must be the same size as ne number of columns of the table
+        :params unit: if specified, the unit that will be used to display the row
+        """
+        assert len(values)==len(self.cols) , "the values array has {} elements and the table has {} columns".format(len(values),len(self.cols))
+        self.rowLabels.append(label)
+        r = {self.cols[i]:values[i] for i in range(len(values))}
+        self.rows[label] = Row(r)
+        if unit:
+            self.rowUnits[label] = unit
+            
+    def appendColFromObj(self,colname,obj,default=None):
+        """ add a new column by searching in obj all properties that have the same name as the row names
+            if a row is not found, then the default is used"""
+        values = {}
+        for label in self.rowLabels:
+            v = getattr(obj,label,default)
+            values[label] = v
+        self.appendCol(colname, values) 
+                       
 class View():
     def __init__(self,table,rows=[],cols=[],rowUnits={},name=''):
         self.table = table

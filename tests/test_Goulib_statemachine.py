@@ -63,6 +63,16 @@ class TestSM_test:
         assert_equal(sm(10),1)
         assert_equal(sm(11),1)
         
+class TestTimeMarker:
+    def test_all(self):
+        tm = TimeMarker('test_tm')
+        assert_equal(tm()('s'),-float('inf'))
+        tm.set(V(3,'s'))
+        assert_equal(tm()('s'),3)
+        tm.set(V(5,'s'))
+        assert_equal(tm()('s'),5)
+        assert_equal(str(tm),'test_tm 3.000000[s] 5.000000[s]')
+        
  
 if __name__ == "__main__":
     runmodule()           

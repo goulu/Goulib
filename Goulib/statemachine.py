@@ -16,6 +16,7 @@ import inspect
 from Goulib.units import V
 from Goulib.piecewise import Piecewise
 from graphviz import Digraph
+from Goulib.notebook import hinfo
 
 
 class StateDiagram(Digraph):
@@ -37,6 +38,25 @@ class StateDiagram(Digraph):
 maxDiff = None
 
         
+class TimeMarker:
+    def __init__(self,name):
+        self.name = name
+        self.markers = [-float('inf')]
+        
+    def set(self,time):
+        self.markers.append(time('s'))
+        hinfo(self.name,'set at %f [s]' % time('s'))
+        
+    def __call__(self):
+        return V(self.markers[-1],'s')
+    
+    def __repr__(self):
+        s = self.name
+        for t in self.markers[1:]:
+            s += ' %f[s]' % t
+        return s
+     
+     
 class StateMachine:
     def __init__(self,simulation=None,name=None,background_color="#F5ECCE"):
         self.displayMove = False
@@ -60,6 +80,7 @@ class StateMachine:
         """ where all actuators should be declared and other variables"""
         self.__reset__()
         self.log = []
+        self.errors =[]
         
     def __reset__(self):
         pass
@@ -97,7 +118,7 @@ class StateMachine:
         return html
                 
     def displayGraph(self):
-        from IPython.display import display         
+        from Goulib.notebook2 import display         
         graph = StateDiagram(self.name)
         for state in self.states:
             graph.state(state,self.states[state]['title'], '<br/>'.join(self.states[state]['actions']), self.states[state]['transitions'])
@@ -108,18 +129,20 @@ class StateMachine:
             self.time = time
             #TODO rethink how to display info .....hinfo(self.name+' waits for ',cause)
             
-    def run(self,start=0,stops=[],startTime=V(0,'s'),maxSteps=100000,maxTime=V(1000,'s'),displayStates=False,displayMove=False):
+    def run(self,start=0,stops=[],startTime=None,maxSteps=100000,maxTime=V(1000,'s'),displayStates=False,displayMove=False):
         """ runs the behavioral simulation 
             :params start: is the starting state of the simulation
             :params stops: a list of states that will stop the simulation (after having simulated this last state)
-            :params startTime: a time to start this run
+            :params startTime: a time to start this run if None takes self.time
             :params maxState: is the number of states being evaluated before the end of simulation
             :params maxTime: is the virtual time at which the simulation ends_in_comment_or_string
             :params displayStates: at every new state, display the state in Notebook as well as the time when entered
             :params displayMove: if True, every actuator.move displays the graph of the move
+            
+            returns the time when run finishes
         """
-        
-        self.time = startTime
+        if startTime:
+            self.time = startTime
         self.displayMove = displayMove
         self.displayStates = displayStates
         currentState = start
@@ -135,6 +158,7 @@ class StateMachine:
                 break
             currentState = self.next 
             steps +=1
+        return self.time
             
     def lastExitTime(self,state):
         last = -float('inf')
@@ -154,5 +178,5 @@ class StateMachine:
         display(p.svg(xlim=(fromTime,toTime)))
         
 
-    
+        
         
