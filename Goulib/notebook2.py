@@ -71,47 +71,34 @@ def display(obj):
     
 sep=' ' # Python2 doesn't allow named param after list of optional ones...
 
-MAXVERBOSITY = {'h1':True,'h2':True,'h3':True,'h':True,'hinfo':True,'hsuccess':True,'hwarning':True,'herror':True}
-SILENT = {'h1':False,'h2':False,'h3':False,'h':False,'hinfo':False,'hsuccess':False,'hwarning':False,'herror':False}
-
-verbosity = MAXVERBOSITY
-
-hasErrors = False
-hasWarning = False
-
 def h1(*args):
-    if verbosity['h1']:
-        display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
+    display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
     
 def h2(*args):
-    if verbosity['h2']:
-        display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
+    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
     
 def h3(*args):
-    if verbosity['h3']:
-        display(HTML('<h3>'+sep.join(str(a) for a in args)+'</h3>'))
+    display(HTML('<h3>'+sep.join(str(a) for a in args)+'</h3>'))
     
 def h(*args):
-    if verbosity['h']:
-        display(HTML(sep.join(str(a) for a in args))) 
+    display(HTML(sep.join(str(a) for a in args))) 
     
 def hinfo(*args):   
-    if verbosity['hinfo']:
-        display(HTML('<div style="background-color:#337ab7;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    display(HTML('<div style="background-color:#337ab7;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
 
 def hsuccess(*args):   
-    if verbosity['hsuccess']:
-        display(HTML('<div style="background-color:#5cb85c;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    display(HTML('<div style="background-color:#5cb85c;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
 
 def hwarning(*args):
-    global hasWarnings
-    hasWarnings = True   
-    if verbosity['hwarning']:
-        display(HTML('<div style="background-color:#f0ad4e;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    display(HTML('<div style="background-color:#f0ad4e;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
 
 def herror(*args):
-    global hasErrors
-    hasErrors = True   
-    if verbosity['herror']:
-        display(HTML('<div style="background-color:#d9534f;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    display(HTML('<div style="background-color:#d9534f;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
     
+def displayState(name,currentState,title,time,background_color):
+        display(HTML('<div style="padding:5px;background-color:'+background_color+';"><h3>{0}={1} {2}</h3>{3:f}</div>'.format(name,currentState,title,time)))
+        
+def displayPlot(name,plot):
+    display(HTML('<h4>{0}</h4>'.format(name)))
+    display(plot.svg())
+        

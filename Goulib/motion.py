@@ -3,7 +3,7 @@
 """
 motion simulation (kinematics)
 """
-from docutils.statemachine import StateMachine
+from Goulib.statemachine import StateMachine,StateChangeLog,TooLateLog,WaitLog
 from test.test_math import acc_check
 from bokeh.sampledata.gapminder import filename
 import Goulib.table
@@ -307,11 +307,8 @@ class Actuator():
         self.lastmove = m
         self.log.append((time,self.pos,V(m.endTime(),'s'),newpos))
 
-        if self.stateMachine.displayMove:
-            from IPython.display import display,HTML
-            display(HTML('<h4>{0}</h4>'.format(self.name)))
-            display(m.svg())
-        
+        self.stateMachine.simulation.displayPlot(self.name,m)
+
         self.pos = newpos
         self.segs.add(m)        
         self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
@@ -426,14 +423,18 @@ class TimeDiagram(plot.Plot):
         
         for s,pos,posShift in self.stateMachines:
             shift = False
-            for (t,state) in s.log:
-                if t >= t0 and t <= t1:
-                    y = posShift if shift else pos
-                    ax.text(t, y, '<'+str(state), fontsize=(6),
-                            horizontalalignment='left',
-                            verticalalignment='center')
-                    shift = not shift
-                ax.text(t1,pos,s.name)
+            for (t,event) in s.log:
+                if isinstance(event, StateChangeLog):
+                    if t >= t0 and t <= t1:
+                        y = posShift if shift else pos
+                        ax.text(t, y, '<'+str(event.newState), fontsize=(6),
+                                horizontalalignment='left',
+                                verticalalignment='center')
+                        shift = not shift
+                    ax.text(t1,pos,s.name)
+                elif isinstance(event,TooLateLog):
+                    ax.broken_barh([(event.pastTime,t)],(pos,posShift),color='red')
+                    
         # Shrink current axis by 20%
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])

@@ -5,6 +5,7 @@ from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 from Goulib.motion import *
+from Goulib.statemachine import Simulation
 from math import pi
 import os
 path=os.path.dirname(os.path.abspath(__file__))
@@ -77,10 +78,9 @@ class TestSegments:
         assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
 
-from Goulib.statemachine import StateMachine
 class TestActuator:
     def test_move_horizontal(self):
-        sm = StateMachine()
+        sm = StateMachine(simulation=Simulation())
         a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))
         # tests that if no move at the beginning, nothing crashes
         time = a.move(V(0,'m')).endTime()
@@ -104,7 +104,7 @@ class TestActuator:
         #assert_equal(a.varNames(),[])
         
     def test_move_vertical(self):
-        sm = StateMachine()
+        sm = StateMachine(simulation=Simulation())
         a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'),friction=V(0.25,'N'),angle=V(90,'deg'))
         a.move(V(-3,'m'))
         assert_almost_equal(a.maxForce()('N'),9.05665)
@@ -112,7 +112,7 @@ class TestActuator:
         assert_almost_equal(a.maxForce()('N'),11.05665)
 
 class TestTimeDiagram:
-        sm = StateMachine()
+        sm = StateMachine(simulation=Simulation())
         a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
         a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
         a1.move(V(3000,'mm'))
