@@ -175,7 +175,7 @@ class StateMachine:
     def checkOnTimeAndWait(self,time,what):
         """ checks that the self.time < time
         if this is not the case an error will be logged with the message"""
-        if self.time < time:
+        if self.time > time:
             TooLateLog(time,what).log(self)
             self.simulation.herror(what,'is too late: ',self.time, 'instead of',time)
         else:

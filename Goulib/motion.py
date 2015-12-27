@@ -410,7 +410,7 @@ class TimeDiagram(plot.Plot):
         """
         linewidth = kwargs.pop('linewidth',0)
         (t0,t1) = kwargs.setdefault('xlim',(self.t0,self.t1))
-
+        (ymin,ymax) = (-1000,1000)
         from matplotlib.font_manager import FontProperties
         fontP = FontProperties()
         fontP.set_size('xx-small')
@@ -433,7 +433,16 @@ class TimeDiagram(plot.Plot):
                         shift = not shift
                     ax.text(t1,pos,s.name)
                 elif isinstance(event,TooLateLog):
-                    ax.broken_barh([(event.pastTime,t)],(pos,posShift),color='red')
+                    tend = event.pastTime('s')
+                    if (t<=t1 and t>=t0) or (tend <= t1 and tend >= t1):
+                        ax.broken_barh([(tend,t-tend)],(ymin,ymax-ymin),facecolor='white',edgecolor='red')
+                        ax.broken_barh([(tend,t-tend)],(pos,posShift-pos),facecolor='red',edgecolor='')
+                        
+                elif isinstance(event,WaitLog):
+                    tend = event.untilTime('s')
+                    if (t<=t1 and t>=t0) or (tend <= t1 and tend >= t1):
+                        ax.broken_barh([(tend,t-tend)],(ymin,ymax-ymin),facecolor='white',edgecolor='green')
+                        ax.broken_barh([(tend,t-tend)],(pos,posShift-pos),facecolor='green')
                     
         # Shrink current axis by 20%
         box = ax.get_position()
