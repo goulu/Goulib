@@ -3,9 +3,7 @@
 """
 motion simulation (kinematics)
 """
-from Goulib.statemachine import StateMachine,StateChangeLog,TooLateLog,WaitLog
-from test.test_math import acc_check
-from bokeh.sampledata.gapminder import filename
+from Goulib.statemachine import StateChangeLog,TooLateLog,WaitLog
 import Goulib.table
 
 __author__ = "Philippe Guglielmetti"
