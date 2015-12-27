@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # coding: utf8
-from skimage.viewer.plugins import labelplugin
-
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
 __credits__= [""]
