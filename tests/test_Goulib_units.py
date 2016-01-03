@@ -52,5 +52,13 @@ class Tests:
         v = V(60,'m/min')
         assert_equal(v('m/s'), 1)
         
+    def test004_TableCell(self):
+        t = Table('test cell',[],[])
+        t.setCell(('speed','km/hour'),'car',V(100,'mph'))
+        t.setCell('speed','bus',V(100,'km/hour'))
+        assert_equal((t['speed']['car'])('km/hour'),160.93439999999998)
+        t.setCell('acceleration','car',V(1,'m/s^2'))
+        logging.info(t._repr_html_())
+        
 if __name__ == "__main__":
     runmodule()

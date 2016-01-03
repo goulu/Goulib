@@ -117,8 +117,8 @@ class Segments(Segment):
         :param label: a label can be given
         """
         self.label = label
-        self.t0 = 0
-        self.t1 = 0
+        self.t0 = -float('inf')
+        self.t1 = -float('inf')
         self.segments = []
         self.add(segments)
         
@@ -264,7 +264,7 @@ class Actuator():
         
 
         
-    def move(self,newpos,relative=False,time = None, vmax=None,acc=None):
+    def move(self,newpos,relative=False,time = None, wait=True, vmax=None,acc=None):
         """ moves the actuator to newpos
         :params newpos: the new absolute position
         :params time: the starting time of the move. by default (None) the state machine time will be used but
@@ -276,6 +276,11 @@ class Actuator():
         
         if time is None:
             time = self.stateMachine.time
+            
+        if time < self.endTime():
+            self.stateMachine.hwarning(self.name,'received at',time,'an order to move while it was already moving. had to wait',self.endTime())
+            time = self.endTime()        
+
         if relative:
             newpos = self.pos + newpos
         
@@ -309,6 +314,9 @@ class Actuator():
         self.segs.add(m)        
         self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
         return m
+    
+    def endTime(self):
+        return V(self.segs.endTime(),'s')
     
     def P(self,t):
         if isinstance(t, V):

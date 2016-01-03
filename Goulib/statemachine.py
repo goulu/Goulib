@@ -129,6 +129,8 @@ class StateMachine:
         """ where all actuators should be declared and other variables"""
         self.__reset__()
         self.log = []
+        self.hasErrors = False
+        self.hasWarnings = False
         
     def __reset__(self):
         pass
@@ -177,10 +179,10 @@ class StateMachine:
         if this is not the case an error will be logged with the message"""
         if self.time > time:
             TooLateLog(time,what).log(self)
-            self.simulation.herror(what,'is too late: ',self.time, 'instead of',time)
+            self.herror(what,'is too late: ',self.time, 'instead of',time)
         else:
             WaitLog(time,what).log(self)
-            self.simulation.hsuccess('waits for ',what,'from',self.time,'to',time)
+            self.hsuccess('waits for ',what,'from',self.time,'to',time)
             self.time = time
             
     def wait(self,time,cause='unknown cause'):
@@ -223,9 +225,11 @@ class StateMachine:
             
     def hwarning(self,*args):
         self.simulation.hwarning(*args)
+        self.hasWarnings = True
             
     def herror(self,*args):
         self.simulation.herror(*args)
+        self.hasErrors = True
         
             
     def lastExitTime(self,state):

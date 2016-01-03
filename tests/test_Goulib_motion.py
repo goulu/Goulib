@@ -84,7 +84,7 @@ class TestActuator:
         a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))
         # tests that if no move at the beginning, nothing crashes
         time = a.move(V(0,'m')).endTime()
-        assert_equal(time,0.0)     
+        assert_equal(time,-float('inf'))     
         
         time = a.move(V(3000,'mm')).endTime()
         assert_equal(a.segs.start(),(0.0, 0.0, 1.0, 0))
@@ -121,8 +121,8 @@ class TestTimeDiagram:
         t = TimeDiagram([a1,a2])
         assert_equal(t.t0,0)
         assert_equal(t.t1,8)
-        t.save('.\\tests\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
-        t.saveAsCsv('.\\tests\\results\\TimeDiagram.csv')
+        t.save(path+'\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
+        t.saveAsCsv(path+'\\results\\TimeDiagram.csv')
                         
 class TestSegmentPoly:
     @classmethod

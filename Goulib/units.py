@@ -24,18 +24,24 @@ class Row():
     def __init__(self,row):  #row has the same format as internal
         self.row = row
        
-    def __getitem__(self,col): 
-        v = self.row[col]
-        if isfunction(v): #in that case, one must resolve the calculation
-            v = v()
-        return v
-    
+    def __getitem__(self,col):
+        try: 
+            v = self.row[col]
+            if isfunction(v): #in that case, one must resolve the calculation
+                v = v()
+            return v
+        except KeyError:
+            return None
+        
     def __setitem__(self,col,value):
         self.row[col] = value
        
     def isfunc(self,col):
-        return isfunction(self.row[col])
-    
+        try:
+            return isfunction(self.row[col])
+        except KeyError:
+            return False
+        
     def _repr_html_(self,col,convertToUnits='',withoutUnits=False):
         if self.isfunc(col):
             c = self.row[col]
@@ -74,7 +80,12 @@ class Table():
      '<the next label>'         
     """
     def __init__(self,name,cols,cells):
-        self.name = name
+        if isinstance(name,tuple):
+            self.name = name[0]
+            self.defaultUnits = name[1]
+        else:
+            self.name = name
+            self.defaultUnits = ''
         self.cols = []
         self.colUnits = {}
         self.rows = {}
@@ -110,11 +121,26 @@ class Table():
             if not tableOk:
                 raise Exception('the cells array has inconsistent number of cells regarding the number of columns passed in cols')
             
+    def setCell(self,row,col,value):
+        if isinstance(row,tuple):
+            self.rowUnits[row[0]]=row[1]
+            row = row[0]
+        if isinstance(col,tuple):
+            self.colUnits[col[0]]=col[1]
+            col = col[0]
+        
+        if row not in self.rowLabels:
+            self.rowLabels.append(row)
+            self.rows[row] = Row({})
+        if col not in self.cols:
+            self.cols.append(col)
+        self.rows[row][col]=value
+               
     def __getitem__(self,key):
         return self.rows[key]
         
     def _repr_html_(self):
-        html = '<table border="1"><caption> '+self.name+'</caption><tr><th></th>'
+        html = '<table border="1"><caption> '+self.name+' '+self.defaultUnits+'</caption><tr><th></th>'
         for col in self.cols:
             unit = ' ['+self.colUnits[col]+']' if col in self.colUnits else ''
             html += '<th colspan="2">'+col+unit+'</th>'
@@ -124,7 +150,7 @@ class Table():
                 units = self.rowUnits[label] 
                 html += '<td>'+label+'['+units+']</td>'
             else:
-                units = '' 
+                units = self.defaultUnits
                 html += '<td>'+label+'</td>'
             r = self.rows[label]    
             for col in self.cols:
