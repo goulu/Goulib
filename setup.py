@@ -2,7 +2,7 @@
 # coding=utf-8
 
 from setuptools import setup
-import os,sys
+import os,sys,uuid
 
 def read(*parts):
     return open(os.path.join(os.path.dirname(__file__), *parts)).read()
@@ -17,6 +17,12 @@ def get_version():
         f.close()
 
 from pip.req import parse_requirements
+reqs = parse_requirements(
+    os.path.join(os.path.dirname(__file__), "requirements.txt"),
+    None,None, None, uuid.uuid1()
+)
+
+reqs = [str(ir.req) for ir in reqs]
 
 setup(
     name='Goulib',
@@ -32,9 +38,7 @@ setup(
 
     scripts=[],
 
-    # parse_requirements() returns generator of pip.req.InstallRequirement objects
-    install_reqs = parse_requirements('requirements.txt'),
-    # extras_require = parse_requirements('optional-requirements.txt'),
+    install_requires=reqs,
 
     test_suite="nose.collector",
     classifiers=[
@@ -46,6 +50,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Multimedia :: Graphics :: Graphics Conversion',
