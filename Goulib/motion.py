@@ -3,7 +3,7 @@
 """
 motion simulation (kinematics)
 """
-from Goulib.statemachine import StateMachine,StateChangeLog,TooLateLog,WaitLog
+from Goulib.statemachine import StateMachine,StateChangeLog,TooLateLog,WaitLog,noPrint
 import Goulib.table
 
 __author__ = "Philippe Guglielmetti"
@@ -307,7 +307,7 @@ class Actuator():
         self._maxAbsSpeed = max(self._maxAbsSpeed,V(abs(m.segments[0].endSpeed()),'m/s'))
         self.lastmove = m
         self.log.append((time,self.pos,V(m.endTime(),'s'),newpos))
-
+        
         self.stateMachine.simulation.displayPlot(self.name,m)
 
         self.pos = newpos
