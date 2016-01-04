@@ -204,6 +204,18 @@ class Image(PILImage.Image):
     def grayscale(self):
         return self.convert("L")
     
+    def filter(self,f):
+        try: # scikit-image filter or similar ?
+            return Image(f(self))
+        except ValueError: #maybe because image has channels ? filter each one
+            split=self.split()
+            split=[Image(f(channel)) for channel in split]
+            return PILImage.merge(self.mode, split)
+        except:
+            pass
+        
+        return super(Image,self).filter(f)
+    
     def correlation(self, other):
         """Compute the correlation between two, single-channel, grayscale input images.
         The second image must be smaller than the first.

@@ -10,6 +10,12 @@ from Goulib.image import *
 import os
 path=os.path.dirname(os.path.abspath(__file__))
 
+try: # http://scikit-image.org/ is optional
+    import skimage
+    SKIMAGE=True
+except:
+    SKIMAGE=False
+
 class TestImage:
     @classmethod
     def setup_class(self):
@@ -87,9 +93,7 @@ class TestImage:
         raise SkipTest # TODO: implement your test here
 
     def test_grayscale(self):
-        # image = Image(data, **kwargs)
-        # assert_equal(expected, image.grayscale())
-        raise SkipTest # TODO: implement your test here
+        pass
 
     def test_invert(self):
         # image = Image(data, **kwargs)
@@ -102,9 +106,14 @@ class TestImage:
         raise SkipTest # TODO: implement your test here
 
     def test_to_html(self):
-        # image = Image(data, **kwargs)
-        # assert_equal(expected, image.to_html())
-        raise SkipTest # TODO: implement your test here
+        pass
+    
+    def test_filter(self):
+        if not SKIMAGE:
+            raise SkipTest
+        from skimage.filters import sobel
+        for f in [sobel]:
+            assert_true(self.lena.filter(f))
 
 class TestCorrelation:
     def test_correlation(self):
