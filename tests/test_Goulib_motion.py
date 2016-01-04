@@ -172,14 +172,14 @@ class TestActuator:
         assert_equal(time,0.0)     
         
         time = a.move(V(3000,'mm')).endTime()
-        assert_equal(a.Segs.start(),(0.0, 0.0, 1.0, 0))
-        assert_equal(a.Segs.end(),(3.0, 0.0, -1.0, 0.0))
+        assert_equal(a.segs.start(),(0.0, 0.0, 1.0, 0))
+        assert_equal(a.segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
         a.move(V(0,'m'),acc=V(2,'m/s^2'))  #test overriding default acc
-        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))
+        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))
         #test that if no real move we get the same result
         a.move(V(0,'m'))
-        assert_equal(a.Segs.end(),(0.0, 0.0, 2.0, 0.0))        
+        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))        
                         
 class TestSegmentPoly:
     @classmethod
