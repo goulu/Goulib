@@ -36,6 +36,61 @@ class TestSegment:
     def test_start(self):
         pass # tested below
     
+    def test_endAcc(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endAcc())
+        raise SkipTest 
+
+    def test_endJerk(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endJerk())
+        raise SkipTest 
+
+    def test_endPos(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endPos())
+        raise SkipTest 
+
+    def test_endSpeed(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endSpeed())
+        raise SkipTest 
+
+    def test_endTime(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.endTime())
+        raise SkipTest 
+
+    def test_startAcc(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startAcc())
+        raise SkipTest 
+
+    def test_startJerk(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startJerk())
+        raise SkipTest 
+
+    def test_startPos(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startPos())
+        raise SkipTest 
+
+    def test_startSpeed(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startSpeed())
+        raise SkipTest 
+
+    def test_startTime(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.startTime())
+        raise SkipTest 
+
+    def test_timeWhenPosBiggerThan(self):
+        # segment = Segment(t0, t1, funcs)
+        # assert_equal(expected, segment.timeWhenPosBiggerThan(pos, resolution))
+        raise SkipTest 
+
 class TestSegments:
     def test___init__(self):
         s1 = Segment2ndDegree(0,2,(0,0,2))

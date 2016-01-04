@@ -10,7 +10,7 @@ from Goulib.units import *
 class Tests:
     def test_append_col(self):
         # assert_equal(expected, appendCol(self, colname, values))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test001_simple_value(self):
         ureg.define('CHF = [Currency]')

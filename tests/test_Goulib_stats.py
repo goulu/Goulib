@@ -52,7 +52,7 @@ class TestStats:
     def test_remove(self):
         # Stats = Stats(data, mean, var)
         # assert_equal(expected, Stats.remove(data))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_mean(self):
         assert_equal(self.f.mean,0.5)
@@ -66,7 +66,7 @@ class TestStats:
     def test_stddev(self):
         # Stats = Stats(data, mean, var)
         # assert_equal(expected, Stats.stddev())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestStddev:
     def test_stddev(self):
@@ -106,6 +106,25 @@ class TestStats:
         assert_equal(sum2,(n+2)/3.,0)
         assert_equal(avg,0.5,4)
         assert_equal(var,1./12,4)
+
+    def test_stats(self):
+        # assert_equal(expected, stats(l))
+        raise SkipTest 
+
+    def test___repr__(self):
+        # stats = Stats(data)
+        # assert_equal(expected, stats.__repr__())
+        raise SkipTest 
+
+    def test_sum(self):
+        # stats = Stats(data)
+        # assert_equal(expected, stats.sum())
+        raise SkipTest 
+
+    def test_sum2(self):
+        # stats = Stats(data)
+        # assert_equal(expected, stats.sum2())
+        raise SkipTest 
 
 class TestLinearRegression:
     def test_linear_regression(self):
@@ -187,47 +206,47 @@ class TestNormal:
     def test___call__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__call__(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___neg__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__neg__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___rsub__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__rsub__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_covariance(self):
         # normal = Normal()
         # assert_equal(expected, normal.covariance(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_pdf(self):
         # normal = Normal()
         # assert_equal(expected, normal.pdf(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_pearson(self):
         # normal = Normal()
         # assert_equal(expected, normal.pearson(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_plot(self):
         # normal = Normal()
         # assert_equal(expected, normal.plot(fmt, x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_pop(self):
         # normal = Normal()
         # assert_equal(expected, normal.pop(i, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_remove(self):
         # normal = Normal()
         # assert_equal(expected, normal.remove(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
     
     def test_save(self):
         n1=Normal()
@@ -238,19 +257,24 @@ class TestNormal:
 class TestMeanVar:
     def test_mean_var(self):
         # assert_equal(expected, mean_var(data))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestKurtosis:
     def test_kurtosis(self):
         # assert_equal(expected, kurtosis(data))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 class TestCovariance:
     def test_covariance(self):
         # assert_equal(expected, covariance(data1, data2))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 
+
+class TestNormalPdf:
+    def test_normal_pdf(self):
+        # assert_equal(expected, normal_pdf(x, mu, sigma))
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

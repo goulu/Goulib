@@ -705,6 +705,16 @@ class TestArcFrom3Points:
         assert_equal(a.r,1)
         assert_equal(a.point(0.5),p2)
 
+class TestEllipse:
+    def test___init__(self):
+        # ellipse = Ellipse(*args)
+        raise SkipTest 
+
+    def test___repr__(self):
+        # ellipse = Ellipse(*args)
+        # assert_equal(expected, ellipse.__repr__())
+        raise SkipTest 
+
 if __name__ == "__main__":
     runmodule()
 

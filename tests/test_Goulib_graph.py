@@ -262,7 +262,5 @@ class TestToNetworkxGraph:
         # assert_equal(expected, to_networkx_graph(data, create_using, multigraph_input))
         raise SkipTest 
 
-
-
 if __name__=="__main__":
     runmodule()

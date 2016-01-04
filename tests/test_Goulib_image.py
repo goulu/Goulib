@@ -33,17 +33,17 @@ class TestImage:
     def test___lt__(self):
         # image = Image(data)
         # assert_equal(expected, image.__lt__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test___repr__(self):
         # image = Image(data)
         # assert_equal(expected, image.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_mode(self):
         # image = Image(data)
         # assert_equal(expected, image.mode())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
     def test_open(self):
         pass #tested above
@@ -119,7 +119,7 @@ class TestImg2base64:
 class TestNormalize:
     def test_normalize(self):
         # assert_equal(expected, normalize(X, norm, axis, copy, positive))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest 
 
 if __name__=="__main__":
     runmodule()

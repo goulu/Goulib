@@ -20,6 +20,21 @@ class TestNodebug:
         # assert_equal(expected, nodebug(func))
         raise SkipTest
 
+class TestGetThreadPool:
+    def test_get_thread_pool(self):
+        # assert_equal(expected, get_thread_pool())
+        raise SkipTest 
+
+class TestTimeout:
+    def test_timeout(self):
+        # assert_equal(expected, timeout(timeout))
+        raise SkipTest 
+
+class TestItimeout:
+    def test_itimeout(self):
+        # assert_equal(expected, itimeout(iterable, timeout))
+        raise SkipTest 
+
 if __name__ == "__main__":
     runmodule()
 

@@ -566,6 +566,21 @@ class TestSphere:
         # assert_equal(expected, sphere.intersect(other))
         raise SkipTest
 
+    def test___contains__(self):
+        # sphere = Sphere(*args)
+        # assert_equal(expected, sphere.__contains__(pt))
+        raise SkipTest 
+
+    def test_distance_on_sphere(self):
+        # sphere = Sphere(*args)
+        # assert_equal(expected, sphere.distance_on_sphere(phi1, theta1, phi2, theta2))
+        raise SkipTest 
+
+    def test_point(self):
+        # sphere = Sphere(*args)
+        # assert_equal(expected, sphere.point(u, v))
+        raise SkipTest 
+
 class TestPlane:
     @classmethod
     def setup_class(self):
@@ -601,6 +616,11 @@ class TestPlane:
         plane=Plane(p1,p2,p3)
         assert_equal(plane.distance(p4),0)
         assert_equal(Point3(1,2,3).distance(plane),3)
+
+class TestSpherical:
+    def test_spherical(self):
+        # assert_equal(expected, Spherical(r, theta, phi))
+        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()
