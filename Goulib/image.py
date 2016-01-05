@@ -231,9 +231,39 @@ class Image(PILImage.Image):
         c=signal.correlate2d(input,match)
         return Image(c)
     
-    def shift(self,dy,dx):
+    def shift(self,dx,dy):
         from scipy.ndimage.interpolation import shift as shift2
-        return Image(shift2(self,(dy,dx)))
+        try:
+            im=Image(shift2(self,(dy,dx)))
+        except RuntimeError:
+            split=self.split()
+            split=[channel.shift(dx,dy) for channel in split]
+            im=PILImage.merge(self.mode, split)
+        return im
+    
+    def expand(self,size,ox=None,oy=None):
+        """
+        :return: image in larger canvas size, pasted at ox,oy
+        """
+        im = Image(mode=self.mode, size=size)
+        (w,h)=self.size
+        if ox is None:
+            ox=(size[0]-w)//2
+        elif ox<0:
+            ox=size[0]-w+ox
+        if oy is None:
+            oy=(size[1]-h)//2
+        elif oy<0:
+            oy=size[1]-h+oy
+        if math2.is_integer(ox) and math2.is_integer(oy):
+            im.paste(self, (ox,oy,ox+w,oy+h))
+        elif ox>=0 and oy>=0:
+            im.paste(self, (0,0,w,h))
+            im=im.shift(ox,oy)
+        else:
+            raise NotImplemented #TODO; something for negative offsets...
+        return im
+    
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 

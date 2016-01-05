@@ -114,6 +114,12 @@ class TestImage:
         from skimage.filters import sobel
         for f in [sobel]:
             assert_true(self.lena.filter(f))
+            
+    def test_expand(self):
+        size=64
+        im=self.lena.resize((size,size))
+        im=im.expand((size+1,size+1),.5,.5) #can you see that half pixel border ?
+        im.save(path+'/results/lena_expand_0.5 border.png')
 
 class TestCorrelation:
     def test_correlation(self):
