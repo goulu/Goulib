@@ -12,12 +12,12 @@ __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
-import six
-
 from PIL import Image as PILImage
 from PIL import ImagePalette, ImageOps
 
 import numpy as np
+
+import six, math, base64
 
 from . import math2
 
@@ -113,16 +113,14 @@ class Image(PILImage.Image):
         :result: string base64 encoded image content in specified format
         """
         # http://stackoverflow.com/questions/31826335/how-to-convert-pil-image-image-object-to-base64-string
-
-        import base64
-        import cStringIO
         
-        buffer = cStringIO.StringIO()
+        buffer = six.BytesIO()
         self.save(buffer, format=fmt)
         return base64.b64encode(buffer.getvalue())
         
     def to_html(self):
-        return r'<img src="data:image/png;base64,{0}">'.format(self.base64('PNG'))
+        s=self.base64('PNG').decode('utf-8')
+        return r'<img src="data:image/png;base64,{0}">'.format(s)
     
     def html(self):
         from IPython.display import HTML
