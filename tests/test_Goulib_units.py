@@ -45,24 +45,20 @@ class Tests:
         t.appendCol('cheval',{'speed':V(60,'km/hour'),'acceleration':V(0.3,'m/s^2'),'autonomy':V(40,'km')})
         logging.debug(t._repr_html_())
         
+        t.appendRow('length', [V(4552,'mm'), V(20,'m'), V(50,'cm'),V(100,'inch')], unit = 'm')
+        logging.debug(t._repr_html_())        
+        
     def test003_m(self):
         v = V(60,'m/min')
         assert_equal(v('m/s'), 1)
         
-class TestMagnitudeIn:
-    def test_magnitude_in(self):
-        # assert_equal(expected, magnitudeIn(self, unit))
-        raise SkipTest 
-
-class TestIsfunc:
-    def test_isfunc(self):
-        # assert_equal(expected, isfunc(self, col))
-        raise SkipTest 
-
-class TestAppendCol:
-    def test_append_col(self):
-        # assert_equal(expected, appendCol(self, colname, values))
-        raise SkipTest 
-
+    def test004_TableCell(self):
+        t = Table('test cell',[],[])
+        t.setCell(('speed','km/hour'),'car',V(100,'mph'))
+        t.setCell('speed','bus',V(100,'km/hour'))
+        assert_equal((t['speed']['car'])('km/hour'),160.93439999999998)
+        t.setCell('acceleration','car',V(1,'m/s^2'))
+        logging.info(t._repr_html_())
+        
 if __name__ == "__main__":
     runmodule()

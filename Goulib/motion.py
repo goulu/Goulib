@@ -3,14 +3,15 @@
 """
 motion simulation (kinematics)
 """
+from Goulib.statemachine import StateMachine,StateChangeLog,TooLateLog,WaitLog,noPrint
+import Goulib.table
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://osterone.bobstgroup.com/wiki/index.php?title=UtlCam"]
 __license__ = "LGPL"
 
-import  logging
-
+from math import sin
 from . import plot, polynomial, itertools2, math2
 from Goulib.units import V,Table, View
 
@@ -116,8 +117,8 @@ class Segments(Segment):
         :param label: a label can be given
         """
         self.label = label
-        self.t0 = 0
-        self.t1 = 0
+        self.t0 = -float('inf')
+        self.t1 = -float('inf')
         self.segments = []
         self.add(segments)
         
@@ -230,27 +231,40 @@ class Actuator():
       
     """
     
-    def __init__(self,stateMachine,vmax,acc,name='',pos=0,distPerTurn=V(1,'mm'),mass=V(1,'kg'),friction=V(0,'N')):
+    def __init__(self,stateMachine,vmax,acc,name='',pos=V(0,'m'),distPerTurn=V(1,'mm'),angle=V(0,'deg'),mass=V(1,'kg'),friction=V(0,'N')):
         """
-        :params simulation: a simulation. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayMove boolean
+        :params stateMachine: a stateMachine. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayMove boolean
         :params acc: the default acceleration of the actuator
         :params vmax: the default vmax
         :params name: name of the actuator
         :params pos: the initial position
+        :params distPerTurn: the distance of the actuator per motor (or reductor) turn
+        :params angle: if 0, the mass is moving horizontally, if 90° vertically: CAREFULL in that case the bigger the position, the higher
+        :params mass: the mass to move (for both intertia and lifting force)
+        :params friction: the friction force TODO: currently no difference between u0 and udynamique
+        intertia of the pulley should be taken into consideration
+        
+        WARNING: the maxForce simulation is minimalist: as we know nothing about the reversibility of the grears and where is the friction, friction is always added
+        even if it might be compensated by the mass in the case we go down
         """
         self.segs = Segments([])
+        self.log = [] #list of (startTime,startPos,endTime,endPos) one tuple per move
         self.name = name
-        self.acc = acc if type(acc) is V else V(acc,'m/s^2')
-        self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
-        self.pos = pos if type(pos) is V else V(pos,'m')
         self.stateMachine = stateMachine
+        self.vmax = vmax
+        self.acc = acc
+        self.pos = pos
         self.distPerTurn = distPerTurn
+        self.angle = angle
         self.mass = mass
-        self._maxAbsAcc = 0
-        self._maxAbsSpeed = 0
-        self.friction = friction
+        self.friction = friction.to('N')        
+        self._maxAbsAcc = V(0,'m/s^2')
+        self._maxAbsSpeed = V(0,'m/s')
+        self._maxForce = V(0,'N')
         
-    def move(self,newpos,relative=False,time = None, vmax=None,acc=None):
+
+        
+    def move(self,newpos,relative=False,time = None, wait=True, vmax=None,acc=None):
         """ moves the actuator to newpos
         :params newpos: the new absolute position
         :params time: the starting time of the move. by default (None) the state machine time will be used but
@@ -259,48 +273,68 @@ class Actuator():
         :params vmax: by default the values given at initialisation, but a value for this move can be given
         :params acc:  by default the values given at initialisation, but a value for this move can be given
         """
+        
         if time is None:
             time = self.stateMachine.time
-        time = time('s')
-        pos = self.pos('m') 
-        newpos = newpos('m')               
+            
+        if time < self.endTime():
+            self.stateMachine.hwarning(self.name,'received at',time,'an order to move while it was already moving. had to wait',self.endTime())
+            time = self.endTime()        
+
         if relative:
-            newpos = pos + newpos
+            newpos = self.pos + newpos
         
-        if newpos == pos:
+        if newpos == self.pos:
             if self.stateMachine.displayMove:
                 from IPython.display import display,HTML
                 display(HTML('<h4>{0}</h4> already in place @ {1}[m]'.format(self.name,newpos)))            
             return self.segs
-        elif newpos > pos:
-            acc = self.acc('m/s^2') if acc is None else acc('m/s^2')
-            vmax = self.vmax('m/s') if vmax is None else vmax('m/s')
-            self._maxAbsAcc = max(acc,self._maxAbsAcc)
+        elif newpos > self.pos:
+            acc = self.acc if acc is None else acc
+            vmax = self.vmax if vmax is None else vmax
         else:
-            acc = - self.acc('m/s^2') if acc is None else -acc('m/s^2')
-            vmax= - self.vmax('m/s') if vmax is None else -vmax('m/s')
-            self._maxAbsAcc = max(-acc,self._maxAbsAcc)            
+            acc = - self.acc if acc is None else -acc
+            vmax= - self.vmax if vmax is None else -vmax
+        self._maxAbsAcc = max(abs(acc),self._maxAbsAcc)
+        s = sin(self.angle)
+        fg = (self.mass*s*V(1,'gravity')).to('N')
+        fa = (self.mass*acc).to('N')
+        fm = abs(fg+fa)
+        ft = fm+self.friction
+        self._maxForce = max(self._maxForce, ft)                        
 
-        m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
-        self._maxAbsSpeed = max(self._maxAbsSpeed,abs(m.segments[0].endSpeed()))
+        m = SegmentsTrapezoidalSpeed(time('s'), self.pos('m'), newpos('m'),  a=acc('m/s^2'), vmax=vmax('m/s'))
+        self._maxAbsSpeed = max(self._maxAbsSpeed,V(abs(m.segments[0].endSpeed()),'m/s'))
         self.lastmove = m
-        self.pos = V(newpos,'m')
+        self.log.append((time,self.pos,V(m.endTime(),'s'),newpos))
+        
+        self.stateMachine.simulation.displayPlot(self.name,m)
+
+        self.pos = newpos
         self.segs.add(m)        
         self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
-        if self.stateMachine.displayMove:
-            from IPython.display import display,HTML
-            display(HTML('<h4>{0}</h4>'.format(self.name)))
-            display(m.svg())
         return m
     
+    def endTime(self):
+        return V(self.segs.endTime(),'s')
+    
+    def P(self,t):
+        if isinstance(t, V):
+            t = t('s')
+        _p = self.segs(t)[0]
+        return V(_p,'m')
+    
     def maxAbsAcc(self):
-        return V(self._maxAbsAcc,'m/s^2')
+        return self._maxAbsAcc
     
     def maxAbsSpeed(self):
-        return V(self._maxAbsSpeed,'m/s')
+        return self._maxAbsSpeed
+    
+    def maxForce(self):
+        return self._maxForce
     
     def maxTork(self):
-        return (((self.mass*self.maxAbsAcc())+self.friction)*self.distPerTurn/6.28).to('N m')
+        return (self._maxForce*self.distPerTurn/V(360,'deg')).to('N m')
     
     def maxRpm(self):
         return self.maxAbsSpeed()/self.distPerTurn
@@ -322,7 +356,11 @@ class Actuator():
         table.appendCol('values',self.varDict())
         v = View(table,rowUnits=self.varRowUnits())
         display(v)
-    
+        timeTable = Table('timing',[self.stateMachine.name+' cycle',('start time','s'),('start pos','mm'),('stop time','s'),('stop pos','mm')],[])
+        for i,l in enumerate(self.log):
+            timeTable.appendRow('move {:0>4d}'.format(i), [self.stateMachine(l[0]('s')),l[0],l[1],l[2],l[3]])
+        display(timeTable)
+        
     def varNames(self):
         """ returns a list of internal variables. intended to be used in the Table.__init__ """
         return [self.name+'.mass',
@@ -358,11 +396,14 @@ class Actuator():
                 }
     
 class TimeDiagram(plot.Plot):        
-    def __init__(self,actuators,fromTime=None,toTime=None):
+    def __init__(self,actuators,stateMachines=[],fromTime=None,toTime=None):
+        """
+        :params stateMachines: [(stateMachine,pos,posShift),...]
+        """
         self.actuators = actuators
         self.t0 = min(a.segs.startTime() for a in actuators) if fromTime is None else fromTime('s')
         self.t1 = max(a.segs.endTime() for a in actuators) if toTime is None else toTime('s')
-        
+        self.stateMachines = stateMachines
         
     def __repr__(self):
         return 'Time Diagram from {0:f}[s] to {1:f}[s]'.format(self.t0,self.t1)
@@ -373,6 +414,10 @@ class TimeDiagram(plot.Plot):
         """
         linewidth = kwargs.pop('linewidth',0)
         (t0,t1) = kwargs.setdefault('xlim',(self.t0,self.t1))
+        (ymin,ymax) = (-1000,1000)
+        from matplotlib.font_manager import FontProperties
+        fontP = FontProperties()
+        fontP.set_size('xx-small')
 
         step=(t1-t0)/500.
         x=[ t for t in itertools2.arange(self.t0,self.t1,step)  ]
@@ -380,14 +425,29 @@ class TimeDiagram(plot.Plot):
             y = [a.segs(t)[0] for t in x]
             ax.plot(x, y, label=a.name, linewidth=linewidth)
         
-        
-        from matplotlib.font_manager import FontProperties
-
-        fontP = FontProperties()
-        fontP.set_size('xx-small')
-        #legend([plot1], "title", prop = fontP)
-        
-        
+        for s,pos,posShift in self.stateMachines:
+            shift = False
+            for (t,event) in s.log:
+                if isinstance(event, StateChangeLog):
+                    if t >= t0 and t <= t1:
+                        y = posShift if shift else pos
+                        ax.text(t, y, '<'+str(event.newState), fontsize=(6),
+                                horizontalalignment='left',
+                                verticalalignment='center')
+                        shift = not shift
+                    ax.text(t1,pos,s.name)
+                elif isinstance(event,TooLateLog):
+                    tend = event.pastTime('s')
+                    if (t<=t1 and t>=t0) or (tend <= t1 and tend >= t1):
+                        ax.broken_barh([(tend,t-tend)],(ymin,ymax-ymin),facecolor='white',edgecolor='red')
+                        ax.broken_barh([(tend,t-tend)],(pos,posShift-pos),facecolor='red',edgecolor='')
+                        
+                elif isinstance(event,WaitLog):
+                    tend = event.untilTime('s')
+                    if (t<=t1 and t>=t0) or (tend <= t1 and tend >= t1):
+                        ax.broken_barh([(tend,t-tend)],(ymin,ymax-ymin),facecolor='white',edgecolor='green')
+                        ax.broken_barh([(tend,t-tend)],(pos,posShift-pos),facecolor='green')
+                    
         # Shrink current axis by 20%
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -395,7 +455,19 @@ class TimeDiagram(plot.Plot):
         # Put a legend to the right of the current axis
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),prop = fontP)
         return ax
+    
+    def saveAsCsv(self,filename):
+        step=(self.t1-self.t0)/500.
+        x=[ t for t in itertools2.arange(self.t0,self.t1,step)]
+        data=[['time']+x]
         
+        for sm,_p,_sp in self.stateMachines:
+            data.append(["'"+sm.name]+[sm(t) for t in x]) 
+        for a in self.actuators:
+            data.append(["'"+a.name]+[(a.P(t))('m') for t in x]) 
+        tab = Goulib.table.Table(data=data)    
+        tab.write_csv(filename)
+
         
 def _pva(val):
     try: p=val[0]

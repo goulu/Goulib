@@ -2,6 +2,8 @@
 # coding: utf8
 """
 image processing and conversion
+:requires:
+* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
 """
 from __future__ import division #"true division" everywhere
 
@@ -10,15 +12,11 @@ __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
-"""
-:requires:
-* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
-"""
-
 from PIL import Image as PILImage
 from PIL import ImagePalette, ImageOps
 
 import numpy as np
+
 import six, math, base64
 
 from . import math2
@@ -27,12 +25,20 @@ class Image(PILImage.Image):
     def __init__(self, data=None, **kwargs):
         """
         :param data: can be either:
-        * None : creates an empty image
         * `PIL.Image` : makes a copy
         * string : path of image to load
+        * None : creates an empty image with kwargs parameters:
+        ** size : (y,x) pixel size tuple
+        ** mode : 'L' (gray) by default
+        ** color: to fill None=black by default
         """
         if data is None:
-            self._initfrom(PILImage.Image(**kwargs))
+            if kwargs:
+                kwargs.setdefault('mode','L')
+                im=PILImage.new(**kwargs)
+            else:
+                im=PILImage.Image()
+            self._initfrom(im)
         elif isinstance(data,PILImage.Image):
             self._initfrom(data)
         elif isinstance(data,six.string_types): #assume a path
@@ -202,6 +208,18 @@ class Image(PILImage.Image):
     def grayscale(self):
         return self.convert("L")
     
+    def filter(self,f):
+        try: # scikit-image filter or similar ?
+            return Image(f(self))
+        except ValueError: #maybe because image has channels ? filter each one
+            split=self.split()
+            split=[Image(f(channel)) for channel in split]
+            return PILImage.merge(self.mode, split)
+        except:
+            pass
+        
+        return super(Image,self).filter(f)
+    
     def correlation(self, other):
         """Compute the correlation between two, single-channel, grayscale input images.
         The second image must be smaller than the first.
@@ -212,7 +230,10 @@ class Image(PILImage.Image):
         match = other.ndarray()
         c=signal.correlate2d(input,match)
         return Image(c)
-
+    
+    def shift(self,dy,dx):
+        from scipy.ndimage.interpolation import shift as shift2
+        return Image(shift2(self,(dy,dx)))
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 
@@ -327,6 +348,18 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
     return background
 
+def disk(radius,antialias=PILImage.BICUBIC):
+    from skimage.morphology import disk as disk2
+    return Image(disk2(radius))
+
+def fspecial(name,**kwargs):
+    """mimics the Matlab image toolbox fspecial function
+    http://www.mathworks.com/help/images/ref/fspecial.html?refresh=true
+    """
+    if name=='disk':
+        return disk(kwargs.get('radius',5)) # 5 is default in Matlab
+    raise NotImplemented
+    
 
 
 

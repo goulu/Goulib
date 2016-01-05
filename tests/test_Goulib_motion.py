@@ -5,7 +5,8 @@ from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 from Goulib.motion import *
-
+from Goulib.statemachine import Simulation
+from math import pi
 import os
 path=os.path.dirname(os.path.abspath(__file__))
 
@@ -132,54 +133,51 @@ class TestSegments:
         assert_equal(segs.html(),'Segments starts=0 ends=4<br/>t=0.000000 (0.000000,0.000000,2.000000,0.000000) --> t=2.000000 (4.000000,4.000000,2.000000,0.000000)<br/>t=2.000000 (4.000000,4.000000,-2.000000,0.000000) --> t=4.000000 (8.000000,0.000000,-2.000000,0.000000)<br/>')
                 
 
-    def test___call__(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.__call__(t))
-        raise SkipTest 
-
-    def test___str__(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.__str__())
-        raise SkipTest 
-
-    def test_end(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.end())
-        raise SkipTest 
-
-    def test_insert(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.insert(segment, autoJoin))
-        raise SkipTest 
-
-    def test_start(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.start())
-        raise SkipTest 
-
-    def test_update(self):
-        # segments = Segments(segments, label)
-        # assert_equal(expected, segments.update())
-        raise SkipTest 
-
-from Goulib.statemachine import StateMachine
 class TestActuator:
-    def test_move(self):
-        sm = StateMachine()
-        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'))
+    def test_move_horizontal(self):
+        sm = StateMachine(simulation=Simulation())
+        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))
         # tests that if no move at the beginning, nothing crashes
         time = a.move(V(0,'m')).endTime()
-        assert_equal(time,0.0)     
+        assert_equal(time,-float('inf'))     
         
         time = a.move(V(3000,'mm')).endTime()
         assert_equal(a.segs.start(),(0.0, 0.0, 1.0, 0))
         assert_equal(a.segs.end(),(3.0, 0.0, -1.0, 0.0))
         assert_equal(time,4.0)
+        assert_equal(a.P(3)('m'),2.5)
+        assert_equal(a.P(V(3.0,'s'))('m'),2.5)
         a.move(V(0,'m'),acc=V(2,'m/s^2'))  #test overriding default acc
         assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))
         #test that if no real move we get the same result
         a.move(V(0,'m'))
-        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))        
+        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))  
+        assert_equal(a.maxAbsAcc(),V(2,'m/s^2'))
+        assert_equal(a.maxAbsSpeed(),V(1,'m/s'))
+        assert_equal(a.maxRpm(),V(1,'1/s'))
+        assert_almost_equal(a.maxTork()('N m'),0.31830988618379064)
+        #assert_equal(a.varNames(),[])
+        
+    def test_move_vertical(self):
+        sm = StateMachine(simulation=Simulation())
+        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'),friction=V(0.25,'N'),angle=V(90,'deg'))
+        a.move(V(-3,'m'))
+        assert_almost_equal(a.maxForce()('N'),9.05665)
+        a.move(V(0,'m'))
+        assert_almost_equal(a.maxForce()('N'),11.05665)
+
+class TestTimeDiagram:
+        sm = StateMachine(simulation=Simulation())
+        a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+        a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+        a1.move(V(3000,'mm'))
+        a2.move(V(3000,'mm'))
+        assert_equal(sm.time,V(8.0,'s'))
+        t = TimeDiagram([a1,a2])
+        assert_equal(t.t0,0)
+        assert_equal(t.t1,8)
+        t.save(path+'\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
+        t.saveAsCsv(path+'\\results\\TimeDiagram.csv')
                         
 class TestSegmentPoly:
     @classmethod
@@ -322,26 +320,6 @@ class TestSegment4thDegree:
         assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
         assert_equal(seg((self.t0+self.t1)/2.),(-0.3125, 2.0, 3.0, 0.0)) #truediv
 
-
-class TestMove:
-    def test_move(self):
-        # assert_equal(expected, move(self, newpos, relative, time, vmax, acc))
-        raise SkipTest 
-
-class TestDisplayLast:
-    def test_display_last(self):
-        # assert_equal(expected, displayLast(self))
-        raise SkipTest 
-
-class TestDisplay:
-    def test_display(self):
-        # assert_equal(expected, display(self, fromTime, toTime))
-        raise SkipTest 
-
-class TestSegmentsTrapezoidalSpeed:
-    def test_segments_trapezoidal_speed(self):
-        # assert_equal(expected, SegmentsTrapezoidalSpeed(t0, p0, p3, a, T, vmax, v0, v3))
-        raise SkipTest 
 
 if __name__ == "__main__":
     runmodule()

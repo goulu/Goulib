@@ -7,12 +7,6 @@ from Goulib.tests import *
 from Goulib.statemachine import *
 from Goulib.motion import Actuator
 
-class Simulation:
-    def __init__(self):
-        self.aGlobalVar = None
-        
-
-
 class SM_Test(StateMachine):
     def __init__(self,simulation):
         StateMachine.__init__(self,simulation)
@@ -54,8 +48,24 @@ class TestSM_test:
         simulation = Simulation()
         sm = SM_Test(simulation)
         sm.run(start=0,maxSteps=4)
-        assert_equal(sm.log, [(0, 0), (3,1), (10,0), (10, 1)])
         assert_equal(sm.lastExitTime(0), V(10,'s'))
+        assert_equal(sm(-1),None)
+        assert_equal(sm(2),0)
+        assert_equal(sm(3),1)
+        assert_equal(sm(4),1)
+        assert_equal(sm(10),1)
+        assert_equal(sm(11),1)
+        
+class TestTimeMarker:
+    def test_all(self):
+        tm = TimeMarker('test_tm')
+        assert_equal(tm()('s'),-float('inf'))
+        tm.set(V(3,'s'))
+        assert_equal(tm()('s'),3)
+        tm.set(V(5,'s'))
+        assert_equal(tm()('s'),5)
+        assert_equal(str(tm),'test_tm 3.000000[s] 5.000000[s]')
+        
  
 class TestStateDiagram:
     def test_state(self):

@@ -4,6 +4,7 @@
 """
 state machines with graph representation
 """
+from scipy.stats.mstats_basic import argstoarray
 
 __author__ = "Marc Nicole"
 __copyright__ = "Copyright 2015, Marc Nicole"
@@ -36,7 +37,75 @@ class StateDiagram(Digraph):
 
 maxDiff = None
 
+
+def noPrint(*args):
+    pass
+
+class Simulation:
+    """ all simulation should derive from this class that has some helper
+    """
+    def __init__(self):
+        self.h1           = noPrint
+        self.h2           = noPrint
+        self.h3           = noPrint
+        self.h            = noPrint
+        self.hinfo        = noPrint
+        self.hsuccess     = noPrint
+        self.hwarning     = noPrint
+        self.herror       = noPrint
+        self.displayState = noPrint
+        self.displayPlot  = noPrint
         
+    def setOutput(self,h1=noPrint,h2=noPrint,h3=noPrint,h=noPrint,hinfo=noPrint,hsuccess=noPrint,hwarning=noPrint,herror=noPrint,displayState=noPrint,displayObj=noPrint,displayPlot=noPrint):
+        self.h1        = h1
+        self.h2        = h2
+        self.h3        = h3
+        self.h         = h
+        self.hinfo     = hinfo
+        self.hsuccess  = hsuccess
+        self.hwarning  = hwarning
+        self.herror    = herror
+        self.displayState = displayState
+        self.displayPlot  = displayPlot
+
+#------------ for the logs -----------
+class EventLog:
+    def log(self,stateMachine):
+        stateMachine.log.append((stateMachine.time('s'),self))
+        
+class StateChangeLog(EventLog):
+    def __init__(self,newState):
+        self.newState = newState
+        
+class WaitLog(EventLog):
+    def __init__(self,untilTime,waitForWhat):
+        self.untilTime = untilTime
+        self.waitForWhat = waitForWhat
+        
+class TooLateLog(EventLog):
+    def __init__(self,pastTime,missedWhat):
+        self.pastTime = pastTime
+        self.missedWhat = missedWhat
+            
+#----------------------------------------            
+class TimeMarker:
+    def __init__(self,name):
+        self.name = name
+        self.markers = [-float('inf')]
+        
+    def set(self,time):
+        self.markers.append(time('s'))
+        
+    def __call__(self):
+        return V(self.markers[-1],'s')
+    
+    def __repr__(self):
+        s = self.name
+        for t in self.markers[1:]:
+            s += ' %f[s]' % t
+        return s
+     
+     
 class StateMachine:
     def __init__(self,simulation=None,name=None,background_color="#F5ECCE"):
         self.displayMove = False
@@ -60,6 +129,8 @@ class StateMachine:
         """ where all actuators should be declared and other variables"""
         self.__reset__()
         self.log = []
+        self.hasErrors = False
+        self.hasWarnings = False
         
     def __reset__(self):
         pass
@@ -79,6 +150,14 @@ class StateMachine:
                 actions.append(d)
         self.states[state]['actions']=actions
             
+    def __call__(self,time):
+        """ find the state at time.  time must be in seconds """
+        for t,event in reversed(self.log):
+            if t <= time and isinstance(event,StateChangeLog):
+                return event.newState
+        return None
+            
+        
             
     def _repr_html_(self):
         html = '<table border="1"><caption>'+self.name+'</caption>'
@@ -89,49 +168,75 @@ class StateMachine:
         return html
                 
     def displayGraph(self):
-        from IPython.display import display         
+        from Goulib.notebook2 import display         
         graph = StateDiagram(self.name)
         for state in self.states:
             graph.state(state,self.states[state]['title'], '<br/>'.join(self.states[state]['actions']), self.states[state]['transitions'])
         display(graph)
         
+    def checkOnTimeAndWait(self,time,what):
+        """ checks that the self.time < time
+        if this is not the case an error will be logged with the message"""
+        if self.time > time:
+            TooLateLog(time,what).log(self)
+            self.herror(what,'is too late: ',self.time, 'instead of',time)
+        else:
+            WaitLog(time,what).log(self)
+            self.hsuccess('waits for ',what,'from',self.time,'to',time)
+            self.time = time
+            
     def wait(self,time,cause='unknown cause'):
         if time > self.time:
             self.time = time
             #TODO rethink how to display info .....hinfo(self.name+' waits for ',cause)
             
-    def run(self,start=0,stops=[],startTime=V(0,'s'),maxSteps=100000,maxTime=V(1000,'s'),displayStates=False,displayMove=False):
+    def run(self,start=0,stops=[],startTime=None,maxSteps=100000,maxTime=V(1000,'s')):
         """ runs the behavioral simulation 
             :params start: is the starting state of the simulation
             :params stops: a list of states that will stop the simulation (after having simulated this last state)
-            :params startTime: a time to start this run
+            :params startTime: a time to start this run if None takes self.time
             :params maxState: is the number of states being evaluated before the end of simulation
             :params maxTime: is the virtual time at which the simulation ends_in_comment_or_string
             :params displayStates: at every new state, display the state in Notebook as well as the time when entered
             :params displayMove: if True, every actuator.move displays the graph of the move
+            
+            returns the time when run finishes
         """
-        
-        self.time = startTime
-        self.displayMove = displayMove
-        self.displayStates = displayStates
+        if startTime:
+            self.time = startTime
         currentState = start
         steps = 0
         while steps < maxSteps and self.time < maxTime:
-            self.log.append((self.time.magnitude,currentState))
-            if displayStates:
-                from IPython.display import display,HTML
-                display(HTML('<div style="padding:5px;background-color:'+self.background_color+';"><h3>{0}={1} {2}</h3>{3:f}</div>'.format(self.name,currentState,self.states[currentState]['title'],self.time)))
+            StateChangeLog(currentState).log(self)
+            self.simulation.displayState(self.name,currentState,self.states[currentState]['title'],self.time,self.background_color)
             self.next = self.states[currentState]['transitions'][0][0]  #by default the next state is the first transition
             self.states[currentState]['action']()
             if currentState in stops:
                 break
             currentState = self.next 
             steps +=1
+        return self.time
+    
+    def hinfo(self,*args):
+        self.simulation.hinfo(*args)
+            
+    def hsuccess(self,*args):
+        self.simulation.hsuccess(*args)
+            
+    def hwarning(self,*args):
+        self.simulation.hwarning(*args)
+        self.hasWarnings = True
+            
+    def herror(self,*args):
+        self.simulation.herror(*args)
+        self.hasErrors = True
+        
             
     def lastExitTime(self,state):
         last = -float('inf')
         for i in range(len(self.log)):
-            if self.log[i][1]==state:
+            event = self.log[i][1]
+            if isinstance(event,StateChangeLog) and event.newState==state:
                 last = self.log[i+1][0]
         return V(last,'s')
     
@@ -142,9 +247,9 @@ class StateMachine:
         if fromTime is not None:
             fromTime = fromTime('s')
         if toTime is not None:
-            toTime =toTime('s')
+            toTime = toTime('s')
         display(p.svg(xlim=(fromTime,toTime)))
         
 
-    
+        
         
