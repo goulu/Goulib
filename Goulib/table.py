@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
+"mini pandas.DataFrame" 
 Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
 """
 __author__ = "Philippe Guglielmetti"
@@ -25,6 +26,7 @@ Element=ElementTree._Element
 
 from .datetime2 import datef, datetimef,strftimedelta
 from .markup import tag, style_str2dict
+from .itertools2 import isiterable
 
 def attr(args):
     res=''
@@ -83,16 +85,20 @@ class Cell():
         * if data is :class:`~datetime.timedelta`, align = "right" and formatting is done by :func:`datetime2.strftimedelta`
         
         """
+        args={}
+        args.update(kwargs) #copy needed to avoid side effects
+        
         v=self.data
         f=self.fmt
         
-        args={}
-        args.update(kwargs) #copy needed to avoid side effects
+        if hasattr(v,'_repr_html_'):
+            return tag(self.tag,v._repr_html_(),**args)
+        
         style=args.get('style',{})
         if not isinstance(style,dict):
             style=style_str2dict(style)
             
-        if not 'text-align' in style: #HTML 4 and befo
+        if not 'text-align' in style: #HTML 4 and before
             a=args.pop('align',self.align)           
             if isinstance(v,int):
                 if not a: a="right"
@@ -144,7 +150,8 @@ class Row():
             data=line
         
         
-        if not isinstance(data,list) : data=list(data)
+        if not isinstance(data,list) : 
+            data=[data]
         #ensure params have the same length as data
         
         if not isinstance(style,list): style=[style]
@@ -183,15 +190,26 @@ class Row():
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
-    def __init__(self,filename=None,titles=[],data=[],**kwargs):
-        """inits a table, optionally by reading a Excel, csv or html file"""
-        list.__init__(self, data)
+    def __init__(self,data=[],**kwargs):
+        """inits a table, optionally by reading a Excel, csv or html file
+        :param data: list of list of cells, or string as filename
+        :param titles: optional list of strings used as column id
+        :param footer: optional list of functions used as column reducers
+        """
+        filename=None
+        if isinstance(data,six.string_types):
+            filename=data
+            data=[]
+        else: #ensure data is 2D and mutable
+            for row in data:
+                if not isiterable(row): #build a column
+                    row=[row]
+                self.append(list(row))
         
-        self.titles=titles
-            
-        self.footer=[]
+        self.titles=kwargs.pop('titles',[])
+        self.footer=kwargs.pop('footer',[])
         if filename:
-            if titles: #explicitely set
+            if self.titles: #explicitely set
                 kwargs.setdefault('titles_line',0)
                 kwargs.setdefault('data_line',1)
             else: #read titles from the file
@@ -225,12 +243,9 @@ class Table(list):
         """:return: string HTML representation of table"""
                 
         def TR(data,align=None,fmt=None,tag=None,style=None):
-            if not isinstance(data[0],list):
-                data=[data]
             res=''
-            for line in data:
-                row=Row(data=line,align=align,fmt=fmt,tag=tag,style=style)
-                res+=row.html()+'\n'
+            row=Row(data=data,align=align,fmt=fmt,tag=tag,style=style)
+            res+=row.html()+'\n'
             return res
             
         def THEAD(data,fmt=None,style=None):

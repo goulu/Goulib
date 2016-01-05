@@ -74,6 +74,13 @@ class TestGroups:
         assert_equal(groups([1,2,3,4,5,6],3,2),[[1,2,3],[3,4,5]])
         assert_equal(groups([1,2,3,4,5,6],3),[[1,2,3],[4,5,6]]) 
         assert_equal(groups([1,2,3,4,5,6],4),[[1,2,3,4]]) 
+        
+class TestReshape:
+    def test_reshape(self):
+        data=[1,[2,[3,4],[5,6,7]]] #data can have any shape...
+        assert_equal(reshape(data,(2,3)),[[1,2,3],[4,5,6]])
+        assert_equal(reshape(data,(3,2)),[[1,2],[3,4],[5,6]])
+        assert_equal(reshape(data,(3,3)),[[1,2,3],[4,5,6],[7]])
 
 class TestCompose:
     def test_compose(self):

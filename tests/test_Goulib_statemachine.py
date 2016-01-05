@@ -67,5 +67,56 @@ class TestTimeMarker:
         assert_equal(str(tm),'test_tm 3.000000[s] 5.000000[s]')
         
  
+class TestStateDiagram:
+    def test_state(self):
+        # state_diagram = StateDiagram()
+        # assert_equal(expected, state_diagram.state(number, descr, actions, transitions))
+        raise SkipTest 
+
+class TestStateMachine:
+    def test___init__(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        raise SkipTest 
+
+    def test___reset__(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.__reset__())
+        raise SkipTest 
+
+    def test_display(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.display(fromTime, toTime))
+        raise SkipTest 
+
+    def test_displayGraph(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.displayGraph())
+        raise SkipTest 
+
+    def test_lastExitTime(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.lastExitTime(state))
+        raise SkipTest 
+
+    def test_parseDoc(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.parseDoc(state, f))
+        raise SkipTest 
+
+    def test_reset(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.reset())
+        raise SkipTest 
+
+    def test_run(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.run(start, stops, startTime, maxSteps, maxTime, displayStates, displayMove))
+        raise SkipTest 
+
+    def test_wait(self):
+        # state_machine = StateMachine(simulation, name, background_color)
+        # assert_equal(expected, state_machine.wait(time))
+        raise SkipTest 
+
 if __name__ == "__main__":
     runmodule()           

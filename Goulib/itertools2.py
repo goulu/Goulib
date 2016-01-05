@@ -210,6 +210,18 @@ def pairwise(iterable,op=None,loop=False):
             yield op(x[1],x[0]) #reversed ! (for sub or div)
         else:
             yield x[0],x[1]
+            
+def reshape(data,dims):
+    """
+    :result: data as a n-dim matrix
+    """
+    data=list(flatten(data))
+    for d in dims[::-1]: #reversed
+        if d:
+            data=[data[i:i+d] for i in range(0,len(data),d)]
+        else:
+            data=[data]
+    return data[0]
 
 
 def compose(f, g):

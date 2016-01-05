@@ -10,12 +10,18 @@ from Goulib.image import *
 import os
 path=os.path.dirname(os.path.abspath(__file__))
 
+try: # http://scikit-image.org/ is optional
+    import skimage
+    SKIMAGE=True
+except:
+    SKIMAGE=False
+
 class TestImage:
     @classmethod
     def setup_class(self):
         self.lena=Image(path+'/data/lena.png')
-        self.lena.convert('L').save(path+'/results/lena_bw.png')
-        self.lena_bw=Image(path+'/results/lena_bw.png')
+        self.lena.grayscale().save(path+'/results/lena_gray.png')
+        self.lena_gray=Image(path+'/results/lena_gray.png')
         
     def test___init__(self):
         lena2=Image(self.lena)
@@ -23,12 +29,28 @@ class TestImage:
         lena3=Image().open(path+'/data/lena.png')
         assert_equal(self.lena,lena3)
         
+        #from matrix
+        a=[[(x-64)*y for x in range(128)] for y in range(128)]
+        a=Image(a)
+        
     def test___hash__(self):
         h1=hash(self.lena)
-        h2=hash(self.lena_bw)
+        h2=hash(self.lena_gray)
         diff=h1^h2 #XOR
         diff=math2.digsum(diff,2) #number of different pixels
-        assert_true(diff<2)
+        assert_equal(h1,h2,msg='difference is %d pixels'%diff)
+        
+    def test___getitem__(self):
+        pixel=self.lena_gray[256,256]
+        assert_equal(pixel,100)
+        pixel=self.lena[256,256]
+        assert_equal(pixel,(180,65,72))
+        face=self.lena[246:374,225:353]
+        face.save(path+"/results/image.lena.face.png")
+        face=face.grayscale()
+        eye=face[3:35,-35:-3] # negative indexes are handy in some cases
+        c=face.correlation(eye)
+        c.save(path+"/results/image.correlation.png")
 
     def test___lt__(self):
         # image = Image(data)
@@ -41,9 +63,7 @@ class TestImage:
         raise SkipTest 
 
     def test_mode(self):
-        # image = Image(data)
-        # assert_equal(expected, image.mode())
-        raise SkipTest 
+        pass #useless ? 
 
     def test_open(self):
         pass #tested above
@@ -53,73 +73,77 @@ class TestImage:
         # split the image into individual bands
         source = self.lena.split()
         
-        R, G, B = 0, 1, 2
-        
-        # select regions where red is less than 100
-        mask = source[R].point(lambda i: 0 if i < 100 else 255)
-        mask.save(path+'/results/lena_R100.png')
-        
-        # process the green band
-        out = source[G].point(lambda i: i * 0.7)
-        
-        # paste the processed band back, but only where red was < 100
-        source[R].paste(out, None, mask)
-        
-        # build a new multiband image
-        res=PILImage.merge(self.lena.mode, source)
-        res
+    def test_html(self):
+        h=self.lena.html()
+        assert_true(h)
 
+    def test_average_hash(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.average_hash(hash_size))
+        raise SkipTest # TODO: implement your test here
 
-    def test_thumbnail(self):
-        thumb=self.lena.thumbnail((8,8))
-        assert_equal(thumb.size,(8,8))
-        assert_equal(self.lena.size,(512,512))
+    def test_base64(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.base64(fmt))
+        raise SkipTest # TODO: implement your test here
 
-class TestNormalizeArray(unittest.TestCase):
-    def test_normalize_array(self):
-        raise SkipTest 
+    def test_dist(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.dist(other, hash_size))
+        raise SkipTest # TODO: implement your test here
 
-class TestPil2array(unittest.TestCase):
-    def test_pil2array(self):
-        raise SkipTest 
+    def test_grayscale(self):
+        pass
 
-class TestArray2pil(unittest.TestCase):
-    def test_array2pil(self):
-        raise SkipTest 
+    def test_invert(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.invert())
+        raise SkipTest # TODO: implement your test here
 
-class TestCorrelation(unittest.TestCase):
+    def test_ndarray(self):
+        # image = Image(data, **kwargs)
+        # assert_equal(expected, image.ndarray())
+        raise SkipTest # TODO: implement your test here
+
+    def test_to_html(self):
+        pass
+    
+    def test_filter(self):
+        if not SKIMAGE:
+            raise SkipTest
+        from skimage.filters import *
+        for f in [sobel]:
+            assert_true(self.lena.filter(f))
+
+class TestCorrelation:
     def test_correlation(self):
-        raise SkipTest 
+        # assert_equal(expected, correlation(input, match))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaToColor(unittest.TestCase):
+class TestAlphaToColor:
     def test_alpha_to_color(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_to_color(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaComposite(unittest.TestCase):
+class TestAlphaComposite:
     def test_alpha_composite(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_composite(front, back))
+        raise SkipTest # TODO: implement your test here
 
-class TestAlphaCompositeWithColor(unittest.TestCase):
+class TestAlphaCompositeWithColor:
     def test_alpha_composite_with_color(self):
-        raise SkipTest 
+        # assert_equal(expected, alpha_composite_with_color(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestPurePilAlphaToColorV1(unittest.TestCase):
+class TestPurePilAlphaToColorV1:
     def test_pure_pil_alpha_to_color_v1(self):
-        raise SkipTest 
+        # assert_equal(expected, pure_pil_alpha_to_color_v1(image, color))
+        raise SkipTest # TODO: implement your test here
 
-class TestPurePilAlphaToColorV2(unittest.TestCase):
+class TestPurePilAlphaToColorV2:
     def test_pure_pil_alpha_to_color_v2(self):
-        raise SkipTest 
-
-class TestImg2base64:
-    def test_img2base64(self):
-        # assert_equal(expected, img2base64(img, fmt))
-        raise SkipTest
-
-class TestNormalize:
-    def test_normalize(self):
-        # assert_equal(expected, normalize(X, norm, axis, copy, positive))
-        raise SkipTest 
+        # assert_equal(expected, pure_pil_alpha_to_color_v2(image, color))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()

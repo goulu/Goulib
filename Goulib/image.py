@@ -2,40 +2,59 @@
 # coding: utf8
 """
 image processing and conversion
+:requires:
+* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
 """
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
-"""
-:requires:
-* `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
-"""
+import six
 
 from PIL import Image as PILImage
-from PIL import ImagePalette
+from PIL import ImagePalette, ImageOps
 
 import numpy as np
-import math
 
 from . import math2
 
 class Image(PILImage.Image):
-    def __init__(self, data=None):
+    def __init__(self, data=None, **kwargs):
         """
         :param data: can be either:
-        * None : creates an empty image
         * `PIL.Image` : makes a copy
         * string : path of image to load
+        * None : creates an empty image with kwargs parameters:
+        ** size : (y,x) pixel size tuple
+        ** mode : 'L' (gray) by default
+        ** color: to fill None=black by default
         """
         if data is None:
-            self._initfrom(PILImage.Image())
+            if kwargs:
+                kwargs.setdefault('mode','L')
+                im=PILImage.new(**kwargs)
+            else:
+                im=PILImage.Image()
+            self._initfrom(im)
         elif isinstance(data,PILImage.Image):
             self._initfrom(data)
-        else: #assume a path
-            self.open(data)
-
+        elif isinstance(data,six.string_types): #assume a path
+            self.open(data,**kwargs)
+        else: #assume a np.ndarray
+            # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
+            data=np.asarray(data, dtype=np.float32) #force ints to float
+            if data.min()<0:
+                data -=data.min()
+            if data.max()>1:
+                data *= 1./data.max() # normalize between 0-1
+            colormap=kwargs.pop('colormap',None)
+            if colormap:
+                data=colormap(data)
+            self._initfrom(PILImage.fromarray(np.uint8(data*255)))
+            return
         
     def open(self,path):
         self.path=path
@@ -77,166 +96,146 @@ class Image(PILImage.Image):
         new.size=im.size
         return new
     
-    def thumbnail(self, size, resample=PILImage.BICUBIC):
-        im=Image(self)
-        super(Image,im).thumbnail(size,resample)
-        return im
-        
+    # representations, data extraction and conversions
+    
     def __repr__(self):
         path=getattr(self,'path',None)
         return "<%s path=%s mode=%s size=%dx%d>" % (
             self.__class__.__name__, path,
             self.mode, self.size[0], self.size[1],
             )
+    
         
-    def __hash__(self):
-        return self.average_hash()
+    def base64(self, fmt='PNG'):
+        """
+        :param fmt: string file format ('PNG', 'JPEG', ... 
+                    see http://pillow.readthedocs.org/en/3.0.x/handbook/image-file-formats.html )
+        :result: string base64 encoded image content in specified format
+        """
+        # http://stackoverflow.com/questions/31826335/how-to-convert-pil-image-image-object-to-base64-string
+
+        import base64
+        import cStringIO
+        
+        buffer = cStringIO.StringIO()
+        self.save(buffer, format=fmt)
+        return base64.b64encode(buffer.getvalue())
+        
+    def to_html(self):
+        return r'<img src="data:image/png;base64,{0}">'.format(self.base64('PNG'))
+    
+    def html(self):
+        from IPython.display import HTML
+        return HTML(self.to_html())
+    
+    def _repr_html_(self):
+        #this returns exactly the same as _repr_png_, but is Table compatible
+        return self.to_html()
+    
+    def ndarray(self):
+        """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
+        
+        :return: `numpy.ndarray` of image
+        """
+        data = list(self.getdata())
+        w,h = self.size
+        A = np.zeros((w*h), 'd')
+        i=0
+        for val in data:
+            A[i] = val
+            i=i+1
+        A=A.reshape(w,h)
+        return A
+    
+    def __getitem__(self,slice):
+        try:
+            return self.getpixel(slice)
+        except TypeError:
+            pass
+        left, upper, right, lower=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
+        # calculate box module size so we handle negative coords like in slices
+        w,h = self.size
+        upper,lower=upper%h,lower%h
+        left,right=left%w,right%w
+        im=self.crop((left, upper, right, lower))
+        im.load()
+        return Image(im)
+    
+    # hash and distance
     
     def average_hash(self, hash_size=8):
         """
         Average Hash computation
         Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
-        @image must be a PIL instance.
+        
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: list of hash_size*hash_size bool (=bits)
         """
         # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
-        self.load()
         image = self.convert("L").resize((hash_size, hash_size), PILImage.ANTIALIAS)
         pixels = np.array(image.getdata()).reshape((1,hash_size*hash_size))[0]
         avg = pixels.mean()
-        diff = pixels > avg
+        diff=pixels > avg
         return math2.num_from_digits(diff,2)
+    
+    def __hash__(self):
+        return self.average_hash(8)
+    
+    def dist(self,other, hash_size=8):
+        """ distance between images
+        
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: float 
+            =0 if images are equal or very similar (same average_hash)
+            =1 if images are completely decorrelated (half of the hash bits are the same by luck)
+            =2 if images are inverted
+        """
+        h1=self.average_hash(hash_size)
+        h2=other.average_hash(hash_size)
+        # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
+        diff=bin(h1^h2).count("1") # ^is XOR
+        diff=2*diff/(hash_size*hash_size)
+        return diff
     
     def __lt__(self, other):
         return math2.mul(self.size) < math2.mul(other.size)
         
-
-def normalize(X, norm='max', axis=0, copy=True, positive=True):
-    """Scale input vectors individually to unit norm (vector length).
     
-    borrowed from http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html
-    (support for sparse matrices removed, default values changed, positive added)
+    def invert(self):
+        # http://stackoverflow.com/questions/2498875/how-to-invert-colors-of-image-with-pil-python-imaging
+        return ImageOps.invert(self)
     
-    Parameters
-    ----------
-    X : array or scipy.sparse matrix with shape [n_samples, n_features]
-        The data to normalize, element by element.
-    norm : 'l1', 'l2', or 'max', optional ('max' by default)
-        The norm to use to normalize each non zero sample (or each non-zero
-        feature if axis is 0).
-    axis : 0 or 1, optional (0 by default)
-        axis used to normalize the data along. If 1, independently normalize
-        each sample, otherwise (if 0) normalize each feature.
-    copy : boolean, optional, default True
-        set to False to perform inplace
-    """
+    __neg__=__inv__=invert #aliases
+    
+    def grayscale(self):
+        return self.convert("L")
+    
+    def filter(self,f):
+        try: # scikit-image filter or similar ?
+            return Image(f(self))
+        except ValueError: #maybe because image has channels ? filter each one
+            split=self.split()
+            split=[Image(f(channel)) for channel in split]
+            return PILImage.merge(self.mode, split)
+        except:
+            pass
         
-    if norm == 'l1':
-        norms = np.abs(X).sum(axis=axis)
-    elif norm == 'l2':
-        norms = np.einsum('ij,ij->i', X, X) # http://ajcr.net/Basic-guide-to-einsum/
-    elif norm == 'max':
-        norms = np.max(X, axis=axis)
-    else:
-        raise ValueError("'%s' is not a supported norm" % norm)
-            
-        norms = _handle_zeros_in_scale(norms)
-        X /= norms[:, np.newaxis]
-
-    if axis == 0:
-        X = X.T
-
-    return X
-
-def pil2array(im):
-    ''' Convert a PIL image to a numpy ndarray '''
-    data = list(im.getdata())
-    w,h = im.size
-    A = np.zeros((w*h), 'd')
-    i=0
-    for val in data:
-        A[i] = val
-        i=i+1
-    A=A.reshape(w,h)
-    return A
-
-def array2pil(A,mode='L'):
-    ''' Convert a numpy ndarray to a PIL image.
-        Only grayscale images (PIL mode 'L') are supported.
-    '''
-    w,h = A.shape
-    # make sure the array only contains values from 0-255
-    # if not... fix them.
-    if A.max() > 255 or A.min() < 0: 
-        A = normalize(A) # normalize between 0-1
-        A = A * 255 # shift values to range 0-255
-    if A.min() >= 0.0 and A.max() <= 1.0: # values are already between 0-1
-        A = A * 255 # shift values to range 0-255
-    A = A.flatten()
-    data = []
-    for val in A:
-        if val is np.nan: val = 0 
-        data.append(int(val)) # make sure they're all int's
-    im = Image.new(mode, (w,h))
-    im.putdata(data)
-    return im
-
-def correlation(input, match):
-    """Compute the correlation between two, single-channel, grayscale input images.
-    The second image must be smaller than the first.
-    :param input: a PIL Image 
-    :para, match: the PIL image we're looking for in input
-    """
-    input = pil2array(input)
-    match = pil2array(match)
+        return super(Image,self).filter(f)
     
-    assert match.shape < input.shape, "Match Template must be Smaller than the input"
-    c = np.zeros(input.shape) # store the coefficients...
-    mfmean = match.mean()
-    iw, ih = input.shape # get input image width and height
-    mw, mh = match.shape # get match image width and height
+    def correlation(self, other):
+        """Compute the correlation between two, single-channel, grayscale input images.
+        The second image must be smaller than the first.
+        :param other: the Image we're looking for
+        """
+        from scipy import signal
+        input = self.ndarray()
+        match = other.ndarray()
+        c=signal.correlate2d(input,match)
+        return Image(c)
     
-
-    for i in range(0, iw):
-        for j in range(0, ih):
-
-            # find the left, right, top 
-            # and bottom of the sub-image
-            if i-mw/2 <= 0:
-                left = 0
-            elif iw - i < mw:
-                left = iw - mw
-            else:
-                left = i
-                
-            right = left + mw 
-
-            if j - mh/2 <= 0:
-                top = 0
-            elif ih - j < mh:
-                top = ih - mh
-            else:
-                top = j
-
-            bottom = top + mh
-
-            # take a slice of the input image as a sub image
-            sub = input[left:right, top:bottom]
-            assert sub.shape == match.shape, "SubImages must be same size!"
-            localmean = sub.mean()
-            temp = (sub - localmean) * (match - mfmean)
-            s1 = temp.sum()
-            temp = (sub - localmean) * (sub - localmean)
-            s2 = temp.sum()
-            temp = (match - mfmean) * (match - mfmean)
-            s3 = temp.sum() 
-            denom = s2*s3
-            if denom == 0: 
-                temp = 0
-            else: 
-                temp = s1 / math.sqrt(denom)
-            
-            c[i,j] = temp
-    return array2pil(c)
+    def shift(self,dy,dx):
+        from scipy.ndimage.interpolation import shift as shift2
+        return Image(shift2(self,(dy,dx)))
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 
@@ -351,18 +350,19 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
     return background
 
-def img2base64(img, fmt='PNG'):
+def disk(radius,antialias=PILImage.BICUBIC):
+    from skimage.morphology import disk as disk2
+    return Image(disk2(radius))
+
+def fspecial(name,**kwargs):
+    """mimics the Matlab image toolbox fspecial function
+    http://www.mathworks.com/help/images/ref/fspecial.html?refresh=true
     """
-    :param img: :class:`PIL:Image`
-    :result: string base64 encoded image content in specified format
-    :see: http://stackoverflow.com/questions/14348442/django-how-do-i-display-a-pil-image-object-in-a-template
-    """
-    import io, base64
-    output = io.StringIO()
-    img.save(output, fmt)
-    output.seek(0)
-    output_s = output.read()
-    return base64.b64encode(output_s)
+    if name=='disk':
+        return disk(kwargs.get('radius',5)) # 5 is default in Matlab
+    raise NotImplemented
+    
+
 
 
 
