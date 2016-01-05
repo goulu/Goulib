@@ -78,7 +78,7 @@ def render(plotables, fmt='svg', **kwargs):
     #extract optional arguments used for rasterization
     printargs,kwargs=itertools2.dictsplit(
         kwargs,
-        ['dpi','transparent','facecolor','background']
+        ['dpi','transparent','facecolor','background','figsize']
     )
     
     ylim=kwargs.pop('ylim',None)

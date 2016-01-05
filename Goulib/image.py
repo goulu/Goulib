@@ -28,7 +28,7 @@ class Image(PILImage.Image):
         * `PIL.Image` : makes a copy
         * string : path of image to load
         * None : creates an empty image with kwargs parameters:
-        ** size : (x,y) pixel size tuple
+        ** size : (y,x) pixel size tuple
         ** mode : 'L' (gray) by default
         ** color: to fill None=black by default
         """

@@ -38,7 +38,7 @@ class Row():
     def isfunc(self,col):
         return isfunction(self.row[col])
     
-    def _repr_html_(self,col,convertToUnits=''):
+    def _repr_html_(self,col,convertToUnits='',withoutUnits=False):
         if self.isfunc(col):
             c = self.row[col]
             style = 'style="background-color: #f1f1c1" title="'+ getsource(c)+'"'
@@ -47,11 +47,12 @@ class Row():
             
         try:
             disp = self[col] if convertToUnits=='' else self[col].to(convertToUnits)
-            return '<td align="right" '+style+'>{0.magnitude}</td><td>{0.units}</td>'.format(disp)
+            if withoutUnits:
+                return '<td colspan=2 align="right" '+style+'>{0.magnitude}</td>'.format(disp)
+            else: 
+                return '<td align="right" '+style+'>{0.magnitude}</td><td>{0.units}</td>'.format(disp)
         except:
             return '<td colspan=2>'+str(self[col])+'</td>'            
-        
-
      
 class Table():
     """
@@ -111,7 +112,7 @@ class Table():
         html += '</table>'
         return html
         
-        
+         
     def appendCol(self,colname,values):
         """ appends a column at the right of the table
             :parameter values: is a dict of {<row>:V(...),...}
@@ -133,7 +134,7 @@ class View():
         self.rowUnits = rowUnits
 
     def _repr_html_(self):
-        html = '<table border="1"><caption>'+self.name+'</caption><tr><th></th>'
+        html = '<table border="1"><caption> '+self.name+'</caption><tr><th></th>'
         for col in self.cols:
             html += '<th colspan="2">'+col+'</th>'
         html += '</tr><tr>'
@@ -146,7 +147,7 @@ class View():
                 html += '<td>'+row+'</td>'
             r = self.table.rows[row]    
             for col in self.cols:
-                html += r._repr_html_(col,convertToUnits=units)
+                html += r._repr_html_(col,convertToUnits=units,withoutUnits=row in self.rowUnits)
             html += '</tr>'
         html += '</table>'
         return html        

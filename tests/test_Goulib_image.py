@@ -111,7 +111,7 @@ class TestImage:
     def test_filter(self):
         if not SKIMAGE:
             raise SkipTest
-        from skimage.filters import sobel
+        from skimage.filters import *
         for f in [sobel]:
             assert_true(self.lena.filter(f))
 

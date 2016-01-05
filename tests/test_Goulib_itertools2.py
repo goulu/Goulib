@@ -80,7 +80,7 @@ class TestReshape:
         data=[1,[2,[3,4],[5,6,7]]] #data can have any shape...
         assert_equal(reshape(data,(2,3)),[[1,2,3],[4,5,6]])
         assert_equal(reshape(data,(3,2)),[[1,2],[3,4],[5,6]])
-        assert_equal(reshape(data,(None,3)),[[1,2,3],[4,5,6],[7]])
+        assert_equal(reshape(data,(3,3)),[[1,2,3],[4,5,6],[8]])
 
 class TestCompose:
     def test_compose(self):

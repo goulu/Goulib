@@ -12,7 +12,7 @@ __license__ = "LGPL"
 import  logging
 
 from . import plot, polynomial, itertools2, math2
-from Goulib.units import V
+from Goulib.units import V,Table, View
 
 from numpy import allclose
 
@@ -230,7 +230,7 @@ class Actuator():
       
     """
     
-    def __init__(self,stateMachine,vmax,acc,name='',pos=0):
+    def __init__(self,stateMachine,vmax,acc,name='',pos=0,distPerTurn=V(1,'mm'),mass=V(1,'kg'),friction=V(0,'N')):
         """
         :params simulation: a simulation. the only requirement for the simulation is to have a .time as V(time,'s') and a .displayMove boolean
         :params acc: the default acceleration of the actuator
@@ -238,12 +238,17 @@ class Actuator():
         :params name: name of the actuator
         :params pos: the initial position
         """
-        self.Segs = Segments([])
+        self.segs = Segments([])
         self.name = name
         self.acc = acc if type(acc) is V else V(acc,'m/s^2')
         self.vmax = vmax if type(vmax) is V else V(vmax,'m/s')
         self.pos = pos if type(pos) is V else V(pos,'m')
         self.stateMachine = stateMachine
+        self.distPerTurn = distPerTurn
+        self.mass = mass
+        self._maxAbsAcc = 0
+        self._maxAbsSpeed = 0
+        self.friction = friction
         
     def move(self,newpos,relative=False,time = None, vmax=None,acc=None):
         """ moves the actuator to newpos
@@ -266,25 +271,39 @@ class Actuator():
             if self.stateMachine.displayMove:
                 from IPython.display import display,HTML
                 display(HTML('<h4>{0}</h4> already in place @ {1}[m]'.format(self.name,newpos)))            
-            return self.Segs
+            return self.segs
         elif newpos > pos:
             acc = self.acc('m/s^2') if acc is None else acc('m/s^2')
             vmax = self.vmax('m/s') if vmax is None else vmax('m/s')
+            self._maxAbsAcc = max(acc,self._maxAbsAcc)
         else:
             acc = - self.acc('m/s^2') if acc is None else -acc('m/s^2')
             vmax= - self.vmax('m/s') if vmax is None else -vmax('m/s')
-            
-        logging.debug(self.stateMachine.time)
+            self._maxAbsAcc = max(-acc,self._maxAbsAcc)            
+
         m = SegmentsTrapezoidalSpeed(time, pos, newpos,  a=acc, vmax=vmax)
+        self._maxAbsSpeed = max(self._maxAbsSpeed,abs(m.segments[0].endSpeed()))
         self.lastmove = m
         self.pos = V(newpos,'m')
-        self.Segs.add(m)        
+        self.segs.add(m)        
         self.stateMachine.time = max(V(m.endTime(),'s'),self.stateMachine.time)
         if self.stateMachine.displayMove:
             from IPython.display import display,HTML
             display(HTML('<h4>{0}</h4>'.format(self.name)))
             display(m.svg())
         return m
+    
+    def maxAbsAcc(self):
+        return V(self._maxAbsAcc,'m/s^2')
+    
+    def maxAbsSpeed(self):
+        return V(self._maxAbsSpeed,'m/s')
+    
+    def maxTork(self):
+        return (((self.mass*self.maxAbsAcc())+self.friction)*self.distPerTurn/6.28).to('N m')
+    
+    def maxRpm(self):
+        return self.maxAbsSpeed()/self.distPerTurn
     
     def displayLast(self):
         from IPython.display import display
@@ -297,9 +316,87 @@ class Actuator():
             fromTime = fromTime('s')
         if toTime is not None:
             toTime =toTime('s')
-        self.Segs.ticks = self.stateMachine.log
-        display(self.Segs.svg(xlim=(fromTime,toTime)))
+        self.segs.ticks = self.stateMachine.log
+        display(self.segs.svg(xlim=(fromTime,toTime)))
+        table = Table(self.name,[],self.varNames())
+        table.appendCol('values',self.varDict())
+        v = View(table,rowUnits=self.varRowUnits())
+        display(v)
     
+    def varNames(self):
+        """ returns a list of internal variables. intended to be used in the Table.__init__ """
+        return [self.name+'.mass',
+                self.name+'.friction',
+                self.name+'.dist/turn', 
+                self.name+'.maxSpeed',
+                self.name+'.maxAcc',               
+                self.name+'.maxForce',
+                self.name+'.maxRpm',
+                self.name+'.maxTork',
+                ]
+    
+    def varRowUnits(self):
+        return {self.name+'.mass'     : 'kg',
+                self.name+'.friction' : 'N',
+                self.name+'.dist/turn': 'mm',
+                self.name+'.maxSpeed' : 'm/s', 
+                self.name+'.maxAcc'   : 'm/s^2',               
+                self.name+'.maxForce' : 'N',
+                self.name+'.maxRpm'   : 'rpm',
+                self.name+'.maxTork'  : 'N m',
+                }
+            
+    def varDict(self):
+        return {self.name+'.mass'    : self.mass,
+                self.name+'.friction': self.friction,
+                self.name+'.dist/turn': self.distPerTurn,
+                self.name+'.maxSpeed' : self.maxAbsSpeed(),
+                self.name+'.maxAcc'   : self.maxAbsAcc(),               
+                self.name+'.maxForce' : self.mass*self.maxAbsAcc()+self.friction,
+                self.name+'.maxRpm'  : self.maxRpm(),
+                self.name+'.maxTork' : self.maxTork(),
+                }
+    
+class TimeDiagram(plot.Plot):        
+    def __init__(self,actuators,fromTime=None,toTime=None):
+        self.actuators = actuators
+        self.t0 = min(a.segs.startTime() for a in actuators) if fromTime is None else fromTime('s')
+        self.t1 = max(a.segs.endTime() for a in actuators) if toTime is None else toTime('s')
+        
+        
+    def __repr__(self):
+        return 'Time Diagram from {0:f}[s] to {1:f}[s]'.format(self.t0,self.t1)
+        
+    def _plot(self, ax, **kwargs):
+        """
+        plots a list of actuators
+        """
+        linewidth = kwargs.pop('linewidth',0)
+        (t0,t1) = kwargs.setdefault('xlim',(self.t0,self.t1))
+
+        step=(t1-t0)/500.
+        x=[ t for t in itertools2.arange(self.t0,self.t1,step)  ]
+        for a in self.actuators:
+            y = [a.segs(t)[0] for t in x]
+            ax.plot(x, y, label=a.name, linewidth=linewidth)
+        
+        
+        from matplotlib.font_manager import FontProperties
+
+        fontP = FontProperties()
+        fontP.set_size('xx-small')
+        #legend([plot1], "title", prop = fontP)
+        
+        
+        # Shrink current axis by 20%
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        
+        # Put a legend to the right of the current axis
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),prop = fontP)
+        return ax
+        
+        
 def _pva(val):
     try: p=val[0]
     except: p=val
