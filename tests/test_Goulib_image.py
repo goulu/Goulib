@@ -10,12 +10,6 @@ from Goulib.image import *
 import os
 path=os.path.dirname(os.path.abspath(__file__))
 
-try: # http://scikit-image.org/ is optional
-    import skimage
-    SKIMAGE=True
-except:
-    SKIMAGE=False
-
 class TestImage:
     @classmethod
     def setup_class(self):
@@ -107,7 +101,7 @@ class TestImage:
         pass
     
     def test_filter(self):
-        if not SKIMAGE:
+        if not SKIMAGE: #optional requirement
             raise SkipTest
         from skimage.filters import sobel
         for f in [sobel]:

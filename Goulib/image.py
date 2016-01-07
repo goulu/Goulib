@@ -13,7 +13,13 @@ __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
 from PIL import Image as PILImage
-from PIL import ImagePalette, ImageOps
+from PIL import ImagePalette, ImageOps, ImageDraw
+
+try: # http://scikit-image.org/ is optional
+    import skimage
+    SKIMAGE=True
+except:
+    SKIMAGE=False
 
 import numpy as np
 
@@ -402,8 +408,11 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     return background
 
 def disk(radius,antialias=PILImage.BICUBIC):
-    from skimage.morphology import disk as disk2
-    return Image(disk2(radius))
+    size = (2*radius, 2*radius)
+    im = Image(size=size)
+    ImageDraw.Draw(im).ellipse((0, 0) + size, fill=255)
+    return im
+    #TODO: http://stackoverflow.com/questions/890051/how-do-i-generate-circular-thumbnails-with-pil
 
 def fspecial(name,**kwargs):
     """mimics the Matlab image toolbox fspecial function
