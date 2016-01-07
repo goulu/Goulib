@@ -549,16 +549,23 @@ def _intersect_circle_circle(c1,c2):
     
     v=c2.c-c1.c #vector between centers
     
-    d = abs(v)
-    if d>(c1.r+c2.r): return None
+    d = v.mag()
+    if d>(c1.r+c2.r): return None #disjoint
     
-    a = (c1.r*c1.r - c2.r*c2.r + d*d)/(2*d)
-    h = sqrt(c1.r*c1.r - a*a)
+    #http://mathworld.wolfram.com/Circle-CircleIntersection.html
+    x = (d*d+ c1.r*c1.r - c2.r*c2.r)/(2*d)
+    try:
+        y = sqrt(c1.r*c1.r - x*x)
+    except: # one circle is inside the other. 
+        return c1 if c1.r<=c2.r else c2
     
     v.normalize()
-    p=c1.c+a*v
+    p=c1.c+x*v
+    if isclose(y,0):
+        return p
+    
     v=v.cross()
-    return [p+h*v,p-h*v]
+    return [p+y*v,p-y*v]
 
 
 def _connect_point2_line2(P, L):
@@ -566,7 +573,7 @@ def _connect_point2_line2(P, L):
     d = L.v.mag2()
     if d==0: #L is degenerate to a point
         return Segment2(P,L.p)
-    u=float(L.v.dot(P-L.p))/d
+    u=(L.v.dot(P-L.p))/d
     if not L._u_in(u):
         u = sat(u,0,1)
     return Segment2(P,L.point(u))

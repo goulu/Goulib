@@ -520,6 +520,11 @@ class TestCircle:
     @classmethod
     def setup_class(self):
         self.c1=Circle(Point2(0,0),1)
+        self.c2=Circle((1,0),1) # intersects c1
+        self.c3=Circle((3,0),1) # tangent to c2, disjoint to c1
+
+    def test___init__(self):
+        pass #tested above
 
     def test_point(self):
         assert_equal(self.c1.point(0),(1,0))
@@ -528,28 +533,37 @@ class TestCircle:
         assert_equal(self.c1.tangent(0),(0,1))
 
     def test___copy__(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.__copy__())
-        raise SkipTest
-
-    def test___init__(self):
-        # circle = Circle(center, radius)
         raise SkipTest
 
     def test___repr__(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.__repr__())
         raise SkipTest
+    
+    def test_intersect(self):
+        res=self.c1.intersect(self.c2)
+        assert_true(isinstance(res,list))
+        assert_equal(len(res),2)
+        assert_true(isinstance(res[0],Point2))
+        assert_true(isinstance(res[0],Point2))
+        
+        res=self.c1.intersect(self.c3)
+        assert_equal(res,None)
+        
+        res=self.c2.intersect(self.c3)
+        assert_true(isinstance(res,Point2))
+        
+        assert_equal(self.c1.intersect(self.c1),self.c1) #
+        
+        large=Circle(self.c1.c,1.1*self.c1.r)
+        assert_equal(large.intersect(self.c1),self.c1)
 
     def test_connect(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.connect(other))
         raise SkipTest
 
-    def test_intersect(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.intersect(other))
-        raise SkipTest
+    
 
     def test___abs__(self):
         # circle = Circle(center, radius)
