@@ -231,6 +231,14 @@ class Image(PILImage.Image):
         c=signal.correlate2d(input,match)
         return Image(c)
     
+    def scale(self,s):
+        try:
+            s[1]
+        except:
+            s=[s,s]
+        w,h=self.size
+        return self.resize((int(w*s[0]+0.5),int(h*s[1]+0.5)))
+    
     def shift(self,dx,dy):
         from scipy.ndimage.interpolation import shift as shift2
         try:
@@ -256,7 +264,7 @@ class Image(PILImage.Image):
         elif oy<0:
             oy=size[1]-h+oy
         if math2.is_integer(ox) and math2.is_integer(oy):
-            im.paste(self, (ox,oy,ox+w,oy+h))
+            im.paste(self, map(math2.rint,(ox,oy,ox+w,oy+h)))
         elif ox>=0 and oy>=0:
             im.paste(self, (0,0,w,h))
             im=im.shift(ox,oy)
@@ -264,6 +272,21 @@ class Image(PILImage.Image):
             raise NotImplemented #TODO; something for negative offsets...
         return im
     
+    def add(self,other,px=0,py=0,alpha=1):
+        """ simply adds other image at px,py (subbixel) coordinates
+        :warning: result is normalized in case of overflow
+        """
+        assert px>=0 and py>=0
+        im1,im2=self,other
+        size=(max(im1.size[0],int(im2.size[0]+px+0.999)),
+              max(im1.size[1],int(im2.size[1]+py+0.999)))
+        if not im1.mode: #empty image
+            im1.mode=im2.mode            
+        im1=im1.expand(size,0,0)
+        im2=im2.expand(size,px,py)
+        d1=np.asarray(im1)/255
+        d2=np.asarray(im2)*alpha/255
+        return Image(d1+d2)
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 
