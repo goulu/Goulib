@@ -332,6 +332,11 @@ class Entity(object):
         except:
             pass
         
+        try:
+            kwargs.setdefault('fill',self.fill)
+        except:
+            pass
+        
         if isinstance(self,Segment2):
             path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
             return [patches.PathPatch(path, **kwargs)]
@@ -343,16 +348,7 @@ class Entity(object):
                 theta1,theta2=theta2,theta1
             d=self.r*2
             return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
-
-        #entities below may be filled, so let's handle the color first
-        if 'color' in kwargs: # color attribute refers to edgecolor for coherency
-            kwargs.setdefault('edgecolor',kwargs.pop('color'))
-        if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
-            kwargs.setdefault('fill',False)
-            return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
-        if isinstance(self,Circle): #must be after Arc2 and Ellipse
-            kwargs.setdefault('fill',False)
-            return [patches.Circle(self.c.xy,self.r,**kwargs)]
+        
         if isinstance(self,Point2):
             try:
                 ms=self.width
@@ -366,6 +362,21 @@ class Entity(object):
             kwargs.setdefault('fill',False)
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
+
+        #entities below may be filled, so let's handle the color first
+        color=kwargs.pop('color')
+        kwargs.setdefault('edgecolor',color)
+        kwargs.setdefault('fill',False)
+        if type(kwargs['fill']) is not bool: #assume it's the fill color
+            kwargs.setdefault('facecolor',kwargs['fill'])
+            kwargs['fill']=True
+        kwargs.setdefault('facecolor',color)
+            
+        if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
+            return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
+        if isinstance(self,Circle): #must be after Arc2 and Ellipse
+            return [patches.Circle(self.c.xy,self.r,**kwargs)]
+
         raise NotImplementedError
 
     @staticmethod
@@ -1059,7 +1070,7 @@ class Text(Entity):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
         #http://matplotlib.org/api/text_api.html?highlight=text#module-matplotlib.text
 
-                #entities below may be filled, so let's handle the color first
+        #entities below may be filled, so let's handle the color first
         if 'color' in kwargs: # color attribute refers to edgecolor for coherency
             kwargs.setdefault('edgecolor',kwargs.pop('color'))
             kwargs.setdefault('fill',False)
