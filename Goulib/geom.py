@@ -543,21 +543,22 @@ def _intersect_circle_circle(c1,c2):
     """Circle/Circle intersection
     :param c1: Line2 (or derived class)
     :param c2: Circle (or derived class)
-    :return: None, single Point2 or [Point2,Point2]
+    :return: None, single Point2, [Point2,Point2] or smallest Circle if inscribed
     """
     # http://stackoverflow.com/questions/3349125/circle-circle-intersection-points
     
     v=c2.c-c1.c #vector between centers
     
     d = v.mag()
-    if d>(c1.r+c2.r): return None #disjoint
+    if d>(c1.r+c2.r): #disjoint
+        return None 
+
+    if d<=abs(c1.r-c2.r): #one circle is inside the other. 
+        return c1 if c1.r<=c2.r else c2
     
     #http://mathworld.wolfram.com/Circle-CircleIntersection.html
     x = (d*d+ c1.r*c1.r - c2.r*c2.r)/(2*d)
-    try:
-        y = sqrt(c1.r*c1.r - x*x)
-    except: # one circle is inside the other. 
-        return c1 if c1.r<=c2.r else c2
+    y = sqrt(c1.r*c1.r - x*x)
     
     v.normalize()
     p=c1.c+x*v
