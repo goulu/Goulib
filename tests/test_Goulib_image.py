@@ -101,9 +101,7 @@ class TestImage:
         raise SkipTest # TODO: implement your test here
 
     def test_ndarray(self):
-        # image = Image(data, **kwargs)
-        # assert_equal(expected, image.ndarray())
-        raise SkipTest # TODO: implement your test here
+        pass
 
     def test_to_html(self):
         pass
@@ -120,6 +118,14 @@ class TestImage:
         im=self.lena.resize((size,size))
         im=im.expand((size+1,size+1),.5,.5) #can you see that half pixel border ?
         im.save(path+'/results/lena_expand_0.5 border.png')
+        
+    def test_add(self):
+        dot=disk(20)
+        im=Image()
+        for i in range(3):
+            for j in range(3):
+                im=im.add(dot,j*38.5,i*41.5,0.5)
+        im.save(path+'/results/image_add.png')
 
 class TestCorrelation:
     def test_correlation(self):
