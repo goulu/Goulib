@@ -270,7 +270,7 @@ class Image(PILImage.Image):
         elif oy<0:
             oy=size[1]-h+oy
         if math2.is_integer(ox) and math2.is_integer(oy):
-            im.paste(self, map(math2.rint,(ox,oy,ox+w,oy+h)))
+            im.paste(self, tuple(map(math2.rint,(ox,oy,ox+w,oy+h))))
         elif ox>=0 and oy>=0:
             im.paste(self, (0,0,w,h))
             im=im.shift(ox,oy)
