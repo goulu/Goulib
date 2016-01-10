@@ -250,9 +250,7 @@ class TestGroup:
 
         self.group=Group([r1,r2,c1,c2,s1,s2,s3])
 
-        self.dxf= Drawing(path+'/data/Homer_Simpson_by_CyberDrone.dxf')
-        self.blocks= self.dxf.block
-        assert_true('hand 1' in self.blocks)
+
         
     def test_distance(self):
         g2=Trans(scale=2, offset=(10,1), rotation=30)*self.group
@@ -271,9 +269,14 @@ class TestGroup:
         raise SkipTest 
 
     def test_from_dxf(self):
-        # group = Group()
-        # assert_equal(expected, group.from_dxf(dxf, layers, only, ignore, trans, flatten))
-        raise SkipTest 
+        try:
+            import dxfgrabber
+        except:
+            raise SkipTest # optional
+        
+        dxf= Drawing(path+'/data/Homer_Simpson_by_CyberDrone.dxf')
+        self.blocks= dxf.block
+        assert_true('hand 1' in self.blocks)
 
     def test_swap(self):
         # group = Group()
@@ -372,7 +375,10 @@ class TestChain:
 class TestDrawing:
     @classmethod
     def setup_class(self):
-        self.dxf= Drawing(path+'/data/drawing.dxf')
+        try:
+            self.dxf= Drawing(path+'/data/drawing.dxf')
+        except:
+            self.dxf=None
         self.svg= Drawing(path+'/data/drawing.svg')
         self.pdf= Drawing(path+'/data/drawing.pdf')
 
@@ -388,8 +394,9 @@ class TestDrawing:
 
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
+            if self.dxf:
+                self.dxf.save(path+'/results/drawing.dxf.%s'%ext)
             self.svg.save(path+'/results/drawing.svg.%s'%ext)
-            self.dxf.save(path+'/results/drawing.dxf.%s'%ext)
             self.pdf.save(path+'/results/drawing.pdf.%s'%ext)
 
     def test___init__(self):

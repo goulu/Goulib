@@ -4,3 +4,4 @@ matplotlib
 rtree
 pygraphviz
 scikit-image
+dxfgrabber

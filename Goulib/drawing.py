@@ -5,11 +5,13 @@
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 :requires:
-* `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
 * `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 * `svg.path <http://pypi.python.org/pypisvg.path/>`_ for svg input
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg and pdf output
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
+
+:optional:
+ * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
 """
 from __future__ import division #"true division" everywhere
 
@@ -19,7 +21,7 @@ __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.aut
 __license__ = "LGPL"
 
 from math import  radians, degrees, tan, atan
-import logging, operator
+import logging, time
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
@@ -85,6 +87,9 @@ class BBox(Box):
     
     @property
     def height(self): return self[1].size
+    
+    @property
+    def area(self): return self.height*self.width
     
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
@@ -425,13 +430,11 @@ class Entity(object):
 
         if patches:
             from matplotlib.collections import PatchCollection
-            plt.gca().add_collection(PatchCollection(patches,match_original=True))
+            fig.gca().add_collection(PatchCollection(patches,match_original=True))
 
         if artists:
             for e in artists:
-                plt.gca().add_artist(e)
-            plt.draw()
-
+                fig.gca().add_artist(e)
         return fig, p
 
     def render(self,format,**kwargs):
@@ -444,8 +447,7 @@ class Entity(object):
         
         fig,_=self.draw(**kwargs)
 
-        from io import BytesIO
-        output = BytesIO()
+        output = six.BytesIO()
         fig.savefig(
             output, 
             format=format, 
@@ -455,6 +457,11 @@ class Entity(object):
         res=output.getvalue()
         plt.close(fig)
         return res
+    
+    def show(self,**kwargs):
+        block=kwargs.pop('block',True)
+        fig,_=self.draw(**kwargs)
+        plt.show(fig, block=block)
 
     # for IPython notebooks
     def _repr_png_(self): return self.render('png',facecolor='white') #TODO: find why we need to specify white here
@@ -1230,7 +1237,11 @@ class Drawing(Group):
         :param options: passed to :class:`~dxfgrabber.drawing.Drawing`constructor
         :param kwargs: dict of optional parameters passed to :method:`Group.from_dxf`
         """
-        import dxfgrabber
+        try:
+            import dxfgrabber
+        except ImportError:
+            logging.error('dxfgrabber is required')
+            return
         try:
             self.dxf = dxfgrabber.readfile(filename,options)
         except Exception as e:
