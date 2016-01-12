@@ -11,7 +11,7 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
 
 :optional:
- * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
+* `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
 """
 from __future__ import division #"true division" everywhere
 
@@ -21,7 +21,7 @@ __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.aut
 __license__ = "LGPL"
 
 from math import  radians, degrees, tan, atan
-import logging, time
+import logging, base64
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
@@ -89,7 +89,7 @@ class BBox(Box):
     def height(self): return self[1].size
     
     @property
-    def area(self): return self.height*self.width
+    def area(self): return self.width*self.height
     
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
@@ -354,28 +354,28 @@ class Entity(object):
             d=self.r*2
             return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
         
+        
+        #entities below may be filled, so let's handle the color first
+        color=kwargs.pop('color')
+        kwargs.setdefault('edgecolor',color)
+        kwargs.setdefault('fill',isinstance(self,Point2))
+        if type(kwargs['fill']) is not bool: #assume it's the fill color
+            kwargs.setdefault('facecolor',kwargs['fill'])
+            kwargs['fill']=True
+        kwargs.setdefault('facecolor',color)
+        
         if isinstance(self,Point2):
             try:
                 ms=self.width
             except:
                 ms=0.01
             kwargs.setdefault('clip_on',False)
-            kwargs.setdefault('fill',True)
-            kwargs.setdefault('facecolor','red')
             return [patches.Circle(self.xy,ms,**kwargs)]
         if isinstance(self,Spline):
-            kwargs.setdefault('fill',False)
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
 
-        #entities below may be filled, so let's handle the color first
-        color=kwargs.pop('color')
-        kwargs.setdefault('edgecolor',color)
-        kwargs.setdefault('fill',False)
-        if type(kwargs['fill']) is not bool: #assume it's the fill color
-            kwargs.setdefault('facecolor',kwargs['fill'])
-            kwargs['fill']=True
-        kwargs.setdefault('facecolor',color)
+
             
         if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
             return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
@@ -430,11 +430,13 @@ class Entity(object):
 
         if patches:
             from matplotlib.collections import PatchCollection
-            fig.gca().add_collection(PatchCollection(patches,match_original=True))
+            plt.gca().add_collection(PatchCollection(patches,match_original=True))
 
         if artists:
             for e in artists:
-                fig.gca().add_artist(e)
+                plt.gca().add_artist(e)
+        plt.draw()
+
         return fig, p
 
     def render(self,format,**kwargs):
@@ -442,30 +444,36 @@ class Entity(object):
         :return: matplotlib figure as a byte stream in specified format
         """
         transparent=kwargs.pop('transparent',True)
-        facecolor=kwargs.pop('facecolor',None)
-        background=kwargs.pop('background',None)
+        facecolor=kwargs.pop('facecolor', kwargs.pop('background','white'))
         
-        fig,_=self.draw(**kwargs)
+        fig,_=self.draw(facecolor=facecolor, **kwargs)
 
-        output = six.BytesIO()
+        buffer = six.BytesIO()
         fig.savefig(
-            output, 
+            buffer, 
             format=format, 
             transparent=transparent,
-            facecolor=facecolor or background,
+            facecolor=fig.get_facecolor(),
         )
-        res=output.getvalue()
+        res=buffer.getvalue()
         plt.close(fig)
         return res
+        
+    def to_html(self):
+        buffer=self.render('png')
+        s=base64.b64encode(buffer)
+        return r'<img src="data:image/png;base64,{0}">'.format(s)
     
-    def show(self,**kwargs):
-        block=kwargs.pop('block',True)
-        fig,_=self.draw(**kwargs)
-        plt.show(fig, block=block)
-
+    def html(self):
+        from IPython.display import HTML
+        return HTML(self.to_html())
+    
     # for IPython notebooks
-    def _repr_png_(self): return self.render('png',facecolor='white') #TODO: find why we need to specify white here
-    def _repr_svg_(self): return self.render('svg',facecolor='white')
+    def _repr_html_(self):
+        #this returns exactly the same as _repr_png_, but is Table compatible
+        return self.to_html()
+    def _repr_png_(self): return self.render('png') 
+    def _repr_svg_(self): return self.render('svg')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Point2.__bases__ += (Entity,)
@@ -1239,11 +1247,10 @@ class Drawing(Group):
         """
         try:
             import dxfgrabber
-        except ImportError:
-            logging.error('dxfgrabber is required')
-            return
-        try:
             self.dxf = dxfgrabber.readfile(filename,options)
+        except ImportError:
+            logging.error('optional module dxfgrabber required')
+            return
         except Exception as e:
             logging.error('could not read %s : %s'%(filename,e))
             return
