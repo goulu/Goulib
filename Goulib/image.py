@@ -209,6 +209,25 @@ class Image(PILImage.Image):
         # http://stackoverflow.com/questions/2498875/how-to-invert-colors-of-image-with-pil-python-imaging
         return ImageOps.invert(self)
     
+    def draw(self,entity):
+        from . import drawing, geom
+        try: #iterable ?
+            for e in entity:
+                draw(e)
+            return
+        except:
+            pass
+        
+        if isinstance(entity,geom.Circle):
+            box=entity.bbox()
+            box=(box.xmin, box.ymin, box.xmax, box.ymax)
+            ImageDraw.Draw(self).ellipse(box, fill=255)
+        else:
+            raise NotImplemented 
+        return self
+            
+        
+    
     __neg__=__inv__=invert #aliases
     
     def grayscale(self):
