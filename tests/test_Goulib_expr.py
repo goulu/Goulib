@@ -26,6 +26,7 @@ class TestExpr:
         self.fb2=Expr('x>2')
         
         self.e1=Expr('3*x+2') #a very simple expression
+        self.e1=Expr(lambda x:3*x+2) #the same as lambda
         self.e2=Expr(self.fs)
         
         self.xy=Expr('x*y')

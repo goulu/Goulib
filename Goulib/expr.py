@@ -12,7 +12,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, logging, copy
+import six, logging, copy, collections
 
 from . import plot #sets matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
@@ -81,6 +81,11 @@ def eval(node,context={}):
             return eval(node.body,context)
     except Exception as e:
         raise TypeError(ast.dump(node,False,False))
+    
+def bytecode2ast(f):
+    """converts an executable function (bytecode) to an ast.AST"""
+    #inspired from https://github.com/ponyorm/pony/blob/orm/pony/orm/decompiling.py
+    #which does the same for SQL-like expressions
 
 class Expr(plot.Plot):
     """
@@ -90,14 +95,20 @@ class Expr(plot.Plot):
     """
     def __init__(self,f):
         """
-        :param f: function or operator, or Expr to copy construct
+        :param f: function or operator, Expr to copy construct, or formula string
         """
+        if isinstance(f, collections.Callable): #function or lambda
+            f=bytecode2ast(f)
+            
         if isinstance(f,Expr): #copy constructor
             self.body=f.body
+            return
         elif isinstance(f,ast.AST):
             self.body=f
-        else: #last chance
-            self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
+            return
+        el
+
+        self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
 
     def __call__(self,x=None,**kwargs):
         """evaluate the Expr at x OR compose self(x())"""
@@ -347,6 +358,7 @@ class LatexVisitor(TextVisitor):
         return l+operators[type(op)][3]+r
 
 
+    
 
 
 
