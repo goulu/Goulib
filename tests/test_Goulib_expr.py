@@ -26,14 +26,16 @@ class TestExpr:
         self.fb2=Expr('x>2')
         
         self.e1=Expr('3*x+2') #a very simple expression
-        self.e1=Expr(lambda x:3*x+2) #the same as lambda
         self.e2=Expr(self.fs)
         
         self.xy=Expr('x*y')
         
         
     def test___init__(self):
-        pass #teste in setup
+        e2=Expr(lambda x:3*x+2) # same as e1
+        def f(x):return 2+x*3
+        e3=Expr(f) # same as function
+        fs=Expr(sin)
     
     def test___call__(self):
         assert_equal(self.f1(),1) # constant function

@@ -12,7 +12,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, logging, copy, collections
+import six, logging, copy, collections, inspect, re
 
 from . import plot #sets matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
@@ -82,10 +82,25 @@ def eval(node,context={}):
     except Exception as e:
         raise TypeError(ast.dump(node,False,False))
     
-def bytecode2ast(f):
-    """converts an executable function (bytecode) to an ast.AST"""
-    #inspired from https://github.com/ponyorm/pony/blob/orm/pony/orm/decompiling.py
-    #which does the same for SQL-like expressions
+def get_function_source(f):
+    """returns cleaned code of a function or lambda
+    currently only supports:
+    - lambda x:formula_of_(x)
+    - def anything(x): return formula_of_(x)
+    """
+    f=inspect.getsource(f).rstrip('\n') #TODO: merge lines more subtly
+    g=re.search(r'lambda(.*):(.*)(\)|#)',f)
+    if g:
+        res=g.group(2)
+        bra,ket=res.count('('),res.count(')')
+        return res[:-1-(ket-bra)]
+    else:
+        g=re.search(r'def \w*\((.*)\):\s*return (.*)',f)
+        if g is None:
+            logging.error('not a valid function code %s'%f)
+        res=g.group(2)
+    return res
+
 
 class Expr(plot.Plot):
     """
@@ -97,8 +112,6 @@ class Expr(plot.Plot):
         """
         :param f: function or operator, Expr to copy construct, or formula string
         """
-        if isinstance(f, collections.Callable): #function or lambda
-            f=bytecode2ast(f)
             
         if isinstance(f,Expr): #copy constructor
             self.body=f.body
@@ -106,7 +119,10 @@ class Expr(plot.Plot):
         elif isinstance(f,ast.AST):
             self.body=f
             return
-        el
+        elif inspect.isfunction(f):
+            f=get_function_source(f)
+        elif isinstance(f, collections.Callable): # builtin function
+            f='%s(x)'%f.__name__
 
         self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
 
@@ -125,7 +141,10 @@ class Expr(plot.Plot):
         return ast.dump(self.body,False,False)
     
     def __str__(self):
-        return TextVisitor().visit(self.body)
+        try:
+            return TextVisitor().visit(self.body)
+        except:
+            return '?'
 
     def _latex(self):
         """:return: string LaTex formula"""
@@ -227,7 +246,7 @@ class Expr(plot.Plot):
     __div__=__truediv__
 
     def __invert__(self):
-        return self.apply('~x')
+        return self.apply(ast.Invert(),right)
 
     def __and__(self,right):
         return self.apply(ast.And(),right)
