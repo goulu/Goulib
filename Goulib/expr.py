@@ -26,12 +26,13 @@ import operator as op
 
 # supported operators with precedence and text + LaTeX repr
 # precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
-# 
+#
 operators = {
     ast.Or: (op.or_,300,' or ',' \\vee '),
     ast.And: (op.and_,400,' and ',' \\wedge '),
     ast.Not: (op.not_,500,'not ','\\neg'),
-    ast.Gt: (op.gt,600,' > ',' \\gtr '), 
+    ast.Eq: (op.eq,600,'=',' = '),
+    ast.Gt: (op.gt,600,' > ',' \\gtr '),
     ast.GtE:(op.ge,600,' >= ',' \\gec '),
     ast.Lt: (op.lt,600,' < ',' \\ltr '),
     ast.LtE: (op.le,600,' <= ',' \\leq '),
@@ -47,7 +48,7 @@ operators = {
     ast.UAdd: (op.pos,1300,'+','+'),
     ast.USub: (op.neg,1300,'-','-'),
     ast.Pow: (op.pow,1400,'**','^'),
-    
+
     # precedence of other types below
     ast.Name:(None,9999),
     ast.Num:(None,9999),
@@ -81,7 +82,7 @@ def eval(node,context={}):
             return eval(node.body,context)
     except Exception as e:
         raise TypeError(ast.dump(node,False,False))
-    
+
 def get_function_source(f):
     """returns cleaned code of a function or lambda
     currently only supports:
@@ -112,7 +113,7 @@ class Expr(plot.Plot):
         """
         :param f: function or operator, Expr to copy construct, or formula string
         """
-            
+
         if isinstance(f,Expr): #copy constructor
             self.body=f.body
             return
@@ -123,6 +124,11 @@ class Expr(plot.Plot):
             f=get_function_source(f)
         elif isinstance(f, collections.Callable): # builtin function
             f='%s(x)'%f.__name__
+        elif f in ('True','False'):
+            f=bool(f)
+        if type(f) is bool: 
+            self.body=ast.Num(f)
+            return
 
         self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
 
@@ -132,19 +138,16 @@ class Expr(plot.Plot):
             return self.applx(x)
         try: #is x iterable ?
             return [self(x) for x in x]
-        except: 
+        except:
             if x is not None:
                 kwargs['x']=x
             return eval(self.body,kwargs)
 
     def __repr__(self):
         return ast.dump(self.body,False,False)
-    
+
     def __str__(self):
-        try:
-            return TextVisitor().visit(self.body)
-        except:
-            return '?'
+        return TextVisitor().visit(self.body)
 
     def _latex(self):
         """:return: string LaTex formula"""
@@ -173,11 +176,13 @@ class Expr(plot.Plot):
 
     def apply(self,f,right=None):
         """function composition self o f = f(self(x))"""
-        
+
         if right is None:
-            if not isinstance(f,Expr):
-                f=Expr(f)
-            return f.applx(self)
+            if isinstance(f, ast.unaryop):
+                node=ast.UnaryOp(f,self.body)
+            else:
+                #if not isinstance(f,Expr): f=Expr(f) #not useful as applx does the reverse
+                return f.applx(self)
         else:
             if not isinstance(right,Expr):
                 right=Expr(right)
@@ -188,23 +193,23 @@ class Expr(plot.Plot):
         """function composition f o self = self(f(x))"""
         if isinstance(f,Expr):
             f=f.body
-            
+
         class Subst(ast.NodeTransformer):
             def visit_Name(self, node):
                 if node.id==var:
                     return f
                 else:
                     return node
-        
-        node=copy.deepcopy(self.body)    
+
+        node=copy.deepcopy(self.body)
         return Expr(Subst().visit(node))
-    
+
     @property
     def isconstant(self):
         try:
             self._y=eval(self.body)
             return True
-        except:
+        except Exception as e:
             return False
 
     def __eq__(self,other):
@@ -232,7 +237,7 @@ class Expr(plot.Plot):
         return self.apply(ast.Sub(),right)
 
     def __neg__(self):
-        return self.apply('-x')
+        return self.apply(ast.USub())
 
     def __mul__(self,right):
         return self.apply(ast.Mult(),right)
@@ -246,7 +251,7 @@ class Expr(plot.Plot):
     __div__=__truediv__
 
     def __invert__(self):
-        return self.apply(ast.Invert(),right)
+        return self.apply(ast.Invert())
 
     def __and__(self,right):
         return self.apply(ast.And(),right)
@@ -273,10 +278,10 @@ class TextVisitor(ast.NodeVisitor):
             return operators[type(n)][1]
         except KeyError:
             return operators[type(n.op)][1]
-        
+
     def prec_UnaryOp(self, n):
         return self.prec(n.op)
-    
+
     def prec_BinOp(self, n):
         return self.prec(n.op)
 
@@ -298,35 +303,35 @@ class TextVisitor(ast.NodeVisitor):
         # commute x*2 as 2*X for clarity
         if isinstance(op, ast.Mult):
             if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
-                return self._Bin(right,op,left) 
-        
+                return self._Bin(right,op,left)
+
         l,r = self.visit(left),self.visit(right)
-            
+
         #handle precedence (parenthesis) if needed
         if self.prec(op) > self.prec(left):
             l = '(%s)' % l
         if self.prec(op) > self.prec(right):
             r = '(%s)' % r
-            
+
         return l+operators[type(op)][2]+r
-    
+
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
-    
+
     def visit_Compare(self,n):
         #TODO: what to do with multiple ops/comparators ?
         return self._Bin(n.left,n.ops[0],n.comparators[0])
-    
+
     def visit_Num(self, n):
         return str(n.n)
 
     def generic_visit(self, n):
-        try: 
+        try:
             l=map(self.visit, n)
             return ''.join(l)
         except:
             pass
-            
+
         if isinstance(n, ast.AST):
             l=map(self.visit, [getattr(n, f) for f in n._fields])
             return ''.join(l)
@@ -352,10 +357,10 @@ class LatexVisitor(TextVisitor):
         # commute x*2 as 2*X for clarity
         if isinstance(op, ast.Mult):
             if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
-                return self._Bin(right,op,left) 
-        
+                return self._Bin(right,op,left)
+
         l,r = self.visit(left),self.visit(right)
-            
+
         #handle divisions and power first as precedence doesn't matter
         if isinstance(op, ast.Div):
             return r'\frac{%s}{%s}' % (l, r)
@@ -363,21 +368,21 @@ class LatexVisitor(TextVisitor):
             return r'\left\lfloor\frac{%s}{%s}\right\rfloor' % (l,r)
         if isinstance(op, ast.Pow):
             return r'%s^{%s}' % (l,r)
-            
+
         #handle precedence (parenthesis) if needed
         if self.prec(op) > self.prec(left):
             l = r'\left(%s\right)' % l
         if self.prec(op) > self.prec(right):
             r = r'\left(%s\right)' % r
-            
+
         if isinstance(op, ast.Mult):
             if isinstance(left, ast.Num) and not isinstance(right, ast.Num):
                 return l+r
-            
+
         return l+operators[type(op)][3]+r
 
 
-    
+
 
 
 

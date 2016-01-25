@@ -24,11 +24,15 @@ class TestExpr:
         
         self.fb1=Expr('x>1')
         self.fb2=Expr('x>2')
+        self.fb3=Expr('a==a') #any way to simplifiy it to constant True ?
         
         self.e1=Expr('3*x+2') #a very simple expression
         self.e2=Expr(self.fs)
         
         self.xy=Expr('x*y')
+        self.true=Expr(True) #make sure it works
+        self.false=Expr('False') #make sure it creates a bool
+        pass
         
         
     def test___init__(self):
@@ -138,8 +142,8 @@ class TestExpr:
         assert_true(Expr(1)==1)
 
     def test_save(self):
-        self.e2(self.e1).save(path+'/expr.png')
-        self.e2(self.e1).save(path+'/expr.svg')
+        self.e2(self.e1).save(path+'/results/expr.png')
+        self.e2(self.e1).save(path+'/results/expr.svg')
 
 if __name__ == "__main__":
     runmodule()
