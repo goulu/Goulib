@@ -58,17 +58,19 @@ operators = {
 import math
 functions=math.__dict__ #allowed functions
 
-def eval_expr(expr):
-    return eval(ast.parse(expr, mode='eval').body)
-
 def eval(node,context={}):
+    """safe eval of ast node : only functions and operators listed above can be used
+    """
     try:
         if isinstance(node, ast.Num): # <number>
             return node.n
         elif isinstance(node, ast.Name):
             return context.get(node.id,node.id) #return value or var
+        elif isinstance(node, ast.Attribute):
+            return getattr(context[node.value.id],node.attr)
         elif isinstance(node, ast.Call):
-            return functions[node.func.id](eval(node.args[0],context))
+            params=[eval(arg,context) for arg in node.args]
+            return functions[node.func.id](*params)
         elif isinstance(node, ast.BinOp): # <left> <operator> <right>
             return operators[type(node.op)][0](eval(node.left,context), eval(node.right,context))
         elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
@@ -80,8 +82,12 @@ def eval(node,context={}):
                 return operators[type(op)][0](left, eval(right,context))
         else:
             return eval(node.body,context)
+    except KeyError:
+        raise NameError('%s function not allowed'%node.func.id)
+    """
     except Exception as e:
-        raise TypeError(ast.dump(node,False,False))
+        logging.error(ast.dump(node,False,False))
+    """
 
 def get_function_source(f):
     """returns cleaned code of a function or lambda
@@ -92,9 +98,12 @@ def get_function_source(f):
     f=inspect.getsource(f).rstrip('\n') #TODO: merge lines more subtly
     g=re.search(r'lambda(.*):(.*)(\)|#)',f)
     if g:
-        res=g.group(2)
+        res=g.group(2).strip() #remove leading+trailing spaces
         bra,ket=res.count('('),res.count(')')
-        return res[:-1-(ket-bra)]
+        if bra==ket:
+            return res
+        else: #closing parenthesis ?
+            return res[:-(ket-bra)]
     else:
         g=re.search(r'def \w*\((.*)\):\s*return (.*)',f)
         if g is None:
@@ -141,6 +150,7 @@ class Expr(plot.Plot):
         except:
             if x is not None:
                 kwargs['x']=x
+            kwargs['self']=self #allows to call methods such as in Stats
             return eval(self.body,kwargs)
 
     def __repr__(self):

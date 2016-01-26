@@ -54,6 +54,7 @@ class TestExpr:
         assert_equal(str(self.fx),'x')    
         assert_equal(str(self.fs),'sin(x)')    
         assert_equal(str(self.fb1),'x > 1')    
+        res=str(Expr('(x*3+(a+b)*y)/x**(3*a*y)'))
         
         #test multiplication commutativity and simplification
         assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
@@ -65,6 +66,7 @@ class TestExpr:
         assert_equal(self.fs._latex(),'\\sin\\left(x\\right)')    
         assert_equal(self.fb1._latex(),'x \\gtr 1')      
         assert_equal(self.fs(self.fx2)._latex(),'\\sin\\left(x^{2}\\right)') 
+        res=Expr('(x*3+(a+b)*y)/x**(3*a*y)')._latex()
         
 
     def test___add__(self):
