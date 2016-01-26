@@ -15,9 +15,8 @@ __license__ = "LGPL"
 import six, logging, copy, collections, inspect, re
 
 from . import plot #sets matplotlib backend
-import matplotlib.pyplot as plt # after import .plot
 
-from . import itertools2
+from . import itertools2, math2
 
 # http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
 
@@ -58,30 +57,42 @@ operators = {
 import math
 functions=math.__dict__ #allowed functions
 
-def eval(node,context={}):
+def eval(node,ctx={}):
     """safe eval of ast node : only functions and operators listed above can be used
+    
+    :param node: ast.AST to evalaluate
+    :param ctx: dict of varname : value to substitute in node
+    :return: number or expression string
     """
     try:
         if isinstance(node, ast.Num): # <number>
             return node.n
         elif isinstance(node, ast.Name):
-            return context.get(node.id,node.id) #return value or var
+            return ctx.get(node.id,node.id) #return value or var
         elif isinstance(node, ast.Attribute):
-            return getattr(context[node.value.id],node.attr)
+            return getattr(ctx[node.value.id],node.attr)
         elif isinstance(node, ast.Call):
-            params=[eval(arg,context) for arg in node.args]
-            return functions[node.func.id](*params)
+            params=[eval(arg,ctx) for arg in node.args]
+            f=functions[node.func.id]
+            return f(*params)
         elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-            return operators[type(node.op)][0](eval(node.left,context), eval(node.right,context))
+            op=operators[type(node.op)]
+            left=eval(node.left,ctx)
+            right=eval(node.right,ctx)
+            if math2.is_number(left) and math2.is_number(right):
+                return op[0](left, right)
+            else:
+                return "%s%s%s"%(left,op[2],right)
         elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
-            return operators[type(node.op)][0](eval(node.operand,context))
+            right=eval(node.operand,ctx)
+            return operators[type(node.op)][0](right)
         elif isinstance(node, ast.Compare):
-            left=eval(node.left,context)
+            left=eval(node.left,ctx)
             for op,right in zip(node.ops,node.comparators):
                 #TODO: find what to do when multiple items in list
-                return operators[type(op)][0](left, eval(right,context))
+                return operators[type(op)][0](left, eval(right,ctx))
         else:
-            return eval(node.body,context)
+            return eval(node.body,ctx)
     except KeyError:
         raise NameError('%s function not allowed'%node.func.id)
     """
@@ -148,10 +159,17 @@ class Expr(plot.Plot):
         try: #is x iterable ?
             return [self(x) for x in x]
         except:
-            if x is not None:
-                kwargs['x']=x
-            kwargs['self']=self #allows to call methods such as in Stats
-            return eval(self.body,kwargs)
+            pass
+        if x is not None:
+            kwargs['x']=x
+        kwargs['self']=self #allows to call methods such as in Stats
+        try:
+            e=eval(self.body,kwargs)
+        except TypeError: # some params remain symbolic
+            return self
+        if math2.is_number(e):
+            return e
+        return Expr(e)
 
     def __repr__(self):
         return ast.dump(self.body,False,False)
@@ -216,29 +234,32 @@ class Expr(plot.Plot):
 
     @property
     def isconstant(self):
-        try:
-            self._y=eval(self.body)
-            return True
-        except Exception as e:
-            return False
+        """:return: True if Expr evaluates to a constant number of bool"""
+        res=self()
+        return not isinstance(res,six.string_types)
 
     def __eq__(self,other):
-        if self.isconstant:
+        if math2.is_number(other):
             try:
-                if other.isconstant:
-                    return self._y==other._y
+                return self()==other
             except:
-                return self._y==other
-        raise NotImplementedError #TODO: implement for general expressions...
+                return False
+        if not isinstance(other,Expr):
+            other=Expr(other)
+        return str(self())==str(other())
 
     def __lt__(self,other):
-        if self.isconstant:
+        if math2.is_number(other):
             try:
-                if other.isconstant:
-                    return self._y<other._y
+                return self()<=other
             except:
-                return self._y<other
-        raise NotImplementedError #TODO: implement for general expressions...
+                return False
+        if not isinstance(other,Expr):
+            other=Expr(other)
+        try:
+            return float(self())==float(other())
+        except:
+            return False
 
     def __add__(self,right):
         return self.apply(ast.Add(),right)

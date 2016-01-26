@@ -24,15 +24,16 @@ class TestExpr:
         
         self.fb1=Expr('x>1')
         self.fb2=Expr('x>2')
-        self.fb3=Expr('a==a') #any way to simplifiy it to constant True ?
+        self.fb3=Expr('a==a') #any way to simplify it to constant True ?
         
         self.e1=Expr('3*x+2') #a very simple expression
         self.e2=Expr(self.fs)
         
         self.xy=Expr('x*y')
+        self.long=Expr('(x*3+(a+b)*y)/x**(3*a*y)')
+        
         self.true=Expr(True) #make sure it works
         self.false=Expr('False') #make sure it creates a bool
-        pass
         
         
     def test___init__(self):
@@ -45,8 +46,10 @@ class TestExpr:
         assert_equal(self.f1(),1) # constant function
         assert_equal(self.fx([-1,0,1]),[-1,0,1])
         assert_equal(self.fb1([0,1,2]),[False,False,True])
-        
         assert_equal(self.xy(x=2,y=3),6)
+        #test substitution
+        e=self.xy(x=2)
+        assert_equal(str(e),'2*y')
 
     def test___str__(self):
         assert_equal(str(self.f),'3*x+2')   
@@ -54,7 +57,7 @@ class TestExpr:
         assert_equal(str(self.fx),'x')    
         assert_equal(str(self.fs),'sin(x)')    
         assert_equal(str(self.fb1),'x > 1')    
-        res=str(Expr('(x*3+(a+b)*y)/x**(3*a*y)'))
+        assert_equal(str(self.long),'(3*x+(a+b)*y)/x**(3*a*y)')
         
         #test multiplication commutativity and simplification
         assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
@@ -66,7 +69,7 @@ class TestExpr:
         assert_equal(self.fs._latex(),'\\sin\\left(x\\right)')    
         assert_equal(self.fb1._latex(),'x \\gtr 1')      
         assert_equal(self.fs(self.fx2)._latex(),'\\sin\\left(x^{2}\\right)') 
-        res=Expr('(x*3+(a+b)*y)/x**(3*a*y)')._latex()
+        assert_equal(self.long._latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
         
 
     def test___add__(self):
@@ -141,7 +144,15 @@ class TestExpr:
 
     def test___eq__(self):
         assert_false(Expr(1)==Expr(2))
+        assert_false(Expr(1)==2)
         assert_true(Expr(1)==1)
+        assert_true(Expr(1)==Expr('2-1'))
+        assert_equal(self.f,'3*x+2')   
+        assert_equal(self.f1,'1')     
+        assert_equal(self.fx,'x')    
+        assert_equal(self.fs,'sin(x)')    
+        assert_equal(self.fb1,'x > 1')    
+        assert_equal(self.long,'(3*x+(a+b)*y)/x**(3*a*y)')
 
     def test_save(self):
         self.e2(self.e1).save(path+'/results/expr.png')
