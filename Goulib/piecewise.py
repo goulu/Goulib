@@ -57,12 +57,13 @@ class Piecewise(expr.Expr):
         prev=None
         i=0
         while i<len(self):
-            if self.y[i]==prev: #simplify
+            x,y=self.x[i],self.y[i]
+            if y==prev: #simplify
                 self.y.pop(i)
                 self.x.pop(i)
             else:
-                yield (self.x[i],self.y[i])
-                prev=self.y[i]
+                yield x,y(x) #eval
+                prev=y
                 i+=1
 
     def append(self, item):
@@ -84,16 +85,16 @@ class Piecewise(expr.Expr):
     def __str__(self):
         return str(list(self))
 
-    def iapply(self,f,right,name=None):
+    def iapply(self,f,right):
         """apply function to self"""
         if not right: #monadic . apply to each expr
-            self.y=[v.apply(f,name=name) for v in self.y]
+            self.y=[v.apply(f) for v in self.y]
         elif isinstance(right,Piecewise): #combine each piece of right with self
             for i,p in enumerate(right):
                 try:
-                    self.iapply(f,(p[0],p[1],right[i+1][0]),name)
+                    self.iapply(f,(p[0],p[1],right[i+1][0]))
                 except:
-                    self.iapply(f,(p[0],p[1]),name)
+                    self.iapply(f,(p[0],p[1]))
         else: #assume a triplet (start,value,end) as called above
             i=self.index(right[0])
             try:
@@ -104,17 +105,17 @@ class Piecewise(expr.Expr):
                 j=len(self)
 
             for k in range(i,j):
-                self.y[k]=self.y[k].apply(f,right[1],name) #calls Expr.apply
+                self.y[k]=self.y[k].apply(f,right[1]) #calls Expr.apply
         return self
 
-    def apply(self,f,right,name=None):
+    def apply(self,f,right=None):
         """apply function to copy of self"""
-        return Piecewise(self).iapply(f,right,name)
+        return Piecewise(self).iapply(f,right)
 
-    def applx(self,f,name=None):
+    def applx(self,f):
         """ apply a function to each x value """
         self.x=[f(x) for x in self.x]
-        self.y=[y.applx(f,name) for y in self.y]
+        self.y=[y.applx(f) for y in self.y]
         return self
 
     def __lshift__(self,dx):

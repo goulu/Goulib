@@ -214,6 +214,7 @@ def normal_pdf(x,mu,sigma):
     except ZeroDivisionError:
         return 1 if math2.isclose(x,mean) else 0
 
+expr.functions["normal_pdf"]=normal_pdf #add to allowed functions
 
 class Normal(Stats, list, expr.Expr):
     """represents a normal distributed variable
@@ -244,6 +245,9 @@ class Normal(Stats, list, expr.Expr):
         for _ in range(n):
             x=list.pop(self,i)
             Stats.remove(self,x)
+            
+    def __str__(self):
+        return Stats.__repr__(self)
 
     def _latex(self):
         return "\mathcal{N}(\mu=%s, \sigma=%s)"%(self.mean,self.stddev)
