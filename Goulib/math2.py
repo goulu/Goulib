@@ -14,12 +14,17 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, math, cmath, operator, itertools, fractions
+import six, math, cmath, operator, itertools, fractions, numbers
 
 from Goulib import itertools2
 
 
 inf=float('Inf') #infinity
+
+def is_number(x):
+    """:return: True if x is a number of any type"""
+    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
+    return isinstance(x, numbers.Number)
 
 def sign(number):
     """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
