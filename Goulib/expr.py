@@ -91,14 +91,13 @@ def eval(node,ctx={}):
             for op,right in zip(node.ops,node.comparators):
                 #TODO: find what to do when multiple items in list
                 return operators[type(op)][0](left, eval(right,ctx))
+        elif six.PY3 and isinstance(node, ast.NameConstant):
+            return node.value
         else:
-            return eval(node.body,ctx)
+            logging.warning(ast.dump(node,False,False))
+            return eval(node.body,ctx) #last chance
     except KeyError:
         raise NameError('%s function not allowed'%node.func.id)
-    """
-    except Exception as e:
-        logging.error(ast.dump(node,False,False))
-    """
 
 def get_function_source(f):
     """returns cleaned code of a function or lambda
@@ -323,6 +322,9 @@ class TextVisitor(ast.NodeVisitor):
 
     def visit_Name(self, n):
         return n.id
+    
+    def visit_NameConstant(self, node):
+        return str(node.value)
 
     def visit_UnaryOp(self, n):
         if self.prec(n.op) > self.prec(n.operand):
