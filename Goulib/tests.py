@@ -94,7 +94,7 @@ class TestCase(unittest.TestCase):
         elements = (seq_type_name.capitalize(), seq1_repr, seq2_repr)
         differing = '%ss differ: %s != %s\n' % elements
 
-        class End:
+        class End(object):
             def __repr__(self) : return '(end)'
         end=End() #a special object is appended to detect mismatching lengths
         
