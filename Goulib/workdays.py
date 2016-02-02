@@ -17,7 +17,7 @@ import logging
 
 from .datetime2 import *
 
-class WorkCalendar:
+class WorkCalendar(object):
     """WorkCalendar class with datetime operations on working hours"""
     
     # Define the weekday mnemonics to match the date.weekday function
