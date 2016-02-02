@@ -378,7 +378,10 @@ class LatexVisitor(TextVisitor):
     def visit_Call(self, n):
         func = self.visit(n.func)
         args = ', '.join(map(self.visit, n.args))
-        return r'\%s\left(%s\right)' % (func, args)
+        if func in ['sqrt']:
+            return r'\%s {%s}' % (func, args)
+            
+        return r'\%s \left(%s\right)' % (func, args)
 
     def visit_UnaryOp(self, n):
         if self.prec(n.op) > self.prec(n.operand):
