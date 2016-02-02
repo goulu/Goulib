@@ -68,7 +68,7 @@ class TestExpr:
         assert_equal(self.fx._latex(),'x')    
         assert_equal(self.fs._latex(),'\\sin \\left(x\\right)')    
         assert_equal(self.fb1._latex(),'x \\gtr 1')      
-        assert_equal(self.fs(self.fx2)._latex(),'\\sin\\left(x^{2}\\right)') 
+        assert_equal(self.fs(self.fx2)._latex(),'\\sin \\left(x^{2}\\right)') 
         assert_equal(self.long._latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
         
 
