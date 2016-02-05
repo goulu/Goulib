@@ -159,8 +159,11 @@ class Image(PILImage.Image):
         left, upper, right, lower=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
         # calculate box module size so we handle negative coords like in slices
         w,h = self.size
-        upper,lower=upper%h,lower%h
-        left,right=left%w,right%w
+        upper = upper%h if upper else 0
+        lower = lower%h if lower else h
+        left = left%w if left else 0
+        right = right%w if right else w
+        
         im=self.crop((left, upper, right, lower))
         im.load()
         return Image(im)

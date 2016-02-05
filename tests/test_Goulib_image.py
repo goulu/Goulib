@@ -39,6 +39,8 @@ class TestImage:
         assert_equal(pixel,100)
         pixel=self.lena[256,256]
         assert_equal(pixel,(180,65,72))
+        left=self.lena[:,:256]
+        right=self.lena[:,256:-1]
         face=self.lena[246:374,225:353]
         face.save(path+"/results/image.lena.face.png")
         face=face.grayscale()
