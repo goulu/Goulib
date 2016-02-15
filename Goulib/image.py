@@ -23,9 +23,27 @@ except:
 
 import numpy as np
 
-import six, math, base64
+import six, math, base64, functools
 
 from . import math2
+
+def adapt_rgb(func):
+    """Decorator that adapts to RGB(A) images to a gray-scale filter.
+    :param apply_to_rgb: function
+        Function that returns a filtered image from an image-filter and RGB
+        image. This will only be called if the image is RGB-like.
+    """
+    # adapted from https://github.com/scikit-image/scikit-image/blob/master/skimage/color/adapt_rgb.py
+    @functools.wraps(func)
+    def image_filter_adapted(image, *args, **kwargs):
+        channels=list(image.split())
+        if len(channels)>1:
+            for i in range(3): #RGB. If there is an A, it is untouched
+                channels[i]=(func)(channels[i], *args, **kwargs)
+            return PILImage.merge(image.mode, channels)
+        else:
+            return func(image, *args, **kwargs)
+    return image_filter_adapted
 
 class Image(PILImage.Image):
     def __init__(self, data=None, **kwargs):
@@ -51,16 +69,17 @@ class Image(PILImage.Image):
             self.open(data,**kwargs)
         else: #assume a np.ndarray
             # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
-            data=np.asarray(data, dtype=np.float32) #force ints to float
-            if data.min()<0:
-                data -=data.min()
-            if data.max()>1:
-                data *= 1./data.max() # normalize between 0-1
+            data=np.asarray(data) #force ints to float
+            if data.max()>255 or data.min()<0: #if data is out of bounds
+                data=_normalize(data,255,0)
+            if data.max()<=1:
+                data*=255
             colormap=kwargs.pop('colormap',None)
             if colormap:
-                data=colormap(data)
-            self._initfrom(PILImage.fromarray(np.uint8(data*255)))
-            return
+                data=colormap(data,bytes=True)
+            elif data.dtype is not np.uint8:
+                data = np.uint8(data)
+            self._initfrom(PILImage.fromarray(data))
         
     def open(self,path):
         self.path=path
@@ -72,6 +91,19 @@ class Image(PILImage.Image):
             self.error=error
         self._initfrom(im)
         return self
+    
+    def save(self,path,format=None, **kwargs):
+        try:
+            super(Image,self).save(path,format,**kwargs)
+            return self
+        except IOError as e:
+            pass
+        try:
+            im=self.convert('RGBA')
+        except IOError:
+            im=self.convert('L') #gray
+            
+        return im.save(path,format,**kwargs)
     
     def _initfrom(self,other):
         #does `PIL.Image.Image._new` "reversed"
@@ -236,17 +268,19 @@ class Image(PILImage.Image):
     def grayscale(self):
         return self.convert("L")
     
+    
+    def normalize(self,newmax=255,newmin=0):
+        #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
+        #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
+        arr=_normalize(np.array(self),newmax,newmin)
+        return Image(arr)
+        
+    @adapt_rgb
     def filter(self,f):
         try: # scikit-image filter or similar ?
             return Image(f(self))
-        except ValueError: #maybe because image has channels ? filter each one
-            split=self.split()
-            split=[Image(f(channel)) for channel in split]
-            return PILImage.merge(self.mode, split)
-        except:
-            pass
-        
-        return super(Image,self).filter(f)
+        except TypeError: #probably a PIL filter then
+            return super(Image,self).filter(f)
     
     def correlation(self, other):
         """Compute the correlation between two, single-channel, grayscale input images.
@@ -260,6 +294,11 @@ class Image(PILImage.Image):
         return Image(c)
     
     def scale(self,s):
+        """resize image by factor s
+        
+        :param s: (sx, sy) tuple of float scaling factor, or scalar s=sx=sy
+        :return: Image scaled
+        """
         try:
             s[1]
         except:
@@ -267,15 +306,10 @@ class Image(PILImage.Image):
         w,h=self.size
         return self.resize((int(w*s[0]+0.5),int(h*s[1]+0.5)))
     
-    def shift(self,dx,dy):
+    @adapt_rgb
+    def shift(self,dx,dy,**kwargs):
         from scipy.ndimage.interpolation import shift as shift2
-        try:
-            im=Image(shift2(self,(dy,dx)))
-        except RuntimeError:
-            split=self.split()
-            split=[channel.shift(dx,dy) for channel in split]
-            im=PILImage.merge(self.mode, split)
-        return im
+        return Image(shift2(self,(dy,dx),**kwargs))
     
     def expand(self,size,ox=None,oy=None):
         """
@@ -443,6 +477,26 @@ def fspecial(name,**kwargs):
     if name=='disk':
         return disk(kwargs.get('radius',5)) # 5 is default in Matlab
     raise NotImplemented
+
+def _normalize(array,newmax=255,newmin=0):
+    #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
+    #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
+    if len(array.shape)==2 : #single channel
+        n=1
+        minval = array.min()
+        maxval = array.max()
+        array += newmin-minval
+        if maxval is not None and minval != maxval:
+            array *= (newmax/(maxval-minval))
+    else:
+        n=min(array.shape[2],3) #if RGBA, ignore A channel
+        minval = array[:,:,0:n].min()
+        maxval = array[:,:,0:n].max()
+        for i in range(n):
+            array[...,i] += newmin-minval
+            if maxval is not None and minval != maxval:
+                array[...,i] *= (newmax/(maxval-minval))
+    return array
     
 
 

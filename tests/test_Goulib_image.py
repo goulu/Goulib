@@ -6,16 +6,18 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.image import *
+from PIL.ImageFilter import *
 
 import os
 path=os.path.dirname(os.path.abspath(__file__))
+results=path+'\\results\\image\\' #path for results
 
 class TestImage:
     @classmethod
     def setup_class(self):
         self.lena=Image(path+'/data/lena.png')
-        self.lena.grayscale().save(path+'/results/lena_gray.png')
-        self.lena_gray=Image(path+'/results/lena_gray.png')
+        self.lena.grayscale().save(results+'lena_gray.png')
+        self.lena_gray=Image(results+'lena_gray.png')
         
     def test___init__(self):
         lena2=Image(self.lena)
@@ -24,8 +26,10 @@ class TestImage:
         assert_equal(self.lena,lena3)
         
         #from matrix
-        a=[[(x-64)*y for x in range(128)] for y in range(128)]
-        a=Image(a)
+        from matplotlib import cm
+        a=[[-x*y for x in range(128)] for y in range(128)]
+        Image(a).save(results+'generated.png')
+        Image(a,colormap=cm.spectral).save(results+'gen_colormap.png')
         
     def test___hash__(self):
         h1=hash(self.lena)
@@ -42,11 +46,11 @@ class TestImage:
         left=self.lena[:,:256]
         right=self.lena[:,256:-1]
         face=self.lena[246:374,225:353]
-        face.save(path+"/results/image.lena.face.png")
+        face.save(path+"/results/image/image.lena.face.png")
         face=face.grayscale()
         eye=face[3:35,-35:-3] # negative indexes are handy in some cases
         c=face.correlation(eye)
-        c.save(path+"/results/image.correlation.png")
+        c.save(path+"/results/image/image.correlation.png")
 
     def test___lt__(self):
         # image = Image(data)
@@ -103,17 +107,21 @@ class TestImage:
         pass
     
     def test_filter(self):
+
+        for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
+            self.lena.filter(f).save(results+'lena_%s.png'%f.__name__)
+        
         if not SKIMAGE: #optional requirement
-            raise SkipTest
+            return
         from skimage.filters import sobel
         for f in [sobel]:
-            assert_true(self.lena.filter(f))
+            self.lena.filter(f).save(results+'lena_sk_%s.png'%f.__name__)
             
     def test_expand(self):
         size=64
         im=self.lena.resize((size,size))
         im=im.expand((size+1,size+1),.5,.5) #can you see that half pixel border ?
-        im.save(path+'/results/lena_expand_0.5 border.png')
+        im.save(results+'lena_expand_0.5 border.png')
         
     def test_add(self):
         dot=disk(20)
@@ -121,7 +129,15 @@ class TestImage:
         for i in range(3):
             for j in range(3):
                 im=im.add(dot,j*38.5,i*41.5,0.5)
-        im.save(path+'/results/image_add.png')
+        im.save(results+'image_add.png')
+        
+    def test_shift(self):
+        left=self.lena[:,0:256]
+        right=self.lena[:,256:]
+        blank=Image(size=(513,513),mode='RGB',color='white')
+        blank.paste(left,(0,0))
+        blank.paste(right.shift(1,1),(256,0))
+        blank.save(results+'image_stitched.png')
 
 class TestCorrelation:
     def test_correlation(self):
