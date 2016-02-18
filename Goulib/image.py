@@ -27,6 +27,18 @@ import six, math, base64, functools
 
 from . import math2
 
+
+#dithering methods
+PHILIPS=11
+
+dithering={
+    PILImage.NEAREST : 'nearest',
+    PILImage.ORDERED : 'ordered', # Not yet implemented in Pillow
+    PILImage.RASTERIZE : 'rasterize', # Not yet implemented in Pillow
+    PILImage.FLOYDSTEINBERG : 'floyd-steinberg',
+    PHILIPS: 'philips', #http://www.google.com/patents/WO2002039381A2
+}
+
 def adapt_rgb(func):
     """Decorator that adapts to RGB(A) images to a gray-scale filter.
     :param apply_to_rgb: function
@@ -40,6 +52,8 @@ def adapt_rgb(func):
         if len(channels)>1:
             for i in range(3): #RGB. If there is an A, it is untouched
                 channels[i]=(func)(channels[i], *args, **kwargs)
+                if channels[i].mode=='1':
+                    channels[i]=channels[i].grayscale()
             return PILImage.merge(image.mode, channels)
         else:
             return func(image, *args, **kwargs)
@@ -69,7 +83,7 @@ class Image(PILImage.Image):
             self.open(data,**kwargs)
         else: #assume a np.ndarray
             # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
-            data=np.asarray(data) #force ints to float
+            data=np.asarray(data)
             if data.max()>255 or data.min()<0: #if data is out of bounds
                 data=_normalize(data,255,0)
             if data.max()<=1:
@@ -168,6 +182,16 @@ class Image(PILImage.Image):
         #this returns exactly the same as _repr_png_, but is Table compatible
         return self.to_html()
     
+    @property
+    def npixels(self):
+        return math2.mul(self.size)
+    
+    def __nonzero__(self):
+        return self.npixels >0
+    
+    def __lt__(self, other):
+        return  self.npixels < other.pixels
+    
     def ndarray(self):
         """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
         
@@ -217,9 +241,6 @@ class Image(PILImage.Image):
         diff=pixels > avg
         return math2.num_from_digits(diff,2)
     
-    def __hash__(self):
-        return self.average_hash(8)
-    
     def dist(self,other, hash_size=8):
         """ distance between images
         
@@ -236,37 +257,63 @@ class Image(PILImage.Image):
         diff=2*diff/(hash_size*hash_size)
         return diff
     
-    def __lt__(self, other):
-        return math2.mul(self.size) < math2.mul(other.size)
-        
+    def __hash__(self):
+        return self.average_hash(8)
+    
+    def __abs__(self):
+        """:return: float Frobenius norm of image"""
+        res= np.linalg.norm(np.array(self,'float'))
+        return res
     
     def invert(self):
         # http://stackoverflow.com/questions/2498875/how-to-invert-colors-of-image-with-pil-python-imaging
-        return ImageOps.invert(self)
-    
-    def draw(self,entity):
-        from . import drawing, geom
-        try: #iterable ?
-            for e in entity:
-                draw(e)
-            return
-        except:
-            pass
-        
-        if isinstance(entity,geom.Circle):
-            box=entity.bbox()
-            box=(box.xmin, box.ymin, box.xmax, box.ymax)
-            ImageDraw.Draw(self).ellipse(box, fill=255)
-        else:
-            raise NotImplemented 
-        return self
-            
-        
+        return ImageOps.invert(self)         
     
     __neg__=__inv__=invert #aliases
     
     def grayscale(self):
         return self.convert("L")
+    
+    def colorize(self,color0,color1=None):
+        """colorize a grayscale image
+        
+        :param color0,color1: 2 colors. 
+            - If only one is specified, image is colorized from white (for 0) to the specified color (for 1)
+            - if 2 colors are specified, image is colorized from color0 (for 0) to color1 (for 1)
+        :return: RGB(A) color
+        """
+        if color1 is None:
+            color1=color0
+            color0='white'
+        return ImageOps.colorize(self,color0,color1)
+    
+    @adapt_rgb
+    def dither(self,method=PILImage.FLOYDSTEINBERG):
+        if method <=PILImage.FLOYDSTEINBERG:
+            return self.convert('1',dither=method)
+        elif method == PHILIPS:
+            width, height = self.size
+            mat=self.load()
+    
+            new=Image(mode='1',size=(width,height))
+            out=new.load()
+    
+            def philips(line):
+                e=0
+                for pixelin in line:
+                    e+=pixelin
+                    c=int(e>127)
+                    e-=c*255
+                    yield c
+
+            #col0=[mat[i,0] for i in range(width)]
+            for i in range(height):
+                row=[mat[i,j] for j in range(width)]
+                for j,c in enumerate(philips(row)):
+                    out[i,j]=c
+            return new
+        else:
+            raise(NotImplemented)
     
     
     def normalize(self,newmax=255,newmin=0):
@@ -274,6 +321,13 @@ class Image(PILImage.Image):
         #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
         arr=_normalize(np.array(self),newmax,newmin)
         return Image(arr)
+    
+    def split(self, mode=None):
+        if mode and mode != self.mode:
+            im=self.convert(mode)
+        else:
+            im=self 
+        return super(Image,im).split()
         
     @adapt_rgb
     def filter(self,f):
@@ -334,10 +388,32 @@ class Image(PILImage.Image):
             raise NotImplemented #TODO; something for negative offsets...
         return im
     
-    def add(self,other,px=0,py=0,alpha=1):
+    # @adapt_rgb
+    def compose(self,other,a=0.5,b=0.5):
+        """compose new image from a*self + b*other
+        """
+        if self:
+            d1=np.array(self,'float')
+        else:
+            d1=None
+        if other:
+            d2=np.array(other,'float')
+        else:
+            d2=None
+        if d1 is not None:
+            if d2 is not None:
+                return Image(a*d1+b*d2)
+            else:
+                return Image(a*d1)
+        else:
+            return Image(b*d2)
+    
+    def add(self,other,pos=(0,0),alpha=1):
         """ simply adds other image at px,py (subbixel) coordinates
         :warning: result is normalized in case of overflow
         """
+        #TOD: use http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
+        px,py=pos
         assert px>=0 and py>=0
         im1,im2=self,other
         size=(max(im1.size[0],int(im2.size[0]+px+0.999)),
@@ -346,9 +422,30 @@ class Image(PILImage.Image):
             im1.mode=im2.mode            
         im1=im1.expand(size,0,0)
         im2=im2.expand(size,px,py)
-        d1=np.asarray(im1)/255
-        d2=np.asarray(im2)*alpha/255
-        return Image(d1+d2)
+        return im1.compose(im2,1,alpha)
+    
+    def __add__(self,other):
+        return self.compose(other,1,1)
+    
+    def __sub__(self,other):
+        return self.compose(other,1,-1)
+    
+    def draw(self,entity):
+        from . import drawing, geom
+        try: #iterable ?
+            for e in entity:
+                draw(e)
+            return
+        except:
+            pass
+        
+        if isinstance(entity,geom.Circle):
+            box=entity.bbox()
+            box=(box.xmin, box.ymin, box.xmax, box.ymax)
+            ImageDraw.Draw(self).ellipse(box, fill=255)
+        else:
+            raise NotImplemented 
+        return self
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 

@@ -16,6 +16,7 @@ class TestImage:
     @classmethod
     def setup_class(self):
         self.lena=Image(path+'/data/lena.png')
+        assert_equal(self.lena,self.lena) #make sure image comparizon works
         self.lena.grayscale().save(results+'lena_gray.png')
         self.lena_gray=Image(results+'lena_gray.png')
         
@@ -68,7 +69,6 @@ class TestImage:
     def test_open(self):
         pass #tested above
     
-    
     def test_split(self):
         # split the image into individual bands
         source = self.lena.split()
@@ -106,6 +106,19 @@ class TestImage:
     def test_to_html(self):
         pass
     
+    def test_split(self):
+        colors=['Cyan','Magenta','Yellow','blacK']
+        cmyk=self.lena.split('CMYK')
+        cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
+        for im,c in zip(cmyk,'CMYK'):
+            im.save(results+'lena_split_%s.png'%c)
+            
+    def test_dither(self):
+        for k in dithering:
+            self.lena_gray.dither(k).save(results+'lena_dither_%s.png'%dithering[k])
+        self.lena.dither().save(results+'lena_color_dither.png')
+            
+        
     def test_filter(self):
 
         for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
@@ -128,8 +141,14 @@ class TestImage:
         im=Image()
         for i in range(3):
             for j in range(3):
-                im=im.add(dot,j*38.5,i*41.5,0.5)
+                im=im.add(dot,(j*38.5,i*41.5),0.5)
         im.save(results+'image_add.png')
+        
+        cmyk=self.lena.split('CMYK')
+        colors=['Cyan','Magenta','Yellow','blacK']
+        cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
+        back=sum(cmyk,Image())
+        assert_equal(self.lena.dist(back),0)
         
     def test_shift(self):
         left=self.lena[:,0:256]
