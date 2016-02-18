@@ -117,9 +117,15 @@ class TestCase(unittest.TestCase):
         """
         #inspired from http://stackoverflow.com/a/3124155/190597 (KennyTM)
         import collections
-        if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
-            super(TestCase,self).assertEqual(first, second,msg=msg)
-        elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
+        
+        if delta is None:
+            if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
+                return super(TestCase,self).assertEqual(first, second,msg=msg)
+        
+        else:
+            places=None
+            
+        if (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
             try:
                 self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
             except TypeError: #for some classes like pint.Quantity
@@ -131,7 +137,7 @@ class TestCase(unittest.TestCase):
         else: #float and classes
             try:
                 super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
-            except TypeError: # unsupported operand type(s) for -
+            except TypeError as e: # unsupported operand type(s) for -
                 super(TestCase,self).assertEqual(first, second,msg=msg)
                 
     def assertCountEqual(self, seq1, seq2, msg=None):
