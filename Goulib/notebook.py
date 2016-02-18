@@ -15,30 +15,38 @@ __credits__= [""]
 __license__ = "LGPL"
 
 from IPython.display import display, HTML
+from .markup import tag
 
-sep=' ' # Python2 doesn't allow named param after list of optional ones...
+def html(anything, sep=' '):
+    try:
+        return anything._repr_html_()
+    except:
+        try:
+            return sep.join(html(a) for a in anything)
+        except:
+            pass
+    
+    return unicode(anything,'utf8') #to render accented chars correctly
+
+sep=u' ' # Python2 doesn't allow named param after list of optional ones...
 
 def h1(*args):
-    display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
+    display(HTML(tag('h1',html(args))))
     
 def h2(*args):
-    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
+    display(HTML(tag('h2',html(args))))
     
 def h3(*args):
-    display(HTML('<h3>'+sep.join(str(a) for a in args)+'</h3>'))
+    display(HTML(tag('h3',html(args))))
     
 def h(*args):
-    display(HTML(sep.join(str(a) for a in args))) 
+    display(HTML(html(args)))
     
 def hinfo(*args):   
-    display(HTML('<div style="background-color:#337ab7;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
-
+    display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))
 def hsuccess(*args):   
-    display(HTML('<div style="background-color:#5cb85c;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
-
+    display(HTML(tag('div',html(args),style="background-color:#5cb85c;color:#ffffff")))
 def hwarning(*args):   
-    display(HTML('<div style="background-color:#f0ad4e;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
-
+    display(HTML(tag('div',html(args),style="background-color:#f0ad4e;color:#ffffff")))
 def herror(*args):   
-    display(HTML('<div style="background-color:#d9534f;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
-    
+    display(HTML(tag('div',html(args),style="background-color:#d9534f;color:#ffffff")))
