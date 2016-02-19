@@ -2,8 +2,13 @@
 # coding: utf8
 """
 image processing and conversion
+
 :requires:
 * `PIL of Pillow <http://pypi.python.org/pypi/pillow/>`_
+
+:optional:
+* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
+* `scikit-image <http://scikit-image.org/>`_ for advanced filtering
 """
 from __future__ import division #"true division" everywhere
 
@@ -13,7 +18,7 @@ __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
 from PIL import Image as PILImage
-from PIL import ImagePalette, ImageOps, ImageDraw
+from PIL import ImagePalette, ImageOps, ImageDraw, ImageCms
 
 try: # http://scikit-image.org/ is optional
     import skimage
@@ -23,7 +28,7 @@ except:
 
 import numpy as np
 
-import six, math, base64, functools
+import six, math, base64, functools, logging
 
 from . import math2
 
@@ -97,7 +102,12 @@ class Image(PILImage.Image):
         
     def open(self,path):
         self.path=path
-        im=PILImage.open(path)
+        ext=path[-3:].lower()
+        if ext=='pdf':
+            im=read_pdf(path)
+        else:
+            im=PILImage.open(path)
+            
         try:
             im.load()
             self.error=None
@@ -595,6 +605,44 @@ def _normalize(array,newmax=255,newmin=0):
                 array[...,i] *= (newmax/(maxval-minval))
     return array
     
+def read_pdf(filename,**kwargs):
+    """ reads a bitmap graphics on a .pdf file
+    only the first page is parsed
+    """
+    from pdfminer.pdfparser import PDFParser
+    from pdfminer.pdfdocument import PDFDocument
+    from pdfminer.pdfpage import PDFPage
+    from pdfminer.pdfinterp import PDFResourceManager
+    from pdfminer.pdfinterp import PDFPageInterpreter
+    from pdfminer.pdfdevice import PDFDevice
+    # PDF's are fairly complex documents organized hierarchically
+    # PDFMiner parses them using a stack and calls a "Device" to process entities
+    # so here we define a Device that processes only "paths" one by one:
+
+   
+    class _Device(PDFDevice):
+        def render_image(self, name, stream):
+            import StringIO
+            try:
+                self.im=PILImage.open(StringIO.StringIO(stream.rawdata))
+            except Exception as e:
+                logging.error(e)
+                
+                render_image
+            
+
+    #then all we have to do is to launch PDFMiner's parser on the file
+    fp = open(filename, 'rb')
+    parser = PDFParser(fp)
+    document = PDFDocument(parser, fallback=False)
+    rsrcmgr = PDFResourceManager()
+    device = _Device(rsrcmgr)
+    device.im=None #in case we can't find an image in file
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    for page in PDFPage.create_pages(document):
+        interpreter.process_page(page)
+        break #handle one page only
+    return device.im
 
 
 
