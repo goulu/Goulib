@@ -5,13 +5,13 @@
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 :requires:
-* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 * `svg.path <http://pypi.python.org/pypisvg.path/>`_ for svg input
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg and pdf output
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
 
 :optional:
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
+* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 """
 from __future__ import division #"true division" everywhere
 

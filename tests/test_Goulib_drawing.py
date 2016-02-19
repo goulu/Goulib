@@ -11,6 +11,7 @@ from Goulib.drawing import *
 
 import os
 path=os.path.dirname(os.path.abspath(__file__))
+results=path+'\\results\\drawing\\' #path for results
 
 class TestTrans:
     def test_trans(self):
@@ -180,9 +181,7 @@ class TestEntity:
         raise SkipTest
 
     def test_from_pdf(self):
-        # entity = Entity()
-        # assert_equal(expected, entity.from_pdf())
-        raise SkipTest
+        pass #tested elsewhere
 
     def test_svg_path(self):
         # entity = Entity()
@@ -255,7 +254,7 @@ class TestGroup:
     def test_distance(self):
         g2=Trans(scale=2, offset=(10,1), rotation=30)*self.group
         g2.color='blue'
-        Drawing([self.group,g2]).save(path+'/results/drawing.Group.distance.png')
+        Drawing([self.group,g2]).save(results+'drawing.Group.distance.png')
         assert_equal(self.group.distance(g2),2.026833782163534)
 
     def test_append(self):
@@ -390,14 +389,14 @@ class TestDrawing:
     def test_load(self):
         return
         cube=Drawing(path+'/data/cubeecraft_template.pdf')
-        cube.save(path+'/results/cubeecraft.dxf')
+        cube.save(results+'cubeecraft.dxf')
 
     def test_save(self):
         for ext in ['png','svg','pdf','dxf']:
             if self.dxf:
-                self.dxf.save(path+'/results/drawing.dxf.%s'%ext)
-            self.svg.save(path+'/results/drawing.svg.%s'%ext)
-            self.pdf.save(path+'/results/drawing.pdf.%s'%ext)
+                self.dxf.save(results+'drawing.dxf.%s'%ext)
+            self.svg.save(results+'drawing.svg.%s'%ext)
+            self.pdf.save(results+'drawing.pdf.%s'%ext)
 
     def test___init__(self):
         pass # tested above
@@ -414,7 +413,8 @@ class TestDrawing:
         pass # tested above
 
     def test_read_pdf(self):
-        pass # tested above
+        pantone=Drawing(path+'/data/Pantone Fan.pdf')
+        pantone.save(results+'Pantone_Fan_out.pdf')
 
     def test_draw(self):
         # drawing = Drawing(filename, **kwargs)
