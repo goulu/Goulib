@@ -594,7 +594,7 @@ def _normalize(array,newmax=255,newmin=0):
         maxval = array.max()
         array += newmin-minval
         if maxval is not None and minval != maxval:
-            array *= (newmax/(maxval-minval))
+            array *= (newmax/(maxval-minval)).astype(array.dtype)
     else:
         n=min(array.shape[2],3) #if RGBA, ignore A channel
         minval = array[:,:,0:n].min()
@@ -602,7 +602,7 @@ def _normalize(array,newmax=255,newmin=0):
         for i in range(n):
             array[...,i] += newmin-minval
             if maxval is not None and minval != maxval:
-                array[...,i] *= (newmax/(maxval-minval))
+                array[...,i] *= (newmax/(maxval-minval)).astype(array.dtype)
     return array
     
 def read_pdf(filename,**kwargs):
