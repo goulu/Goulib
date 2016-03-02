@@ -437,7 +437,7 @@ class Entity(object):
                 plt.gca().add_artist(e)
         plt.draw()
 
-        return fig, p
+        return fig #, p
 
     def render(self,format,**kwargs):
         """ render graph to bitmap stream
@@ -446,7 +446,7 @@ class Entity(object):
         transparent=kwargs.pop('transparent',True)
         facecolor=kwargs.pop('facecolor', kwargs.pop('background','white'))
         
-        fig,_=self.draw(facecolor=facecolor, **kwargs)
+        fig=self.draw(facecolor=facecolor, **kwargs)
 
         buffer = six.BytesIO()
         fig.savefig(
