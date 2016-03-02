@@ -198,4 +198,4 @@ class TestPurePilAlphaToColorV2:
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
-    runmodule(logging.DEBUG)
+    runmodule()
