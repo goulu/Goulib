@@ -18,7 +18,9 @@ __credits__ = ['Brad Montgomery http://bradmontgomery.net']
 __license__ = "LGPL"
 
 from PIL import Image as PILImage
-from PIL import ImagePalette, ImageOps, ImageDraw, ImageCms
+from PIL import ImagePalette, ImageOps, ImageDraw
+
+# from PIL import ImageCms #disabled for now
 
 try: # http://scikit-image.org/ is optional
     import skimage
