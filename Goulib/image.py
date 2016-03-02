@@ -33,7 +33,7 @@ import numpy as np
 import six, math, base64, functools, logging
 
 from . import math2
-
+from .drawing import Drawing #to read vector pdf files as images
 
 #dithering methods
 PHILIPS=11
@@ -101,7 +101,7 @@ class Image(PILImage.Image):
             elif data.dtype is not np.uint8:
                 data = np.uint8(data)
             self._initfrom(PILImage.fromarray(data))
-        
+
     def open(self,path):
         self.path=path
         ext=path[-3:].lower()
@@ -109,7 +109,10 @@ class Image(PILImage.Image):
             im=read_pdf(path)
         else:
             im=PILImage.open(path)
-            
+
+        if im is None:
+            raise IOError('could not read %s'%path)
+
         try:
             im.load()
             self.error=None
@@ -117,7 +120,7 @@ class Image(PILImage.Image):
             self.error=error
         self._initfrom(im)
         return self
-    
+
     def save(self,path,format=None, **kwargs):
         try:
             super(Image,self).save(path,format,**kwargs)
@@ -128,9 +131,9 @@ class Image(PILImage.Image):
             im=self.convert('RGBA')
         except IOError:
             im=self.convert('L') #gray
-            
+
         return im.save(path,format,**kwargs)
-    
+
     def _initfrom(self,other):
         #does `PIL.Image.Image._new` "reversed"
         self.im = other.im
@@ -149,7 +152,7 @@ class Image(PILImage.Image):
         self.category = other.category
         self.readonly = other.readonly
         self.pyaccess = other.pyaccess
-        
+
     def _new(self, im):
         #overloads `PIL.Image.Image._new`
         #so that it is called by most usual PIL(low) functions
@@ -159,54 +162,54 @@ class Image(PILImage.Image):
         new.mode=im.mode
         new.size=im.size
         return new
-    
+
     # representations, data extraction and conversions
-    
+
     def __repr__(self):
         path=getattr(self,'path',None)
         return "<%s path=%s mode=%s size=%dx%d>" % (
             self.__class__.__name__, path,
             self.mode, self.size[0], self.size[1],
             )
-    
-        
+
+
     def base64(self, fmt='PNG'):
         """
-        :param fmt: string file format ('PNG', 'JPEG', ... 
+        :param fmt: string file format ('PNG', 'JPEG', ...
                     see http://pillow.readthedocs.org/en/3.0.x/handbook/image-file-formats.html )
         :result: string base64 encoded image content in specified format
         """
         # http://stackoverflow.com/questions/31826335/how-to-convert-pil-image-image-object-to-base64-string
-        
+
         buffer = six.BytesIO()
         self.save(buffer, format=fmt)
         return base64.b64encode(buffer.getvalue())
-        
+
     def to_html(self):
         s=self.base64('PNG').decode('utf-8')
         return r'<img src="data:image/png;base64,{0}">'.format(s)
-    
+
     def html(self):
         from IPython.display import HTML
         return HTML(self.to_html())
-    
+
     def _repr_html_(self):
         #this returns exactly the same as _repr_png_, but is Table compatible
         return self.to_html()
-    
+
     @property
     def npixels(self):
         return math2.mul(self.size)
-    
+
     def __nonzero__(self):
         return self.npixels >0
-    
+
     def __lt__(self, other):
         return  self.npixels < other.pixels
-    
+
     def ndarray(self):
         """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
-        
+
         :return: `numpy.ndarray` of image
         """
         data = list(self.getdata())
@@ -218,7 +221,7 @@ class Image(PILImage.Image):
             i=i+1
         A=A.reshape(w,h)
         return A
-    
+
     def __getitem__(self,slice):
         try:
             return self.getpixel(slice)
@@ -231,18 +234,18 @@ class Image(PILImage.Image):
         lower = lower%h if lower else h
         left = left%w if left else 0
         right = right%w if right else w
-        
+
         im=self.crop((left, upper, right, lower))
         im.load()
         return Image(im)
-    
+
     # hash and distance
-    
+
     def average_hash(self, hash_size=8):
         """
         Average Hash computation
         Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
-        
+
         :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
         :return: list of hash_size*hash_size bool (=bits)
         """
@@ -252,12 +255,12 @@ class Image(PILImage.Image):
         avg = pixels.mean()
         diff=pixels > avg
         return math2.num_from_digits(diff,2)
-    
+
     def dist(self,other, hash_size=8):
         """ distance between images
-        
+
         :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
-        :return: float 
+        :return: float
             =0 if images are equal or very similar (same average_hash)
             =1 if images are completely decorrelated (half of the hash bits are the same by luck)
             =2 if images are inverted
@@ -268,28 +271,28 @@ class Image(PILImage.Image):
         diff=bin(h1^h2).count("1") # ^is XOR
         diff=2*diff/(hash_size*hash_size)
         return diff
-    
+
     def __hash__(self):
         return self.average_hash(8)
-    
+
     def __abs__(self):
         """:return: float Frobenius norm of image"""
-        res= np.linalg.norm(np.array(self,'float'))
+        res= np.linalg.norm(np.array(self,np.float))
         return res
-    
+
     def invert(self):
         # http://stackoverflow.com/questions/2498875/how-to-invert-colors-of-image-with-pil-python-imaging
-        return ImageOps.invert(self)         
-    
+        return ImageOps.invert(self)
+
     __neg__=__inv__=invert #aliases
-    
+
     def grayscale(self):
         return self.convert("L")
-    
+
     def colorize(self,color0,color1=None):
         """colorize a grayscale image
-        
-        :param color0,color1: 2 colors. 
+
+        :param color0,color1: 2 colors.
             - If only one is specified, image is colorized from white (for 0) to the specified color (for 1)
             - if 2 colors are specified, image is colorized from color0 (for 0) to color1 (for 1)
         :return: RGB(A) color
@@ -298,7 +301,7 @@ class Image(PILImage.Image):
             color1=color0
             color0='white'
         return ImageOps.colorize(self,color0,color1)
-    
+
     @adapt_rgb
     def dither(self,method=PILImage.FLOYDSTEINBERG):
         if method <=PILImage.FLOYDSTEINBERG:
@@ -306,10 +309,10 @@ class Image(PILImage.Image):
         elif method == PHILIPS:
             width, height = self.size
             mat=self.load()
-    
+
             new=Image(mode='1',size=(width,height))
             out=new.load()
-    
+
             def philips(line):
                 e=0
                 for pixelin in line:
@@ -326,28 +329,28 @@ class Image(PILImage.Image):
             return new
         else:
             raise(NotImplemented)
-    
-    
+
+
     def normalize(self,newmax=255,newmin=0):
         #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
         #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
         arr=_normalize(np.array(self),newmax,newmin)
         return Image(arr)
-    
+
     def split(self, mode=None):
         if mode and mode != self.mode:
             im=self.convert(mode)
         else:
-            im=self 
+            im=self
         return super(Image,im).split()
-        
+
     @adapt_rgb
     def filter(self,f):
         try: # scikit-image filter or similar ?
             return Image(f(self))
         except TypeError: #probably a PIL filter then
             return super(Image,self).filter(f)
-    
+
     def correlation(self, other):
         """Compute the correlation between two, single-channel, grayscale input images.
         The second image must be smaller than the first.
@@ -358,10 +361,10 @@ class Image(PILImage.Image):
         match = other.ndarray()
         c=signal.correlate2d(input,match)
         return Image(c)
-    
+
     def scale(self,s):
         """resize image by factor s
-        
+
         :param s: (sx, sy) tuple of float scaling factor, or scalar s=sx=sy
         :return: Image scaled
         """
@@ -371,12 +374,12 @@ class Image(PILImage.Image):
             s=[s,s]
         w,h=self.size
         return self.resize((int(w*s[0]+0.5),int(h*s[1]+0.5)))
-    
+
     @adapt_rgb
     def shift(self,dx,dy,**kwargs):
         from scipy.ndimage.interpolation import shift as shift2
         return Image(shift2(self,(dy,dx),**kwargs))
-    
+
     def expand(self,size,ox=None,oy=None):
         """
         :return: image in larger canvas size, pasted at ox,oy
@@ -399,17 +402,17 @@ class Image(PILImage.Image):
         else:
             raise NotImplemented #TODO; something for negative offsets...
         return im
-    
+
     # @adapt_rgb
     def compose(self,other,a=0.5,b=0.5):
         """compose new image from a*self + b*other
         """
         if self:
-            d1=np.array(self,'float')
+            d1=np.array(self,dtype=np.float)
         else:
             d1=None
         if other:
-            d2=np.array(other,'float')
+            d2=np.asarray(other,dtype=np.float)
         else:
             d2=None
         if d1 is not None:
@@ -419,7 +422,7 @@ class Image(PILImage.Image):
                 return Image(a*d1)
         else:
             return Image(b*d2)
-    
+
     def add(self,other,pos=(0,0),alpha=1):
         """ simply adds other image at px,py (subbixel) coordinates
         :warning: result is normalized in case of overflow
@@ -431,17 +434,17 @@ class Image(PILImage.Image):
         size=(max(im1.size[0],int(im2.size[0]+px+0.999)),
               max(im1.size[1],int(im2.size[1]+py+0.999)))
         if not im1.mode: #empty image
-            im1.mode=im2.mode            
+            im1.mode=im2.mode
         im1=im1.expand(size,0,0)
         im2=im2.expand(size,px,py)
         return im1.compose(im2,1,alpha)
-    
+
     def __add__(self,other):
         return self.compose(other,1,1)
-    
+
     def __sub__(self,other):
         return self.compose(other,1,-1)
-    
+
     def draw(self,entity):
         from . import drawing, geom
         try: #iterable ?
@@ -450,13 +453,13 @@ class Image(PILImage.Image):
             return
         except:
             pass
-        
+
         if isinstance(entity,geom.Circle):
             box=entity.bbox()
             box=(box.xmin, box.ymin, box.xmax, box.ymax)
             ImageDraw.Draw(self).ellipse(box, fill=255)
         else:
-            raise NotImplemented 
+            raise NotImplemented
         return self
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
@@ -472,12 +475,12 @@ def alpha_to_color(image, color=(255, 255, 255)):
     image -- PIL RGBA Image object
     color -- Tuple r, g, b (default 255, 255, 255)
 
-    """ 
+    """
     x = np.array(image)
     r, g, b, a = np.rollaxis(x, axis=-1)
     r[a == 0] = color[0]
     g[a == 0] = color[1]
-    b[a == 0] = color[2] 
+    b[a == 0] = color[2]
     x = np.dstack([r, g, b, a])
     return Image.fromarray(x, 'RGBA')
 
@@ -490,13 +493,13 @@ def alpha_composite(front, back):
     Keyword Arguments:
     front -- PIL RGBA Image object
     back -- PIL RGBA Image object
-    
+
     The algorithm comes from http://en.wikipedia.org/wiki/Alpha_compositing
 
     """
     front = np.asarray(front)
     back = np.asarray(back)
-    result = np.empty(front.shape, dtype='float')
+    result = np.empty(front.shape, dtype=np.float)
     alpha = np.index_exp[:, :, 3:]
     rgb = np.index_exp[:, :, :3]
     falpha = front[alpha] / 255.0
@@ -539,7 +542,7 @@ def pure_pil_alpha_to_color_v1(image, color=(255, 255, 255)):
     image -- PIL RGBA Image object
     color -- Tuple r, g, b (default 255, 255, 255)
 
-    """ 
+    """
     def blend_value(back, front, a):
         return (front * a + back * (255 - a)) / 255
 
@@ -606,7 +609,7 @@ def _normalize(array,newmax=255,newmin=0):
             if maxval is not None and minval != maxval:
                 array[...,i] *= (newmax/(maxval-minval)).astype(array.dtype)
     return array
-    
+
 def read_pdf(filename,**kwargs):
     """ reads a bitmap graphics on a .pdf file
     only the first page is parsed
@@ -621,7 +624,7 @@ def read_pdf(filename,**kwargs):
     # PDFMiner parses them using a stack and calls a "Device" to process entities
     # so here we define a Device that processes only "paths" one by one:
 
-   
+
     class _Device(PDFDevice):
         def render_image(self, name, stream):
             import StringIO
@@ -629,9 +632,7 @@ def read_pdf(filename,**kwargs):
                 self.im=PILImage.open(StringIO.StringIO(stream.rawdata))
             except Exception as e:
                 logging.error(e)
-                
-                render_image
-            
+
 
     #then all we have to do is to launch PDFMiner's parser on the file
     fp = open(filename, 'rb')
@@ -644,10 +645,35 @@ def read_pdf(filename,**kwargs):
     for page in PDFPage.create_pages(document):
         interpreter.process_page(page)
         break #handle one page only
-    return device.im
+
+    im=device.im
+
+    if im is None: #it's maybe a drawing
+        fig=Drawing(filename).draw(**kwargs)
+        im=fig2img(fig)
+
+    return im
+
+def fig2img ( fig ):
+    """
+    Convert a Matplotlib figure to a PIL Image in RGBA format and return it
+    
+    :param fig: matplotlib figure
+    :return: PIL image
+    """
+    #http://www.icare.univ-lille1.fr/wiki/index.php/How_to_convert_a_matplotlib_figure_to_a_numpy_array_or_a_PIL_image
+
+    fig.canvas.draw ( )
+
+    # Get the RGBA buffer from the figure
+    w,h = fig.canvas.get_width_height()
+    buf = np.fromstring ( fig.canvas.tostring_argb(), dtype=np.uint8 )
+    buf.shape = ( w, h,4 )
+
+    # canvas.tostring_argb give pixmap in ARGB mode. Roll the ALPHA channel to have it in RGBA mode
+    buf = np.roll ( buf, 3, axis = 2 )
+    w, h, _ = buf.shape
+    return PILImage.frombytes( "RGBA", ( w ,h ), buf.tostring( ) )
 
 
 
-
-
- 
