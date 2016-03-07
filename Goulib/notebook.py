@@ -16,17 +16,26 @@ __license__ = "LGPL"
 
 from IPython.display import display, HTML
 from .markup import tag
+from .itertools2 import isiterable
 
 def html(anything, sep=' '):
     try:
         return anything._repr_html_()
     except:
+        pass
+    
+    if isiterable(anything): #iterable, but not a string
         try:
             return sep.join(html(a) for a in anything)
         except:
             pass
     
-    return unicode(anything,'utf8') #to render accented chars correctly
+    try:
+        return unicode(anything,'utf8') #to render accented chars correctly
+    except:
+        pass
+    
+    return str(anything)
 
 sep=u' ' # Python2 doesn't allow named param after list of optional ones...
 
