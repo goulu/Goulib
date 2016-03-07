@@ -35,15 +35,15 @@ def attr(args):
         res+=' %s="%s"'%(k,val)
     return res
 
-class Cell():
+class Cell(object):
     """Table cell with HTML attributes"""
-    def __init__(self,data=None,align=None,fmt=None,tag=None,style=None):
+    def __init__(self,data=None,align=None,fmt=None,tag=None,style={}):
         """
         :param data: cell value(s) of any type
         :param align: string for HTML align attribute
         :param fmt: format string applied applied to data
         :param tag: called to build each cell. defaults to 'td'
-        :param style: dict for HTML style attribute
+        :param style: dict or string for HTML style attribute
         """
         
         if isinstance(data,Element):
@@ -58,7 +58,9 @@ class Cell():
         self.align=align
         self.fmt=fmt
         self.tag=tag if tag else 'td'
-        self.style=style_str2dict(style) if style else {}
+        if not isinstance(style,dict):
+            style=style_str2dict(style)
+        self.style=style
         
     def __repr__(self):
         return str(self.data)
@@ -132,26 +134,21 @@ class Cell():
             v=f%v if f else six.text_type(v)
         return tag(self.tag,v,**args)
 
-class Row():
+class Row(object):
     """Table row with HTML attributes"""
-    def __init__(self,data,align=None,fmt=None,tag=None,style=None):
+    def __init__(self,data,align=None,fmt=None,tag=None,style={}):
         """
         :param data: (list of) cell value(s) of any type
         :param align: (list of) string for HTML align attribute
         :param fmt: (list of) format string applied applied to data
         :param tag: (list of) tags called to build each cell. defaults to 'td'
-        :param style: (list of) string for HTML style attribute
+        :param style: (list of) dict or string for HTML style attribute
         """
-        if isinstance(data,Element):
-            line=[]
-            for td in data:
-                cell=Cell(td)
-                line.append(cell.data)
-            data=line
         
-        
-        if not isinstance(data,list) : 
+        if not isiterable(data) : 
             data=[data]
+        data=list(data) #to make it mutable
+            
         #ensure params have the same length as data
         
         if not isinstance(style,list): style=[style]
@@ -168,11 +165,16 @@ class Row():
             tag=[tag]*(len(data)) #make a full row, in case it's a 'th'
         tag=tag+[None]*(len(data)-len(fmt)) #fill the row with None, which will be 'td's
             
+        for i,cell in enumerate(data):
+            if not isinstance(cell,Cell):
+                cell=Cell(cell,align[i],fmt[i],tag[i],style[i])
+            else:
+                pass #ignore attribs for now
+            data[i]=cell
+        
+
+       
         self.data=data
-        self.align=align
-        self.fmt=fmt
-        self.tag=tag
-        self.style=style 
         
     def __repr__(self):
         return str(self.data)
@@ -183,8 +185,7 @@ class Row():
     def html(self,cell_args={},**kwargs):
         """return in HTML format"""
         res=''
-        for i,v in enumerate(self.data):
-            cell=Cell(v,self.align[i],self.fmt[i],self.tag[i],self.style[i])
+        for cell in self.data:
             res+=cell.html(**cell_args)
         return tag('tr',res,**kwargs)
     
@@ -239,22 +240,22 @@ class Table(list):
     def _repr_html_(self):
         return self.html()
     
-    def html(self,head=None,foot=None,colstyle=None,**kwargs):
+    def html(self,head=None,foot=None,colstyle={},**kwargs):
         """:return: string HTML representation of table"""
                 
-        def TR(data,align=None,fmt=None,tag=None,style=None):
+        def TR(data,align=None,fmt=None,tag=None,style={}):
             res=''
             row=Row(data=data,align=align,fmt=fmt,tag=tag,style=style)
             res+=row.html()+'\n'
             return res
             
-        def THEAD(data,fmt=None,style=None):
+        def THEAD(data,fmt=None,style={}):
             res="<thead>\n"
             res+=TR(data=data,fmt=fmt,tag='th',style=style)
             res+="</thead>\n"
             return res
             
-        def TFOOT(data,fmt=None,style=None):
+        def TFOOT(data,fmt=None,style={}):
             res="<tfoot>\n"
             res+=TR(data=data,fmt=fmt,tag='th',style=style)
             res+="</tfoot>\n"
@@ -276,15 +277,17 @@ class Table(list):
         return tag('table',res,**kwargs)+'\n'
     
     def read_element(self,element, **kwargs):
-        """read table from a DOM element"""
+        """read table from a DOM element.
+        :Warning: drops all formatting
+        """
         head=element.find('thead')
         if head is not None:
-            self.titles=Row(head.find('tr')).data
+            self.titles=[cell.data for cell in Row(head.find('tr')).data]
         body=element.find('tbody')
         if body is None:
             body=element
         for row in body.findall('tr'):
-            line=Row(row).data
+            line=[cell.data for cell in Row(row).data]
             if not line: continue #skip empty lines
             if not self.titles:
                 self.titles=line
@@ -491,6 +494,10 @@ class Table(list):
     def rowasdict(self,i):
         ''' returns a line as a dict '''
         return dict(list(zip(self.titles,self[i])))
+    
+    def asdict(self):
+        for line in self:
+            yield dict(list(zip(self.titles,line)))
         
     def groupby(self,by,sort=True,removecol=True):
         '''dictionary of subtables grouped by a column'''
