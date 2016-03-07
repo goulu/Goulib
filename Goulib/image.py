@@ -408,7 +408,7 @@ class Image(PILImage.Image):
         """compose new image from a*self + b*other
         """
         if self:
-            d1=np.array(self,dtype=np.float)
+            d1=np.asarray(self,dtype=np.float)
         else:
             d1=None
         if other:
@@ -627,9 +627,8 @@ def read_pdf(filename,**kwargs):
 
     class _Device(PDFDevice):
         def render_image(self, name, stream):
-            import StringIO
             try:
-                self.im=PILImage.open(StringIO.StringIO(stream.rawdata))
+                self.im=PILImage.open(six.BytesIO(stream.rawdata))
             except Exception as e:
                 logging.error(e)
 
