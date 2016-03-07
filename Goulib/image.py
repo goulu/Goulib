@@ -408,11 +408,11 @@ class Image(PILImage.Image):
         """compose new image from a*self + b*other
         """
         if self:
-            d1=np.asarray(self,dtype=np.float)
+            d1=np.array(self,dtype=np.float)
         else:
             d1=None
         if other:
-            d2=np.asarray(other,dtype=np.float)
+            d2=np.array(other,dtype=np.float)
         else:
             d2=None
         if d1 is not None:
@@ -511,7 +511,7 @@ def alpha_composite(front, back):
     result[alpha] *= 255
     np.clip(result, 0, 255)
     # astype('uint8') maps np.nan and np.inf to 0
-    result = result.astype('uint8')
+    result = result.astype(np.uint8)
     result = Image.fromarray(result, 'RGBA')
     return result
 
