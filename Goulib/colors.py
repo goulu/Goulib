@@ -19,7 +19,7 @@ from .table import Table
 path=os.path.dirname(os.path.abspath(__file__))
 
 # http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/
-pantone=Table(path+'\\colors.csv',titles=['_','pantone','L','a','b','R','G','B','hex'])
+pantone=Table(path+'/colors.csv',titles=['_','pantone','L','a','b','R','G','B','hex'])
 pantone=dict([line['pantone'],line['hex']] for line in pantone.asdict())
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
