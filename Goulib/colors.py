@@ -1,14 +1,26 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-hex RGB colors and related functions
+very simple (RGB) color management
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
+__credits__ = ['Colormath http://python-colormath.readthedocs.org/en/latest/',
+               'Bruno Nuttens Pantone color table http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/',
+               ]
 
-import six
+#see http://python-colormath.readthedocs.org/en/latest/ if you need more
+
+import six,os 
 from . import math2
+from .table import Table
+
+path=os.path.dirname(os.path.abspath(__file__))
+
+# http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/
+pantone=Table(path+'\\colors.csv',titles=['_','pantone','L','a','b','R','G','B','hex'])
+pantone=dict([line['pantone'],line['hex']] for line in pantone.asdict())
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
@@ -231,6 +243,7 @@ color = {
     'yellowgreen': '#9acd32'}
 
 color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
+
 
 """array of 256 Autocad/Autodesk ACI colors produced from http://www.isctex.com/acadcolors.php produced by this code :
     >>> from Goulib.table import Table

@@ -6,6 +6,10 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.colors import *
+from Goulib.itertools2 import reshape
+
+import os
+path=os.path.dirname(os.path.abspath(__file__))
 
 class TestRgbToHex:
     def test_rgb_to_hex(self):
@@ -84,6 +88,16 @@ class TestAciToColor:
     def test_aci_to_color(self):
         # assert_equal(expected, aci_to_color(x, block_color, layer_color))
         raise SkipTest 
+    
+class TestPantone:
+    def test_pantone(self):
+        from Goulib.table import Table,Cell
+        from Goulib.itertools2 import reshape
+        
+        t=[Cell(name,style={'background-color':pantone[name]}) for name in sorted(pantone)]
+        t=Table(reshape(t,(0,10)))
+        with open(path+'\\results\\colors.pantone.html', 'w') as f:
+            f.write(t.html())
 
 if __name__ == "__main__":
     runmodule()
