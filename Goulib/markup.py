@@ -30,11 +30,12 @@ def style_dict2str(style):
 
 def style_str2dict(style):
     res={}
-    for s in style.split(';'):
-        k,v=s.split(':')
-        k=k.lstrip().rstrip()
-        v=v.lstrip().rstrip()
-        res[k]=v
+    if style: #skip if None or empty string
+        for s in style.split(';'):
+            k,v=s.split(':')
+            k=k.lstrip().rstrip()
+            v=v.lstrip().rstrip()
+            res[k]=v
     return res
         
 def tag( tag, between, **kwargs ):
