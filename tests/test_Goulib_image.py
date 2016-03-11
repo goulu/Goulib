@@ -158,6 +158,11 @@ class TestImage:
         cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
         back=sum(cmyk,Image())
         assert_equal(self.lena.dist(back),0)
+        
+    def test_mul(self):
+        mask=disk(self.lena.size[0]/2)
+        res=self.lena*mask
+        res.save(results+'lena_disk_mul.png')
 
     def test_shift(self):
         left=self.lena[:,0:256]

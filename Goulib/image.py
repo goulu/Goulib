@@ -205,7 +205,15 @@ class Image(PILImage.Image):
         return self.npixels >0
 
     def __lt__(self, other):
+        """ is smaller"""
         return  self.npixels < other.pixels
+
+    @property
+    def nchannels(self):
+        if self.mode=='YCbCr' : return 3
+        return len(self.mode) # http://effbot.org/imagingbook/concepts.htm
+        #http://stackoverflow.com/questions/19062875/how-to-get-the-number-of-channels-from-an-image-in-opencv-2
+        return 1 if len(self.shape)==2 else self.shape[-1]
 
     def ndarray(self):
         """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
@@ -342,7 +350,10 @@ class Image(PILImage.Image):
             im=self.convert(mode)
         else:
             im=self
-        return super(Image,im).split()
+        try:
+            return super(Image,im).split()
+        except:
+            return [im]
 
     @adapt_rgb
     def filter(self,f):
@@ -403,10 +414,12 @@ class Image(PILImage.Image):
             raise NotImplemented #TODO; something for negative offsets...
         return im
 
-    # @adapt_rgb
+    #@adapt_rgb
     def compose(self,other,a=0.5,b=0.5):
         """compose new image from a*self + b*other
         """
+        if self and other and self.mode != other.mode:
+            other=other.convert(self.mode)
         if self:
             d1=np.array(self,dtype=np.float)
         else:
@@ -444,6 +457,22 @@ class Image(PILImage.Image):
 
     def __sub__(self,other):
         return self.compose(other,1,-1)
+
+    def __mul__(self,other):
+        if isinstance(other,six.string_types):
+            return self.colorize(other)
+        if math2.is_number(other):
+            return self.compose(None,other)
+        if other.nchannels>self.nchannels:
+            return other*self
+        if other.nchannels==1:
+            if self.nchannels==1:
+                return self.compose(None,np.array(other,dtype=np.float))
+            rgba=list(self.convert('RGBA').split())
+            rgba[-1]=rgba[-1]*other
+            return PILImage.merge('RGBA',rgba)
+        raise NotImplemented('%s * %s'%(self,other))
+
 
     def draw(self,entity):
         from . import drawing, geom
@@ -575,12 +604,15 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
     return background
 
-def disk(radius,antialias=PILImage.BICUBIC):
+def disk(radius,antialias=PILImage.ANTIALIAS):
     size = (2*radius, 2*radius)
-    im = Image(size=size)
-    ImageDraw.Draw(im).ellipse((0, 0) + size, fill=255)
+    bigsize = (6*radius, 6*radius)
+    im = Image(size=bigsize)
+    ImageDraw.Draw(im).ellipse((0, 0) + bigsize, fill=255)
+    # http://stackoverflow.com/questions/890051/how-do-i-generate-circular-thumbnails-with-pil
+    im = im.resize(size, antialias)
     return im
-    #TODO: http://stackoverflow.com/questions/890051/how-do-i-generate-circular-thumbnails-with-pil
+    #TODO: 
 
 def fspecial(name,**kwargs):
     """mimics the Matlab image toolbox fspecial function
@@ -592,23 +624,26 @@ def fspecial(name,**kwargs):
 
 def _normalize(array,newmax=255,newmin=0):
     #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
-    #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
+    #warning : don't use @adapt_rgb here as it would normalize each channel independently
+    t=array.dtype
     if len(array.shape)==2 : #single channel
         n=1
         minval = array.min()
         maxval = array.max()
         array += newmin-minval
         if maxval is not None and minval != maxval:
-            array *= (newmax/(maxval-minval)).astype(array.dtype)
+            array=array.astype(np.float)
+            array *= newmax/(maxval-minval)
     else:
         n=min(array.shape[2],3) #if RGBA, ignore A channel
         minval = array[:,:,0:n].min()
         maxval = array[:,:,0:n].max()
+        array=array.astype(np.float)
         for i in range(n):
             array[...,i] += newmin-minval
             if maxval is not None and minval != maxval:
-                array[...,i] *= (newmax/(maxval-minval)).astype(array.dtype)
-    return array
+                array[...,i] *= newmax/(maxval-minval)
+    return array.astype(t)
 
 def read_pdf(filename,**kwargs):
     """ reads a bitmap graphics on a .pdf file
@@ -656,7 +691,7 @@ def read_pdf(filename,**kwargs):
 def fig2img ( fig ):
     """
     Convert a Matplotlib figure to a PIL Image in RGBA format and return it
-    
+
     :param fig: matplotlib figure
     :return: PIL image
     """
