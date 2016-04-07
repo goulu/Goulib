@@ -133,8 +133,6 @@ class TestImage:
         for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
             self.lena.filter(f).save(results+'lena_%s.png'%f.__name__)
 
-        if not SKIMAGE: #optional requirement
-            return
         from skimage.filters import sobel
         for f in [sobel]:
             self.lena.filter(f).save(results+'lena_sk_%s.png'%f.__name__)

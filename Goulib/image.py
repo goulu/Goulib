@@ -20,13 +20,9 @@ __license__ = "LGPL"
 from PIL import Image as PILImage
 from PIL import ImagePalette, ImageOps, ImageDraw
 
-# from PIL import ImageCms #disabled for now
+from PIL import ImageCms
 
-try: # http://scikit-image.org/ is optional
-    import skimage
-    SKIMAGE=True
-except:
-    SKIMAGE=False
+import skimage
 
 import numpy as np
 
@@ -61,7 +57,7 @@ def adapt_rgb(func):
                 channels[i]=(func)(channels[i], *args, **kwargs)
                 if channels[i].mode=='1':
                     channels[i]=channels[i].grayscale()
-            return PILImage.merge(image.mode, channels)
+            return Image(channels,mode=image.mode)
         else:
             return func(image, *args, **kwargs)
     return image_filter_adapted
@@ -80,27 +76,32 @@ class Image(PILImage.Image):
         if data is None:
             if kwargs:
                 kwargs.setdefault('mode','L')
-                im=PILImage.new(**kwargs)
+                data=PILImage.new(**kwargs)
             else:
-                im=PILImage.Image()
-            self._initfrom(im)
-        elif isinstance(data,PILImage.Image):
-            self._initfrom(data)
+                data=PILImage.Image()
+        elif isinstance(data, PILImage.Image):
+            pass 
         elif isinstance(data,six.string_types): #assume a path
             self.open(data,**kwargs)
-        else: #assume a np.ndarray
+            return
+        else: # assume some kind of array
+            try:
+                mode=kwargs.get('mode','RGBA'[:len(data)])
+                data=PILImage.merge(mode,data)
+            except: #assume a np.ndarray
             # http://stackoverflow.com/questions/10965417/how-to-convert-numpy-array-to-pil-image-applying-matplotlib-colormap
-            data=np.asarray(data)
-            if data.max()>255 or data.min()<0: #if data is out of bounds
-                data=_normalize(data,255,0)
-            if data.max()<=1:
-                data*=255
-            colormap=kwargs.pop('colormap',None)
-            if colormap:
-                data=colormap(data,bytes=True)
-            elif data.dtype is not np.uint8:
-                data = np.uint8(data)
-            self._initfrom(PILImage.fromarray(data))
+                data=np.asarray(data)
+                if data.max()>255 or data.min()<0: #if data is out of bounds
+                    data=_normalize(data,255,0)
+                if data.max()<=1:
+                    data*=255
+                colormap=kwargs.pop('colormap',None)
+                if colormap:
+                    data=colormap(data,bytes=True)
+                elif data.dtype is not np.uint8:
+                    data = np.uint8(data)
+                data=PILImage.fromarray(data)
+        self._initfrom(data)
 
     def open(self,path):
         self.path=path
@@ -133,6 +134,19 @@ class Image(PILImage.Image):
             im=self.convert('L') #gray
 
         return im.save(path,format,**kwargs)
+    
+    def convert(self,mode,**kwargs):
+        return super(Image,self).convert(mode)
+    
+    def split(self, mode=None):
+        if mode and mode != self.mode:
+            im=self.convert(mode)
+        else:
+            im=self
+        try:
+            return super(Image,im).split()
+        except:
+            return [im]
 
     def _initfrom(self,other):
         #does `PIL.Image.Image._new` "reversed"
@@ -345,16 +359,6 @@ class Image(PILImage.Image):
         arr=_normalize(np.array(self),newmax,newmin)
         return Image(arr)
 
-    def split(self, mode=None):
-        if mode and mode != self.mode:
-            im=self.convert(mode)
-        else:
-            im=self
-        try:
-            return super(Image,im).split()
-        except:
-            return [im]
-
     @adapt_rgb
     def filter(self,f):
         try: # scikit-image filter or similar ?
@@ -468,9 +472,9 @@ class Image(PILImage.Image):
         if other.nchannels==1:
             if self.nchannels==1:
                 return self.compose(None,np.array(other,dtype=np.float))
-            rgba=list(self.convert('RGBA').split())
+            rgba=list(self.split('RGBA'))
             rgba[-1]=rgba[-1]*other
-            return PILImage.merge('RGBA',rgba)
+            return Image(rgba,mode='RGBA')
         raise NotImplemented('%s * %s'%(self,other))
 
 
