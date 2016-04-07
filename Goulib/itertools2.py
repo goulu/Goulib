@@ -62,9 +62,12 @@ def drop(n, iterable):
 
 def ilen(it):
     """
-    :result: int length exhausing an iterator
+    :result: int length exhausting an iterator
     """
-    return sum(1 for _ in it)
+    try:
+        return len(it) #much faster if defined...
+    except:
+        return sum(1 for _ in it)
 
 def irange(start_or_end, optional_end=None):
     """
@@ -84,10 +87,10 @@ def isiterable(obj):
 
 def arange(start,stop=None,step=1):
     """ range for floats or other types (`numpy.arange` without numpy)
-    
+
     :param start: optional number. Start of interval. The interval includes this value. The default start value is 0.
     :param stop: number. End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
-    :param step: optional number. Spacing between values. For any output out, this is the distance between two adjacent values, out[i+1] - out[i]. The default step size is 1. 
+    :param step: optional number. Spacing between values. For any output out, this is the distance between two adjacent values, out[i+1] - out[i]. The default step size is 1.
     :result: iterator
     """
     if stop is None:
@@ -107,7 +110,7 @@ def arange(start,stop=None,step=1):
 def linspace(start,end,n=100):
     """ iterator over n values linearly interpolated between (and including) start and end
     `numpy.linspace` without numpy
-    
+
     :param start: number, or iterable vector
     :param end: number, or iterable vector
     :param n: int number of interpolated values
@@ -127,7 +130,7 @@ def linspace(start,end,n=100):
 
 def flatten(l, donotrecursein=six.string_types):
     """iterator to flatten (depth-first) structure
-    
+
     :param l: iterable structure
     :param donotrecursein: tuple of iterable types in which algo doesn't recurse
                            string type by default
@@ -170,7 +173,7 @@ def compress(iterable):
 
 def tee(iterable, n=2, copy=None):
     """tee or copy depending on type and goal
-    
+
     :param iterable: any iterable
     :param n: int number of tees/copies to return
     :param copy: optional copy function, for exemple copy.copy or copy.deepcopy
@@ -197,7 +200,7 @@ def groups(iterable, n, step=None):
 def pairwise(iterable,op=None,loop=False):
     """
     iterates through consecutive pairs
-    
+
     :param iterable: input iterable s1,s2,s3, .... sn
     :param op: optional operator to apply to each pair
     :param loop: boolean True if last pair should be (sn,s1) to close the loop
@@ -210,7 +213,30 @@ def pairwise(iterable,op=None,loop=False):
             yield op(x[1],x[0]) #reversed ! (for sub or div)
         else:
             yield x[0],x[1]
-            
+
+def shape(iterable):
+    """ shape of a mutidimensional array, without numpy
+    :param iterable: iterable of iterable ... of iterable or numpy arrays...
+    :result: list of n ints corresponding to iterable's len of each dimension
+    """
+    # http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.ndarray.shape.html
+    res=[]
+    try:
+        while True:
+            res.append(ilen(iterable))
+            iterable=first(iterable)
+    except:
+        pass
+    return res
+
+def ndim(iterable):
+    """ number of dimensions of a mutidimensional array, without numpy
+    :param iterable: iterable of iterable ... of iterable or numpy arrays...
+    :result: int number of dimensions
+    """
+    return len(shape)
+    
+
 def reshape(data,dims):
     """
     :result: data as a n-dim matrix
@@ -239,7 +265,7 @@ def iterate(func, arg):
 
 def accumulate(iterable, func=operator.add, skip_first=False):
     """Return running totals. extends `python.itertools.accumulate`
-    
+
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
     # accumulate([1,2,3,4,5], operator.mul) --> 1 2 6 24 120
     """
@@ -255,7 +281,7 @@ def accumulate(iterable, func=operator.add, skip_first=False):
 
 def tails(seq):
     """Get tails of a sequence
-    
+
     tails([1,2,3]) -> [1,2,3], [2,3], [3], [].
     """
     for idx in range(len(seq)+1):
@@ -276,7 +302,7 @@ def ireduce(func, iterable, init=None):
 
 def unique(iterable, key=None):
     """generate unique elements, preserving order. Remember all elements ever seen.
-    
+
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
     """
@@ -289,7 +315,7 @@ def unique(iterable, key=None):
 
 def count_unique(iterable, key=None):
     """Count unique elements
-    
+
     # count_unique('AAAABBBCCDAABBB') --> 4
     # count_unique('ABBCcAD', str.lower) --> 4
     """
