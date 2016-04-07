@@ -2,6 +2,7 @@ six
 lxml
 xlrd
 pillow
+scikit-image
 dxfgrabber
 dxfwrite
 svg.path

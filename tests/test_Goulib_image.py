@@ -21,6 +21,7 @@ class TestImage:
         self.lena_gray=Image(results+'lena_gray.png')
 
     def test_pdf(self):
+        return # for now for speed
         try:
             import pdfminer
         except:
@@ -121,6 +122,13 @@ class TestImage:
         cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
         for im,c in zip(cmyk,'CMYK'):
             im.save(results+'lena_split_%s.png'%c)
+            
+        lab=self.lena.split('Lab')
+        for im,c in zip(lab,'LAB'):
+            im.save(results+'lena_split_%s.png'%c)
+            
+        lab=Image(lab,mode='LAB')
+        lab.save(results+'lena_Lab.png')
 
     def test_dither(self):
         for k in dithering:

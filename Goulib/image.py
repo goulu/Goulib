@@ -11,6 +11,7 @@ image processing and conversion
 * `scikit-image <http://scikit-image.org/>`_ for advanced filtering
 """
 from __future__ import division #"true division" everywhere
+from string import upper
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
@@ -28,8 +29,15 @@ import numpy as np
 
 import six, math, base64, functools, logging
 
-from . import math2
+from . import math2, itertools2
 from .drawing import Drawing #to read vector pdf files as images
+
+
+#add Lab and XYZ Image modes
+from PIL import ImageMode
+ImageMode.getmode('L') #to make sure to initialize _modes
+ImageMode._modes['LAB']=ImageMode.ModeDescriptor('LAB',('L','A','B'),'L','L')
+ImageMode._modes['XYZ']=ImageMode.ModeDescriptor('XYZ',('X','Y','Z'),'L','L')
 
 #dithering methods
 PHILIPS=11
@@ -85,6 +93,11 @@ class Image(PILImage.Image):
             self.open(data,**kwargs)
             return
         else: # assume some kind of array
+            s=itertools2.shape(data)
+            if len(s)==3: #more than 1 plane
+                if s[-1]==min(s): #probably a skimage array X.Y.colors
+                    data=np.transpose(data, (2, 0, 1))
+                data=[Image(plane) for plane in data]
             try:
                 mode=kwargs.get('mode','RGBA'[:len(data)])
                 data=PILImage.merge(mode,data)
@@ -136,6 +149,16 @@ class Image(PILImage.Image):
         return im.save(path,format,**kwargs)
     
     def convert(self,mode,**kwargs):
+        mode=upper(mode) #because users might write "Lab"
+        if mode==self.mode: #quick but dangerous. let's see if it works
+            return self #otherwise maybe add a kwarg to force copy ?
+        if mode =='LAB':
+            lab=skimage.color.rgb2lab(self.convert('RGB'))
+            return Image(lab,mode='LAB')
+        if self.mode == 'LAB':
+            rgb=skimage.color.lab2rgb(self)
+            return Image(rgb).convert(mode)
+            
         return super(Image,self).convert(mode)
     
     def split(self, mode=None):
