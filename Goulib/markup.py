@@ -42,7 +42,8 @@ def tag( tag, between, **kwargs ):
     """generate full tag."""
     single=kwargs.pop('single',False)
     out = "<%s" % tag
-    for key, value in list(kwargs.items()):
+    for key in sorted(kwargs):
+        value=kwargs[key]
         if value is None:               # when value is None that means stuff like <... checked>
             out = "%s %s" % ( out, key )
         else:
