@@ -67,6 +67,28 @@ def gcd(*args):
 def coprime(*args):
     return gcd(*args)==1
 
+def coprimes_gen(limit):
+    '''Fast computation of Farey sequence as a generator'''
+    # https://www.quora.com/What-are-the-fastest-algorithms-for-generating-coprime-pairs
+    # n, d is the start fraction n/d (0,1) initially
+    # N, D is the stop fraction N/D (1,1) initially
+    pend = []
+    n = 0
+    d = N = D = 1
+    while True:
+        mediant_d = d + D
+        if mediant_d <= limit:
+            mediant_n = n + N
+            pend.append((mediant_n, mediant_d, N, D))
+            N = mediant_n
+            D = mediant_d
+        else:
+            yield n, d
+            if pend:
+                n, d, N, D = pend.pop()
+            else:
+                break
+
 def lcm(a,b):
     """least common multiple"""
     return abs(a * b) // gcd(a,b) if a and b else 0
@@ -291,6 +313,10 @@ def dist(a,b,norm=norm_2):
 def vecunit(v,norm=norm_2):
     """:return: vector normalized"""
     return vecdiv(v,norm(v))
+
+def hamming(s1, s2):
+    """Calculate the Hamming distance between two iterables"""
+    return sum(c1 != c2 for c1, c2 in zip(s1, s2))
 
 def sets_dist(a,b):
     """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
