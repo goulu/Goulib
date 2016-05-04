@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf8
+
+from __future__ import division #"true division" everywhere
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -13,17 +16,16 @@ path=os.path.dirname(os.path.abspath(__file__))
 
 class TestRgbToHex:
     def test_rgb_to_hex(self):
-        assert_equal( rgb_to_hex((0,16,255)),'#0010ff')
+        assert_equal( rgb_to_hex((0,16/255,1)),'#0010ff')
 
 class TestHexToRgb:
     def test_hex_to_rgb(self):
-        assert_equal(hex_to_rgb('#0010ff'),(0,16,255))
-        assert_equal(hex_to_rgb('#0010ff',1./255),(0,16./255,1))
+        assert_equal(hex_to_rgb('#0010ff'),(0,16./255,1))
         
 class TestRgbToCmyk:
     def test_rgb_to_cmyk(self):
-        assert_equal(rgb_to_cmyk(0,0,0),(0,0,0,1))
-        assert_equal(rgb_to_cmyk(.8,.6,.4),(0,0.25,.5,0.2))
+        assert_equal(rgb_to_cmyk((0,0,0)),(0,0,0,1))
+        assert_equal(rgb_to_cmyk((.8,.6,.4)),(0,0.25,.5,0.2))
 
 class TestNearestColor:
     def test_nearest_color(self):
@@ -77,8 +79,16 @@ class TestColor:
     def test__repr_html_(self):
         assert_equal(Color('blue')._repr_html_(),'<div style="color:#0000ff">blue</div>')
 
+    def test_rgb(self):
+        pass #tested above
+    
     def test_hex(self):
         pass #tested above
+    
+    def test_cmyk(self):
+        assert_equal(Color('black').cmyk,(0,0,0,1))
+        assert_equal(Color('blue').cmyk,(1,1,0,0))
+        assert_equal(Color((0,.5,.5)).cmyk,(1,0,0,.5)) #teal
 
 class TestColorToAci:
     def test_color_to_aci(self):

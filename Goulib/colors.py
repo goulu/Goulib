@@ -16,6 +16,9 @@ __credits__ = ['Colormath http://python-colormath.readthedocs.org/en/latest/',
 #see http://python-colormath.readthedocs.org/en/latest/ if you need more
 
 import six, os 
+from matplotlib.colors import rgb2hex, hex2color
+from skimage.color import rgb2gray, rgb2lab, lab2rgb, rgb2hsv, hsv2rgb
+
 from Goulib import math2
 from Goulib.table import Table
 
@@ -34,25 +37,18 @@ pantone=dict([line['name'],line['hex']] for line in table['Pantone'].asdict())
 
 # http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 
-def rgb_to_hex(rgb):
-    """:param rgb: tuple (r,g,b) of 3 ints 0-255
-    :result: string "#rrggbb" in hex suitable for HTML color"""
-    return '#%02x%02x%02x' % tuple(rgb)
-
-def hex_to_rgb(value,scale=1):
-    """:param value: string "#rrggbb" in hex suitable for HTML color
-    :param scale: float optional 1./255 to scale output to [0,1] floats
-    :result: tuple (r,g,b) of 3 ints 0-255"""
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(scale*int(value[i:i+int(lv/3)], 16) for i in range(0, lv, int(lv/3)))
+rgb_to_hex = rgb2hex
+hex_to_rgb = hex2color
 
 # http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
 
-def rgb_to_cmyk(r,g,b):
+def rgb_to_cmyk(rgb):
     """:param r,g,b: floats of red,green,blue in [0..1] range
     :return: tuple of 4 floats (cyan, magenta, yellow, black) in [0..1] range
     """
+    
+    r,g,b=rgb
+    
     c = 1 - r
     m = 1 - g
     y = 1 - b
@@ -73,18 +69,18 @@ def color_range(n,start,end):
     :param end: string hex color or color name
     :result: list of n hexcolors interpolated between start and end, included
     """
-    import colorsys
+
     from .itertools2 import linspace
     if start in color: start=color[start]
-    start=hex_to_rgb(start,1./255)
-    start=colorsys.rgb_to_hsv(*start)
+    start=hex_to_rgb(start)
+    start=rgb2hsv(start)
     if end in color: end=color[end]
-    end=hex_to_rgb(end,1./255)
-    end=colorsys.rgb_to_hsv(*end)
+    end=hex_to_rgb(end)
+    end=rgb2hsv(end)
     res=[]
     for hsv in linspace(start,end,n):
-        rgb=colorsys.hsv_to_rgb(*hsv)
-        hex=rgb_to_hex(tuple(int(255*x) for x in rgb))
+        rgb=hsv2rgb(*hsv)
+        hex=rgb_to_hex(rgb)
         res.append(hex)
     return res
 
@@ -160,11 +156,11 @@ def aci_to_color(x, block_color=None, layer_color=None):
 def _nearest(x,l):
     """:return: index  of the nearest color in list l"""
     if isinstance(x,six.string_types):
-        rgb=hex_to_rgb(x,1./255)
+        rgb=hex_to_rgb(x)
     else:
         rgb=math2.sat(x,0,1)
     from .itertools2 import index_min
-    return index_min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
+    return index_min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_)))
 
 def nearest_color(x,l=None):
     """:return: name of the nearest color in list l or in color_lootup table"""
@@ -219,20 +215,31 @@ class Color(object):
     @property
     def rgb(self):
         if self._rgb is None:
-            self._rgb=hex_to_rgb(self._hex, 1/255)     
+            if self._lab:
+                self._rgb=lab2rgb(self._lab)
+            else:
+                self._rgb=hex_to_rgb(self._hex)     
         return self._rgb 
     
     @property
     def hex(self):
         if self._hex is None:
-            self._hex=rgb_to_hex((math2.rint(_*255) for _ in self.rgb))
+            self._hex=rgb_to_hex(self.rgb)
         return self._hex
     
     @property
     def lab(self):
         if self._lab is None:
-            pass #TODO: implement
+            self._lab=rgb2lab(self.rgb)
         return self._lab
+    
+    @property
+    def cmyk(self):
+        return rgb_to_cmyk(self.rgb)
+    
+    @property
+    def hsv(self):
+        return rgb2hsv(self.rgb)
     
     def __repr__(self):
         return "Color('%s')"%(self.name if self.name[0]!='~' else self.hex)
