@@ -42,7 +42,7 @@ class TestColorRange:
         assert_equal(c[0],color['red'])
         assert_equal(c[1],color['yellow'])
         assert_equal(c[2],color['lime'])
-        assert_equal(c[3],color['aqua'])
+        assert_equal(c[3],color['cyan'])
         assert_equal(c[4],color['blue'])
 
 class TestColor:
@@ -53,7 +53,8 @@ class TestColor:
         blue3=Color((0,0,1))
         assert_equal(blue1,blue3)
         blue4=Color((0,0,255))
-        assert_equal(blue1,blue4)
+        blue5=Color(blue4)
+        assert_equal(blue1,blue5)
     
     def test___add__(self):
         red=Color('red')

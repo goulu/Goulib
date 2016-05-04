@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-very simple (RGB) color management
+very simple color management
 """
+
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
@@ -173,30 +176,63 @@ def nearest_color(x,l=None):
 
 class Color(object):
     '''class to allow simple math operations on colors'''
-    def __init__(self,c):
-        ''':param c: either color name, hex string, or (r,g,b) tuple in [0..255] int or [0,.1.] float range'''
-        if isinstance(c,six.string_types):
-            try: #is c a color name ?
-                c=color[c]
-            except: #assume it's a hex string
-                pass
-            self.rgb=hex_to_rgb(c,1./255)
-        else: # assume (r,g,b) tuple
-            if max(c)>1:
-                c=tuple(_/255. for _ in c)
-            self.rgb=c
+    def __init__(self, name, rgb=None, lab=None):
+        """constructor
         
-        try: #to guess the color name
-            self.name=color_lookup[self.hex]
-            return
-        except: #find the closest one
-            pass
-        self.name='~'+nearest_color(self.rgb)
+        :param name: string color name, hex string, or (r,g,b) tuple in [0..255] int or [0,.1.] float range
+        """
+        
+        def init(name=None, rgb=None, hex=None, lab=None):
+            self._name=name
+            if rgb:
+                if max(rgb)>1:
+                    rgb=tuple(_/255. for _ in rgb)
+                rgb=math2.sat(rgb,0,1) #nothing is whiter than white...
+            self._rgb=rgb
+            self._hex=hex
+            self._lab=lab
+            
+        if isinstance(name,Color): #copy constructor
+            init(name.name,name.rgb,name.hex,name.lab)
+        elif isinstance(name, six.string_types):
+            if name in color:
+                init(name,hex=color[name])
+            elif name in pantone:
+                init(name,hex=pantone[name]) #TODO: use Lab instead
+            else:
+                init(hex=name)
+        elif lab is not None:
+            init(lab=lab)
+        else:  # assume (r,g,b) tuple
+            init(rgb=rgb or name)
+
+        
+    @property
+    def name(self):
+        if self._name is None:
+            if self.hex in color_lookup:
+                self._name=color_lookup[self.hex]
+            else:
+                self._name='~'+nearest_color(self.rgb)
+        return self._name
             
     @property
+    def rgb(self):
+        if self._rgb is None:
+            self._rgb=hex_to_rgb(self._hex, 1/255)     
+        return self._rgb 
+    
+    @property
     def hex(self):
-        rgb=math2.sat(self.rgb)
-        return rgb_to_hex((math2.rint(_*255) for _ in rgb))
+        if self._hex is None:
+            self._hex=rgb_to_hex((math2.rint(_*255) for _ in self.rgb))
+        return self._hex
+    
+    @property
+    def lab(self):
+        if self._lab is None:
+            pass #TODO: implement
+        return self._lab
     
     def __repr__(self):
         return "Color('%s')"%(self.name if self.name[0]!='~' else self.hex)
