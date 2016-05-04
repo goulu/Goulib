@@ -197,6 +197,15 @@ class Table(list):
         :param titles: optional list of strings used as column id
         :param footer: optional list of functions used as column reducers
         """
+        try:
+            self.titles=data.titles
+        except:
+            self.titles=kwargs.pop('titles',[])
+        try:
+            self.footer=data.footer
+        except:
+            self.footer=kwargs.pop('footer',[])
+            
         filename=None
         if isinstance(data,six.string_types):
             filename=data
@@ -207,19 +216,17 @@ class Table(list):
                     row=[row]
                 self.append(list(row))
         
-        self.titles=kwargs.pop('titles',[])
-        self.footer=kwargs.pop('footer',[])
         if filename:
-            if self.titles: #explicitely set
+            if self.titles: #explicitly set
                 kwargs.setdefault('titles_line',0)
                 kwargs.setdefault('data_line',1)
             else: #read titles from the file
                 kwargs.setdefault('titles_line',1) 
                 kwargs.setdefault('data_line',2)
             ext=filename.split('.')[-1].lower()
-            if ext=='xls':
+            if ext in ('xls','xlsx'):
                 self.read_xls(filename,**kwargs)
-            elif ext[:3]=='htm':
+            elif ext in ('htm','html'):
                 self.read_html(filename,**kwargs)
             else: #try ...
                 self.read_csv(filename,**kwargs)
@@ -319,13 +326,18 @@ class Table(list):
         
         from xlrd import open_workbook
         wb = open_workbook(filename)
-        for s in wb.sheets():
-            for i in range(s.nrows):
-                line=[Cell.read(s.cell(i,j).value) for j in range(s.ncols)]
-                if i==titles_line:
-                    self.titles=line
-                elif i>=data_line:
-                    self.append(line)
+        sheet=kwargs.get('sheet',0)
+        if isinstance(sheet,six.string_types):
+            s=wb.sheet_by_name(sheet)
+        else:
+            s=wb.sheet_by_index(sheet)
+        
+        for i in range(s.nrows):
+            line=[Cell.read(s.cell(i,j).value) for j in range(s.ncols)]
+            if i==titles_line:
+                self.titles=line
+            elif i>=data_line:
+                self.append(line)
         return self
         
     def read_csv(self, filename, **kwargs):
