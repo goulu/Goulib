@@ -16,8 +16,10 @@ __credits__ = ['Colormath http://python-colormath.readthedocs.org/en/latest/',
 #see http://python-colormath.readthedocs.org/en/latest/ if you need more
 
 import six, os 
+import numpy as np
+
 from matplotlib.colors import rgb2hex, hex2color
-from skimage.color import rgb2gray, rgb2lab, lab2rgb, rgb2hsv, hsv2rgb
+hex2rgb=hex2color #alias
 
 from Goulib import math2
 from Goulib.table import Table
@@ -35,14 +37,33 @@ color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/r
 
 pantone=dict([line['name'],line['hex']] for line in table['Pantone'].asdict())
 
-# http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
+# color conversion
+# skimage.color has several useful color conversion routines, but for images
+# so here is a generic adapter that allows to call them with colors
 
-rgb_to_hex = rgb2hex
-hex_to_rgb = hex2color
+def _skadapt(f):
+    def adapted(arr):
+        arr = np.asanyarray(arr)
+        if arr.ndim ==1:
+            arr=arr.reshape(1,1,arr.shape[-1])
+            res=f(arr)
+            res=res.reshape(arr.shape[-1])
+            return res
+        else:
+            return f(arr)
+    return adapted
+
+import skimage.color as skcolor
+
+rgb2gray=_skadapt(skcolor.rgb2gray)
+rgb2lab=_skadapt(skcolor.rgb2lab)
+lab2rgb=_skadapt(skcolor.lab2rgb)
+rgb2hsv=_skadapt(skcolor.rgb2hsv)
+hsv2rgb=_skadapt(skcolor.hsv2rgb)
 
 # http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
 
-def rgb_to_cmyk(rgb):
+def rgb2cmyk(rgb):
     """:param r,g,b: floats of red,green,blue in [0..1] range
     :return: tuple of 4 floats (cyan, magenta, yellow, black) in [0..1] range
     """
@@ -72,15 +93,15 @@ def color_range(n,start,end):
 
     from .itertools2 import linspace
     if start in color: start=color[start]
-    start=hex_to_rgb(start)
+    start=hex2rgb(start)
     start=rgb2hsv(start)
     if end in color: end=color[end]
-    end=hex_to_rgb(end)
+    end=hex2rgb(end)
     end=rgb2hsv(end)
     res=[]
     for hsv in linspace(start,end,n):
-        rgb=hsv2rgb(*hsv)
-        hex=rgb_to_hex(rgb)
+        rgb=hsv2rgb(hsv)
+        hex=rgb2hex(rgb)
         res.append(hex)
     return res
 
@@ -88,7 +109,7 @@ def color_range(n,start,end):
     >>> from Goulib.table import Table
     >>> acadcolors=[]
     >>> t=Table('AutoCAD Color Index RGB Equivalents.html')[1:] #outer <table> from original file must be removed
-    >>> for c in t: acadcolors.append(rgb_to_hex(c[4:]))
+    >>> for c in t: acadcolors.append(rgb2hex(c[4:]))
 """
 acadcolors=[
     '#000000', '#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ffffff', 
@@ -156,11 +177,11 @@ def aci_to_color(x, block_color=None, layer_color=None):
 def _nearest(x,l):
     """:return: index  of the nearest color in list l"""
     if isinstance(x,six.string_types):
-        rgb=hex_to_rgb(x)
+        rgb=hex2rgb(x)
     else:
         rgb=math2.sat(x,0,1)
     from .itertools2 import index_min
-    return index_min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_)))
+    return index_min(l,key=lambda _:math2.dist(rgb, hex2rgb(_)))
 
 def nearest_color(x,l=None):
     """:return: name of the nearest color in list l or in color_lootup table"""
@@ -218,13 +239,13 @@ class Color(object):
             if self._lab:
                 self._rgb=lab2rgb(self._lab)
             else:
-                self._rgb=hex_to_rgb(self._hex)     
+                self._rgb=hex2rgb(self._hex)     
         return self._rgb 
     
     @property
     def hex(self):
         if self._hex is None:
-            self._hex=rgb_to_hex(self.rgb)
+            self._hex=rgb2hex(self.rgb)
         return self._hex
     
     @property
@@ -235,7 +256,7 @@ class Color(object):
     
     @property
     def cmyk(self):
-        return rgb_to_cmyk(self.rgb)
+        return rgb2cmyk(self.rgb)
     
     @property
     def hsv(self):

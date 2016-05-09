@@ -14,18 +14,18 @@ from Goulib.itertools2 import reshape
 import os
 path=os.path.dirname(os.path.abspath(__file__))
 
-class TestRgbToHex:
-    def test_rgb_to_hex(self):
-        assert_equal( rgb_to_hex((0,16/255,1)),'#0010ff')
+class TestRgb2Hex:
+    def test_rgb2hex(self):
+        assert_equal( rgb2hex((0,16/255,1)),'#0010ff')
 
-class TestHexToRgb:
-    def test_hex_to_rgb(self):
-        assert_equal(hex_to_rgb('#0010ff'),(0,16./255,1))
+class TestHex2Rgb:
+    def test_hex2rgb(self):
+        assert_equal(hex2rgb('#0010ff'),(0,16./255,1))
         
-class TestRgbToCmyk:
-    def test_rgb_to_cmyk(self):
-        assert_equal(rgb_to_cmyk((0,0,0)),(0,0,0,1))
-        assert_equal(rgb_to_cmyk((.8,.6,.4)),(0,0.25,.5,0.2))
+class TestRgb2Cmyk:
+    def test_rgb2cmyk(self):
+        assert_equal(rgb2cmyk((0,0,0)),(0,0,0,1))
+        assert_equal(rgb2cmyk((.8,.6,.4)),(0,0.25,.5,0.2))
 
 class TestNearestColor:
     def test_nearest_color(self):
