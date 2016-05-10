@@ -2,9 +2,7 @@
 # coding: utf8
 """
 efficient Euclidian Graphs for :mod:`networkx` and related algorithms
-"""
-# 
-"""
+
 :requires:
 * `networkx <http://networkx.github.io/>`_ 
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ 
@@ -118,7 +116,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
     
 
 
-class _Geo(object):
+class _Geo(plot.Plot):
     """base class for graph with nodes at specified positions.
     if edges have a "length" attribute, it is used to compute distances,
     otherwise euclidian distance between nodes is used by default
@@ -203,6 +201,13 @@ class _Geo(object):
             return self.multi
         except:
             return True
+        
+    def pos(self,node):
+        try:
+            return self.node[node]['pos']
+        except:
+            return node #supposedly a tuple
+        
             
         
     def dist(self,u,v):
@@ -213,7 +218,8 @@ class _Geo(object):
         try:
             return self[u][v]['length'] 
         except: 
-            return math2.dist(u,v)
+            pass
+        return math2.dist(self.pos(u),self.pos(v))
                 
     def length(self,edges=None):
         """
@@ -301,10 +307,10 @@ class _Geo(object):
         if p in self.node: #point already exists
             return p
         
+        id=p
+        
         if type(p) is not tuple:
             # try to find a position tuple somewhere
-            # otherwise generate a random position
-            # and store the node id
             if p in self._map:
                 return self._map[p]
             a={} 
@@ -313,17 +319,16 @@ class _Geo(object):
             if attr :
                 a.update(**attr)
 
-            id=p #save p as key
+            
             p=a.get('pos',id)
             if isinstance(p,six.string_types):
                 p=p.split(',')
             try:
                 p=tuple(float(x) for x in p)
-            except: # assign a random position
+            except: # assign a random position, but keep node id
                 from random import random
-                p=tuple((random(),random()))
+                attr['pos']=p=tuple((random(),random()))
 
-            self._map[id]=p
             
         if self.idx is None: #now we know the dimension, so we can create the index
             n=len(p)
@@ -335,12 +340,16 @@ class _Geo(object):
         if close and d<=self.tol:
             return close[0]
         else: # point doesn't exist yet : create it
+            #RTREE uses unique int node identifiers
             global _nk
             _nk+=1
-            attr['key']=_nk
-            self.parent.add_node(self,p, attr_dict, **attr)
             self.idx.insert(_nk,p,p)
-        return p
+            # networkX uses any id type, but the RTREE key is kept
+            attr['key']=_nk
+            self.parent.add_node(self,id, attr_dict, **attr)
+            #._map links both id
+            self._map[id]=p
+        return id
     
     def add_nodes_from(self, nodes, **attr):
         """must be here because Graph.add_nodes_from doesn't call add_node cleanly as it should..."""
@@ -423,7 +432,11 @@ class _Geo(object):
                 keys=set()
                 k=0
         
-        self.parent.add_edge(self,u, v, k, attr_dict=a) #doesn't return created data... what a pity ...
+        res=self.parent.add_edge(self,u, v, k, attr_dict=a)
+        if res is not None:
+            return res
+        # networkX still doesn't return created data... what a pity ...
+        # we have to search the dict object that was just created ...
 
         if k is None:
             k=next(iter(set(self[u][v].keys())-keys))
@@ -465,6 +478,9 @@ class _Geo(object):
             if n1!=n2:
                 raise KeyError('%s %s number of nodes %d!=%d'%(self.__class__.__name__, self.name, n1,n2))
         return n1
+    
+    def shortest_path(self,source=None,target=None):
+        return nx.shortest_path(self,source,target) #TODO : add distance weights
     
     def stats(self):
         """:return: dict of graph data to use in __repr__ or usable otherwise"""
@@ -511,11 +527,6 @@ class _Geo(object):
         return res
     
     # for IPython notebooks
-    def _repr_svg_(self):
-        return self.render('svg').decode('utf-8')
-    
-    def _repr_png_(self): 
-        return self.render('png')
     
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
@@ -528,6 +539,9 @@ class _Geo(object):
             open(filename,'wb').write(self.render(ext,**kwargs))
             
 class GeoGraph(_Geo, nx.MultiGraph):
+    """ Undirected graph with nodes positions
+    can be set to non multiedges anytime with attribute multi=False
+    """
     def __init__(self, data=None, nodes=None, **kwargs):
         """
         :param data: see :meth:`to_networkx_graph` for valid types
@@ -543,6 +557,26 @@ class GeoGraph(_Geo, nx.MultiGraph):
         
         nx.MultiGraph.__init__(self,None, **properties)
         _Geo.__init__(self,nx.MultiGraph,data,nodes)
+        
+class DiGraph(_Geo, nx.MultiDiGraph):
+    """ directed graph with nodes positions
+    can be set to non multiedges anytime with attribute multi=False
+    """
+    def __init__(self, data=None, nodes=None, **kwargs):
+        """
+        :param data: see :meth:`to_networkx_graph` for valid types
+        :param kwargs: other parameters will be copied as attributes, especially:
+
+        """
+        properties=kwargs
+        try:
+            properties.update(data.graph)
+        except:
+            pass
+        properties.setdefault('tol',0.010) #default tolerance on node positions
+        
+        nx.MultiDiGraph.__init__(self,None, **properties)
+        _Geo.__init__(self,nx.MultiDiGraph,data,nodes)
     
     
 def figure(g, box=None,**kwargs):
@@ -564,7 +598,7 @@ def figure(g, box=None,**kwargs):
     
     return fig
 
-def draw_networkx(g, pos=None, with_labels=False, **kwargs):
+def draw_networkx(g, pos=None, **kwargs):
     """ improves draw_networkx 
     :param g: NetworkX Graph
     :param pos: can be either :
@@ -600,11 +634,7 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
     except:
         pass
         
-    try:
-        edgelist=kwargs.pop('edgelist')
-    except:
-        edgelist=g.edges(data=True)
-    edgelist=list(edgelist)
+    edgelist=list(kwargs.pop('edgelist',g.edges(data=True)))
         
     edge_color=kwargs.get('edge_color',None)
     if edge_color is None:
@@ -640,8 +670,15 @@ def draw_networkx(g, pos=None, with_labels=False, **kwargs):
         nx.draw_networkx_nodes(g, pos, **kwargs)
         
     nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
-    if with_labels:
-        nx.draw_networkx_labels(g, pos, **kwargs)
+    
+    labels=kwargs.pop('labels',None)
+    if labels:
+        if labels==True: labels=None #will be set automatically
+        if six.callable(labels): #mapping function ?
+            labels=list(labels(u) for u in g.nodes(data=True))
+        if isinstance(labels,list): # a dict is expected:
+            labels=dict(zip(g.nodes(),labels))
+        nx.draw_networkx_labels(g, pos, labels, **kwargs)
         
     return fig
 

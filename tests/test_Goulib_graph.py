@@ -12,6 +12,7 @@ import logging
 
 import os
 path=os.path.dirname(os.path.abspath(__file__))
+results=path+'\\results\\graph\\' #path for results
 
 class TestGeoGraph:
     @classmethod
@@ -32,10 +33,10 @@ class TestGeoGraph:
                     
     def test_save(self):
         if self.dot:
-            self.dot.save(path+'/results/cluster.png', transparent=False)
+            self.dot.save(results+'cluster.png', transparent=False)
         
         #3D graph
-        self.sphere.save(path+'/results/graph.sphere.png', transparent=False)
+        self.sphere.save(results+'graph.sphere.png', transparent=False)
         
         
     def test_render(self):
@@ -43,8 +44,12 @@ class TestGeoGraph:
         m=plt.get_cmap('Blues')
         def edge_color(data): #make longer links darker
             return m(data['length']/.25)    
-        self.geo.render(edge_color=edge_color, node_size=50) #this sets geo.render_args ...
-        self.geo.save(path+'/results/graph.graph.png', transparent=False)
+        self.geo.render(
+            edge_color=edge_color,
+            node_size=50,
+            labels=lambda x:x[1]['key'], # key of dict of node attributes
+        ) #this sets geo.render_args ...
+        self.geo.save(results+'graph.graph.png', transparent=False)
     
     def test_is_multigraph(self):
         assert_false(self.cube.is_multigraph())
@@ -217,12 +222,12 @@ class TestDelauneyTriangulation:
         logging.info('Delauney %d : %f'%(n,time.clock()-start))
         assert_equal(graph.number_of_nodes(),n)
         assert_true(nx.is_connected(graph))
-        graph.save(path+'/results/graph.delauney.png')
+        graph.save(results+'graph.delauney.png')
         to_networkx_graph(graph)
         start=time.clock()
         graph=euclidean_minimum_spanning_tree(nodes)
         logging.info('Spanning tree %d : %f'%(n,time.clock()-start))
-        graph.save(path+'/results/graph.emst.png')
+        graph.save(results+'graph.emst.png')
 
 class TestEuclideanMinimumSpanningTree:
     def test_euclidean_minimum_spanning_tree(self):
