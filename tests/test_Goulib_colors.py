@@ -30,6 +30,10 @@ class TestRgb2Cmyk:
 class TestNearestColor:
     def test_nearest_color(self):
         assert_equal(nearest_color('#414142'),color['darkslategray'])
+        cmyk=Color((.45,.12,.67,.05),mode='cmyk')
+        p=nearest_color(cmyk,pantone)
+        assert_equal(p.name,'802C')
+        dE=deltaE
 
 class TestAci:
     def test_color_to_aci(self):
@@ -48,21 +52,33 @@ class TestColorRange:
         assert_equal(c[4],color['blue'])
 
 class TestColor:
+    @classmethod
+    def setup_class(self):
+        self.blue=Color('blue')
+        self.blues=[ #many ways to define the same color
+            self.blue,
+            Color('#0000ff'),
+            Color((0,0,1)),
+            Color((0,0,255)),
+            Color(self.blue),
+        ]
+        
+        self.red=Color('red')
+        self.green=Color('lime') # 'green' has hex 80 value, not ff
+        
+        self.white=color['white']
+        
+        self.cmyk=Color((.45,.12,.67,.05),mode='cmyk') # a random cmyk color
+        
     def test___init__(self):
-        blue1=Color('blue')
-        blue2=Color('#0000ff')
-        assert_equal(blue1,blue2)
-        blue3=Color((0,0,1))
-        assert_equal(blue1,blue3)
-        blue4=Color((0,0,255))
-        blue5=Color(blue4)
-        assert_equal(blue1,blue5)
+        #check all constructors make the same color
+        for b in self.blues:
+            assert_equal(b,self.blue)
 
     def test___add__(self):
-        red=Color('red')
-        green=Color('lime') # 'green' has hex 80 value, not ff
-        blue=Color('blue')
-        assert_equal(red+green+blue,'white')
+
+        assert_equal(self.red+self.green+self.blue,'white')
+        assert_equal(self.red+self.green+self.blue,'white')
 
     def test___sub__(self):
         white=Color('white')
@@ -83,12 +99,14 @@ class TestColor:
         pass #tested above
 
     def test_hex(self):
-        pass #tested above
+        assert_equal(self.cmyk.hex,'#80d447')
+        #TODO : find why http://www.ginifab.com/feeds/pms/cmyk_to_pantone.php gives #85d550
 
     def test_cmyk(self):
         assert_equal(Color('black').cmyk,(0,0,0,1))
         assert_equal(Color('blue').cmyk,(1,1,0,0))
         assert_equal(Color((0,.5,.5)).cmyk,(1,0,0,.5)) #teal
+    
 
 class TestColorLookup:
     def test_color_lookup(self):

@@ -29,8 +29,9 @@ rgb2hex=mplcolors.rgb2hex
 hex2rgb=mplcolors.hex2color
 
 def rgb2cmyk(rgb):
-    """:param r,g,b: floats of red,green,blue in [0..1] range
-    :return: tuple of 4 floats (cyan, magenta, yellow, black) in [0..1] range
+    """
+    :param rgb: 3-tuple of floats of red,green,blue in [0..1] range
+    :return: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
     """
     # http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
 
@@ -47,6 +48,16 @@ def rgb2cmyk(rgb):
     m = (m - k) / (1 - k)
     y = (y - k) / (1 - k)
     return (c,m,y,k)
+
+def cmyk2rgb(cmyk):
+    """
+    :param cmyk: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
+    :result: 3-tuple of floats (red,green,blue) 
+    warning : rgb is out the [0..1] range for some cmyk
+    
+    """
+    c,m,y,k=cmyk
+    return (1.0-(c+k), 1.0-(m+k), 1.0-(y+k))
 
 # skimage.color has several useful color conversion routines, but for images
 # so here is a generic adapter that allows to call them with colors
@@ -75,9 +86,8 @@ modes=(
 #build a graph of available converters
 #as in https://github.com/gtaylor/python-colormath
 
-import networkx as nx # http://networkx.github.io/
-
-converters=nx.DiGraph()
+from .graph import DiGraph
+converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
 for source in modes:
     for target in modes:
         key=(source.lower(),target.lower())
@@ -99,9 +109,9 @@ def convert(color,source,target):
     """
     source,target=source.lower(),target.lower()
     if source==target: return color
-    path=nx.shortest_path(converters, source, target)
+    path=converters.shortest_path(source, target)
     for u,v in itertools2.pairwise(path):
-        color=converters[u][v]['f'](color)
+        color=converters[u][v][0]['f'](color)
     return color #isn't it beautiful ?
 
 class Color(object):
@@ -154,16 +164,17 @@ class Color(object):
             if self.hex in color_lookup:
                 self._name=color_lookup[self.hex].name
             else:
-                self._name='~'+nearest_color(self.rgb).name
+                self._name='~'+nearest_color(self).name
         return self._name
 
     def _convert(self, target):
         target=target.lower()
         if target not in self._values:
-            path=nx.shortest_path(converters, self._mode, target)
+            path=converters.shortest_path(self._mode, target)
             for u,v in itertools2.pairwise(path):
                 if v not in self._values:
-                    self._values[v]=converters[u][v]['f'](self._values[u])
+                    edge=converters[u][v][0]
+                    self._values[v]=edge['f'](self._values[u])
         return self._values[target]
 
     @property
@@ -205,6 +216,12 @@ class Color(object):
     def __neg__(self):
         """ complementary color"""
         return color['white']-self
+    
+    def deltaE(self,other):
+        """color difference according to CIEDE2000
+        https://en.wikipedia.org/wiki/Color_difference
+        """
+        return deltaE(self,other)
 
 # dictionaries of standardized colors
 
@@ -261,18 +278,29 @@ def aci_to_color(x, block_color=None, layer_color=None):
     if x==256: return layer_color
     return acadcolors[x]
 
-def nearest_color(x,l=None):
+from skimage.color import deltaE_ciede2000
+
+def deltaE(c1,c2):
+    # http://scikit-image.org/docs/dev/api/skimage.color.html#skimage.color.deltaE_ciede2000
+    if not isinstance(c1, Color):
+        c1=Color(c1)
+    if not isinstance(c2, Color):
+        c2=Color(c2)
+    return deltaE_ciede2000(c1.lab, c2.lab)
+
+def nearest_color(c,l=None, opt=min):
     """
     :param x: Color
-    :param l: list or dict of Color, color_lookup by default
+    :param l: list or dict of Color, color by default
+    :param opt: with opt=max you can find the most different color ...
     :return: nearest Color of x in  l
     """
-    if not isinstance(x, Color):
-        x=Color(x)
-    l=l or color_lookup
+    if not isinstance(c, Color):
+        c=Color(c)
+    l=l or color
     if isinstance(l,dict):
         l=l.values()
-    return min(l,key=lambda _:math2.dist(x.rgb, _.rgb))
+    return opt(l,key=lambda c2:deltaE(c,c2))
 
 #http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
 
