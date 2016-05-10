@@ -9,35 +9,44 @@ exemple: h('the result is',time,'[ms]')
 
 """
 
-__author__ = "Marc Nicole"
-__copyright__ = "Copyright 2015, Marc Nicole"
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2016, Philippe Guglielmetti"
 __credits__= [""]
 __license__ = "LGPL"
+
+import logging, six
 
 from IPython.display import display, HTML
 from .markup import tag
 from .itertools2 import isiterable
 
-def html(anything, sep=' '):
-    try:
-        return anything._repr_html_()
-    except:
-        pass
-    
-    if isiterable(anything): #iterable, but not a string
-        try:
-            return sep.join(html(a) for a in anything)
-        except:
-            pass
-    
-    try:
-        return unicode(anything,'utf8') #to render accented chars correctly
-    except:
-        pass
-    
-    return str(anything)
 
-sep=u' ' # Python2 doesn't allow named param after list of optional ones...
+def html(obj, sep=None):
+    try:
+        return obj._repr_html_()
+    except AttributeError:
+        pass #skip logging.error
+    
+    if sep is None:
+        sep=' '
+        bra,ket='',''
+    else:
+        if isinstance(obj,list):
+            bra,ket='[',']'
+        elif isinstance(obj,dict):
+            bra,ket='{','}'
+        else:
+            bra,ket='(',')'
+    
+    if isiterable(obj): #iterable, but not a string
+            return bra+sep.join(html(a,sep=',') for a in obj)+ket
+    
+    try:
+        return unicode(obj,'utf-8') #to render accented chars correctly
+    except :
+        pass
+    
+    return str(obj)
 
 def h1(*args):
     display(HTML(tag('h1',html(args))))
@@ -48,8 +57,19 @@ def h2(*args):
 def h3(*args):
     display(HTML(tag('h3',html(args))))
     
+def h4(*args):
+    display(HTML(tag('h4',html(args))))
+    
 def h(*args):
     display(HTML(html(args)))
+    
+#redefine "print" for notebooks ...
+try: #http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+    get_ipython #is defined from within IPython (notebook)
+except:
+    pass
+else:
+    print = h
     
 def hinfo(*args):   
     display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))
