@@ -21,7 +21,7 @@ class TestRgb2Hex:
 class TestHex2Rgb:
     def test_hex2rgb(self):
         assert_equal(hex2rgb('#0010ff'),(0,16./255,1))
-        
+
 class TestRgb2Cmyk:
     def test_rgb2cmyk(self):
         assert_equal(rgb2cmyk((0,0,0)),(0,0,0,1))
@@ -29,14 +29,14 @@ class TestRgb2Cmyk:
 
 class TestNearestColor:
     def test_nearest_color(self):
-        assert_equal(nearest_color('#414142'),'darkslategray')
-    
+        assert_equal(nearest_color('#414142'),color['darkslategray'])
+
 class TestAci:
     def test_color_to_aci(self):
         assert_equal(color_to_aci('red'), 1)
         assert_equal(color_to_aci(acadcolors[123]), 123)
         c=color_to_aci('#414142',True)
-        assert_equal(acadcolors[c],'#414141')
+        assert_equal(acadcolors[c].hex,'#414141')
 
 class TestColorRange:
     def test_color_range(self):
@@ -57,13 +57,13 @@ class TestColor:
         blue4=Color((0,0,255))
         blue5=Color(blue4)
         assert_equal(blue1,blue5)
-    
+
     def test___add__(self):
         red=Color('red')
         green=Color('lime') # 'green' has hex 80 value, not ff
         blue=Color('blue')
         assert_equal(red+green+blue,'white')
-        
+
     def test___sub__(self):
         white=Color('white')
         green=Color('lime') # 'green' has hex 80 value, not ff
@@ -75,37 +75,43 @@ class TestColor:
 
     def test___repr__(self):
         assert_equal(repr(Color('blue')),"Color('blue')")
-        
+
     def test__repr_html_(self):
         assert_equal(Color('blue')._repr_html_(),'<div style="color:#0000ff">blue</div>')
 
     def test_rgb(self):
         pass #tested above
-    
+
     def test_hex(self):
         pass #tested above
-    
+
     def test_cmyk(self):
         assert_equal(Color('black').cmyk,(0,0,0,1))
         assert_equal(Color('blue').cmyk,(1,1,0,0))
         assert_equal(Color((0,.5,.5)).cmyk,(1,0,0,.5)) #teal
 
+class TestColorLookup:
+    def test_color_lookup(self):
+        c=color['blue']
+        c2=color_lookup[c.hex]
+        assert_equal(c,c2)
+
 class TestColorToAci:
     def test_color_to_aci(self):
         # assert_equal(expected, color_to_aci(x, nearest))
-        raise SkipTest 
+        raise SkipTest
 
 class TestAciToColor:
     def test_aci_to_color(self):
         # assert_equal(expected, aci_to_color(x, block_color, layer_color))
-        raise SkipTest 
-    
+        raise SkipTest
+
 class TestPantone:
     def test_pantone(self):
         from Goulib.table import Table,Cell
         from Goulib.itertools2 import reshape
-        
-        t=[Cell(name,style={'background-color':pantone[name]}) for name in sorted(pantone)]
+
+        t=[Cell(name,style={'background-color':pantone[name].hex}) for name in sorted(pantone)]
         t=Table(reshape(t,(0,10)))
         with open(path+'\\results\\colors.pantone.html', 'w') as f:
             f.write(t.html())
