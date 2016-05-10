@@ -83,7 +83,12 @@ def isiterable(obj):
     """
     :result: bool True if obj is iterable (but not a string)
     """
-    return hasattr(obj, '__iter__')
+    # http://stackoverflow.com/questions/1055360/how-to-tell-a-variable-is-iterable-but-not-a-string
+    if not hasattr(obj, '__iter__'): return False
+    if isinstance(obj, six.string_types): return False #required since Python 3.5
+    return True
+
+    
 
 def arange(start,stop=None,step=1):
     """ range for floats or other types (`numpy.arange` without numpy)
@@ -235,7 +240,7 @@ def ndim(iterable):
     :result: int number of dimensions
     """
     return len(shape)
-    
+
 
 def reshape(data,dims):
     """

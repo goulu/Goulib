@@ -91,6 +91,15 @@ class TestCompose:
 class TestIterate:
     def test_iterate(self):
         assert_equal(take(4,iterate(lambda x:x*x, 2)), [2,4,16,16*16])
+        
+class TestIsIterable:
+    def test_isiterable(self):
+        assert_true(isiterable([]))
+        assert_true(isiterable(tuple()))
+        assert_true(isiterable({}))
+        assert_true(isiterable(set()))
+        assert_true(isiterable((x for x in range(10))))
+        assert_false(isiterable(''))
 
 class TestTails:
     def test_tails(self):
