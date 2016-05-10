@@ -77,7 +77,7 @@ class TestColor:
         assert_equal(repr(Color('blue')),"Color('blue')")
 
     def test__repr_html_(self):
-        assert_equal(Color('blue')._repr_html_(),'<div style="color:#0000ff">blue</div>')
+        assert_equal(Color('blue')._repr_html_(),'<p style="color:#0000ff">blue</p>')
 
     def test_rgb(self):
         pass #tested above
