@@ -9,11 +9,11 @@ from __future__ import division #"true division" everywhere
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
-__credits__ = ['Colormath http://python-colormath.readthedocs.org/en/latest/',
+__credits__ = ['Colormath https://pypi.python.org/pypi/colormath/',
                'Bruno Nuttens Pantone color table http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/',
                ]
 
-#see http://python-colormath.readthedocs.org/en/latest/ if you need more
+#get https://pypi.python.org/pypi/colormath/ if you need more
 
 import six, os, sys
 import numpy as np
@@ -59,6 +59,26 @@ def cmyk2rgb(cmyk):
     c,m,y,k=cmyk
     return (1.0-(c+k), 1.0-(m+k), 1.0-(y+k))
 
+def xyz2xyy(xyz):
+    """
+    Convert from XYZ to xyY.
+    
+    Based on formula from http://brucelindbloom.com/Eqn_XYZ_to_xyY.html
+    
+    Implementation Notes:
+    1. Watch out for black, where X = Y = Z = 0. In that case, x and y are set 
+       to the chromaticity coordinates of the reference whitepoint.
+    2. The output Y value is in the nominal range [0.0, Y[XYZ]].
+    
+    """
+    s=sum(xyz)
+    if s == 0:
+        # We can't check for X == Y == Z == 0 because they may actually add up
+        # to 0, thus resulting in ZeroDivisionError later
+        x, y, _ = xyz2xyy(color['white'].xyz)
+        return (x, y, 0.0)
+    return (xyz[0]/s, xyz[1]/s, xyz[1])
+ 
 # skimage.color has several useful color conversion routines, but for images
 # so here is a generic adapter that allows to call them with colors
 
@@ -75,6 +95,7 @@ def _skadapt(f):
 #supported colorspaces. need more ? just add it :-)
 modes=(
     'XYZ',
+    'xyY', #for CIE Chromaticity plots
     'Lab',
     'HSV',
     'CMYK',
@@ -187,10 +208,16 @@ class Color(object):
     def lab(self): return self._convert('lab')
 
     @property
-    def cmyk(self):return self._convert('cmyk')
+    def cmyk(self): return self._convert('cmyk')
 
     @property
-    def hsv(self):return self._convert('hsv')
+    def hsv(self): return self._convert('hsv')
+    
+    @property
+    def xyz(self): return self._convert('xyz')
+    
+    @property
+    def xyY(self): return self._convert('xyY')
 
     def __hash__(self):
         return hash(self.hex)
