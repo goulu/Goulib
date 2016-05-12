@@ -374,10 +374,7 @@ class TestChain:
 class TestDrawing:
     @classmethod
     def setup_class(self):
-        try:
-            self.dxf= Drawing(path+'/data/drawing.dxf')
-        except:
-            self.dxf=None
+        self.dxf= Drawing(path+'/data/drawing.dxf')
         self.svg= Drawing(path+'/data/drawing.svg')
         self.pdf= Drawing(path+'/data/drawing.pdf')
 

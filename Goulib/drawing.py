@@ -25,6 +25,7 @@ import logging, base64
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
+from .plot import Plot
 from .colors import color_to_aci, aci_to_color
 from .interval import Box
 from .math2 import rint, isclose
@@ -147,7 +148,7 @@ class BBox(Box):
         return res
 
 
-class Entity(object):
+class Entity(plot.Plot):
     """Base class for all drawing entities"""
     
     color='black' # by default
@@ -294,9 +295,9 @@ class Entity(object):
             res=Segment2(start,end)
         elif e.dxftype == 'ARC':
             c=Point2(e.center[:2])
-            startangle=radians(e.startangle)
+            startangle=radians(e.start_angle)
             start=c+Polar(e.radius,startangle)
-            endangle=radians(e.endangle)
+            endangle=radians(e.end_angle)
             end=c+Polar(e.radius,endangle)
             res=Arc2(c,start,end)
         elif e.dxftype == 'CIRCLE':
@@ -439,7 +440,7 @@ class Entity(object):
 
         return fig #, p
 
-    def render(self,format,**kwargs):
+    def render(self,fmt,**kwargs):
         """ render graph to bitmap stream
         :return: matplotlib figure as a byte stream in specified format
         """
@@ -451,7 +452,7 @@ class Entity(object):
         buffer = six.BytesIO()
         fig.savefig(
             buffer, 
-            format=format, 
+            format=fmt, 
             transparent=transparent,
             facecolor=fig.get_facecolor(),
         )
@@ -459,21 +460,6 @@ class Entity(object):
         plt.close(fig)
         return res
         
-    def to_html(self):
-        buffer=self.render('png')
-        s=base64.b64encode(buffer)
-        return r'<img src="data:image/png;base64,{0}">'.format(s)
-    
-    def html(self):
-        from IPython.display import HTML
-        return HTML(self.to_html())
-    
-    # for IPython notebooks
-    def _repr_html_(self):
-        #this returns exactly the same as _repr_png_, but is Table compatible
-        return self.to_html()
-    def _repr_png_(self): return self.render('png') 
-    def _repr_svg_(self): return self.render('svg')
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Point2.__bases__ += (Entity,)
