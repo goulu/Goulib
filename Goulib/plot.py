@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-plotable rich object display on IPython notebooks 
+plotable rich object display on IPython/Jupyter notebooks 
 """
 
 __author__ = "Philippe Guglielmetti"
@@ -10,7 +10,7 @@ __credits__ = []
 __license__ = "LGPL"
 
 #import matplotlib and set backend once for all
-import matplotlib, os, sys, logging, six
+import matplotlib, os, sys, logging, six, base64
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
@@ -44,17 +44,23 @@ class Plot(object):
     def save(self,filename,**kwargs):
         return save([self],filename, **kwargs) # call global function
     
+    # for IPython notebooks
+    
     def _repr_png_(self,**kwargs):
-        try:
-            return self.render(fmt='png',**kwargs)
-        except: #maybe this object is not plotable
-            return None
+        return self.render(fmt='png',**kwargs)
 
     def _repr_svg_(self,**kwargs):
+        return self.render(fmt='svg',**kwargs).decode('utf-8')
+        
+    def _repr_html_(self):
         try:
-            return self.render(fmt='svg',**kwargs).decode('utf-8')
-        except: #maybe this object is not plotable
-            return None
+            return self._repr_svg_()
+        except:
+            pass
+        #this returns  the same as _repr_png_, but is Table compatible
+        buffer=self.render('png')
+        s=base64.b64encode(buffer).decode('utf-8')
+        return '<img src="data:image/png;base64,%s">'%s
     
     def png(self,**kwargs):
         from IPython.display import Image
@@ -63,6 +69,10 @@ class Plot(object):
     def svg(self,**kwargs):
         from IPython.display import SVG
         return SVG(self._repr_svg_(**kwargs))
+    
+    def html(self):
+        from IPython.display import HTML
+        return HTML(self._repr_html_(**kwargs))
     
     def plot(self,**kwargs):
         """ renders on IPython Notebook
@@ -108,8 +118,7 @@ def render(plotables, fmt='svg', **kwargs):
     if len(labels)>1:
         ax.legend()
         
-    from io import BytesIO
-    output = BytesIO()
+    output = six.BytesIO()
     fig.savefig(output, format=fmt, **printargs)
     data=output.getvalue()
     plt.close(fig)
