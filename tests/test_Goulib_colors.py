@@ -30,7 +30,7 @@ class TestRgb2Cmyk:
 class TestNearestColor:
     def test_nearest_color(self):
         assert_equal(nearest_color('#414142'),color['darkslategray'])
-        cmyk=Color((.45,.12,.67,.05),mode='cmyk')
+        cmyk=Color((.45,.12,.67,.05),space='cmyk')
         p=nearest_color(cmyk,pantone)
         assert_equal(p.name,'802C')
         dE=deltaE
@@ -68,7 +68,7 @@ class TestColor:
         
         self.white=color['white']
         
-        self.cmyk=Color((.45,.12,.67,.05),mode='cmyk') # a random cmyk color
+        self.cmyk=Color((.45,.12,.67,.05),space='cmyk') # a random cmyk color
         
     def test___init__(self):
         #check all constructors make the same color
@@ -93,7 +93,7 @@ class TestColor:
         assert_equal(repr(Color('blue')),"Color('blue')")
 
     def test__repr_html_(self):
-        assert_equal(Color('blue')._repr_html_(),'<p style="color:#0000ff">blue</p>')
+        assert_equal(Color('blue')._repr_html_(),'<span style="color:#0000ff">blue</span>')
 
     def test_rgb(self):
         pass #tested above

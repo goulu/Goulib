@@ -93,7 +93,7 @@ def _skadapt(f):
     return adapted
 
 #supported colorspaces. need more ? just add it :-)
-modes=(
+colorspaces=(
     'XYZ',
     'xyY', #for CIE Chromaticity plots
     'Lab',
@@ -109,8 +109,8 @@ modes=(
 
 from .graph import DiGraph
 converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
-for source in modes:
-    for target in modes:
+for source in colorspaces:
+    for target in colorspaces:
         key=(source.lower(),target.lower())
         if key[0]==key[1]:
             continue
@@ -139,14 +139,14 @@ class Color(object):
     """A color with math operations and conversions
     Color is immutable (as ._values caches representations)
     """
-    def __init__(self, value, mode='RGB', name=None):
+    def __init__(self, value, space='RGB', name=None):
         """constructor
 
         :param value: string color name, hex string, or values tuple
-        :param mode: string defining the color space of value
+        :param space: string defining the color space of value
         """
         self._name=name
-        mode=mode.lower() # for easier conversions
+        space=space.lower() # for easier conversions
 
         if isinstance(value,Color): #copy constructor
             self._copy_from_(value)
@@ -159,23 +159,23 @@ class Color(object):
                 self._copy_from_(pantone[value])
                 return
             elif len(value)==7 and value[0]=='#':
-                mode='hex'
+                space='hex'
             else:
-                raise(ValueError("Couldn't create Color(%s,%s)"%(value,mode)))
+                raise(ValueError("Couldn't create Color(%s,%s)"%(value,space)))
 
-        self._mode=mode # "native" mode in which the color was created
+        self.space=space # "native" space in which the color was created
 
-        if mode=='rgb':
+        if space=='rgb':
             if max(value)>1:
                 value=tuple(_/255. for _ in value)
             value=math2.sat(value,0,1) # do not wash whiter than white...
-        if mode!='hex': # force to floats
+        if space!='hex': # force to floats
             value=tuple(float(_) for _ in value)
-        self._values={mode:value}
+        self._values={space:value}
 
 
     def _copy_from_(self,c):
-        self._mode=c._mode
+        self.space=c.space
         self._name=c._name
         self._values=c._values
 
@@ -188,10 +188,10 @@ class Color(object):
                 self._name='~'+nearest_color(self).name
         return self._name
 
-    def _convert(self, target):
+    def convert(self, target):
         target=target.lower()
         if target not in self._values:
-            path=converters.shortest_path(self._mode, target)
+            path=converters.shortest_path(self.space, target)
             for u,v in itertools2.pairwise(path):
                 if v not in self._values:
                     edge=converters[u][v][0]
@@ -199,25 +199,25 @@ class Color(object):
         return self._values[target]
 
     @property
-    def rgb(self): return self._convert('rgb')
+    def rgb(self): return self.convert('rgb')
 
     @property
-    def hex(self): return self._convert('hex')
+    def hex(self): return self.convert('hex')
 
     @property
-    def lab(self): return self._convert('lab')
+    def lab(self): return self.convert('lab')
 
     @property
-    def cmyk(self): return self._convert('cmyk')
+    def cmyk(self): return self.convert('cmyk')
 
     @property
-    def hsv(self): return self._convert('hsv')
+    def hsv(self): return self.convert('hsv')
     
     @property
-    def xyz(self): return self._convert('xyz')
+    def xyz(self): return self.convert('xyz')
     
     @property
-    def xyY(self): return self._convert('xyY')
+    def xyY(self): return self.convert('xyY')
 
     def __hash__(self):
         return hash(self.hex)
@@ -226,7 +226,7 @@ class Color(object):
         return "Color('%s')"%(self.name)
 
     def _repr_html_(self):
-        return '<p style="color:%s">%s</p>'%(self.hex,self.name)
+        return '<span style="color:%s">%s</span>'%(self.hex,self.name)
 
     def __eq__(self,other):
         try:
@@ -266,7 +266,7 @@ pantone={} #dict of pantone colors
 
 # http://www.w3schools.com/colors/colors_names.asp
 
-for c in table['matplotlib'].asdict():
+for c in table['websafe'].asdict():
     id=c['name']
     color[id]=Color(c['hex'],name=id)
 
@@ -275,7 +275,7 @@ color_lookup=dict([v.hex,v] for k,v in color.items()) #http://code.activestate.c
 
 for c in table['Pantone'].asdict():
     id=c['name']
-    pantone[id]=Color((c['L'],c['a'],c['b']),mode='Lab',name=id)
+    pantone[id]=Color((c['L'],c['a'],c['b']),space='Lab',name=id)
     # assert p.hex==c['hex'] is always wrong
 
 acadcolors=[None]*256 #table of Autocad indexed colors
@@ -303,7 +303,7 @@ def color_to_aci(x, nearest=True):
 def aci_to_color(x, block_color=None, layer_color=None):
     if x==0: return block_color
     if x==256: return layer_color
-    return acadcolors[x]
+    return acadcolors[x].hex
 
 from skimage.color import deltaE_ciede2000
 
@@ -331,7 +331,7 @@ def nearest_color(c,l=None, opt=min):
 
 #http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
 
-def color_range(n,start,end):
+def color_range(n,start,end,space='hsv'):
     """:param n: int number of colors to generate
     :param start: string hex color or color name
     :param end: string hex color or color name
@@ -339,6 +339,6 @@ def color_range(n,start,end):
     """
 
     from .itertools2 import linspace
-    start=Color(start).hsv
-    end=Color(end).hsv
-    return [Color(hsv, mode='HSV') for hsv in linspace(start,end,n)]
+    start=Color(start).convert(space)
+    end=Color(end).convert(space)
+    return [Color(v, space=space) for v in linspace(start,end,n)]
