@@ -94,7 +94,11 @@ class Cell(object):
         f=self.fmt
         
         if hasattr(v,'_repr_html_'):
-            return tag(self.tag,v._repr_html_(),**args)
+            try:
+                s=v._repr_html_()
+            except Exception as e:
+                s='ERROR : %s _repr_html_ failed : %s'%(v,e)
+            return tag(self.tag,s,**args)
         
         style=args.get('style',{})
         if not isinstance(style,dict):
