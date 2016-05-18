@@ -152,14 +152,19 @@ class Color(object):
             self._copy_from_(value)
             return
         if isinstance(value, six.string_types):
+            if value in pantone:
+                self._copy_from_(pantone[value])
+                return
+            value=value.lower()
             if value in color:
                 self._copy_from_(color[value])
                 return
-            elif value in pantone:
-                self._copy_from_(pantone[value])
-                return
             elif len(value)==7 and value[0]=='#':
-                space='hex'
+                if value in color_lookup:
+                    self._copy_from_(color_lookup[value])
+                    return
+                else:
+                    space='hex'
             else:
                 raise(ValueError("Couldn't create Color(%s,%s)"%(value,space)))
 
@@ -197,6 +202,9 @@ class Color(object):
                     edge=converters[u][v][0]
                     self._values[v]=edge['f'](self._values[u])
         return self._values[target]
+    
+    @property
+    def native(self): return self._values[self.space]
 
     @property
     def rgb(self): return self.convert('rgb')
@@ -262,12 +270,13 @@ table.applyf('hex',lambda x:x.lower())
 table=table.groupby('System')
 
 color={} #dict of HTML / matplotlib colors, which seem to be the same
+color_lookup={} # reverse color dict indexed by hex
 pantone={} #dict of pantone colors
 
 # http://www.w3schools.com/colors/colors_names.asp
 
 for c in table['websafe'].asdict():
-    id=c['name']
+    id=c['name'].lower()
     color[id]=Color(c['hex'],name=id)
 
 color_lookup=dict([v.hex,v] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
