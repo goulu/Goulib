@@ -21,10 +21,9 @@ class TestGeoGraph:
         self.cube=GeoGraph(nx.hypercube_graph(3),multi=False)
         self.geo=GeoGraph(nx.random_geometric_graph(50,.25))
         
-        nodes=points_on_sphere(50)
+        nodes=points_on_sphere(120)
         self.sphere=GeoGraph(nodes=nodes) #test if we can construct from nodes only
-        if SCIPY:
-            self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
+        self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
         
         if PYGRAPHVIZ: #optional import
             self.dot=GeoGraph(path+'/data/cluster.dot')
@@ -37,6 +36,10 @@ class TestGeoGraph:
         
         #3D graph
         self.sphere.save(results+'graph.sphere.png', transparent=False)
+        
+    def test_to_drawing(self):
+        d=to_drawing(self.sphere)
+        d.save(results+'graph.sphere.drawing.svg')
         
         
     def test_render(self):
@@ -252,10 +255,6 @@ class TestPointsOnSphere:
     def test_points_on_sphere(self):
         pass
 
-class TestToDrawing:
-    def test_to_drawing(self):
-        # assert_equal(expected, to_drawing(g, d, edges))
-        raise SkipTest 
 
 class TestWriteDxf:
     def test_write_dxf(self):
