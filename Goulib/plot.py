@@ -70,7 +70,7 @@ class Plot(object):
         from IPython.display import SVG
         return SVG(self._repr_svg_(**kwargs))
     
-    def html(self):
+    def html(self,**kwargs):
         from IPython.display import HTML
         return HTML(self._repr_html_(**kwargs))
     
