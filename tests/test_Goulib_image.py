@@ -38,7 +38,7 @@ class TestImage:
 
         #from matrix
         from matplotlib import cm
-        a=[[-x*y for x in range(128)] for y in range(128)]
+        a=[[x*y for x in range(128)] for y in range(128)]
         Image(a).save(results+'generated.png')
         Image(a,colormap=cm.spectral).save(results+'gen_colormap.png')
 
@@ -51,7 +51,7 @@ class TestImage:
 
     def test___getitem__(self):
         pixel=self.lena_gray[256,256]
-        assert_equal(pixel,100)
+        assert_equal(pixel,89)
         pixel=self.lena[256,256]
         assert_equal(pixel,(180,65,72))
         left=self.lena[:,:256]
@@ -78,10 +78,6 @@ class TestImage:
 
     def test_open(self):
         pass #tested above
-
-    def test_split(self):
-        # split the image into individual bands
-        source = self.lena.split()
 
     def test_html(self):
         h=self.lena.html()
@@ -117,9 +113,13 @@ class TestImage:
         pass
 
     def test_split(self):
+        rgb = self.lena.split()
+        for im,c in zip(rgb,'RGB'):
+            im.save(results+'lena_split_%s.png'%c)
+        
         colors=['Cyan','Magenta','Yellow','blacK']
         cmyk=self.lena.split('CMYK')
-        cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
+        cmyk=[im.colorize(col) for im,col in zip(cmyk,colors)]
         for im,c in zip(cmyk,'CMYK'):
             im.save(results+'lena_split_%s.png'%c)
             
@@ -145,8 +145,13 @@ class TestImage:
         for f in [sobel]:
             self.lena.filter(f).save(results+'lena_sk_%s.png'%f.__name__)
 
-    def test_expand(self):
+    def test_resize(self):
         size=64
+        im=self.lena.resize((size,size))
+        im.save(results+'lena_resize_%d.png'%size)
+        
+    def test_expand(self):
+        size=128
         im=self.lena.resize((size,size))
         im=im.expand((size+1,size+1),.5,.5) #can you see that half pixel border ?
         im.save(results+'lena_expand_0.5 border.png')
@@ -158,11 +163,13 @@ class TestImage:
             for j in range(3):
                 im=im.add(dot,(j*38.5,i*41.5),0.5)
         im.save(results+'image_add.png')
-
+    
+    def test_colorize(self):
         cmyk=self.lena.split('CMYK')
         colors=['Cyan','Magenta','Yellow','blacK']
-        cmyk=[im.colorize('white',col) for im,col in zip(cmyk,colors)]
+        cmyk=[im.colorize(col) for im,col in zip(cmyk,colors)]
         back=sum(cmyk,Image())
+        back.save(results+'image_add_sum_cmyk.png')
         assert_equal(self.lena.dist(back),0)
         
     def test_mul(self):

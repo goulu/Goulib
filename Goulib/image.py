@@ -23,6 +23,9 @@ __license__ = "LGPL"
 import numpy as np
 import skimage
 
+import warnings
+warnings.filterwarnings("ignore") # because too many are generated
+
 # import PIL.Image as PILImage
 
 import six
@@ -54,15 +57,28 @@ modes = {
     'I'     : Mode('gray',1,np.int16,-32768,32767), # skimage gray level
     'L'     : Mode('gray',1,np.uint8,0,255), # single layer or RGB(A)
     'P'     : Mode('gray',1,np.uint8,0,255), # indexed color (palette)
-    'RGB'   : Mode('rgb',3,np.uint8,0,255),
-    'RGBA'  : Mode('rgba',4,np.uint8,0,255),
-    'CMYK'  : Mode('cmyk',4,np.uint8,0,255),
+    'RGB'   : Mode('rgb',3,np.float,0,1), # not uint8 as in PIL
+    'RGBA'  : Mode('rgba',4,np.float,0,1), # not uint8 as in PIL
+    'CMYK'  : Mode('cmyk',4,np.float,0,1), # not uint8 as in PIL
     'LAB'   : Mode('lab',3,np.float,-100,100),
     'XYZ'   : Mode('xyz',3,np.float,0,1), # https://en.wikipedia.org/wiki/CIE_1931_color_space
     'HSV'   : Mode('hsv',3,np.float,0,1), # https://en.wikipedia.org/wiki/HSL_and_HSV
 }
 
+def nchannels(arr):
+    return 1 if len(arr.shape)==2 else arr.shape[-1]
 
+def guessmode(arr):
+    n=nchannels(arr)
+    if n>1:
+        return 'RGBA'[:n]
+    if np.issubdtype(arr.dtype,float):
+        return 'F'
+    if arr.dtype == np.uint8:
+        return 'L'
+    if arr.dtype == np.uint16:
+        return 'U'
+    return 'I'
 
 from PIL.Image import NEAREST, BILINEAR, BICUBIC, ANTIALIAS
 
@@ -115,11 +131,11 @@ class Image(Plot):
         * string : path of image to load
         * None : creates an empty image with kwargs parameters:
         ** size : (y,x) pixel size tuple
-        ** mode : 'L' (gray) by default
+        ** mode : 'F' (gray) by default
         ** color: to fill None=black by default
         """
         if data is None:
-            self.mode = mode = mode or 'L'
+            self.mode = mode = mode or 'F'
             n=modes[mode].nchannels
             size = tuple(kwargs.get('size',(0,0)))
             if n>1 : size=size+ (n,)
@@ -131,15 +147,14 @@ class Image(Plot):
             self.mode=data.mode
             self.array=data.array
         elif isinstance(data,six.string_types): #assume a path
-            self.open(data,**kwargs)
+            self.load(data,**kwargs)
         else: # assume some kind of array
-            dtype=modes[mode].type if mode else None
-            try:
-                self.array=np.asarray(data,dtype)
-            except: # assume data is a list of image planes to merge
-                data=np.concatenate([x.array[..., np.newaxis] for x in data], axis=-1)
-                self.array=np.asarray(data,dtype)
-            self.mode=mode or self.guessmode()
+            self._set(data,mode)
+    
+    def _set(self,data,mode):
+        data=np.asanyarray(data)
+        self.mode=mode or guessmode(data)
+        self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
 
     @property
     def shape(self):
@@ -151,7 +166,7 @@ class Image(Plot):
 
     @property
     def nchannels(self):
-        return 1 if len(self.shape)==2 else self.shape[-1]
+        return nchannels(self.array)
 
     @property
     def npixels(self):
@@ -165,34 +180,29 @@ class Image(Plot):
         """ is smaller"""
         return  self.npixels < other.pixels
 
-    def guessmode(self):
-        n=self.nchannels
-        if n>1:
-            return 'RGBA'[:n]
-        if np.issubdtype(self.array.dtype,float):
-            return 'F'
-        if self.array.dtype == np.uint8:
-            return 'L'
-        return 'I'
-
-    def open(self,path):
+    def load(self,path): 
         from skimage import io
         if not io.util.is_url(path):
             path = os.path.abspath(path)
         self._path = path
         ext=path[-3:].lower()
         if ext=='pdf':
-            self.array=read_pdf(path)
+            data=read_pdf(path)
         else:
             with io.util.file_or_url_context(path) as context:
-                self.array = io.imread(context)
-        self.mode=self.guessmode()
-        return self
+                data = io.imread(context)        
+        mode=guessmode(data)
+        self._set(data,'F' if mode in 'U' else mode)
+    
+    open=load # PIL compatibility
 
     def save(self,path,**kwargs):
+        a=self.array
+        """
+        if self.mode in 'RGBA' and a.dtype!=np.uint8: #only format supported now
+            a=np.asarray(a*255,np.uint8)
+        """
         try:
-            f=255/modes[self.mode].max
-            a=np.asarray(self.array*f,np.uint8)
             skimage.io.imsave(path,a,**kwargs)
             return self
         except IOError as e:
@@ -200,7 +210,7 @@ class Image(Plot):
         try:
             im=self.convert('RGBA')
         except IOError:
-            im=self.convert('L') #gray
+            im=self.convert('L') # uint8 gray
 
         return im.save(path,**kwargs)
 
@@ -219,6 +229,8 @@ class Image(Plot):
         return self.array
 
     def split(self, mode=None):
+        if mode:
+            mode=mode.upper()
         if mode and mode != self.mode:
             im=self.convert(mode)
         else:
@@ -226,40 +238,52 @@ class Image(Plot):
         if self.nchannels==1:
             return [self] #for coherency
 
-        mode='L'
-        return [Image(self._get_channel(i),mode) for i in range(self.nchannels)]
+        return [Image(im._get_channel(i)) for i in range(im.nchannels)]
 
     def getpixel(self,yx):
         if self.nchannels==1:
             return self.array[yx[0],yx[1]]
         else:
             return self.array[yx[0],yx[1],:]
+        
+    def putpixel(self,yx,value):
+        if self.nchannels==1:
+            self.array[yx[0],yx[1]]=value
+        else:
+            self.array[yx[0],yx[1],:]=value
 
-    def crop(self,lurl):
+    def crop(self,lurb):
         """
         :param lurl: 4-tuple with left,up,right,bottom int coordinates
         :return: Image
         """
+        l,u,r,b=lurb
         if self.nchannels==1:
-            a=self.array[lurl[1]:lurl[3],lurl[0]:lurl[2]]
+            a=self.array[u:b,l:r]
         else:
-            a=self.array[lurl[1]:lurl[3],lurl[0]:lurl[2],:]
+            a=self.array[u:b,l:r,:]
         return Image(a,self.mode)
 
     def __getitem__(self,slice):
         try:
-            return self.getpixel(slice)
+            a=self.getpixel(slice)
         except TypeError:
             pass
-        left, upper, right, lower=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
+        else:
+            if math2.mul(a.shape[:2])==1:
+                return a
+            else:
+                return Image(a,self.mode)
+            
+        l,u,r,b=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
         # calculate box module size so we handle negative coords like in slices
         w,h = self.size
-        upper = upper%h if upper else 0
-        lower = lower%h if lower else h
-        left = left%w if left else 0
-        right = right%w if right else w
+        u = u%h if u else 0
+        b = b%h if b else h
+        l = l%w if l else 0
+        r = r%w if r else w
 
-        return self.crop((left, upper, right, lower))
+        return self.crop((l,u,r,b))
 
     def resize(self,size, filter=None, **kwargs):
         """
@@ -294,8 +318,17 @@ class Image(Plot):
                     Note that if you paste an “RGBA” image, the alpha band is ignored.
                     You can work around this by using the same image as both source image and mask.
         """
-        if len(box)==2:
-            box=(box[0],box[1])
+        if mask is not None:
+            raise(NotImplementedError('masking not yet implemented'))
+        if box is None:
+            l,u=0,0
+        else:
+            l,u=box[0:2] # ignore r,b if they're specified, recalculated below
+        w,h = image.size
+        r,b=l+w,u+h
+        self.array[u:b,l:r]=image.array
+        return
+        
 
     def threshold(self, level=None):
         from skimage.filters import threshold_otsu
@@ -416,7 +449,7 @@ class Image(Plot):
             color0='white'
         color0=Color(color0).rgb
         color1=Color(color1).rgb
-        a=bool2rgb(self.array,color0,color1)
+        a=gray2rgb(self.array,color0,color1)
         return Image(a,'RGB')
 
     @adapt_rgb
@@ -500,7 +533,7 @@ class Image(Plot):
         """compose new image from a*self + b*other
         """
         if self and other and self.mode != other.mode:
-            pass # other=other.convert(self.mode)
+            other=other.convert(self.mode)
         if self:
             d1=self.array # np.array(self,dtype=np.float)
         else:
@@ -885,11 +918,15 @@ def rgb2cmyk(rgb):
 
     return np.concatenate([x[..., np.newaxis] for x in [c,m,y,k]], axis=-1)
 
-def bool2rgb(im,color0=(0,0,0), color1=(1,1,1)):
+def gray2rgb(im,color0=(0,0,0), color1=(1,1,1)):
     color0=np.asarray(color0,np.float)
     color1=np.asarray(color1,np.float)
     d=color1-color0
-    return np.outer(im,d)+color0
+    a=np.outer(im,d)
+    a=a.reshape([im.shape[0],im.shape[1],d.shape[0]])+color0
+    return a
+
+bool2rgb=gray2rgb #works also
 
 #build a graph of available converters
 #as in https://github.com/gtaylor/python-colormath
