@@ -250,7 +250,17 @@ A004169=Sequence(
     desc='Values of n for which a regular polygon with n sides cannot be constructed with ruler and compass'
 )
 
-A000292=Sequence(None,lambda n:n*(n+1)*(n+2)//6, desc='Tetrahedral (or triangular pyramidal) numbers')
+A000292=Sequence(None,math2.tetrahedral, desc='Tetrahedral (or triangular pyramidal) numbers')
+
+A000330=Sequence(None,math2.sum_of_squares,desc='Square pyramidal numbers')
+
+A000537=Sequence(None,math2.sum_of_cubes,desc='Sum of first n cubes; or n-th triangular number squared')
+
+
+A027641=Sequence(None, lambda n:math2.bernouilli(n,-1).numerator,'Numerator of Bernoulli number B_n.')
+A027642=Sequence(None, lambda n:math2.bernouilli(n).denominator,'Denominators of Bernoulli numbers')
+A164555=Sequence(None, lambda n:math2.bernouilli(n,1).numerator,'Numerators of the "original" Bernoulli numbers')
+
 
 def cullen(n):return n*2**n+1
 
