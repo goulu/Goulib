@@ -849,6 +849,56 @@ def bouncy(n):
     s1=''.join(sorted(s))
     return s==s1,s==s1[::-1] #increasing,decreasing
 
+def tetrahedral(n):
+    """
+    https://en.wikipedia.org/wiki/Tetrahedral_number
+    """
+    return n*(n+1)*(n+2)//6
+
+def sum_of_squares(n):
+    """:return: 1^2 + 2^2 + 3^2 + ... + n^2
+    https://en.wikipedia.org/wiki/Square_pyramidal_number
+    """
+    return n*(n+1)*(2*n+1)//6
+
+pyramidal = sum_of_squares
+
+def sum_of_cubes(n):
+    """:return: 1^3 + 2^3 + 3^3 + ... + n^3
+    https://en.wikipedia.org/wiki/Squared_triangular_number
+    """
+    a=triangular(n)
+    return a*a # by Nicomachus's theorem
+
+def bernouilli_gen(init=1):
+    """generator of Bernouilli numbers
+    :param init: int -1 or +1. 
+    * -1 for "first Bernoulli numbers" with B1=-1/2
+    * +1 for "second Bernoulli numbers" with B1=+1/2
+    https://en.wikipedia.org/wiki/Bernoulli_number
+    https://rosettacode.org/wiki/Bernoulli_numbers#Python:_Optimised_task_algorithm
+    """
+    B, m = [], 0
+    while True:
+        B.append(fractions.Fraction(1, m+1))
+        for j in range(m, 0, -1):
+            B[j-1] = j*(B[j-1] - B[j])
+        yield init*B[0] if m==1 else B[0]# (which is Bm)
+        m += 1
+        
+def bernouilli(n,init=1):
+    return itertools2.takenth(n,bernouilli_gen(init))
+
+def faulhaber(n,p):
+    """ sum of the p-th powers of the first n positive integers
+    :return: 1^p + 2^p + 3^p + ... + n^p
+    https://en.wikipedia.org/wiki/Faulhaber%27s_formula
+    """
+    s=0
+    for j in range(p+1):
+        s=s+binomial(p+1,j)*bernouilli(j)*n**(p+1-j)
+    return s//(p+1)
+
 def sos_digits(n):
     """:return: int sum of square of digits of n"""
     s = 0
@@ -904,9 +954,13 @@ def triangle(n):
     """
     return polygonal(3,n) # (n*(n+1))/2
 
+triangular=triangle
+
 def is_triangle(x):
     """:return: True if x is a triangle number"""
     return is_integer((-1 + math.sqrt(1 + 8*x)) / 2.)
+
+is_triangular=is_triangle
 
 def square(n):
     return polygonal(4,n) # n*n
