@@ -222,11 +222,11 @@ class Table(list):
         
         if filename:
             if self.titles: #explicitly set
-                kwargs.setdefault('titles_line',0)
-                kwargs.setdefault('data_line',1)
+                l=kwargs.setdefault('titles_line',0)
+                kwargs.setdefault('data_line',l+1)
             else: #read titles from the file
-                kwargs.setdefault('titles_line',1) 
-                kwargs.setdefault('data_line',2)
+                l=kwargs.setdefault('titles_line',1) 
+                kwargs.setdefault('data_line',l+1)
             ext=filename.split('.')[-1].lower()
             if ext in ('xls','xlsx'):
                 self.read_xls(filename,**kwargs)
@@ -291,19 +291,26 @@ class Table(list):
         """read table from a DOM element.
         :Warning: drops all formatting
         """
+        titles_line=kwargs.pop('titles_line',1)-1
+        data_line=kwargs.pop('data_line',2)-1
+        line=0
         head=element.find('thead')
         if head is not None:
-            self.titles=[cell.data for cell in Row(head.find('tr')).data]
+            for row in head.findall('tr'):
+                if line==titles_line:
+                    self.titles=[cell.data for cell in Row(row).data]
+                line=line+1
         body=element.find('tbody')
         if body is None:
             body=element
         for row in body.findall('tr'):
-            line=[cell.data for cell in Row(row).data]
-            if not line: continue #skip empty lines
-            if not self.titles:
-                self.titles=line
-            else:
-                self.append(line)
+            data=[cell.data for cell in Row(row).data]
+            if not data: continue #skip empty lines
+            if not self.titles and line==titles_line:
+                self.titles=data
+            elif line>=data_line:
+                self.append(data)
+            line=line+1
         return self
     
     def read_html(self,filename, **kwargs):
