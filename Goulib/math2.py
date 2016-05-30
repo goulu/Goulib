@@ -895,8 +895,9 @@ def faulhaber(n,p):
     https://en.wikipedia.org/wiki/Faulhaber%27s_formula
     """
     s=0
-    for j in range(p+1):
-        s=s+binomial(p+1,j)*bernouilli(j)*n**(p+1-j)
+    for j,a in enumerate(bernouilli_gen()):
+        if j>p : break
+        s=s+binomial(p+1,j)*a*n**(p+1-j)
     return s//(p+1)
 
 def sos_digits(n):
