@@ -18,26 +18,17 @@ class TestTable:
         #test reading an Excel file
         self.t=Table(self.path+'/data/test.xls') # from http://www.contextures.com/xlSampleData01.html
         assert_equal(self.t.titles,['OrderDate', u'Région', 'Rep', 'Item', u'Unités', 'Cost', 'Total'])
-        
-        #test that t can be written to csv, then re-read in t2 without loss
-        self.t.write_csv(self.path+'/results/table.test.csv')
-        
-        self.t2=Table() #empty table
-        self.t2.read_csv(self.path+'/results/table.test.csv')
-        
-        assert_equal(repr(self.t),repr(self.t2))
-        assert_equal(str(self.t),str(self.t2))
-        
+              
         #format some columns
-        self.t2.applyf('Cost',float)
-        self.t2.applyf('Total',lambda x:float(x) if isinstance(x,(six.integer_types,float)) else float(x.replace(',','')))
+        self.t.applyf('Cost',float)
+        self.t.applyf('Total',lambda x:float(x) if isinstance(x,(six.integer_types,float)) else float(x.replace(',','')))
         
-        self.t2.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
-        assert_equal(self.t2[0][0],datetime.date(2012, 6, 1))
-        assert_equal(self.t2[1][0],datetime.date(2012, 1,23))
+        self.t.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
+        assert_equal(self.t[0][0],datetime.date(2012, 6, 1))
+        assert_equal(self.t[1][0],datetime.date(2012, 1,23))
         
         ref='<tr><td style="text-align:right;">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td style="text-align:right;">2</td><td style="text-align:right;">125.00</td><td style="text-align:right;">250.00</td></tr>'
-        t=Row(self.t2[14]).html()
+        t=Row(self.t[14]).html()
         assert_equal(t,ref)
         
     def test___init__(self):
@@ -62,7 +53,24 @@ class TestTable:
         pass #tested in setup
     
     def test_read_csv(self):
-        pass #tested in setup
+        #test that t can be written to csv, then re-read in t2 without loss
+        self.t.save(self.path+'/results/table.test.csv')
+        
+        t=Table(self.path+'/results/table.test.csv')
+        t.to_date('OrderDate')
+
+        assert_equal(t,self.t)
+        
+    def test_write_csv(self):
+        pass #tested in test_read_csv
+    
+    def test_write_json(self):
+
+        self.t.save(self.path+'/results/table.test.json')
+        t=Table(titles=self.t.titles) #to keep column order
+        t.load(self.path+'/results/table.test.json')
+        t.to_date('OrderDate')
+        assert_equal(t,self.t)
 
     def test_read_xls(self):
         pass #tested in setup
@@ -73,20 +81,14 @@ class TestTable:
     def test_to_datetime(self):
         pass #tested in setup
 
-    def test_write_csv(self):
-        pass #tested in setup
-
     def test_html(self):
-        t=self.t2.html()
-        f = open(self.path+'/results/test.htm', 'w')
-        f.write(t)
-        f.close()
+        t=self.t.save(self.path+'/results/test.htm')
         
         t=Table(self.path+'/results/test.htm')
         assert_equal(t._i('OrderDate'),0) #check the column exists
         
         t.to_date('OrderDate')
-        assert_equal(t,self.t2)
+        assert_equal(t,self.t)
         
         #a table with objects in cells
         from Goulib.stats import Normal
@@ -105,8 +107,8 @@ class TestTable:
         pass #tested by test_sort
         
     def test_sort(self):
-        self.t2.sort('Cost')
-        col=self.t2.col('Cost')
+        self.t.sort('Cost')
+        col=self.t.col('Cost')
         assert_equal(col[0],1.29)
         assert_equal(col[-1],275)
         
@@ -117,10 +119,11 @@ class TestTable:
         pass #tested by test_addcol
 
     def test_addcol(self):
-        n=len(self.t2)
-        self.t2.addcol('Discount', 0.15, 4)
-        assert_equal(len(self.t2),n)  #check we don't change the lines
-        assert_equal(self.t2.ncols(),8)  
+        t=Table(self.t)
+        n=len(t)
+        t.addcol('Discount', 0.15, 4)
+        assert_equal(len(t),n)  #check we don't change the lines
+        assert_equal(t.ncols(),8)  
 
     def test_find_col(self):
         assert_equal(self.t.find_col('Date'),self.t._i('OrderDate'))
@@ -172,7 +175,7 @@ class TestTable:
         r=self.t.rowasdict(3)
         assert_equal(r,{u'Cost': 1.99,
                         u'Item': u'Pencil',
-                        u'OrderDate': u'4/18/2012',
+                        u'OrderDate': date(2012,4,18),
                         u'Rep': u'Andrews',
                         u'Région': u'Central',
                         u'Total': 149.25,
@@ -193,21 +196,11 @@ class TestTable:
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.index(value, column))
         raise SkipTest
+    
+    def test_transpose(self):
+        t=self.t.transpose()
+        assert_equal(t[1,1],'Smith')
 
-class TestAttr:
-    def test_attr(self):
-        # assert_equal(expected, attr(args))
-        raise SkipTest 
-
-class TestRead:
-    def test_read(self):
-        # assert_equal(expected, read(x))
-        raise SkipTest 
-
-class TestHtml:
-    def test_html(self):
-        # assert_equal(expected, html(self, **kwargs))
-        raise SkipTest 
 
 if __name__=="__main__":
     runmodule()
