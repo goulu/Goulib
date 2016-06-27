@@ -9,9 +9,9 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import csv, itertools, operator, string, codecs, six, logging
+import csv, itertools, operator, string, codecs, json, six, logging
 
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, time, timedelta
 
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
@@ -49,7 +49,19 @@ class Cell(object):
         if isinstance(data,Element):
             tag=data.tag
             assert(tag in ('td','th'))
-            data=Cell.read(data.text)
+            
+            def _recurse(data):
+                "grab all possible text from the cell content"
+                if data is None:
+                    return ''
+                s=''.join(_recurse(x) for x in data.getchildren())
+                if data.text:
+                    s=data.text+s
+                if data.tail:
+                    s=s+data.tail
+                return s
+                    
+            data=Cell.read(_recurse(data))
             
         if isinstance(data,str):
             data=data.lstrip().rstrip() #remove spaces, but also trailing \r\n
@@ -221,19 +233,7 @@ class Table(list):
                 self.append(list(row))
         
         if filename:
-            if self.titles: #explicitly set
-                l=kwargs.setdefault('titles_line',0)
-                kwargs.setdefault('data_line',l+1)
-            else: #read titles from the file
-                l=kwargs.setdefault('titles_line',1) 
-                kwargs.setdefault('data_line',l+1)
-            ext=filename.split('.')[-1].lower()
-            if ext in ('xls','xlsx'):
-                self.read_xls(filename,**kwargs)
-            elif ext in ('htm','html'):
-                self.read_html(filename,**kwargs)
-            else: #try ...
-                self.read_csv(filename,**kwargs)
+            self.load(filename,**kwargs)
             
     def __repr__(self):
         """:return: repr string of titles+5 first lines"""
@@ -287,6 +287,24 @@ class Table(list):
         
         return tag('table',res,**kwargs)+'\n'
     
+    def load(self,filename,**kwargs):
+        if self.titles: #explicitly set
+            l=kwargs.setdefault('titles_line',0)
+            kwargs.setdefault('data_line',l+1)
+        else: #read titles from the file
+            l=kwargs.setdefault('titles_line',1) 
+            kwargs.setdefault('data_line',l+1)
+        ext=filename.split('.')[-1].lower()
+        if ext in ('xls','xlsx'):
+            self.read_xls(filename,**kwargs)
+        elif ext in ('htm','html'):
+            self.read_html(filename,**kwargs)
+        elif ext in ('json'):
+            self.read_json(filename,**kwargs)
+        else: #try ...
+            self.read_csv(filename,**kwargs)
+        return self #to allow chaining
+    
     def read_element(self,element, **kwargs):
         """read table from a DOM element.
         :Warning: drops all formatting
@@ -328,6 +346,13 @@ class Table(list):
             raise LookupError('no table found in file')
         
         self.read_element(element, **kwargs)
+        return self
+    
+    def read_json(self,filename, **kwargs):
+        """appends a json file made of lines dictionaries"""
+        with open(filename, 'r') as file:
+            for row in json.load(file):
+                self.append(row)
         return self
     
     def read_xls(self, filename, **kwargs):
@@ -383,8 +408,38 @@ class Table(list):
                 if line!=[None]: #strange last line sometimes ...
                     self.append(line)
         return self
+    
+    def save(self,filename,**kwargs):
+        ext=filename.split('.')[-1].lower()
+        if ext in ('xls','xlsx'):
+            self.write_xlsx(filename,**kwargs)
+        elif ext in ('htm','html'):
+            with open(filename, 'w') as file:
+                file.write(self.html(**kwargs))
+        elif ext in ('json'):
+            self.write_json(filename,**kwargs)
+        else: #try ...
+            self.write_csv(filename,**kwargs)
+        return self #to allow chaining
+    
+    def write_xlsx(self,filename, **kwargs):
+        raise(NotImplementedError)
+        #TODO : https://pypi.python.org/pypi/XlsxWriter
+        return self
+        
+    def write_json(self,filename, **kwargs):
+        def json_serial(obj):
+            """JSON serializer for objects not serializable by default json code"""
+            if isinstance(obj, (datetime,date,time,timedelta)):
+                serial = obj.isoformat()
+                return serial
+            raise TypeError ("Type not serializable")
+        array=[self.rowasdict(i) for i in range(len(self))]
+        with open(filename, 'w') as file:
+            json.dump(array, file, default=json_serial)
+        return self
             
-    def write_csv(self,filename, transpose=False, **kwargs):
+    def write_csv(self,filename, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
     
         dialect=kwargs.get('dialect','excel')
@@ -402,25 +457,30 @@ class Table(list):
                 return [empty if s is None else unicode(s).encode(encoding) for s in line]
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
-        if transpose:
-            i=0
-            while self.col(i)[0]:
-                line=[empty]
-                if self.titles: line=[self.titles[i]]
-                line.extend(self.col(i))
-                writer.writerow(_encode(line))
-                i+=1
-        else:
-            if self.titles:
-                s=_encode(self.titles)
-                writer.writerow(s)
-            for line in self:
-                s=_encode(line)
-                writer.writerow(s)
+        if self.titles:
+            s=_encode(self.titles)
+            writer.writerow(s)
+        for line in self:
+            s=_encode(line)
+            writer.writerow(s)
         f.close()
+        return self
+    
+    def __eq__(self,other):
+        """compare 2 Tables contents, mainly for tests"""
+        if self.titles!=other.titles:
+            return False
+        if len(self)!=len(other):
+            return False
+        for i in range(len(self)):
+            if self[i]!=other[i]:
+                return False
+        return True
     
     def ncols(self):
-        """return number of columns, ignoring title"""
+        """
+        :return: number of columns, ignoring title
+        """
         return six.moves.reduce(max,list(map(len,self)))
                 
     def find_col(self,title):
@@ -441,15 +501,38 @@ class Table(list):
             return None
     
     def icol(self,column):
-        '''iterates column'''
+        """iterates a column"""
+        i=self._i(column)
         for row in self:
             try:
-                yield row[self._i(column)]
+                yield row[i]
             except:
                 yield None
                 
-    def col(self,column):
-        return [x for x in self.icol(column)]
+    def col(self,column,title=False):
+        i=self._i(column)
+        res=[x for x in self.icol(i)]
+        if title:
+            res=[self.titles[i]]+res
+        return res
+    
+    def cols(self,title=False):
+        """iterator through columns"""
+        for i in range(self.ncols()):
+            yield self.col(i,title)
+            
+    def transpose(self,titles_column=0):
+        """transpose table
+        :param: titles_column
+        :return: Table where rows are made from self's columns and vice-versa
+        """
+        res=Table()
+        for i,row in enumerate(self.cols(self.titles)):
+            if i==titles_column:
+                res.titles=row
+            else:
+                res.append(row)
+        return res
     
     def index(self,value,column=0):
         """
@@ -460,9 +543,22 @@ class Table(list):
                 return i
         return None
     
-    def get(self,row,col):
         col=self._i(col)
         return self[row][col]
+    
+    def __getitem__(self, n):
+        #TODO : support slices
+        try:
+            c=self._i(n[1])
+        except TypeError:
+            return super(Table,self).__getitem__(n)
+        else:
+            rows=super(Table,self).__getitem__(n[0])
+            return rows[c]
+        
+    def get(self,row,col):
+        return self[row,col]
+        
     
     def set(self,row,col,value):
         col=self._i(col)
@@ -570,8 +666,8 @@ class Table(list):
         res=True
         i=self._i(by)
         for row in self:
-            x=row[i]
             try:
+                x=row[i]
                 row[i]=f(x)
             except:
                 if not skiperrors:
@@ -627,14 +723,5 @@ class Table(list):
         from .itertools2 import removef
         return len(removef(self,f))
     
-    def __eq__(self,other):
-        """compare 2 Tables contents, mainly for tests"""
-        if self.titles!=other.titles:
-            return False
-        if len(self)!=len(other):
-            return False
-        for i in range(len(self)):
-            if self[i]!=other[i]:
-                return False
-        return True
+
                 
