@@ -66,7 +66,7 @@ class TestTable:
     
     def test_write_json(self):
 
-        self.t.save(self.path+'/results/table.test.json')
+        self.t.save(self.path+'/results/table.test.json',indent=True)
         t=Table(titles=self.t.titles) #to keep column order
         t.load(self.path+'/results/table.test.json')
         t.to_date('OrderDate')

@@ -144,7 +144,7 @@ class Cell(object):
         if style:
             args['style']=style
         
-        if not v or v=='':
+        if v is None or v=='':
             v="&nbsp;" #for IE8
         else:
             v=f%v if f else six.text_type(v)
@@ -252,7 +252,19 @@ class Table(list):
         return self.html()
     
     def html(self,head=None,foot=None,colstyle={},**kwargs):
-        """:return: string HTML representation of table"""
+        """HTML representation of table
+        
+        :param head: optional column headers, .titles by default
+        :param foot: optional column footers, .footer by default
+        :param style: (list of) dict of style attributes
+        :param kwargs: optional parameters passed along to tag('table'...
+            except:
+            * start=optional start row
+            * stop=optional end row
+            used to display a subset of lines. in this case rows with '...' cells
+            are displayed before and/or after the lines
+        :return: string HTML representation of table
+        """
                 
         def TR(data,align=None,fmt=None,tag=None,style={}):
             res=''
@@ -278,8 +290,14 @@ class Table(list):
             head=self.titles
         if head:
             res+=THEAD(head)
-        for row in self:
+        start=kwargs.pop('start',0)
+        stop=kwargs.pop('stop',len(self))
+        if start!=0:
+            res+=TR(['...']*self.ncols(),style=colstyle)  
+        for row in self[start:stop]:
             res+=TR(row,style=colstyle)  
+        if stop!=-1 and stop<len(self):
+            res+=TR(['...']*self.ncols(),style=colstyle)  
         if foot is None:
             foot=self.footer
         if foot:
@@ -417,7 +435,8 @@ class Table(list):
             with open(filename, 'w') as file:
                 file.write(self.html(**kwargs))
         elif ext in ('json'):
-            self.write_json(filename,**kwargs)
+            with open(filename, 'w') as file:
+                file.write(self.json(**kwargs))
         else: #try ...
             self.write_csv(filename,**kwargs)
         return self #to allow chaining
@@ -426,8 +445,11 @@ class Table(list):
         raise(NotImplementedError)
         #TODO : https://pypi.python.org/pypi/XlsxWriter
         return self
-        
-    def write_json(self,filename, **kwargs):
+    
+    def json(self, **kwargs):
+        """
+        :return: string JSON representation of table
+        """
         def json_serial(obj):
             """JSON serializer for objects not serializable by default json code"""
             if isinstance(obj, (datetime,date,time,timedelta)):
@@ -435,9 +457,8 @@ class Table(list):
                 return serial
             raise TypeError ("Type not serializable")
         array=[self.rowasdict(i) for i in range(len(self))]
-        with open(filename, 'w') as file:
-            json.dump(array, file, default=json_serial)
-        return self
+        kwargs.setdefault('default',json_serial)
+        return json.dumps(array, **kwargs)
             
     def write_csv(self,filename, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
@@ -568,12 +589,20 @@ class Table(list):
             self[row].extend([None]*(1+col-len(self[row])))
         self[row][col]=value
     
-    def setcol(self,by,val,i=0):
-        '''set column'''
-        j=self._i(by)
-        for v in val:
-            self.set(i,j,v)
-            i+=1
+    def setcol(self,col,value,i=0):
+        """set column values
+        :param col: int or string column index
+        :param value: single value assigned to whole column or iterable assigned to each cell
+        :param i: optional int : index of first row to assign
+        """
+        j=self._i(col)
+        if isiterable(value):
+            for v in value:
+                self.set(i,j,v)
+                i+=1
+        else:
+            for i in range(i,len(self)):
+                self.set(i,j,value)
             
     def append(self,line):
         ''' appends a line to table
@@ -591,6 +620,7 @@ class Table(list):
                 self.set(r,i,v)
         else:
             list.append(self,line)
+        return self
             
     def addcol(self,title,val=None,i=0):
         '''add column to the right'''
@@ -601,6 +631,7 @@ class Table(list):
         for v in val:
             self.set(i,col,v)
             i+=1
+        return self
             
     def sort(self,by,reverse=False):
         '''sort by column'''
