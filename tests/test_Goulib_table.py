@@ -104,7 +104,7 @@ class TestTable:
         assert_true(len(ta)==2 and ta.ncols()==2)
         
     def test_col(self):
-        pass #tested by test_sort
+        assert_equal(self.t.col('Cost'),self.t[:,'Cost'])
         
     def test_sort(self):
         self.t.sort('Cost')
@@ -129,7 +129,7 @@ class TestTable:
         assert_equal(self.t.find_col('Date'),self.t._i('OrderDate'))
 
     def test_get(self):
-        assert_equal(self.t.get(3,'Cost'),self.t[3][5])
+        assert_equal(self.t.get(3,'Cost'),self.t[3,5])
         assert_equal(self.t.get(-1,'Total'),139.72)
 
     def test_groupby(self):

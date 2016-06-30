@@ -564,18 +564,16 @@ class Table(list):
                 return i
         return None
     
-        col=self._i(col)
-        return self[row][col]
-    
     def __getitem__(self, n):
-        #TODO : support slices
         try:
             c=self._i(n[1])
         except TypeError:
             return super(Table,self).__getitem__(n)
         else:
             rows=super(Table,self).__getitem__(n[0])
-            return rows[c]
+            if not isinstance(n[0],slice):
+                return rows[c]
+            return [row[c] for row in rows]
         
     def get(self,row,col):
         return self[row,col]
