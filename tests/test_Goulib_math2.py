@@ -396,10 +396,13 @@ class TestBinomial:
 
 class TestFaulhaber:
     def test_faulhaber(self):
+        def sumpow(n,p):
+            return sum((x**p for x in range(n+1)))
         assert_equal(faulhaber(100,0),100)
         assert_equal(faulhaber(100,1),triangular(100))
         assert_equal(faulhaber(100,2),sum_of_squares(100))
         assert_equal(faulhaber(100,3),sum_of_cubes(100))
+        assert_equal(faulhaber(100,4),sumpow(100,4))
 
 class TestBinomialExponent:
     def test_binomial_exponent(self):
