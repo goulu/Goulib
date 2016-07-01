@@ -6,7 +6,7 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.image import *
-from PIL.ImageFilter import *
+# from PIL.ImageFilter import *
 
 import os
 path=os.path.dirname(os.path.abspath(__file__))
@@ -109,8 +109,9 @@ class TestImage:
     def test_ndarray(self):
         pass
 
-    def test_to_html(self):
-        pass
+    def test_render(self):
+        from Goulib.notebook import h
+        h(self.lena)
 
     def test_split(self):
         rgb = self.lena.split()
@@ -167,7 +168,8 @@ class TestImage:
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')
         colors=['Cyan','Magenta','Yellow','blacK']
-        cmyk=[im.colorize(col) for im,col in zip(cmyk,colors)]
+        cmyk=[im*col for im,col in zip(cmyk,colors)] # multiply a graylevel image by a color to colorize it !
+        # cmyk=[im.colorize(col,'black') for im,col in zip(cmyk,colors)]
         back=sum(cmyk,Image())
         back.save(results+'image_add_sum_cmyk.png')
         assert_equal(self.lena.dist(back),0)

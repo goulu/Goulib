@@ -26,7 +26,7 @@ import skimage
 import warnings
 warnings.filterwarnings("ignore") # because too many are generated
 
-# import PIL.Image as PILImage
+import PIL.Image as PILImage
 
 import six
 from six.moves.urllib_parse import urlparse
@@ -113,15 +113,15 @@ def adapt_rgb(func):
     """
     # adapted from https://github.com/scikit-image/scikit-image/blob/master/skimage/color/adapt_rgb.py
     @functools.wraps(func)
-    def image_filter_adapted(image, *args, **kwargs):
-        channels=list(image.split())
-        if len(channels)>1:
+    def _adapter(image, *args, **kwargs):
+        if image.nchannels>1:
+            channels=image.split('RGB')
             for i in range(3): #RGB. If there is an A, it is untouched
-                channels[i]=(func)(channels[i], *args, **kwargs)
-            return Image(channels,image.mode)
+                channels[i]=func(channels[i], *args, **kwargs)
+            return Image(channels,'RGB')
         else:
             return func(image, *args, **kwargs)
-    return image_filter_adapted
+    return _adapter
 
 class Image(Plot):
     def __init__(self, data=None, mode=None, **kwargs):
@@ -135,24 +135,35 @@ class Image(Plot):
         ** color: to fill None=black by default
         """
         if data is None:
-            self.mode = mode = mode or 'F'
+            mode = mode or 'F'
             n=modes[mode].nchannels
             size = tuple(kwargs.get('size',(0,0)))
             if n>1 : size=size+ (n,)
             color=Color(kwargs.get('color','black')).rgb
             if n==1:
                 color=color[0] #somewhat brute
-            self.array = np.ones(size, dtype=modes[mode].type) * color
+            data=np.ones(size, dtype=modes[mode].type) * color
+            self._set(data)
         elif isinstance(data,Image): #copy constructor
             self.mode=data.mode
             self.array=data.array
         elif isinstance(data,six.string_types): #assume a path
             self.load(data,**kwargs)
         else: # assume some kind of array
+            try: # list of Images ?
+                data=[im.array for im in data]
+            except:
+                pass
             self._set(data,mode)
     
-    def _set(self,data,mode):
+    def _set(self,data,mode=None,copy=False):
         data=np.asanyarray(data)
+        if copy:
+            data=data.copy()
+        s=data.shape
+        if len(s)==3:
+            if s[0]<10 and s[1]>10 and s[2]>10: 
+                data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
         self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
 
@@ -219,14 +230,28 @@ class Image(Plot):
         #... it causes _repr_png_ to be called by Plot._repr_html_
 
     def render(self, fmt='png'):
-        import PIL.Image
+        a=self.getdata(np.uint8)
         buffer = six.BytesIO()
-        PIL.Image.fromarray(self.array).save(buffer, fmt)
+        PILImage.fromarray(a).save(buffer, fmt)
         return buffer.getvalue()
 
     # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
-    def getdata(self):
-        return self.array
+    def getdata(self,dtype=np.uint8):
+        a=np.copy(self.array) #because we'll change the type in place below
+        #then change array type if required
+        if a.dtype==dtype:
+            pass
+        elif dtype==np.float:
+            a=skimage.img_as_float(a)
+        elif dtype==np.int16:
+            a=skimage.img_as_int(a)
+        elif dtype==np.uint16:
+            a=skimage.img_as_uint(a)
+        elif dtype==np.uint8:
+            a=skimage.img_as_ubyte(a)
+        else:
+            pass #keep the wrong type for now and see what happens
+        return a
 
     def split(self, mode=None):
         if mode:
@@ -364,21 +389,6 @@ class Image(Plot):
         return "%s(mode=%s size=%s)" % (
             self.__class__.__name__,self.mode, size,
             )
-
-    def ndarray(self):
-        """ http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.ndarray.html
-
-        :return: `numpy.ndarray` of image
-        """
-        data = list(self.getdata())
-        w,h = self.size
-        A = np.zeros((w*h), 'd')
-        i=0
-        for val in data:
-            A[i] = val
-            i=i+1
-        A=A.reshape(w,h)
-        return A
 
 
     # hash and distance
@@ -567,10 +577,16 @@ class Image(Plot):
         return im1.compose(im2,1,alpha)
 
     def __add__(self,other):
-        return self.compose(other,1,1)
+        if self.npixels==0:
+            return Image(other)
+        else:
+            return self.compose(other,1,1)
 
     def __sub__(self,other):
-        return self.compose(other,1,-1)
+        if self.npixels==0:
+            return -other
+        else:
+            return self.compose(other,1,-1)
 
     def __mul__(self,other):
         if isinstance(other,six.string_types):
@@ -587,30 +603,13 @@ class Image(Plot):
             return Image(rgba,'RGBA')
         raise NotImplemented('%s * %s'%(self,other))
 
-
-    def draw(self,entity):
-        from . import drawing, geom
-        try: #iterable ?
-            for e in entity:
-                draw(e)
-            return
-        except:
-            pass
-
-        if isinstance(entity,geom.Circle):
-            box=entity.bbox()
-            box=(box.xmin, box.ymin, box.xmax, box.ymax)
-            ImageDraw.Draw(self).ellipse(box, fill=255)
-        else:
-            raise NotImplemented
-        return self
-
 def rgb2rgba(array):
     s=array.shape
     if s[2]==4: #already RGBA
         return array
-    a=np.zeros(s[:2],s.dtype())
-    return np.append(array,a,0)
+    a=np.zeros(s[:2],array.dtype)
+    array=np.append(array,a,0)
+    return array
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
 
@@ -961,20 +960,4 @@ def convert(im,source,target,**kwargs):
         im=converters[u][v][0]['f'](im,**kwargs)
     return im #isn't it beautiful ?
 
-
-    a=np.copy(self.array) #because we'll change the type in place below
-    #then change array type if required
-    dtype=modes[mode].type
-    if a.dtype==dtype:
-        pass
-    elif dtype==np.float:
-        a=skimage.img_as_float(a)
-    elif dtype==np.int16:
-        a=skimage.img_as_int(a)
-    elif dtype==np.uint16:
-        a=skimage.img_as_uint(a)
-    elif dtype==np.uint8:
-        a=skimage.img_as_ubyte(a)
-    else:
-        pass #keep the wrong type for now and see what happens
 
