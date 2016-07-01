@@ -5,13 +5,13 @@ SortedCollection
 """
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
-__credits__ = []
+__credits__ = ['Raymond Hettinger http://code.activestate.com/recipes/577197-sortedcollection/']
 __license__ = "LGPL"
 
 from bisect import bisect_left, bisect_right
 
 class SortedCollection(object):
-    #http://code.activestate.com/recipes/577197-sortedcollection/
+    #
     '''Sequence sorted by a key function.
 
     SortedCollection() is much easier to work with than using bisect() directly.
