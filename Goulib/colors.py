@@ -97,6 +97,7 @@ colorspaces=(
     'XYZ',
     'xyY', #for CIE Chromaticity plots
     'Lab',
+    'Luv',
     'HSV',
     'CMYK',
     'RGB',
@@ -200,7 +201,10 @@ class Color(object):
             for u,v in itertools2.pairwise(path):
                 if v not in self._values:
                     edge=converters[u][v][0]
-                    self._values[v]=edge['f'](self._values[u])
+                    c=edge['f'](self._values[u])
+                    if isinstance(c,np.ndarray):
+                        c=tuple(map(float,c))
+                    self._values[v]=c
         return self._values[target]
     
     @property
@@ -214,6 +218,9 @@ class Color(object):
 
     @property
     def lab(self): return self.convert('lab')
+    
+    @property
+    def luv(self): return self.convert('Luv')
 
     @property
     def cmyk(self): return self.convert('cmyk')
@@ -226,6 +233,7 @@ class Color(object):
     
     @property
     def xyY(self): return self.convert('xyY')
+
 
     def __hash__(self):
         return hash(self.hex)
@@ -243,10 +251,23 @@ class Color(object):
             return self.name==other
 
     def __add__(self,other):
-        return Color(math2.vecadd(self.rgb,other.rgb))
+        from .image import Image
+        if isinstance(other, Color):
+            return Color(math2.vecadd(self.rgb,other.rgb))
+        elif isinstance(other, Image):
+            return Image(size=other.size,color=self.native,mode=self.space)+other
+        else: #last chance
+            return Color(math2.vecadd(self.rgb,other))
 
     def __sub__(self,other):
-        return Color(math2.vecsub(self.rgb,other.rgb))
+        from .image import Image
+        if isinstance(other, Color):
+            return Color(math2.vecsub(self.rgb,other.rgb))
+        elif isinstance(other, Image):
+            mode=other.mode
+            return Image(size=other.size,color=self.convert(mode),mode=mode)-other
+        else: #last chance
+            return Color(math2.vecsub(self.rgb,other))
     
     def __neg__(self):
         """ complementary color"""
