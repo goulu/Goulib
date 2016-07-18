@@ -117,12 +117,16 @@ class TestImage:
         rgb = self.lena.split()
         for im,c in zip(rgb,'RGB'):
             im.save(results+'lena_split_%s.png'%c)
+            
+        Image(rgb).save(results+'lena_RGB_merge.png')
         
         colors=['Cyan','Magenta','Yellow','blacK']
         cmyk=self.lena.split('CMYK')
-        cmyk=[im.colorize(col) for im,col in zip(cmyk,colors)]
-        for im,c in zip(cmyk,'CMYK'):
+        cmyk2=[im.colorize(col) for im,col in zip(cmyk,colors)]
+        for im,c in zip(cmyk2,'CMYK'):
             im.save(results+'lena_split_%s.png'%c)
+            
+        Image(cmyk,mode='CMYK').save(results+'lena_CMYK_merge.png')
             
         lab=self.lena.split('Lab')
         for im,c in zip(lab,'LAB'):
@@ -167,10 +171,11 @@ class TestImage:
     
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')
-        colors=['Cyan','Magenta','Yellow','blacK']
-        cmyk=[im*col for im,col in zip(cmyk,colors)] # multiply a graylevel image by a color to colorize it !
+        k=cmyk[3]
+        colors=['Cyan','Magenta','Yellow']
+        cmy=[(im/k+k)*col for im,col in zip(cmyk,colors)] # multiply a graylevel image by a color to colorize it !
         # cmyk=[im.colorize(col,'black') for im,col in zip(cmyk,colors)]
-        back=sum(cmyk,Image())
+        back=sum(cmy)
         back.save(results+'image_add_sum_cmyk.png')
         assert_equal(self.lena.dist(back),0)
         

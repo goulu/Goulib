@@ -208,29 +208,28 @@ class Image(Plot):
     open=load # PIL compatibility
 
     def save(self,path,**kwargs):
-        a=self.array
-        """
-        if self.mode in 'RGBA' and a.dtype!=np.uint8: #only format supported now
-            a=np.asarray(a*255,np.uint8)
-        """
-        try:
-            skimage.io.imsave(path,a,**kwargs)
-            return self
-        except IOError as e:
-            pass
-        try:
-            im=self.convert('RGBA')
-        except IOError:
-            im=self.convert('L') # uint8 gray
+        if self.nchannels==1:
+            mode='L'
+        elif self.mode=='RGBA':
+            mode=self.mode
+        else:
+            mode='RGB'
+        a=convert(self.array,self.mode,mode)
+        skimage.io.imsave(path,a,**kwargs)
+        return self
 
-        return im.save(path,**kwargs)
 
     def _repr_svg_(self, **kwargs):
         raise NotImplementedError() #and should never be ...
         #... it causes _repr_png_ to be called by Plot._repr_html_
 
     def render(self, fmt='png'):
-        a=self.getdata(np.uint8)
+        try:
+            a=self.getdata(np.uint8)
+        except ValueError as e:
+            raise ValueError('image has min=%s max=%s range'%
+                          (np.min(self.array),np.max(self.array))
+            )
         buffer = six.BytesIO()
         PILImage.fromarray(a).save(buffer, fmt)
         return buffer.getvalue()
@@ -562,7 +561,6 @@ class Image(Plot):
 
     def add(self,other,pos=(0,0),alpha=1):
         """ simply adds other image at px,py (subbixel) coordinates
-        :warning: result is normalized in case of overflow
         """
         #TOD: use http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
         px,py=pos
@@ -581,6 +579,11 @@ class Image(Plot):
             return Image(other)
         else:
             return self.compose(other,1,1)
+        
+    def __radd__(self,other):
+        """only to allow sum(images) easily"""
+        assert other==0
+        return self
 
     def __sub__(self,other):
         if self.npixels==0:
@@ -590,18 +593,23 @@ class Image(Plot):
 
     def __mul__(self,other):
         if isinstance(other,six.string_types):
-            return self.colorize(other)
+            return self.colorize('black',other)
         if math2.is_number(other):
             return self.compose(None,other)
         if other.nchannels>self.nchannels:
             return other*self
         if other.nchannels==1:
             if self.nchannels==1:
-                return self.compose(None,np.array(other,dtype=np.float))
+                return self.compose(None,other.array)
             rgba=list(self.split('RGBA'))
             rgba[-1]=rgba[-1]*other
             return Image(rgba,'RGBA')
         raise NotImplemented('%s * %s'%(self,other))
+    
+    def __div__(self,f):
+        return self*(1/f)
+    
+    __truediv__ = __div__
 
 def rgb2rgba(array):
     s=array.shape
@@ -910,12 +918,24 @@ def rgb2cmyk(rgb):
     cmy=1-arr
 
     k = np.amin(cmy,axis=2)
-    w = 1-k
+    w = 1 #-k
     c = (cmy[:,:,0] - k) / w
     m = (cmy[:,:,1] - k) / w
     y = (cmy[:,:,2] - k) / w
 
     return np.concatenate([x[..., np.newaxis] for x in [c,m,y,k]], axis=-1)
+
+def cmyk2rgb(cmyk):
+    cmyk = np.asanyarray(cmyk)
+    cmyk=skimage.img_as_float(cmyk)
+
+    k = 1-cmyk[:,:,3]
+    w = 1 #-k
+    r = k-cmyk[:,:,0]*w
+    g = k-cmyk[:,:,1]*w
+    b = k-cmyk[:,:,2]*w
+
+    return np.concatenate([x[..., np.newaxis] for x in [r,g,b]], axis=-1)
 
 def gray2rgb(im,color0=(0,0,0), color1=(1,1,1)):
     color0=np.asarray(color0,np.float)
