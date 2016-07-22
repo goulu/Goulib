@@ -161,13 +161,13 @@ def record(iterable, it=count(), max=0):
             yield i
             max=v
 
-A000004=Sequence(repeat(0), desc='The zero sequence')
+A000004=Sequence(repeat(0),lambda n:0, lambda x:x==0, desc='The zero sequence')
 
-A000007=Sequence(None,lambda n:0**n, desc='The characteristic function of 0: a(n) = 0^n.')
+A000007=Sequence(None,lambda n:0**n, lambda x:x in (0,1), desc='The characteristic function of 0: a(n) = 0^n.')
 
-A000027=Sequence(count(1), lambda n:n, desc='The positive integers.')
-A005408=Sequence(count(1,2), lambda n:2*n+1, desc='The odd numbers: a(n) = 2n+1.')
-A005843=Sequence(count(0,2), lambda n:2*n, desc='The even numbers: a(n) = 2n ')
+A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers.')
+A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
+A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
 A008587=Sequence(None,lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(None,lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
