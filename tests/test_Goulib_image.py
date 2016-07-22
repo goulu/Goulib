@@ -6,7 +6,8 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.image import *
-# from PIL.ImageFilter import *
+
+from skimage import data
 
 import os
 path=os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +20,7 @@ class TestImage:
         assert_equal(self.lena,self.lena) #make sure image comparizon works
         self.lena.grayscale().save(results+'lena_gray.png')
         self.lena_gray=Image(results+'lena_gray.png')
+        self.camera=Image(data.camera())
 
     def test_pdf(self):
         return # for now for speed
@@ -69,9 +71,7 @@ class TestImage:
         raise SkipTest
 
     def test___repr__(self):
-        # image = Image(data)
-        # assert_equal(expected, image.__repr__())
-        raise SkipTest
+        assert_equal(repr(self.lena),'Image(mode=RGB shape=(512, 512, 3) type=float64)')
 
     def test_mode(self):
         pass #useless ?
@@ -112,6 +112,17 @@ class TestImage:
     def test_render(self):
         from Goulib.notebook import h
         h(self.lena)
+        
+    def test_convert(self):
+        for mode in modes:
+            im=self.lena.convert(mode)
+            im.save(results+'lena_convert_%s.png'%mode)
+            try:
+                im=im.convert('RGBA')
+                im.save(results+'lena_convert_%s_round_trip.png'%mode)
+            except:
+                logging.error('%s round trip conversion failed'%mode)
+                
 
     def test_split(self):
         rgb = self.lena.split()
@@ -139,7 +150,7 @@ class TestImage:
         for k in dithering:
             self.lena_gray.dither(k).save(results+'lena_dither_%s.png'%dithering[k])
         self.lena.dither().save(results+'lena_color_dither.png')
-
+        self.lena.dither(n=4).save(results+'lena_color_dither4.png')
 
     def test_filter(self):
 
@@ -151,9 +162,11 @@ class TestImage:
             self.lena.filter(f).save(results+'lena_sk_%s.png'%f.__name__)
 
     def test_resize(self):
-        size=64
+        size=128
         im=self.lena.resize((size,size))
         im.save(results+'lena_resize_%d.png'%size)
+        im=self.camera.resize((size,size))
+        im.save(results+'camera_resize_%d.png'%size)
         
     def test_expand(self):
         size=128
@@ -171,11 +184,9 @@ class TestImage:
     
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')
-        k=cmyk[3]
-        colors=['Cyan','Magenta','Yellow']
-        cmy=[(im/k+k)*col for im,col in zip(cmyk,colors)] # multiply a graylevel image by a color to colorize it !
-        # cmyk=[im.colorize(col,'black') for im,col in zip(cmyk,colors)]
-        back=sum(cmy)
+        colors=['Cyan','Magenta','Yellow','blacK']
+        cmyk2=[im.colorize(col) for im,col in zip(cmyk,colors)] 
+        back=cmyk2[0]-(-cmyk2[1])-(-cmyk2[2])-(-cmyk2[3]) #what a strange syntax ...
         back.save(results+'image_add_sum_cmyk.png')
         assert_equal(self.lena.dist(back),0)
         

@@ -60,7 +60,7 @@ modes = {
     'RGB'   : Mode('rgb',3,np.float,0,1), # not uint8 as in PIL
     'RGBA'  : Mode('rgba',4,np.float,0,1), # not uint8 as in PIL
     'CMYK'  : Mode('cmyk',4,np.float,0,1), # not uint8 as in PIL
-    'LAB'   : Mode('lab',3,np.float,-100,100),
+    'LAB'   : Mode('lab',3,np.float,-1,1),
     'XYZ'   : Mode('xyz',3,np.float,0,1), # https://en.wikipedia.org/wiki/CIE_1931_color_space
     'HSV'   : Mode('hsv',3,np.float,0,1), # https://en.wikipedia.org/wiki/HSL_and_HSV
 }
@@ -160,6 +160,8 @@ class Image(Plot):
         data=np.asanyarray(data)
         if copy:
             data=data.copy()
+        if mode=='LAB' and np.max(data)>1:
+            data=data/100
         s=data.shape
         if len(s)==3:
             if s[0]<10 and s[1]>10 and s[2]>10: 
@@ -169,7 +171,11 @@ class Image(Plot):
 
     @property
     def shape(self):
-        return self.array.shape
+        #alwasy return y,x,nchannels
+        s=self.array.shape
+        if len(s)==2:
+            s=(s[0],s[1],1)
+        return s
 
     @property
     def size(self):
@@ -177,7 +183,7 @@ class Image(Plot):
 
     @property
     def nchannels(self):
-        return nchannels(self.array)
+        return self.shape[2]
 
     @property
     def npixels(self):
@@ -323,7 +329,7 @@ class Image(Plot):
         from skimage.transform import resize
         order=0 if filter in (None,NEAREST) else 1 if filter==BILINEAR else 3
         order=kwargs.pop('order',order)
-        array=resize(self.array, size, order, preserve_range=True, **kwargs)
+        array=resize(self.array, size, order, **kwargs) #preserve_range=True ?
         return Image(array, self.mode)
 
     def paste(self,image,box, mask=None):
@@ -384,9 +390,9 @@ class Image(Plot):
     # representations, data extraction and conversions
 
     def __repr__(self):
-        size=getattr(self,'size','unknown')
-        return "%s(mode=%s size=%s)" % (
-            self.__class__.__name__,self.mode, size,
+        s=getattr(self,'shape','unknown')
+        return "%s(mode=%s shape=%s type=%s)" % (
+            self.__class__.__name__,self.mode, s,self.array.dtype.name
             )
 
 
@@ -443,8 +449,11 @@ class Image(Plot):
     __neg__=__inv__=invert #aliases
 
     def grayscale(self):
-        return self.convert('F')
-
+        if np.issubdtype(self.array.dtype, np.float):
+            return self.convert('F')
+        else:
+            return self.convert('L')
+        
     def colorize(self,color0,color1=None):
         """colorize a grayscale image
 
@@ -462,10 +471,15 @@ class Image(Plot):
         return Image(a,'RGB')
 
     @adapt_rgb
-    def dither(self,method=FLOYDSTEINBERG):
-        L=modes[self.mode].max
-        a=dither(self.invert().array,method,L=L)
-        return Image(a,'1')
+    def dither(self,method=None,n=2):
+        if method is None:
+            method=FLOYDSTEINBERG
+        level=modes[self.mode].max
+        a=dither(self.array,method,N=n,L=level)
+        if n==2:
+            return Image(a,'1')
+        else:
+            return Image(a/(n-1),'F')
 
     def normalize(self,newmax=255,newmin=0):
         #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
@@ -615,8 +629,8 @@ def rgb2rgba(array):
     s=array.shape
     if s[2]==4: #already RGBA
         return array
-    a=np.zeros(s[:2],array.dtype)
-    array=np.append(array,a,0)
+    a=np.ones((s[0],s[1],1),array.dtype)
+    array=np.append(array,a,2)
     return array
 
 #from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
@@ -947,8 +961,11 @@ def gray2rgb(im,color0=(0,0,0), color1=(1,1,1)):
 
 bool2rgb=gray2rgb #works also
 
+def bool2gray(im):
+    return im/255
+
 #build a graph of available converters
-#as in https://github.com/gtaylor/python-colormath
+#inspired by https://github.com/gtaylor/python-colormath
 
 from .graph import DiGraph
 import skimage.color as skcolor
