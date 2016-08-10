@@ -314,8 +314,10 @@ class TestSubdict:
 
 class TestCompress:
     def test_compress(self):
-        # assert_equal(expected, compress(iterable))
-        raise SkipTest 
+        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
+        res=compress('aaaaabbbbccccccaaaaaaa')
+        res=''.join('%d%s'%(n,c) for (c,n) in res)
+        assert_equal(res,'5a4b6c7a')
 
 class TestAccumulate:
     def test_accumulate(self):

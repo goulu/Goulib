@@ -162,7 +162,7 @@ def compact(iterable,f=bool):
 
 def compress(iterable):
     """
-    generates (item,count) paris by counting the number of consecutive items in iterable)
+    generates (item,count) pairs by counting the number of consecutive items in iterable)
     """
     prev,count=None,0
     for item in iterable:
