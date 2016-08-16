@@ -84,9 +84,8 @@ def isiterable(obj):
     :result: bool True if obj is iterable (but not a string)
     """
     # http://stackoverflow.com/questions/1055360/how-to-tell-a-variable-is-iterable-but-not-a-string
-    if not hasattr(obj, '__iter__'): return False
     if isinstance(obj, six.string_types): return False #required since Python 3.5
-    return True
+    return isinstance(obj, collections.Iterable)
 
     
 
@@ -305,18 +304,26 @@ def ireduce(func, iterable, init=None):
         curr = func(curr, x)
         yield curr
 
-def unique(iterable, key=None):
-    """generate unique elements, preserving order. Remember all elements ever seen.
+def unique(iterable, key=None, maxsize=None):
+    """generate unique elements, preserving order.
+    :param iterable: iterable
+    :param key: optional function defining which elements are considered equal
+    :param maxsize: optional integer defining how many of the last unique elements to keep in memory
 
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
     """
-    seen = set()
+    seen = list() if maxsize else set()
     for element in iterable:
         k = key(element) if key else element
         if k not in seen:
-            seen.add(k)
             yield element
+            if not maxsize:
+                seen.add(k)
+            else:
+                seen.append(k)
+                if len(seen)>maxsize:
+                    seen.pop(0)
 
 def count_unique(iterable, key=None):
     """Count unique elements
@@ -666,14 +673,6 @@ def sorted_iterable(iterable, key=None, buffer=100):
     for x in b: yield x # this never happens if iterable is infinite
 
 # operations on sorted iterators
-
-def unique_sorted(iterable):
-    """generates items in sorted iterable without repetition"""
-    prev=None
-    for x in iterable:
-        if x!=prev:
-            yield x
-        prev=x
 
 def diff(iterable1,iterable2):
     """generate items in sorted iterable1 that are not in sorted iterable2"""

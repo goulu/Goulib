@@ -94,12 +94,15 @@ class TestIterate:
         
 class TestIsIterable:
     def test_isiterable(self):
+        assert_false(isiterable(123))
+        assert_false(isiterable('a string'))
         assert_true(isiterable([]))
         assert_true(isiterable(tuple()))
         assert_true(isiterable({}))
         assert_true(isiterable(set()))
         assert_true(isiterable((x for x in range(10))))
-        assert_false(isiterable(''))
+        assert_true(isiterable(map(lambda x:x*x,[1,2,3])))
+        
 
 class TestTails:
     def test_tails(self):
@@ -115,6 +118,7 @@ class TestUnique:
     def test_unique(self):
         assert_equal(''.join(unique('AAAABBBCCDAABBB')),'ABCD')
         assert_equal(''.join(unique('ABBCcAD', str.lower)),'ABCD')
+        assert_equal(''.join(unique('AAAABBBCCDAABBB',None,1)),'ABCDAB')
 
 class TestIdentity:
     def test_identity(self):
@@ -322,11 +326,6 @@ class TestCompress:
 class TestAccumulate:
     def test_accumulate(self):
         # assert_equal(expected, accumulate(iterable, func, skip_first))
-        raise SkipTest 
-
-class TestUniqueSorted:
-    def test_unique_sorted(self):
-        # assert_equal(expected, unique_sorted(iterable))
         raise SkipTest 
 
 class TestDiff:
