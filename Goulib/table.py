@@ -230,7 +230,7 @@ class Table(list):
             for row in data:
                 if not isiterable(row): #build a column
                     row=[row]
-                self.append(list(row))
+                self.append(row)
         
         if filename:
             self.load(filename,**kwargs)
@@ -624,7 +624,7 @@ class Table(list):
         '''add column to the right'''
         col=len(self.titles)
         self.titles.append(title)
-        if not isinstance(val,list):
+        if not isiterable(val):
             val=[val]*(len(self)-i)
         for v in val:
             self.set(i,col,v)
