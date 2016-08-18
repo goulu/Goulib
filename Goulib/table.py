@@ -617,7 +617,7 @@ class Table(list):
                     self.titles.append(k)
                 self.set(r,i,v)
         else:
-            list.append(self,line)
+            list.append(self,list(line))
         return self
             
     def addcol(self,title,val=None,i=0):
