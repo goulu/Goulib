@@ -145,6 +145,10 @@ class TestVeccompare:
 
 class TestFibonacci:
     def test_fibonacci(self):
+        
+        #http://controlfd.com/2016/07/05/using-floats-in-python.html
+        assert_equal(fibonacci(78),8944394323791464)
+        
         # https://projecteuler.net/problem=2
         from itertools import takewhile
 
@@ -764,6 +768,10 @@ class TestModBinomial:
         assert_equal(  mod_binomial(938977945,153121024,m),47619)
         assert_equal(  mod_binomial(906601285,527203335,m),0)
         assert_equal(  mod_binomial(993051461,841624879,m),104247)
+        
+class TestDeBrujin:
+    def test_de_brujin(self):
+        assert_equal(de_bruijn('1234',3),'1112113114122123124132133134142143144222322423323424324433343444')
 
 class TestXgcd:
     def test_xgcd(self):

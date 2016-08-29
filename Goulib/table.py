@@ -9,7 +9,8 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import csv, itertools, operator, string, codecs, json, six, logging
+import six, logging
+import csv, itertools, codecs, json, collections
 
 from datetime import datetime, date, time, timedelta
 
@@ -647,12 +648,12 @@ class Table(list):
         for line in self:
             yield dict(list(zip(self.titles,line)))
         
-    def groupby(self,by,sort=True,removecol=True):
-        '''dictionary of subtables grouped by a column'''
+    def groupby_gen(self,by,sort=True,removecol=True):
+        """generates subtables
+        """
         i=self._i(by)
         t=self.titles
         if removecol: t=t[:i]+t[i+1:]
-        res={}
         if sort: 
             self.sort(i) 
         else:
@@ -662,8 +663,15 @@ class Table(list):
                 r=Table(titles=t,data=[a[:i]+a[i+1:] for a in g])
             else:
                 r=Table(titles=t,data=list(g))
-            res[k]=r
-        return res
+            yield k,r
+    
+    def groupby(self,by,sort=True,removecol=True):
+        """ ordered dictionary of subtables
+        """
+        return collections.OrderedDict(
+            (k,t) for (k,t) in self.groupby_gen(by,sort,removecol)
+        )
+        
     
     def hierarchy(self,by='Level',
                   factory=lambda row:(row,[]),          #creates an object from a line
