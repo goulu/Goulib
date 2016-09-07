@@ -1,6 +1,0 @@
-networkx
-scipy
-matplotlib
-rtree
-pygraphviz
-dxfgrabber

@@ -206,6 +206,13 @@ class Row(object):
             res+=cell.html(**cell_args)
         return tag('tr',res,**kwargs)
     
+if six.PY3 :
+    def _encode(line): 
+         return [s for s in line]
+else: #Python 2
+    def _encode(line): 
+        return [empty if s is None else unicode(s).encode(encoding) for s in line]
+    
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
     def __init__(self,data=[],**kwargs):
@@ -443,8 +450,30 @@ class Table(list):
         return self #to allow chaining
     
     def write_xlsx(self,filename, **kwargs):
-        raise(NotImplementedError)
-        #TODO : https://pypi.python.org/pypi/XlsxWriter
+        import xlsxwriter
+
+        workbook = xlsxwriter.Workbook(filename)
+        worksheet = workbook.add_worksheet()
+        df=workbook.add_format({'num_format': 'dd/mm/yyyy'})
+        tf=workbook.add_format({'num_format': 'hh:mm:ss'})
+        dtf=workbook.add_format({'num_format': 'dd/mm/yyyy hh:mm:ss'})
+        
+        def writerow(i,line):
+            for j,s in enumerate(line):
+                if isinstance(s, datetime):
+                     worksheet.write_datetime(i, j,s,dtf)
+                elif isinstance(s, date):
+                    worksheet.write_datetime(i, j,s,df)
+                elif isinstance(s, (time,timedelta)):
+                     worksheet.write_datetime(i, j,s,tf)
+                else:
+                    worksheet.write(i, j,s)
+                
+        writerow(0,self.titles)
+        for i,row in enumerate(self):
+            writerow(i+1,row)
+        
+        workbook.close()
         return self
     
     def json(self, **kwargs):
@@ -471,12 +500,8 @@ class Table(list):
         
         if six.PY3 :
             f = open(filename, 'w', newline='', encoding=encoding)
-            def _encode(line): 
-                return [s for s in line]
         else: #Python 2
             f = open(filename, 'wb')
-            def _encode(line): 
-                return [empty if s is None else unicode(s).encode(encoding) for s in line]
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if self.titles:

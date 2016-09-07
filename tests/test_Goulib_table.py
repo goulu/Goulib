@@ -54,9 +54,9 @@ class TestTable:
     
     def test_read_csv(self):
         #test that t can be written to csv, then re-read in t2 without loss
-        self.t.save(self.path+'/results/table.test.csv')
+        self.t.save(self.path+'/results/table/test.csv')
         
-        t=Table(self.path+'/results/table.test.csv')
+        t=Table(self.path+'/results/table/test.csv')
         t.to_date('OrderDate')
 
         assert_equal(t,self.t)
@@ -66,14 +66,17 @@ class TestTable:
     
     def test_write_json(self):
 
-        self.t.save(self.path+'/results/table.test.json',indent=True)
+        self.t.save(self.path+'/results/table/test.json',indent=True)
         t=Table(titles=self.t.titles) #to keep column order
-        t.load(self.path+'/results/table.test.json')
+        t.load(self.path+'/results/table/test.json')
         t.to_date('OrderDate')
         assert_equal(t,self.t)
 
     def test_read_xls(self):
         pass #tested in setup
+    
+    def test_write_xlsx(self):
+        self.t.save(self.path+'/results/table/test.xlsx')
 
     def test_to_date(self):
         pass #tested in setup and test_html
@@ -82,9 +85,9 @@ class TestTable:
         pass #tested in setup
 
     def test_html(self):
-        t=self.t.save(self.path+'/results/test.htm')
+        t=self.t.save(self.path+'/results/table/test.htm')
         
-        t=Table(self.path+'/results/test.htm')
+        t=Table(self.path+'/results/table/test.htm')
         assert_equal(t._i('OrderDate'),0) #check the column exists
         
         t.to_date('OrderDate')
