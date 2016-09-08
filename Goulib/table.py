@@ -25,7 +25,7 @@ except: #ElementTree
     
 Element=ElementTree._Element
 
-from .datetime2 import datef, datetimef,strftimedelta
+from .datetime2 import datef, datetimef, timef, strftimedelta
 from .markup import tag, style_str2dict
 from .itertools2 import isiterable
 
@@ -205,13 +205,6 @@ class Row(object):
         for cell in self.data:
             res+=cell.html(**cell_args)
         return tag('tr',res,**kwargs)
-    
-if six.PY3 :
-    def _encode(line): 
-         return [s for s in line]
-else: #Python 2
-    def _encode(line): 
-        return [empty if s is None else unicode(s).encode(encoding) for s in line]
     
 class Table(list):
     """Table class with CSV I/O, easy access to columns, HTML output"""
@@ -500,8 +493,12 @@ class Table(list):
         
         if six.PY3 :
             f = open(filename, 'w', newline='', encoding=encoding)
+            def _encode(line): 
+                 return [s for s in line]
         else: #Python 2
             f = open(filename, 'wb')
+            def _encode(line): 
+                return [empty if s is None else unicode(s).encode(encoding) for s in line]
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if self.titles:
@@ -667,11 +664,11 @@ class Table(list):
     
     def rowasdict(self,i):
         ''' returns a line as a dict '''
-        return dict(list(zip(self.titles,self[i])))
+        return collections.OrderedDict(zip(self.titles,self[i]))
     
     def asdict(self):
-        for line in self:
-            yield dict(list(zip(self.titles,line)))
+        for i in range(len(self)):
+            yield self.rowasdict(i)
         
     def groupby_gen(self,by,sort=True,removecol=True):
         """generates subtables
@@ -733,36 +730,38 @@ class Table(list):
                 row[i]=f(x)
             except:
                 if not skiperrors:
-                    logging.error('could not applyf to %s'%x)
-                    raise(ValueError)
+                    raise ValueError('could not applyf to %s'%x)
                 res=False
         return res
-            
-    def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
-        """convert a column to datetime
+    
+    def _datetimeformat(self,by,fmt,function,skiperrors):
+        """convert a column to a date, time or datetime
         :param by: column name of number
-        :param fmt: string defining datetime format
+        :param fmt: string defining format, or list of formats to try one by one
+        :param function: function to call
         :param skiperrors: bool. if True, conversion errors are ignored
         :return: bool True if ok, False if skiperrors==True and conversion failed
         """
         if isinstance(fmt,list):
             for f in fmt:
-                res=self.to_datetime(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
+                res=self._datetimeformat(by, f, function, True if f!=fmt[-1] else skiperrors)
             return res
-        return self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
+        return self.applyf(by,lambda x: function(x,fmt=fmt),skiperrors)
+            
+    def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
+        """convert a column to datetime
+        """
+        return self._datetimeformat(by, fmt, datetimef, skiperrors)
         
     def to_date(self,by,fmt='%Y-%m-%d',skiperrors=False):
         """convert a column to date
-        :param by: column name of number
-        :param fmt: string defining datetime format
-        :param skiperrors: bool. if True, conversion errors are ignored
-        :return: bool True if ok, False if skiperrors==True and conversion failed
-        """  
-        if isinstance(fmt,list):
-            for f in fmt:
-                res=self.to_date(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
-            return res
-        return self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
+        """
+        return self._datetimeformat(by, fmt, datef, skiperrors)
+    
+    def to_time(self,by,fmt='%H:%M:%S',skiperrors=False):
+        """convert a column to time
+        """
+        return self._datetimeformat(by, fmt, timef, skiperrors)
             
 
     def total(self,funcs):
