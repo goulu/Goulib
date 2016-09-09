@@ -12,7 +12,7 @@ __license__ = "LGPL"
 import six, logging
 import csv, itertools, codecs, json, collections
 
-from datetime import datetime, date, time, timedelta
+
 
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
@@ -25,7 +25,9 @@ except: #ElementTree
     
 Element=ElementTree._Element
 
-from .datetime2 import datef, datetimef, timef, strftimedelta
+from datetime import datetime, date, time, timedelta
+
+from .datetime2 import datef, datetimef, timef, timedeltaf, strftimedelta
 from .markup import tag, style_str2dict
 from .itertools2 import isiterable
 
@@ -228,6 +230,8 @@ class Table(list):
             filename=data
             data=[]
         else: #ensure data is 2D and mutable
+            if isinstance(data, dict):
+                data=data.values()
             for row in data:
                 if not isiterable(row): #build a column
                     row=[row]
@@ -728,9 +732,9 @@ class Table(list):
             try:
                 x=row[i]
                 row[i]=f(x)
-            except:
+            except Exception as e:
                 if not skiperrors:
-                    raise ValueError('could not applyf to %s'%x)
+                    raise e('could not applyf to %s'%x)
                 res=False
         return res
     
@@ -762,6 +766,11 @@ class Table(list):
         """convert a column to time
         """
         return self._datetimeformat(by, fmt, timef, skiperrors)
+    
+    def to_timedelta(self,by,fmt='%H:%M:%S',skiperrors=False):
+        """convert a column to time
+        """
+        return self._datetimeformat(by, fmt, timedeltaf, skiperrors)
             
 
     def total(self,funcs):
@@ -776,13 +785,17 @@ class Table(list):
                 self.footer.append(f)
         return self.footer
     
-    def remove_lines_where(self,f):
+    def remove_lines_where(self,f,value=(None,0,'')):
         """
         :param f: function of the form lambda line:bool returning True if line should be removed
         :return: int number of lines removed
         """
+        i=self._i(f)
+        if i is not None:
+            f=lambda x:x[i] in value
         from .itertools2 import removef
         return len(removef(self,f))
+    
     
 
                 
