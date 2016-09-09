@@ -10,6 +10,32 @@ __license__ = "LGPL"
 
 from bisect import bisect_left, bisect_right
 
+from collections import OrderedDict
+
+class Record(OrderedDict):
+    #http://stackoverflow.com/questions/5227839/why-python-does-not-support-record-type-i-e-mutable-namedtuple
+    def __init__(self, *args, **kwargs):
+        super(Record, self).__init__(*args, **kwargs)
+        self._initialized = True
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __setattr__(self, name, value):
+        if not name:
+            return
+        if hasattr(self, '_initialized'):
+            super(Record, self).__setitem__(name, value)
+        else:
+            super(Record, self).__setattr__(name, value)
+            
+    def __str__(self):
+        res=['%s:%s'%(k,self[k]) for k in self]
+        return '{{%s}}'%(','.join(res))
+
 class SortedCollection(object):
     #
     '''Sequence sorted by a key function.
