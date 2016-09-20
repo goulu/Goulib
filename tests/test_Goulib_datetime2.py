@@ -31,6 +31,15 @@ class TestDatetimef:
         assert_equal(datetimef('25/12/1963',t,fmt='%d/%m/%Y'),d)
         assert_true(equal(datetimef(40179.503472,fmt=None),datetime(year=2010,month=0o1,day=0o1,hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
 
+class TestTimedeltaf:
+    def test_timedeltaf(self):
+        td=timedelta(days=25,hours=12,minutes=34,seconds=56)
+        s=str(td)
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        s=('%d:%d:%d'%(25*24+12,34,56))
+        s=timedeltaf(s)
+        assert_equal(s,td)
 
 class TestStrftimedelta:
     def test_strftimedelta(self):
