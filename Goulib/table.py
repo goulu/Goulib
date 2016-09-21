@@ -12,6 +12,8 @@ __license__ = "LGPL"
 import six, logging
 import csv, itertools, codecs, json, collections
 
+import datetime as std_datetime
+
 
 
 try: # using http://lxml.de/
@@ -26,8 +28,8 @@ except: #ElementTree
 Element=ElementTree._Element
 
 from datetime import datetime, date, time, timedelta
-
 from .datetime2 import datef, datetimef, timef, timedeltaf, strftimedelta
+
 from .markup import tag, style_str2dict
 from .itertools2 import isiterable
 
@@ -479,10 +481,11 @@ class Table(list):
         """
         def json_serial(obj):
             """JSON serializer for objects not serializable by default json code"""
-            if isinstance(obj, (datetime,date,time,timedelta)):
-                serial = obj.isoformat()
-                return serial
-            raise TypeError ("Type not serializable")
+            if isinstance(obj, (datetime,date,time)):
+                return obj.isoformat()
+            if isinstance(obj, (timedelta)):
+                return str(obj)
+            raise TypeError ("Type %s not serializable"%(type(obj)))
         array=[self.rowasdict(i) for i in range(len(self))]
         kwargs.setdefault('default',json_serial)
         return json.dumps(array, **kwargs)
@@ -752,7 +755,7 @@ class Table(list):
             return res
         return self.applyf(by,lambda x: function(x,fmt=fmt),skiperrors)
             
-    def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
+    def to_datetime(self,by,fmt='%Y-%m-%d %H:%M:%S',skiperrors=False):
         """convert a column to datetime
         """
         return self._datetimeformat(by, fmt, datetimef, skiperrors)
@@ -767,7 +770,7 @@ class Table(list):
         """
         return self._datetimeformat(by, fmt, timef, skiperrors)
     
-    def to_timedelta(self,by,fmt='%H:%M:%S',skiperrors=False):
+    def to_timedelta(self,by,fmt=None,skiperrors=False):
         """convert a column to time
         """
         return self._datetimeformat(by, fmt, timedeltaf, skiperrors)

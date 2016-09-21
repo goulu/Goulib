@@ -42,7 +42,7 @@ class TestTimedeltaf:
         s=timedeltaf(s)
         assert_equal(s,td)
         #check negative
-        td=timedeltaf('-1 day, 00:00:00')
+        td=timedeltaf('-1 day,00:00:00')
         s=str(td)
         s=timedeltaf(s)
         assert_equal(s,td)

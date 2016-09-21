@@ -95,7 +95,7 @@ def timef(t,fmt='%H:%M:%S'):
     return datetimef(t,fmt=fmt).time()
     
 _cache ={}
-def timedeltaf(t,fmt='(%D)?%H:%M:%S'):
+def timedeltaf(t,fmt=None):
     '''converts something to a timedelta.
     :param t: can be:
     * already a timedelta, or a time, or a int/float giving a number of days (Excel)
@@ -109,20 +109,26 @@ def timedeltaf(t,fmt='(%D)?%H:%M:%S'):
     elif isinstance(t,(six.integer_types,float)): 
         return timedelta(days=t)
     try: #for timedeltas < 24h
-        t=datetimef(t,fmt=fmt).time()
+        t=datetimef(t,fmt=fmt or '%H:%M:%S').time()
         return time_sub(t,midnight)
     except ValueError:
         pass
     
     # http://stackoverflow.com/questions/18303301/working-with-time-values-greater-than-24-hours
+    if fmt is None:
+        fmt='(%D days, )?%H:%M:%S'
     if not fmt in _cache:
-        expr=fmt.replace('%D','(?P<days>\d+) day(s?), ')
+        expr=fmt.replace('%D','(?P<days>\d+)')
         expr=expr.replace('%H','(?P<hours>\d+)')
         expr=expr.replace('%M','(?P<minutes>\d+)')
         expr=expr.replace('%S','(?P<seconds>\d+)')
         expr='(?P<sign>-?)'+expr
         _cache[fmt]=re.compile(expr)
-    d = re.match(_cache[fmt], t).groupdict(0)
+    try:
+        expr=_cache[fmt]
+        d = re.match(expr, t).groupdict(0)
+    except AttributeError:
+        raise ValueError('"%s" does not match fmt=%s'%(t,fmt))
     sign=d.pop('sign',None)
     td=timedelta(**dict(((key, int(value)) for key, value in d.items())))
     if sign=='-':

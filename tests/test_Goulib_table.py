@@ -3,11 +3,10 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
-from Goulib.tests import *
 
+from Goulib.tests import *
 from Goulib.table import *
-import datetime,os
-import six
+import datetime,os, operator,six
 
 class TestTable:
     
@@ -30,6 +29,11 @@ class TestTable:
         ref='<tr><td style="text-align:right;">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td style="text-align:right;">2</td><td style="text-align:right;">125.00</td><td style="text-align:right;">250.00</td></tr>'
         t=Row(self.t[14]).html()
         assert_equal(t,ref)
+        
+        #add a column to test timedeltas
+        d=self.t.col('OrderDate')
+        d=list(map(operator.sub,d,[d[0]]+d[:-1]))
+        self.t.addcol('timedelta',d)
         
     def test___init__(self):
         #most tests are above, but some more are here:
@@ -58,7 +62,7 @@ class TestTable:
         
         t=Table(self.path+'/results/table/test.csv')
         t.to_date('OrderDate')
-
+        t.to_timedelta('timedelta')
         assert_equal(t,self.t)
         
     def test_write_csv(self):
@@ -70,6 +74,7 @@ class TestTable:
         t=Table(titles=self.t.titles) #to keep column order
         t.load(self.path+'/results/table/test.json')
         t.to_date('OrderDate')
+        t.to_timedelta('timedelta')
         assert_equal(t,self.t)
 
     def test_read_xls(self):
@@ -91,6 +96,7 @@ class TestTable:
         assert_equal(t._i('OrderDate'),0) #check the column exists
         
         t.to_date('OrderDate')
+        t.to_timedelta('timedelta')
         assert_equal(t,self.t)
         
         #a table with objects in cells
@@ -116,7 +122,7 @@ class TestTable:
         assert_equal(col[-1],275)
         
     def test_ncols(self):
-        assert_equal(self.t.ncols(),7)
+        assert_equal(self.t.ncols(),8)
         
     def test_setcol(self):
         pass #tested by test_addcol
@@ -126,7 +132,7 @@ class TestTable:
         n=len(t)
         t.addcol('Discount', 0.15, 4)
         assert_equal(len(t),n)  #check we don't change the lines
-        assert_equal(t.ncols(),8)  
+        assert_equal(t.ncols(),9)  
 
     def test_find_col(self):
         assert_equal(self.t.find_col('Date'),self.t._i('OrderDate'))
@@ -182,7 +188,8 @@ class TestTable:
                         u'Rep': u'Andrews',
                         u'Région': u'Central',
                         u'Total': 149.25,
-                        u'Unités': 75}
+                        u'Unités': 75,
+                        u'timedelta':timedelta(days=105)}
                      )
 
     def test_set(self):
