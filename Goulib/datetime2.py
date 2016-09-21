@@ -10,10 +10,35 @@ __license__ = "LGPL"
 
 import six, re
 
-from datetime import datetime, date, time, timedelta
-import datetime as dt #to distinguish from datetime type
-
 from Goulib import math2, interval
+from datetime import datetime,date,time,timedelta #will be replaced soon
+import datetime as dt 
+
+# classes extending builtin
+
+class datetime2(dt.datetime):
+    def __init__(self,*args,**kwargs):
+        super(datetime2,self).__init__(*args,**kwargs)
+    def __sub__(self,other):
+        d=super(datetime2,self).__sub__(self,other)
+        return timedelta(d)
+
+class date2(dt.date):
+    def init__(self,*args,**kwargs):
+        super(date2,self).__init__(*args,**kwargs)
+
+class time2(dt.time):
+    def __init__(self,*args,**kwargs):
+        super(time2,self).__init__(*args,**kwargs)
+
+class timedelta2(dt.timedelta):
+    def __init__(self,*args,**kwargs):
+        super(timedelta2,self).__init__(*args,**kwargs)
+        self.test='ok'
+        
+    def isoformat(self):
+        #allow seamless json serialization
+        return str(self)
 
 #useful constants
 timedelta0=timedelta(0) 
@@ -39,9 +64,9 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
     :param t: optional time. replaces the time of the datetime obtained from d. Allows datetimef(date,time)
     :return: datetime
     """
-    if isinstance(d,datetime):
+    if isinstance(d,dt.datetime):
         d=d
-    elif isinstance(d,date):
+    elif isinstance(d,dt.date):
         d=datetime(year=d.year, month=d.month, day=d.day)
     elif isinstance(d,(six.integer_types,float)): 
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
@@ -53,9 +78,9 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
     
 def datef(d,fmt='%Y-%m-%d'):
     '''converts something to a date. See datetimef'''
-    if isinstance(d,datetime):
+    if isinstance(d,dt.datetime):
         return d.date()
-    if isinstance(d,date):
+    if isinstance(d,dt.date):
         return d
     if isinstance(d,(six.string_types,six.integer_types,float)):
         return datetimef(d,fmt=fmt).date()
@@ -63,13 +88,14 @@ def datef(d,fmt='%Y-%m-%d'):
     
 def timef(t,fmt='%H:%M:%S'):
     '''converts something to a time. See datetimef'''
-    if isinstance(t,datetime):
+    if isinstance(t,dt.datetime):
         return t.time()
-    elif isinstance(t,time):
+    elif isinstance(t,dt.time):
         return t
     return datetimef(t,fmt=fmt).time()
     
-def timedeltaf(t,fmt='%H:%M:%S'):
+_cache ={}
+def timedeltaf(t,fmt='(%D)?%H:%M:%S'):
     '''converts something to a timedelta.
     :param t: can be:
     * already a timedelta, or a time, or a int/float giving a number of days (Excel)
@@ -87,10 +113,21 @@ def timedeltaf(t,fmt='%H:%M:%S'):
         return time_sub(t,midnight)
     except ValueError:
         pass
+    
     # http://stackoverflow.com/questions/18303301/working-with-time-values-greater-than-24-hours
-    d = re.match(r'((?P<days>\d+) days, )?(?P<hours>\d+):'
-                 r'(?P<minutes>\d+):(?P<seconds>\d+)', str(t)).groupdict(0)
-    return timedelta(**dict(((key, int(value)) for key, value in d.items())))
+    if not fmt in _cache:
+        expr=fmt.replace('%D','(?P<days>\d+) day(s?), ')
+        expr=expr.replace('%H','(?P<hours>\d+)')
+        expr=expr.replace('%M','(?P<minutes>\d+)')
+        expr=expr.replace('%S','(?P<seconds>\d+)')
+        expr='(?P<sign>-?)'+expr
+        _cache[fmt]=re.compile(expr)
+    d = re.match(_cache[fmt], t).groupdict(0)
+    sign=d.pop('sign',None)
+    td=timedelta(**dict(((key, int(value)) for key, value in d.items())))
+    if sign=='-':
+        td=-td
+    return td
 
 def strftimedelta(t,fmt='%H:%M:%S'):
     """
@@ -162,6 +199,7 @@ def time_sub(t1,t2):
 def time_add(t,d):
     '''adds delta to time. should be a method of time...'''
     return (datetimef(datemin,t)+d).time()
+ 
 
 def equal(a,b,epsilon=timedelta(seconds=0.5)):
     """approximately equal. Use this instead of a==b

@@ -37,9 +37,16 @@ class TestTimedeltaf:
         s=str(td)
         s=timedeltaf(s)
         assert_equal(s,td)
+        #check with hours > 24
         s=('%d:%d:%d'%(25*24+12,34,56))
         s=timedeltaf(s)
         assert_equal(s,td)
+        #check negative
+        td=timedeltaf('-1 day, 00:00:00')
+        s=str(td)
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        
 
 class TestStrftimedelta:
     def test_strftimedelta(self):
@@ -116,6 +123,18 @@ class TestTimeIntersect:
         d=[d for d in daysgen(start,4,td)]
         assert_equal(time_intersect([d[0],d[2]],[d[1],d[3]]),td)
 
+
+class TestDatetime:
+    def test___sub__(self):
+        # datetime = datetime()
+        # assert_equal(expected, datetime.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+class TestTimedelta:
+    def test_isoformat(self):
+        # timedelta = timedelta()
+        # assert_equal(expected, timedelta.isoformat())
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
