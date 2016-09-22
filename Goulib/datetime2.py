@@ -11,7 +11,7 @@ __license__ = "LGPL"
 import six, re
 
 from Goulib import math2, interval
-from datetime import datetime,date,time,timedelta #will be replaced soon
+from datetime import datetime,date,time,timedelta
 import datetime as dt 
 
 # classes extending builtin
@@ -116,7 +116,7 @@ def timedeltaf(t,fmt=None):
     
     # http://stackoverflow.com/questions/18303301/working-with-time-values-greater-than-24-hours
     if fmt is None:
-        fmt='(%D days, )?%H:%M:%S'
+        fmt='(%D day(s?), )?%H:%M:%S'
     if not fmt in _cache:
         expr=fmt.replace('%D','(?P<days>\d+)')
         expr=expr.replace('%H','(?P<hours>\d+)')
@@ -205,7 +205,23 @@ def time_sub(t1,t2):
 def time_add(t,d):
     '''adds delta to time. should be a method of time...'''
     return (datetimef(datemin,t)+d).time()
- 
+
+def add_months(date,months):
+    day = date.day
+    month = date.month + months - 1 #zero based
+    year = date.year + month // 12
+    month = month % 12 + 1 #back to 1 based
+    if month == 2:
+        if day >= 29 and not year%4 and (year%100 or not year%400):
+            day = 29
+        elif day > 28:
+            day = 28
+    elif month in (4,6,9,11) and day > 30:
+        day = 30
+    return date.replace(year, month, day)
+
+def date_add(date,years=0,months=0,weeks=0,days=0):
+    return add_months(date,years*12+months)+(weeks*7+days)*oneday
 
 def equal(a,b,epsilon=timedelta(seconds=0.5)):
     """approximately equal. Use this instead of a==b
