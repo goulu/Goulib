@@ -221,6 +221,11 @@ class TestDigits:
 class TestDigsum:
     def test_digsum(self):
         assert_equal(digsum(1234567890),45)
+        assert_equal(digsum(255,2),8) # sum of ones in binary rep
+        assert_equal(digsum(255,16),30) # $FF in hex
+        assert_equal(digsum(1234567890,f=2),sum_of_squares(9))
+        assert_equal(digsum(548834,f=6),548834) #narcissic number
+        assert_equal(digsum(3435,f=lambda x:x**x),3435) #Munchausen number
 
 class TestIntegerExponent:
     def test_integer_exponent(self):
@@ -419,11 +424,6 @@ class TestBinomialExponent:
                 for k in range(1,n):
                     assert_equal(binomial_exponent(n,k,b), integer_exponent(binomial(n,k),b))
 
-
-class TestCombinationsWithReplacement:
-    def test_combinations_with_replacement(self):
-        assert_equal(combinations_with_replacement('ABC', 2),
-            ['AA','AB','AC','BB','BC','CC'])
 
 class TestProportional:
     def test_proportional(self):
@@ -689,11 +689,6 @@ class TestBouncy:
         # assert_equal(expected, bouncy(n))
         raise SkipTest #
 
-class TestSosDigits:
-    def test_sos_digits(self):
-        # assert_equal(expected, sos_digits(n))
-        raise SkipTest #
-
 class TestIsHappy:
     def test_is_happy(self):
         # assert_equal(expected, is_happy(n))
@@ -842,6 +837,46 @@ class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):
         # assert_equal(expected, baby_step_giant_step(y, a, n))
         raise SkipTest
+
+class TestIsNumber:
+    def test_is_number(self):
+        # assert_equal(expected, is_number(x))
+        raise SkipTest # TODO: implement your test here
+
+class TestCoprimesGen:
+    def test_coprimes_gen(self):
+        # assert_equal(expected, coprimes_gen(limit))
+        raise SkipTest # TODO: implement your test here
+
+class TestTetrahedral:
+    def test_tetrahedral(self):
+        # assert_equal(expected, tetrahedral(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSumOfSquares:
+    def test_sum_of_squares(self):
+        # assert_equal(expected, sum_of_squares(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSumOfCubes:
+    def test_sum_of_cubes(self):
+        # assert_equal(expected, sum_of_cubes(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestBernouilliGen:
+    def test_bernouilli_gen(self):
+        # assert_equal(expected, bernouilli_gen(init))
+        raise SkipTest # TODO: implement your test here
+
+class TestBernouilli:
+    def test_bernouilli(self):
+        # assert_equal(expected, bernouilli(n, init))
+        raise SkipTest # TODO: implement your test here
+
+class TestDeBruijn:
+    def test_de_bruijn(self):
+        # assert_equal(expected, de_bruijn(k, n))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

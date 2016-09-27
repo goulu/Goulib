@@ -15,6 +15,7 @@ __credits__ = [
 __license__ = "LGPL"
 
 import six, math, cmath, operator, itertools, fractions, numbers
+from six.moves import map, reduce, filter, zip_longest
 
 from Goulib import itertools2
 
@@ -218,7 +219,7 @@ def mul(nums,init=1):
     """
     :return: Product of nums
     """
-    return six.moves.reduce(operator.mul, nums, init)
+    return reduce(operator.mul, nums, init)
 
 def transpose(m):
     """:return: matrix m transposed"""
@@ -245,11 +246,11 @@ def minimum(m):
 
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return [l[0]+l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]+l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [l[0]-l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]-l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     """unary negation"""
@@ -261,13 +262,13 @@ def vecmul(a,b):
         return [x*a for x in b]
     if isinstance(b,(int,float)):
         return [x*b for x in a]
-    return [six.moves.reduce(operator.mul,l) for l in zip(a,b)]
+    return [reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
     if isinstance(b,(int,float)):
         return [float(x)/b for x in a]
-    return [six.moves.reduce(operator.truediv,l) for l in zip(a,b)]
+    return [reduce(operator.truediv,l) for l in zip(a,b)]
 
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
@@ -743,9 +744,30 @@ def digits(num, base=10, rev=False):
     res=list(digits_gen(num,base))
     return res if rev else reversed(res)
 
-def digsum(num, base=10):
-    """:return: sum of digits of num"""
-    return sum(digits_gen(num,base))
+def digsum(num, base=10, f=None):
+    """:return: sum of digits of num
+    :param f: optional function to apply to the terms:
+      * None = identity
+      * number = elevation to the fth power
+      * function(digit) or func(digit,position)
+    :return: sum of f(digits) of num
+    
+    digsum(num) -> sum of digits
+    digsum(num,f=2) -> sum of the squares of digits
+    digsum(num,f=lambda x:x**x) -> sum of the digits elevaed to their own power
+    """
+    d=digits_gen(num,base)
+    if f is None:
+        return sum(d)
+    if is_number(f):
+        p=f
+        f=lambda x:pow(x,p)
+    try:
+        return sum(map(f,d))
+    except AttributeError:
+        pass
+    d=[f(x,i) for i,x in enumerate(d)]
+    return sum(d)
 
 def integer_exponent(a,b=10):
     """:returns: int highest power of b that divides a.
@@ -764,13 +786,13 @@ def power_tower(v):
     :return: v[0]**v[1]**v[2] ...
     :see: http://ajcr.net//Python-power-tower/
     """
-    return six.moves.reduce(lambda x,y:y**x, reversed(v))
+    return reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base
     """
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
-    for one,two in six.moves.zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
+    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
@@ -900,17 +922,10 @@ def faulhaber(n,p):
         s=s+binomial(p+1,j)*a*n**(p+1-j)
     return s//(p+1)
 
-def sos_digits(n):
-    """:return: int sum of square of digits of n"""
-    s = 0
-    while n > 0:
-        s, n = s + (n % 10)**2, n // 10
-    return s
-
 def is_happy(n):
     #https://en.wikipedia.org/wiki/Happy_number
     while n > 1 and n != 89 and n != 4:
-        n = sos_digits(n)
+        n = digsum(n,f=2) #sum of squares of digits
     return n==1
 
 def lychrel_seq(n):
@@ -1073,7 +1088,8 @@ def is_perfect(n):
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
-    return int(math.log(num,base)) + 1
+    if num==0: return 1
+    return int(math.log(abs(num),base)) + 1
 
 def chakravala(n):
     """
@@ -1139,15 +1155,6 @@ def binomial_exponent(n,k,p):
         return carries(k,n-k,p) # https://en.wikipedia.org/wiki/Kummer%27s_theorem
 
     return min(binomial_exponent(n,k,a)//b for a,b in factorize(p))
-
-
-def combinations_with_replacement(iterable, r):
-    """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
-    pool = tuple(iterable)
-    n = len(pool)
-    for indices in itertools2.cartesian_product(list(range(n)), repeat=r):
-        if sorted(indices) == list(indices):
-            yield tuple(pool[i] for i in indices)
 
 def log_factorial(n):
     """:return: float approximation of ln(n!) by Ramanujan formula"""
