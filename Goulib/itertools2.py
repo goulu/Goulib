@@ -12,6 +12,7 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
+from six.moves import reduce,zip
 import random, operator, collections, heapq, itertools
 
 #reciepes from Python manual
@@ -355,6 +356,17 @@ def cartesian_product(*iterables, **kwargs):
         for item in it() if isinstance(it, collections.Callable) else iter(it):
             for items in cartesian_product(*iterables[1:]):
                 yield (item, ) + items
+                
+def combinations_with_replacement(iterable, r):
+    """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC
+    same as itertools.combinations_with_replacement except it doesn't generate
+    duplicates
+    """
+    pool = tuple(iterable)
+    n = len(pool)
+    for indices in cartesian_product(list(range(n)), repeat=r):
+        if sorted(indices) == list(indices):
+            yield tuple(pool[i] for i in indices)
 
 # my functions added
 
@@ -443,7 +455,7 @@ def index_min(values, key=identity):
 
 def index_max(values, key=identity):
     """
-    :result: min_index, min_value
+    :result: max_index, max_value
     """
     return max(enumerate(values), key=lambda v:key(v[1]))
 

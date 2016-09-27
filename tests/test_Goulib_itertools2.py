@@ -263,6 +263,13 @@ class TestCartesianProduct:
         
         assert_equal(next(g),(range(100),range(100)))
         
+class TestCombinationsWithReplacement:
+    def test_combinations_with_replacement(self):
+        assert_equal(combinations_with_replacement('ABC', 2),
+            ['AA','AB','AC','BB','BC','CC'])
+        assert_equal(combinations_with_replacement('AB', 4),
+            ['AAAA','AAAB','AABB','ABBB','BBBB'])
+        
 class TestCountUnique:
     def test_count_unique(self):
         assert_equal(count_unique('AAAABBBCCDAABBB'),4)
@@ -362,6 +369,16 @@ class TestDictsplit:
     def test_dictsplit(self):
         # assert_equal(expected, dictsplit(dic, keys))
         raise SkipTest 
+
+class TestShape:
+    def test_shape(self):
+        # assert_equal(expected, shape(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestNdim:
+    def test_ndim(self):
+        # assert_equal(expected, ndim(iterable))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
