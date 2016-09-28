@@ -203,6 +203,126 @@ class TestImage:
         blank.paste(right.shift(1,1),(256,0))
         blank.save(results+'image_stitched.png')
 
+    def test___abs__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__abs__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___add__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__add__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___div__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__div__(f))
+        raise SkipTest # TODO: implement your test here
+
+    def test___mul__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__mul__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___nonzero__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__nonzero__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___radd__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__radd__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_compose(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.compose(other, a, b))
+        raise SkipTest # TODO: implement your test here
+
+    def test_correlation(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.correlation(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_crop(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.crop(lurb))
+        raise SkipTest # TODO: implement your test here
+
+    def test_getdata(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.getdata(dtype))
+        raise SkipTest # TODO: implement your test here
+
+    def test_getpixel(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.getpixel(yx))
+        raise SkipTest # TODO: implement your test here
+
+    def test_load(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.load(path))
+        raise SkipTest # TODO: implement your test here
+
+    def test_nchannels(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.nchannels())
+        raise SkipTest # TODO: implement your test here
+
+    def test_normalize(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.normalize(newmax, newmin))
+        raise SkipTest # TODO: implement your test here
+
+    def test_npixels(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.npixels())
+        raise SkipTest # TODO: implement your test here
+
+    def test_paste(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.paste(image, box, mask))
+        raise SkipTest # TODO: implement your test here
+
+    def test_putpixel(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.putpixel(yx, value))
+        raise SkipTest # TODO: implement your test here
+
+    def test_quantize(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.quantize(levels))
+        raise SkipTest # TODO: implement your test here
+
+    def test_save(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.save(path, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_scale(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.scale(s))
+        raise SkipTest # TODO: implement your test here
+
+    def test_shape(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.shape())
+        raise SkipTest # TODO: implement your test here
+
+    def test_size(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.size())
+        raise SkipTest # TODO: implement your test here
+
+    def test_threshold(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.threshold(level))
+        raise SkipTest # TODO: implement your test here
+
 class TestCorrelation:
     def test_correlation(self):
         # assert_equal(expected, correlation(input, match))
@@ -231,6 +351,66 @@ class TestPurePilAlphaToColorV1:
 class TestPurePilAlphaToColorV2:
     def test_pure_pil_alpha_to_color_v2(self):
         # assert_equal(expected, pure_pil_alpha_to_color_v2(image, color))
+        raise SkipTest # TODO: implement your test here
+
+class TestNchannels:
+    def test_nchannels(self):
+        # assert_equal(expected, nchannels(arr))
+        raise SkipTest # TODO: implement your test here
+
+class TestGuessmode:
+    def test_guessmode(self):
+        # assert_equal(expected, guessmode(arr))
+        raise SkipTest # TODO: implement your test here
+
+class TestAdaptRgb:
+    def test_adapt_rgb(self):
+        # assert_equal(expected, adapt_rgb(func))
+        raise SkipTest # TODO: implement your test here
+
+class TestRgb2rgba:
+    def test_rgb2rgba(self):
+        # assert_equal(expected, rgb2rgba(array))
+        raise SkipTest # TODO: implement your test here
+
+class TestDisk:
+    def test_disk(self):
+        # assert_equal(expected, disk(radius, antialias))
+        raise SkipTest # TODO: implement your test here
+
+class TestFspecial:
+    def test_fspecial(self):
+        # assert_equal(expected, fspecial(name, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestReadPdf:
+    def test_read_pdf(self):
+        # assert_equal(expected, read_pdf(filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestFig2img:
+    def test_fig2img(self):
+        # assert_equal(expected, fig2img(fig))
+        raise SkipTest # TODO: implement your test here
+
+class TestQuantize:
+    def test_quantize(self):
+        # assert_equal(expected, quantize(image, N, L))
+        raise SkipTest # TODO: implement your test here
+
+class TestDither:
+    def test_dither(self):
+        # assert_equal(expected, dither(image, method, N, L))
+        raise SkipTest # TODO: implement your test here
+
+class TestGray2rgb:
+    def test_gray2rgb(self):
+        # assert_equal(expected, gray2rgb(im, color0, color1))
+        raise SkipTest # TODO: implement your test here
+
+class TestBool2gray:
+    def test_bool2gray(self):
+        # assert_equal(expected, bool2gray(im))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":

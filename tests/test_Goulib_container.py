@@ -140,6 +140,26 @@ class TestSortedCollection:
         # assert_equal(expected, sorted_collection.remove(item))
         raise SkipTest 
     
+class TestRecord:
+    def test___getattr__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__getattr__(name))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # record = Record(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___setattr__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__setattr__(name, value))
+        raise SkipTest # TODO: implement your test here
+
+    def test___str__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__str__())
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
 

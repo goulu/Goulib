@@ -506,6 +506,11 @@ class TestLine3:
         # assert_equal(expected, line3.intersect(other))
         raise SkipTest
 
+    def test_point(self):
+        # line3 = Line3(*args)
+        # assert_equal(expected, line3.point(u))
+        raise SkipTest # TODO: implement your test here
+
 class TestRay3:
     def test___repr__(self):
         # ray3 = Ray3()
@@ -584,7 +589,12 @@ class TestSphere:
 class TestPlane:
     @classmethod
     def setup_class(self):
-        pass
+        u=Vector3(2,2,1)
+        v=Vector3(2,1,1)
+        p=Plane((0,0,0),u,v)
+        self.F=Plane(u,v)
+        assert_equal(p,self.F)
+        
 
     def test___copy__(self):
         # plane = Plane(*args)

@@ -88,6 +88,10 @@ class TestMode:
         assert_equal(mode([1,2,2,3,3,3]),3) #test when mode is last
         assert_equal(mode([1,2,2,3,3,4]),2) #test equality
 
+    def test___init__(self):
+        # mode = Mode(name, nchannels, type, min, max)
+        raise SkipTest # TODO: implement your test here
+
 class TestStats:
     def test_stats(self):
         # https://www.hackerrank.com/challenges/stat-warmup

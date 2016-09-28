@@ -108,6 +108,61 @@ class TestColor:
         assert_equal(Color((0,.5,.5)).cmyk,(1,0,0,.5)) #teal
     
 
+    def test___hash__(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.__hash__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___neg__(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.__neg__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_convert(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.convert(target))
+        raise SkipTest # TODO: implement your test here
+
+    def test_deltaE(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.deltaE(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_hsv(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.hsv())
+        raise SkipTest # TODO: implement your test here
+
+    def test_lab(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.lab())
+        raise SkipTest # TODO: implement your test here
+
+    def test_luv(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.luv())
+        raise SkipTest # TODO: implement your test here
+
+    def test_name(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.name())
+        raise SkipTest # TODO: implement your test here
+
+    def test_native(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.native())
+        raise SkipTest # TODO: implement your test here
+
+    def test_xyY(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.xyY())
+        raise SkipTest # TODO: implement your test here
+
+    def test_xyz(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.xyz())
+        raise SkipTest # TODO: implement your test here
+
 class TestColorLookup:
     def test_color_lookup(self):
         c=color['blue']
@@ -133,6 +188,31 @@ class TestPantone:
         t=Table(reshape(t,(0,10)))
         with open(path+'\\results\\colors.pantone.html', 'w') as f:
             f.write(t.html())
+
+class TestRgb2cmyk:
+    def test_rgb2cmyk(self):
+        # assert_equal(expected, rgb2cmyk(rgb))
+        raise SkipTest # TODO: implement your test here
+
+class TestCmyk2rgb:
+    def test_cmyk2rgb(self):
+        # assert_equal(expected, cmyk2rgb(cmyk))
+        raise SkipTest # TODO: implement your test here
+
+class TestXyz2xyy:
+    def test_xyz2xyy(self):
+        # assert_equal(expected, xyz2xyy(xyz))
+        raise SkipTest # TODO: implement your test here
+
+class TestConvert:
+    def test_convert(self):
+        # assert_equal(expected, convert(color, source, target))
+        raise SkipTest # TODO: implement your test here
+
+class TestDeltaE:
+    def test_delta_e(self):
+        # assert_equal(expected, deltaE(c1, c2))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

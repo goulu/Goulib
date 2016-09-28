@@ -254,6 +254,8 @@ class TestNumFromDigits:
 
 class TestNumberOfDigits:
     def test_number_of_digits(self):
+        assert_equal(number_of_digits(0),1)
+        assert_equal(number_of_digits(-1),1)
         assert_equal(number_of_digits(1234),4)
         assert_equal(number_of_digits(2014,2),11)
         assert_equal(number_of_digits(65535,16),4)

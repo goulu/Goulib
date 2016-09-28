@@ -15,7 +15,7 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        t=tag('tag', u'bÃ©tweÃªÃ±', class_='class')
+        t=tag('tag', u'bétweêñ', class_='class')
         assert_equal(t,'<tag class="class">b&#233;twe&#234;&#241;</tag>')
         
         t=tag('tag', None, style={'align':'left', 'color':'red'}, single=True)
@@ -182,6 +182,16 @@ class TestStyleStr2dict:
     def test_style_str2dict(self):
         # assert_equal(expected, style_str2dict(style))
         raise SkipTest 
+
+class test__oneliner:
+    def test___getattr__(self):
+        # _oneliner = _oneliner(case)
+        # assert_equal(expected, _oneliner.__getattr__(attr))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # _oneliner = _oneliner(case)
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()
