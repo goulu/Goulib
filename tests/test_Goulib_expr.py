@@ -62,15 +62,18 @@ class TestExpr:
         #test multiplication commutativity and simplification
         assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
         
-    def test__latex(self):
-        assert_equal(self.f._latex(),'3x+2')   
-        assert_equal(self.f1._latex(),'1')     
-        assert_equal(self.fx._latex(),'x')    
-        assert_equal(self.fs._latex(),'\\sin \\left(x\\right)')    
-        assert_equal(self.fb1._latex(),'x \\gtr 1')      
-        assert_equal(self.fs(self.fx2)._latex(),'\\sin \\left(x^{2}\\right)') 
-        assert_equal(self.long._latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
-        
+    def test_latex(self):
+        assert_equal(self.f.latex(),'3x+2')   
+        assert_equal(self.f1.latex(),'1')     
+        assert_equal(self.fx.latex(),'x')    
+        assert_equal(self.fs.latex(),'\\sin \\left(x\\right)')    
+        assert_equal(self.fb1.latex(),'x \\gtr 1')      
+        assert_equal(self.fs(self.fx2).latex(),'\\sin \\left(x^{2}\\right)') 
+        assert_equal(self.long.latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
+        assert_equal(Expr(sqrt(3)).latex(),'\\sqrt {3}')
+        assert_equal(Expr(1/3).latex(),'\\frac{1}{3}')
+        l=Expr('sqrt(x*3+(a+b)*y)/x**(3*a*y)').latex()
+        assert_equal(l,'\\frac{\\sqrt {3x+\\left(a+b\\right) \\cdot y}}{x^{3a \\cdot y}}')
 
     def test___add__(self):
         f=self.fx+self.f1
@@ -157,6 +160,103 @@ class TestExpr:
     def test_save(self):
         self.e2(self.e1).save(path+'/results/expr.png')
         self.e2(self.e1).save(path+'/results/expr.svg')
+
+    def test___invert__(self):
+        # expr = Expr(f)
+        # assert_equal(expected, expr.__invert__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # expr = Expr(f)
+        # assert_equal(expected, expr.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___truediv__(self):
+        # expr = Expr(f)
+        # assert_equal(expected, expr.__truediv__(right))
+        raise SkipTest # TODO: implement your test here
+
+    def test_isconstant(self):
+        # expr = Expr(f)
+        # assert_equal(expected, expr.isconstant())
+        raise SkipTest # TODO: implement your test here
+
+class TestEval:
+    def test_eval(self):
+        # assert_equal(expected, eval(node, ctx))
+        raise SkipTest # TODO: implement your test here
+
+class TestGetFunctionSource:
+    def test_get_function_source(self):
+        # assert_equal(expected, get_function_source(f))
+        raise SkipTest # TODO: implement your test here
+
+class TestTextVisitor:
+    def test_generic_visit(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.generic_visit(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_prec(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.prec(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_prec_BinOp(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.prec_BinOp(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_prec_UnaryOp(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.prec_UnaryOp(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_BinOp(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_BinOp(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_Call(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_Call(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_Compare(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_Compare(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_Name(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_Name(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_NameConstant(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_NameConstant(node))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_Num(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_Num(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_UnaryOp(self):
+        # text_visitor = TextVisitor()
+        # assert_equal(expected, text_visitor.visit_UnaryOp(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestLatexVisitor:
+    def test_visit_Call(self):
+        # latex_visitor = LatexVisitor()
+        # assert_equal(expected, latex_visitor.visit_Call(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_visit_UnaryOp(self):
+        # latex_visitor = LatexVisitor()
+        # assert_equal(expected, latex_visitor.visit_UnaryOp(n))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

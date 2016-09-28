@@ -148,6 +148,13 @@ class Expr(plot.Plot):
         if type(f) is bool: 
             self.body=ast.Num(f)
             return
+        if type(f) is float: #try to beautify it
+            if math2.is_integer(f):
+                f=math2.rint(f)
+            elif f!=0 and math2.is_integer(1/f):
+                f='1/%d'%math2.rint(1/f)
+            elif math2.is_integer(f*f):
+                f='sqrt(%d)'%math2.rint(f*f)
 
         self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
 
@@ -175,17 +182,17 @@ class Expr(plot.Plot):
 
     def __str__(self):
         return TextVisitor().visit(self.body)
+    
+    def _repr_html_(self):
+        """default rich format is LaTeX"""
+        return self._repr_latex_()
 
-    def _latex(self):
+    def latex(self):
         """:return: string LaTex formula"""
         return LatexVisitor().visit(self.body)
 
     def _repr_latex_(self):
-        return r'$%s$'%self._latex()
-
-    def latex(self):
-        from IPython.display import Math
-        return Math(self._latex())
+        return r'$%s$'%self.latex()
 
     def _plot(self, ax, x=None, y=None, **kwargs):
         if x is None:
