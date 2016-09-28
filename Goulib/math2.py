@@ -400,6 +400,19 @@ def fibonacci(n):
         raise ValueError("Negative arguments not implemented")
     return _fib(n)[0]
 
+def pascal_gen():
+    """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
+    https://oeis.org/A007318
+    """
+    __author__ = 'Nick Hobson <nickh@qbyte.org>'
+    # code from https://oeis.org/A007318/a007318.py.txt with additional related functions
+    for row in itertools.count():
+        x = 1
+        yield x
+        for m in range(row):
+            x = (x * (row - m)) // (m + 1)
+            yield x
+
 def catalan(n):
     """Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
     """
