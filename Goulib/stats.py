@@ -5,6 +5,7 @@ very basic statistics functions
 """
 
 from __future__ import division #"true division" everywhere
+from Goulib.itertools2 import isiterable
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -134,6 +135,9 @@ def stats(l):
     return s.lo,s.hi,s.sum1,s.sum2,s.avg,s.var
 
 class Stats(object):
+    """an object that computes mean, variance and modes of data that is appended to it
+    as in a list (but actual values are not stored)
+    """
     def __init__(self,data=[]):
         self.lo=float("inf")
         self.hi=float("-inf")
@@ -207,6 +211,19 @@ class Stats(object):
 
     sigma=stddev
     
+class PDF(expr.Expr, Stats):
+    """probability density function"""
+    def __init__(self,f,data=[]):
+        Stats.__init__(self,data)
+        self.f=f
+        expr.Expr.__init__(self,f)
+        
+    def __call__(self,x=None,**kwargs):
+        if isiterable(x):
+            return (self.f(x) for x in x)
+        return self.f(x)
+
+    
 def normal_pdf(x,mu,sigma):
     """Return the probability density function at x"""
     try:
@@ -216,41 +233,26 @@ def normal_pdf(x,mu,sigma):
 
 expr.functions["normal_pdf"]=normal_pdf #add to allowed functions
 
-class Normal(Stats, list, expr.Expr):
+class Normal(PDF):
     """represents a normal distributed variable
     the base class (list) optionally contains data
     """
     
     def __init__(self,data=[],mean=0,var=1):
-        Stats.__init__(self,data)
-        expr.Expr.__init__(self,lambda x:normal_pdf(x,self.mu,self.sigma))
-        if not data: #cheat 
-            s=math.sqrt(var/2)
-            Stats.append(self,mean-s)
-            Stats.append(self,mean+s)
-            #this way we preserve mean and variance, but have no real data
-    
-    def append(self,x):
-        list.append(self,x)
-        Stats.append(self,x)
-
-    def extend(self,x):
-        Stats.extend(self,x) #calls self.append
-        
-    def remove(self,x):
-        list.remove(self,x)
-        Stats.remove(self,x)
-        
-    def pop(self,i=-1,n=1):
-        for _ in range(n):
-            x=list.pop(self,i)
-            Stats.remove(self,x)
+        """if data is specified, it it used to fit a normal law"""
+        sigma=math.sqrt(var)
+        s2=math.sqrt(var/2)
+        data=data or [mean-s2,mean+s2]  #this way we preserve mean and variance
+        super(Normal,self).__init__(
+            lambda x:normal_pdf(x,mean,sigma), data)
             
     def __str__(self):
         return Stats.__repr__(self)
 
-    def _latex(self):
-        return "\mathcal{N}(\mu=%s, \sigma=%s)"%(self.mean,self.stddev)
+    def latex(self):
+        mean=expr.Expr(self.mean).latex()
+        sigma=expr.Expr(self.sigma).latex()
+        return "\mathcal{N}(\mu=%s, \sigma=%s)"%(mean,sigma)
 
     def _plot(self, ax, x=None, **kwargs):
         if x is None:
@@ -263,11 +265,7 @@ class Normal(Stats, list, expr.Expr):
         """
         :return: a*self+b
         """
-        return Normal(
-            data=[a*x+b for x in self],
-            mean=self.mean*a+b,
-            var=abs(self.var*a)
-        )
+        return Normal(mean=self.mean*a+b,var=abs(self.var*a))
 
     def __mul__(self,a):
         return self.linear(a,0)
@@ -283,8 +281,7 @@ class Normal(Stats, list, expr.Expr):
         # else: assume other is a Normal variable
         mean=self.mean+other.mean
         var=self.var+other.var+2*self.cov(other)
-        data=math2.vecadd(self,other) if len(self)==len(other) else []
-        return Normal(data=data, mean=mean, var=var)
+        return Normal(mean=mean, var=var)
 
     def __radd__(self, other):
         return self+other

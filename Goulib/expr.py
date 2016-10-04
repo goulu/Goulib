@@ -64,40 +64,41 @@ def eval(node,ctx={}):
     :param ctx: dict of varname : value to substitute in node
     :return: number or expression string
     """
-    try:
-        if isinstance(node, ast.Num): # <number>
-            return node.n
-        elif isinstance(node, ast.Name):
-            return ctx.get(node.id,node.id) #return value or var
-        elif isinstance(node, ast.Attribute):
-            return getattr(ctx[node.value.id],node.attr)
-        elif isinstance(node, ast.Call):
-            params=[eval(arg,ctx) for arg in node.args]
-            f=functions[node.func.id]
-            return f(*params)
-        elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-            op=operators[type(node.op)]
-            left=eval(node.left,ctx)
-            right=eval(node.right,ctx)
-            if math2.is_number(left) and math2.is_number(right):
-                return op[0](left, right)
-            else:
-                return "%s%s%s"%(left,op[2],right)
-        elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
-            right=eval(node.operand,ctx)
-            return operators[type(node.op)][0](right)
-        elif isinstance(node, ast.Compare):
-            left=eval(node.left,ctx)
-            for op,right in zip(node.ops,node.comparators):
-                #TODO: find what to do when multiple items in list
-                return operators[type(op)][0](left, eval(right,ctx))
-        elif six.PY3 and isinstance(node, ast.NameConstant):
-            return node.value
+    if isinstance(node, ast.Num): # <number>
+        return node.n
+    elif isinstance(node, ast.Name):
+        return ctx.get(node.id,node.id) #return value or var
+    elif isinstance(node, ast.Attribute):
+        return getattr(ctx[node.value.id],node.attr)
+    elif isinstance(node,ast.Tuple):
+        return tuple(eval(e,ctx) for e in node.elts)
+    elif isinstance(node, ast.Call):
+        params=[eval(arg,ctx) for arg in node.args]
+        if not node.func.id in functions:
+            raise NameError('%s function not allowed'%node.func.id)
+        f=functions[node.func.id]
+        return f(*params)
+    elif isinstance(node, ast.BinOp): # <left> <operator> <right>
+        op=operators[type(node.op)]
+        left=eval(node.left,ctx)
+        right=eval(node.right,ctx)
+        if math2.is_number(left) and math2.is_number(right):
+            return op[0](left, right)
         else:
-            logging.warning(ast.dump(node,False,False))
-            return eval(node.body,ctx) #last chance
-    except KeyError:
-        raise NameError('%s function not allowed'%node.func.id)
+            return "%s%s%s"%(left,op[2],right)
+    elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
+        right=eval(node.operand,ctx)
+        return operators[type(node.op)][0](right)
+    elif isinstance(node, ast.Compare):
+        left=eval(node.left,ctx)
+        for op,right in zip(node.ops,node.comparators):
+            #TODO: find what to do when multiple items in list
+            return operators[type(op)][0](left, eval(right,ctx))
+    elif six.PY3 and isinstance(node, ast.NameConstant):
+        return node.value
+    else:
+        logging.warning(ast.dump(node,False,False))
+        return eval(node.body,ctx) #last chance
 
 def get_function_source(f):
     """returns cleaned code of a function or lambda
@@ -171,7 +172,7 @@ class Expr(plot.Plot):
         kwargs['self']=self #allows to call methods such as in Stats
         try:
             e=eval(self.body,kwargs)
-        except TypeError: # some params remain symbolic
+        except TypeError as error: # some params remain symbolic
             return self
         if math2.is_number(e):
             return e

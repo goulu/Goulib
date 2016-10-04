@@ -53,6 +53,7 @@ class Plot(object):
         return self.render(fmt='svg',**kwargs).decode('utf-8')
         
     def _repr_html_(self):
+        """default rich format is svg plot"""
         try:
             return self._repr_svg_()
         except:
