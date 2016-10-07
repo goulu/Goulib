@@ -138,13 +138,16 @@ class Stats(object):
     """an object that computes mean, variance and modes of data that is appended to it
     as in a list (but actual values are not stored)
     """
-    def __init__(self,data=[]):
+    def __init__(self,data=[],mean=None,var=None):
         self.lo=float("inf")
         self.hi=float("-inf")
         self.n=0
         self._offset=0
         self._dsum1=0
         self._dsum2=0
+        if not data:
+            s2=math.sqrt(var/2)
+            data=[mean-s2,mean+s2]
         self.extend(data)
         
     def __repr__(self):
@@ -211,17 +214,71 @@ class Stats(object):
 
     sigma=stddev
     
+    def __add__(self,other):
+        mean=(self.mean+other.mean)/2 #TODO : improve
+        #https://fr.wikipedia.org/wiki/Variance_(statistiques_et_probabilit%C3%A9s)#Produit
+        try:
+            cov=covariance(self,other)
+        except:
+            cov=2
+        var=self.variance+other.variance+2*cov
+        return Stats(mean=mean,var=var)
+    
+    def __mul__(self,other):
+        if math2.is_number(other):
+            mean=self.mean
+            var=other*self.variance
+        else: #it's a Stat
+            mean=self.mean*other.mean
+            #https://fr.wikipedia.org/wiki/Variance_(statistiques_et_probabilit%C3%A9s)#Produit
+            var = self.variance*other.variance + \
+                self.variance*other.mean**2 + other.variance*self.mean**2
+        return Stats(mean=mean,var=var)
+    
+    def __pow__(self,n):
+        from copy import copy
+        res=copy(self)
+        while n>1:
+            res=res*self
+            n-=1
+        return res
+    
+class Discrete(Stats):
+    """discrete probability density function"""
+    def __init__(self,data):
+        """
+        :param data: can be:
+        * list of equiprobable values (uniform distribution)
+        * dict of x:p values:probability pairs
+        """
+        n=len(data)
+        if not isinstance(data,dict): #uniform distribution
+            data=list(data)
+            data={i:1/n for i in data}
+        Stats.__init__(self,[x*data[x]*n for x in data])
+        self.pdf=data
+            
+    def __call__(self,x):
+        if isiterable(x):
+            return (self(x) for x in x)
+        if x in self.pdf:
+            return self.pdf[x]
+        else:
+            return 0
+    
+
+
 class PDF(expr.Expr, Stats):
     """probability density function"""
-    def __init__(self,f,data=[]):
+    def __init__(self,pdf,data=[]):
         Stats.__init__(self,data)
-        self.f=f
-        expr.Expr.__init__(self,f)
+        self.pdf=pdf
+        expr.Expr.__init__(self,pdf)
         
     def __call__(self,x=None,**kwargs):
         if isiterable(x):
-            return (self.f(x) for x in x)
-        return self.f(x)
+            return (self(x) for x in x)
+        return self.pdf(x)
 
     
 def normal_pdf(x,mu,sigma):
