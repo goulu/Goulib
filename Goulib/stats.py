@@ -215,14 +215,19 @@ class Stats(object):
     sigma=stddev
     
     def __add__(self,other):
-        mean=(self.mean+other.mean)/2 #TODO : improve
+        if math2.is_number(other):
+            other=Stats([other])
         #https://fr.wikipedia.org/wiki/Variance_(statistiques_et_probabilit%C3%A9s)#Produit
         try:
             cov=covariance(self,other)
         except:
-            cov=2
+            cov=0
+        mean=(self.mean+other.mean)/2 #TODO : improve
         var=self.variance+other.variance+2*cov
         return Stats(mean=mean,var=var)
+    
+    def __sub__(self,other):
+        return self+(-other)
     
     def __mul__(self,other):
         if math2.is_number(other):
@@ -235,6 +240,9 @@ class Stats(object):
                 self.variance*other.mean**2 + other.variance*self.mean**2
         return Stats(mean=mean,var=var)
     
+    def __neg__(self):
+        return self*(-1)
+    
     def __pow__(self,n):
         from copy import copy
         res=copy(self)
@@ -242,6 +250,10 @@ class Stats(object):
             res=res*self
             n-=1
         return res
+    
+    def covariance(self, other):
+        xy=(self-self.mean)*(other-other.mean)
+        return xy.mean
     
 class Discrete(Stats):
     """discrete probability density function"""
