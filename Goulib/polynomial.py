@@ -25,19 +25,20 @@ class Polynomial(expr.Expr):
           terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
           
         """
-        self.plist = plist(val)
-        s=''.join('%+f*x**%d'%(f,i) for i,f in enumerate(self.plist))
+        self.plist = tuple(plist(val)) #a polynomial is immutable
+        s=tostring(self.plist,pow='**',mul='*')
         super(Polynomial,self).__init__(s)
         return
 
-    
+    """
     def __str__(self):
-        """:return: the best string we can for text output"""
+        ''':return: the best string we can for text output'''
         return tostring(self.plist)
     
     def __repr__(self):
-        """:return: a string we can cut/paste in a calculator"""
+        ''':return: a string we can cut/paste in a calculator'''
         return tostring(self.plist,mul='*')
+    """
     
     def _latex(self,**kwargs):
         return tostring(self.plist,**kwargs)

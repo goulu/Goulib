@@ -27,32 +27,37 @@ import operator as op
 # precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
 #
 operators = {
-    ast.Or: (op.or_,300,' or ',' \\vee '),
-    ast.And: (op.and_,400,' and ',' \\wedge '),
-    ast.Not: (op.not_,500,'not ','\\neg'),
-    ast.Eq: (op.eq,600,'=',' = '),
-    ast.Gt: (op.gt,600,' > ',' \\gtr '),
-    ast.GtE:(op.ge,600,' >= ',' \\gec '),
-    ast.Lt: (op.lt,600,' < ',' \\ltr '),
-    ast.LtE: (op.le,600,' <= ',' \\leq '),
-    ast.BitXor: (op.xor,800,' xor ',' xor '),
-    ast.LShift: (op.lshift, 1000,' << ',' \\ll '),
-    ast.RShift: (op.rshift, 1000,' >> ',' \\gg '),
-    ast.Add: (op.add, 1100,'+','+'),
-    ast.Sub: (op.sub, 1100,'-','-'),
-    ast.Mult: (op.mul, 1200,'*',' \\cdot '),
-    ast.Div: (op.truediv, 1200,'/','/'),
-    ast.Mod: (op.mod, 1200,'%','\\bmod'),
-    ast.Invert: (op.not_,1300,'~','\\sim'),
-    ast.UAdd: (op.pos,1300,'+','+'),
-    ast.USub: (op.neg,1300,'-','-'),
-    ast.Pow: (op.pow,1400,'**','^'),
+    ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
+    ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
+    ast.Not: (op.not_,500,'not ','not ','\\neg'),
+    ast.Eq: (op.eq,600,'=',' == ',' = '),
+    ast.Gt: (op.gt,600,' > ',' > ',' \\gtr '),
+    ast.GtE:(op.ge,600,' >= ',' >= ',' \\gec '),
+    ast.Lt: (op.lt,600,' < ',' < ',' \\ltr '),
+    ast.LtE: (op.le,600,' <= ',' <= ',' \\leq '),
+    ast.BitXor: (op.xor,800,' xor ',' xor ',' xor '),
+    ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
+    ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
+    ast.Add: (op.add, 1100,'+','+','+'),
+    ast.Sub: (op.sub, 1100,'-','-','-'),
+    ast.Mult: (op.mul, 1200,'','*',' \\cdot '),
+    ast.Div: (op.truediv, 1200,'/','/','/'),
+    ast.Mod: (op.mod, 1200,' mod ','%','\\bmod'),
+    ast.Invert: (op.not_,1300,'~','~','\\sim'),
+    ast.UAdd: (op.pos,1300,'+','+','+'),
+    ast.USub: (op.neg,1300,'-','-','-'),
+    ast.Pow: (op.pow,1400,'^','**','^'),
 
     # precedence of other types below
     ast.Name:(None,9999),
     ast.Num:(None,9999),
     ast.Call:(None,9999),
 }
+
+#indexes in operators to use for corresponding symbols
+_dialect_str = 2
+_dialect_python = 3
+_dialect_latex = 4
 
 import math
 functions=math.__dict__ #allowed functions
@@ -85,7 +90,7 @@ def eval(node,ctx={}):
         if math2.is_number(left) and math2.is_number(right):
             return op[0](left, right)
         else:
-            return "%s%s%s"%(left,op[2],right)
+            return "%s%s%s"%(left,op[_dialect_python],right)
     elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
         right=eval(node.operand,ctx)
         return operators[type(node.op)][0](right)
@@ -179,10 +184,11 @@ class Expr(plot.Plot):
         return Expr(e)
 
     def __repr__(self):
+        return TextVisitor(_dialect_python).visit(self.body)
         return ast.dump(self.body,False,False)
 
     def __str__(self):
-        return TextVisitor().visit(self.body)
+        return TextVisitor(_dialect_str).visit(self.body)
     
     def _repr_html_(self):
         """default rich format is LaTeX"""
@@ -310,6 +316,11 @@ class Expr(plot.Plot):
 #http://stackoverflow.com/questions/3867028/converting-a-python-numeric-expression-to-latex
 
 class TextVisitor(ast.NodeVisitor):
+    
+    def __init__(self,dialect):
+        ''':param dialect: int index in operators of symbols to use
+        '''
+        self.dialect=dialect
 
     def prec(self, n):
         try:
@@ -336,9 +347,9 @@ class TextVisitor(ast.NodeVisitor):
 
     def visit_UnaryOp(self, n):
         if self.prec(n.op) > self.prec(n.operand):
-            return r'%s(%s)' % (operators[type(n.op)][2], self.visit(n.operand))
+            return r'%s(%s)' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
         else:
-            return r'%s%s' % (operators[type(n.op)][2], self.visit(n.operand))
+            return r'%s%s' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
 
     def _Bin(self, left,op,right):
         # commute x*2 as 2*X for clarity
@@ -354,7 +365,7 @@ class TextVisitor(ast.NodeVisitor):
         if self.prec(op) > self.prec(right):
             r = '(%s)' % r
 
-        return l+operators[type(op)][2]+r
+        return l+operators[type(op)][self.dialect]+r
 
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
@@ -364,7 +375,7 @@ class TextVisitor(ast.NodeVisitor):
         return self._Bin(n.left,n.ops[0],n.comparators[0])
 
     def visit_Num(self, n):
-        return str(n.n)
+        return str(math2.int_or_float(n.n))
 
     def generic_visit(self, n):
         try:
@@ -381,7 +392,8 @@ class TextVisitor(ast.NodeVisitor):
 
 
 class LatexVisitor(TextVisitor):
-
+    def __init__(self):
+        super(LatexVisitor,self).__init__(_dialect_latex)
 
     def visit_Call(self, n):
         func = self.visit(n.func)
@@ -393,9 +405,12 @@ class LatexVisitor(TextVisitor):
 
     def visit_UnaryOp(self, n):
         if self.prec(n.op) > self.prec(n.operand):
-            return r'%s\left(%s\right)' % (operators[type(op)][3], self.visit(n.operand))
+            return r'%s\left(%s\right)' % (operators[type(n.op)][_dialect_latex], self.visit(n.operand))
         else:
-            return r'%s %s' % (operators[type(op)][3], self.visit(n.operand))
+            try:
+                return r'%s %s' % (operators[type(n.op)][_dialect_latex], self.visit(n.operand))
+            except Exception as e:
+                pass
 
     def _Bin(self, left,op,right):
         # commute x*2 as 2*X for clarity
@@ -411,8 +426,10 @@ class LatexVisitor(TextVisitor):
         if isinstance(op, ast.FloorDiv):
             return r'\left\lfloor\frac{%s}{%s}\right\rfloor' % (l,r)
         if isinstance(op, ast.Pow):
-            return r'%s^{%s}' % (l,r)
-
+            if isinstance(right,ast.BinOp):
+                return r'%s^{%s}' % (l,r)
+            else:
+                return r'%s^%s' % (l,r)
         #handle precedence (parenthesis) if needed
         if self.prec(op) > self.prec(left):
             l = r'\left(%s\right)' % l
@@ -423,7 +440,7 @@ class LatexVisitor(TextVisitor):
             if isinstance(left, ast.Num) and not isinstance(right, ast.Num):
                 return l+r
 
-        return l+operators[type(op)][3]+r
+        return l+operators[type(op)][_dialect_latex]+r
 
 
 

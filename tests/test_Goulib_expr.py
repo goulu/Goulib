@@ -49,18 +49,29 @@ class TestExpr:
         assert_equal(self.xy(x=2,y=3),6)
         #test substitution
         e=self.xy(x=2)
-        assert_equal(str(e),'2*y')
+        assert_equal(str(e),'2y')
 
     def test___str__(self):
-        assert_equal(str(self.f),'3*x+2')   
+        assert_equal(str(self.f),'3x+2')   
         assert_equal(str(self.f1),'1')     
         assert_equal(str(self.fx),'x')    
         assert_equal(str(self.fs),'sin(x)')    
         assert_equal(str(self.fb1),'x > 1')    
-        assert_equal(str(self.long),'(3*x+(a+b)*y)/x**(3*a*y)')
+        assert_equal(str(self.long),'(3x+(a+b)y)/x^(3ay)')
         
         #test multiplication commutativity and simplification
-        assert_equal(str(Expr('x*3+(a+b)')),'3*x+a+b')
+        assert_equal(str(Expr('x*3+(a+b)')),'3x+a+b')
+        
+    def test___repr__(self):
+        assert_equal(repr(self.f),'3*x+2')   
+        assert_equal(repr(self.f1),'1')     
+        assert_equal(repr(self.fx),'x')    
+        assert_equal(repr(self.fs),'sin(x)')    
+        assert_equal(repr(self.fb1),'x > 1')    
+        assert_equal(repr(self.long),'(3*x+(a+b)*y)/x**(3*a*y)')
+        
+        #test multiplication commutativity and simplification
+        assert_equal(repr(Expr('x*3+(a+b)')),'3*x+a+b')
         
     def test_latex(self):
         assert_equal(self.f.latex(),'3x+2')   
@@ -68,7 +79,7 @@ class TestExpr:
         assert_equal(self.fx.latex(),'x')    
         assert_equal(self.fs.latex(),'\\sin \\left(x\\right)')    
         assert_equal(self.fb1.latex(),'x \\gtr 1')      
-        assert_equal(self.fs(self.fx2).latex(),'\\sin \\left(x^{2}\\right)') 
+        assert_equal(self.fs(self.fx2).latex(),'\\sin \\left(x^2\\right)') 
         assert_equal(self.long.latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
         assert_equal(Expr(sqrt(3)).latex(),'\\sqrt {3}')
         assert_equal(Expr(1/3).latex(),'\\frac{1}{3}')
@@ -164,11 +175,6 @@ class TestExpr:
     def test___invert__(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.__invert__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___repr__(self):
-        # expr = Expr(f)
-        # assert_equal(expected, expr.__repr__())
         raise SkipTest # TODO: implement your test here
 
     def test___truediv__(self):
