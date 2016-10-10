@@ -16,6 +16,7 @@ import collections
 import logging
 
 from .datetime2 import *
+from .interval import *
 
 class WorkCalendar(object):
     """WorkCalendar class with datetime operations on working hours"""

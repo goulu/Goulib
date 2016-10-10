@@ -20,7 +20,9 @@ class TestTimef:
         t=time(hour=12,minute=34,second=56)
         assert_equal(timef(t),t)
         assert_equal(timef('12:34:56'),t)
-        assert_true(equal(timef(0.503473,fmt=None),time(hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        t=timef(0.503473,fmt='%d')
+        assert_true(equal(t,time(hour=12,minute=5))) 
     
 class TestDatetimef:
     def test_datetimef(self):

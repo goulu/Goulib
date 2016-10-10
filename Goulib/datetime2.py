@@ -90,8 +90,16 @@ def timef(t,fmt='%H:%M:%S'):
     '''converts something to a time. See datetimef'''
     if isinstance(t,dt.datetime):
         return t.time()
-    elif isinstance(t,dt.time):
+    if isinstance(t,dt.time):
         return t
+    if isinstance(t,(six.integer_types,float)):
+        if not '%d' in fmt: # t is in hours
+            s=math2.rint(t*3600)
+            h,m=divmod(s,3600)
+            m,s=divmod(m,60)
+            return time(hour=h,minute=m,second=s)
+        else: # t is in days (Excel
+            pass
     return datetimef(t,fmt=fmt).time()
     
 _cache ={}
