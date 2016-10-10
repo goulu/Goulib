@@ -13,6 +13,7 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import os, sys, six, logging, re
+from six.moves import zip
 
 from Goulib import itertools2, decorators
 from Goulib.tests import *
@@ -24,7 +25,7 @@ path=os.path.dirname(os.path.abspath(__file__))
 def assert_generator(f,l,name,time_limit=10):
     i=0
     try:
-        for item1,item2 in decorators.itimeout(six.moves.zip(f,l),time_limit):
+        for item1,item2 in decorators.itimeout(zip(f,l),time_limit):
             m='%s : First differing element %d: %s != %s\n' %(name, i, item1, item2)
             assert_equal(item1,item2, msg=m)
             i+=1
@@ -46,7 +47,7 @@ def data(s):
     except:
         pass
     
-    from six.moves.urllib.request import urlopen
+    from urllib.request import urlopen
     file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
     logging.info('downloading b%s.txt'%s2)
     res=[]

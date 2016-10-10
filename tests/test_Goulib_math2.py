@@ -880,5 +880,10 @@ class TestDeBruijn:
         # assert_equal(expected, de_bruijn(k, n))
         raise SkipTest # TODO: implement your test here
 
+class TestPascalGen:
+    def test_pascal_gen(self):
+        # assert_equal(expected, pascal_gen())
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

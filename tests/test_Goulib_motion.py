@@ -197,28 +197,28 @@ class TestActuator:
         assert_almost_equal(a.maxForce()('N'),11.05665)
 
 class TestTimeDiagram:
-        sm = StateMachine(simulation=Simulation())
-        a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
-        a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
-        a1.move(V(3000,'mm'))
-        a2.move(V(3000,'mm'))
-        assert_equal(sm.time,V(8.0,'s'))
-        t = TimeDiagram([a1,a2])
-        assert_equal(t.t0,0)
-        assert_equal(t.t1,8)
-        t.save(path+'\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
-        t.saveAsCsv(path+'\\results\\TimeDiagram.csv')
+    sm = StateMachine(simulation=Simulation())
+    a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+    a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
+    a1.move(V(3000,'mm'))
+    a2.move(V(3000,'mm'))
+    assert_equal(sm.time,V(8.0,'s'))
+    t = TimeDiagram([a1,a2])
+    assert_equal(t.t0,0)
+    assert_equal(t.t1,8)
+    t.save(path+'\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
+    t.saveAsCsv(path+'\\results\\TimeDiagram.csv')
         
-def test___init__(self):
+    def test___init__(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
         raise SkipTest # TODO: implement your test here
 
-        def test___repr__(self):
+    def test___repr__(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
         # assert_equal(expected, time_diagram.__repr__())
         raise SkipTest # TODO: implement your test here
 
-        def test_saveAsCsv(self):
+    def test_saveAsCsv(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
         # assert_equal(expected, time_diagram.saveAsCsv(filename))
         raise SkipTest # TODO: implement your test here

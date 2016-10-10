@@ -38,6 +38,11 @@ class TestPlot:
         # assert_equal(expected, plot.save(filename, **kwargs))
         raise SkipTest 
 
+    def test_html(self):
+        # plot = Plot()
+        # assert_equal(expected, plot.html(**kwargs))
+        raise SkipTest # TODO: implement your test here
+
 class TestPng:
     def test_png(self):
         # assert_equal(expected, png(plotables, **kwargs))

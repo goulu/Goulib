@@ -136,5 +136,46 @@ class TestTimedelta:
         # assert_equal(expected, timedelta.isoformat())
         raise SkipTest # TODO: implement your test here
 
+class TestDatetime2:
+    def test___init__(self):
+        # datetime2 = datetime2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # datetime2 = datetime2(*args, **kwargs)
+        # assert_equal(expected, datetime2.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+class TestDate2:
+    def test_init__(self):
+        # date2 = date2()
+        # assert_equal(expected, date2.init__(*args, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestTime2:
+    def test___init__(self):
+        # time2 = time2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+class TestTimedelta2:
+    def test___init__(self):
+        # timedelta2 = timedelta2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test_isoformat(self):
+        # timedelta2 = timedelta2(*args, **kwargs)
+        # assert_equal(expected, timedelta2.isoformat())
+        raise SkipTest # TODO: implement your test here
+
+class TestAddMonths:
+    def test_add_months(self):
+        # assert_equal(expected, add_months(date, months))
+        raise SkipTest # TODO: implement your test here
+
+class TestDateAdd:
+    def test_date_add(self):
+        # assert_equal(expected, date_add(date, years, months, weeks, days))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
