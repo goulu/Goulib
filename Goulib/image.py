@@ -210,6 +210,7 @@ class Image(Plot):
                 data = io.imread(context)        
         mode=guessmode(data)
         self._set(data,'F' if mode in 'U' else mode)
+        return self
     
     open=load # PIL compatibility
 
@@ -222,8 +223,6 @@ class Image(Plot):
             mode='RGB'
         a=convert(self.array,self.mode,mode)
         skimage.io.imsave(path,a,**kwargs)
-        return self
-
 
     def _repr_svg_(self, **kwargs):
         raise NotImplementedError() #and should never be ...
@@ -299,11 +298,8 @@ class Image(Plot):
             a=self.getpixel(slice)
         except TypeError:
             pass
-        else:
-            if math2.mul(a.shape[:2])==1:
-                return a
-            else:
-                return Image(a,self.mode)
+        else: #single pixel
+            return a
             
         l,u,r,b=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
         # calculate box module size so we handle negative coords like in slices
@@ -354,10 +350,13 @@ class Image(Plot):
             l,u=0,0
         else:
             l,u=box[0:2] # ignore r,b if they're specified, recalculated below
-        w,h = image.size
+        h,w = image.size
         r,b=l+w,u+h
-        self.array[u:b,l:r]=image.array
-        return
+        try:
+            self.array[u:b,l:r]=image.array
+        except:
+            self.array[u:b,l:r]=image.array
+        return self
         
 
     def threshold(self, level=None):
@@ -531,17 +530,17 @@ class Image(Plot):
         :return: image in larger canvas size, pasted at ox,oy
         """
         im = Image(None, self.mode, size=size)
-        (w,h)=self.size
+        (h,w)=self.size
         if w*h==0: #resize empty image...
             return im
         if ox is None: #center
-            ox=(size[0]-w)//2
+            ox=(size[1]-w)//2
         elif ox<0: #from the right
-            ox=size[0]-w+ox
+            ox=size[1]-w+ox
         if oy is None: #center
-            oy=(size[1]-h)//2
+            oy=(size[0]-h)//2
         elif oy<0: #from bottom
-            oy=size[1]-h+oy
+            oy=size[0]-h+oy
         if math2.is_integer(ox) and math2.is_integer(oy):
             im.paste(self, tuple(map(math2.rint,(ox,oy,ox+w,oy+h))))
         elif ox>=0 and oy>=0:
@@ -752,9 +751,11 @@ def disk(radius,antialias=ANTIALIAS):
     img = np.zeros(size, dtype=np.double)
     rr, cc = circle(radius+1,radius+1,radius)
     img[rr, cc] = 1
-
+    #antialiased perimeter works only with ints ?
+    """
     rr, cc, val = circle_perimeter_aa(radius+1,radius+1,radius)
     img[rr, cc] = val
+    """
     return Image(img)
 
 def fspecial(name,**kwargs):
@@ -984,17 +985,28 @@ for source in modes:
         if converter:
             converters.add_edge(key[0],key[1],{'f':converter})
 
-def convert(im,source,target,**kwargs):
+def convert(a,source,target,**kwargs):
     """convert an image between modes, eventually using intermediary steps
-    :param im: nparray (x,y,n) containing image
+    :param a: nparray (x,y,n) containing image
     :param source: string : key of source image mode in modes
     :param target: string : key of target image mode in modes
     """
-    source,target=modes[source.upper()].name,modes[target.upper()].name
-    if source==target: return im
-    path=converters.shortest_path(source, target)
+    source,target=modes[source.upper()],modes[target.upper()]
+    np.clip(a, source.min, source.max, out=a)
+    path=converters.shortest_path(source.name, target.name)
     for u,v in itertools2.pairwise(path):
-        im=converters[u][v][0]['f'](im,**kwargs)
-    return im #isn't it beautiful ?
+        a=converters[u][v][0]['f'](a,**kwargs)
+    dtype=target.type
+    if a.dtype==dtype:
+        pass
+    elif dtype==np.float:
+        a=skimage.img_as_float(a)
+    elif dtype==np.int16:
+        a=skimage.img_as_int(a)
+    elif dtype==np.uint16:
+        a=skimage.img_as_uint(a)
+    elif dtype==np.uint8:
+        a=skimage.img_as_ubyte(a)
+    return a #isn't it beautiful ?
 
 

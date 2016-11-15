@@ -53,9 +53,9 @@ class TestImage:
 
     def test___getitem__(self):
         pixel=self.lena_gray[256,256]
-        assert_equal(pixel,89)
+        assert_equal(pixel,90)
         pixel=self.lena[256,256]
-        assert_equal(pixel,(180,65,72))
+        assert_equal(pixel,[ 0.70588235 ,0.25490196 ,0.28235294]) # (180,65,72))
         left=self.lena[:,:256]
         right=self.lena[:,256:-1]
         face=self.lena[246:374,225:353]
@@ -155,7 +155,8 @@ class TestImage:
     def test_filter(self):
 
         for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
-            self.lena.filter(f).save(results+'lena_%s.png'%f.__name__)
+            r=self.lena.filter(f)
+            r.save(results+'lena_%s.png'%f.__name__)
 
         from skimage.filters import sobel
         for f in [sobel]:
@@ -180,7 +181,7 @@ class TestImage:
         for i in range(3):
             for j in range(3):
                 im=im.add(dot,(j*38.5,i*41.5),0.5)
-        im.save(results+'image_add.png')
+                im.save(results+'image_add_%d.png'%(i*3+j))
     
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')
