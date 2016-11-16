@@ -146,21 +146,21 @@ class TestImage:
         lab=Image(lab,mode='LAB')
         lab.save(results+'lena_Lab.png')
 
+    def test_filter(self):
+
+        for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
+            r=self.lena.filter(f)
+            r.save(results+'lena_filter_%s.png'%f.__name__)
+
+        from skimage.filters import sobel
+        for f in [sobel]:
+            self.lena.filter(f).save(results+'lena_skfilter_%s.png'%f.__name__)
+            
     def test_dither(self):
         for k in dithering:
             self.lena_gray.dither(k).save(results+'lena_dither_%s.png'%dithering[k])
         self.lena.dither().save(results+'lena_color_dither.png')
         self.lena.dither(n=4).save(results+'lena_color_dither4.png')
-
-    def test_filter(self):
-
-        for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
-            r=self.lena.filter(f)
-            r.save(results+'lena_%s.png'%f.__name__)
-
-        from skimage.filters import sobel
-        for f in [sobel]:
-            self.lena.filter(f).save(results+'lena_sk_%s.png'%f.__name__)
 
     def test_resize(self):
         size=128
@@ -181,7 +181,7 @@ class TestImage:
         for i in range(3):
             for j in range(3):
                 im=im.add(dot,(j*38.5,i*41.5),0.5)
-                im.save(results+'image_add_%d.png'%(i*3+j))
+        im.save(results+'image_add.png')
     
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')

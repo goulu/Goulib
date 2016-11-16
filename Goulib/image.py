@@ -298,8 +298,12 @@ class Image(Plot):
             a=self.getpixel(slice)
         except TypeError:
             pass
-        else: #single pixel
-            return a
+        else:
+            s=a.shape
+            if len(s[:2])<=1: #single pixel
+                return a
+            else:
+                return Image(a,self.mode)
             
         l,u,r,b=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
         # calculate box module size so we handle negative coords like in slices
@@ -488,11 +492,15 @@ class Image(Plot):
 
     @adapt_rgb
     def filter(self,f):
-        #PIL filters
-        if f==BLUR:
-            CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN
-        else: # scikit-image filter or similar ?
-            return Image(f(self.array))
+        try: # scikit-image filter or similar ?
+            a=f(self.array)
+            return Image(a)
+        except Exception as e:
+            pass
+        a=skimage.img_as_ubyte(self.array) # PIL filters want integer images
+        im=PILImage.fromarray(a)
+        im=im.filter(f)
+        return Image(im,mode=self.mode)
 
 
     def correlation(self, other):
@@ -501,8 +509,8 @@ class Image(Plot):
         :param other: the Image we're looking for
         """
         from scipy import signal
-        input = self.ndarray()
-        match = other.ndarray()
+        input = self.array
+        match = other.array
         c=signal.correlate2d(input,match)
         return Image(c)
 
@@ -579,8 +587,8 @@ class Image(Plot):
         px,py=pos
         assert px>=0 and py>=0
         im1,im2=self,other
-        size=(max(im1.size[0],int(im2.size[0]+px+0.999)),
-              max(im1.size[1],int(im2.size[1]+py+0.999)))
+        size=(max(im1.size[0],int(im2.size[0]+py+0.999)),
+              max(im1.size[1],int(im2.size[1]+px+0.999)))
         if not im1.mode: #empty image
             im1.mode=im2.mode
         im1=im1.expand(size,0,0)
@@ -747,13 +755,13 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
 
 def disk(radius,antialias=ANTIALIAS):
     from skimage.draw import circle, circle_perimeter_aa
-    size = (2*radius+2, 2*radius+2)
+    size = (2*radius, 2*radius)
     img = np.zeros(size, dtype=np.double)
-    rr, cc = circle(radius+1,radius+1,radius)
+    rr, cc = circle(radius,radius,radius)
     img[rr, cc] = 1
     #antialiased perimeter works only with ints ?
     """
-    rr, cc, val = circle_perimeter_aa(radius+1,radius+1,radius)
+    rr, cc, val = circle_perimeter_aa(radius,radius,radius)
     img[rr, cc] = val
     """
     return Image(img)
@@ -996,17 +1004,7 @@ def convert(a,source,target,**kwargs):
     path=converters.shortest_path(source.name, target.name)
     for u,v in itertools2.pairwise(path):
         a=converters[u][v][0]['f'](a,**kwargs)
-    dtype=target.type
-    if a.dtype==dtype:
-        pass
-    elif dtype==np.float:
-        a=skimage.img_as_float(a)
-    elif dtype==np.int16:
-        a=skimage.img_as_int(a)
-    elif dtype==np.uint16:
-        a=skimage.img_as_uint(a)
-    elif dtype==np.uint8:
-        a=skimage.img_as_ubyte(a)
+    a=skimage.util.dtype.convert(a,target.type)
     return a #isn't it beautiful ?
 
 
