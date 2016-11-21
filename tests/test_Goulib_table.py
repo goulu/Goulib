@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf8
 
 from nose.tools import assert_equal
@@ -16,7 +17,7 @@ class TestTable:
         
         #test reading an Excel file
         self.t=Table(self.path+'/data/test.xls') # from http://www.contextures.com/xlSampleData01.html
-        assert_equal(self.t.titles,['OrderDate', u'Région', 'Rep', 'Item', u'Unités', 'Cost', 'Total'])
+        assert_equal(self.t.titles,['OrderDate', u'RÃ©gion', 'Rep', 'Item', u'UnitÃ©s', 'Cost', 'Total'])
               
         #format some columns
         self.t.applyf('Cost',float)
@@ -142,7 +143,7 @@ class TestTable:
         assert_equal(self.t.get(-1,'Total'),139.72)
 
     def test_groupby(self):
-        d=self.t.groupby(u'Région')
+        d=self.t.groupby(u'RÃ©gion')
         assert_equal(sum([len(d[k]) for k in d]),len(self.t))
         assert_equal(len(d['East']),13)
 
@@ -186,9 +187,9 @@ class TestTable:
                         u'Item': u'Pencil',
                         u'OrderDate': date(2012,4,18),
                         u'Rep': u'Andrews',
-                        u'Région': u'Central',
+                        u'RÃ©gion': u'Central',
                         u'Total': 149.25,
-                        u'Unités': 75,
+                        u'UnitÃ©s': 75,
                         u'timedelta':timedelta(days=105)}
                      )
 

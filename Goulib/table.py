@@ -10,6 +10,8 @@ __credits__ = []
 __license__ = "LGPL"
 
 import six, logging
+from six.moves import html_parser, reduce
+
 import csv, itertools, codecs, json, collections
 
 import datetime as std_datetime
@@ -22,7 +24,7 @@ try: # using http://lxml.de/
 except: #ElementTree
     logging.info('LXML unavailable : falling back to ElementTree')
     from xml.etree import ElementTree
-    from six.moves.html_parser import HTMLParser
+    from html_parser import HTMLParser
     defaultparser=HTMLParser
     
 Element=ElementTree._Element
@@ -532,7 +534,7 @@ class Table(list):
         """
         :return: number of columns, ignoring title
         """
-        return six.moves.reduce(max,list(map(len,self)))
+        return reduce(max,list(map(len,self)))
                 
     def find_col(self,title):
         """finds a column from a part of the title"""
