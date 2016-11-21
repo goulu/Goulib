@@ -56,7 +56,7 @@ modes = {
     'U'     : Mode('gray',1,np.uint16,0,65535), # skimage gray level
     'I'     : Mode('gray',1,np.int16,-32768,32767), # skimage gray level
     'L'     : Mode('gray',1,np.uint8,0,255), # single layer or RGB(A)
-    'P'     : Mode('gray',1,np.uint8,0,255), # indexed color (palette)
+#    'P'     : Mode('palette',1,np.uint8,0,255), # indexed color (palette) not yet supported
     'RGB'   : Mode('rgb',3,np.float,0,1), # not uint8 as in PIL
     'RGBA'  : Mode('rgba',4,np.float,0,1), # not uint8 as in PIL
     'CMYK'  : Mode('cmyk',4,np.float,0,1), # not uint8 as in PIL
@@ -162,6 +162,8 @@ class Image(Plot):
             data=data.copy()
         if mode=='LAB' and np.max(data)>1:
             data=data/100
+        elif mode!='1' and data.dtype == np.uint8 and np.max(data)==1:
+            data=data*255
         s=data.shape
         if len(s)==3:
             if s[0]<10 and s[1]>10 and s[2]>10: 
@@ -632,37 +634,6 @@ class Image(Plot):
     
     __truediv__ = __div__
 
-def rgb2rgba(array):
-    s=array.shape
-    if s[2]==4: #already RGBA
-        return array
-    a=np.ones((s[0],s[1],1),array.dtype)
-    array=np.append(array,a,2)
-    return array
-
-#from http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
-
-def alpha_to_color(image, color=(255, 255, 255)):
-    """Set all fully transparent pixels of an RGBA image to the specified color.
-    This is a very simple solution that might leave over some ugly edges, due
-    to semi-transparent areas. You should use alpha_composite_with color instead.
-
-    Source: http://stackoverflow.com/a/9166671/284318
-
-    Keyword Arguments:
-    image -- PIL RGBA Image object
-    color -- Tuple r, g, b (default 255, 255, 255)
-
-    """
-    x = np.array(image)
-    r, g, b, a = np.rollaxis(x, axis=-1)
-    r[a == 0] = color[0]
-    g[a == 0] = color[1]
-    b[a == 0] = color[2]
-    x = np.dstack([r, g, b, a])
-    return Image.fromarray(x, 'RGBA')
-
-
 def alpha_composite(front, back):
     """Alpha composite two RGBA images.
 
@@ -887,10 +858,8 @@ def dither(image, method=FLOYDSTEINBERG, N=2, L=1):
     if method==NEAREST:
         return quantize(image,N,L)
     elif method==RANDOM:
-        img_dither_random = image + np.abs(np.random.normal(size=image.shape,scale=1./(3 * N)))
+        img_dither_random = image + np.abs(np.random.normal(size=image.shape,scale=L/(3 * N)))
         return quantize(img_dither_random, N,L)
-
-    image = image.copy()
 
     if method == PHILIPS:
         positions = [(0,0)]
@@ -907,16 +876,18 @@ def dither(image, method=FLOYDSTEINBERG, N=2, L=1):
                    1, 2, 4, 2, 1]
     else:
         if method!=FLOYDSTEINBERG:
-            logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg'%method)
+            logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg'%dithering[method])
         positions = [(0, 1), (1, -1), (1, 0), (1, 1)]
         weights = [7, 3, 5, 1]
 
     weights = weights / np.sum(weights)
 
-    T = np.linspace(0, L, N, endpoint=False)[1:]
+    T = np.linspace(0., 1., N, endpoint=False)[1:]
+    
+    image=skimage.img_as_float(image, True) #normalize to [0..1]
+    out = np.zeros_like(image, dtype=int)
+    
     rows, cols = image.shape
-
-    out = np.zeros_like(image, dtype=float)
     for i in range(rows):
         for j in range(cols):
             # Quantize
@@ -961,34 +932,52 @@ def cmyk2rgb(cmyk):
     return np.concatenate([x[..., np.newaxis] for x in [r,g,b]], axis=-1)
 
 def gray2rgb(im,color0=(0,0,0), color1=(1,1,1)):
+    im=skimage.img_as_float(im)
     color0=np.asarray(color0,np.float)
     color1=np.asarray(color1,np.float)
     d=color1-color0
     a=np.outer(im,d)
     a=a.reshape([im.shape[0],im.shape[1],d.shape[0]])+color0
+    
     return a
 
 bool2rgb=gray2rgb #works also
 
 def bool2gray(im):
-    return im/255
+    return im*255
+
+def rgb2rgba(array):
+    s=array.shape
+    if s[2]==4: #already RGBA
+        return array
+    a=np.ones((s[0],s[1],1),array.dtype)
+    array=np.append(array,a,2)
+    return array
+
+import skimage.color as skcolor
+try:
+    skcolor.rgba2rgb #will be available soon
+except:
+    def rgba2rgb(array):
+        #trivial version ignoring alpha channel
+        return array[:,:,:3]
 
 #build a graph of available converters
 #inspired by https://github.com/gtaylor/python-colormath
 
 from .graph import DiGraph
-import skimage.color as skcolor
+
 converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
 for source in modes:
     for target in modes:
         key=(modes[source].name, modes[target].name)
-        if key[0]==key[1]:
+        if key[0]==key[1]: 
             continue
-        else:
-            convname='%s2%s'%key
-            converter = getattr(sys.modules[__name__], convname,None)
-            if converter is None:
-                converter=getattr(skcolor, convname,None)
+        convname='%s2%s'%key
+            
+        converter = getattr(sys.modules[__name__], convname,None)
+        if converter is None:
+            converter=getattr(skcolor, convname,None)
                 
         if converter:
             converters.add_edge(key[0],key[1],{'f':converter})
@@ -1002,8 +991,10 @@ def convert(a,source,target,**kwargs):
     source,target=modes[source.upper()],modes[target.upper()]
     np.clip(a, source.min, source.max, out=a)
     path=converters.shortest_path(source.name, target.name)
+
     for u,v in itertools2.pairwise(path):
-        a=converters[u][v][0]['f'](a,**kwargs)
+        if u!=v: #avoid converting from gray to gray
+            a=converters[u][v][0]['f'](a,**kwargs)
     a=skimage.util.dtype.convert(a,target.type)
     return a #isn't it beautiful ?
 
