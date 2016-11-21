@@ -592,8 +592,6 @@ class TestPlane:
         u=Vector3(2,2,1)
         v=Vector3(2,1,1)
         p=Plane((0,0,0),u,v)
-        self.F=Plane(u,v)
-        assert_equal(p,self.F)
         
 
     def test___copy__(self):

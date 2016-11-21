@@ -253,6 +253,10 @@ class TestTextVisitor:
         # assert_equal(expected, text_visitor.visit_UnaryOp(n))
         raise SkipTest # TODO: implement your test here
 
+    def test___init__(self):
+        # text_visitor = TextVisitor(dialect)
+        raise SkipTest # TODO: implement your test here
+
 class TestLatexVisitor:
     def test_visit_Call(self):
         # latex_visitor = LatexVisitor()
@@ -262,6 +266,10 @@ class TestLatexVisitor:
     def test_visit_UnaryOp(self):
         # latex_visitor = LatexVisitor()
         # assert_equal(expected, latex_visitor.visit_UnaryOp(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # latex_visitor = LatexVisitor()
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
