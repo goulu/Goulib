@@ -19,6 +19,7 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import six, logging, operator, math
+from six.moves import map, reduce, filter, zip_longest
 
 from itertools import count, repeat, tee, islice
 
@@ -129,7 +130,7 @@ class Sequence(object):
 
     def apply(self,f,containf=None,desc=''):
         return Sequence(
-            six.moves.map(f,self),
+            map(f,self),
             lambda i:f(self[i]),
             containf,
             desc
@@ -137,7 +138,7 @@ class Sequence(object):
 
     def filter(self,f,desc=''):
         return Sequence(
-            six.moves.filter(f,self),
+            filter(f,self),
             None,
             lambda n:f(n) and n in self,
             desc
@@ -152,11 +153,17 @@ class Sequence(object):
     def sort(self,key=None,buffer=1000):
         return Sequence(itertools2.sorted_iterable(self, key, buffer))
 
-    def unique(self):
-        return Sequence(itertools2.unique_sorted(self))
+    def unique(self,buffer=1000):
+        """ 
+        :param buffer: int number of last elements found. 
+        if two identical elements are separated by more than this number of elements
+        in self, they might be generated twice in the resulting Sequence
+        :return: Sequence made of unique elements of this one
+        """
+        return Sequence(itertools2.unique(self,None,buffer))
 
 def record(iterable, it=count(), max=0):
-    for i,v in six.moves.zip(it,iterable):
+    for i,v in zip(it,iterable):
         if v>max:
             yield i
             max=v
@@ -402,13 +409,13 @@ A001223=A000040.pairwise(operator.sub)
 
 A077800=Sequence(itertools2.flatten(math2.twin_primes()))
 
-A001097=Sequence(itertools2.unique_sorted(A077800))
+A001097=A077800.unique()
 
 A001359=Sequence(itertools2.itemgetter(math2.twin_primes(),0),desc="Lesser of twin primes.")
 
 A006512=Sequence(itertools2.itemgetter(math2.twin_primes(),1),desc="Greater of twin primes.")
 
-A037074=Sequence(six.moves.map(math2.mul,math2.twin_primes()), desc="Numbers that are the product of a pair of twin primes")
+A037074=Sequence(map(math2.mul,math2.twin_primes()), desc="Numbers that are the product of a pair of twin primes")
 
 def count_10_exp(iterable):
     """generates number of iterable up to 10^n."""
@@ -445,6 +452,16 @@ def is_product_of_2_primes(n):
     
 A006881=Sequence(1,None,is_product_of_2_primes,"Numbers that are the product of two distinct primes.")
 
+def is_powerful(n):
+    """if a prime p divides n then p^2 must also divide n
+    (also called squareful, square full, square-full or 2-full numbers).
+    """
+    for f in itertools2.unique(math2.prime_factors(n)):
+        if n%(f*f): return False
+    return True
+        
+A001694=Sequence(1,None,is_powerful,"powerful numbers")
+
 #these 2 implementations have pretty much the same performance
 A030513=A030078+A006881 #Numbers with 4 divisors
 A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4,"Numbers with 4 divisors")
@@ -460,6 +477,8 @@ A001222=Sequence(1,math2.bigomega)
 
 A000045=Sequence(math2.fibonacci_gen,math2.fibonacci) #Fibonacci numbers: F(n) = F(n-1) + F(n-2) with F(0) = 0 and F(1) = 1
 
+A007318=Sequence(math2.pascal_gen)
+
 A000108=Sequence(math2.catalan_gen,math2.catalan)
 
 def recaman():
@@ -472,11 +491,11 @@ def recaman():
         s.add(x)
         yield x,addition_step,n
 
-A005132=Sequence(six.moves.map(operator.itemgetter(0), recaman()))
+A005132=Sequence(map(operator.itemgetter(0), recaman()))
 
 A057165=Sequence(
-    six.moves.map(operator.itemgetter(2),   # get n from ...
-        six.moves.filter(                   # filtered recaman generator
+    map(operator.itemgetter(2),   # get n from ...
+        filter(                   # filtered recaman generator
             lambda x:x[1],                  # when addition_step is True
             recaman()
         )
@@ -484,8 +503,8 @@ A057165=Sequence(
 )
 
 A057166=Sequence(
-    six.moves.map(operator.itemgetter(2),   # get n from ...
-        six.moves.filter(                   # filtered recaman generator
+    map(operator.itemgetter(2),   # get n from ...
+        filter(                   # filtered recaman generator
             lambda x:x[1]==False,           # when substraction step
             recaman()
         )
@@ -518,28 +537,21 @@ A007953=Sequence(None,math2.digsum, True) #Digital sum (i.e., sum of digits) of 
 
 A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence: number of 1's in binary expansion of n
 
-def pascal():
-    """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
-    https://oeis.org/A007318
-    """
-    __author__ = 'Nick Hobson <nickh@qbyte.org>'
-    # code from https://oeis.org/A007318/a007318.py.txt with additional related functions
-    for row in count():
-        x = 1
-        yield x
-        for m in range(row):
-            x = (x * (row - m)) // (m + 1)
-            yield x
+def sumdigpow(p,desc=None):
+    """sum of p-th powers of digits"""
+    return Sequence(None,lambda x:math2.digsum(x,f=p),desc=desc)
+                    
+A003132=sumdigpow(2,desc='Sum of squares of digits of n. ')
+A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose trajectory under iteration of sum of squares of digits map (see A003132) includes 1.')
 
-A007318=Sequence(pascal)
+A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-A003132=Sequence(None,math2.sos_digits)
-A007770=Sequence(None,None,math2.is_happy)
+#A005188=Sequence(1,lambda x:math2.digsum(x,f=len(str(x))),desc='Armstrong (or Plus Perfect, or narcissistic) numbers: n-digit numbers equal to sum of n-th powers of their digits')
 
 # Reverse and Add
 # https://oeis.org/wiki/Index_to_OEIS:_Section_Res#RAA
 
-A006960=Sequence(six.moves.map(operator.itemgetter(0), math2.lychrel_seq(196))) # Reverse and Add! sequence starting with 196.
+A006960=Sequence(map(operator.itemgetter(0), math2.lychrel_seq(196))) # Reverse and Add! sequence starting with 196.
 
 A023108=Sequence(None,None,math2.is_lychrel)
 """Positive integers which apparently never result in a palindrome
