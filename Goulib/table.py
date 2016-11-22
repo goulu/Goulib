@@ -16,8 +16,6 @@ import csv, itertools, codecs, json, collections
 
 import datetime as std_datetime
 
-
-
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
     defaultparser=ElementTree.HTMLParser

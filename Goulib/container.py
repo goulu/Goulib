@@ -27,7 +27,7 @@ class Record(OrderedDict):
     def __setattr__(self, name, value):
         if not name:
             return
-        if hasattr(self, '_initialized'):
+        if '_initialized' in self.__dict__:
             super(Record, self).__setitem__(name, value)
         else:
             super(Record, self).__setattr__(name, value)

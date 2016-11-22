@@ -10,6 +10,7 @@ __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import six, types, re, itertools
+from six.moves import filter, zip
 
 import unittest, nose
 import nose.tools
@@ -23,7 +24,7 @@ def pprint_gen(iterable,indices=[0,1,2,-3,-2,-1],sep='...'):
         indices=(i if i>=0 else l+i for i in indices if i<l)
     except: #infinite iterable
         l=None
-        indices=six.moves.filter(lambda x:x>=0,indices)
+        indices=filter(lambda x:x>=0,indices)
     indices=list(itertools2.unique(indices)) #to remove overlaps
     indices.sort() 
     
@@ -99,7 +100,7 @@ class TestCase(unittest.TestCase):
         end=End() #a special object is appended to detect mismatching lengths
         
         i=0
-        for item1,item2 in six.moves.zip(itertools.chain(seq1,[end]),itertools.chain(seq2,[end])):
+        for item1,item2 in zip(itertools.chain(seq1,[end]),itertools.chain(seq2,[end])):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
