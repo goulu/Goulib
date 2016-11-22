@@ -14,7 +14,7 @@ before_install:
   - export PATH=/home/travis/anaconda/bin:$PATH
   # Update conda itself
   - conda config --add channels conda-canary
-  - conda config --remove channels defaults
+  # - conda config --remove channels defaults
   - conda update -q conda
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
   - sudo rm -rf /dev/shm
