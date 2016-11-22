@@ -423,5 +423,10 @@ class TestBool2gray:
         # assert_equal(expected, bool2gray(im))
         raise SkipTest # TODO: implement your test here
 
+class TestRgba2rgb:
+    def test_rgba2rgb(self):
+        # assert_equal(expected, rgba2rgb(array))
+        raise SkipTest # TODO: implement your test here
+
 if __name__=="__main__":
     runmodule()
