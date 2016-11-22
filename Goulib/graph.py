@@ -135,7 +135,7 @@ class _Geo(plot.Plot):
             if isinstance(data,six.string_types): # suppose data is a filename
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
-                    data=nx.read_dot(data)
+                    data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
                 else:
                     raise(Exception('unknown file format'))
             elif isinstance(data,AGraph):
@@ -534,7 +534,7 @@ class _Geo(plot.Plot):
         if ext=='dxf':
             write_dxf(self,filename)
         elif ext=='dot':
-            nx.write_dot(self, filename)
+            nx.nx_pydot.write_dot(self, filename)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
 
