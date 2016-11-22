@@ -69,15 +69,13 @@ if not RTREE:
                 """ very inefficient, but remember it's a fallback..."""
                 return itertools2.best(list(self.values()),key=lambda q:math2.dist(p,q),n=num_results)
 
-try:
+_nk=0 # node key
+
+try: # pygraphviz is optional
     from pygraphviz import AGraph # http://pygraphviz.github.io/
-    PYGRAPHVIZ=True
-except: #fallback since I couldn't manage to install graphviz on travis-ci ...
-    logging.warning('pygraphviz not available')
-    PYGRAPHVIZ=False
+except:
     class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 
-_nk=0 # node key
 
 def to_networkx_graph(data,create_using=None,multigraph_input=False):
     """Make a NetworkX graph from a known data structure.
@@ -135,7 +133,7 @@ class _Geo(plot.Plot):
             if isinstance(data,six.string_types): # suppose data is a filename
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
-                    data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
+                    data=nx.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
                 else:
                     raise(Exception('unknown file format'))
             elif isinstance(data,AGraph):
@@ -534,7 +532,7 @@ class _Geo(plot.Plot):
         if ext=='dxf':
             write_dxf(self,filename)
         elif ext=='dot':
-            nx.nx_pydot.write_dot(self, filename)
+            nx.write_dot(self, filename)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
 
@@ -617,11 +615,17 @@ def draw_networkx(g, pos=None, **kwargs):
 
     if six.callable(pos): #mapping function
         pos=dict(((node,pos(node)) for node in g.nodes_iter()))
+        
+    if pos is None:
+        try:
+            pos=dict((node,data['pos'][:2]) for node,data in g.nodes_iter(True))
+        except KeyError:
+            pass
 
     if pos is None:
         try:
             pos=dict(((node,node[:2]) for node in g.nodes_iter()))
-        except:
+        except TypeError:
             pass
 
     if pos is None:
@@ -631,7 +635,7 @@ def draw_networkx(g, pos=None, **kwargs):
     try: #convert ndarray to python lists
         for k in pos:
             pos[k]=pos[k].tolist()
-    except:
+    except AttributeError:
         pass
 
     edgelist=list(kwargs.pop('edgelist',g.edges(data=True)))
@@ -642,7 +646,7 @@ def draw_networkx(g, pos=None, **kwargs):
         default=None
         try: # get default edge color
             default=g.color
-        except:
+        except AttributeError:
             pass
         if default is None:
             default='k' #black

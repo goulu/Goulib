@@ -25,14 +25,10 @@ class TestGeoGraph:
         self.sphere=GeoGraph(nodes=nodes) #test if we can construct from nodes only
         self.sphere=delauney_triangulation(nodes,'Qz',tol=0) #'Qz' required for spheres
         
-        if PYGRAPHVIZ: #optional import
-            self.dot=GeoGraph(path+'/data/cluster.dot')
-        else:
-            self.dot=None
+        self.dot=GeoGraph(path+'/data/cluster.dot')
                     
     def test_save(self):
-        if self.dot:
-            self.dot.save(results+'cluster.png', transparent=False)
+        self.dot.save(results+'cluster.png', transparent=False)
         
         #3D graph
         self.sphere.save(results+'graph.sphere.png', transparent=False)
