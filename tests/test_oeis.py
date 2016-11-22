@@ -47,7 +47,7 @@ def data(s):
     except:
         pass
     
-    from urllib.request import urlopen
+    from six.moves.urllib.request import urlopen
     file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
     logging.info('downloading b%s.txt'%s2)
     res=[]
