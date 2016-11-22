@@ -19,7 +19,7 @@ class TestTag:
         assert_equal(t,'<tag class="class">b&#233;twe&#234;&#241;</tag>')
         
         t=tag('tag', None, style={'align':'left', 'color':'red'}, single=True)
-        assert_true(t in ('<tag style="color:red; align:left;" />','<tag align:left; style="color:red;" />'))
+        assert_true(t in ('<tag style="color:red; align:left;" />','<tag style="align:left; color:red;" />'))
         
 
 class TestElement:
