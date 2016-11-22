@@ -1,7 +1,6 @@
 scipy
 matplotlib
 networkx
-rtree
 pygraphviz
 graphviz
 six
