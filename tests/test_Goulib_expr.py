@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf8
+
+from __future__ import division #"true division" everywhere
+
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
@@ -82,7 +85,7 @@ class TestExpr:
         assert_equal(self.fs(self.fx2).latex(),'\\sin \\left(x^2\\right)') 
         assert_equal(self.long.latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
         assert_equal(Expr(sqrt(3)).latex(),'\\sqrt {3}')
-        assert_equal(Expr(1/3).latex(),'\\frac{1}{3}')
+        assert_equal(Expr(1./3).latex(),'\\frac{1}{3}')
         l=Expr('sqrt(x*3+(a+b)*y)/x**(3*a*y)').latex()
         assert_equal(l,'\\frac{\\sqrt {3x+\\left(a+b\\right) \\cdot y}}{x^{3a \\cdot y}}')
 
