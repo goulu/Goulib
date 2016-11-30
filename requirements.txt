@@ -14,3 +14,4 @@ dxfwrite
 svg.path
 pdfminer.six
 pint
+nose
