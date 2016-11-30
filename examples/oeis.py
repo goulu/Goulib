@@ -19,7 +19,7 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import six, logging, operator, math
-from six.moves import map, reduce, filter, zip_longest
+from six.moves import map, reduce, filter, zip, zip_longest
 
 from itertools import count, repeat, tee, islice
 
