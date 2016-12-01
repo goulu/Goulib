@@ -1,8 +1,6 @@
 cls -C
-cd goulib
-call sphinx-apidoc . -eo ..\docs\modules 
-cd ..
 cd docs
+call sphinx-apidoc ..\Goulib -eo modules 
 del modules\Goulib.rst
 del _build\html\index.html
 call make html
