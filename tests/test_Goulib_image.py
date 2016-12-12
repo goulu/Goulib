@@ -47,6 +47,7 @@ class TestImage:
         lena3=Image().open(path+'/data/lena.png')
         assert_equal(self.lena,lena3)
 
+    def test_generate(self):
         #from matrix
         from matplotlib import cm
         a=[[x*y for x in range(128)] for y in range(128)]
@@ -157,7 +158,7 @@ class TestImage:
         assert_image(lab,'Lab.png')
 
     def test_filter(self):
-
+        from PIL.ImageFilter import BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN
         for f in [BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN]:
             r=self.lena.filter(f)
             assert_image(r,'filter_pil_%s.png'%f.__name__)
@@ -172,7 +173,8 @@ class TestImage:
 
     def test_dither(self):
         for k in dithering:
-            assert_image(self.gray.dither(k),'dither_%s.png'%dithering[k])
+            im=self.gray.dither(k)*255
+            assert_image(im,'dither_%s.png'%dithering[k])
         assert_image(self.lena.dither(),'dither_color_2.png')
         assert_image(self.lena.dither(n=4),'dither_color_4.png')
 
@@ -342,6 +344,16 @@ class TestImage:
         # assert_equal(expected, image.getcolors(maxcolors))
         raise SkipTest # TODO: implement your test here
 
+    def test_getpalette(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.getpalette(maxcolors))
+        raise SkipTest # TODO: implement your test here
+
+    def test_setpalette(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.setpalette(p))
+        raise SkipTest # TODO: implement your test here
+
 class TestCorrelation:
     def test_correlation(self):
         # assert_equal(expected, correlation(input, match))
@@ -452,6 +464,46 @@ class TestInd2any:
 class TestInd2rgb:
     def test_ind2rgb(self):
         # assert_equal(expected, ind2rgb(im, palette))
+        raise SkipTest # TODO: implement your test here
+
+class TestRandomize:
+    def test_randomize(self):
+        # assert_equal(expected, randomize(image, N, L))
+        raise SkipTest # TODO: implement your test here
+
+class TestDitherer:
+    def test___call__(self):
+        # ditherer = Ditherer(name, method)
+        # assert_equal(expected, ditherer.__call__(image, N))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # ditherer = Ditherer(name, method)
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # ditherer = Ditherer(name, method)
+        # assert_equal(expected, ditherer.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+class TestErrorDiffusion:
+    def test___call__(self):
+        # error_diffusion = ErrorDiffusion(name, positions, weights)
+        # assert_equal(expected, error_diffusion.__call__(image, N))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # error_diffusion = ErrorDiffusion(name, positions, weights)
+        raise SkipTest # TODO: implement your test here
+
+class TestFloydSteinberg:
+    def test___call__(self):
+        # floyd_steinberg = FloydSteinberg()
+        # assert_equal(expected, floyd_steinberg.__call__(image, N))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # floyd_steinberg = FloydSteinberg()
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":

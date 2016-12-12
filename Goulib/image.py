@@ -30,6 +30,7 @@ import warnings
 warnings.filterwarnings("ignore") # because too many are generated
 
 import PIL.Image as PILImage
+from PIL.Image import ANTIALIAS, NEAREST, BILINEAR, BICUBIC
 
 import six
 from six.moves.urllib_parse import urlparse
@@ -40,7 +41,7 @@ import os, sys, math, base64, functools, logging
 
 from Goulib import math2, itertools2
 from Goulib.drawing import Drawing #to read vector pdf files as images
-from Goulib.colors import Color
+from Goulib.colors import Color, Palette
 from Goulib.plot import Plot
 
 class Mode(object):
@@ -81,35 +82,10 @@ def guessmode(arr):
     if np.issubdtype(arr.dtype,float):
         return 'F'
     if arr.dtype == np.uint8:
-        return 'L'
+        return 'L' if arr.max()>1 else '1'
     if arr.dtype == np.uint16:
         return 'U'
     return 'I'
-
-from PIL.Image import NEAREST, BILINEAR, BICUBIC, ANTIALIAS
-
-# skimage equivalents of PIL filters
-# see http://www2.fhstp.ac.at/~webmaster/Imaging-1.1.5/PIL/ImageFilter.py
-from PIL.ImageFilter import BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN
-
-#PIL+SKIMAGE dithering methods
-
-from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
-PHILIPS=FLOYDSTEINBERG+1
-SIERRA=FLOYDSTEINBERG+2
-STUCKI=FLOYDSTEINBERG+3
-RANDOM=FLOYDSTEINBERG+10
-
-dithering={
-    NEAREST : 'nearest',
-    ORDERED : 'ordered', # Not yet implemented in Pillow
-    RASTERIZE : 'rasterize', # Not yet implemented in Pillow
-    FLOYDSTEINBERG : 'floyd-steinberg',
-    PHILIPS: 'philips', #http://www.google.com/patents/WO2002039381A2
-    SIERRA: 'sierra filter lite',
-    STUCKI: 'stucki',
-    RANDOM: 'random',
-}
 
 def adapt_rgb(func):
     """Decorator that adapts to RGB(A) images to a gray-scale filter.
@@ -139,6 +115,7 @@ class Image(Plot):
         ** size : (y,x) pixel size tuple
         ** mode : 'F' (gray) by default
         ** color: to fill None=black by default
+        ** colormap: Palette or matplotlib colormap
         """
         if data is None:
             mode = mode or 'F'
@@ -155,15 +132,21 @@ class Image(Plot):
             self.array=data.array
         elif isinstance(data,six.string_types): #assume a path
             self.load(data,**kwargs)
-        elif isinstance(data,tuple):
+        elif isinstance(data,tuple): # (image,palette) tuple return by convert
             self._set(data[0],mode)
-            self.palette=data[1]
+            self.setpalette(data[1])
         else: # assume some kind of array
             try: # list of Images ?
                 data=[im.array for im in data]
             except:
                 pass
             self._set(data,mode)
+        if modes[self.mode].nchannels==1:
+            p=kwargs.get('colormap',None)
+            if p:
+                self.mode='P'
+                self.setpalette(p)
+            
 
     def _set(self,data,mode=None,copy=False):
         data=np.asanyarray(data)
@@ -309,6 +292,15 @@ class Image(Plot):
         To make sure you get all colors in an image, you can pass in size[0]*size[1]
         (but make sure you have lots of memory before you do that on huge images).
         """
+        
+    def getpalette(self,maxcolors=256):
+        if self.mode=='P':
+            return self.palette
+        return Palette(self.getcolors(maxcolors))
+    
+    def setpalette(self,p):
+        assert(self.mode=='P')
+        self.palette=Palette(p)
 
     def crop(self,lurb):
         """
@@ -529,8 +521,7 @@ class Image(Plot):
     def dither(self,method=None,n=2):
         if method is None:
             method=FLOYDSTEINBERG
-        level=modes[self.mode].max
-        a=dither(self.array,method,N=n,L=level)
+        a=dither(self.array,method,N=n)
         if n==2:
             return Image(a,'1')
         else:
@@ -539,6 +530,8 @@ class Image(Plot):
     def normalize(self,newmax=255,newmin=0):
         #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
         #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
+        newmax=newmax or modes[self.mode].max
+        newmin=newmin or modes[self.mode].min
         arr=_normalize(np.array(self),newmax,newmin)
         return Image(arr)
 
@@ -885,73 +878,111 @@ def fig2img ( fig ):
 # from https://github.com/scikit-image/skimage-demos/blob/master/dither.py
 # see https://bitbucket.org/kuraiev/halftones for more
 
-def quantize(image, N=2, L=1):
+def quantize(image, N=2, L=None):
     """Quantize a gray image.
     :param image: ndarray input image.
     :param N: int number of quantization levels.
     :param L: float max value.
     """
+    L=L or modes[guessmode(image)].max #max level of image
     T = np.linspace(0, L, N, endpoint=False)[1:]
     return np.digitize(image.flat, T).reshape(image.shape)
 
+def randomize(image, N=2, L=None):
+    L=L or modes[guessmode(image)].max #max level of image
+    img_dither_random = image + np.abs(np.random.normal(size=image.shape,scale=L/(3 * N)))
+    return quantize(img_dither_random, N,L)
 
+class Ditherer(object):
+    def __init__(self,name,method):
+        self.name=name
+        self.method=method
+    
+    def __call__(self, image, N=2):
+        return self.method(image,N)
+    
+    def __repr__(self):
+        return self.name
 
-def dither(image, method=FLOYDSTEINBERG, N=2, L=1):
+class ErrorDiffusion(Ditherer):
+    def __init__(self,name, positions,weights):
+        Ditherer.__init__(self,name,None)
+        self.weights = weights / np.sum(weights)
+        self.positions=positions
+        
+    def __call__(self, image, N=2):
+        image=skimage.img_as_float(image, True) #normalize to [0..1]
+        T = np.linspace(0., 1., N, endpoint=False)[1:]
+        out = np.zeros_like(image, dtype=int)
+    
+        rows, cols = image.shape
+        for i in range(rows):
+            for j in range(cols):
+                # Quantize
+                out[i, j], = np.digitize([image[i, j]], T)
+    
+                # Propagate quantization noise
+                d = (image[i, j] - out[i, j] / (N - 1))
+                for (ii, jj), w in zip(self.positions, self.weights):
+                    ii = i + ii
+                    jj = j + jj
+                    if ii < rows and jj < cols:
+                        image[ii, jj] += d * w
+    
+        return out
+    
+class FloydSteinberg(ErrorDiffusion):
+    def __init__(self):
+        ErrorDiffusion.__init__(self,'floyd-steinberg',         
+            positions = [(0, 1), (1, -1), (1, 0), (1, 1)],
+            weights = [7, 3, 5, 1]
+        )
+        
+    def __call__(self, image, N=2):
+        return ErrorDiffusion.__call__(self,image,N)   
+    
+#PIL+SKIMAGE dithering methods
+from PIL.Image import ORDERED, RASTERIZE, FLOYDSTEINBERG
+PHILIPS=FLOYDSTEINBERG+1
+SIERRA=FLOYDSTEINBERG+2
+STUCKI=FLOYDSTEINBERG+3
+RANDOM=FLOYDSTEINBERG+10
+
+dithering={
+    NEAREST : Ditherer('nearest',quantize),
+    RANDOM: Ditherer('random',randomize),
+    #ORDERED : 'ordered', # Not yet implemented in Pillow
+    #RASTERIZE : 'rasterize', # Not yet implemented in Pillow
+    FLOYDSTEINBERG : FloydSteinberg(),
+    PHILIPS: ErrorDiffusion('philips',
+        [(0,0)], [1]), #http://www.google.com/patents/WO2002039381A2
+    SIERRA: ErrorDiffusion('sierra lite',
+        [(0, 1), (1, -1), (1, 0)],[2, 1, 1]),
+    STUCKI: ErrorDiffusion('stucki',
+        positions = [(0, 1), (0, 2), (1, -2), (1, -1),
+            (1, 0), (1, 1), (1, 2),
+            (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)],
+        weights = [ 8, 4,
+                   2, 4, 8, 4, 2,
+                   1, 2, 4, 2, 1]
+        ),
+}
+
+def dither(image, method=FLOYDSTEINBERG, N=2):
     """Quantize a gray image, using dithering.
     :param image: ndarray input image.
-    :param method: enum
+    :param method: key in dithering dict
     :param N: int number of quantization levels.
     References
     ----------
     http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
     """
-    if method==NEAREST:
-        return quantize(image,N,L)
-    elif method==RANDOM:
-        img_dither_random = image + np.abs(np.random.normal(size=image.shape,scale=L/(3 * N)))
-        return quantize(img_dither_random, N,L)
+    if method in dithering:
+        return dithering[method](image,N)
+    logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg'%dithering[method])
+    return dither(image, FLOYDSTEINBERG, N)
 
-    if method == PHILIPS:
-        positions = [(0,0)]
-        weights = [1]
-    elif method==SIERRA:
-        positions = [(0, 1), (1, -1), (1, 0)]
-        weights = [2, 1, 1]
-    elif method==STUCKI:
-        positions = [(0, 1), (0, 2), (1, -2), (1, -1),
-               (1, 0), (1, 1), (1, 2),
-               (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)]
-        weights = [         8, 4,
-                   2, 4, 8, 4, 2,
-                   1, 2, 4, 2, 1]
-    else:
-        if method!=FLOYDSTEINBERG:
-            logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg'%dithering[method])
-        positions = [(0, 1), (1, -1), (1, 0), (1, 1)]
-        weights = [7, 3, 5, 1]
-
-    weights = weights / np.sum(weights)
-
-    T = np.linspace(0., 1., N, endpoint=False)[1:]
-
-    image=skimage.img_as_float(image, True) #normalize to [0..1]
-    out = np.zeros_like(image, dtype=int)
-
-    rows, cols = image.shape
-    for i in range(rows):
-        for j in range(cols):
-            # Quantize
-            out[i, j], = np.digitize([image[i, j]], T)
-
-            # Propagate quantization noise
-            d = (image[i, j] - out[i, j] / (N - 1))
-            for (ii, jj), w in zip(positions, weights):
-                ii = i + ii
-                jj = j + jj
-                if ii < rows and jj < cols:
-                    image[ii, jj] += d * w
-
-    return out
+   
 
 #converter functions complementing those in skimage.color are defined below
 #function should be named "source2dest" in order to be inserted in converters graph
@@ -1051,7 +1082,7 @@ def lab2ind(im,colors=16):
     return im,p
 
 def ind2any(im,palette,dest):
-    palette=[c.convert(dest) for c in palette]
+    palette=[c.convert(dest) for c in palette.values()]
     w, h = im.shape
     image = np.zeros((w, h, 3))
     for i in range(w):
