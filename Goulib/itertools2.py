@@ -88,7 +88,14 @@ def isiterable(obj):
     if isinstance(obj, six.string_types): return False #required since Python 3.5
     return isinstance(obj, collections.Iterable)
 
-    
+def enumerates(iterable):
+    """
+    generalizes enumerate to dicts
+    :result: key,value pair for whatever iterable type
+    """
+    if isinstance(iterable,dict):
+        return six.iteritems(iterable)
+    return enumerate(iterable)
 
 def arange(start,stop=None,step=1):
     """ range for floats or other types (`numpy.arange` without numpy)
@@ -451,13 +458,13 @@ def index_min(values, key=identity):
     """
     :result: min_index, min_value
     """
-    return min(enumerate(values), key=lambda v:key(v[1]))
+    return min(enumerates(values), key=lambda v:key(v[1]))
 
 def index_max(values, key=identity):
     """
     :result: max_index, max_value
     """
-    return max(enumerate(values), key=lambda v:key(v[1]))
+    return max(enumerates(values), key=lambda v:key(v[1]))
 
 def best(iterable, key=None, n=1, reverse=False):
     """ generate items corresponding to the n best values of key sort order"""
