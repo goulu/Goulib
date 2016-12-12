@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # coding: utf8
+
+
+from __future__ import division #"true division" everywhere
+
 """
 image processing with PIL's ease and skimage's power
 
@@ -11,7 +15,6 @@ image processing with PIL's ease and skimage's power
 * `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
@@ -35,10 +38,10 @@ urlopen = request.urlopen
 
 import os, sys, math, base64, functools, logging
 
-from . import math2, itertools2
-from .drawing import Drawing #to read vector pdf files as images
-from .colors import Color
-from .plot import Plot
+from Goulib import math2, itertools2
+from Goulib.drawing import Drawing #to read vector pdf files as images
+from Goulib.colors import Color
+from Goulib.plot import Plot
 
 class Mode(object):
     def __init__(self,name,nchannels,type,min, max):
@@ -48,6 +51,9 @@ class Mode(object):
         self.min=min
         self.max=max
 
+    def __repr__(self):
+        return "Mode('%s',%dx%s,[%d-%d]"%(self.name,self.nchannels,self.type,self.min,self.max)
+
 modes = {
     # http://pillow.readthedocs.io/en/3.1.x/handbook/concepts.html#concept-modes
     # + some others
@@ -56,7 +62,7 @@ modes = {
     'U'     : Mode('gray',1,np.uint16,0,65535), # skimage gray level
     'I'     : Mode('gray',1,np.int16,-32768,32767), # skimage gray level
     'L'     : Mode('gray',1,np.uint8,0,255), # single layer or RGB(A)
-#    'P'     : Mode('palette',1,np.uint8,0,255), # indexed color (palette) not yet supported
+    'P'     : Mode('ind',1,np.uint8,0,255), # indexed color (palette)
     'RGB'   : Mode('rgb',3,np.float,0,1), # not uint8 as in PIL
     'RGBA'  : Mode('rgba',4,np.float,0,1), # not uint8 as in PIL
     'CMYK'  : Mode('cmyk',4,np.float,0,1), # not uint8 as in PIL
@@ -149,13 +155,16 @@ class Image(Plot):
             self.array=data.array
         elif isinstance(data,six.string_types): #assume a path
             self.load(data,**kwargs)
+        elif isinstance(data,tuple):
+            self._set(data[0],mode)
+            self.palette=data[1]
         else: # assume some kind of array
             try: # list of Images ?
                 data=[im.array for im in data]
             except:
                 pass
             self._set(data,mode)
-    
+
     def _set(self,data,mode=None,copy=False):
         data=np.asanyarray(data)
         if copy:
@@ -166,7 +175,7 @@ class Image(Plot):
             data=data*255
         s=data.shape
         if len(s)==3:
-            if s[0]<10 and s[1]>10 and s[2]>10: 
+            if s[0]<10 and s[1]>10 and s[2]>10:
                 data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
         self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
@@ -199,7 +208,7 @@ class Image(Plot):
         """ is smaller"""
         return  self.npixels < other.pixels
 
-    def load(self,path): 
+    def load(self,path):
         from skimage import io
         if not io.util.is_url(path):
             path = os.path.abspath(path)
@@ -209,22 +218,29 @@ class Image(Plot):
             data=read_pdf(path)
         else:
             with io.util.file_or_url_context(path) as context:
-                data = io.imread(context)        
+                data = io.imread(context)
         mode=guessmode(data)
         self._set(data,'F' if mode in 'U' else mode)
         return self
-    
+
     open=load # PIL compatibility
 
-    def save(self,path,**kwargs):
-        if self.nchannels==1:
-            mode='L'
-        elif self.mode=='RGBA':
-            mode=self.mode
-        else:
-            mode='RGB'
-        a=convert(self.array,self.mode,mode)
-        skimage.io.imsave(path,a,**kwargs)
+    def save(self, path, autoconvert=True, **kwargs):
+        """saves an image
+        :param path: string with path/filename.ext
+        :param autoconvert: bool, if True converts color planes formats to RGB
+        :param kwargs: optional params passed to skimage.io.imsave:
+        :return: self for chaining
+        """
+        mode=self.mode
+        if autoconvert:
+            if self.nchannels==1 and self.mode!='P':
+                mode='L'
+            elif self.mode not in 'RGBA': #modes we can save directly
+                mode='RGB'
+        im=self.convert(mode)
+        skimage.io.imsave(path,im.array,**kwargs)
+        return self
 
     def _repr_svg_(self, **kwargs):
         raise NotImplementedError() #and should never be ...
@@ -276,12 +292,23 @@ class Image(Plot):
             return self.array[yx[0],yx[1]]
         else:
             return self.array[yx[0],yx[1],:]
-        
+
     def putpixel(self,yx,value):
         if self.nchannels==1:
             self.array[yx[0],yx[1]]=value
         else:
             self.array[yx[0],yx[1],:]=value
+
+    def getcolors(self,maxcolors=256):
+        """
+        :return: an unsorted list of (count, color) tuples,
+        where count is the number of times the corresponding color occurs in the image.
+        If the maxcolors value is exceeded,
+        the method stops counting and returns None.
+        The default maxcolors value is 256.
+        To make sure you get all colors in an image, you can pass in size[0]*size[1]
+        (but make sure you have lots of memory before you do that on huge images).
+        """
 
     def crop(self,lurb):
         """
@@ -306,7 +333,7 @@ class Image(Plot):
                 return a
             else:
                 return Image(a,self.mode)
-            
+
         l,u,r,b=slice[1].start,slice[0].start,slice[1].stop,slice[0].stop
         # calculate box module size so we handle negative coords like in slices
         w,h = self.size
@@ -363,7 +390,7 @@ class Image(Plot):
         except:
             self.array[u:b,l:r]=image.array
         return self
-        
+
 
     def threshold(self, level=None):
         from skimage.filters import threshold_otsu
@@ -371,14 +398,35 @@ class Image(Plot):
             level=threshold_otsu(self.array)
         return Image(self.array>level, '1')
 
-    def quantize(self, levels):
-        a=quantize(self.array,levels)
+    def quantize(self, colors=256, method=None, kmeans=0, palette=None):
+        """
+        (PIL.Image compatible)
+        Convert the image to 'P' mode with the specified number
+        of colors.
+        :param colors: The desired number of colors, <= 256
+        :param method: 0 = median cut
+                       1 = maximum coverage
+                       2 = fast octree
+                       3 = libimagequant
+        :param kmeans: Integer
+        :param palette: Quantize to the :py:class:`PIL.ImagingPalette` palette.
+        :returns: A new image
+        """
+        a=quantize(self.array,colors)
         return Image(a,'P')
 
 
     def convert(self,mode,**kwargs):
-        a=convert(self.array,self.mode,mode)
-        return Image(a, mode)
+        """convert image mode
+        :param mode: string destination mode
+        :param kwargs: optional params passed to converter(s). can contain:
+        * palette : to force using a palette instead of the image's one for indexed images
+        :return: image in desired mode
+        """
+        if self.mode=='P':
+            kwargs.setdefault('palette',self.palette)
+        a=convert(self.array,self.mode,mode,**kwargs)
+        return Image(a, mode=mode)
 
 
     def _get_channel(self, channel):
@@ -453,12 +501,14 @@ class Image(Plot):
 
     __neg__=__inv__=invert #aliases
 
-    def grayscale(self):
-        if np.issubdtype(self.array.dtype, np.float):
-            return self.convert('F')
-        else:
-            return self.convert('L')
-        
+    def grayscale(self,mode=None):
+        """convert (color) to grayscale
+        :param mode: string target mode (should be in 'FUIL') or automatic if none
+        """
+        if mode is None:
+            mode='F' if np.issubdtype(self.array.dtype, np.float) else 'L'
+        return self.convert(mode)
+
     def colorize(self,color0,color1=None):
         """colorize a grayscale image
 
@@ -602,7 +652,7 @@ class Image(Plot):
             return Image(other)
         else:
             return self.compose(other,1,1)
-        
+
     def __radd__(self,other):
         """only to allow sum(images) easily"""
         assert other==0
@@ -628,10 +678,10 @@ class Image(Plot):
             rgba[-1]=rgba[-1]*other
             return Image(rgba,'RGBA')
         raise NotImplemented('%s * %s'%(self,other))
-    
+
     def __div__(self,f):
         return self*(1/f)
-    
+
     __truediv__ = __div__
 
 def alpha_composite(front, back):
@@ -883,10 +933,10 @@ def dither(image, method=FLOYDSTEINBERG, N=2, L=1):
     weights = weights / np.sum(weights)
 
     T = np.linspace(0., 1., N, endpoint=False)[1:]
-    
+
     image=skimage.img_as_float(image, True) #normalize to [0..1]
     out = np.zeros_like(image, dtype=int)
-    
+
     rows, cols = image.shape
     for i in range(rows):
         for j in range(cols):
@@ -902,6 +952,9 @@ def dither(image, method=FLOYDSTEINBERG, N=2, L=1):
                     image[ii, jj] += d * w
 
     return out
+
+#converter functions complementing those in skimage.color are defined below
+#function should be named "source2dest" in order to be inserted in converters graph
 
 gray2bool=dither
 
@@ -938,7 +991,7 @@ def gray2rgb(im,color0=(0,0,0), color1=(1,1,1)):
     d=color1-color0
     a=np.outer(im,d)
     a=a.reshape([im.shape[0],im.shape[1],d.shape[0]])+color0
-    
+
     return a
 
 bool2rgb=gray2rgb #works also
@@ -959,26 +1012,76 @@ try:
     skcolor.rgba2rgb #will be available soon
 except:
     def rgba2rgb(array):
-        #trivial version ignoring alpha channel
+        #trivial version ignoring alpha channel for now
         return array[:,:,:3]
+
+def palette(im,ncolors):
+    """extract the color palette of im
+    :param im: nparray (x,y,n) containing image
+    :param ncolors: int number of colors
+    :return: array of ncolors most used in image (center of kmeans centroids)
+    """
+    # http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html
+    # but without scipy-learn (for now)
+    from scipy.cluster.vq import kmeans
+    w, h, d = im.shape
+    s=w*h #number of pixels
+    im = np.reshape(im, (s, d)) #flatten for kmeans
+    decimate=int(s/(ncolors*1000)) #keep only ~1000 points per color for speed
+    if decimate>1:
+        im=im[::decimate]
+    return kmeans(im,ncolors)[0]
+
+def lab2ind(im,colors=16):
+    """convert an image from Lab to indexed colors
+    :param a: nparray (x,y,n) containing image
+    :param colors: int nimber of colors. Default is 16 for speed and visibility
+    :ref: http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html
+    """
+    #http://stackoverflow.com/questions/10818546/finding-index-of-nearest-point-in-numpy-arrays-of-x-and-y-coordinates
+    p=palette(im,colors)
+    w, h, d = im.shape
+    s=w*h #number of pixels
+    flat = np.reshape(im, (s, d))
+    from scipy.spatial import cKDTree as KDTree #compiled is MUCH faster
+    mytree = KDTree(p)
+    _, indexes = mytree.query(flat)
+    im=indexes.reshape(w,h)
+    p=[Color(c,'lab') for c in p]
+    return im,p
+
+def ind2any(im,palette,dest):
+    palette=[c.convert(dest) for c in palette]
+    w, h = im.shape
+    image = np.zeros((w, h, 3))
+    for i in range(w):
+        for j in range(h):
+            image[i,j] = palette[im[i,j]]
+    return image
+
+def ind2rgb(im,palette):
+    return ind2any(im,palette,'rgb')
 
 #build a graph of available converters
 #inspired by https://github.com/gtaylor/python-colormath
+#WATCH OUT! converters must be defined above this line...
 
-from .graph import DiGraph
+from Goulib.graph import DiGraph
 
 converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
 for source in modes:
     for target in modes:
         key=(modes[source].name, modes[target].name)
-        if key[0]==key[1]: 
+        if key[0]==key[1]:
             continue
         convname='%s2%s'%key
-            
+        if convname=='lab2ind':
+            pass
+
         converter = getattr(sys.modules[__name__], convname,None)
         if converter is None:
             converter=getattr(skcolor, convname,None)
-                
+
         if converter:
             converters.add_edge(key[0],key[1],{'f':converter})
 
@@ -988,14 +1091,30 @@ def convert(a,source,target,**kwargs):
     :param source: string : key of source image mode in modes
     :param target: string : key of target image mode in modes
     """
+    import networkx as nx # http://networkx.github.io/
     source,target=modes[source.upper()],modes[target.upper()]
-    np.clip(a, source.min, source.max, out=a)
-    path=converters.shortest_path(source.name, target.name)
+    a=np.clip(a, source.min, source.max, out=a)
+    try:
+        path=converters.shortest_path(source.name, target.name)
+    except nx.exception.NetworkXError:
+        raise NotImplementedError(
+            'no conversion between %s and %s modes'
+            %(source.name, target.name)
+        )
 
     for u,v in itertools2.pairwise(path):
-        if u!=v: #avoid converting from gray to gray
+        if u==v: continue #avoid converting from gray to gray
+        try:
             a=converters[u][v][0]['f'](a,**kwargs)
-    a=skimage.util.dtype.convert(a,target.type)
-    return a #isn't it beautiful ?
+        except TypeError as e:
+            if kwargs: #maybe the converter doesn't support args ? retry!
+                a=converters[u][v][0]['f'](a)
+            else:
+                raise(e)
 
+    try:
+        a=skimage.util.dtype.convert(a,target.type)
+    except ValueError as e: #probably a tuple (indexed, palette)
+        a=tuple((skimage.util.dtype.convert(a[0],target.type),a[1]))
+    return a #isn't it beautiful ?
 

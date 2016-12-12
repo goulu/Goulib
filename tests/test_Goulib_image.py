@@ -14,18 +14,20 @@ path=os.path.dirname(os.path.abspath(__file__))
 results=path+'\\results\\image\\' #path for results
 
 def assert_image(image,name=None):
+    from skimage.exposure import is_low_contrast
     if name:
-        image.save(results+name)
+        image.save(results+name,autoconvert=False) #we want to see the color planes
     h=hash(image)
     assert_not_equal(h,0,'image is black')
     assert_not_equal(h,2**64-1,'image is white')
+    #assert_false(is_low_contrast(image.array))
 
 class TestImage:
     @classmethod
     def setup_class(self):
         self.lena=Image(path+'/data/lena.png')
         assert_equal(self.lena,self.lena) #make sure image comparizon works
-        assert_image(self.lena.grayscale(),'grayscale.png')
+        assert_image(self.lena.grayscale('L'),'grayscale.png') #force to uint8
         self.gray=Image(results+'grayscale.png')
         self.camera=Image(data.camera())
 
@@ -119,7 +121,7 @@ class TestImage:
     def test_render(self):
         from Goulib.notebook import h
         h(self.lena)
-        
+
     def test_convert(self):
         for mode in modes:
             im=self.lena.convert(mode)
@@ -130,27 +132,27 @@ class TestImage:
             except Exception as e:
                 logging.error('%s round trip conversion failed with %s'%(mode,e))
                 im2=im.convert('RGB')
-                
+
 
     def test_split(self):
         rgb = self.lena.split()
         for im,c in zip(rgb,'RGB'):
             assert_image(im,'split_%s.png'%c)
-            
+
         assert_image(Image(rgb),'RGB_merge.png')
-        
+
         colors=['Cyan','Magenta','Yellow','blacK']
         cmyk=self.lena.split('CMYK')
         cmyk2=[im.colorize(col) for im,col in zip(cmyk,colors)]
         for im,c in zip(cmyk2,'CMYK'):
             assert_image(im,'split_%s.png'%c)
-            
+
         assert_image(Image(cmyk,mode='CMYK'),'CMYK_merge.png')
-            
+
         lab=self.lena.split('Lab')
         for im,c in zip(lab,'LAB'):
             assert_image(im,'split_%s.png'%c)
-            
+
         lab=Image(lab,mode='LAB')
         assert_image(lab,'Lab.png')
 
@@ -160,16 +162,20 @@ class TestImage:
             r=self.lena.filter(f)
             assert_image(r,'filter_pil_%s.png'%f.__name__)
 
-        from skimage.filters import sobel
-        for f in [sobel]:
-            assert_image(self.lena.filter(f),'filter_sk_%s.png'%f.__name__)
-            
+        from skimage.filters import sobel, prewitt, scharr, roberts
+        from skimage.restoration import denoise_bilateral
+        for f in [sobel, prewitt, scharr, roberts, denoise_bilateral,]:
+            try:
+                assert_image(self.lena.filter(f),'filter_sk_%s.png'%f.__name__)
+            except:
+                pass
+
     def test_dither(self):
         for k in dithering:
             assert_image(self.gray.dither(k),'dither_%s.png'%dithering[k])
         assert_image(self.lena.dither(),'dither_color_2.png')
         assert_image(self.lena.dither(n=4),'dither_color_4.png')
-        
+
 
     def test_resize(self):
         size=128
@@ -177,7 +183,7 @@ class TestImage:
         assert_image(im,'resize_%d.png'%size)
         im=self.camera.resize((size,size))
         assert_image(im,'camera_resize_%d.png'%size)
-        
+
     def test_expand(self):
         size=128
         im=self.lena.resize((size,size))
@@ -191,15 +197,15 @@ class TestImage:
             for j in range(3):
                 im=im.add(dot,(j*38.5,i*41.5),0.5)
         assert_image(im,'image_add.png')
-    
+
     def test_colorize(self):
         cmyk=self.lena.split('CMYK')
         colors=['Cyan','Magenta','Yellow','blacK']
-        cmyk2=[im.colorize(col) for im,col in zip(cmyk,colors)] 
+        cmyk2=[im.colorize(col) for im,col in zip(cmyk,colors)]
         back=cmyk2[0]-(-cmyk2[1])-(-cmyk2[2])-(-cmyk2[3]) #what a strange syntax ...
         assert_image(back,'image_add_sum_cmyk.png')
         assert_equal(self.lena.dist(back),0)
-        
+
     def test_mul(self):
         mask=disk(self.lena.size[0]/2)
         res=self.lena*mask
@@ -309,9 +315,7 @@ class TestImage:
         raise SkipTest # TODO: implement your test here
 
     def test_save(self):
-        # image = Image(data, mode, **kwargs)
-        # assert_equal(expected, image.save(path, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        pass #tested everywhere
 
     def test_scale(self):
         # image = Image(data, mode, **kwargs)
@@ -331,6 +335,11 @@ class TestImage:
     def test_threshold(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.threshold(level))
+        raise SkipTest # TODO: implement your test here
+
+    def test_getcolors(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.getcolors(maxcolors))
         raise SkipTest # TODO: implement your test here
 
 class TestCorrelation:
@@ -380,8 +389,7 @@ class TestAdaptRgb:
 
 class TestRgb2rgba:
     def test_rgb2rgba(self):
-        # assert_equal(expected, rgb2rgba(array))
-        raise SkipTest # TODO: implement your test here
+        pass #tested in test_convert
 
 class TestDisk:
     def test_disk(self):
@@ -415,17 +423,35 @@ class TestDither:
 
 class TestGray2rgb:
     def test_gray2rgb(self):
-        # assert_equal(expected, gray2rgb(im, color0, color1))
-        raise SkipTest # TODO: implement your test here
+        pass #tested in test_convert
 
 class TestBool2gray:
     def test_bool2gray(self):
-        # assert_equal(expected, bool2gray(im))
+        pass #tested in test_convert
         raise SkipTest # TODO: implement your test here
 
 class TestRgba2rgb:
     def test_rgba2rgb(self):
-        # assert_equal(expected, rgba2rgb(array))
+        pass #tested in test_convert
+
+class TestPalette:
+    def test_palette(self):
+        # assert_equal(expected, palette(im, ncolors))
+        raise SkipTest # TODO: implement your test here
+
+class TestLab2ind:
+    def test_lab2ind(self):
+        # assert_equal(expected, lab2ind(im, colors))
+        raise SkipTest # TODO: implement your test here
+
+class TestInd2any:
+    def test_ind2any(self):
+        # assert_equal(expected, ind2any(im, palette, dest))
+        raise SkipTest # TODO: implement your test here
+
+class TestInd2rgb:
+    def test_ind2rgb(self):
+        # assert_equal(expected, ind2rgb(im, palette))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
