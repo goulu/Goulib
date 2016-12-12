@@ -5,6 +5,7 @@ simple color management
 """
 
 from __future__ import division #"true division" everywhere
+from _collections import OrderedDict
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
@@ -138,7 +139,7 @@ def convert(color,source,target):
 
 class Color(object):
     """A color with math operations and conversions
-    Color is immutable (as ._values caches representations)
+    Color is immutable (._values caches representations)
     """
     def __init__(self, value, space='RGB', name=None):
         """constructor
@@ -278,6 +279,37 @@ class Color(object):
         https://en.wikipedia.org/wiki/Color_difference
         """
         return deltaE(self,other)
+    
+from collections import OrderedDict
+from matplotlib.colors import Colormap
+
+class Palette(OrderedDict):
+    def __init__(self, data=[], n=256):
+        if data:
+            self.update(data,n)
+        
+    def update(self,data, n=256):
+        if isinstance(data, Colormap):
+            for i in range(n):
+                self[i]=Color(data(i/(n-1)))
+        elif isinstance(data, dict):
+            for k in data:
+                self[k]=Color(data[k])
+        elif isinstance(data, list):
+            for i in range(len(data)):
+                self[i]=Color(data[i])
+        else:
+            raise(NotImplementedError())
+        
+    def index(self,c,dE=5):
+        """
+        :return: key of c or nearest color, None if distance is larger than deltaE
+        """
+        c=Color(c)
+        k,v=itertools2.index_min(self,key=lambda c2:deltaE(c,c2))
+        if k is None or deltaE(c,v) > dE:
+            return None
+        return k
 
 # dictionaries of standardized colors
 
@@ -290,9 +322,9 @@ table=Table(path+'/colors.csv')
 table.applyf('hex',lambda x:x.lower())
 table=table.groupby('System')
 
-color={} #dict of HTML / matplotlib colors, which seem to be the same
-color_lookup={} # reverse color dict indexed by hex
-pantone={} #dict of pantone colors
+color=Palette() #dict of HTML / matplotlib colors, which seem to be the same
+color_lookup=Palette() # reverse color dict indexed by hex
+pantone=Palette() #dict of pantone colors
 
 # http://www.w3schools.com/colors/colors_names.asp
 

@@ -162,6 +162,30 @@ class TestColor:
         # color = Color(value, space, name)
         # assert_equal(expected, color.xyz())
         raise SkipTest # TODO: implement your test here
+    
+from matplotlib import cm #colormaps
+    
+class TestPalette:
+    @classmethod
+    def setup_class(self):
+        self.spectral=Palette(cm.spectral)
+        
+    def test___init__(self):
+        assert_equal(len(self.spectral),256)
+
+    def test_index(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.index(c, dE))
+        raise SkipTest # TODO: implement your test here
+
+    def test_update(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.update(data, n))
+        raise SkipTest # TODO: implement your test here
+
+    def test_palette(self):
+        # assert_equal(expected, palette(im, ncolors))
+        raise SkipTest # TODO: implement your test here
 
 class TestColorLookup:
     def test_color_lookup(self):
