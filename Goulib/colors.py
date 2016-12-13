@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-simple color management
+color conversion in various colorspaces and palettes
 """
 
 from __future__ import division #"true division" everywhere
@@ -310,6 +310,24 @@ class Palette(OrderedDict):
         if k is None or deltaE(c,v) > dE:
             return None
         return k
+    
+    @property
+    def pil(self):
+        """
+        :return: a sequence of integers, or a string containing a binary 
+        representation of the palette.
+        In both cases, the palette contents should be ordered (r, g, b, r, g, b, …). 
+        The palette can contain up to 768 entries (3*256). 
+        If a shorter palette is given, it is padded with zeros.
+        #http://effbot.org/zone/creating-palette-images.htm
+        """
+        res=[]
+        for c in self.values():
+            r,g,b=c.rgb
+            res.append(math2.rint(r*255))
+            res.append(math2.rint(g*255))
+            res.append(math2.rint(b*255))
+        return res
 
 # dictionaries of standardized colors
 

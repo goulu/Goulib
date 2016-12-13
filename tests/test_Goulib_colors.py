@@ -187,6 +187,11 @@ class TestPalette:
         # assert_equal(expected, palette(im, ncolors))
         raise SkipTest # TODO: implement your test here
 
+    def test_pil(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.pil())
+        raise SkipTest # TODO: implement your test here
+
 class TestColorLookup:
     def test_color_lookup(self):
         c=color['blue']
