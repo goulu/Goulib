@@ -44,8 +44,6 @@ class TestImage:
     def test___init__(self):
         lena2=Image(self.lena)
         assert_equal(self.lena,lena2)
-        lena3=Image().open(path+'/data/lena.png')
-        assert_equal(self.lena,lena3)
 
     def test_generate(self):
         #from matrix
@@ -87,10 +85,11 @@ class TestImage:
         pass #useless ?
 
     def test_open(self):
-        pass #tested above
+        lena3=Image.open(path+'/data/lena.png')
+        assert_equal(self.lena,lena3)
 
     def test_html(self):
-        h=self.lena.html()
+        h=self.lena.convert('P').html()
         assert_true(h)
 
     def test_average_hash(self):
@@ -352,6 +351,16 @@ class TestImage:
     def test_setpalette(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.setpalette(p))
+        raise SkipTest # TODO: implement your test here
+
+    def test_new(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.new(size, color))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pil(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.pil())
         raise SkipTest # TODO: implement your test here
 
 class TestCorrelation:

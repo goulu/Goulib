@@ -30,7 +30,6 @@ import warnings
 warnings.filterwarnings("ignore") # because too many are generated
 
 import PIL.Image as PILImage
-from PIL.Image import ANTIALIAS, NEAREST, BILINEAR, BICUBIC
 
 import six
 from six.moves.urllib_parse import urlparse
@@ -161,7 +160,7 @@ class Image(Plot):
             if s[0]<10 and s[1]>10 and s[2]>10:
                 data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
-        self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
+        self.array=skimage.util.dtype.convert(data,modes[self.mode].type) 
 
     @property
     def shape(self):
@@ -205,8 +204,16 @@ class Image(Plot):
         mode=guessmode(data)
         self._set(data,'F' if mode in 'U' else mode)
         return self
-
-    open=load # PIL compatibility
+    
+    @staticmethod
+    def open(path):
+        """PIL(low) compatibility"""
+        return Image(path)
+    
+    @staticmethod
+    def new(mode, size, color='black'):
+        """PIL(low) compatibility"""
+        return Image(mode=mode, size=size, color=color)
 
     def save(self, path, autoconvert=True, **kwargs):
         """saves an image
@@ -224,36 +231,43 @@ class Image(Plot):
         im=self.convert(mode)
         skimage.io.imsave(path,im.array,**kwargs)
         return self
+    
+    @property
+    def pil(self):
+        """convert to PIL(low) Image
+        :see: http://effbot.org/imagingbook/concepts.htm
+        """
+        a=self.getdata()
+        im=PILImage.fromarray(a)
+        if self.mode=='P':
+            im.putpalette(self.palette.pil)
+        return im
 
     def _repr_svg_(self, **kwargs):
         raise NotImplementedError() #and should never be ...
-        #... it causes _repr_png_ to be called by Plot._repr_html_
+        #... because it causes _repr_png_ to be called by Plot._repr_html_
+        # instead of render below
 
     def render(self, fmt='png'):
-        try:
-            a=self.getdata(np.uint8)
-        except ValueError as e:
-            raise ValueError('image has min=%s max=%s range'%
-                          (np.min(self.array),np.max(self.array))
-            )
+        im=self.pil
         buffer = six.BytesIO()
-        PILImage.fromarray(a).save(buffer, fmt)
+        im.save(buffer, fmt)
         return buffer.getvalue()
 
     # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
-    def getdata(self,dtype=np.uint8):
-        a=np.copy(self.array) #because we'll change the type in place below
-        #then change array type if required
+    def getdata(self,dtype=np.uint8,copy=True):
+        a=self.array
         if a.dtype==dtype:
-            pass
+            if copy: #to be coherent
+                a=np.copy(self.array)
         elif dtype==np.float:
-            a=skimage.img_as_float(a)
+            a=skimage.img_as_float(a,copy)
         elif dtype==np.int16:
-            a=skimage.img_as_int(a)
+            a=skimage.img_as_int(a,copy)
         elif dtype==np.uint16:
-            a=skimage.img_as_uint(a)
+            a=skimage.img_as_uint(a,copy)
         elif dtype==np.uint8:
-            a=skimage.img_as_ubyte(a)
+            a=skimage.img_as_ubyte(a,copy)
         else:
             pass #keep the wrong type for now and see what happens
         return a
@@ -348,7 +362,7 @@ class Image(Plot):
         :param kwargs: axtra parameters passed to skimage.transform.resize
         """
         from skimage.transform import resize
-        order=0 if filter in (None,NEAREST) else 1 if filter==BILINEAR else 3
+        order=0 if filter in (None,PILImage.NEAREST) else 1 if filter==PILImage.BILINEAR else 3
         order=kwargs.pop('order',order)
         array=resize(self.array, size, order, **kwargs) #preserve_range=True ?
         return Image(array, self.mode)
@@ -457,7 +471,7 @@ class Image(Plot):
         else:
             image=self
 
-        image = image.resize((hash_size, hash_size), ANTIALIAS)
+        image = image.resize((hash_size, hash_size), PILImage.ANTIALIAS)
         pixels = image.array.reshape((1,hash_size*hash_size))[0]
         avg = pixels.mean()
         diff=pixels > avg
@@ -532,7 +546,7 @@ class Image(Plot):
         #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
         newmax=newmax or modes[self.mode].max
         newmin=newmin or modes[self.mode].min
-        arr=_normalize(np.array(self),newmax,newmin)
+        arr=normalize(self.array,newmax,newmin)
         return Image(arr)
 
     @adapt_rgb
@@ -542,8 +556,7 @@ class Image(Plot):
             return Image(a)
         except Exception as e:
             pass
-        a=skimage.img_as_ubyte(self.array) # PIL filters want integer images
-        im=PILImage.fromarray(a)
+        im=self.pil
         im=im.filter(f)
         return Image(im,mode=self.mode)
 
@@ -767,7 +780,7 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
     return background
 
-def disk(radius,antialias=ANTIALIAS):
+def disk(radius,antialias=PILImage.ANTIALIAS):
     from skimage.draw import circle, circle_perimeter_aa
     size = (2*radius, 2*radius)
     img = np.zeros(size, dtype=np.double)
@@ -788,9 +801,10 @@ def fspecial(name,**kwargs):
         return disk(kwargs.get('radius',5)) # 5 is default in Matlab
     raise NotImplemented
 
-def _normalize(array,newmax=255,newmin=0):
+def normalize(a,newmax=255,newmin=0):
     #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
     #warning : don't use @adapt_rgb here as it would normalize each channel independently
+    array=np.array(a)
     t=array.dtype
     if len(array.shape)==2 : #single channel
         n=1
@@ -942,7 +956,7 @@ class FloydSteinberg(ErrorDiffusion):
         return ErrorDiffusion.__call__(self,image,N)   
     
 #PIL+SKIMAGE dithering methods
-from PIL.Image import ORDERED, RASTERIZE, FLOYDSTEINBERG
+from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
 PHILIPS=FLOYDSTEINBERG+1
 SIERRA=FLOYDSTEINBERG+2
 STUCKI=FLOYDSTEINBERG+3
