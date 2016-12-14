@@ -428,24 +428,20 @@ def catalan_gen():
     for n in itertools.count(1):
         last=last*(4*n+2)//(n+2)
         yield last
+        
+def is_pythagorean_triple(a,b,c):
+    return a*a+b*b == c*c
 
-def triples():
-    """ generates Pythagorean triples sorted by z,y,x with x<y<z
-    """
-    for z in itertools.count(5):
-        for y in range(z-1,3,-1):
-            x=math.sqrt(z*z-y*y)
-            if x<y and is_integer(x,1e-12):
-                yield (int(x),y,z)
+from Goulib.container import SortedCollection
 
-def primitive_triples(sort_xy=True):
-    """ generates primitive Pythagorean triples
+def primitive_triples():
+    """ generates primitive Pythagorean triplets x<y<z sorted by hypotenuse z
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
-    triples are "almost sorted". use itertools2.iterator_sort if required
-    :param sort_xy: bool to ensure x<y<z
     """
-    triples = [[3,4,5]]
+
+    triples=SortedCollection(key=lambda x:x[2])
+    triples.insert([3,4,5])
     A = [[ 1,-2, 2], [ 2,-1, 2], [ 2,-2, 3]]
     B = [[ 1, 2, 2], [ 2, 1, 2], [ 2, 2, 3]]
     C = [[-1, 2, 2], [-2, 1, 2], [-2, 2, 3]]
@@ -457,10 +453,29 @@ def primitive_triples(sort_xy=True):
         # expand this triple to 3 new triples using Berggren's matrices
         for X in [A,B,C]:
             triple=[sum(x*y for (x,y) in zip([a,b,c],X[i])) for i in range(3)]
-            if sort_xy and triple[0]>triple[1]:
+            if triple[0]>triple[1]: # ensure x<y<z
                 triple[0],triple[1]=triple[1],triple[0]
-            triples.append(triple)
+            triples.insert(triple)
 
+def triples():
+    """ generates all Pythagorean triplets triplets x<y<z sorted by hypotenuse z   
+    """
+    prim=[] #list of primitive triples up to now
+    buffer=SortedCollection(key=lambda x:x[2]) # temp multiples of prims by hyp
+    for pt in primitive_triples():
+        z=pt[2]
+        #build buffer of smaller multiples of the primitives already found
+        for i,pm in enumerate(prim):
+            p,m=pm[0:2]
+            while m <= z//p[2]: # add all multiples of primitive p up to z
+                buffer.insert(tuple(m*x for x in p))
+                m+=1
+            prim[i][1]=m #update multiplier for next loops
+        while buffer: #empty buffer
+            yield buffer.pop(0)
+        yield pt
+        prim.append([pt,2]) #add primitive to the list
+                
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
     including 1 and n,

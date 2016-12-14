@@ -6,7 +6,7 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.math2 import *
-
+from Goulib.itertools2 import take
 import six
 
 class TestSign:
@@ -618,68 +618,58 @@ class TestCeildiv:
 
 class TestFibonacciGen:
     def test_fibonacci_gen(self):
-        # assert_equal(expected, fibonacci_gen(max))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestCatalanGen:
     def test_catalan_gen(self):
-        # assert_equal(expected, catalan_gen())
-        raise SkipTest #
-
-class TestTriples:
-    def test_triples(self):
-        # assert_equal(expected, triples())
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestPrimitiveTriples:
-    def test_primitive_triples(self):
-        # assert_equal(expected, primitive_triples(sort_xy))
-        raise SkipTest #
+        key=lambda x:x[2]
+        for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
+            assert_true(is_pythagorean_triple(*t))
+    
+class TestTriples:
+    def test_triples(self):
+        key=lambda x:x[2]
+        for t in take(10000,itertools2.ensure_sorted(triples(),key)):
+            assert_true(is_pythagorean_triple(*t))
 
 class TestPolygonal:
     def test_polygonal(self):
-        # assert_equal(expected, polygonal(s, n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestSquare:
     def test_square(self):
-        # assert_equal(expected, square(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestIsSquare:
     def test_is_square(self):
-        # assert_equal(expected, is_square(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestIsHexagonal:
     def test_is_hexagonal(self):
-        # assert_equal(expected, is_hexagonal(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestHeptagonal:
     def test_heptagonal(self):
-        # assert_equal(expected, heptagonal(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestIsHeptagonal:
     def test_is_heptagonal(self):
-        # assert_equal(expected, is_heptagonal(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestOctagonal:
     def test_octagonal(self):
-        # assert_equal(expected, octagonal(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestIsOctagonal:
     def test_is_octagonal(self):
-        # assert_equal(expected, is_octagonal(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestPartition:
     def test_partition(self):
-        # assert_equal(expected, partition(n))
-        raise SkipTest #
+        pass #tested in test_oeis
 
 class TestChakravala:
     def test_chakravala(self):
