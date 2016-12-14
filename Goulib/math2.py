@@ -435,12 +435,13 @@ def is_pythagorean_triple(a,b,c):
 from Goulib.container import SortedCollection
 
 def primitive_triples():
-    """ generates primitive Pythagorean triplets x<y<z sorted by hypotenuse z
+    """ generates primitive Pythagorean triplets x<y<z
+    sorted by hypotenuse z, then longest side y
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
     """
-
-    triples=SortedCollection(key=lambda x:x[2])
+    key=lambda x:(x[2],x[1])
+    triples=SortedCollection(key=key)
     triples.insert([3,4,5])
     A = [[ 1,-2, 2], [ 2,-1, 2], [ 2,-2, 3]]
     B = [[ 1, 2, 2], [ 2, 1, 2], [ 2, 2, 3]]
@@ -458,22 +459,37 @@ def primitive_triples():
             triples.insert(triple)
 
 def triples():
-    """ generates all Pythagorean triplets triplets x<y<z sorted by hypotenuse z   
+    """ generates all Pythagorean triplets triplets x<y<z 
+    sorted by hypotenuse z, then longest side y
     """
     prim=[] #list of primitive triples up to now
-    buffer=SortedCollection(key=lambda x:x[2]) # temp multiples of prims by hyp
+    key=lambda x:(x[2],x[1])
+    samez=SortedCollection(key=key) # temp triplets with same z
+    buffer=SortedCollection(key=key) # temp for triplets with smaller z
     for pt in primitive_triples():
         z=pt[2]
+        if samez and z!=samez[0][2]: #flush samez
+            while samez:
+                yield samez.pop(0)
+        samez.insert(pt)
         #build buffer of smaller multiples of the primitives already found
         for i,pm in enumerate(prim):
             p,m=pm[0:2]
-            while m <= z//p[2]: # add all multiples of primitive p up to z
-                buffer.insert(tuple(m*x for x in p))
+            while True:
+                mz=m*p[2]
+                if mz < z:
+                    buffer.insert(tuple(m*x for x in p))
+                elif mz == z: 
+                    # we need another buffer because next pt might have
+                    # the same z as the previous one, but a smaller y than
+                    # a multiple of a previous pt ...
+                    samez.insert(tuple(m*x for x in p))
+                else:
+                    break
                 m+=1
             prim[i][1]=m #update multiplier for next loops
-        while buffer: #empty buffer
+        while buffer: #flush buffer
             yield buffer.pop(0)
-        yield pt
         prim.append([pt,2]) #add primitive to the list
                 
 def divisors(n):

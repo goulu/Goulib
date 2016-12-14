@@ -626,13 +626,13 @@ class TestCatalanGen:
 
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
-        key=lambda x:x[2]
+        key=lambda x:(x[2],x[1])
         for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
 class TestTriples:
     def test_triples(self):
-        key=lambda x:x[2]
+        key=lambda x:(x[2],x[1])
         for t in take(10000,itertools2.ensure_sorted(triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
