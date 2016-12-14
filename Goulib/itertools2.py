@@ -312,25 +312,25 @@ def ireduce(func, iterable, init=None):
         curr = func(curr, x)
         yield curr
 
-def unique(iterable, key=None, maxsize=None):
+def unique(iterable, key=None, buffer=None):
     """generate unique elements, preserving order.
     :param iterable: iterable
     :param key: optional function defining which elements are considered equal
-    :param maxsize: optional integer defining how many of the last unique elements to keep in memory
+    :param buffer: optional integer defining how many of the last unique elements to keep in memory
 
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
     """
-    seen = list() if maxsize else set()
+    seen = list() if buffer else set()
     for element in iterable:
         k = key(element) if key else element
         if k not in seen:
             yield element
-            if not maxsize:
+            if not buffer:
                 seen.add(k)
             else:
                 seen.append(k)
-                if len(seen)>maxsize:
+                if len(seen)>buffer:
                     seen.pop(0)
 
 def count_unique(iterable, key=None):
@@ -677,19 +677,37 @@ def subdict(d,keys):
     """
     return dict([(i, d[i]) for i in keys if i in d])
 
+def ensure_sorted(iterable,key=None):
+    """ makes sure iterable is sorted according to key
+    :yields: items of iterable
+    :raise: BufferError if not 
+    (BufferError because one might increase buffer in sorted_iterable...)
+    """
+    key=key or identity
+    prev=None
+    for x in iterable:
+        kx=key(x)
+        if prev is not None and kx<prev:
+            raise BufferError()
+        prev=kx
+        yield x
+    
+
 def sorted_iterable(iterable, key=None, buffer=100):
-    """sorts an almost sorted (infinite) iterable
+    """sorts an "almost sorted" (infinite) iterable
     :param iterable: iterable
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
     """
+    key=key or identity
     from Goulib.container import SortedCollection
     b=SortedCollection(key=key)
     for x in iterable:
         if len(b)>=buffer:
             yield b.pop(0)
         b.insert(x)
-    for x in b: yield x # this never happens if iterable is infinite
+    for x in b: # this never happens if iterable is infinite
+        yield x 
 
 # operations on sorted iterators
 

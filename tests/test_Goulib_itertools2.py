@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_not_equals
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
@@ -342,13 +342,22 @@ class TestDiff:
 
 class TestSortedIterable:
     def test_sorted_iterable(self):
-        # assert_equal(expected, sorted_iterable(iterable, key, buffer))
-        raise SkipTest 
+        data=[1,2,3,7,6,5,4]
+        res=sorted(data)
+        #with a small buffer, it fails
+        def _(): 
+            return [x for x in ensure_sorted(sorted_iterable(data,buffer=3))]
+        assert_raises(BufferError, _)
+        #with a larger one, it's ok
+        assert_equal(sorted_iterable(data,buffer=4),res)
+
 
 class TestIsiterable:
     def test_isiterable(self):
-        # assert_equal(expected, isiterable(obj))
-        raise SkipTest 
+        assert_true(isiterable(list()))
+        assert_true(isiterable(tuple()))
+        assert_true(isiterable(range(1000)))
+        assert_false(isiterable(''))
 
 class TestItemgetter:
     def test_itemgetter(self):
@@ -378,6 +387,11 @@ class TestShape:
 class TestNdim:
     def test_ndim(self):
         # assert_equal(expected, ndim(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestEnumerates:
+    def test_enumerates(self):
+        # assert_equal(expected, enumerates(iterable))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
