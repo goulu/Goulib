@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # coding: utf8
 
+from __future__ import division #"true division" everywhere
+
 """
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
 
 sequences are implemented as INFINITE length generators only
 """
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
@@ -23,7 +25,7 @@ from six.moves import map, reduce, filter, zip, zip_longest
 
 from itertools import count, repeat, tee, islice
 
-from Goulib import math2, itertools2, decorators, table, tests
+from Goulib import math2, itertools2, decorators, tests
 
 class Sequence(object):
     """combines a generator and a read-only list
@@ -150,10 +152,10 @@ class Sequence(object):
     def pairwise(self,op,skip_first=False):
         return Sequence(itertools2.pairwise(self,op))
 
-    def sort(self,key=None,buffer=1000):
+    def sort(self,key=None,buffer=100):
         return Sequence(itertools2.sorted_iterable(self, key, buffer))
 
-    def unique(self,buffer=1000):
+    def unique(self,buffer=100):
         """ 
         :param buffer: int number of last elements found. 
         if two identical elements are separated by more than this number of elements
@@ -616,28 +618,38 @@ def pi_generate():
 A000796=Sequence(pi_generate) #Decimal expansion of Pi (or, digits of Pi).
 
 # pythagorean triples
-
-"""problems with .sort
-
-A009096=Sequence(math2.triples).apply(sum).sort() # not .unique()
+A009096=Sequence(math2.triples) \
+    .apply(sum) \
+    .sort() # not .unique()
 
 desc="Sum of legs of Pythagorean triangles (without multiple entries)."
-A118905=Sequence(math2.triples,desc=desc).apply(lambda x:x[0]+x[1]).sort().unique()
+A118905=Sequence(math2.triples,desc=desc) \
+    .apply(lambda x:x[0]+x[1]) \
+    .sort() \
+    .unique()
 
 desc="Ordered areas of primitive Pythagorean triangles."
-A024406=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0]*x[1]//2).sort()
+A024406=Sequence(math2.primitive_triples,desc=desc) \
+    .apply(lambda x:x[0]*x[1]//2) \
+    .sort()
 
-desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
-A121727=Sequence(math2.primitive_triples,desc=desc).sort(lambda x:(x[0]*x[1]//2,x[2])).apply(lambda x:x[2])
 
 desc="Ordered hypotenuses (with multiplicity) of primitive Pythagorean triangles."
-A020882=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[2]).sort()
+A020882=Sequence(math2.primitive_triples,desc=desc) \
+    .apply(lambda x:x[2])
+    # .sort() #not needed anymore
 
 desc="Smallest member 'a' of the primitive Pythagorean triples (a,b,c) ordered by increasing c, then b"
-A046086=Sequence(math2.primitive_triples,desc=desc).sort(key=lambda x:x[2]).apply(lambda x:x[0])
-
+A046086=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0])
+    # .sort(key=lambda x:x[2]) \ #not needed anymore
+    # .apply(lambda x:x[0])
+    
+""" found a bug in OEIS ! 20th term of the serie is 145, not 142
+desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
+A121727=Sequence(math2.primitive_triples,desc=desc) \
+    .sort(lambda x:(x[0]*x[1],x[2])) \
+    .apply(lambda x:x[2])
 """
-
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -646,6 +658,12 @@ for id in seqs:
     if id[0]=='A' and len(id)==7:
         seqs[id].name=id
         oeis[id]=seqs[id]
-
+        
+        
+if __name__ == "__main__": 
+    """local tests"""
+    it=itertools2.sorted_iterable(math2.primitive_triples(),(lambda x:(x[0]*x[1],x[2])))
+    for p in itertools2.take(30,it):
+        print(p,p[0]*p[1]/2)
 
 
