@@ -6,10 +6,7 @@ from __future__ import division #"true division" everywhere
 """
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
-
-sequences are implemented as INFINITE length generators only
 """
-
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
@@ -23,146 +20,11 @@ __revision__ = '$Revision$'
 import six, logging, operator, math
 from six.moves import map, reduce, filter, zip, zip_longest
 
-from itertools import count, repeat, tee, islice
+from itertools import count, repeat
 
-from Goulib import math2, itertools2, decorators, tests
+from Goulib import math2, itertools2, decorators
 
-class Sequence(object):
-    """combines a generator and a read-only list
-    used for numeric (integer) sequences
-    """
-    def __init__(self,iterf=None,itemf=None,containf=None,desc=''):
-        """
-        :param iterf: optional iterator, or a function returning an iterator
-        :param itemf: optional function(i) returning the i-th element
-        :param containf: optional function(n) return bool True if n belongs to Sequence
-        :param desc: string description
-        """
-        self.name=self.__class__.__name__ #by default
-
-        if isinstance(iterf,six.integer_types):
-            self.offset=iterf
-            self.iterf=None
-        else:
-            try: #evaluate function into iterator
-                iterf=iterf()
-            except:
-                pass
-            self.offset=0
-            self.iterf=iterf
-        self.itemf=itemf
-        if itemf and not desc:
-            desc=itemf.__doc__
-        self.containf=containf
-
-        self.desc=desc
-
-    def __repr__(self):     
-        return self.name
-        s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
-        return '%s (%s ...)'%(self.name,s)
-
-    def __iter__(self):
-        """reset the generator
-        :return: a tee-ed copy of iterf
-        """
-        if self.iterf:
-            self.iterf, self.generator=tee(self.iterf)
-        elif self.itemf:
-            def _():
-                for i in count(self.offset):
-                    yield self[i]
-            self.generator=_()
-        else:
-            def _():
-                for n in count(self.offset):
-                    if n in self:
-                        yield n
-            self.generator=_()
-        return self.generator
-
-    def __getitem__(self, i):
-        if not isinstance(i,slice):
-            if self.itemf :
-                return self.itemf(i)
-            else:
-                return itertools2.index(i,self)
-        else:
-            return islice(self(),i.start,i.stop,i.step)
-
-    def index(self,v):
-        #assume sequence is growing
-        for i,n in enumerate(self):
-            if v==n: return i
-            if n>v: return -1
-
-    def __contains__(self,n):
-        if self.containf:
-            return self.containf(n)
-        else:
-            return self.index(n)>=0
-
-    def __add__(self,other):
-        if type(other) is int:
-            return self.apply(
-                lambda n:n+other,
-                containf=lambda n:n-other in self,
-                desc='%s+%d'%(self.name,other)
-            )
-            
-    def __and__(self,other):
-        return Sequence(
-            itertools2.merge(self,other), None,
-            lambda x:x in self or x in other
-        )
-
-    def __sub__(self,other):
-        if type(other) is int:
-            return self.apply(
-                lambda n:n-other,
-                containf=lambda n:n+other in self,
-                desc='%s-%d'%(self.name,other)
-            )
-    
-    def __mod__(self,other):
-        return Sequence(
-            itertools2.diff(self.__iter__(),other.__iter__()), None,
-            lambda x:x in self and x not in other
-        )
-
-    def apply(self,f,containf=None,desc=''):
-        return Sequence(
-            map(f,self),
-            lambda i:f(self[i]),
-            containf,
-            desc
-        )
-
-    def filter(self,f,desc=''):
-        return Sequence(
-            filter(f,self),
-            None,
-            lambda n:f(n) and n in self,
-            desc
-        )
-
-    def accumulate(self,op,skip_first=False):
-        return Sequence(itertools2.accumulate(self,op,skip_first))
-
-    def pairwise(self,op,skip_first=False):
-        return Sequence(itertools2.pairwise(self,op))
-
-    def sort(self,key=None,buffer=100):
-        return Sequence(itertools2.sorted_iterable(self, key, buffer))
-
-    def unique(self,buffer=100):
-        """ 
-        :param buffer: int number of last elements found. 
-        if two identical elements are separated by more than this number of elements
-        in self, they might be generated twice in the resulting Sequence
-        :return: Sequence made of unique elements of this one
-        """
-        return Sequence(itertools2.unique(self,None,buffer))
+from Goulib.container import Sequence
 
 def record(iterable, it=count(), max=0):
     for i,v in zip(it,iterable):
