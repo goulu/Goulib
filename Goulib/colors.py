@@ -284,6 +284,7 @@ class Color(object):
 
 class Palette(OrderedDict):
     def __init__(self, data=[], n=256):
+        super(Palette, self).__init__() #mandatory http://stackoverflow.com/questions/11174702/how-to-subclass-an-ordereddict
         if data:
             self.update(data,n)
         
