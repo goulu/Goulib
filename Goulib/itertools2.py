@@ -677,20 +677,22 @@ def subdict(d,keys):
     """
     return dict([(i, d[i]) for i in keys if i in d])
 
+class SortingError(Exception):
+    pass
+
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
     :yields: items of iterable
-    :raise: BufferError if not 
-    (BufferError because one might increase buffer in sorted_iterable...)
+    :raise: SortingError if not 
     """
     key=key or identity
-    prev=None
+    prev,n=None,0
     for x in iterable:
-        kx=key(x)
-        if prev is not None and kx<prev:
-            raise BufferError()
-        prev=kx
+        if prev is not None and key(x)<key(prev):
+            raise SortingError("%d: %s < %s"%(n, x,prev))
+        prev=x
         yield x
+        n+=1
     
 
 def sorted_iterable(iterable, key=None, buffer=100):
@@ -704,7 +706,8 @@ def sorted_iterable(iterable, key=None, buffer=100):
     b=SortedCollection(key=key)
     for x in iterable:
         if len(b)>=buffer:
-            yield b.pop(0)
+            res=b.pop(0)
+            yield res
         b.insert(x)
     for x in b: # this never happens if iterable is infinite
         yield x 

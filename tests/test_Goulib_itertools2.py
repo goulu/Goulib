@@ -345,11 +345,13 @@ class TestSortedIterable:
         data=[1,2,3,7,6,5,4]
         res=sorted(data)
         #with a small buffer, it fails
-        def _(): 
-            return [x for x in ensure_sorted(sorted_iterable(data,buffer=3))]
-        assert_raises(BufferError, _)
+        def test(iterable,buffer,key=None): 
+            return [x for x in ensure_sorted(
+                sorted_iterable(iterable,key=key, buffer=buffer)
+                ,key=key)]
+        assert_raises(SortingError,test,data,3)
         #with a larger one, it's ok
-        assert_equal(sorted_iterable(data,buffer=4),res)
+        assert_equal(test(data,buffer=4),res)
 
 
 class TestIsiterable:
