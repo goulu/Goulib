@@ -5,7 +5,6 @@ color conversion in various colorspaces and palettes
 """
 
 from __future__ import division #"true division" everywhere
-from _collections import OrderedDict
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
@@ -18,6 +17,9 @@ __credits__ = ['Colormath https://pypi.python.org/pypi/colormath/',
 
 import six, os, sys
 import numpy as np
+
+from collections import OrderedDict
+from matplotlib.colors import Colormap
 
 from Goulib import math2, itertools2
 
@@ -279,9 +281,6 @@ class Color(object):
         https://en.wikipedia.org/wiki/Color_difference
         """
         return deltaE(self,other)
-    
-from collections import OrderedDict
-from matplotlib.colors import Colormap
 
 class Palette(OrderedDict):
     def __init__(self, data=[], n=256):
