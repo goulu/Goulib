@@ -625,10 +625,11 @@ class TestCatalanGen:
         pass #tested in test_oeis
 
 class TestPrimitiveTriples:
+    def test_primitive_triples(self):
         key=lambda x:x[2]
         for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
             assert_true(is_pythagorean_triple(*t))
-    
+
 class TestTriples:
     def test_triples(self):
         key=lambda x:x[2]
@@ -873,6 +874,11 @@ class TestDeBruijn:
 class TestPascalGen:
     def test_pascal_gen(self):
         # assert_equal(expected, pascal_gen())
+        raise SkipTest # TODO: implement your test here
+
+class TestIsPythagoreanTriple:
+    def test_is_pythagorean_triple(self):
+        # assert_equal(expected, is_pythagorean_triple(a, b, c))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
