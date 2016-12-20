@@ -881,5 +881,10 @@ class TestIsPythagoreanTriple:
         # assert_equal(expected, is_pythagorean_triple(a, b, c))
         raise SkipTest # TODO: implement your test here
 
+class TestFormat:
+    def test_format(self):
+        # assert_equal(expected, format(x, decimals))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

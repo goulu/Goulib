@@ -137,6 +137,8 @@ def is_integer(x, epsilon=1e-6):
     """
     :return: True if  float x is almost an integer
     """
+    if type(x) is int:
+        return True
     return isclose(x,round(x),0,epsilon)
 
 def rint(v):
@@ -149,6 +151,14 @@ def int_or_float(x, epsilon=1e-6):
     :return: int if x is (almost) an integer, otherwise float
     """
     return rint(x) if is_integer(x, epsilon) else x
+
+def format(x, decimals=3):
+    """ formats a number
+    :return: string repr of x with decimals if not int
+    """
+    if is_integer(x):
+        decimals = 0
+    return '{0:.{1}f}'.format(x, decimals)
 
 def ceildiv(a, b):
     return -(-a // b) #simple and clever
@@ -201,11 +211,11 @@ def accsum(it):
 cumsum=accsum #numpy alias
 
 
-def dot(a,b):
+def dot(a,b,default=0):
     """dot product"""
     try: #vector*vector
-        return sum(map( operator.mul, a, b))
-    except:
+        return sum(map( operator.mul, a, b),default)
+    except Exception as e:
         pass
     try: #matrix*vector
         return [dot(line,b) for line in a]
