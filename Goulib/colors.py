@@ -15,7 +15,7 @@ __credits__ = ['Colormath https://pypi.python.org/pypi/colormath/',
 
 #get https://pypi.python.org/pypi/colormath/ if you need more
 
-import six, os, sys
+import six, os, sys, logging
 import numpy as np
 
 from collections import OrderedDict
@@ -27,6 +27,7 @@ from Goulib import math2, itertools2
 
 #redefine some converters in current module to build converters dict below
 import skimage.color as skcolor
+
 import matplotlib.colors as mplcolors
 rgb2hex=mplcolors.rgb2hex
 hex2rgb=mplcolors.hex2color
@@ -60,11 +61,12 @@ def cmyk2rgb(cmyk):
     
     """
     c,m,y,k=cmyk
-    return (1.0-(c+k), 1.0-(m+k), 1.0-(y+k))
+    w=1-k
+    return ((1-c)*w, (1-m)*w, (1-y)*w)
 
 def xyz2xyy(xyz):
     """
-    Convert from XYZ to xyY.
+    Convert from XYZ to xyY
     
     Based on formula from http://brucelindbloom.com/Eqn_XYZ_to_xyY.html
     
@@ -81,6 +83,26 @@ def xyz2xyy(xyz):
         x, y, _ = xyz2xyy(color['white'].xyz)
         return (x, y, 0.0)
     return (xyz[0]/s, xyz[1]/s, xyz[1])
+
+def xyy2xyz(xyY):
+    """
+    Convert from xyY to XYZ to
+    
+    Based on formula from http://brucelindbloom.com/Eqn_xyY_to_XYZ.html
+    
+    Implementation Notes:
+    
+    1. Watch out for the case where y = 0.
+       In that case, you may want to set X = Y = Z = 0.
+    2. The output XYZ values are in the nominal range [0.0, 1.0].
+    
+    """
+    x,y,Y=xyY
+    if y==0:
+        return (0,0,0)
+    X=x*Y/y
+    Z=(1-x-y)*Y/y
+    return (X,Y,Z)
  
 # skimage.color has several useful color conversion routines, but for images
 # so here is a generic adapter that allows to call them with colors
@@ -97,15 +119,14 @@ def _skadapt(f):
 
 #supported colorspaces. need more ? just add it :-)
 colorspaces=(
+    'CMYK',
     'XYZ',
     'xyY', #for CIE Chromaticity plots
     'Lab',
     'Luv',
     'HSV',
-    'CMYK',
     'RGB',
     'HEX',
-    #'ACI', #Autocad Color Index [0..255]
     )
 
 #build a graph of available converters
@@ -177,10 +198,11 @@ class Color(object):
         if space=='rgb':
             if max(value)>1:
                 value=tuple(_/255. for _ in value)
-            value=math2.sat(value,0,1) # do not wash whiter than white...
+            value=math2.sat(value[:3],0,1) # rgb only, not whiter than white...
         if space!='hex': # force to floats
             value=tuple(float(_) for _ in value)
-        self._values={space:value}
+        self._values=OrderedDict() # so native space is always first
+        self._values[space]=value 
 
 
     def _copy_from_(self,c):
@@ -198,20 +220,37 @@ class Color(object):
         return self._name
 
     def convert(self, target):
-        target=target.lower()
+        """ 
+        :param target: str of desired colorspace, or none for default
+        :return: color in target colorspace
+        """
+        import networkx as nx
+        target=target.lower() if target else self.space
         if target not in self._values:
-            path=converters.shortest_path(self.space, target)
+            try:
+                path=converters.shortest_path(self.space, target)
+            except nx.exception.NetworkXNoPath:
+                raise NotImplementedError(
+                    'no conversion between %s and %s color spaces'
+                    %(self.space, target)
+                )
             for u,v in itertools2.pairwise(path):
                 if v not in self._values:
                     edge=converters[u][v][0]
                     c=edge['f'](self._values[u])
-                    if isinstance(c,np.ndarray):
+                    if itertools2.isiterable(c): #but not a string
                         c=tuple(map(float,c))
                     self._values[v]=c
         return self._values[target]
     
+    def str(self,mode=None):
+        res=self.convert(mode)
+        if not isinstance(res, six.string_types):
+            res=', '.join(map(math2.format,res))
+        return res
+    
     @property
-    def native(self): return self._values[self.space]
+    def native(self): return self.convert(None)
 
     @property
     def rgb(self): return self.convert('rgb')
@@ -237,7 +276,6 @@ class Color(object):
     @property
     def xyY(self): return self.convert('xyY')
 
-
     def __hash__(self):
         return hash(self.hex)
 
@@ -246,12 +284,6 @@ class Color(object):
 
     def _repr_html_(self):
         return '<span style="color:%s">%s</span>'%(self.hex,self.name)
-
-    def __eq__(self,other):
-        try:
-            return self.hex==other.hex
-        except:
-            return self.name==other
 
     def __add__(self,other):
         from .image import Image
@@ -264,13 +296,22 @@ class Color(object):
 
     def __sub__(self,other):
         from .image import Image
-        if isinstance(other, Color):
-            return Color(math2.vecsub(self.rgb,other.rgb))
-        elif isinstance(other, Image):
+        if isinstance(other, Image):
             mode=other.mode
             return Image(size=other.size,color=self.convert(mode),mode=mode)-other
-        else: #last chance
-            return Color(math2.vecsub(self.rgb,other))
+        if not isinstance(other, Color):
+            other=Color(other)
+        return Color(math2.vecsub(self.rgb,other.rgb)) #TODO: change to other space one day
+        
+    def __mul__(self,factor):
+        if factor<0:
+            return (-self)*(-factor)
+        l,a,b=self.lab
+        l*=factor
+        res=Color((l,a,b),'lab')
+        return res
+        
+        
     
     def __neg__(self):
         """ complementary color"""
@@ -280,7 +321,29 @@ class Color(object):
         """color difference according to CIEDE2000
         https://en.wikipedia.org/wiki/Color_difference
         """
-        return deltaE(self,other)
+        return skcolor.deltaE_ciede2000(self.lab, other.lab)
+    
+    def isclose(self,other,abs_tol=1):
+        """
+        http://zschuessler.github.io/DeltaE/learn/
+        <= 1.0    Not perceptible by human eyes.
+        1 - 2    Perceptible through close observation.
+        2 - 10    Perceptible at a glance.
+        11 - 49    Colors are more similar than opposite
+        100    Colors are exact opposite
+        """
+        dE=self.deltaE(other)
+        if dE<=abs_tol:
+            return True
+        else:
+            return False
+    
+    def __eq__(self,other):
+        other=Color(other)
+        if self.space==other.space:
+            if self.native==other.native:
+                return True
+        return self.isclose(other,1) #difference not perceptible to human eye
 
 class Palette(OrderedDict):
     def __init__(self, data=[], n=256):
@@ -311,6 +374,29 @@ class Palette(OrderedDict):
             return None
         return k
     
+    def _repr_html_(self):
+        def tooltip(k):
+            c=self[k]
+            res='[%s] %s '%(k,c.name)
+            return res+'\n'.join('%s = %s'%(k,c.str(k)) for k in c._values)
+        
+        width=max(4,1000//len(self))
+        
+        mode='inline' if width==4 else 'flex'
+    
+        labels=(color['black'],color['white']) #possible colors for labels
+        res='<div style="display:%s; width:100%%;">'%mode
+        style='display:%s-block; min-width: 4px; ' %mode
+        style+=' flex-basis: 90%%;'
+        style+=' background:%s; color:%s;'
+        cell='<div style="'+style+'" title="%s">&nbsp;</div>'
+        for k in self:
+            c=self[k]
+            # c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
+            res+= cell % (c.hex, c.hex, tooltip(k))
+        return res+'</div>'
+        
+    
     @property
     def pil(self):
         """
@@ -328,6 +414,25 @@ class Palette(OrderedDict):
             res.append(math2.rint(g*255))
             res.append(math2.rint(b*255))
         return res
+    
+    def sorted(self,key=lambda c:c[1].lab[0]):
+        # http://stackoverflow.com/questions/8031418/how-to-sort-ordereddict-of-ordereddict-python
+        return Palette(dict(sorted(self.items(), key=key)))
+    
+def ColorTable(colors,key,width=10):
+    from Goulib.table import Table, Cell
+    from Goulib.itertools2 import reshape
+    
+    def tooltip(c):
+        return '\n'.join('%s = %s'%(k,v) for k,v in c._values.items())
+
+    labels=(color['black'],color['white']) #possible colors for labels
+    t=[]
+    for c in sorted(colors.values(),key=key):
+        c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
+        s='<span title="%s" style="color:%s">%s</span>'%(tooltip(c),c2.hex,c.name)
+        t.append(Cell(s,style={'background-color':c.hex}))
+    return Table(reshape(t,(0,width)))
 
 # dictionaries of standardized colors
 
@@ -348,10 +453,10 @@ pantone=Palette() #dict of pantone colors
 
 for c in table['websafe'].asdict():
     id=c['name'].lower()
-    color[id]=Color(c['hex'],name=id)
-
-color_lookup=dict([v.hex,v] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
-
+    hex=c['hex']
+    c=Color(hex,name=id)
+    color[id]=c
+    color_lookup[c.hex]=c
 
 for c in table['Pantone'].asdict():
     id=c['name']
@@ -385,15 +490,13 @@ def aci_to_color(x, block_color=None, layer_color=None):
     if x==256: return layer_color
     return acadcolors[x].hex
 
-from skimage.color import deltaE_ciede2000
-
 def deltaE(c1,c2):
     # http://scikit-image.org/docs/dev/api/skimage.color.html#skimage.color.deltaE_ciede2000
     if not isinstance(c1, Color):
         c1=Color(c1)
     if not isinstance(c2, Color):
         c2=Color(c2)
-    return deltaE_ciede2000(c1.lab, c2.lab)
+    return skcolor.deltaE_ciede2000(c1.lab, c2.lab)
 
 def nearest_color(c,l=None, opt=min):
     """
@@ -415,7 +518,7 @@ def color_range(n,start,end,space='hsv'):
     """:param n: int number of colors to generate
     :param start: string hex color or color name
     :param end: string hex color or color name
-    :result: list of n hexcolors interpolated between start and end, included
+    :result: list of n Color interpolated between start and end, included
     """
 
     from .itertools2 import linspace
