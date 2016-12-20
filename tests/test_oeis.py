@@ -30,7 +30,7 @@ def assert_generator(f,l,name,time_limit=10):
             assert_equal(item1,item2, msg=m)
             i+=1
     except decorators.TimeoutError:
-        if i<min(100,len(l)/2):
+        if i<min(10,len(l)/2):
             logging.warning('%s timeout after only %d loops'%(name,i))
         else:
             logging.debug('%s timeout after %d loops'%(name,i))
