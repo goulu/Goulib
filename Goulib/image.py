@@ -1061,7 +1061,8 @@ except:
         return array[:,:,:3]
 
 def palette(im,ncolors):
-    """extract the color palette of im
+    """extract the color palette of image array
+    (in its own colorspace. use Lab for best results)
     :param im: nparray (x,y,n) containing image
     :param ncolors: int number of colors
     :return: array of ncolors most used in image (center of kmeans centroids)
@@ -1077,14 +1078,19 @@ def palette(im,ncolors):
         im=im[::decimate]
     return kmeans(im,ncolors)[0]
 
-def lab2ind(im,colors=16):
-    """convert an image from Lab to indexed colors
+def lab2ind(im,colors=256):
+    """convert a Lab image to indexed colors
     :param a: nparray (x,y,n) containing image
-    :param colors: int nimber of colors. Default is 16 for speed and visibility
+    :param colors: int number of colors or predefined Palette
     :ref: http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html
     """
     #http://stackoverflow.com/questions/10818546/finding-index-of-nearest-point-in-numpy-arrays-of-x-and-y-coordinates
-    p=palette(im,colors)
+    if isinstance(colors,int):
+        p=palette(im,colors) # 
+        pal=[Color(c,'lab') for c in p]
+    else:
+        pal=colors
+        p=[c.lab for c in itertools2.flatten(pal)]
     w, h, d = im.shape
     s=w*h #number of pixels
     flat = np.reshape(im, (s, d))
@@ -1092,8 +1098,7 @@ def lab2ind(im,colors=16):
     mytree = KDTree(p)
     _, indexes = mytree.query(flat)
     im=indexes.reshape(w,h)
-    p=[Color(c,'lab') for c in p]
-    return im,p
+    return im,pal
 
 def ind2any(im,palette,dest):
     palette=[c.convert(dest) for c in palette.values()]
