@@ -380,13 +380,11 @@ class Palette(OrderedDict):
             res='[%s] %s '%(k,c.name)
             return res+'\n'.join('%s = %s'%(k,c.str(k)) for k in c._values)
         
-        width=max(4,1000//len(self))
-        
-        mode='inline' if width==4 else 'flex'
+        mode='inline' if len(self)>256 else 'flex'
     
         labels=(color['black'],color['white']) #possible colors for labels
         res='<div style="display:%s; width:100%%;">'%mode
-        style='display:%s-block; min-width: 4px; ' %mode
+        style='display:%s-block; min-width: 1px; ' %mode
         style+=' flex-basis: 90%%;'
         style+=' background:%s; color:%s;'
         cell='<div style="'+style+'" title="%s">&nbsp;</div>'
