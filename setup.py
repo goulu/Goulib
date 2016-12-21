@@ -37,6 +37,7 @@ setup(
     license='LGPL',
 
     scripts=[],
+    package_data={'': ['colors.csv']},
 
     install_requires=reqs,
 
