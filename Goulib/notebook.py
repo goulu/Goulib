@@ -33,15 +33,17 @@ def html(obj, sep=None):
         sep=' '
         bra,ket='',''
     else:
-        if isinstance(obj,list):
+        if isinstance(obj,dict):
+            res=',\n'.join("%s:%s"%(html(k),html(v)) 
+                for k,v in six.iteritems(obj))
+            return '{%s}'%res
+        elif isinstance(obj,list):
             bra,ket='[',']'
-        elif isinstance(obj,dict):
-            bra,ket='{','}'
         else:
             bra,ket='(',')'
 
     if isiterable(obj): #iterable, but not a string
-            return bra+sep.join(html(a,sep=',') for a in obj)+ket
+        return bra+sep.join(html(a,sep=',') for a in obj)+ket
 
     try:
         return unicode(obj,'utf-8') #to render accented chars correctly
