@@ -144,10 +144,12 @@ def flatten(l, donotrecursein=six.string_types):
     """iterator to flatten (depth-first) structure
 
     :param l: iterable structure
-    :param donotrecursein: tuple of iterable types in which algo doesn't recurse
+    :param donotrecursein: iterable types in which algo doesn't recurse
                            string type by default
     """
     #http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
+    if isinstance(l,dict):
+        l=six.itervalues(l)
     for el in l:
         if not isinstance(el, collections.Iterable):
             yield el

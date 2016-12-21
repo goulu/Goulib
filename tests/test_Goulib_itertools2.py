@@ -396,5 +396,10 @@ class TestEnumerates:
         # assert_equal(expected, enumerates(iterable))
         raise SkipTest # TODO: implement your test here
 
+class TestEnsureSorted:
+    def test_ensure_sorted(self):
+        # assert_equal(expected, ensure_sorted(iterable, key))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
