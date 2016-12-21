@@ -506,7 +506,8 @@ A046086=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0])
     # .sort(key=lambda x:x[2]) \ #not needed anymore
     # .apply(lambda x:x[0])
     
-""" found a bug in OEIS ! 20th term of the serie is 145, not 142
+""" found a bug in OEIS ! 20th term of the serie is 145, not 142 !
+
 desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
 A121727=Sequence(math2.primitive_triples,desc=desc) \
     .sort(lambda x:(x[0]*x[1],x[2])) \

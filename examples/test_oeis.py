@@ -36,7 +36,7 @@ def assert_generator(f,l,name,time_limit=10):
             logging.debug('%s timeout after %d loops'%(name,i))
 
 import shelve
-database = shelve.open(path+'/data/oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
+database = shelve.open(path+'/oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
 
 def data(s):
     s2=s[1:]
