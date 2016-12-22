@@ -597,67 +597,6 @@ class TestChains:
         # assert_equal(expected, chains(group, tol, mergeable))
         raise SkipTest 
 
-class test__Group:
-    def test_bbox(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.bbox(filter))
-        raise SkipTest # TODO: implement your test here
-
-    def test_connect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.connect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_intersect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_length(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.length())
-        raise SkipTest # TODO: implement your test here
-
-    def test_patches(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-    def test_to_dxf(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-class test__Group:
-    def test_bbox(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.bbox(filter))
-        raise SkipTest # TODO: implement your test here
-
-    def test_connect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.connect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_intersect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_length(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.length())
-        raise SkipTest # TODO: implement your test here
-
-    def test_patches(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # TODO: implement your test here
-
-    def test_to_dxf(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule(level=logging.WARNING)
