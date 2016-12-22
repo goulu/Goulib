@@ -3,6 +3,7 @@
 
 
 from __future__ import division #"true division" everywhere
+from _hashlib import new
 
 """
 image processing with PIL's ease and skimage's power
@@ -32,6 +33,7 @@ warnings.filterwarnings("ignore") # because too many are generated
 import PIL.Image as PILImage
 
 import six
+from six.moves import zip
 from six.moves.urllib_parse import urlparse
 from six.moves.urllib import request
 urlopen = request.urlopen
@@ -62,7 +64,7 @@ modes = {
     'U'     : Mode('gray',1,np.uint16,0,65535), # skimage gray level
     'I'     : Mode('gray',1,np.int16,-32768,32767), # skimage gray level
     'L'     : Mode('gray',1,np.uint8,0,255), # single layer or RGB(A)
-    'P'     : Mode('ind',1,np.uint8,0,255), # indexed color (palette)
+    'P'     : Mode('ind',1,np.uint16,0,65535), # indexed color (palette)
     'RGB'   : Mode('rgb',3,np.float,0,1), # not uint8 as in PIL
     'RGBA'  : Mode('rgba',4,np.float,0,1), # not uint8 as in PIL
     'CMYK'  : Mode('cmyk',4,np.float,0,1), # not uint8 as in PIL
@@ -95,7 +97,7 @@ def adapt_rgb(func):
     # adapted from https://github.com/scikit-image/scikit-image/blob/master/skimage/color/adapt_rgb.py
     @functools.wraps(func)
     def _adapter(image, *args, **kwargs):
-        if image.nchannels>1:
+        if image.nchannels>1 or image.mode=='P':
             channels=image.split('RGB')
             for i in range(3): #RGB. If there is an A, it is untouched
                 channels[i]=func(channels[i], *args, **kwargs)
@@ -125,14 +127,15 @@ class Image(Plot):
             if n==1:
                 color=color[0] #somewhat brute
             data=np.ones(size, dtype=modes[mode].type) * color
-            self._set(data)
+            self._set(data,mode)
         elif isinstance(data,Image): #copy constructor
             self.mode=data.mode
             self.array=data.array
+            self.palette=data.palette
         elif isinstance(data,six.string_types): #assume a path
             self.load(data,**kwargs)
         elif isinstance(data,tuple): # (image,palette) tuple return by convert
-            self._set(data[0],mode)
+            self._set(data[0],'P')
             self.setpalette(data[1])
         else: # assume some kind of array
             try: # list of Images ?
@@ -140,12 +143,16 @@ class Image(Plot):
             except:
                 pass
             self._set(data,mode)
-        if modes[self.mode].nchannels==1:
-            p=kwargs.get('colormap',None)
-            if p:
-                self.mode='P'
-                self.setpalette(p)
-            
+        #make sure the image has a palette attribute    
+        try:
+            self.palette
+        except AttributeError:
+            self.palette=None
+            try:
+                self.setpalette(kwargs['colormap'])
+            except (AssertionError,KeyError):
+                pass
+                
 
     def _set(self,data,mode=None,copy=False):
         data=np.asanyarray(data)
@@ -160,11 +167,11 @@ class Image(Plot):
             if s[0]<10 and s[1]>10 and s[2]>10:
                 data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
-        self.array=skimage.util.dtype.convert(data,modes[self.mode].type) 
+        self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
 
     @property
     def shape(self):
-        #alwasy return y,x,nchannels
+        #always return y,x,nchannels
         s=self.array.shape
         if len(s)==2:
             s=(s[0],s[1],1)
@@ -204,12 +211,12 @@ class Image(Plot):
         mode=guessmode(data)
         self._set(data,'F' if mode in 'U' else mode)
         return self
-    
+
     @staticmethod
     def open(path):
         """PIL(low) compatibility"""
         return Image(path)
-    
+
     @staticmethod
     def new(mode, size, color='black'):
         """PIL(low) compatibility"""
@@ -231,7 +238,7 @@ class Image(Plot):
         im=self.convert(mode)
         skimage.io.imsave(path,im.array,**kwargs)
         return self
-    
+
     @property
     def pil(self):
         """convert to PIL(low) Image
@@ -296,6 +303,15 @@ class Image(Plot):
         else:
             self.array[yx[0],yx[1],:]=value
 
+    def getpalette(self,maxcolors=256):
+        if self.mode=='P':
+            return self.palette
+        return Palette(self.getcolors(maxcolors))
+
+    def setpalette(self,p):
+        assert(self.mode=='P')
+        self.palette=Palette(p)
+
     def getcolors(self,maxcolors=256):
         """
         :return: an unsorted list of (count, color) tuples,
@@ -306,15 +322,51 @@ class Image(Plot):
         To make sure you get all colors in an image, you can pass in size[0]*size[1]
         (but make sure you have lots of memory before you do that on huge images).
         """
-        
-    def getpalette(self,maxcolors=256):
         if self.mode=='P':
-            return self.palette
-        return Palette(self.getcolors(maxcolors))
-    
-    def setpalette(self,p):
+            im=self
+        else:
+            im=self.convert('P',colors=maxcolors)
+        count=np.bincount(im.array.flatten())
+        return zip(count,im.palette) #return palette KEYS 
+
+    def replace(self,pairs):
+        """replace a color by another
+        currently works only for indexed color images
+        :param pairs: iterable of (from,to) ints
+        """
+        # http://stackoverflow.com/questions/3403973/fast-replacement-of-values-in-a-numpy-array
+        assert(self.mode=='P') #TODO: support other modes
+        a=np.copy(self.array)
+        for c in pairs:
+            self.array[a==c[0]] = c[1]
+        return self
+
+    def optimize(self,maxcolors=256):
+        """remove unused colors from the palette
+        """
         assert(self.mode=='P')
-        self.palette=Palette(p)
+        hist=self.getcolors(maxcolors)
+        #replace palette indices by in indices
+        hist2=[]
+        for i,c in enumerate(hist):
+            hist2.append(tuple((i,c[1],c[0]))) # index, key, count
+        #sort by decreasing occurences    
+        hist=sorted(hist2,key=lambda c:c[2],reverse=True)
+        new=Palette()
+        pairs=[]
+        for old,key,count in hist:
+            i=len(new)
+            if count==0 : break # hist is in decreasing order, so it's over
+            if i<maxcolors:
+                new[key]=self.palette[key] #copy useful color
+                j=i
+            else: # find nearest color in new palette
+                j=new.index(self.palette[key],0)
+                j=list(new.keys()).index(j) #convert to numeric index
+            pairs.append((old,j)) #add index substitution
+        self.replace(pairs)
+        self.palette=new
+        return self
 
     def crop(self,lurb):
         """
@@ -541,7 +593,7 @@ class Image(Plot):
         else:
             return Image(a/(n-1),'F')
 
-    def normalize(self,newmax=255,newmin=0):
+    def normalize(self,newmax=None,newmin=None):
         #http://stackoverflow.com/questions/7422204/intensity-normalization-of-image-using-pythonpil-speed-issues
         #warning : this normalizes each channel independently, so we don't use @adapt_rgb here
         newmax=newmax or modes[self.mode].max
@@ -595,7 +647,7 @@ class Image(Plot):
         """
         :return: image in larger canvas size, pasted at ox,oy
         """
-        im = Image(None, self.mode, size=size)
+        im = Image(None, self.mode, size=size, colormap=self.palette)
         (h,w)=self.size
         if w*h==0: #resize empty image...
             return im
@@ -616,32 +668,32 @@ class Image(Plot):
             raise NotImplemented #TODO; something for negative offsets...
         return im
 
-    #@adapt_rgb
-    def compose(self,other,a=0.5,b=0.5):
+    def compose(self,other,a=0.5,b=0.5,mode=None):
         """compose new image from a*self + b*other
         """
-        if self and other and self.mode != other.mode:
-            other=other.convert(self.mode)
+        mode=mode or 'F' if self.nchannels==1 else 'RGB'
         if self:
-            d1=self.array # np.array(self,dtype=np.float)
+            d1=self.convert(mode).array
         else:
             d1=None
         if other:
-            d2=other.array # np.array(other,dtype=np.float)
+            d2=other.convert(mode).array
         else:
             d2=None
         if d1 is not None:
             if d2 is not None:
-                return Image(a*d1+b*d2)
+                return Image(a*d1+b*d2,mode)
             else:
-                return Image(a*d1)
+                return Image(a*d1,mode)
         else:
-            return Image(b*d2)
+            return Image(b*d2,mode)
 
-    def add(self,other,pos=(0,0),alpha=1):
+    def add(self,other,pos=(0,0),alpha=1,mode=None):
         """ simply adds other image at px,py (subbixel) coordinates
         """
         #TOD: use http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
+        if self.npixels==0:
+            return Image(other*alpha)
         px,py=pos
         assert px>=0 and py>=0
         im1,im2=self,other
@@ -651,24 +703,21 @@ class Image(Plot):
             im1.mode=im2.mode
         im1=im1.expand(size,0,0)
         im2=im2.expand(size,px,py)
-        return im1.compose(im2,1,alpha)
+        return im1.compose(im2,1,alpha,mode)
 
     def __add__(self,other):
-        if self.npixels==0:
-            return Image(other)
-        else:
-            return self.compose(other,1,1)
+        return self.add(other)
 
     def __radd__(self,other):
         """only to allow sum(images) easily"""
         assert other==0
         return self
+    
+    def sub(self,other,pos=(0,0),alpha=1,mode=None):
+        return self.add(other,pos,-alpha,mode)
 
     def __sub__(self,other):
-        if self.npixels==0:
-            return -other
-        else:
-            return self.compose(other,1,-1)
+        return self.sub(other)
 
     def __mul__(self,other):
         if isinstance(other,six.string_types):
@@ -911,10 +960,10 @@ class Ditherer(object):
     def __init__(self,name,method):
         self.name=name
         self.method=method
-    
+
     def __call__(self, image, N=2):
         return self.method(image,N)
-    
+
     def __repr__(self):
         return self.name
 
@@ -923,18 +972,18 @@ class ErrorDiffusion(Ditherer):
         Ditherer.__init__(self,name,None)
         self.weights = weights / np.sum(weights)
         self.positions=positions
-        
+
     def __call__(self, image, N=2):
         image=skimage.img_as_float(image, True) #normalize to [0..1]
         T = np.linspace(0., 1., N, endpoint=False)[1:]
         out = np.zeros_like(image, dtype=int)
-    
+
         rows, cols = image.shape
         for i in range(rows):
             for j in range(cols):
                 # Quantize
                 out[i, j], = np.digitize([image[i, j]], T)
-    
+
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
                 for (ii, jj), w in zip(self.positions, self.weights):
@@ -942,19 +991,19 @@ class ErrorDiffusion(Ditherer):
                     jj = j + jj
                     if ii < rows and jj < cols:
                         image[ii, jj] += d * w
-    
+
         return out
-    
+
 class FloydSteinberg(ErrorDiffusion):
     def __init__(self):
-        ErrorDiffusion.__init__(self,'floyd-steinberg',         
+        ErrorDiffusion.__init__(self,'floyd-steinberg',
             positions = [(0, 1), (1, -1), (1, 0), (1, 1)],
             weights = [7, 3, 5, 1]
         )
-        
+
     def __call__(self, image, N=2):
-        return ErrorDiffusion.__call__(self,image,N)   
-    
+        return ErrorDiffusion.__call__(self,image,N)
+
 #PIL+SKIMAGE dithering methods
 from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
 PHILIPS=FLOYDSTEINBERG+1
@@ -996,7 +1045,7 @@ def dither(image, method=FLOYDSTEINBERG, N=2):
     logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg'%dithering[method])
     return dither(image, FLOYDSTEINBERG, N)
 
-   
+
 
 #converter functions complementing those in skimage.color are defined below
 #function should be named "source2dest" in order to be inserted in converters graph
@@ -1060,11 +1109,13 @@ except:
         #trivial version ignoring alpha channel for now
         return array[:,:,:3]
 
-def palette(im,ncolors):
+def palette(im,ncolors,tol=1/100):
     """extract the color palette of image array
     (in its own colorspace. use Lab for best results)
     :param im: nparray (x,y,n) containing image
     :param ncolors: int number of colors
+    :param tol: tolerance for precision/speed compromise. 
+    1/100 means about 100 points per color are taken for kmeans segmentation
     :return: array of ncolors most used in image (center of kmeans centroids)
     """
     # http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html
@@ -1073,7 +1124,7 @@ def palette(im,ncolors):
     w, h, d = im.shape
     s=w*h #number of pixels
     im = np.reshape(im, (s, d)) #flatten for kmeans
-    decimate=int(s/(ncolors*1000)) #keep only ~1000 points per color for speed
+    decimate=int(tol*s/ncolors) #keep only ~100 points per color for speed
     if decimate>1:
         im=im[::decimate]
     return kmeans(im,ncolors)[0]
@@ -1086,7 +1137,7 @@ def lab2ind(im,colors=256):
     """
     #http://stackoverflow.com/questions/10818546/finding-index-of-nearest-point-in-numpy-arrays-of-x-and-y-coordinates
     if isinstance(colors,int):
-        p=palette(im,colors) # 
+        p=palette(im,colors) #
         pal=[Color(c,'lab') for c in p]
     else:
         pal=colors
@@ -1165,6 +1216,7 @@ def convert(a,source,target,**kwargs):
     try:
         a=skimage.util.dtype.convert(a,target.type)
     except ValueError as e: #probably a tuple (indexed, palette)
-        a=tuple((skimage.util.dtype.convert(a[0],target.type),a[1]))
+        pass #do not force int type here
+        #a=tuple((skimage.util.dtype.convert(a[0],target.type),a[1]))
     return a #isn't it beautiful ?
 

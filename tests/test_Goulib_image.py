@@ -13,14 +13,20 @@ import os
 path=os.path.dirname(os.path.abspath(__file__))
 results=path+'\\results\\image\\' #path for results
 
-def assert_image(image,name=None):
+def assert_image(image,name=None,convert=False):
+    """ Checks if an image is present (not black, white, or low contrast
+        :param image: Image to check
+        :param name: str, optional file name. image is saved is specified
+        :param convert: bool specifies if image is converted to RGB for saving
+    """
     from skimage.exposure import is_low_contrast
     if name:
-        image.save(results+name,autoconvert=False) #we want to see the color planes
+        image.save(results+name,autoconvert=convert)
     h=hash(image)
     assert_not_equal(h,0,'image is black')
     assert_not_equal(h,2**64-1,'image is white')
-    #assert_false(is_low_contrast(image.array))
+    if is_low_contrast(image.array):
+        logging.warning('image %s has low contrast'%name)
 
 class TestImage:
     @classmethod
@@ -48,9 +54,10 @@ class TestImage:
     def test_generate(self):
         #from matrix
         from matplotlib import cm
-        a=[[x*y for x in range(128)] for y in range(128)]
+        a=[[-x*x+y*y for x in range(128)] for y in range(128)]
+        a=normalize(a)
         assert_image(Image(a),'generated.png')
-        assert_image(Image(a,colormap=cm.spectral),'gen_colormap.png')
+        assert_image(Image(a,colormap=cm.spectral),'gen_colormap.png',True)
 
     def test___hash__(self):
         h1=hash(self.lena)
@@ -363,6 +370,21 @@ class TestImage:
         # assert_equal(expected, image.pil())
         raise SkipTest # TODO: implement your test here
 
+    def test_optimize(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.optimize(maxcolors))
+        raise SkipTest # TODO: implement your test here
+
+    def test_replace(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.replace(pairs))
+        raise SkipTest # TODO: implement your test here
+
+    def test_sub(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.sub(other, pos, alpha, mode))
+        raise SkipTest # TODO: implement your test here
+
 class TestCorrelation:
     def test_correlation(self):
         # assert_equal(expected, correlation(input, match))
@@ -460,9 +482,27 @@ class TestPalette:
         # assert_equal(expected, palette(im, ncolors))
         raise SkipTest # TODO: implement your test here
 
+    def test___init__(self):
+        # palette = Palette(data, n)
+        raise SkipTest # TODO: implement your test here
+
+    def test_index(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.index(c, dE))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pil(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.pil())
+        raise SkipTest # TODO: implement your test here
+
+    def test_update(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.update(data, n))
+        raise SkipTest # TODO: implement your test here
+
 class TestLab2ind:
     def test_lab2ind(self):
-        # assert_equal(expected, lab2ind(im, colors))
         raise SkipTest # TODO: implement your test here
 
 class TestInd2any:
@@ -513,6 +553,11 @@ class TestFloydSteinberg:
 
     def test___init__(self):
         # floyd_steinberg = FloydSteinberg()
+        raise SkipTest # TODO: implement your test here
+
+class TestNormalize:
+    def test_normalize(self):
+        # assert_equal(expected, normalize(a, newmax, newmin))
         raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
