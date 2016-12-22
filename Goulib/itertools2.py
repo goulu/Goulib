@@ -88,6 +88,9 @@ def isiterable(obj):
     if isinstance(obj, six.string_types): return False #required since Python 3.5
     return isinstance(obj, collections.Iterable)
 
+def iscallable(f):
+    return isinstance(f, collections.Callable)
+
 def enumerates(iterable):
     """
     generalizes enumerate to dicts
@@ -362,7 +365,7 @@ def cartesian_product(*iterables, **kwargs):
     else:
         iterables = iterables * kwargs.get('repeat', 1)
         it = iterables[0]
-        for item in it() if isinstance(it, collections.Callable) else iter(it):
+        for item in it() if iscallable(it) else iter(it):
             for items in cartesian_product(*iterables[1:]):
                 yield (item, ) + items
                 

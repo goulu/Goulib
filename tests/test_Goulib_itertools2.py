@@ -401,5 +401,10 @@ class TestEnsureSorted:
         # assert_equal(expected, ensure_sorted(iterable, key))
         raise SkipTest # TODO: implement your test here
 
+class TestIscallable:
+    def test_iscallable(self):
+        # assert_equal(expected, iscallable(f))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
