@@ -35,8 +35,9 @@ def assert_generator(f,l,name,time_limit=10):
         else:
             logging.debug('%s timeout after %d loops'%(name,i))
 
-import shelve
-database = shelve.open(path+'/oeis%d%d.db'%sys.version_info[:2]) #db format depends on Py version...
+import pickle
+cachef=path+'/oeis.pck'
+database = dict()
 
 def data(s):
     s2=s[1:]
@@ -46,7 +47,7 @@ def data(s):
         return database[s]
     except:
         pass
-    
+
     from six.moves.urllib.request import urlopen
     file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
     logging.info('downloading b%s.txt'%s2)
@@ -60,9 +61,17 @@ def data(s):
                 res.append(n)
 
     database[s]=res
-    database.sync()
+    pickle.dump(tuple((s,res)), open(cachef,"ab")) #append to pickle file
 
     return res
+#data('A000001') #to force creating the file
+with open(cachef, "rb") as f:
+    while True:
+        try:
+            k,v=pickle.load(f)
+            database[k]=v
+        except EOFError:
+            break
 
 def check(f,s=None):
     try:
@@ -81,8 +90,7 @@ class TestOEIS:
         if d[0]==2014:
             d.pop(0)
             database['A009994']=d
-            database.sync()
-            
+
     def test_repeat(self):
         #check that we can iterate twice in the same Sequence
         l1=list(itertools2.take(20,A000040))
