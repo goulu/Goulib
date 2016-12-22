@@ -61,10 +61,10 @@ def data(s):
                 res.append(n)
 
     database[s]=res
-    pickle.dump(tuple((s,res)), open(cachef,"ab")) #append to pickle file
+    pickle.dump(tuple((s,res)), open(cachef,"ab"), protocol=2) #append to pickle file
 
     return res
-#data('A000001') #to force creating the file
+# data('A000001') #to force creating the file
 with open(cachef, "rb") as f:
     while True:
         try:
