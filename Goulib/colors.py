@@ -293,6 +293,11 @@ class Color(object):
             return Image(size=other.size,color=self.native,mode=self.space)+other
         else: #last chance
             return Color(math2.vecadd(self.rgb,other))
+        
+    def __radd__(self,other):
+        """only to allow sum(colors) easily"""
+        assert other==0
+        return self
 
     def __sub__(self,other):
         from .image import Image
@@ -370,9 +375,12 @@ class Palette(OrderedDict):
         """
         c=Color(c)
         k,v=itertools2.index_min(self,key=lambda c2:deltaE(c,c2))
-        if k is None or deltaE(c,v) > dE:
+        if k is None or (dE>0 and deltaE(c,v) > dE):
             return None
         return k
+    
+    def __repr__(self):
+        return '%s of %d colors' % (self.__class__.__name__,len(self))
     
     def _repr_html_(self):
         def tooltip(k):

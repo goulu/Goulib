@@ -176,6 +176,11 @@ class TestColor:
         # assert_equal(expected, color.__mul__(factor))
         raise SkipTest # TODO: implement your test here
 
+    def test___radd__(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.__radd__(other))
+        raise SkipTest # TODO: implement your test here
+
 from matplotlib import cm #colormaps
     
 class TestPalette:
@@ -212,6 +217,11 @@ class TestPalette:
     def test_sorted(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.sorted(key))
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.__repr__())
         raise SkipTest # TODO: implement your test here
 
 class TestColorLookup:
