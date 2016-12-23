@@ -12,6 +12,7 @@ __credits__ = ['Raymond Hettinger http://code.activestate.com/recipes/577197-sor
 __license__ = "LGPL"
 
 import six
+from six.moves import map, filter
 
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
