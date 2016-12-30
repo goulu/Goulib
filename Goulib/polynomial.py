@@ -14,9 +14,9 @@ __license__ = "LGPL"
 import six #python 2+3 compatibility
 import re
 
-from .expr import Expr
+from . import expr
 
-class Polynomial(Expr):
+class Polynomial(expr.Expr):
     def __init__(self,val):
         """:param: val can be:
         - an iterable of the factors in ascending powers order : Polynomial([1,2,3]) holds 3*x^2+2*x+1
@@ -25,18 +25,20 @@ class Polynomial(Expr):
           terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
           
         """
-        self.plist = plist(val)
-        super(Polynomial,self).__init__(lambda x:peval(self.plist,x))
+        self.plist = tuple(plist(val)) #a polynomial is immutable
+        s=tostring(self.plist,pow='**',mul='*')
+        super(Polynomial,self).__init__(s)
         return
 
-    
+    """
     def __str__(self):
-        """:return: the best string we can for text output"""
+        ''':return: the best string we can for text output'''
         return tostring(self.plist)
     
     def __repr__(self):
-        """:return: a string we can cut/paste in a calculator"""
+        ''':return: a string we can cut/paste in a calculator'''
         return tostring(self.plist,mul='*')
+    """
     
     def _latex(self,**kwargs):
         return tostring(self.plist,**kwargs)

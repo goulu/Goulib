@@ -45,5 +45,20 @@ class TestHerror:
         # assert_equal(expected, herror(*args))
         raise SkipTest 
 
+class TestHtml:
+    def test_html(self):
+        # assert_equal(expected, html(obj, sep))
+        raise SkipTest # TODO: implement your test here
+
+class TestH4:
+    def test_h4(self):
+        # assert_equal(expected, h4(*args))
+        raise SkipTest # TODO: implement your test here
+
+class TestLatex:
+    def test_latex(self):
+        # assert_equal(expected, latex(obj))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

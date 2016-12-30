@@ -5,13 +5,13 @@
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 :requires:
-* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 * `svg.path <http://pypi.python.org/pypisvg.path/>`_ for svg input
 * `matplotlib <http://pypi.python.org/pypi/matplotlib/>`_ for bitmap + svg and pdf output
 * `dxfwrite <http://pypi.python.org/pypi/dxfwrite/>`_ for dxf output
 
 :optional:
- * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
+* `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
+* `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 """
 from __future__ import division #"true division" everywhere
 
@@ -21,10 +21,11 @@ __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.aut
 __license__ = "LGPL"
 
 from math import  radians, degrees, tan, atan
-import logging, time
+import logging, base64
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
+from .plot import Plot
 from .colors import color_to_aci, aci_to_color
 from .interval import Box
 from .math2 import rint, isclose
@@ -89,7 +90,7 @@ class BBox(Box):
     def height(self): return self[1].size
     
     @property
-    def area(self): return self.height*self.width
+    def area(self): return self.width*self.height
     
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
@@ -147,7 +148,7 @@ class BBox(Box):
         return res
 
 
-class Entity(object):
+class Entity(plot.Plot):
     """Base class for all drawing entities"""
     
     color='black' # by default
@@ -294,9 +295,9 @@ class Entity(object):
             res=Segment2(start,end)
         elif e.dxftype == 'ARC':
             c=Point2(e.center[:2])
-            startangle=radians(e.startangle)
+            startangle=radians(e.start_angle)
             start=c+Polar(e.radius,startangle)
-            endangle=radians(e.endangle)
+            endangle=radians(e.end_angle)
             end=c+Polar(e.radius,endangle)
             res=Arc2(c,start,end)
         elif e.dxftype == 'CIRCLE':
@@ -354,28 +355,28 @@ class Entity(object):
             d=self.r*2
             return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
         
+        
+        #entities below may be filled, so let's handle the color first
+        color=kwargs.pop('color')
+        kwargs.setdefault('edgecolor',color)
+        kwargs.setdefault('fill',isinstance(self,Point2))
+        if type(kwargs['fill']) is not bool: #assume it's the fill color
+            kwargs.setdefault('facecolor',kwargs['fill'])
+            kwargs['fill']=True
+        kwargs.setdefault('facecolor',color)
+        
         if isinstance(self,Point2):
             try:
                 ms=self.width
             except:
                 ms=0.01
             kwargs.setdefault('clip_on',False)
-            kwargs.setdefault('fill',True)
-            kwargs.setdefault('facecolor','red')
             return [patches.Circle(self.xy,ms,**kwargs)]
         if isinstance(self,Spline):
-            kwargs.setdefault('fill',False)
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
 
-        #entities below may be filled, so let's handle the color first
-        color=kwargs.pop('color')
-        kwargs.setdefault('edgecolor',color)
-        kwargs.setdefault('fill',False)
-        if type(kwargs['fill']) is not bool: #assume it's the fill color
-            kwargs.setdefault('facecolor',kwargs['fill'])
-            kwargs['fill']=True
-        kwargs.setdefault('facecolor',color)
+
             
         if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
             return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
@@ -430,42 +431,35 @@ class Entity(object):
 
         if patches:
             from matplotlib.collections import PatchCollection
-            fig.gca().add_collection(PatchCollection(patches,match_original=True))
+            plt.gca().add_collection(PatchCollection(patches,match_original=True))
 
         if artists:
             for e in artists:
-                fig.gca().add_artist(e)
-        return fig, p
+                plt.gca().add_artist(e)
+        plt.draw()
 
-    def render(self,format,**kwargs):
+        return fig #, p
+
+    def render(self,fmt,**kwargs):
         """ render graph to bitmap stream
         :return: matplotlib figure as a byte stream in specified format
         """
         transparent=kwargs.pop('transparent',True)
-        facecolor=kwargs.pop('facecolor',None)
-        background=kwargs.pop('background',None)
+        facecolor=kwargs.pop('facecolor', kwargs.pop('background','white'))
         
-        fig,_=self.draw(**kwargs)
+        fig=self.draw(facecolor=facecolor, **kwargs)
 
-        output = six.BytesIO()
+        buffer = six.BytesIO()
         fig.savefig(
-            output, 
-            format=format, 
+            buffer, 
+            format=fmt, 
             transparent=transparent,
-            facecolor=facecolor or background,
+            facecolor=fig.get_facecolor(),
         )
-        res=output.getvalue()
+        res=buffer.getvalue()
         plt.close(fig)
         return res
-    
-    def show(self,**kwargs):
-        block=kwargs.pop('block',True)
-        fig,_=self.draw(**kwargs)
-        plt.show(fig, block=block)
-
-    # for IPython notebooks
-    def _repr_png_(self): return self.render('png',facecolor='white') #TODO: find why we need to specify white here
-    def _repr_svg_(self): return self.render('svg',facecolor='white')
+        
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Point2.__bases__ += (Entity,)
@@ -1239,11 +1233,10 @@ class Drawing(Group):
         """
         try:
             import dxfgrabber
-        except ImportError:
-            logging.error('dxfgrabber is required')
-            return
-        try:
             self.dxf = dxfgrabber.readfile(filename,options)
+        except ImportError:
+            logging.error('optional module dxfgrabber required')
+            return
         except Exception as e:
             logging.error('could not read %s : %s'%(filename,e))
             return

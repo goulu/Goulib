@@ -1,36 +1,46 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-hex RGB colors and related functions
+color conversion in various colorspaces and palettes
 """
+
+from __future__ import division #"true division" everywhere
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
 __license__ = "LGPL"
+__credits__ = ['Colormath https://pypi.python.org/pypi/colormath/',
+               'Bruno Nuttens Pantone color table http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/',
+               ]
 
-import six
-from . import math2
+#get https://pypi.python.org/pypi/colormath/ if you need more
 
-# http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
+import six, os, sys, logging
+import numpy as np
 
-def rgb_to_hex(rgb):
-    """:param rgb: tuple (r,g,b) of 3 ints 0-255
-    :result: string "#rrggbb" in hex suitable for HTML color"""
-    return '#%02x%02x%02x' % tuple(rgb)
+from collections import OrderedDict
+from matplotlib.colors import Colormap
 
-def hex_to_rgb(value,scale=1):
-    """:param value: string "#rrggbb" in hex suitable for HTML color
-    :param scale: float optional 1./255 to scale output to [0,1] floats
-    :result: tuple (r,g,b) of 3 ints 0-255"""
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(scale*int(value[i:i+int(lv/3)], 16) for i in range(0, lv, int(lv/3)))
+from Goulib import math2, itertools2
 
-# http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
+# color conversion
 
-def rgb_to_cmyk(r,g,b):
-    """:param r,g,b: floats of red,green,blue in [0..1] range
-    :return: tuple of 4 floats (cyan, magenta, yellow, black) in [0..1] range
+#redefine some converters in current module to build converters dict below
+import skimage.color as skcolor
+
+import matplotlib.colors as mplcolors
+rgb2hex=mplcolors.rgb2hex
+hex2rgb=mplcolors.hex2color
+
+def rgb2cmyk(rgb):
     """
+    :param rgb: 3-tuple of floats of red,green,blue in [0..1] range
+    :return: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
+    """
+    # http://stackoverflow.com/questions/14088375/how-can-i-convert-rgb-to-cmyk-and-vice-versa-in-python
+
+    r,g,b=rgb
+
     c = 1 - r
     m = 1 - g
     y = 1 - b
@@ -43,234 +53,426 @@ def rgb_to_cmyk(r,g,b):
     y = (y - k) / (1 - k)
     return (c,m,y,k)
 
-#http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
-    
-def color_range(n,start,end):
-    """:param n: int number of colors to generate
-    :param start: string hex color or color name
-    :param end: string hex color or color name
-    :result: list of n hexcolors interpolated between start and end, included
+def cmyk2rgb(cmyk):
     """
-    import colorsys
-    from .itertools2 import linspace
-    if start in color: start=color[start]
-    start=hex_to_rgb(start,1./255)
-    start=colorsys.rgb_to_hsv(*start)
-    if end in color: end=color[end]
-    end=hex_to_rgb(end,1./255)
-    end=colorsys.rgb_to_hsv(*end)
-    res=[]
-    for hsv in linspace(start,end,n):
-        rgb=colorsys.hsv_to_rgb(*hsv)
-        hex=rgb_to_hex(tuple(int(255*x) for x in rgb))
-        res.append(hex)
-    return res
+    :param cmyk: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
+    :result: 3-tuple of floats (red,green,blue) 
+    warning : rgb is out the [0..1] range for some cmyk
+    
+    """
+    c,m,y,k=cmyk
+    w=1-k
+    return ((1-c)*w, (1-m)*w, (1-y)*w)
 
-color = {
-    # dict of most used colors indexed by name
-    'black': '#000000',
-    'blue': '#0000ff',
-    'fuchsia': '#ff00ff',
-    'green': '#008000',
-    'grey': '#808080',
-    'lime': '#00ff00',
-    'maroon': '#800000',
-    'navy': '#000080',
-    'olive': '#808000',
-    'purple': '#800080',
-    'red': '#ff0000',
-    'silver': '#c0c0c0',
-    'teal': '#008080',
-    'white': '#ffffff',
-    'yellow': '#ffff00',
-    'aliceblue': '#f0f8ff',
-    'antiquewhite': '#faebd7',
-    'aqua': '#00ffff',
-    'aquamarine': '#7fffd4',
-    'azure': '#f0ffff',
-    'beige': '#f5f5dc',
-    'bisque': '#ffe4c4',
-    'black': '#000000',
-    'blanchedalmond': '#ffebcd',
-    'blue': '#0000ff',
-    'blueviolet': '#8a2be2',
-    'brown': '#a52a2a',
-    'burlywood': '#deb887',
-    'cadetblue': '#5f9ea0',
-    'chartreuse': '#7fff00',
-    'chocolate': '#d2691e',
-    'coral': '#ff7f50',
-    'cornflowerblue': '#6495ed',
-    'cornsilk': '#fff8dc',
-    'crimson': '#dc143c',
-    'cyan': '#00ffff',
-    'darkblue': '#00008b',
-    'darkcyan': '#008b8b',
-    'darkgoldenrod': '#b8860b',
-    'darkgray': '#a9a9a9',
-    'darkgrey': '#a9a9a9',
-    'darkgreen': '#006400',
-    'darkkhaki': '#bdb76b',
-    'darkmagenta': '#8b008b',
-    'darkolivegreen': '#556b2f',
-    'darkorange': '#ff8c00',
-    'darkorchid': '#9932cc',
-    'darkred': '#8b0000',
-    'darksalmon': '#e9967a',
-    'darkseagreen': '#8fbc8f',
-    'darkslateblue': '#483d8b',
-    'darkslategray': '#2f4f4f',
-    'darkturquoise': '#00ced1',
-    'darkviolet': '#9400d3',
-    'deeppink': '#ff1493',
-    'deepskyblue': '#00bfff',
-    'dimgray': '#696969',
-    'dimgrey': '#696969',
-    'dodgerblue': '#1e90ff',
-    'firebrick': '#b22222',
-    'floralwhite': '#fffaf0',
-    'forestgreen': '#228b22',
-    'fuchsia': '#ff00ff',
-    'gainsboro': '#dcdcdc',
-    'ghostwhite': '#f8f8ff',
-    'gold': '#ffd700',
-    'goldenrod': '#daa520',
-    'gray': '#808080',
-    'grey': '#808080',
-    'green': '#008000',
-    'greenyellow': '#adff2f',
-    'honeydew': '#f0fff0',
-    'hotpink': '#ff69b4',
-    'indianred': '#cd5c5c',
-    'indigo': '#4b0082',
-    'ivory': '#fffff0',
-    'khaki': '#f0e68c',
-    'lavender': '#e6e6fa',
-    'lavenderblush': '#fff0f5',
-    'lawngreen': '#7cfc00',
-    'lemonchiffon': '#fffacd',
-    'lightblue': '#add8e6',
-    'lightcoral': '#f08080',
-    'lightcyan': '#e0ffff',
-    'lightgoldenrodyellow': '#fafad2',
-    'lightgray': '#d3d3d3',
-    'lightgrey': '#d3d3d3',
-    'lightgreen': '#90ee90',
-    'lightpink': '#ffb6c1',
-    'lightsalmon': '#ffa07a',
-    'lightseagreen': '#20b2aa',
-    'lightskyblue': '#87cefa',
-    'lightslategray': '#778899',
-    'lightslategrey': '#778899',
-    'lightsteelblue': '#b0c4de',
-    'lightyellow': '#ffffe0',
-    'lime': '#00ff00',
-    'limegreen': '#32cd32',
-    'linen': '#faf0e6',
-    'magenta': '#ff00ff',
-    'maroon': '#800000',
-    'mediumaquamarine': '#66cdaa',
-    'mediumblue': '#0000cd',
-    'mediumorchid': '#ba55d3',
-    'mediumpurple': '#9370d8',
-    'mediumseagreen': '#3cb371',
-    'mediumslateblue': '#7b68ee',
-    'mediumspringgreen': '#00fa9a',
-    'mediumturquoise': '#48d1cc',
-    'mediumvioletred': '#c71585',
-    'midnightblue': '#191970',
-    'mintcream': '#f5fffa',
-    'mistyrose': '#ffe4e1',
-    'moccasin': '#ffe4b5',
-    'navajowhite': '#ffdead',
-    'navy': '#000080',
-    'oldlace': '#fdf5e6',
-    'olive': '#808000',
-    'olivedrab': '#6b8e23',
-    'orange': '#ffa500',
-    'orangered': '#ff4500',
-    'orchid': '#da70d6',
-    'palegoldenrod': '#eee8aa',
-    'palegreen': '#98fb98',
-    'paleturquoise': '#afeeee',
-    'palevioletred': '#d87093',
-    'papayawhip': '#ffefd5',
-    'peachpuff': '#ffdab9',
-    'peru': '#cd853f',
-    'pink': '#ffc0cb',
-    'plum': '#dda0dd',
-    'powderblue': '#b0e0e6',
-    'purple': '#800080',
-    'red': '#ff0000',
-    'rosybrown': '#bc8f8f',
-    'royalblue': '#4169e1',
-    'saddlebrown': '#8b4513',
-    'salmon': '#fa8072',
-    'sandybrown': '#f4a460',
-    'seagreen': '#2e8b57',
-    'seashell': '#fff5ee',
-    'sienna': '#a0522d',
-    'silver': '#c0c0c0',
-    'skyblue': '#87ceeb',
-    'slateblue': '#6a5acd',
-    'slategray': '#708090',
-    'slategrey': '#708090',
-    'snow': '#fffafa',
-    'springgreen': '#00ff7f',
-    'steelblue': '#4682b4',
-    'tan': '#d2b48c',
-    'teal': '#008080',
-    'thistle': '#d8bfd8',
-    'tomato': '#ff6347',
-    'turquoise': '#40e0d0',
-    'violet': '#ee82ee',
-    'wheat': '#f5deb3',
-    'white': '#ffffff',
-    'whitesmoke': '#f5f5f5',
-    'yellow': '#ffff00',
-    'yellowgreen': '#9acd32'}
+def xyz2xyy(xyz):
+    """
+    Convert from XYZ to xyY
+    
+    Based on formula from http://brucelindbloom.com/Eqn_XYZ_to_xyY.html
+    
+    Implementation Notes:
+    1. Watch out for black, where X = Y = Z = 0. In that case, x and y are set 
+       to the chromaticity coordinates of the reference whitepoint.
+    2. The output Y value is in the nominal range [0.0, Y[XYZ]].
+    
+    """
+    s=sum(xyz)
+    if s == 0:
+        # We can't check for X == Y == Z == 0 because they may actually add up
+        # to 0, thus resulting in ZeroDivisionError later
+        x, y, _ = xyz2xyy(color['white'].xyz)
+        return (x, y, 0.0)
+    return (xyz[0]/s, xyz[1]/s, xyz[1])
 
-color_lookup=dict([v,k] for k,v in color.items()) #http://code.activestate.com/recipes/252143-invert-a-dictionary-one-liner/
+def xyy2xyz(xyY):
+    """
+    Convert from xyY to XYZ to
+    
+    Based on formula from http://brucelindbloom.com/Eqn_xyY_to_XYZ.html
+    
+    Implementation Notes:
+    
+    1. Watch out for the case where y = 0.
+       In that case, you may want to set X = Y = Z = 0.
+    2. The output XYZ values are in the nominal range [0.0, 1.0].
+    
+    """
+    x,y,Y=xyY
+    if y==0:
+        return (0,0,0)
+    X=x*Y/y
+    Z=(1-x-y)*Y/y
+    return (X,Y,Z)
+ 
+# skimage.color has several useful color conversion routines, but for images
+# so here is a generic adapter that allows to call them with colors
 
-"""array of 256 Autocad/Autodesk ACI colors produced from http://www.isctex.com/acadcolors.php produced by this code :
-    >>> from Goulib.table import Table
-    >>> acadcolors=[]
-    >>> t=Table('AutoCAD Color Index RGB Equivalents.html')[1:] #outer <table> from original file must be removed
-    >>> for c in t: acadcolors.append(rgb_to_hex(c[4:]))
-"""
-acadcolors=[
-    '#000000', '#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ffffff', 
-    '#414141', '#808080', '#ff0000', '#ffaaaa', '#bd0000', '#bd7e7e', '#810000', '#815656', 
-    '#680000', '#684545', '#4f0000', '#4f3535', '#ff3f00', '#ffbfaa', '#bd2e00', '#bd8d7e', 
-    '#811f00', '#816056', '#681900', '#684e45', '#4f1300', '#4f3b35', '#ff7f00', '#ffd4aa', 
-    '#bd5e00', '#bd9d7e', '#814000', '#816b56', '#683400', '#685645', '#4f2700', '#4f4235', 
-    '#ffbf00', '#ffeaaa', '#bd8d00', '#bdad7e', '#816000', '#817656', '#684e00', '#685f45', 
-    '#4f3b00', '#4f4935', '#ffff00', '#ffffaa', '#bdbd00', '#bdbd7e', '#818100', '#818156', 
-    '#686800', '#686845', '#4f4f00', '#4f4f35', '#bfff00', '#eaffaa', '#8dbd00', '#adbd7e', 
-    '#608100', '#768156', '#4e6800', '#5f6845', '#3b4f00', '#494f35', '#7fff00', '#d4ffaa', 
-    '#5ebd00', '#9dbd7e', '#408100', '#6b8156', '#346800', '#566845', '#274f00', '#424f35', 
-    '#3fff00', '#bfffaa', '#2ebd00', '#8dbd7e', '#1f8100', '#608156', '#196800', '#4e6845', 
-    '#134f00', '#3b4f35', '#00ff00', '#aaffaa', '#00bd00', '#7ebd7e', '#008100', '#568156', 
-    '#006800', '#456845', '#004f00', '#354f35', '#00ff3f', '#aaffbf', '#00bd2e', '#7ebd8d', 
-    '#00811f', '#568160', '#006819', '#45684e', '#004f13', '#354f3b', '#00ff7f', '#aaffd4', 
-    '#00bd5e', '#7ebd9d', '#008140', '#56816b', '#006834', '#456856', '#004f27', '#354f42', 
-    '#00ffbf', '#aaffea', '#00bd8d', '#7ebdad', '#008160', '#568176', '#00684e', '#45685f', 
-    '#004f3b', '#354f49', '#00ffff', '#aaffff', '#00bdbd', '#7ebdbd', '#008181', '#568181', 
-    '#006868', '#456868', '#004f4f', '#354f4f', '#00bfff', '#aaeaff', '#008dbd', '#7eadbd', 
-    '#006081', '#567681', '#004e68', '#455f68', '#003b4f', '#35494f', '#007fff', '#aad4ff', 
-    '#005ebd', '#7e9dbd', '#004081', '#566b81', '#003468', '#455668', '#00274f', '#35424f', 
-    '#003fff', '#aabfff', '#002ebd', '#7e8dbd', '#001f81', '#566081', '#001968', '#454e68', 
-    '#00134f', '#353b4f', '#0000ff', '#aaaaff', '#0000bd', '#7e7ebd', '#000081', '#565681', 
-    '#000068', '#454568', '#00004f', '#35354f', '#3f00ff', '#bfaaff', '#2e00bd', '#8d7ebd', 
-    '#1f0081', '#605681', '#190068', '#4e4568', '#13004f', '#3b354f', '#7f00ff', '#d4aaff', 
-    '#5e00bd', '#9d7ebd', '#400081', '#6b5681', '#340068', '#564568', '#27004f', '#42354f', 
-    '#bf00ff', '#eaaaff', '#8d00bd', '#ad7ebd', '#600081', '#765681', '#4e0068', '#5f4568', 
-    '#3b004f', '#49354f', '#ff00ff', '#ffaaff', '#bd00bd', '#bd7ebd', '#810081', '#815681', 
-    '#680068', '#684568', '#4f004f', '#4f354f', '#ff00bf', '#ffaaea', '#bd008d', '#bd7ead', 
-    '#810060', '#815676', '#68004e', '#68455f', '#4f003b', '#4f3549', '#ff007f', '#ffaad4', 
-    '#bd005e', '#bd7e9d', '#810040', '#81566b', '#680034', '#684556', '#4f0027', '#4f3542', 
-    '#ff003f', '#ffaabf', '#bd002e', '#bd7e8d', '#81001f', '#815660', '#680019', '#68454e', 
-    '#4f0013', '#4f353b', '#333333', '#505050', '#696969', '#828282', '#bebebe', '#ffffff']
+def _skadapt(f):
+    def adapted(arr):
+        arr = np.asanyarray(arr)
+        if arr.ndim ==1:
+            res=f(arr.reshape(1,1,arr.shape[-1]))
+            return res.reshape(arr.shape[-1])
+        else:
+            return f(arr)
+    return adapted
+
+#supported colorspaces. need more ? just add it :-)
+colorspaces=(
+    'CMYK',
+    'XYZ',
+    'xyY', #for CIE Chromaticity plots
+    'Lab',
+    'Luv',
+    'HSV',
+    'RGB',
+    'HEX',
+    )
+
+#build a graph of available converters
+#as in https://github.com/gtaylor/python-colormath
+
+from .graph import DiGraph
+converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
+for source in colorspaces:
+    for target in colorspaces:
+        key=(source.lower(),target.lower())
+        if key[0]==key[1]:
+            continue
+        else:
+            convname='%s2%s'%key
+            converter = getattr(sys.modules[__name__], convname,None)
+            if converter is None:
+                converter=getattr(skcolor, convname,None)
+                if converter: #adapt it:
+                    converter=_skadapt(converter)
+        if converter:
+            converters.add_edge(key[0],key[1],{'f':converter})
+
+def convert(color,source,target):
+    """convert a color between colorspaces,
+    eventually using intermediary steps
+    """
+    source,target=source.lower(),target.lower()
+    if source==target: return color
+    path=converters.shortest_path(source, target)
+    for u,v in itertools2.pairwise(path):
+        color=converters[u][v][0]['f'](color)
+    return color #isn't it beautiful ?
+
+class Color(object):
+    """A color with math operations and conversions
+    Color is immutable (._values caches representations)
+    """
+    def __init__(self, value, space='RGB', name=None):
+        """constructor
+
+        :param value: string color name, hex string, or values tuple
+        :param space: string defining the color space of value
+        """
+        self._name=name
+        space=space.lower() # for easier conversions
+
+        if isinstance(value,Color): #copy constructor
+            self._copy_from_(value)
+            return
+        if isinstance(value, six.string_types):
+            if value in pantone:
+                self._copy_from_(pantone[value])
+                return
+            value=value.lower()
+            if value in color:
+                self._copy_from_(color[value])
+                return
+            elif len(value)==7 and value[0]=='#':
+                if value in color_lookup:
+                    self._copy_from_(color_lookup[value])
+                    return
+                else:
+                    space='hex'
+            else:
+                raise(ValueError("Couldn't create Color(%s,%s)"%(value,space)))
+
+        self.space=space # "native" space in which the color was created
+
+        if space=='rgb':
+            if max(value)>1:
+                value=tuple(_/255. for _ in value)
+            value=math2.sat(value[:3],0,1) # rgb only, not whiter than white...
+        if space!='hex': # force to floats
+            value=tuple(float(_) for _ in value)
+        self._values=OrderedDict() # so native space is always first
+        self._values[space]=value 
+
+
+    def _copy_from_(self,c):
+        self.space=c.space
+        self._name=c._name
+        self._values=c._values
+
+    @property
+    def name(self):
+        if self._name is None:
+            if self.hex in color_lookup:
+                self._name=color_lookup[self.hex].name
+            else:
+                self._name='~'+nearest_color(self).name
+        return self._name
+
+    def convert(self, target):
+        """ 
+        :param target: str of desired colorspace, or none for default
+        :return: color in target colorspace
+        """
+        import networkx as nx
+        target=target.lower() if target else self.space
+        if target not in self._values:
+            try:
+                path=converters.shortest_path(self.space, target)
+            except nx.exception.NetworkXNoPath:
+                raise NotImplementedError(
+                    'no conversion between %s and %s color spaces'
+                    %(self.space, target)
+                )
+            for u,v in itertools2.pairwise(path):
+                if v not in self._values:
+                    edge=converters[u][v][0]
+                    c=edge['f'](self._values[u])
+                    if itertools2.isiterable(c): #but not a string
+                        c=tuple(map(float,c))
+                    self._values[v]=c
+        return self._values[target]
+    
+    def str(self,mode=None):
+        res=self.convert(mode)
+        if not isinstance(res, six.string_types):
+            res=', '.join(map(math2.format,res))
+        return res
+    
+    @property
+    def native(self): return self.convert(None)
+
+    @property
+    def rgb(self): return self.convert('rgb')
+
+    @property
+    def hex(self): return self.convert('hex')
+
+    @property
+    def lab(self): return self.convert('lab')
+    
+    @property
+    def luv(self): return self.convert('Luv')
+
+    @property
+    def cmyk(self): return self.convert('cmyk')
+
+    @property
+    def hsv(self): return self.convert('hsv')
+    
+    @property
+    def xyz(self): return self.convert('xyz')
+    
+    @property
+    def xyY(self): return self.convert('xyY')
+
+    def __hash__(self):
+        return hash(self.hex)
+
+    def __repr__(self):
+        return "Color('%s')"%(self.name)
+
+    def _repr_html_(self):
+        return '<span style="color:%s">%s</span>'%(self.hex,self.name)
+
+    def __add__(self,other):
+        from .image import Image
+        if isinstance(other, Color):
+            return Color(math2.vecadd(self.rgb,other.rgb))
+        elif isinstance(other, Image):
+            return Image(size=other.size,color=self.native,mode=self.space)+other
+        else: #last chance
+            return Color(math2.vecadd(self.rgb,other))
+        
+    def __radd__(self,other):
+        """only to allow sum(colors) easily"""
+        assert other==0
+        return self
+
+    def __sub__(self,other):
+        from .image import Image
+        if isinstance(other, Image):
+            mode=other.mode
+            return Image(size=other.size,color=self.convert(mode),mode=mode)-other
+        if not isinstance(other, Color):
+            other=Color(other)
+        return Color(math2.vecsub(self.rgb,other.rgb)) #TODO: change to other space one day
+        
+    def __mul__(self,factor):
+        if factor<0:
+            return (-self)*(-factor)
+        l,a,b=self.lab
+        l*=factor
+        res=Color((l,a,b),'lab')
+        return res
+        
+        
+    
+    def __neg__(self):
+        """ complementary color"""
+        return color['white']-self
+    
+    def deltaE(self,other):
+        """color difference according to CIEDE2000
+        https://en.wikipedia.org/wiki/Color_difference
+        """
+        return skcolor.deltaE_ciede2000(self.lab, other.lab)
+    
+    def isclose(self,other,abs_tol=1):
+        """
+        http://zschuessler.github.io/DeltaE/learn/
+        <= 1.0    Not perceptible by human eyes.
+        1 - 2    Perceptible through close observation.
+        2 - 10    Perceptible at a glance.
+        11 - 49    Colors are more similar than opposite
+        100    Colors are exact opposite
+        """
+        dE=self.deltaE(other)
+        if dE<=abs_tol:
+            return True
+        else:
+            return False
+    
+    def __eq__(self,other):
+        other=Color(other)
+        if self.space==other.space:
+            if self.native==other.native:
+                return True
+        return self.isclose(other,1) #difference not perceptible to human eye
+
+class Palette(OrderedDict):
+    def __init__(self, data=[], n=256):
+        super(Palette, self).__init__() #mandatory http://stackoverflow.com/questions/11174702/how-to-subclass-an-ordereddict
+        if data:
+            self.update(data,n)
+        
+    def update(self,data, n=256):
+        if isinstance(data, Colormap):
+            for i in range(n):
+                self[i]=Color(data(i/(n-1)))
+        elif isinstance(data, dict):
+            for k in data:
+                self[k]=Color(data[k])
+        elif isinstance(data, list):
+            for i in range(len(data)):
+                self[i]=Color(data[i])
+        else:
+            raise(NotImplementedError())
+        
+    def index(self,c,dE=5):
+        """
+        :return: key of c or nearest color, None if distance is larger than deltaE
+        """
+        c=Color(c)
+        k,v=itertools2.index_min(self,key=lambda c2:deltaE(c,c2))
+        if k is None or (dE>0 and deltaE(c,v) > dE):
+            return None
+        return k
+    
+    def __repr__(self):
+        return '%s of %d colors' % (self.__class__.__name__,len(self))
+    
+    def _repr_html_(self):
+        def tooltip(k):
+            c=self[k]
+            res='[%s] %s '%(k,c.name)
+            return res+'\n'.join('%s = %s'%(k,c.str(k)) for k in c._values)
+        
+        mode='inline' if len(self)>256 else 'flex'
+    
+        labels=(color['black'],color['white']) #possible colors for labels
+        res='<div style="display:%s; width:100%%;">'%mode
+        style='display:%s-block; min-width: 1px; ' %mode
+        style+=' flex-basis: 90%%;'
+        style+=' background:%s; color:%s;'
+        cell='<div style="'+style+'" title="%s">&nbsp;</div>'
+        for k in self:
+            c=self[k]
+            # c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
+            res+= cell % (c.hex, c.hex, tooltip(k))
+        return res+'</div>'
+        
+    
+    @property
+    def pil(self):
+        """
+        :return: a sequence of integers, or a string containing a binary 
+        representation of the palette.
+        In both cases, the palette contents should be ordered (r, g, b, r, g, b, …). 
+        The palette can contain up to 768 entries (3*256). 
+        If a shorter palette is given, it is padded with zeros.
+        #http://effbot.org/zone/creating-palette-images.htm
+        """
+        res=[]
+        for c in self.values():
+            r,g,b=c.rgb
+            res.append(math2.rint(r*255))
+            res.append(math2.rint(g*255))
+            res.append(math2.rint(b*255))
+        return res
+    
+    def sorted(self,key=lambda c:c[1].lab[0]):
+        # http://stackoverflow.com/questions/8031418/how-to-sort-ordereddict-of-ordereddict-python
+        return Palette(dict(sorted(self.items(), key=key)))
+    
+def ColorTable(colors,key,width=10):
+    from Goulib.table import Table, Cell
+    from Goulib.itertools2 import reshape
+    
+    def tooltip(c):
+        return '\n'.join('%s = %s'%(k,v) for k,v in c._values.items())
+
+    labels=(color['black'],color['white']) #possible colors for labels
+    t=[]
+    for c in sorted(colors.values(),key=key):
+        c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
+        s='<span title="%s" style="color:%s">%s</span>'%(tooltip(c),c2.hex,c.name)
+        t.append(Cell(s,style={'background-color':c.hex}))
+    return Table(reshape(t,(0,width)))
+
+# dictionaries of standardized colors
+
+from Goulib.table import Table
+
+path=os.path.dirname(os.path.abspath(__file__))
+
+# http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/
+table=Table(path+'/colors.csv')
+table.applyf('hex',lambda x:x.lower())
+table=table.groupby('System')
+
+color=Palette() #dict of HTML / matplotlib colors, which seem to be the same
+color_lookup=Palette() # reverse color dict indexed by hex
+pantone=Palette() #dict of pantone colors
+
+# http://www.w3schools.com/colors/colors_names.asp
+
+for c in table['websafe'].asdict():
+    id=c['name'].lower()
+    hex=c['hex']
+    c=Color(hex,name=id)
+    color[id]=c
+    color_lookup[c.hex]=c
+
+for c in table['Pantone'].asdict():
+    id=c['name']
+    pantone[id]=Color((c['L'],c['a'],c['b']),space='Lab',name=id)
+    # assert p.hex==c['hex'] is always wrong
+
+acadcolors=[None]*256 #table of Autocad indexed colors
+for c in table['autocad'].asdict():
+    id=c['name']
+    acadcolors[id]=Color(c['hex'],name=id) #color name is a 0..255 number
 
 
 def color_to_aci(x, nearest=True):
@@ -279,86 +481,53 @@ def color_to_aci(x, nearest=True):
     """
     if x is None:
         return -1
-    if x in color :  #color name
-        x=color[x]
+    x=Color(x)
     try:
         return acadcolors.index(x)
     except:
         pass
     if nearest:
-        return _nearest(x,acadcolors)[0] #return index only
-    else:
-        return acadcolors.index(color_lookup[x])
+        return nearest_color(x,acadcolors).name # name = int id
+    return -1
 
-    
+
 def aci_to_color(x, block_color=None, layer_color=None):
     if x==0: return block_color
     if x==256: return layer_color
-    c=acadcolors[x]
-    try: #handle standard Matplotlib colors by name
-        c=color_lookup[c]
-    except:
-        pass
-    return c
+    return acadcolors[x].hex
 
-def _nearest(x,l):
-    """:return: index  of the nearest color in list l"""
-    if isinstance(x,six.string_types):
-        rgb=hex_to_rgb(x,1./255)
-    else:
-        rgb=math2.sat(x,0,1)
-    from .itertools2 import index_min
-    return index_min(l,key=lambda _:math2.dist(rgb, hex_to_rgb(_,1./255)))
+def deltaE(c1,c2):
+    # http://scikit-image.org/docs/dev/api/skimage.color.html#skimage.color.deltaE_ciede2000
+    if not isinstance(c1, Color):
+        c1=Color(c1)
+    if not isinstance(c2, Color):
+        c2=Color(c2)
+    return skcolor.deltaE_ciede2000(c1.lab, c2.lab)
 
-def nearest_color(x,l=None):
-    """:return: name of the nearest color in list l or in color_lootup table"""
-    l=l or color_lookup
-    i,c=_nearest(x,l)
+def nearest_color(c,l=None, opt=min):
+    """
+    :param x: Color
+    :param l: list or dict of Color, color by default
+    :param opt: with opt=max you can find the most different color ...
+    :return: nearest Color of x in  l
+    """
+    if not isinstance(c, Color):
+        c=Color(c)
+    l=l or color
     if isinstance(l,dict):
-        return l[c]
-    return l[i]
+        l=l.values()
+    return opt(l,key=lambda c2:deltaE(c,c2))
 
-class Color(object):
-    '''class to allow simple math operations on colors'''
-    def __init__(self,c):
-        ''':param c: either color name, hex string, or (r,g,b) tuple in [0..255] int or [0,.1.] float range'''
-        if isinstance(c,str):
-            try: #is c a color name ?
-                c=color[c]
-            except: #assume it's a hex string
-                pass
-            self.rgb=hex_to_rgb(c,1./255)
-        else: # assume (r,g,b) tuple
-            if max(c)>1:
-                c=tuple(_/255. for _ in c)
-            self.rgb=c
-        
-        try: #to guess the color name
-            self.name=color_lookup[self.hex]
-            return
-        except: #find the closest one
-            pass
-        self.name='~'+nearest_color(self.rgb)
-            
-    @property
-    def hex(self):
-        rgb=math2.sat(self.rgb)
-        return rgb_to_hex((math2.rint(_*255) for _ in rgb))
-    
-    def __repr__(self):
-        return "Color('%s')"%(self.name if self.name[0]!='~' else self.hex)
-        
-    def _repr_html_(self):
-        return '<div style="color:%s">%s</div>'%(self.hex,self.name)
-        
-    def __eq__(self,other):
-        try:
-            return self.hex==other.hex
-        except:
-            return self.name==other
-    
-    def __add__(self,other):
-        return Color(math2.vecadd(self.rgb,other.rgb))
-    
-    def __sub__(self,other):        
-        return Color(math2.vecsub(self.rgb,other.rgb))
+#http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
+
+def color_range(n,start,end,space='hsv'):
+    """:param n: int number of colors to generate
+    :param start: string hex color or color name
+    :param end: string hex color or color name
+    :result: list of n Color interpolated between start and end, included
+    """
+
+    from .itertools2 import linspace
+    start=Color(start).convert(space)
+    end=Color(end).convert(space)
+    return [Color(v, space=space) for v in linspace(start,end,n)]

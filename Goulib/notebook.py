@@ -9,36 +9,82 @@ exemple: h('the result is',time,'[ms]')
 
 """
 
-__author__ = "Marc Nicole"
-__copyright__ = "Copyright 2015, Marc Nicole"
+from __future__ import print_function
+
+__author__ = "Philippe Guglielmetti"
+__copyright__ = "Copyright 2016, Philippe Guglielmetti"
 __credits__= [""]
 __license__ = "LGPL"
 
-from IPython.display import display, HTML
+import logging, six
 
-sep=' ' # Python2 doesn't allow named param after list of optional ones...
+from IPython.display import display, HTML, Math
+from .markup import tag
+from .itertools2 import isiterable
+
+
+def html(obj, sep=None):
+    try:
+        return obj._repr_html_()
+    except AttributeError:
+        pass #skip logging.error
+
+    if sep is None:
+        sep=' '
+        bra,ket='',''
+    else:
+        if isinstance(obj,dict):
+            res=',\n'.join("%s:%s"%(html(k),html(v)) 
+                for k,v in six.iteritems(obj))
+            return '{%s}'%res
+        elif isinstance(obj,list):
+            bra,ket='[',']'
+        else:
+            bra,ket='(',')'
+
+    if isiterable(obj): #iterable, but not a string
+        return bra+sep.join(html(a,sep=',') for a in obj)+ket
+
+    try:
+        return unicode(obj,'utf-8') #to render accented chars correctly
+    except :
+        pass
+
+    return str(obj)
 
 def h1(*args):
-    display(HTML('<h1>'+sep.join(str(a) for a in args)+'</h1>'))
-    
+    display(HTML(tag('h1',html(args))))
+
 def h2(*args):
-    display(HTML('<h2>'+sep.join(str(a) for a in args)+'</h2>'))
-    
+    display(HTML(tag('h2',html(args))))
+
 def h3(*args):
-    display(HTML('<h3>'+sep.join(str(a) for a in args)+'</h3>'))
-    
+    display(HTML(tag('h3',html(args))))
+
+def h4(*args):
+    display(HTML(tag('h4',html(args))))
+
 def h(*args):
-    display(HTML(sep.join(str(a) for a in args))) 
-    
-def hinfo(*args):   
-    display(HTML('<div style="background-color:#337ab7;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+    display(HTML(html(args)))
 
-def hsuccess(*args):   
-    display(HTML('<div style="background-color:#5cb85c;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+#redefine "print" for notebooks ...
+try: #http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+    get_ipython #is defined from within IPython (notebook)
+except:
+    pass
+else:
+    pass #for pythoscope
+    # print = h # this is ok in Python 3, but not before
 
-def hwarning(*args):   
-    display(HTML('<div style="background-color:#f0ad4e;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
+def hinfo(*args):
+    display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))
+def hsuccess(*args):
+    display(HTML(tag('div',html(args),style="background-color:#5cb85c;color:#ffffff")))
+def hwarning(*args):
+    display(HTML(tag('div',html(args),style="background-color:#f0ad4e;color:#ffffff")))
+def herror(*args):
+    display(HTML(tag('div',html(args),style="background-color:#d9534f;color:#ffffff")))
 
-def herror(*args):   
-    display(HTML('<div style="background-color:#d9534f;color:#ffffff">'+sep.join(str(a) for a in args)+'</div>'))   
-    
+def latex(obj):
+    """ to force LaTeX representation """
+    return Math(obj.latex())

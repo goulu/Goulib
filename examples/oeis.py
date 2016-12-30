@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # coding: utf8
 
+from __future__ import division #"true division" everywhere
+
 """
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
-
-sequences are implemented as INFINITE length generators only
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
@@ -19,155 +18,27 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import six, logging, operator, math
+from six.moves import map, reduce, filter, zip, zip_longest
 
-from itertools import count, repeat, tee, islice
+from itertools import count, repeat
 
-from Goulib import math2, itertools2, decorators, table, tests
+from Goulib import math2, itertools2, decorators
 
-class Sequence(object):
-    """combines a generator and a read-only list
-    used for numeric (integer) sequences
-    """
-    def __init__(self,iterf=None,itemf=None,containf=None,desc=''):
-        """
-        :param iterf: optional iterator, or a function returning an iterator
-        :param itemf: optional function(i) returning the i-th element
-        :param containf: optional function(n) return bool True if n belongs to Sequence
-        :param desc: string description
-        """
-        self.name=self.__class__.__name__ #by default
-
-        if isinstance(iterf,six.integer_types):
-            self.offset=iterf
-            self.iterf=None
-        else:
-            try: #evaluate function into iterator
-                iterf=iterf()
-            except:
-                pass
-            self.offset=0
-            self.iterf=iterf
-        self.itemf=itemf
-        if itemf and not desc:
-            desc=itemf.__doc__
-        self.containf=containf
-
-        self.desc=desc
-
-    def __repr__(self):     
-        return self.name
-        s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
-        return '%s (%s ...)'%(self.name,s)
-
-    def __iter__(self):
-        """reset the generator
-        :return: a tee-ed copy of iterf
-        """
-        if self.iterf:
-            self.iterf, self.generator=tee(self.iterf)
-        elif self.itemf:
-            def _():
-                for i in count(self.offset):
-                    yield self[i]
-            self.generator=_()
-        else:
-            def _():
-                for n in count(self.offset):
-                    if n in self:
-                        yield n
-            self.generator=_()
-        return self.generator
-
-    def __getitem__(self, i):
-        if not isinstance(i,slice):
-            if self.itemf :
-                return self.itemf(i)
-            else:
-                return itertools2.index(i,self)
-        else:
-            return islice(self(),i.start,i.stop,i.step)
-
-    def index(self,v):
-        #assume sequence is growing
-        for i,n in enumerate(self):
-            if v==n: return i
-            if n>v: return -1
-
-    def __contains__(self,n):
-        if self.containf:
-            return self.containf(n)
-        else:
-            return self.index(n)>=0
-
-    def __add__(self,other):
-        if type(other) is int:
-            return self.apply(
-                lambda n:n+other,
-                containf=lambda n:n-other in self,
-                desc='%s+%d'%(self.name,other)
-            )
-            
-    def __and__(self,other):
-        return Sequence(
-            itertools2.merge(self,other), None,
-            lambda x:x in self or x in other
-        )
-
-    def __sub__(self,other):
-        if type(other) is int:
-            return self.apply(
-                lambda n:n-other,
-                containf=lambda n:n+other in self,
-                desc='%s-%d'%(self.name,other)
-            )
-    
-    def __mod__(self,other):
-        return Sequence(
-            itertools2.diff(self.__iter__(),other.__iter__()), None,
-            lambda x:x in self and x not in other
-        )
-
-    def apply(self,f,containf=None,desc=''):
-        return Sequence(
-            six.moves.map(f,self),
-            lambda i:f(self[i]),
-            containf,
-            desc
-        )
-
-    def filter(self,f,desc=''):
-        return Sequence(
-            six.moves.filter(f,self),
-            None,
-            lambda n:f(n) and n in self,
-            desc
-        )
-
-    def accumulate(self,op,skip_first=False):
-        return Sequence(itertools2.accumulate(self,op,skip_first))
-
-    def pairwise(self,op,skip_first=False):
-        return Sequence(itertools2.pairwise(self,op))
-
-    def sort(self,key=None,buffer=1000):
-        return Sequence(itertools2.sorted_iterable(self, key, buffer))
-
-    def unique(self):
-        return Sequence(itertools2.unique_sorted(self))
+from Goulib.container import Sequence
 
 def record(iterable, it=count(), max=0):
-    for i,v in six.moves.zip(it,iterable):
+    for i,v in zip(it,iterable):
         if v>max:
             yield i
             max=v
 
-A000004=Sequence(repeat(0), desc='The zero sequence')
+A000004=Sequence(repeat(0),lambda n:0, lambda x:x==0, desc='The zero sequence')
 
-A000007=Sequence(None,lambda n:0**n, desc='The characteristic function of 0: a(n) = 0^n.')
+A000007=Sequence(None,lambda n:0**n, lambda x:x in (0,1), desc='The characteristic function of 0: a(n) = 0^n.')
 
-A000027=Sequence(count(1), lambda n:n, desc='The positive integers.')
-A005408=Sequence(count(1,2), lambda n:2*n+1, desc='The odd numbers: a(n) = 2n+1.')
-A005843=Sequence(count(0,2), lambda n:2*n, desc='The even numbers: a(n) = 2n ')
+A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers.')
+A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
+A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
 A008587=Sequence(None,lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(None,lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
@@ -250,7 +121,17 @@ A004169=Sequence(
     desc='Values of n for which a regular polygon with n sides cannot be constructed with ruler and compass'
 )
 
-A000292=Sequence(None,lambda n:n*(n+1)*(n+2)//6, desc='Tetrahedral (or triangular pyramidal) numbers')
+A000292=Sequence(None,math2.tetrahedral, desc='Tetrahedral (or triangular pyramidal) numbers')
+
+A000330=Sequence(None,math2.sum_of_squares,desc='Square pyramidal numbers')
+
+A000537=Sequence(None,math2.sum_of_cubes,desc='Sum of first n cubes; or n-th triangular number squared')
+
+
+A027641=Sequence(None, lambda n:math2.bernouilli(n,-1).numerator,'Numerator of Bernoulli number B_n.')
+A027642=Sequence(None, lambda n:math2.bernouilli(n).denominator,'Denominators of Bernoulli numbers')
+A164555=Sequence(None, lambda n:math2.bernouilli(n,1).numerator,'Numerators of the "original" Bernoulli numbers')
+
 
 def cullen(n):return n*2**n+1
 
@@ -392,13 +273,13 @@ A001223=A000040.pairwise(operator.sub)
 
 A077800=Sequence(itertools2.flatten(math2.twin_primes()))
 
-A001097=Sequence(itertools2.unique_sorted(A077800))
+A001097=A077800.unique()
 
 A001359=Sequence(itertools2.itemgetter(math2.twin_primes(),0),desc="Lesser of twin primes.")
 
 A006512=Sequence(itertools2.itemgetter(math2.twin_primes(),1),desc="Greater of twin primes.")
 
-A037074=Sequence(six.moves.map(math2.mul,math2.twin_primes()), desc="Numbers that are the product of a pair of twin primes")
+A037074=Sequence(map(math2.mul,math2.twin_primes()), desc="Numbers that are the product of a pair of twin primes")
 
 def count_10_exp(iterable):
     """generates number of iterable up to 10^n."""
@@ -435,6 +316,16 @@ def is_product_of_2_primes(n):
     
 A006881=Sequence(1,None,is_product_of_2_primes,"Numbers that are the product of two distinct primes.")
 
+def is_powerful(n):
+    """if a prime p divides n then p^2 must also divide n
+    (also called squareful, square full, square-full or 2-full numbers).
+    """
+    for f in itertools2.unique(math2.prime_factors(n)):
+        if n%(f*f): return False
+    return True
+        
+A001694=Sequence(1,None,is_powerful,"powerful numbers")
+
 #these 2 implementations have pretty much the same performance
 A030513=A030078+A006881 #Numbers with 4 divisors
 A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4,"Numbers with 4 divisors")
@@ -450,6 +341,8 @@ A001222=Sequence(1,math2.bigomega)
 
 A000045=Sequence(math2.fibonacci_gen,math2.fibonacci) #Fibonacci numbers: F(n) = F(n-1) + F(n-2) with F(0) = 0 and F(1) = 1
 
+A007318=Sequence(math2.pascal_gen)
+
 A000108=Sequence(math2.catalan_gen,math2.catalan)
 
 def recaman():
@@ -462,11 +355,11 @@ def recaman():
         s.add(x)
         yield x,addition_step,n
 
-A005132=Sequence(six.moves.map(operator.itemgetter(0), recaman()))
+A005132=Sequence(map(operator.itemgetter(0), recaman()))
 
 A057165=Sequence(
-    six.moves.map(operator.itemgetter(2),   # get n from ...
-        six.moves.filter(                   # filtered recaman generator
+    map(operator.itemgetter(2),   # get n from ...
+        filter(                   # filtered recaman generator
             lambda x:x[1],                  # when addition_step is True
             recaman()
         )
@@ -474,8 +367,8 @@ A057165=Sequence(
 )
 
 A057166=Sequence(
-    six.moves.map(operator.itemgetter(2),   # get n from ...
-        six.moves.filter(                   # filtered recaman generator
+    map(operator.itemgetter(2),   # get n from ...
+        filter(                   # filtered recaman generator
             lambda x:x[1]==False,           # when substraction step
             recaman()
         )
@@ -508,28 +401,21 @@ A007953=Sequence(None,math2.digsum, True) #Digital sum (i.e., sum of digits) of 
 
 A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence: number of 1's in binary expansion of n
 
-def pascal():
-    """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
-    https://oeis.org/A007318
-    """
-    __author__ = 'Nick Hobson <nickh@qbyte.org>'
-    # code from https://oeis.org/A007318/a007318.py.txt with additional related functions
-    for row in count():
-        x = 1
-        yield x
-        for m in range(row):
-            x = (x * (row - m)) // (m + 1)
-            yield x
+def sumdigpow(p,desc=None):
+    """sum of p-th powers of digits"""
+    return Sequence(None,lambda x:math2.digsum(x,f=p),desc=desc)
+                    
+A003132=sumdigpow(2,desc='Sum of squares of digits of n. ')
+A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose trajectory under iteration of sum of squares of digits map (see A003132) includes 1.')
 
-A007318=Sequence(pascal)
+A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-A003132=Sequence(None,math2.sos_digits)
-A007770=Sequence(None,None,math2.is_happy)
+#A005188=Sequence(1,lambda x:math2.digsum(x,f=len(str(x))),desc='Armstrong (or Plus Perfect, or narcissistic) numbers: n-digit numbers equal to sum of n-th powers of their digits')
 
 # Reverse and Add
 # https://oeis.org/wiki/Index_to_OEIS:_Section_Res#RAA
 
-A006960=Sequence(six.moves.map(operator.itemgetter(0), math2.lychrel_seq(196))) # Reverse and Add! sequence starting with 196.
+A006960=Sequence(map(operator.itemgetter(0), math2.lychrel_seq(196))) # Reverse and Add! sequence starting with 196.
 
 A023108=Sequence(None,None,math2.is_lychrel)
 """Positive integers which apparently never result in a palindrome
@@ -594,28 +480,39 @@ def pi_generate():
 A000796=Sequence(pi_generate) #Decimal expansion of Pi (or, digits of Pi).
 
 # pythagorean triples
-
-"""problems with .sort
-
-A009096=Sequence(math2.triples).apply(sum).sort() # not .unique()
+A009096=Sequence(math2.triples) \
+    .apply(sum) \
+    .sort() # not .unique()
 
 desc="Sum of legs of Pythagorean triangles (without multiple entries)."
-A118905=Sequence(math2.triples,desc=desc).apply(lambda x:x[0]+x[1]).sort().unique()
+A118905=Sequence(math2.triples,desc=desc) \
+    .apply(lambda x:x[0]+x[1]) \
+    .sort() \
+    .unique()
 
 desc="Ordered areas of primitive Pythagorean triangles."
-A024406=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0]*x[1]//2).sort()
+A024406=Sequence(math2.primitive_triples,desc=desc) \
+    .apply(lambda x:x[0]*x[1]//2) \
+    .sort()
 
-desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
-A121727=Sequence(math2.primitive_triples,desc=desc).sort(lambda x:(x[0]*x[1]//2,x[2])).apply(lambda x:x[2])
 
 desc="Ordered hypotenuses (with multiplicity) of primitive Pythagorean triangles."
-A020882=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[2]).sort()
+A020882=Sequence(math2.primitive_triples,desc=desc) \
+    .apply(lambda x:x[2])
+    # .sort() #not needed anymore
 
 desc="Smallest member 'a' of the primitive Pythagorean triples (a,b,c) ordered by increasing c, then b"
-A046086=Sequence(math2.primitive_triples,desc=desc).sort(key=lambda x:x[2]).apply(lambda x:x[0])
+A046086=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0])
+    # .sort(key=lambda x:x[2]) \ #not needed anymore
+    # .apply(lambda x:x[0])
+    
+""" found a bug in OEIS ! 20th term of the serie is 145, not 142 !
 
+desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
+A121727=Sequence(math2.primitive_triples,desc=desc) \
+    .sort(lambda x:(x[0]*x[1],x[2])) \
+    .apply(lambda x:x[2])
 """
-
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -624,6 +521,12 @@ for id in seqs:
     if id[0]=='A' and len(id)==7:
         seqs[id].name=id
         oeis[id]=seqs[id]
-
+        
+        
+if __name__ == "__main__": 
+    """local tests"""
+    it=itertools2.sorted_iterable(math2.primitive_triples(),(lambda x:(x[0]*x[1],x[2])))
+    for p in itertools2.take(30,it):
+        print(p,p[0]*p[1]/2)
 
 

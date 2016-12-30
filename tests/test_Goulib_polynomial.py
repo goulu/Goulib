@@ -7,9 +7,6 @@ from Goulib.tests import *
 
 from Goulib.polynomial import *
 
-import os
-path=os.path.dirname(os.path.abspath(__file__))
-
 class TestPolynomial:
     @classmethod
     def setup_class(self):
@@ -60,13 +57,19 @@ class TestPolynomial:
         assert_equal(self.p.integral(),'x^3+x^2+x')
 
     def test___repr__(self):
-        pass # tested in several comparizons above
+        s=repr(self.p)
+        s=s.replace(' ','')
+        assert_equal(repr(self.p), '3*x**2+2*x+1')
     
     def test__repr_latex_(self):
-        assert_equal(self.p._repr_latex_(), '$3x^2 + 2x + 1$')
+        s=self.p._repr_latex_()
+        s=s.replace(' ','')
+        assert_equal(s, '$3x^2+2x+1$')
     
     def test___str__(self):
-        assert_equal(str(self.p), '3x^2 + 2x + 1')
+        s=str(self.p)
+        s=s.replace(' ','')
+        assert_equal(s,'3x^2+2x+1')
 
     def test___eq__(self):
        assert_true(self.p=='3x^2+2*x+1')
@@ -86,10 +89,6 @@ class TestPolynomial:
         assert_true(self.p>self.p2)
         assert_equal(self.p3,[1,2,-4,0,0,7])
         assert_equal(self.p3,'7x^5 - 4x^2 + 2x + 1')
-        
-    def test_save(self):
-        self.p3.save(path+'/results/polynomial.png')
-        self.p3.save(path+'/results/polynomial.svg')
 
 class TestPlist:
     def test_plist(self):

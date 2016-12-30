@@ -71,22 +71,19 @@ class Interval(list):
     """
     
     def __init__(self, start, end):
-        "Construct, start must be <= end."
+        """Construct, start must be <= end."""
         self[0:1] = _order((start,end))
         
     start = property(fget=lambda self: self[0], doc="The interval's start")
     end = property(fget=lambda self: self[1], doc="The interval's end")
      
     def __str__(self):
-        "As string."
         return '[%s,%s)' % (self.start, self.end)
     
     def __repr__(self):
-        "String representation."
         return '[%s,%s)' % (self.start, self.end)
     
     def __hash__(self):
-        "Hash."
         return hash(self.start) ^ hash(self.end)
     
     def __lt__(self, other):
@@ -110,17 +107,18 @@ class Interval(list):
         return start,end
     
     def separation(self, other):
-        ":return: distance between self and other, negative if overlap"
+        """:return: distance between self and other, negative if overlap"""
         start,end=self._combine(other)
         return start-end #yes, in this order ...
     
     def overlap(self, other, allow_contiguous=False):
         """:return: True iff self intersects other."""
         d=self.separation(other)
-        if allow_contiguous and d==0:
+        zero=type(d)()
+        if allow_contiguous and d==zero:
             return True
         else:
-            return d<0
+            return d<zero
     
     def intersection(self, other):
         """:return: Intersection with other, or None if no intersection."""

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_not_equals
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
@@ -91,6 +91,18 @@ class TestCompose:
 class TestIterate:
     def test_iterate(self):
         assert_equal(take(4,iterate(lambda x:x*x, 2)), [2,4,16,16*16])
+        
+class TestIsIterable:
+    def test_isiterable(self):
+        assert_false(isiterable(123))
+        assert_false(isiterable('a string'))
+        assert_true(isiterable([]))
+        assert_true(isiterable(tuple()))
+        assert_true(isiterable({}))
+        assert_true(isiterable(set()))
+        assert_true(isiterable((x for x in range(10))))
+        assert_true(isiterable(map(lambda x:x*x,[1,2,3])))
+        
 
 class TestTails:
     def test_tails(self):
@@ -106,6 +118,7 @@ class TestUnique:
     def test_unique(self):
         assert_equal(''.join(unique('AAAABBBCCDAABBB')),'ABCD')
         assert_equal(''.join(unique('ABBCcAD', str.lower)),'ABCD')
+        assert_equal(''.join(unique('AAAABBBCCDAABBB',None,1)),'ABCDAB')
 
 class TestIdentity:
     def test_identity(self):
@@ -250,6 +263,13 @@ class TestCartesianProduct:
         
         assert_equal(next(g),(range(100),range(100)))
         
+class TestCombinationsWithReplacement:
+    def test_combinations_with_replacement(self):
+        assert_equal(combinations_with_replacement('ABC', 2),
+            ['AA','AB','AC','BB','BC','CC'])
+        assert_equal(combinations_with_replacement('AB', 4),
+            ['AAAA','AAAB','AABB','ABBB','BBBB'])
+        
 class TestCountUnique:
     def test_count_unique(self):
         assert_equal(count_unique('AAAABBBCCDAABBB'),4)
@@ -305,17 +325,14 @@ class TestSubdict:
 
 class TestCompress:
     def test_compress(self):
-        # assert_equal(expected, compress(iterable))
-        raise SkipTest 
+        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
+        res=compress('aaaaabbbbccccccaaaaaaa')
+        res=''.join('%d%s'%(n,c) for (c,n) in res)
+        assert_equal(res,'5a4b6c7a')
 
 class TestAccumulate:
     def test_accumulate(self):
         # assert_equal(expected, accumulate(iterable, func, skip_first))
-        raise SkipTest 
-
-class TestUniqueSorted:
-    def test_unique_sorted(self):
-        # assert_equal(expected, unique_sorted(iterable))
         raise SkipTest 
 
 class TestDiff:
@@ -325,13 +342,24 @@ class TestDiff:
 
 class TestSortedIterable:
     def test_sorted_iterable(self):
-        # assert_equal(expected, sorted_iterable(iterable, key, buffer))
-        raise SkipTest 
+        data=[1,2,3,7,6,5,4]
+        res=sorted(data)
+        #with a small buffer, it fails
+        def test(iterable,buffer,key=None): 
+            return [x for x in ensure_sorted(
+                sorted_iterable(iterable,key=key, buffer=buffer)
+                ,key=key)]
+        assert_raises(SortingError,test,data,3)
+        #with a larger one, it's ok
+        assert_equal(test(data,buffer=4),res)
+
 
 class TestIsiterable:
     def test_isiterable(self):
-        # assert_equal(expected, isiterable(obj))
-        raise SkipTest 
+        assert_true(isiterable(list()))
+        assert_true(isiterable(tuple()))
+        assert_true(isiterable(range(1000)))
+        assert_false(isiterable(''))
 
 class TestItemgetter:
     def test_itemgetter(self):
@@ -352,6 +380,31 @@ class TestDictsplit:
     def test_dictsplit(self):
         # assert_equal(expected, dictsplit(dic, keys))
         raise SkipTest 
+
+class TestShape:
+    def test_shape(self):
+        # assert_equal(expected, shape(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestNdim:
+    def test_ndim(self):
+        # assert_equal(expected, ndim(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestEnumerates:
+    def test_enumerates(self):
+        # assert_equal(expected, enumerates(iterable))
+        raise SkipTest # TODO: implement your test here
+
+class TestEnsureSorted:
+    def test_ensure_sorted(self):
+        # assert_equal(expected, ensure_sorted(iterable, key))
+        raise SkipTest # TODO: implement your test here
+
+class TestIscallable:
+    def test_iscallable(self):
+        # assert_equal(expected, iscallable(f))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

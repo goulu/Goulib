@@ -9,9 +9,12 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import csv, itertools, operator, string, codecs, six, logging
+import six, logging
+from six.moves import html_parser, reduce
 
-from datetime import datetime, date, timedelta
+import csv, itertools, codecs, json, collections
+
+import datetime as std_datetime
 
 try: # using http://lxml.de/
     from lxml import etree as ElementTree
@@ -19,12 +22,14 @@ try: # using http://lxml.de/
 except: #ElementTree
     logging.info('LXML unavailable : falling back to ElementTree')
     from xml.etree import ElementTree
-    from six.moves.html_parser import HTMLParser
+    from html_parser import HTMLParser
     defaultparser=HTMLParser
     
 Element=ElementTree._Element
 
-from .datetime2 import datef, datetimef,strftimedelta
+from datetime import datetime, date, time, timedelta
+from .datetime2 import datef, datetimef, timef, timedeltaf, strftimedelta
+
 from .markup import tag, style_str2dict
 from .itertools2 import isiterable
 
@@ -35,21 +40,33 @@ def attr(args):
         res+=' %s="%s"'%(k,val)
     return res
 
-class Cell():
+class Cell(object):
     """Table cell with HTML attributes"""
-    def __init__(self,data=None,align=None,fmt=None,tag=None,style=None):
+    def __init__(self,data=None,align=None,fmt=None,tag=None,style={}):
         """
         :param data: cell value(s) of any type
         :param align: string for HTML align attribute
         :param fmt: format string applied applied to data
         :param tag: called to build each cell. defaults to 'td'
-        :param style: dict for HTML style attribute
+        :param style: dict or string for HTML style attribute
         """
         
         if isinstance(data,Element):
             tag=data.tag
             assert(tag in ('td','th'))
-            data=Cell.read(data.text)
+            
+            def _recurse(data):
+                "grab all possible text from the cell content"
+                if data is None:
+                    return ''
+                s=''.join(_recurse(x) for x in data.getchildren())
+                if data.text:
+                    s=data.text+s
+                if data.tail:
+                    s=s+data.tail
+                return s
+                    
+            data=Cell.read(_recurse(data))
             
         if isinstance(data,str):
             data=data.lstrip().rstrip() #remove spaces, but also trailing \r\n
@@ -58,7 +75,9 @@ class Cell():
         self.align=align
         self.fmt=fmt
         self.tag=tag if tag else 'td'
-        self.style=style_str2dict(style) if style else {}
+        if not isinstance(style,dict):
+            style=style_str2dict(style)
+        self.style=style
         
     def __repr__(self):
         return str(self.data)
@@ -92,7 +111,11 @@ class Cell():
         f=self.fmt
         
         if hasattr(v,'_repr_html_'):
-            return tag(self.tag,v._repr_html_(),**args)
+            try:
+                s=v._repr_html_()
+            except Exception as e:
+                s='ERROR : %s _repr_html_ failed : %s'%(v,e)
+            return tag(self.tag,s,**args)
         
         style=args.get('style',{})
         if not isinstance(style,dict):
@@ -126,32 +149,27 @@ class Cell():
         if style:
             args['style']=style
         
-        if not v or v=='':
+        if v is None or v=='':
             v="&nbsp;" #for IE8
         else:
             v=f%v if f else six.text_type(v)
         return tag(self.tag,v,**args)
 
-class Row():
+class Row(object):
     """Table row with HTML attributes"""
-    def __init__(self,data,align=None,fmt=None,tag=None,style=None):
+    def __init__(self,data,align=None,fmt=None,tag=None,style={}):
         """
         :param data: (list of) cell value(s) of any type
         :param align: (list of) string for HTML align attribute
         :param fmt: (list of) format string applied applied to data
         :param tag: (list of) tags called to build each cell. defaults to 'td'
-        :param style: (list of) string for HTML style attribute
+        :param style: (list of) dict or string for HTML style attribute
         """
-        if isinstance(data,Element):
-            line=[]
-            for td in data:
-                cell=Cell(td)
-                line.append(cell.data)
-            data=line
         
-        
-        if not isinstance(data,list) : 
+        if not isiterable(data) : 
             data=[data]
+        data=list(data) #to make it mutable
+            
         #ensure params have the same length as data
         
         if not isinstance(style,list): style=[style]
@@ -168,11 +186,16 @@ class Row():
             tag=[tag]*(len(data)) #make a full row, in case it's a 'th'
         tag=tag+[None]*(len(data)-len(fmt)) #fill the row with None, which will be 'td's
             
+        for i,cell in enumerate(data):
+            if not isinstance(cell,Cell):
+                cell=Cell(cell,align[i],fmt[i],tag[i],style[i])
+            else:
+                pass #ignore attribs for now
+            data[i]=cell
+        
+
+       
         self.data=data
-        self.align=align
-        self.fmt=fmt
-        self.tag=tag
-        self.style=style 
         
     def __repr__(self):
         return str(self.data)
@@ -183,8 +206,7 @@ class Row():
     def html(self,cell_args={},**kwargs):
         """return in HTML format"""
         res=''
-        for i,v in enumerate(self.data):
-            cell=Cell(v,self.align[i],self.fmt[i],self.tag[i],self.style[i])
+        for cell in self.data:
             res+=cell.html(**cell_args)
         return tag('tr',res,**kwargs)
     
@@ -196,32 +218,29 @@ class Table(list):
         :param titles: optional list of strings used as column id
         :param footer: optional list of functions used as column reducers
         """
+        try:
+            self.titles=data.titles
+        except:
+            self.titles=kwargs.pop('titles',[])
+        try:
+            self.footer=data.footer
+        except:
+            self.footer=kwargs.pop('footer',[])
+            
         filename=None
         if isinstance(data,six.string_types):
             filename=data
             data=[]
         else: #ensure data is 2D and mutable
+            if isinstance(data, dict):
+                data=data.values()
             for row in data:
                 if not isiterable(row): #build a column
                     row=[row]
-                self.append(list(row))
+                self.append(row)
         
-        self.titles=kwargs.pop('titles',[])
-        self.footer=kwargs.pop('footer',[])
         if filename:
-            if self.titles: #explicitely set
-                kwargs.setdefault('titles_line',0)
-                kwargs.setdefault('data_line',1)
-            else: #read titles from the file
-                kwargs.setdefault('titles_line',1) 
-                kwargs.setdefault('data_line',2)
-            ext=filename.split('.')[-1].lower()
-            if ext=='xls':
-                self.read_xls(filename,**kwargs)
-            elif ext[:3]=='htm':
-                self.read_html(filename,**kwargs)
-            else: #try ...
-                self.read_csv(filename,**kwargs)
+            self.load(filename,**kwargs)
             
     def __repr__(self):
         """:return: repr string of titles+5 first lines"""
@@ -239,22 +258,34 @@ class Table(list):
     def _repr_html_(self):
         return self.html()
     
-    def html(self,head=None,foot=None,colstyle=None,**kwargs):
-        """:return: string HTML representation of table"""
+    def html(self,head=None,foot=None,colstyle={},**kwargs):
+        """HTML representation of table
+        
+        :param head: optional column headers, .titles by default
+        :param foot: optional column footers, .footer by default
+        :param style: (list of) dict of style attributes
+        :param kwargs: optional parameters passed along to tag('table'...
+            except:
+            * start=optional start row
+            * stop=optional end row
+            used to display a subset of lines. in this case rows with '...' cells
+            are displayed before and/or after the lines
+        :return: string HTML representation of table
+        """
                 
-        def TR(data,align=None,fmt=None,tag=None,style=None):
+        def TR(data,align=None,fmt=None,tag=None,style={}):
             res=''
             row=Row(data=data,align=align,fmt=fmt,tag=tag,style=style)
             res+=row.html()+'\n'
             return res
             
-        def THEAD(data,fmt=None,style=None):
+        def THEAD(data,fmt=None,style={}):
             res="<thead>\n"
             res+=TR(data=data,fmt=fmt,tag='th',style=style)
             res+="</thead>\n"
             return res
             
-        def TFOOT(data,fmt=None,style=None):
+        def TFOOT(data,fmt=None,style={}):
             res="<tfoot>\n"
             res+=TR(data=data,fmt=fmt,tag='th',style=style)
             res+="</tfoot>\n"
@@ -266,8 +297,14 @@ class Table(list):
             head=self.titles
         if head:
             res+=THEAD(head)
-        for row in self:
+        start=kwargs.pop('start',0)
+        stop=kwargs.pop('stop',len(self))
+        if start!=0:
+            res+=TR(['...']*self.ncols(),style=colstyle)  
+        for row in self[start:stop]:
             res+=TR(row,style=colstyle)  
+        if stop!=-1 and stop<len(self):
+            res+=TR(['...']*self.ncols(),style=colstyle)  
         if foot is None:
             foot=self.footer
         if foot:
@@ -275,21 +312,48 @@ class Table(list):
         
         return tag('table',res,**kwargs)+'\n'
     
+    def load(self,filename,**kwargs):
+        if self.titles: #explicitly set
+            l=kwargs.setdefault('titles_line',0)
+            kwargs.setdefault('data_line',l+1)
+        else: #read titles from the file
+            l=kwargs.setdefault('titles_line',1) 
+            kwargs.setdefault('data_line',l+1)
+        ext=filename.split('.')[-1].lower()
+        if ext in ('xls','xlsx'):
+            self.read_xls(filename,**kwargs)
+        elif ext in ('htm','html'):
+            self.read_html(filename,**kwargs)
+        elif ext in ('json'):
+            self.read_json(filename,**kwargs)
+        else: #try ...
+            self.read_csv(filename,**kwargs)
+        return self #to allow chaining
+    
     def read_element(self,element, **kwargs):
-        """read table from a DOM element"""
+        """read table from a DOM element.
+        :Warning: drops all formatting
+        """
+        titles_line=kwargs.pop('titles_line',1)-1
+        data_line=kwargs.pop('data_line',2)-1
+        line=0
         head=element.find('thead')
         if head is not None:
-            self.titles=Row(head.find('tr')).data
+            for row in head.findall('tr'):
+                if line==titles_line:
+                    self.titles=[cell.data for cell in Row(row).data]
+                line=line+1
         body=element.find('tbody')
         if body is None:
             body=element
         for row in body.findall('tr'):
-            line=Row(row).data
-            if not line: continue #skip empty lines
-            if not self.titles:
-                self.titles=line
-            else:
-                self.append(line)
+            data=[cell.data for cell in Row(row).data]
+            if not data: continue #skip empty lines
+            if not self.titles and line==titles_line:
+                self.titles=data
+            elif line>=data_line:
+                self.append(data)
+            line=line+1
         return self
     
     def read_html(self,filename, **kwargs):
@@ -309,6 +373,13 @@ class Table(list):
         self.read_element(element, **kwargs)
         return self
     
+    def read_json(self,filename, **kwargs):
+        """appends a json file made of lines dictionaries"""
+        with open(filename, 'r') as file:
+            for row in json.load(file):
+                self.append(row)
+        return self
+    
     def read_xls(self, filename, **kwargs):
         """appends an Excel table"""
         titles_line=kwargs.pop('titles_line',1)-1
@@ -316,13 +387,18 @@ class Table(list):
         
         from xlrd import open_workbook
         wb = open_workbook(filename)
-        for s in wb.sheets():
-            for i in range(s.nrows):
-                line=[Cell.read(s.cell(i,j).value) for j in range(s.ncols)]
-                if i==titles_line:
-                    self.titles=line
-                elif i>=data_line:
-                    self.append(line)
+        sheet=kwargs.get('sheet',0)
+        if isinstance(sheet,six.string_types):
+            s=wb.sheet_by_name(sheet)
+        else:
+            s=wb.sheet_by_index(sheet)
+        
+        for i in range(s.nrows):
+            line=[Cell.read(s.cell(i,j).value) for j in range(s.ncols)]
+            if i==titles_line:
+                self.titles=line
+            elif i>=data_line:
+                self.append(line)
         return self
         
     def read_csv(self, filename, **kwargs):
@@ -357,8 +433,64 @@ class Table(list):
                 if line!=[None]: #strange last line sometimes ...
                     self.append(line)
         return self
+    
+    def save(self,filename,**kwargs):
+        ext=filename.split('.')[-1].lower()
+        if ext in ('xls','xlsx'):
+            self.write_xlsx(filename,**kwargs)
+        elif ext in ('htm','html'):
+            with open(filename, 'w') as file:
+                file.write(self.html(**kwargs))
+        elif ext in ('json'):
+            with open(filename, 'w') as file:
+                file.write(self.json(**kwargs))
+        else: #try ...
+            self.write_csv(filename,**kwargs)
+        return self #to allow chaining
+    
+    def write_xlsx(self,filename, **kwargs):
+        import xlsxwriter
+
+        workbook = xlsxwriter.Workbook(filename)
+        worksheet = workbook.add_worksheet()
+        df=workbook.add_format({'num_format': 'dd/mm/yyyy'})
+        tf=workbook.add_format({'num_format': 'hh:mm:ss'})
+        dtf=workbook.add_format({'num_format': 'dd/mm/yyyy hh:mm:ss'})
+        
+        def writerow(i,line):
+            for j,s in enumerate(line):
+                if isinstance(s, datetime):
+                     worksheet.write_datetime(i, j,s,dtf)
+                elif isinstance(s, date):
+                    worksheet.write_datetime(i, j,s,df)
+                elif isinstance(s, (time,timedelta)):
+                     worksheet.write_datetime(i, j,s,tf)
+                else:
+                    worksheet.write(i, j,s)
+                
+        writerow(0,self.titles)
+        for i,row in enumerate(self):
+            writerow(i+1,row)
+        
+        workbook.close()
+        return self
+    
+    def json(self, **kwargs):
+        """
+        :return: string JSON representation of table
+        """
+        def json_serial(obj):
+            """JSON serializer for objects not serializable by default json code"""
+            if isinstance(obj, (datetime,date,time)):
+                return obj.isoformat()
+            if isinstance(obj, (timedelta)):
+                return str(obj)
+            raise TypeError ("Type %s not serializable"%(type(obj)))
+        array=[self.rowasdict(i) for i in range(len(self))]
+        kwargs.setdefault('default',json_serial)
+        return json.dumps(array, **kwargs)
             
-    def write_csv(self,filename, transpose=False, **kwargs):
+    def write_csv(self,filename, **kwargs):
         """ write the table in Excel csv format, optionally transposed"""
     
         dialect=kwargs.get('dialect','excel')
@@ -369,33 +501,38 @@ class Table(list):
         if six.PY3 :
             f = open(filename, 'w', newline='', encoding=encoding)
             def _encode(line): 
-                return [s for s in line]
+                 return [s for s in line]
         else: #Python 2
             f = open(filename, 'wb')
             def _encode(line): 
                 return [empty if s is None else unicode(s).encode(encoding) for s in line]
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
-        if transpose:
-            i=0
-            while self.col(i)[0]:
-                line=[empty]
-                if self.titles: line=[self.titles[i]]
-                line.extend(self.col(i))
-                writer.writerow(_encode(line))
-                i+=1
-        else:
-            if self.titles:
-                s=_encode(self.titles)
-                writer.writerow(s)
-            for line in self:
-                s=_encode(line)
-                writer.writerow(s)
+        if self.titles:
+            s=_encode(self.titles)
+            writer.writerow(s)
+        for line in self:
+            s=_encode(line)
+            writer.writerow(s)
         f.close()
+        return self
+    
+    def __eq__(self,other):
+        """compare 2 Tables contents, mainly for tests"""
+        if self.titles!=other.titles:
+            return False
+        if len(self)!=len(other):
+            return False
+        for i in range(len(self)):
+            if self[i]!=other[i]:
+                return False
+        return True
     
     def ncols(self):
-        """return number of columns, ignoring title"""
-        return six.moves.reduce(max,list(map(len,self)))
+        """
+        :return: number of columns, ignoring title
+        """
+        return reduce(max,list(map(len,self)))
                 
     def find_col(self,title):
         """finds a column from a part of the title"""
@@ -415,15 +552,38 @@ class Table(list):
             return None
     
     def icol(self,column):
-        '''iterates column'''
+        """iterates a column"""
+        i=self._i(column)
         for row in self:
             try:
-                yield row[self._i(column)]
+                yield row[i]
             except:
                 yield None
                 
-    def col(self,column):
-        return [x for x in self.icol(column)]
+    def col(self,column,title=False):
+        i=self._i(column)
+        res=[x for x in self.icol(i)]
+        if title:
+            res=[self.titles[i]]+res
+        return res
+    
+    def cols(self,title=False):
+        """iterator through columns"""
+        for i in range(self.ncols()):
+            yield self.col(i,title)
+            
+    def transpose(self,titles_column=0):
+        """transpose table
+        :param: titles_column
+        :return: Table where rows are made from self's columns and vice-versa
+        """
+        res=Table()
+        for i,row in enumerate(self.cols(self.titles)):
+            if i==titles_column:
+                res.titles=row
+            else:
+                res.append(row)
+        return res
     
     def index(self,value,column=0):
         """
@@ -434,9 +594,20 @@ class Table(list):
                 return i
         return None
     
+    def __getitem__(self, n):
+        try:
+            c=self._i(n[1])
+        except TypeError:
+            return super(Table,self).__getitem__(n)
+        else:
+            rows=super(Table,self).__getitem__(n[0])
+            if not isinstance(n[0],slice):
+                return rows[c]
+            return [row[c] for row in rows]
+        
     def get(self,row,col):
-        col=self._i(col)
-        return self[row][col]
+        return self[row,col]
+        
     
     def set(self,row,col,value):
         col=self._i(col)
@@ -446,12 +617,20 @@ class Table(list):
             self[row].extend([None]*(1+col-len(self[row])))
         self[row][col]=value
     
-    def setcol(self,by,val,i=0):
-        '''set column'''
-        j=self._i(by)
-        for v in val:
-            self.set(i,j,v)
-            i+=1
+    def setcol(self,col,value,i=0):
+        """set column values
+        :param col: int or string column index
+        :param value: single value assigned to whole column or iterable assigned to each cell
+        :param i: optional int : index of first row to assign
+        """
+        j=self._i(col)
+        if isiterable(value):
+            for v in value:
+                self.set(i,j,v)
+                i+=1
+        else:
+            for i in range(i,len(self)):
+                self.set(i,j,value)
             
     def append(self,line):
         ''' appends a line to table
@@ -468,17 +647,19 @@ class Table(list):
                     self.titles.append(k)
                 self.set(r,i,v)
         else:
-            list.append(self,line)
+            list.append(self,list(line))
+        return self
             
     def addcol(self,title,val=None,i=0):
         '''add column to the right'''
         col=len(self.titles)
         self.titles.append(title)
-        if not isinstance(val,list):
+        if not isiterable(val):
             val=[val]*(len(self)-i)
         for v in val:
             self.set(i,col,v)
             i+=1
+        return self
             
     def sort(self,by,reverse=False):
         '''sort by column'''
@@ -490,14 +671,18 @@ class Table(list):
     
     def rowasdict(self,i):
         ''' returns a line as a dict '''
-        return dict(list(zip(self.titles,self[i])))
+        return collections.OrderedDict(zip(self.titles,self[i]))
+    
+    def asdict(self):
+        for i in range(len(self)):
+            yield self.rowasdict(i)
         
-    def groupby(self,by,sort=True,removecol=True):
-        '''dictionary of subtables grouped by a column'''
+    def groupby_gen(self,by,sort=True,removecol=True):
+        """generates subtables
+        """
         i=self._i(by)
         t=self.titles
         if removecol: t=t[:i]+t[i+1:]
-        res={}
         if sort: 
             self.sort(i) 
         else:
@@ -507,8 +692,15 @@ class Table(list):
                 r=Table(titles=t,data=[a[:i]+a[i+1:] for a in g])
             else:
                 r=Table(titles=t,data=list(g))
-            res[k]=r
-        return res
+            yield k,r
+    
+    def groupby(self,by,sort=True,removecol=True):
+        """ ordered dictionary of subtables
+        """
+        return collections.OrderedDict(
+            (k,t) for (k,t) in self.groupby_gen(by,sort,removecol)
+        )
+        
     
     def hierarchy(self,by='Level',
                   factory=lambda row:(row,[]),          #creates an object from a line
@@ -540,41 +732,48 @@ class Table(list):
         res=True
         i=self._i(by)
         for row in self:
-            x=row[i]
             try:
+                x=row[i]
                 row[i]=f(x)
-            except:
+            except Exception as e:
                 if not skiperrors:
-                    logging.error('could not applyf to %s'%x)
-                    raise(ValueError)
+                    raise e('could not applyf to %s'%x)
                 res=False
         return res
-            
-    def to_datetime(self,by,fmt='%Y-%m-%d',skiperrors=False):
-        """convert a column to datetime
+    
+    def _datetimeformat(self,by,fmt,function,skiperrors):
+        """convert a column to a date, time or datetime
         :param by: column name of number
-        :param fmt: string defining datetime format
+        :param fmt: string defining format, or list of formats to try one by one
+        :param function: function to call
         :param skiperrors: bool. if True, conversion errors are ignored
         :return: bool True if ok, False if skiperrors==True and conversion failed
         """
         if isinstance(fmt,list):
             for f in fmt:
-                res=self.to_datetime(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
+                res=self._datetimeformat(by, f, function, True if f!=fmt[-1] else skiperrors)
             return res
-        return self.applyf(by,lambda x: datetimef(x,fmt=fmt),skiperrors)
+        return self.applyf(by,lambda x: function(x,fmt=fmt),skiperrors)
+            
+    def to_datetime(self,by,fmt='%Y-%m-%d %H:%M:%S',skiperrors=False):
+        """convert a column to datetime
+        """
+        return self._datetimeformat(by, fmt, datetimef, skiperrors)
         
     def to_date(self,by,fmt='%Y-%m-%d',skiperrors=False):
         """convert a column to date
-        :param by: column name of number
-        :param fmt: string defining datetime format
-        :param skiperrors: bool. if True, conversion errors are ignored
-        :return: bool True if ok, False if skiperrors==True and conversion failed
-        """  
-        if isinstance(fmt,list):
-            for f in fmt:
-                res=self.to_date(by, f, skiperrors=True if f!=fmt[-1] else skiperrors)
-            return res
-        return self.applyf(by,lambda x: datef(x,fmt=fmt),skiperrors)
+        """
+        return self._datetimeformat(by, fmt, datef, skiperrors)
+    
+    def to_time(self,by,fmt='%H:%M:%S',skiperrors=False):
+        """convert a column to time
+        """
+        return self._datetimeformat(by, fmt, timef, skiperrors)
+    
+    def to_timedelta(self,by,fmt=None,skiperrors=False):
+        """convert a column to time
+        """
+        return self._datetimeformat(by, fmt, timedeltaf, skiperrors)
             
 
     def total(self,funcs):
@@ -589,22 +788,17 @@ class Table(list):
                 self.footer.append(f)
         return self.footer
     
-    def remove_lines_where(self,f):
+    def remove_lines_where(self,f,value=(None,0,'')):
         """
         :param f: function of the form lambda line:bool returning True if line should be removed
         :return: int number of lines removed
         """
+        i=self._i(f)
+        if i is not None:
+            f=lambda x:x[i] in value
         from .itertools2 import removef
         return len(removef(self,f))
     
-    def __eq__(self,other):
-        """compare 2 Tables contents, mainly for tests"""
-        if self.titles!=other.titles:
-            return False
-        if len(self)!=len(other):
-            return False
-        for i in range(len(self)):
-            if self[i]!=other[i]:
-                return False
-        return True
+    
+
                 

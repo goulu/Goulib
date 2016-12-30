@@ -45,8 +45,8 @@ def get_version():
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('modules'))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- General configuration -----------------------------------------------------
@@ -62,10 +62,10 @@ extensions = [
     'sphinx.ext.viewcode', 
     'sphinx.ext.inheritance_diagram', 
     'sphinx.ext.intersphinx',
+#    'sphinx.ext.napoleon',
     ]
-
-if not on_rtd:
-    extensions.append('sphinx.ext.napoleon')
+    
+napoleon_include_special_with_doc = False
 
 autosummary_generate = True
 
@@ -100,7 +100,6 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
                   '__doc__', '__module__', '__dict__',  
                   )
     exclude = name in exclusions
-    if exclude: print name
     return skip or exclude
 
 def setup(app):

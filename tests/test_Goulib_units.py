@@ -60,5 +60,35 @@ class Tests:
         t.setCell('acceleration','car',V(1,'m/s^2'))
         logging.info(t._repr_html_())
         
+class TestMagnitudeIn:
+    def test_magnitude_in(self):
+        # assert_equal(expected, magnitudeIn(self, unit))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsfunc:
+    def test_isfunc(self):
+        # assert_equal(expected, isfunc(self, col))
+        raise SkipTest # TODO: implement your test here
+
+class TestSetCell:
+    def test_set_cell(self):
+        # assert_equal(expected, setCell(self, row, col, value))
+        raise SkipTest # TODO: implement your test here
+
+class TestAppendCol:
+    def test_append_col(self):
+        # assert_equal(expected, appendCol(self, colname, values))
+        raise SkipTest # TODO: implement your test here
+
+class TestAppendRow:
+    def test_append_row(self):
+        # assert_equal(expected, appendRow(self, label, values, unit))
+        raise SkipTest # TODO: implement your test here
+
+class TestAppendColFromObj:
+    def test_append_col_from_obj(self):
+        # assert_equal(expected, appendColFromObj(self, colname, obj, default))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()

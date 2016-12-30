@@ -30,21 +30,20 @@ def style_dict2str(style):
 
 def style_str2dict(style):
     res={}
-    for s in style.split(';'):
-        try:
+    if style: #skip if None or empty string
+        for s in style.split(';'):
             k,v=s.split(':')
             k=k.lstrip().rstrip()
             v=v.lstrip().rstrip()
             res[k]=v
-        except: #pro
-            pass
     return res
         
 def tag( tag, between, **kwargs ):
     """generate full tag."""
     single=kwargs.pop('single',False)
     out = "<%s" % tag
-    for key, value in list(kwargs.items()):
+    for key in sorted(kwargs):
+        value=kwargs[key]
         if value is None:               # when value is None that means stuff like <... checked>
             out = "%s %s" % ( out, key )
         else:

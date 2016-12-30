@@ -1,10 +1,16 @@
+scipy
+matplotlib
+networkx
+pydotplus
+graphviz
 six
 lxml
 xlrd
+xlsxwriter
 pillow
+scikit-image
 dxfgrabber
 dxfwrite
 svg.path
 pdfminer.six
-graphviz
 pint

@@ -7,6 +7,7 @@ from Goulib.tests import *
 
 from Goulib.interval import *
 
+
 class TestInInterval:
     def test_in_interval(self):
         assert_equal(in_interval([1,2], 1),True)

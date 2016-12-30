@@ -1,7 +1,0 @@
-networkx
-scipy
-matplotlib
-rtree
-pygraphviz
-scikit-image
-dxfgrabber

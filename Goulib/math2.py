@@ -14,12 +14,18 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, math, cmath, operator, itertools, fractions
+import six, math, cmath, operator, itertools, fractions, numbers
+from six.moves import map, reduce, filter, zip_longest
 
 from Goulib import itertools2
 
 
 inf=float('Inf') #infinity
+
+def is_number(x):
+    """:return: True if x is a number of any type"""
+    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
+    return isinstance(x, numbers.Number)
 
 def sign(number):
     """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
@@ -61,6 +67,28 @@ def gcd(*args):
 
 def coprime(*args):
     return gcd(*args)==1
+
+def coprimes_gen(limit):
+    '''Fast computation of Farey sequence as a generator'''
+    # https://www.quora.com/What-are-the-fastest-algorithms-for-generating-coprime-pairs
+    # n, d is the start fraction n/d (0,1) initially
+    # N, D is the stop fraction N/D (1,1) initially
+    pend = []
+    n = 0
+    d = N = D = 1
+    while True:
+        mediant_d = d + D
+        if mediant_d <= limit:
+            mediant_n = n + N
+            pend.append((mediant_n, mediant_d, N, D))
+            N = mediant_n
+            D = mediant_d
+        else:
+            yield n, d
+            if pend:
+                n, d, N, D = pend.pop()
+            else:
+                break
 
 def lcm(a,b):
     """least common multiple"""
@@ -109,6 +137,8 @@ def is_integer(x, epsilon=1e-6):
     """
     :return: True if  float x is almost an integer
     """
+    if type(x) is int:
+        return True
     return isclose(x,round(x),0,epsilon)
 
 def rint(v):
@@ -121,6 +151,14 @@ def int_or_float(x, epsilon=1e-6):
     :return: int if x is (almost) an integer, otherwise float
     """
     return rint(x) if is_integer(x, epsilon) else x
+
+def format(x, decimals=3):
+    """ formats a number
+    :return: string repr of x with decimals if not int
+    """
+    if is_integer(x):
+        decimals = 0
+    return '{0:.{1}f}'.format(x, decimals)
 
 def ceildiv(a, b):
     return -(-a // b) #simple and clever
@@ -173,11 +211,11 @@ def accsum(it):
 cumsum=accsum #numpy alias
 
 
-def dot(a,b):
+def dot(a,b,default=0):
     """dot product"""
     try: #vector*vector
-        return sum(map( operator.mul, a, b))
-    except:
+        return sum(map( operator.mul, a, b),default)
+    except Exception as e:
         pass
     try: #matrix*vector
         return [dot(line,b) for line in a]
@@ -191,7 +229,7 @@ def mul(nums,init=1):
     """
     :return: Product of nums
     """
-    return six.moves.reduce(operator.mul, nums, init)
+    return reduce(operator.mul, nums, init)
 
 def transpose(m):
     """:return: matrix m transposed"""
@@ -218,11 +256,11 @@ def minimum(m):
 
 def vecadd(a,b,fillvalue=0):
     """addition of vectors of inequal lengths"""
-    return [l[0]+l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]+l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     """substraction of vectors of inequal lengths"""
-    return [l[0]-l[1] for l in six.moves.zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]-l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     """unary negation"""
@@ -234,13 +272,13 @@ def vecmul(a,b):
         return [x*a for x in b]
     if isinstance(b,(int,float)):
         return [x*b for x in a]
-    return [six.moves.reduce(operator.mul,l) for l in zip(a,b)]
+    return [reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
     """quotient of vectors of inequal lengths"""
     if isinstance(b,(int,float)):
         return [float(x)/b for x in a]
-    return [six.moves.reduce(operator.truediv,l) for l in zip(a,b)]
+    return [reduce(operator.truediv,l) for l in zip(a,b)]
 
 def veccompare(a,b):
     """compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]"""
@@ -286,6 +324,10 @@ def dist(a,b,norm=norm_2):
 def vecunit(v,norm=norm_2):
     """:return: vector normalized"""
     return vecdiv(v,norm(v))
+
+def hamming(s1, s2):
+    """Calculate the Hamming distance between two iterables"""
+    return sum(c1 != c2 for c1, c2 in zip(s1, s2))
 
 def sets_dist(a,b):
     """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
@@ -368,6 +410,19 @@ def fibonacci(n):
         raise ValueError("Negative arguments not implemented")
     return _fib(n)[0]
 
+def pascal_gen():
+    """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
+    https://oeis.org/A007318
+    """
+    __author__ = 'Nick Hobson <nickh@qbyte.org>'
+    # code from https://oeis.org/A007318/a007318.py.txt with additional related functions
+    for row in itertools.count():
+        x = 1
+        yield x
+        for m in range(row):
+            x = (x * (row - m)) // (m + 1)
+            yield x
+
 def catalan(n):
     """Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).
     """
@@ -383,24 +438,21 @@ def catalan_gen():
     for n in itertools.count(1):
         last=last*(4*n+2)//(n+2)
         yield last
+        
+def is_pythagorean_triple(a,b,c):
+    return a*a+b*b == c*c
 
-def triples():
-    """ generates Pythagorean triples sorted by z,y,x with x<y<z
-    """
-    for z in itertools.count(5):
-        for y in range(z-1,3,-1):
-            x=math.sqrt(z*z-y*y)
-            if x<y and is_integer(x,1e-12):
-                yield (int(x),y,z)
+from Goulib.container import SortedCollection
 
-def primitive_triples(sort_xy=True):
-    """ generates primitive Pythagorean triples
+def primitive_triples():
+    """ generates primitive Pythagorean triplets x<y<z
+    sorted by hypotenuse z, then longest side y
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
-    triples are "almost sorted". use itertools2.iterator_sort if required
-    :param sort_xy: bool to ensure x<y<z
     """
-    triples = [[3,4,5]]
+    key=lambda x:(x[2],x[1])
+    triples=SortedCollection(key=key)
+    triples.insert([3,4,5])
     A = [[ 1,-2, 2], [ 2,-1, 2], [ 2,-2, 3]]
     B = [[ 1, 2, 2], [ 2, 1, 2], [ 2, 2, 3]]
     C = [[-1, 2, 2], [-2, 1, 2], [-2, 2, 3]]
@@ -412,10 +464,44 @@ def primitive_triples(sort_xy=True):
         # expand this triple to 3 new triples using Berggren's matrices
         for X in [A,B,C]:
             triple=[sum(x*y for (x,y) in zip([a,b,c],X[i])) for i in range(3)]
-            if sort_xy and triple[0]>triple[1]:
+            if triple[0]>triple[1]: # ensure x<y<z
                 triple[0],triple[1]=triple[1],triple[0]
-            triples.append(triple)
+            triples.insert(triple)
 
+def triples():
+    """ generates all Pythagorean triplets triplets x<y<z 
+    sorted by hypotenuse z, then longest side y
+    """
+    prim=[] #list of primitive triples up to now
+    key=lambda x:(x[2],x[1])
+    samez=SortedCollection(key=key) # temp triplets with same z
+    buffer=SortedCollection(key=key) # temp for triplets with smaller z
+    for pt in primitive_triples():
+        z=pt[2]
+        if samez and z!=samez[0][2]: #flush samez
+            while samez:
+                yield samez.pop(0)
+        samez.insert(pt)
+        #build buffer of smaller multiples of the primitives already found
+        for i,pm in enumerate(prim):
+            p,m=pm[0:2]
+            while True:
+                mz=m*p[2]
+                if mz < z:
+                    buffer.insert(tuple(m*x for x in p))
+                elif mz == z: 
+                    # we need another buffer because next pt might have
+                    # the same z as the previous one, but a smaller y than
+                    # a multiple of a previous pt ...
+                    samez.insert(tuple(m*x for x in p))
+                else:
+                    break
+                m+=1
+            prim[i][1]=m #update multiplier for next loops
+        while buffer: #flush buffer
+            yield buffer.pop(0)
+        prim.append([pt,2]) #add primitive to the list
+                
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
     including 1 and n,
@@ -712,9 +798,30 @@ def digits(num, base=10, rev=False):
     res=list(digits_gen(num,base))
     return res if rev else reversed(res)
 
-def digsum(num, base=10):
-    """:return: sum of digits of num"""
-    return sum(digits_gen(num,base))
+def digsum(num, base=10, f=None):
+    """:return: sum of digits of num
+    :param f: optional function to apply to the terms:
+      * None = identity
+      * number = elevation to the fth power
+      * function(digit) or func(digit,position)
+    :return: sum of f(digits) of num
+    
+    digsum(num) -> sum of digits
+    digsum(num,f=2) -> sum of the squares of digits
+    digsum(num,f=lambda x:x**x) -> sum of the digits elevaed to their own power
+    """
+    d=digits_gen(num,base)
+    if f is None:
+        return sum(d)
+    if is_number(f):
+        p=f
+        f=lambda x:pow(x,p)
+    try:
+        return sum(map(f,d))
+    except AttributeError:
+        pass
+    d=[f(x,i) for i,x in enumerate(d)]
+    return sum(d)
 
 def integer_exponent(a,b=10):
     """:returns: int highest power of b that divides a.
@@ -733,13 +840,13 @@ def power_tower(v):
     :return: v[0]**v[1]**v[2] ...
     :see: http://ajcr.net//Python-power-tower/
     """
-    return six.moves.reduce(lambda x,y:y**x, reversed(v))
+    return reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
     """ :return: int number of carries required to add a+b in base
     """
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
-    for one,two in six.moves.zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
+    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
@@ -818,17 +925,61 @@ def bouncy(n):
     s1=''.join(sorted(s))
     return s==s1,s==s1[::-1] #increasing,decreasing
 
-def sos_digits(n):
-    """:return: int sum of square of digits of n"""
-    s = 0
-    while n > 0:
-        s, n = s + (n % 10)**2, n // 10
-    return s
+def tetrahedral(n):
+    """
+    https://en.wikipedia.org/wiki/Tetrahedral_number
+    """
+    return n*(n+1)*(n+2)//6
+
+def sum_of_squares(n):
+    """:return: 1^2 + 2^2 + 3^2 + ... + n^2
+    https://en.wikipedia.org/wiki/Square_pyramidal_number
+    """
+    return n*(n+1)*(2*n+1)//6
+
+pyramidal = sum_of_squares
+
+def sum_of_cubes(n):
+    """:return: 1^3 + 2^3 + 3^3 + ... + n^3
+    https://en.wikipedia.org/wiki/Squared_triangular_number
+    """
+    a=triangular(n)
+    return a*a # by Nicomachus's theorem
+
+def bernouilli_gen(init=1):
+    """generator of Bernouilli numbers
+    :param init: int -1 or +1. 
+    * -1 for "first Bernoulli numbers" with B1=-1/2
+    * +1 for "second Bernoulli numbers" with B1=+1/2
+    https://en.wikipedia.org/wiki/Bernoulli_number
+    https://rosettacode.org/wiki/Bernoulli_numbers#Python:_Optimised_task_algorithm
+    """
+    B, m = [], 0
+    while True:
+        B.append(fractions.Fraction(1, m+1))
+        for j in range(m, 0, -1):
+            B[j-1] = j*(B[j-1] - B[j])
+        yield init*B[0] if m==1 else B[0]# (which is Bm)
+        m += 1
+        
+def bernouilli(n,init=1):
+    return itertools2.takenth(n,bernouilli_gen(init))
+
+def faulhaber(n,p):
+    """ sum of the p-th powers of the first n positive integers
+    :return: 1^p + 2^p + 3^p + ... + n^p
+    https://en.wikipedia.org/wiki/Faulhaber%27s_formula
+    """
+    s=0
+    for j,a in enumerate(bernouilli_gen()):
+        if j>p : break
+        s=s+binomial(p+1,j)*a*n**(p+1-j)
+    return s//(p+1)
 
 def is_happy(n):
     #https://en.wikipedia.org/wiki/Happy_number
     while n > 1 and n != 89 and n != 4:
-        n = sos_digits(n)
+        n = digsum(n,f=2) #sum of squares of digits
     return n==1
 
 def lychrel_seq(n):
@@ -873,9 +1024,13 @@ def triangle(n):
     """
     return polygonal(3,n) # (n*(n+1))/2
 
+triangular=triangle
+
 def is_triangle(x):
     """:return: True if x is a triangle number"""
     return is_integer((-1 + math.sqrt(1 + 8*x)) / 2.)
+
+is_triangular=is_triangle
 
 def square(n):
     return polygonal(4,n) # n*n
@@ -987,7 +1142,8 @@ def is_perfect(n):
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
-    return int(math.log(num,base)) + 1
+    if num==0: return 1
+    return int(math.log(abs(num),base)) + 1
 
 def chakravala(n):
     """
@@ -1053,15 +1209,6 @@ def binomial_exponent(n,k,p):
         return carries(k,n-k,p) # https://en.wikipedia.org/wiki/Kummer%27s_theorem
 
     return min(binomial_exponent(n,k,a)//b for a,b in factorize(p))
-
-
-def combinations_with_replacement(iterable, r):
-    """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC"""
-    pool = tuple(iterable)
-    n = len(pool)
-    for indices in itertools2.cartesian_product(list(range(n)), repeat=r):
-        if sorted(indices) == list(indices):
-            yield tuple(pool[i] for i in indices)
 
 def log_factorial(n):
     """:return: float approximation of ln(n!) by Ramanujan formula"""
@@ -1182,6 +1329,37 @@ def rectangular_repartition(x,n,h):
             return  float(h*(xb-x1)+o*(w-(xb-x1)))/w
 
     return [_integral(i*w,(i+1)*w) for i in range(n)]
+
+def de_bruijn(k, n):
+    """
+    De Bruijn sequence for alphabet k and subsequences of length n.
+    https://en.wikipedia.org/wiki/De_Bruijn_sequence
+    """
+    try:
+        # let's see if k can be cast to an integer;
+        # if so, make our alphabet a list
+        _ = int(k)
+        alphabet = list(map(str, range(k)))
+
+    except (ValueError, TypeError):
+        alphabet = k
+        k = len(k)
+
+    a = [0] * k * n
+    sequence = []
+
+    def db(t, p):
+        if t > n:
+            if n % p == 0:
+                sequence.extend(a[1:p + 1])
+        else:
+            a[t] = a[t - p]
+            db(t + 1, p)
+            for j in range(a[t - p] + 1, k):
+                a[t] = j
+                db(t + 1, t)
+    db(1, 1)
+    return "".join(alphabet[i] for i in sequence)
 
 """modular arithmetic
 initial motivation: https://www.hackerrank.com/challenges/ncr

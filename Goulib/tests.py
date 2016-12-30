@@ -10,6 +10,7 @@ __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import six, types, re, itertools
+from six.moves import filter, zip
 
 import unittest, nose
 import nose.tools
@@ -23,7 +24,7 @@ def pprint_gen(iterable,indices=[0,1,2,-3,-2,-1],sep='...'):
         indices=(i if i>=0 else l+i for i in indices if i<l)
     except: #infinite iterable
         l=None
-        indices=six.moves.filter(lambda x:x>=0,indices)
+        indices=filter(lambda x:x>=0,indices)
     indices=list(itertools2.unique(indices)) #to remove overlaps
     indices.sort() 
     
@@ -94,12 +95,12 @@ class TestCase(unittest.TestCase):
         elements = (seq_type_name.capitalize(), seq1_repr, seq2_repr)
         differing = '%ss differ: %s != %s\n' % elements
 
-        class End:
+        class End(object):
             def __repr__(self) : return '(end)'
         end=End() #a special object is appended to detect mismatching lengths
         
         i=0
-        for item1,item2 in six.moves.zip(itertools.chain(seq1,[end]),itertools.chain(seq2,[end])):
+        for item1,item2 in zip(itertools.chain(seq1,[end]),itertools.chain(seq2,[end])):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
@@ -117,9 +118,15 @@ class TestCase(unittest.TestCase):
         """
         #inspired from http://stackoverflow.com/a/3124155/190597 (KennyTM)
         import collections
-        if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
-            super(TestCase,self).assertEqual(first, second,msg=msg)
-        elif (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
+        
+        if delta is None:
+            if places is None or (isinstance(first,self.base_types) and isinstance(second,self.base_types)):
+                return super(TestCase,self).assertEqual(first, second,msg=msg)
+        
+        else:
+            places=None
+            
+        if (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
             try:
                 self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
             except TypeError: #for some classes like pint.Quantity
@@ -131,7 +138,7 @@ class TestCase(unittest.TestCase):
         else: #float and classes
             try:
                 super(TestCase,self).assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
-            except TypeError: # unsupported operand type(s) for -
+            except TypeError as e: # unsupported operand type(s) for -
                 super(TestCase,self).assertEqual(first, second,msg=msg)
                 
     def assertCountEqual(self, seq1, seq2, msg=None):

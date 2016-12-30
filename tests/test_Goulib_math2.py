@@ -6,7 +6,7 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.math2 import *
-
+from Goulib.itertools2 import take
 import six
 
 class TestSign:
@@ -53,19 +53,19 @@ class TestEqual:
 
     def test_equal(self):
         # assert_equal(expected, equal(a, b, epsilon))
-        raise SkipTest 
+        raise SkipTest
 
 class TestLcm:
     def test_lcm(self):
         assert_equal(lcm(101, -3),-303)
         assert_equal(lcm(4,6),12)
-        
+
 class TestGcd:
     def test_gcd(self):
         assert_equal(gcd(54,24),6)
         assert_equal(gcd(68, 14, 9, 36, 126),1)
         assert_equal(gcd(7, 14, 35, 7000),7)
-        
+
 class TestCoprime:
     def test_coprime(self):
         assert_true(coprime(68, 14, 9, 36, 126))
@@ -145,6 +145,10 @@ class TestVeccompare:
 
 class TestFibonacci:
     def test_fibonacci(self):
+        
+        #http://controlfd.com/2016/07/05/using-floats-in-python.html
+        assert_equal(fibonacci(78),8944394323791464)
+        
         # https://projecteuler.net/problem=2
         from itertools import takewhile
 
@@ -176,7 +180,7 @@ class TestSieve:
 class TestPrimes:
     def test_primes(self):
         # assert_equal(expected, primes(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestPrimesGen:
     def test_primes_gen(self):
@@ -195,39 +199,44 @@ class TestStrBase:
         assert_equal(str_base(-0),"0")
         assert_equal(str_base(2014,2),"11111011110")
         assert_equal(str_base(65535,16),"ffff")
-        
+
         assert_raises(ValueError,str_base,0,1)
-        
+
         # http://www.drgoulu.com/2011/09/25/comment-comptent-les-extraterrestres
         shadok=['GA','BU','ZO','MEU']
         assert_raises(ValueError,str_base,0,10,shadok)
         assert_equal(str_base(41,4,shadok),"ZOZOBU")
         assert_equal(str_base(1681,4,shadok),"BUZOZOBUGABU")
-         
+
 class TestDigitsGen:
     def test_digits_gen(self):
         pass #used below
-    
+
 class TestDigits:
     def test_digits(self):
         assert_equal(digits(1234),[1,2,3,4])
         assert_equal(digits(1234, rev=True),[4,3,2,1])
         assert_equal(digits(2014,2),[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0])
-        
+
 class TestDigsum:
     def test_digsum(self):
         assert_equal(digsum(1234567890),45)
-        
+        assert_equal(digsum(255,2),8) # sum of ones in binary rep
+        assert_equal(digsum(255,16),30) # $FF in hex
+        assert_equal(digsum(1234567890,f=2),sum_of_squares(9))
+        assert_equal(digsum(548834,f=6),548834) #narcissic number
+        assert_equal(digsum(3435,f=lambda x:x**x),3435) #Munchausen number
+
 class TestIntegerExponent:
     def test_integer_exponent(self):
         assert_equal(integer_exponent(1000),3)
         assert_equal(integer_exponent(1024,2),10)
         assert_equal(integer_exponent(binomial(1000,373),2),6) #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_3.html
-        
+
 class TestPowerTower:
     def test_power_tower(self):
         assert_equal(power_tower([3,2,2,2]),43046721)
-        
+
 class TestCarries:
     def test_carries(self):
         assert_equal(carries(127, 123),1)
@@ -245,16 +254,18 @@ class TestNumFromDigits:
 
 class TestNumberOfDigits:
     def test_number_of_digits(self):
+        assert_equal(number_of_digits(0),1)
+        assert_equal(number_of_digits(-1),1)
         assert_equal(number_of_digits(1234),4)
         assert_equal(number_of_digits(2014,2),11)
         assert_equal(number_of_digits(65535,16),4)
-        
+
 
 class TestIsPalindromic:
     def test_is_palindromic(self):
         assert_true(is_palindromic(4352534))
         assert_true(is_palindromic(17,2))
-        
+
 class TestIsLychrel:
     def test_is_lychrel(self):
         assert_true(is_lychrel(196))
@@ -334,7 +345,7 @@ class TestGetCardinalName:
        assert_equal(get_cardinal_name(1234567890),
             'one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety'
         )
-       
+
 class TestIsPerfect:
     def test_is_perfect(self):
         d=list(factorize(496))
@@ -342,7 +353,7 @@ class TestIsPerfect:
         assert_equal(is_perfect(496),0) #perfect
         assert_equal(is_perfect(54),1) #abundant
         assert_equal(is_perfect(2),-1) #deficient
-        
+
         assert_equal(is_perfect(2305843008139952128),0) #Millenium 4, page 326
 
 class TestIsPandigital:
@@ -352,13 +363,19 @@ class TestIsPandigital:
         assert_true(is_pandigital(1223334444555567890))
         assert_true(is_pandigital(10,2))
         assert_true(is_pandigital(0x1023456789ABCDEF,16))
-        
+
 
 class TestSetsDist:
     def test_sets_dist(self):
         a=set(list('hello'))
         b=set(list('world'))
         assert_equal(sets_dist(a, b),3.1622776601683795)
+
+class TestHamming:
+    def test_hamming(self):
+        a="10011100"
+        b="00011010"
+        assert_equal(hamming(a, b),3)
 
 class TestSetsLevenshtein:
     def test_sets_levenshtein(self):
@@ -383,27 +400,32 @@ class TestBinomial:
             binomial(100000,4000),
             binomial(100000,96000) #same because 100000-96000=4000
         )
-        
+
     @raises(OverflowError)
     def test_binomial_overflow(self):
         assert_equal(binomial(961173600,386223045)%142857,0)
-        
+
+class TestFaulhaber:
+    def test_faulhaber(self):
+        def sumpow(n,p):
+            return sum((x**p for x in range(n+1)))
+        assert_equal(faulhaber(100,0),100)
+        assert_equal(faulhaber(100,1),triangular(100))
+        assert_equal(faulhaber(100,2),sum_of_squares(100))
+        assert_equal(faulhaber(100,3),sum_of_cubes(100))
+        assert_equal(faulhaber(100,4),sumpow(100,4))
+
 class TestBinomialExponent:
     def test_binomial_exponent(self):
         assert_equal(binomial_exponent(88,50,3),3) # https://www.math.upenn.edu/~wilf/website/dm36.pdf
-        
+
         #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_3.html
-        assert_equal(binomial_exponent(1000,373,2),6) 
+        assert_equal(binomial_exponent(1000,373,2),6)
         for b in range(2,11):
             for n in range(1,20):
                 for k in range(1,n):
                     assert_equal(binomial_exponent(n,k,b), integer_exponent(binomial(n,k),b))
-                     
-                                       
-class TestCombinationsWithReplacement:
-    def test_combinations_with_replacement(self):
-        assert_equal(combinations_with_replacement('ABC', 2),
-            ['AA','AB','AC','BB','BC','CC'])
+
 
 class TestProportional:
     def test_proportional(self):
@@ -519,22 +541,22 @@ class TestSlerp:
 
 class TestLogFactorial:
     def test_log_factorial(self):
-        assert_equal(log_factorial(100),363.73937555556349014408) 
+        assert_equal(log_factorial(100),363.73937555556349014408)
 
 class TestLogBinomialCoefficient:
     def test_log_binomial(self):
         assert_equal(log_binomial(87,28),math.log(49848969000742658237160))
-        
+
 class Moebius:
     def test_moebius(self):
         assert_equal(moebius(3),-1)
-    
+
 class Omega:
     def test_omega(self):
         assert_equal(omega(3),0)
         assert_equal(omega(4),1)
         assert_equal(omega(6),2)
-        
+
 class TestEulerPhi:
     def test_euler_phi(self):
         assert_equal(euler_phi(8849513),8843520)
@@ -542,12 +564,12 @@ class TestEulerPhi:
 class TestRecurrence:
     def test_recurrence(self):
         # assert_equal(expected, recurrence(factors, values, max))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestCatalan:
     def test_catalan(self):
         # assert_equal(expected, catalan())
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestLucasLehmer:
     def test_lucas_lehmer(self):
@@ -557,142 +579,128 @@ class TestLucasLehmer:
 class TestReverse:
     def test_reverse(self):
         # assert_equal(expected, reverse(i))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestIsPermutation:
     def test_is_permutation(self):
         # assert_equal(expected, is_permutation(num1, num2, base))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestLychrelSeq:
     def test_lychrel_seq(self):
         # assert_equal(expected, lychrel_seq(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestLychrelCount:
     def test_lychrel_count(self):
         # assert_equal(expected, lychrel_count(n, limit))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestIsqrt:
     def test_isqrt(self):
         # assert_equal(expected, isqrt(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestAbundance:
     def test_abundance(self):
         # assert_equal(expected, abundance(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestFactorial:
     def test_factorial(self):
         # assert_equal(expected, factorial())
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestCeildiv:
     def test_ceildiv(self):
         # assert_equal(expected, ceildiv(a, b))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestFibonacciGen:
     def test_fibonacci_gen(self):
-        # assert_equal(expected, fibonacci_gen(max))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestCatalanGen:
     def test_catalan_gen(self):
-        # assert_equal(expected, catalan_gen())
-        raise SkipTest # 
-
-class TestTriples:
-    def test_triples(self):
-        # assert_equal(expected, triples())
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
-        # assert_equal(expected, primitive_triples(sort_xy))
-        raise SkipTest # 
+        key=lambda x:(x[2],x[1])
+        for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
+            assert_true(is_pythagorean_triple(*t))
+
+class TestTriples:
+    def test_triples(self):
+        key=lambda x:(x[2],x[1])
+        for t in take(10000,itertools2.ensure_sorted(triples(),key)):
+            assert_true(is_pythagorean_triple(*t))
 
 class TestPolygonal:
     def test_polygonal(self):
-        # assert_equal(expected, polygonal(s, n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestSquare:
     def test_square(self):
-        # assert_equal(expected, square(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestIsSquare:
     def test_is_square(self):
-        # assert_equal(expected, is_square(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestIsHexagonal:
     def test_is_hexagonal(self):
-        # assert_equal(expected, is_hexagonal(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestHeptagonal:
     def test_heptagonal(self):
-        # assert_equal(expected, heptagonal(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestIsHeptagonal:
     def test_is_heptagonal(self):
-        # assert_equal(expected, is_heptagonal(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestOctagonal:
     def test_octagonal(self):
-        # assert_equal(expected, octagonal(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestIsOctagonal:
     def test_is_octagonal(self):
-        # assert_equal(expected, is_octagonal(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestPartition:
     def test_partition(self):
-        # assert_equal(expected, partition(n))
-        raise SkipTest # 
+        pass #tested in test_oeis
 
 class TestChakravala:
     def test_chakravala(self):
         # assert_equal(expected, chakravala(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestBouncy:
     def test_bouncy(self):
         # assert_equal(expected, bouncy(n))
-        raise SkipTest # 
-
-class TestSosDigits:
-    def test_sos_digits(self):
-        # assert_equal(expected, sos_digits(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestIsHappy:
     def test_is_happy(self):
         # assert_equal(expected, is_happy(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestNumberOfDivisors:
     def test_number_of_divisors(self):
         # assert_equal(expected, number_of_divisors(n))
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestFactorialGen:
     def test_factorial_gen(self):
         # assert_equal(expected, factorial_gen())
-        raise SkipTest # 
+        raise SkipTest #
 
 class TestEuclidGen:
     def test_euclid_gen(self):
         # assert_equal(expected, euclid_gen())
-        raise SkipTest 
+        raise SkipTest
 
 class TestModPow:
     def test_mod_pow(self):
@@ -727,97 +735,156 @@ class TestChineseRemainder:
 class TestModBinomial:
     def test_mod_binomial(self):
         assert_equal( mod_binomial(456, 51, 30),28) #http://math.stackexchange.com/questions/95491/n-choose-k-bmod-m-using-chinese-remainder-theorem
-        
+
         assert_equal( mod_binomial(1000, 729, 19),13) #http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients/HTMLLinks/index_4.html
-        
+
         res=binomial(16, 5) % 9
         #http://math.stackexchange.com/questions/222637/binomial-coefficient-modulo-prime-power
         assert_equal(  mod_binomial(16, 5, 9),res)
-        
+
         m=142857
-        
+
         assert_equal(  mod_binomial(5,2,m),binomial(5,2))
         assert_equal(  mod_binomial(10,3,m),binomial(10,3))
-        
+
         assert_equal(  mod_binomial(27,3,27),binomial(27, 3) % 27) #==9
         assert_equal(  mod_binomial(27,3,m),binomial(27,3)%m) #== 2925
-        
+
         return #tests below are too large for now
-        
+
         assert_equal(  mod_binomial(961173600,386223045,m),0)
         assert_equal(  mod_binomial(938977945,153121024,m),47619)
         assert_equal(  mod_binomial(906601285,527203335,m),0)
         assert_equal(  mod_binomial(993051461,841624879,m),104247)
+        
+class TestDeBrujin:
+    def test_de_brujin(self):
+        assert_equal(de_bruijn('1234',3),'1112113114122123124132133134142143144222322423323424324433343444')
 
 class TestXgcd:
     def test_xgcd(self):
         # assert_equal(expected, xgcd(a, b))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIsclose:
     def test_isclose(self):
         # assert_equal(expected, isclose(a, b, rel_tol, abs_tol))
-        raise SkipTest 
+        raise SkipTest
 
 class TestOmega:
     def test_omega(self):
         # assert_equal(expected, omega(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestBigomega:
     def test_bigomega(self):
         # assert_equal(expected, bigomega(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestMoebius:
     def test_moebius(self):
         # assert_equal(expected, moebius(n))
-        raise SkipTest 
+        raise SkipTest
 
 class TestPrimeKtuple:
     def test_prime_ktuple(self):
         # assert_equal(expected, prime_ktuple(constellation))
-        raise SkipTest 
+        raise SkipTest
 
 class TestTwinPrimes:
     def test_twin_primes(self):
         # assert_equal(expected, twin_primes())
-        raise SkipTest 
+        raise SkipTest
 
 class TestCousinPrimes:
     def test_cousin_primes(self):
         # assert_equal(expected, cousin_primes())
-        raise SkipTest 
+        raise SkipTest
 
 class TestSexyPrimes:
     def test_sexy_primes(self):
         # assert_equal(expected, sexy_primes())
-        raise SkipTest 
+        raise SkipTest
 
 class TestSexyPrimeTriplets:
     def test_sexy_prime_triplets(self):
         # assert_equal(expected, sexy_prime_triplets())
-        raise SkipTest 
+        raise SkipTest
 
 class TestSexyPrimeQuadruplets:
     def test_sexy_prime_quadruplets(self):
         # assert_equal(expected, sexy_prime_quadruplets())
-        raise SkipTest 
+        raise SkipTest
 
 class TestLogBinomial:
     def test_log_binomial(self):
         # assert_equal(expected, log_binomial(n, k))
-        raise SkipTest 
+        raise SkipTest
 
 class TestIlog:
     def test_ilog(self):
         # assert_equal(expected, ilog(a, b, upper_bound))
-        raise SkipTest 
+        raise SkipTest
 
 class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):
         # assert_equal(expected, baby_step_giant_step(y, a, n))
-        raise SkipTest 
+        raise SkipTest
+
+class TestIsNumber:
+    def test_is_number(self):
+        # assert_equal(expected, is_number(x))
+        raise SkipTest # TODO: implement your test here
+
+class TestCoprimesGen:
+    def test_coprimes_gen(self):
+        # assert_equal(expected, coprimes_gen(limit))
+        raise SkipTest # TODO: implement your test here
+
+class TestTetrahedral:
+    def test_tetrahedral(self):
+        # assert_equal(expected, tetrahedral(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSumOfSquares:
+    def test_sum_of_squares(self):
+        # assert_equal(expected, sum_of_squares(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestSumOfCubes:
+    def test_sum_of_cubes(self):
+        # assert_equal(expected, sum_of_cubes(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestBernouilliGen:
+    def test_bernouilli_gen(self):
+        # assert_equal(expected, bernouilli_gen(init))
+        raise SkipTest # TODO: implement your test here
+
+class TestBernouilli:
+    def test_bernouilli(self):
+        # assert_equal(expected, bernouilli(n, init))
+        raise SkipTest # TODO: implement your test here
+
+class TestDeBruijn:
+    def test_de_bruijn(self):
+        # assert_equal(expected, de_bruijn(k, n))
+        raise SkipTest # TODO: implement your test here
+
+class TestPascalGen:
+    def test_pascal_gen(self):
+        # assert_equal(expected, pascal_gen())
+        raise SkipTest # TODO: implement your test here
+
+class TestIsPythagoreanTriple:
+    def test_is_pythagorean_triple(self):
+        # assert_equal(expected, is_pythagorean_triple(a, b, c))
+        raise SkipTest # TODO: implement your test here
+
+class TestFormat:
+    def test_format(self):
+        # assert_equal(expected, format(x, decimals))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()

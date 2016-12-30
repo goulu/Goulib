@@ -140,6 +140,106 @@ class TestSortedCollection:
         # assert_equal(expected, sorted_collection.remove(item))
         raise SkipTest 
     
+class TestRecord:
+    def test___getattr__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__getattr__(name))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # record = Record(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___setattr__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__setattr__(name, value))
+        raise SkipTest # TODO: implement your test here
+
+    def test___str__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__str__())
+        raise SkipTest # TODO: implement your test here
+
+class TestSequence:
+    def test___add__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__add__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___and__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__and__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___contains__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__contains__(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test___getitem__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__getitem__(i))
+        raise SkipTest # TODO: implement your test here
+
+    def test___init__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        raise SkipTest # TODO: implement your test here
+
+    def test___iter__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__iter__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___mod__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__mod__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_accumulate(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.accumulate(op, skip_first))
+        raise SkipTest # TODO: implement your test here
+
+    def test_apply(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.apply(f, containf, desc))
+        raise SkipTest # TODO: implement your test here
+
+    def test_filter(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.filter(f, desc))
+        raise SkipTest # TODO: implement your test here
+
+    def test_index(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.index(v))
+        raise SkipTest # TODO: implement your test here
+
+    def test_pairwise(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.pairwise(op, skip_first))
+        raise SkipTest # TODO: implement your test here
+
+    def test_sort(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.sort(key, buffer))
+        raise SkipTest # TODO: implement your test here
+
+    def test_unique(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.unique(buffer))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
 

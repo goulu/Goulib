@@ -36,7 +36,7 @@ Modules
 -------
 
 **colors**
-	hex RGB colors and related functions
+	very simple RGB color management
 **container**
     sorted collection
 **datetime2**

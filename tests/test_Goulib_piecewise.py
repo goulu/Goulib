@@ -88,7 +88,7 @@ class TestPiecewise:
         assert_equal(y,[0.0, 1.0, 0.5, 1.0, 2.0, 0.0, 0.0, 0.0])
         
     def test___str__(self):
-        assert_equal(str(self.p1),'[(-inf, 0), (1, 1), (3, 3.0), (4, 4), (5, 0)]')
+        assert_equal(str(self.p1),'[(-inf, 0), (1, 1), (3, 3), (4, 4), (5, 0)]')
         
     def test___iter__(self):
         pass #tested in functions below, where list(p) calls

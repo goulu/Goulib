@@ -20,7 +20,9 @@ class TestTimef:
         t=time(hour=12,minute=34,second=56)
         assert_equal(timef(t),t)
         assert_equal(timef('12:34:56'),t)
-        assert_true(equal(timef(0.503473,fmt=None),time(hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
+        t=timef(0.503473,fmt='%d')
+        assert_true(equal(t,time(hour=12,minute=5))) 
     
 class TestDatetimef:
     def test_datetimef(self):
@@ -31,6 +33,22 @@ class TestDatetimef:
         assert_equal(datetimef('25/12/1963',t,fmt='%d/%m/%Y'),d)
         assert_true(equal(datetimef(40179.503472,fmt=None),datetime(year=2010,month=0o1,day=0o1,hour=12,minute=0o5))) #http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/
 
+class TestTimedeltaf:
+    def test_timedeltaf(self):
+        td=timedelta(days=25,hours=12,minutes=34,seconds=56)
+        s=str(td)
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        #check with hours > 24
+        s=('%d:%d:%d'%(25*24+12,34,56))
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        #check negative
+        td=timedeltaf('-1 day, 00:00:00')
+        s=str(td)
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        
 
 class TestStrftimedelta:
     def test_strftimedelta(self):
@@ -107,6 +125,59 @@ class TestTimeIntersect:
         d=[d for d in daysgen(start,4,td)]
         assert_equal(time_intersect([d[0],d[2]],[d[1],d[3]]),td)
 
+
+class TestDatetime:
+    def test___sub__(self):
+        # datetime = datetime()
+        # assert_equal(expected, datetime.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+class TestTimedelta:
+    def test_isoformat(self):
+        # timedelta = timedelta()
+        # assert_equal(expected, timedelta.isoformat())
+        raise SkipTest # TODO: implement your test here
+
+class TestDatetime2:
+    def test___init__(self):
+        # datetime2 = datetime2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # datetime2 = datetime2(*args, **kwargs)
+        # assert_equal(expected, datetime2.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+class TestDate2:
+    def test_init__(self):
+        # date2 = date2()
+        # assert_equal(expected, date2.init__(*args, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestTime2:
+    def test___init__(self):
+        # time2 = time2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+class TestTimedelta2:
+    def test___init__(self):
+        # timedelta2 = timedelta2(*args, **kwargs)
+        raise SkipTest # TODO: implement your test here
+
+    def test_isoformat(self):
+        # timedelta2 = timedelta2(*args, **kwargs)
+        # assert_equal(expected, timedelta2.isoformat())
+        raise SkipTest # TODO: implement your test here
+
+class TestAddMonths:
+    def test_add_months(self):
+        # assert_equal(expected, add_months(date, months))
+        raise SkipTest # TODO: implement your test here
+
+class TestDateAdd:
+    def test_date_add(self):
+        # assert_equal(expected, date_add(date, years, months, weeks, days))
+        raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
     runmodule()
