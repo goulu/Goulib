@@ -17,6 +17,8 @@ from six.moves import map, filter
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
 
+import operator
+
 from itertools import count, tee, islice
 from Goulib import itertools2
 
@@ -322,22 +324,36 @@ class Sequence(object):
                 containf=lambda n:n-other in self,
                 desc='%s+%d'%(self.name,other)
             )
+        return self & other
+                        
+    def __sub__(self,other):
+        if type(other) is int:
+            return self+(-other)
+        return self % other
             
-    def __and__(self,other):
+    def __or__(self,other):
+        """
+        :return: Sequence with items from both operands
+        """
         return Sequence(
             itertools2.merge(self,other), None,
             lambda x:x in self or x in other
         )
-
-    def __sub__(self,other):
-        if type(other) is int:
-            return self.apply(
-                lambda n:n-other,
-                containf=lambda n:n+other in self,
-                desc='%s-%d'%(self.name,other)
-            )
+        
+    def __and__(self,other):
+        """
+        :return: Sequence with items in both operands
+        """
+        if other.containf:
+            return self.filter(other.containf)
+        if self.containf:
+            return other.filter(self.containf)
+        raise(NotImplementedError)
     
     def __mod__(self,other):
+        """
+        :return: Sequence with items from left operand not in right
+        """
         return Sequence(
             itertools2.diff(self.__iter__(),other.__iter__()), None,
             lambda x:x in self and x not in other
@@ -359,7 +375,7 @@ class Sequence(object):
             desc
         )
 
-    def accumulate(self,op,skip_first=False):
+    def accumulate(self,op=operator.add,skip_first=False):
         return Sequence(itertools2.accumulate(self,op,skip_first))
 
     def pairwise(self,op,skip_first=False):
