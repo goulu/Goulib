@@ -40,8 +40,8 @@ A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers
 A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
 A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
-A008587=Sequence(None,lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
-A008589=Sequence(None,lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
+A008587=Sequence(count(0,5),lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
+A008589=Sequence(count(0,7),lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
 
 A000079=Sequence(None,lambda n:2**n, desc='Powers of 2: a(n) = 2^n.')
 A001146=Sequence(None,lambda n:2**2**n, desc='2^(2^n)')
@@ -166,7 +166,7 @@ A008683=Sequence(1,math2.moebius)
 
 A000010=Sequence(1,math2.euler_phi)
 
-A002088=Sequence(0,math2.euler_phi).accumulate(operator.add) #strangely this one has a leading 0...
+A002088=Sequence(0,math2.euler_phi).accumulate() #strangely this one has a leading 0...
 
 
 # primes & co
@@ -269,6 +269,7 @@ A018239=A006862.filter(
     desc='Primorial primes: form product of first k primes and add 1, then reject unless prime.'
 )
 
+A007504=A000040.accumulate()
 A001223=A000040.pairwise(operator.sub)
 
 A077800=Sequence(itertools2.flatten(math2.twin_primes()))
@@ -327,8 +328,9 @@ def is_powerful(n):
 A001694=Sequence(1,None,is_powerful,"powerful numbers")
 
 #these 2 implementations have pretty much the same performance
-A030513=A030078+A006881 #Numbers with 4 divisors
-A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4,"Numbers with 4 divisors")
+A030513=A030078 | A006881 #Numbers with 4 divisors
+#A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4)
+A030513.desc="Numbers with 4 divisors"
 
 A035533=Sequence(count_10_exp(A030513),desc="Number of numbers up to 10^n with exactly 4 divisors")
 
@@ -400,6 +402,21 @@ A001045=Sequence(math2.recurrence([2,1],[0,1])) # Jacobsthal sequence (or Jacobs
 A007953=Sequence(None,math2.digsum, True) #Digital sum (i.e., sum of digits) of n; also called digsum(n).
 
 A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence: number of 1's in binary expansion of n
+
+def digits_in(n,digits_set):
+    s1=set(math2.digits(n))
+    return s1 <= digits_set
+                                 
+A007088=Sequence(None,lambda n:int(bin(n)[2:]),lambda n:digits_in(n,set((0,1))),
+    desc='The binary numbers: numbers written in base 2'
+)
+
+A020449= A007088 & A000040 #much faster than the other way around
+A020449.desc='Primes that contain digits 0 and 1 only.'
+
+A046034=Sequence(None,None,lambda n:digits_in(n,set((2,3,5,7))),
+    desc='Numbers whose digits are primes.'
+)
 
 def sumdigpow(p,desc=None):
     """sum of p-th powers of digits"""
@@ -525,8 +542,6 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
-    it=itertools2.sorted_iterable(math2.primitive_triples(),(lambda x:(x[0]*x[1],x[2])))
-    for p in itertools2.take(30,it):
-        print(p,p[0]*p[1]/2)
+    pass
 
 
