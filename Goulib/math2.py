@@ -249,6 +249,7 @@ def minimum(m):
     """
     Compare N arrays and returns a new array containing the element-wise minima
     http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html
+    
     :param m: list of arrays (matrix)
     :return: list of minimal values found in each column of m
     """
@@ -336,6 +337,7 @@ def sets_dist(a,b):
 
 def sets_levenshtein(a,b):
     """levenshtein distance on sets
+    
     :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
     c = a.intersection(b)
@@ -366,6 +368,7 @@ def levenshtein(seq1, seq2):
 
 def recurrence(coefficients,values,cst=0, max=None):
     """general generator for recurrences
+    
     :param values: list of initial values
     :param coefficients: list of factors defining the recurrence
     """
@@ -550,6 +553,7 @@ _primes_set = set(_primes) # to speed us primality tests below
 
 def primes(n):
     """memoized list of n first primes
+    
     :warning: do not call with large n, use prime_gen instead
     """
     m=n-len(_primes)
@@ -562,6 +566,7 @@ def primes(n):
 
 def is_prime(n, oneisprime=False, precision_for_huge_n=16):
     """primality test. Uses Miller-Rabin for large n
+    
     :param n: int number to test
     :param oneisprime: bool True if 1 should be considered prime (it was, a long time ago)
     :param precision_for_huge_n: int number of primes to use in Miller
@@ -626,14 +631,14 @@ def primes_gen(start=2,stop=None):
             yield n
 
 def euclid_gen():
-    """Euclid numbers: 1 + product of the first n primes"""
+    """generates Euclid numbers: 1 + product of the first n primes"""
     n = 1
     for p in primes_gen(1):
         n = n * p
         yield n+1
 
 def prime_factors(num, start=2):
-    """generates all prime factors (ordered) of num in a list"""
+    """generates all prime factors (ordered) of num"""
     for p in primes_gen(start):
         if num==1:
             break
@@ -769,6 +774,7 @@ def sexy_prime_quadruplets():
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
+    
     :param p: int
     :return: True if 2^p-1 is prime
     """
@@ -794,12 +800,15 @@ def digits_gen(num, base=10):
 
 
 def digits(num, base=10, rev=False):
-    """:return: list of digits of num expressed in base, optionally reversed"""
+    """
+    :return: list of digits of num expressed in base, optionally reversed
+    """
     res=list(digits_gen(num,base))
     return res if rev else reversed(res)
 
 def digsum(num, base=10, f=None):
-    """:return: sum of digits of num
+    """
+    :return: sum of digits of num
     :param f: optional function to apply to the terms:
       * None = identity
       * number = elevation to the fth power
@@ -824,8 +833,9 @@ def digsum(num, base=10, f=None):
     return sum(d)
 
 def integer_exponent(a,b=10):
-    """:returns: int highest power of b that divides a.
-    https://reference.wolfram.com/language/ref/IntegerExponent.html
+    """
+    :returns: int highest power of b that divides a.
+    :see: https://reference.wolfram.com/language/ref/IntegerExponent.html
     """
     res=0
     for d in digits_gen(a, b):
@@ -843,7 +853,8 @@ def power_tower(v):
     return reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
-    """ :return: int number of carries required to add a+b in base
+    """
+    :return: int number of carries required to add a+b in base
     """
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
     for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
@@ -853,10 +864,10 @@ def carries(a,b,base=10,pos=0):
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
+    :return: string representation of num in base
     :param num: int number (decimal)
     :param base: int base, 10 by default
     :param numerals: string with all chars representing numbers in base base. chars after the base-th are ignored
-    :return: string representation of num in base
     """
     if base==10 and numerals[:10]=='0123456789':
         return str(num)
@@ -914,7 +925,9 @@ def is_permutation(num1, num2, base=10):
     return digits1==digits2
 
 def is_pandigital(num, base=10):
-    """:Return: True if num contains all digits in specified base"""
+    """
+    :return: True if num contains all digits in specified base
+    """
     n=str_base(num,base)
     return len(n)>=base and not '123456789abcdefghijklmnopqrstuvwxyz'[:base-1].strip(n)
     # return set(sorted(digits_from_num(num,base))) == set(range(base)) #slow
@@ -927,27 +940,31 @@ def bouncy(n):
 
 def tetrahedral(n):
     """
-    https://en.wikipedia.org/wiki/Tetrahedral_number
+    :return: int n-th tetrahedral number
+    :see: https://en.wikipedia.org/wiki/Tetrahedral_number
     """
     return n*(n+1)*(n+2)//6
 
 def sum_of_squares(n):
-    """:return: 1^2 + 2^2 + 3^2 + ... + n^2
-    https://en.wikipedia.org/wiki/Square_pyramidal_number
+    """
+    :return: 1^2 + 2^2 + 3^2 + ... + n^2
+    :see: https://en.wikipedia.org/wiki/Square_pyramidal_number
     """
     return n*(n+1)*(2*n+1)//6
 
 pyramidal = sum_of_squares
 
 def sum_of_cubes(n):
-    """:return: 1^3 + 2^3 + 3^3 + ... + n^3
-    https://en.wikipedia.org/wiki/Squared_triangular_number
+    """
+    :return: 1^3 + 2^3 + 3^3 + ... + n^3
+    :see: https://en.wikipedia.org/wiki/Squared_triangular_number
     """
     a=triangular(n)
     return a*a # by Nicomachus's theorem
 
 def bernouilli_gen(init=1):
     """generator of Bernouilli numbers
+    
     :param init: int -1 or +1. 
     * -1 for "first Bernoulli numbers" with B1=-1/2
     * +1 for "second Bernoulli numbers" with B1=+1/2
@@ -967,8 +984,9 @@ def bernouilli(n,init=1):
 
 def faulhaber(n,p):
     """ sum of the p-th powers of the first n positive integers
+    
     :return: 1^p + 2^p + 3^p + ... + n^p
-    https://en.wikipedia.org/wiki/Faulhaber%27s_formula
+    :see: https://en.wikipedia.org/wiki/Faulhaber%27s_formula
     """
     s=0
     for j,a in enumerate(bernouilli_gen()):
