@@ -63,6 +63,9 @@ class TestFlatten:
         assert_equal(flatten([1,[2,[3]]]),[1,2,3])
         assert_equal(flatten(['a',['bc']]),['a','bc']) #do not recurse in strings
         assert_equal(flatten([[[1],(2,[3])]],(tuple)),[1,(2,[3])]) # do not recurse in tuple
+        d=dict(enumerate(range(10)))
+        assert_equal(flatten(d),range(10))
+               
 
 class TestCompact:
     def test_compact(self):
@@ -211,8 +214,10 @@ class TestSplit:
 
 class TestNextPermutation:
     def test_next_permutation(self):
-        # assert_equal(expected, next_permutation(seq, pred))
-        raise SkipTest 
+        res=take(10,next_permutation(list('hello')))
+        res=[''.join(x) for x in res]
+        res=','.join(res)
+        assert_equal(res,'hello,helol,heoll,hlelo,hleol,hlleo,hlloe,hloel,hlole,hoell')
 
 class TestIter2:
     def test___add__(self):
@@ -383,18 +388,19 @@ class TestDictsplit:
 
 class TestShape:
     def test_shape(self):
-        # assert_equal(expected, shape(iterable))
-        raise SkipTest # TODO: implement your test here
+        data=[[[5,6,7],2,[3,4]],1] #data can have any shape...
+        assert_equal(shape(data),(2,3,3)) #... but shape is evaluated from [0]
 
 class TestNdim:
     def test_ndim(self):
-        # assert_equal(expected, ndim(iterable))
-        raise SkipTest # TODO: implement your test here
+        data=[[[5,6,7],2,[3,4]],1] #data can have any shape...
+        assert_equal(ndim(data),3) #... but shape is evaluated from [0]
 
 class TestEnumerates:
     def test_enumerates(self):
-        # assert_equal(expected, enumerates(iterable))
-        raise SkipTest # TODO: implement your test here
+        r=range(10)
+        d=dict(enumerate(r))
+        assert_equal(enumerates(d),enumerates(r))
 
 class TestEnsureSorted:
     def test_ensure_sorted(self):
@@ -405,6 +411,15 @@ class TestIscallable:
     def test_iscallable(self):
         # assert_equal(expected, iscallable(f))
         raise SkipTest # TODO: implement your test here
+    
+class TestIntersect:
+    def test_intersect(self):
+        # http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
+        postings = [[1,   100, 142, 322, 12312],
+            [2,   100, 101, 322, 1221],
+            [100, 142, 322, 956, 1222]]
+        
+        assert_equal(intersect(*postings),[100, 322])
 
 if __name__ == "__main__":
     runmodule()

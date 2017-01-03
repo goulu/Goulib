@@ -233,10 +233,13 @@ def pairwise(iterable,op=None,loop=False):
 
 def shape(iterable):
     """ shape of a mutidimensional array, without numpy
+    
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: list of n ints corresponding to iterable's len of each dimension
+    :warning: if iterable is not a (hyper) rect matrix, shape is evaluated from
+    the [0,0,...0] element ...
+    :see: http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.ndarray.shape.html
     """
-    # http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.ndarray.shape.html
     res=[]
     try:
         while True:
@@ -248,10 +251,11 @@ def shape(iterable):
 
 def ndim(iterable):
     """ number of dimensions of a mutidimensional array, without numpy
+    
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: int number of dimensions
     """
-    return len(shape)
+    return len(shape(iterable))
 
 
 def reshape(data,dims):
@@ -730,8 +734,15 @@ def diff(iterable1,iterable2):
 
 merge=heapq.merge
 
-#http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
+
 def intersect(*its):
+    """ generates itersection of N iterables
+    
+    :param its: any number of SORTED iterables
+    :yields: elements that belong to all iterables
+    :see: http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
+    """
+    
     for key, values in itertools.groupby(heapq.merge(*its)):
         if len(list(values)) == len(its):
             yield key
