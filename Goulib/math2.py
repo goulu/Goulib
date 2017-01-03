@@ -69,13 +69,13 @@ def coprime(*args):
     return gcd(*args)==1
 
 def coprimes_gen(limit):
-    '''Fast computation of Farey sequence as a generator'''
+    """Fast computation using Farey sequence as a generator
+    """
     # https://www.quora.com/What-are-the-fastest-algorithms-for-generating-coprime-pairs
-    # n, d is the start fraction n/d (0,1) initially
-    # N, D is the stop fraction N/D (1,1) initially
+    
     pend = []
-    n = 0
-    d = N = D = 1
+    n,d = 0,1 # n, d is the start fraction n/d (0,1) initially
+    N = D = 1 # N, D is the stop fraction N/D (1,1) initially
     while True:
         mediant_d = d + D
         if mediant_d <= limit:
@@ -84,7 +84,7 @@ def coprimes_gen(limit):
             N = mediant_n
             D = mediant_d
         else:
-            yield n, d
+            yield n, d #numerator / denominator
             if pend:
                 n, d, N, D = pend.pop()
             else:
@@ -695,8 +695,9 @@ def factorize(n):
 def number_of_divisors(n):
     #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
     res=1
-    for (p,e) in factorize(n):
-        res=res*(e+1)
+    if n>1:
+        for (p,e) in factorize(n):
+            res=res*(e+1)
     return res
 
 def omega(n):
@@ -733,23 +734,26 @@ totient=euler_phi #alias. totient is available in sympy
 def prime_ktuple(constellation):
     """
     generates tuples of primes with specified differences
-    https://en.wikipedia.org/wiki/Prime_k-tuple
-    :param constellation: iterable of int differences betwwen primes to return:
+    
+    :param constellation: iterable of int differences betwwen primes to return
+    :note: negative int means the difference must NOT be prime
+    :see: https://en.wikipedia.org/wiki/Prime_k-tuple
     (0, 2)    twin primes
     (0, 4)    cousin primes
     (0, 6)    sexy primes
     (0, 2, 6), (0, 4, 6)    prime triplets
-    (0, 6, 12)    sexy prime triplets
+    (0, 6, 12, -18)    sexy prime triplets
     (0, 2, 6, 8)    prime quadruplets
     (0, 6, 12, 18)    sexy prime quadruplets
     (0, 2, 6, 8, 12), (0, 4, 6, 10, 12)    quintuplet primes
     (0, 4, 6, 10, 12, 16)    sextuplet primes
+    
     """
     diffs=constellation[1:]
     for p in primes_gen():
         res=[p]
         for d in diffs:
-            if not is_prime(p+d):
+            if is_prime(p+abs(d)) == (d<0):
                 res=None
                 break
             res.append(p+d)
@@ -767,7 +771,7 @@ def sexy_primes():
     return prime_ktuple((0, 6))
 
 def sexy_prime_triplets(): 
-    return prime_ktuple((0, 6, 12))
+    return prime_ktuple((0, 6, 12, -18)) #exclude quatruplets
 
 def sexy_prime_quadruplets(): 
     return prime_ktuple((0, 6, 12, 18))

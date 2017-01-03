@@ -6,7 +6,7 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.math2 import *
-from Goulib.itertools2 import take
+from Goulib.itertools2 import take, index
 import six
 
 class TestSign:
@@ -65,6 +65,7 @@ class TestGcd:
         assert_equal(gcd(54,24),6)
         assert_equal(gcd(68, 14, 9, 36, 126),1)
         assert_equal(gcd(7, 14, 35, 7000),7)
+        assert_equal(gcd(1548),1548)
 
 class TestCoprime:
     def test_coprime(self):
@@ -191,6 +192,8 @@ class TestPrimesGen:
         assert_equal(a,[29, 31, 37, 41, 43, 47, 53, 59, 61, 67])
         a=list(islice(primes_gen(67,29),10))
         assert_equal(a,reversed([29, 31, 37, 41, 43, 47, 53, 59, 61, 67]))
+        a=list(primes_gen(901, 1000))
+        assert_equal(a,[907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997])
 
 class TestStrBase:
     def test_str_base(self):
@@ -276,9 +279,12 @@ class TestIsPrime:
         assert_false(is_prime(0))
         assert_false(is_prime(1))
         assert_true(is_prime(2))
-        assert_false(is_prime(2013))
-        assert_false(is_prime(20132013))
-        assert_false(is_prime(201420132013))
+        
+        #https://oeis.org/A014233
+        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
+        for pp in pseudoprimes:
+            assert_false(is_prime(pp))
+        
         assert_true(is_prime(201420142013))
         assert_true(is_prime(4547337172376300111955330758342147474062293202868155909489))
         assert_false(is_prime(4547337172376300111955330758342147474062293202868155909393))
@@ -566,13 +572,9 @@ class TestRecurrence:
         # assert_equal(expected, recurrence(factors, values, max))
         raise SkipTest #
 
-class TestCatalan:
-    def test_catalan(self):
-        # assert_equal(expected, catalan())
-        raise SkipTest #
-
 class TestLucasLehmer:
     def test_lucas_lehmer(self):
+        assert_false(lucas_lehmer(1548)) # trivial case
         assert_true(lucas_lehmer(11213)) # found on Illiac 2, 1963)
         assert_false(lucas_lehmer(239))
 
@@ -622,7 +624,11 @@ class TestFibonacciGen:
 
 class TestCatalanGen:
     def test_catalan_gen(self):
-        pass #tested in test_oeis
+        assert_equal(index(20,catalan_gen()),6564120420) # https://oeis.org/A000108
+    
+class TestCatalan:
+    def test_catalan(self):
+        assert_equal(catalan(20),6564120420) # https://oeis.org/A000108
 
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
@@ -838,8 +844,8 @@ class TestIsNumber:
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):
-        # assert_equal(expected, coprimes_gen(limit))
-        raise SkipTest # TODO: implement your test here
+        res=','.join(('%d/%d'%(n,d) for n,d in coprimes_gen(10)))
+        assert_equal(res,'0/1,1/10,1/9,1/8,1/7,1/6,1/5,2/9,1/4,2/7,3/10,1/3,3/8,2/5,3/7,4/9,1/2,5/9,4/7,3/5,5/8,2/3,7/10,5/7,3/4,7/9,4/5,5/6,6/7,7/8,8/9,9/10')
 
 class TestTetrahedral:
     def test_tetrahedral(self):
@@ -885,6 +891,15 @@ class TestFormat:
     def test_format(self):
         # assert_equal(expected, format(x, decimals))
         raise SkipTest # TODO: implement your test here
+    
+class TestMultiply:
+    def test_multiply(self):
+        from random import getrandbits
+        for bits in [100,1000,10000]:
+            a=getrandbits(bits)
+            b=getrandbits(bits)
+            assert_equal(multiply(a,b),a*b)
+            
 
 if __name__ == "__main__":
     runmodule()
