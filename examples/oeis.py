@@ -140,9 +140,8 @@ A002064=Sequence(None,cullen,desc='Cullen numbers')
 # divisors
 # https://oeis.org/wiki/Index_entries_for_number_of_divisors
 
-A000005=Sequence(1,lambda n:len(list(math2.divisors(n))),
-    desc='d(n) (also called tau(n) or sigma_0(n)), the number of divisors of n.'
-)
+A000005=Sequence(1,math2.number_of_divisors)
+A000005.desc='d(n) (also called tau(n) or sigma_0(n)), the number of divisors of n.'
 
 A002182=Sequence(record(A000005,count(1)),
     desc='Highly composite numbers, definition (1): where d(n), the number of divisors of n (A000005), increases to a record.'
@@ -168,6 +167,8 @@ A000010=Sequence(1,math2.euler_phi)
 
 A002088=Sequence(0,math2.euler_phi).accumulate() #strangely this one has a leading 0...
 
+A005728=A002088+1
+A005728.desc='Number of fractions in Farey series of order n.'
 
 # primes & co
 
@@ -300,8 +301,19 @@ A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neithe
 A023200=Sequence(itertools2.itemgetter(math2.cousin_primes(), 0), desc="Lesser of cousin primes.")
 A046132=Sequence(itertools2.itemgetter(math2.cousin_primes(), 1),desc="Greater of cousin primes")
 
-A023201=Sequence(itertools2.itemgetter(math2.sexy_primes(), 0), desc="Numbers n such that n and n + 6 are both prime (sexy primes)")
-A046117=Sequence(itertools2.itemgetter(math2.sexy_primes(), 1), desc="Values of p+6 such that p and p+6 are both prime (sexy primes)")
+A023201=Sequence(itertools2.itemgetter(math2.sexy_primes(), 0))
+A023201.desc="Sexy Primes : Numbers n such that n and n + 6 are both prime (sexy primes)"
+A046117=Sequence(itertools2.itemgetter(math2.sexy_primes(), 1))
+A046117.desc="Values of p+6 such that p and p+6 are both prime (sexy primes)"
+
+A046118=Sequence(itertools2.itemgetter(math2.sexy_prime_triplets(), 0))
+A046119=Sequence(itertools2.itemgetter(math2.sexy_prime_triplets(), 1))
+A046120=Sequence(itertools2.itemgetter(math2.sexy_prime_triplets(), 2))
+
+A023271=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 0))
+A046122=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 1))
+A046123=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 2))
+A046124=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 3))
 
 def is_squarefree(n):
     for p,q in math2.factorize(n):
@@ -332,7 +344,8 @@ A030513=A030078 | A006881 #Numbers with 4 divisors
 #A030513=Sequence(None,None,lambda n:len(list(math2.divisors(n)))==4)
 A030513.desc="Numbers with 4 divisors"
 
-A035533=Sequence(count_10_exp(A030513),desc="Number of numbers up to 10^n with exactly 4 divisors")
+A035533=Sequence(count_10_exp(A030513))
+A035533.desc="Number of numbers up to 10^n with exactly 4 divisors"
 
 A000006=A000040.apply(math2.isqrt,desc="Integer part of square root of n-th prime.")
 
@@ -345,7 +358,7 @@ A000045=Sequence(math2.fibonacci_gen,math2.fibonacci) #Fibonacci numbers: F(n) =
 
 A007318=Sequence(math2.pascal_gen)
 
-A000108=Sequence(math2.catalan_gen,math2.catalan)
+A000108=Sequence(math2.catalan_gen, math2.catalan)
 
 def recaman():
     """Generate Recaman's sequence and additional info"""
@@ -427,7 +440,9 @@ A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose tra
 
 A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-#A005188=Sequence(1,lambda x:math2.digsum(x,f=len(str(x))),desc='Armstrong (or Plus Perfect, or narcissistic) numbers: n-digit numbers equal to sum of n-th powers of their digits')
+A005188=Sequence(1,None,lambda x:x==math2.digsum(x,f=len(str(x))))
+A005188.desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
+n-digit numbers equal to sum of n-th powers of their digits'
 
 # Reverse and Add
 # https://oeis.org/wiki/Index_to_OEIS:_Section_Res#RAA
