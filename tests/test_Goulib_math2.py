@@ -175,13 +175,13 @@ class TestIntOrFloat:
 
 class TestSieve:
     def test_sieve(self):
-        # assert_equal(expected, sieve(n))
-        raise SkipTest
+        last=sieve(10000)[-1] #more than _sieve for coverage
+        assert_equal(last,9973)
 
 class TestPrimes:
     def test_primes(self):
-        # assert_equal(expected, primes(n))
-        raise SkipTest
+        last=primes(1001)[999] #more than _primes for coverage
+        assert_equal(last,7919)
 
 class TestPrimesGen:
     def test_primes_gen(self):
@@ -680,8 +680,9 @@ class TestPartition:
 
 class TestChakravala:
     def test_chakravala(self):
-        # assert_equal(expected, chakravala(n))
-        raise SkipTest #
+        x,y=chakravala(61)
+        assert_true(x==1766319049 and y==226153980)
+        #https://en.wikipedia.org/wiki/Chakravala_method
 
 class TestBouncy:
     def test_bouncy(self):
@@ -834,8 +835,10 @@ class TestIlog:
 
 class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):
-        # assert_equal(expected, baby_step_giant_step(y, a, n))
-        raise SkipTest
+        #70 = 2**x mod 131
+        y,a,n=70,2,131
+        x=baby_step_giant_step(y,a,n)
+        assert_true(y==a**x % n)
 
 class TestIsNumber:
     def test_is_number(self):

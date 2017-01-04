@@ -390,6 +390,8 @@ A057166=Sequence(
     )
 )
 
+A000041=Sequence(None,math2.partition,desc='number of partitions of n (the partition numbers)')
+
 def bell():
     """Bell or exponential numbers: number of ways to partition a set of n labeled elements.
     """
