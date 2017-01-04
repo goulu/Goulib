@@ -1171,7 +1171,14 @@ class Ellipse(Circle):
                 self.r,self.r2=(self.p-self.c).xy
 
     def __repr__(self):
-        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
+        return '%s(%s,%g,%g)' % (self.__class__.__name__,self.c,self.r,self.r2)
+    
+    def __eq__(self, other):
+        try:
+            other=Ellipse(other) #in case it's a Circle
+        except:
+            return False
+        return self.c==other.c and self.r==other.r and self.r2==other.r2
 
     def _apply_transform(self, t):
         self.c = t * self.c
@@ -1452,11 +1459,19 @@ class Matrix3(object):
          self.c, self.g, self.k))
 
     def __getitem__(self, key):
+        try: #is key a tuple ?
+            key=3*key[0]+key[1]
+        except:
+            pass
         return [self.a, self.e, self.i,
                 self.b, self.f, self.j,
                 self.c, self.g, self.k][key]
 
     def __setitem__(self, key, value):
+        try: #is key a tuple ?
+            key=3*key[0]+key[1]
+        except:
+            pass
         L = self[:]
         L[key] = value
         (self.a, self.e, self.i,
