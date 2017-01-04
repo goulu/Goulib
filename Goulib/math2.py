@@ -175,6 +175,21 @@ def isqrt(n):
         y = (x + n // x) // 2
     return x
 
+def sqrt(n):
+    """improved square root
+    
+    :return: int or float 
+    """
+    if type(n) is int:
+        s=isqrt(n)
+        if s*s==n:
+            return s
+    return math.sqrt(n)
+
+def is_square(n):
+    s=isqrt(n)
+    return s*s==n
+
 def multiply(x, y):
     """
     Karatsuba fast multiplication algorithm
@@ -305,7 +320,7 @@ def sat(x,low=0,high=None):
 
 def norm_2(v):
     """:return: "normal" euclidian norm of vector v"""
-    return math.sqrt(sum(x*x for x in v))
+    return sqrt(sum(x*x for x in v))
 
 def norm_1(v):
     """:return: "manhattan" norm of vector v"""
@@ -333,7 +348,7 @@ def hamming(s1, s2):
 def sets_dist(a,b):
     """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
     c = a.intersection(b)
-    return math.sqrt(len(a-c)*2 + len(b-c)*2)
+    return sqrt(len(a-c)*2 + len(b-c)*2)
 
 def sets_levenshtein(a,b):
     """levenshtein distance on sets
@@ -1040,7 +1055,7 @@ def is_lychrel(n,limit=96):
 
 def polygonal(s, n):
     #https://en.wikipedia.org/wiki/Polygonal_number
-    return ((s-2)*n*n-(s-4)*n)/2
+    return ((s-2)*n*n-(s-4)*n)//2
 
 def triangle(n):
     """
@@ -1053,15 +1068,12 @@ triangular=triangle
 
 def is_triangle(x):
     """:return: True if x is a triangle number"""
-    return is_integer((-1 + math.sqrt(1 + 8*x)) / 2.)
+    return is_square(1 + 8*x)
 
 is_triangular=is_triangle
 
 def square(n):
     return polygonal(4,n) # n*n
-
-def is_square(n):
-    return is_integer(math.sqrt(n))
 
 def pentagonal(n):
     """
@@ -1072,7 +1084,13 @@ def pentagonal(n):
 
 def is_pentagonal(n):
     """:return: True if x is a pentagonal number"""
-    return (n >= 1) and is_integer((1+math.sqrt(1+24*n))/6.0)
+    if n<1:
+        return False
+    n=1+24*n
+    s=isqrt(n)
+    if s*s != n: 
+        return False
+    return is_integer((1+s)/6.0)
 
 def hexagonal(n):
     """
@@ -1082,19 +1100,19 @@ def hexagonal(n):
     return polygonal(6,n) # n*(2*n - 1)
 
 def is_hexagonal(n):
-    return (1 + math.sqrt(1 + (8 * n))) % 4 == 0
+    return (1 + sqrt(1 + (8 * n))) % 4 == 0
 
 def heptagonal(n):
     return polygonal(7,n) # (n * (5 * n - 3)) / 2
 
 def is_heptagonal(n):
-    return (3 + math.sqrt(9 + (40 * n))) % 10 == 0
+    return (3 + sqrt(9 + (40 * n))) % 10 == 0
 
 def octagonal(n):
     return polygonal(8,n) # (n * (3 * n - 2))
 
 def is_octagonal(n):
-    return (2 + math.sqrt(4 + (12 * n))) % 6 == 0
+    return (2 + sqrt(4 + (12 * n))) % 6 == 0
 
 #@memoize
 def partition(n):
@@ -1118,8 +1136,9 @@ def partition(n):
 
     result = 0
     for k in non_zero_integers(n + 1):
-        sign = (-1) ** ((k - 1) % 2)
-        result += int(sign) * partition(n - pentagonal(k))
+        # sign = (-1) ** ((k - 1) % 2)
+        sign = 1 if (k - 1) % 2==0 else -1
+        result += sign * partition(n - pentagonal(k))
     return result
 
 def get_cardinal_name(num):
@@ -1194,7 +1213,7 @@ def chakravala(n):
 
     while k != 1 or b == 0:
         m = k * (m//k+1) - m
-        m = m - int((m - math.sqrt(n))//k) * k
+        m = m - int((m - sqrt(n))//k) * k
 
         tempA = (a*m + n*b) // abs(k)
         b = (a + b*m) // abs(k)
