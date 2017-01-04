@@ -14,7 +14,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 .. image:: https://travis-ci.org/goulu/Goulib.svg?branch=master
     :target: https://travis-ci.org/goulu/Goulib
     :alt: Build
-.. image:: https://coveralls.io/repos/goulu/Goulib/badge.svg?branch=master&service=github
+.. image:: https://coveralls.io/repos/github/goulu/Goulib/badge.svg?branch=master
     :target: https://coveralls.io/github/goulu/Goulib?branch=master
     :alt: Tests
 .. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
