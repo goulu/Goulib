@@ -620,6 +620,9 @@ def primes_gen(start=2,stop=None):
         yield 1 #if we asked for it explicitly
     if start<=2:
         yield 2
+    elif start%2==0:
+        start+=1 
+    
     if stop is None:
         candidates=itertools.count(max(start,3),2)
     elif stop>start:
@@ -1095,6 +1098,14 @@ def is_octagonal(n):
 
 #@memoize
 def partition(n):
+    """
+    The partition function p(n)
+    gives the number of partitions of a nonnegative integer n
+    into positive integers. 
+    (There is one partition of zero into positive integers, 
+    i.e. the empty partition, since the empty sum is defined as 0.)
+    :see: http://oeis.org/wiki/Partition_function
+    """
     def non_zero_integers(n):
         for k in range(1, n):
             yield k
@@ -1108,7 +1119,7 @@ def partition(n):
     result = 0
     for k in non_zero_integers(n + 1):
         sign = (-1) ** ((k - 1) % 2)
-        result += sign * partition(n - pentagonal(k))
+        result += int(sign) * partition(n - pentagonal(k))
     return result
 
 def get_cardinal_name(num):
@@ -1182,12 +1193,12 @@ def chakravala(n):
     b = 0
 
     while k != 1 or b == 0:
-        m = k * (m/k+1) - m
-        m = m - int((m - math.sqrt(n))/k) * k
+        m = k * (m//k+1) - m
+        m = m - int((m - math.sqrt(n))//k) * k
 
-        tempA = (a*m + n*b) / abs(k)
-        b = (a + b*m) / abs(k)
-        k = (m*m - n) / k
+        tempA = (a*m + n*b) // abs(k)
+        b = (a + b*m) // abs(k)
+        k = (m*m - n) // k
 
         a = tempA
 
@@ -1510,7 +1521,8 @@ def mod_binomial(n,k,m,q=None):
         return chinese_remainder(f,r)
 
 def baby_step_giant_step(y, a, n):
-    #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
+    """ solves Discrete Logarithm Problem (DLP) y = a**x mod n
+    """
     #http://l34rn-p14y.blogspot.it/2013/11/baby-step-giant-step-algorithm-python.html
     s = int(math.ceil(math.sqrt(n)))
     A = [y * pow(a, r, n) % n for r in range(s)]
