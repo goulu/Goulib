@@ -229,11 +229,13 @@ class TestVector2:
 class TestMatrix3:
     @classmethod
     def setup_class(self):
-        self.mat123=Matrix3(1,2,3,4,5,6,7,8,9)
+        self.id3=Matrix3() #identity
+        self.mat123=Matrix3(1,2,3,4,5,6,7,8,9) # singular
+        self.mat456=Matrix3(4,5,6,9,8,7,3,1,2)
 
     def test___init__(self):
         #default constructor makes an identity matrix
-        assert_equal(Matrix3(), Matrix3(1,0,0, 0,1,0, 0,0,1))
+        assert_equal(self.id3, Matrix3(1,0,0, 0,1,0, 0,0,1))
         #copy constructor
         mat123=Matrix3(self.mat123)
         assert_equal(mat123,self.mat123)
@@ -276,9 +278,9 @@ class TestMatrix3:
         raise SkipTest
 
     def test___getitem__(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.__getitem__(key))
-        raise SkipTest
+        assert_equal(self.mat456.f,8) #central element
+        assert_equal(self.mat456[1,1],8)
+        assert_equal(self.mat456[4],8)
 
     def test___imul__(self):
         # matrix3 = Matrix3()
@@ -291,9 +293,7 @@ class TestMatrix3:
         raise SkipTest
 
     def test___setitem__(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.__setitem__(key, value))
-        raise SkipTest
+        pass # used everywhere
 
     def test_angle(self):
         # matrix3 = Matrix3()
@@ -301,9 +301,10 @@ class TestMatrix3:
         raise SkipTest
 
     def test_determinant(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.determinant())
-        raise SkipTest
+        d=self.mat123.determinant()
+        assert_equal(d,0)
+        d=self.mat456.determinant()
+        assert_equal(d,-39)
 
     def test_identity(self):
         # matrix3 = Matrix3()
@@ -311,9 +312,10 @@ class TestMatrix3:
         raise SkipTest
 
     def test_inverse(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.inverse())
-        raise SkipTest
+        inv=self.mat123.inverse()
+        assert_equal(inv,self.id3)
+        inv=self.mat456.inverse()
+        assert_equal(inv[0,0],-0.23076923076923075)
 
     def test_mag(self):
         # matrix3 = Matrix3()
@@ -720,14 +722,19 @@ class TestArcFrom3Points:
         assert_equal(a.point(0.5),p2)
 
 class TestEllipse:
+    @classmethod
+    def setup_class(self):
+        self.e1=Ellipse((1,2),(3,4))
+        self.e2=Ellipse((1,2),2,2,pi/2)     
+        self.e3=Ellipse(self.e2)        
+        assert_equal(self.e1,self.e2)
+        
     def test___init__(self):
-        # ellipse = Ellipse(*args)
-        raise SkipTest 
+        pass
 
     def test___repr__(self):
-        # ellipse = Ellipse(*args)
-        # assert_equal(expected, ellipse.__repr__())
-        raise SkipTest 
+        s=str(self.e1)
+        assert_equal(s,'Ellipse(Point2(1, 2),2,2)')
 
 if __name__ == "__main__":
     runmodule()
