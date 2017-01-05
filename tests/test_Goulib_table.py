@@ -22,13 +22,13 @@ class TestTable:
         #format some columns
         self.t.applyf('Cost',float)
         self.t.applyf('Total',lambda x:float(x) if isinstance(x,(six.integer_types,float)) else float(x.replace(',','')))
-        
         self.t.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
-        assert_equal(self.t[0][0],datetime.date(2012, 6, 1))
+        assert_equal(self.t[0,0],datetime.date(2012, 6, 1))
         assert_equal(self.t[1][0],datetime.date(2012, 1,23))
         
         ref='<tr><td style="text-align:right;">2012-01-09</td><td>Central</td><td>Smith</td><td>Desk</td><td style="text-align:right;">2</td><td style="text-align:right;">125.00</td><td style="text-align:right;">250.00</td></tr>'
-        t=Row(self.t[14]).html()
+        t=Row(self.t[14])
+        t=t.html()
         assert_equal(t,ref)
         
         #add a column to test timedeltas
