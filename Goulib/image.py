@@ -235,8 +235,11 @@ class Image(Plot):
                 mode='L'
             elif self.mode not in 'RGBA': #modes we can save directly
                 mode='RGB'
-        im=self.convert(mode)
-        skimage.io.imsave(path,im.array,**kwargs)
+        a=self.convert(mode).array # makes sure we have a copy of self.array
+        ext=path.split('.')[-1][:3]
+        if ext.lower()=='tif':
+            a=skimage.img_as_uint(a)
+        skimage.io.imsave(path,a,**kwargs)
         return self
 
     @property
@@ -718,6 +721,14 @@ class Image(Plot):
 
     def __sub__(self,other):
         return self.sub(other)
+    
+    def deltaE(self,other):
+        import skimage.color as skcolor
+        a=skcolor.deltaE_ciede2000(
+            self.convert('lab').array,
+            other.convert('lab').array,
+        )
+        return Image(a,'F')
 
     def __mul__(self,other):
         if isinstance(other,six.string_types):
