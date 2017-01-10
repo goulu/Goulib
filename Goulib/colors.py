@@ -284,15 +284,19 @@ class Color(object):
 
     def _repr_html_(self):
         return '<span style="color:%s">%s</span>'%(self.hex,self.name)
+    
+    def compose(self,other,f,mode='rgb'):
+        """ compose colors in given mode
+        """
+        if not isinstance(other, Color):
+            other=Color(other,mode)
+        return f(self.convert(mode),other.convert(mode))
 
     def __add__(self,other):
-        from .image import Image
-        if isinstance(other, Color):
-            return Color(math2.vecadd(self.rgb,other.rgb))
-        elif isinstance(other, Image):
+        from Goulib.image import Image
+        if isinstance(other, Image):
             return Image(size=other.size,color=self.native,mode=self.space)+other
-        else: #last chance
-            return Color(math2.vecadd(self.rgb,other))
+        return Color(self.compose(other,math2.vecadd))
         
     def __radd__(self,other):
         """only to allow sum(colors) easily"""
@@ -300,13 +304,11 @@ class Color(object):
         return self
 
     def __sub__(self,other):
-        from .image import Image
+        from Goulib.image import Image
         if isinstance(other, Image):
             mode=other.mode
             return Image(size=other.size,color=self.convert(mode),mode=mode)-other
-        if not isinstance(other, Color):
-            other=Color(other)
-        return Color(math2.vecsub(self.rgb,other.rgb)) #TODO: change to other space one day
+        return Color(self.compose(other,math2.vecsub))
         
     def __mul__(self,factor):
         if factor<0:
@@ -315,8 +317,6 @@ class Color(object):
         l*=factor
         res=Color((l,a,b),'lab')
         return res
-        
-        
     
     def __neg__(self):
         """ complementary color"""
@@ -401,7 +401,16 @@ class Palette(OrderedDict):
             # c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
             res+= cell % (c.hex, c.hex, tooltip(k))
         return res+'</div>'
-        
+    
+    def patches(self,wide=64,size=(16,16)):
+        """Image made of each palette color
+        """
+        from Goulib.image import Image
+        n=len(self)
+        data=itertools2.reshape(range(n),(wide,n//wide))
+        res=Image(data,'P',palette=self)
+        res=res.scale(size)
+        return res
     
     @property
     def pil(self):
@@ -504,7 +513,7 @@ def deltaE(c1,c2):
         c2=Color(c2)
     return skcolor.deltaE_ciede2000(c1.lab, c2.lab)
 
-def nearest_color(c,l=None, opt=min):
+def nearest_color(c,l=None, opt=min, comp=deltaE):
     """
     :param x: Color
     :param l: list or dict of Color, color by default
@@ -516,7 +525,7 @@ def nearest_color(c,l=None, opt=min):
     l=l or color
     if isinstance(l,dict):
         l=l.values()
-    return opt(l,key=lambda c2:deltaE(c,c2))
+    return opt(l,key=lambda c2:comp(c,c2))
 
 #http://stackoverflow.com/questions/876853/generating-color-ranges-in-python
 

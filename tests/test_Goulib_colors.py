@@ -181,6 +181,11 @@ class TestColor:
         # assert_equal(expected, color.__radd__(other))
         raise SkipTest # TODO: implement your test here
 
+    def test_compose(self):
+        # color = Color(value, space, name)
+        # assert_equal(expected, color.compose(other, f, mode))
+        raise SkipTest # TODO: implement your test here
+
 from matplotlib import cm #colormaps
     
 class TestPalette:

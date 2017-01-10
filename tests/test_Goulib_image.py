@@ -385,6 +385,11 @@ class TestImage:
         # assert_equal(expected, image.sub(other, pos, alpha, mode))
         raise SkipTest # TODO: implement your test here
 
+    def test_deltaE(self):
+        # image = Image(data, mode, **kwargs)
+        # assert_equal(expected, image.deltaE(other))
+        raise SkipTest # TODO: implement your test here
+
 class TestCorrelation:
     def test_correlation(self):
         # assert_equal(expected, correlation(input, match))
@@ -499,6 +504,21 @@ class TestPalette:
     def test_update(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.update(data, n))
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test_patches(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.patches(wide, size))
+        raise SkipTest # TODO: implement your test here
+
+    def test_sorted(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.sorted(key))
         raise SkipTest # TODO: implement your test here
 
 class TestLab2ind:

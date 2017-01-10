@@ -148,10 +148,12 @@ class Image(Plot):
             self.palette
         except AttributeError:
             self.palette=None
-            try:
-                self.setpalette(kwargs['colormap'])
-            except (AssertionError,KeyError):
-                pass
+            for arg in ['colormap','palette','colors']: #aliases
+                try:
+                    self.setpalette(kwargs[arg])
+                    break # found it
+                except (AssertionError,KeyError):
+                    pass
                 
 
     def _set(self,data,mode=None,copy=False):
@@ -232,8 +234,10 @@ class Image(Plot):
             format_str=path.split('.')[-1][:3]
         if format_str.upper()=='TIF':
             a=skimage.img_as_uint(a)
-                
-        skimage.io.imsave(path,a,format_str=format_str,**kwargs)
+        else: #tiff plugin doesn't like format_str arg
+            kwargs['format_str']=format_str.upper()    
+        from skimage import io
+        io.imsave(path,a,**kwargs)
         return self
 
     def _repr_svg_(self, **kwargs):
@@ -423,6 +427,7 @@ class Image(Plot):
             * ANTIALIAS (a high-quality downsampling filter)
         :param kwargs: axtra parameters passed to skimage.transform.resize
         """
+           
         from skimage.transform import resize
         order=0 if filter in (None,PILImage.NEAREST) else 1 if filter==PILImage.BILINEAR else 3
         order=kwargs.pop('order',order)
@@ -644,6 +649,13 @@ class Image(Plot):
             s[1]
         except:
             s=[s,s]
+            
+        if self.mode=='P':
+            a=self.array
+            for axis,r in enumerate(s):
+                a=np.repeat(a,r,axis=axis)
+            return Image(a, 'P', colors=self.palette)
+        
         w,h=self.size
         return self.resize((int(w*s[0]+0.5),int(h*s[1]+0.5)))
 
