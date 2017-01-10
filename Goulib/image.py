@@ -168,6 +168,7 @@ class Image(Plot):
                 data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
         self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
+    
 
     @property
     def shape(self):
@@ -212,20 +213,11 @@ class Image(Plot):
         self._set(data,'F' if mode in 'U' else mode)
         return self
 
-    @staticmethod
-    def open(path):
-        """PIL(low) compatibility"""
-        return Image(path)
-
-    @staticmethod
-    def new(mode, size, color='black'):
-        """PIL(low) compatibility"""
-        return Image(mode=mode, size=size, color=color)
-
-    def save(self, path, autoconvert=True, **kwargs):
+    def save(self, path, autoconvert=True, format_str=None, **kwargs):
         """saves an image
         :param path: string with path/filename.ext
         :param autoconvert: bool, if True converts color planes formats to RGB
+        :param format_str: str of file format. set to 'PNG' by skimage.io.imsave
         :param kwargs: optional params passed to skimage.io.imsave:
         :return: self for chaining
         """
@@ -236,12 +228,39 @@ class Image(Plot):
             elif self.mode not in 'RGBA': #modes we can save directly
                 mode='RGB'
         a=self.convert(mode).array # makes sure we have a copy of self.array
-        ext=path.split('.')[-1][:3]
-        if ext.lower()=='tif':
+        if format_str is None and isinstance(path,six.string_types):
+            format_str=path.split('.')[-1][:3]
+        if format_str.upper()=='TIF':
             a=skimage.img_as_uint(a)
-        skimage.io.imsave(path,a,**kwargs)
+                
+        skimage.io.imsave(path,a,format_str=format_str,**kwargs)
         return self
 
+    def _repr_svg_(self, **kwargs):
+        raise NotImplementedError() #and should never be ...
+        #... because it causes _repr_png_ to be called by Plot._repr_html_
+        # instead of render below
+
+    def render(self, fmt='PNG',**kwargs):
+        buffer = six.BytesIO()
+        self.save(buffer, format_str=fmt, **kwargs)
+        #self.save(buffer)
+        #im=self.pil
+        #im.save(buffer, fmt)
+        return buffer.getvalue()
+
+    # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
+    
+    @staticmethod
+    def open(path):
+        """PIL(low) compatibility"""
+        return Image(path)
+
+    @staticmethod
+    def new(mode, size, color='black'):
+        """PIL(low) compatibility"""
+        return Image(mode=mode, size=size, color=color)
+    
     @property
     def pil(self):
         """convert to PIL(low) Image
@@ -252,19 +271,7 @@ class Image(Plot):
         if self.mode=='P':
             im.putpalette(self.palette.pil)
         return im
-
-    def _repr_svg_(self, **kwargs):
-        raise NotImplementedError() #and should never be ...
-        #... because it causes _repr_png_ to be called by Plot._repr_html_
-        # instead of render below
-
-    def render(self, fmt='png'):
-        im=self.pil
-        buffer = six.BytesIO()
-        im.save(buffer, fmt)
-        return buffer.getvalue()
-
-    # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
+    
     def getdata(self,dtype=np.uint8,copy=True):
         a=self.array
         if a.dtype==dtype:
