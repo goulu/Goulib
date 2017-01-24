@@ -3,9 +3,11 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
-from Goulib.tests import *
 
+from Goulib.tests import *
 from Goulib.container import *
+
+from Goulib import math2
 
 def ve2no(f, *args):
     'Convert ValueError result to -1'
@@ -141,26 +143,40 @@ class TestSortedCollection:
         raise SkipTest 
     
 class TestRecord:
-    def test___getattr__(self):
-        # record = Record(*args, **kwargs)
-        # assert_equal(expected, record.__getattr__(name))
-        raise SkipTest # TODO: implement your test here
-
+    @classmethod
+    def setup_class(self):
+        self.d={'first':'Albert', 'last':'Einstein'}
+        self.r=Record(self.d)
+        assert_raises(AttributeError,lambda:self.r.birth)
+        
     def test___init__(self):
-        # record = Record(*args, **kwargs)
-        raise SkipTest # TODO: implement your test here
+        pass
+    
+    def test___getattr__(self):
+        assert_equal(self.r.first,self.d['first'])
+        assert_equal(self.r['first'],self.d['first'])
 
     def test___setattr__(self):
-        # record = Record(*args, **kwargs)
-        # assert_equal(expected, record.__setattr__(name, value))
-        raise SkipTest # TODO: implement your test here
+        self.r.born=1879
+        assert_equal(self.r['born'],1879)
+        
+        r2=self.r.copy()
+        r2.first='Franck' # Franck Enstein ;-)
+        #check the fields are copied
+        assert_equal(self.r.first,self.d['first'])
+        
 
     def test___str__(self):
         # record = Record(*args, **kwargs)
         # assert_equal(expected, record.__str__())
         raise SkipTest # TODO: implement your test here
 
+
 class TestSequence:
+    @classmethod
+    def setup_class(self):
+        self.A000040=Sequence(containf=math2.is_prime)
+        
     def test___add__(self):
         # sequence = Sequence(iterf, itemf, containf, desc)
         # assert_equal(expected, sequence.__add__(other))
@@ -206,19 +222,13 @@ class TestSequence:
         raise SkipTest # TODO: implement your test here
 
     def test_accumulate(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.accumulate(op, skip_first))
-        raise SkipTest # TODO: implement your test here
+        A007504=self.A000040.accumulate()
 
     def test_apply(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.apply(f, containf, desc))
-        raise SkipTest # TODO: implement your test here
+        A001248=self.A000040.apply(lambda n:n*n)
 
     def test_filter(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.filter(f, desc))
-        raise SkipTest # TODO: implement your test here
+        A000043=self.A000040.filter(math2.lucas_lehmer)
 
     def test_index(self):
         # sequence = Sequence(iterf, itemf, containf, desc)
@@ -226,9 +236,7 @@ class TestSequence:
         raise SkipTest # TODO: implement your test here
 
     def test_pairwise(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.pairwise(op, skip_first))
-        raise SkipTest # TODO: implement your test here
+        A001223=self.A000040.pairwise(operator.sub)
 
     def test_sort(self):
         # sequence = Sequence(iterf, itemf, containf, desc)
@@ -238,6 +246,11 @@ class TestSequence:
     def test_unique(self):
         # sequence = Sequence(iterf, itemf, containf, desc)
         # assert_equal(expected, sequence.unique(buffer))
+        raise SkipTest # TODO: implement your test here
+
+    def test___or__(self):
+        # sequence = Sequence(iterf, itemf, containf, desc)
+        # assert_equal(expected, sequence.__or__(other))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":
