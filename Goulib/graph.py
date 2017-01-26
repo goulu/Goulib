@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt # after import .plot
 try:
     import numpy, scipy.spatial
     SCIPY=True
-except:
+except Exception:
     logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
@@ -37,7 +37,7 @@ from . import itertools2
 try:
     from rtree import index # http://toblerity.org/rtree/
     RTREE=True
-except: #fallback, especially because I couldn't manage to install rtree on travis-ci
+except Exception: #fallback, especially because I couldn't manage to install rtree on travis-ci
     RTREE=False
 
 if not RTREE:
@@ -73,7 +73,7 @@ _nk=0 # node key
 
 try: # pygraphviz is optional
     from pygraphviz import AGraph # http://pygraphviz.github.io/
-except:
+except Exception:
     class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 
 
@@ -101,9 +101,9 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
             tol=create_using.tol
             create_using.tol=0 #zero tolerance when copying
             for k in data.node: #create nodes
-                create_using.add_node(k,attr_dict=data.node[k])
+                create_using.add_node(k,**data.node[k])
             for u,v,d in data.edges(data=True):
-                create_using.add_edge(u,v,attr_dict=d)
+                create_using.add_edge(u,v,**d)
             create_using.tol=tol # revert original tolerance
             return create_using
 
@@ -149,16 +149,22 @@ class _Geo(plot.Plot):
 
 
     def copy(self):
-        """does not use deepcopy because the rtree index must be rebuilt"""
+        """
+        :return: copy of self graph
+        """
+        # does not use deepcopy because the rtree index must be rebuilt
         return self.__class__(self,**self.graph)
 
     def __eq__(self,other):
-        """:return: True if self and other are equal"""
+        """
+        :return: True if self and other are equal
+        """
         def eq(a,b): return a==b
         return nx.is_isomorphic(self,other, node_match=eq, edge_match=eq)
 
     def __nonzero__(self):
-        """:return: True if graph has at least one node
+        """
+        :return: True if graph has at least one node
         """
         return self.number_of_nodes()>0
 
@@ -197,15 +203,23 @@ class _Geo(plot.Plot):
         """used internally in constructor"""
         try:
             return self.multi
-        except:
+        except AttributeError:
             return True
 
-    def pos(self,node):
+    def pos(self,nodes=None):
+        """ 
+        :param nodes: a single node, an iterator of all nodes if None
+        :return: the position of node(s)
+        """
         try:
-            return self.node[node]['pos']
-        except:
-            return node #supposedly a tuple
-
+            return self.node[nodes]['pos']
+        except KeyError:
+            pass
+        if isinstance(nodes,tuple):
+            return nodes
+        if nodes is None:
+            nodes=self.nodes()
+        return (self.pos(n) for n in nodes)
 
 
     def dist(self,u,v):
@@ -215,9 +229,8 @@ class _Geo(plot.Plot):
 
         try:
             return self[u][v]['length']
-        except:
-            pass
-        return math2.dist(self.pos(u),self.pos(v))
+        except Exception:
+            return math2.dist(self.pos(u),self.pos(v))
 
     def length(self,edges=None):
         """
@@ -304,19 +317,19 @@ class _Geo(plot.Plot):
         """
         if p in self.node: #point already exists
             return p
-
-        id=p
+        
+        a={}
+        if attr_dict :
+            a.update(attr_dict)
+        if attr :
+            a.update(**attr)
+            
+        id=p #save the node id as the position might differ
 
         if type(p) is not tuple:
             # try to find a position tuple somewhere
             if p in self._map:
                 return self._map[p]
-            a={}
-            if attr_dict :
-                a.update(**attr_dict)
-            if attr :
-                a.update(**attr)
-
 
             p=a.get('pos',id)
             if isinstance(p,six.string_types):
@@ -325,7 +338,7 @@ class _Geo(plot.Plot):
                 p=tuple(float(x) for x in p)
             except: # assign a random position, but keep node id
                 from random import random
-                attr['pos']=p=tuple((random(),random()))
+                a['pos']=p=tuple((random(),random()))
 
 
         if self.idx is None: #now we know the dimension, so we can create the index
@@ -343,8 +356,8 @@ class _Geo(plot.Plot):
             _nk+=1
             self.idx.insert(_nk,p,p)
             # networkX uses any id type, but the RTREE key is kept
-            attr['key']=_nk
-            self.parent.add_node(self,id, attr_dict, **attr)
+            a['key']=_nk
+            self.parent.add_node(self,id, **a)
             #._map links both id
             self._map[id]=p
         return id
@@ -430,11 +443,13 @@ class _Geo(plot.Plot):
                 keys=set()
                 k=0
 
-        res=self.parent.add_edge(self,u, v, k, attr_dict=a)
-        if res is not None:
+        res=self.parent.add_edge(self,u, v, k, **a)
+        
+        #Goulib returns the data dict, becasue that's what the most useful
+        if isinstance(res,dict):
             return res
-        # networkX still doesn't return created data... what a pity ...
-        # we have to search the dict object that was just created ...
+        # but NetworkX 1.x returns None and 2.0 returns the ink key...
+        # so we have to search the dict object that was just created
 
         if k is None:
             k=next(iter(set(self[u][v].keys())-keys))
@@ -524,8 +539,6 @@ class _Geo(plot.Plot):
         plt.close(fig)
         return res
 
-    # for IPython notebooks
-
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
         ext=filename.split('.')[-1].lower()
@@ -535,6 +548,7 @@ class _Geo(plot.Plot):
             nx.nx_pydot.write_dot(self, filename)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
+        return self
 
 class GeoGraph(_Geo, nx.MultiGraph):
     """ Undirected graph with nodes positions
@@ -614,17 +628,17 @@ def draw_networkx(g, pos=None, **kwargs):
     #build node positions
 
     if six.callable(pos): #mapping function
-        pos=dict(((node,pos(node)) for node in g.nodes_iter()))
+        pos=dict(((node,pos(node)) for node in g.nodes()))
         
     if pos is None:
         try:
-            pos=dict((node,data['pos'][:2]) for node,data in g.nodes_iter(True))
+            pos=dict((node,data['pos'][:2]) for node,data in g.nodes(True))
         except KeyError:
             pass
 
     if pos is None:
         try:
-            pos=dict(((node,node[:2]) for node in g.nodes_iter()))
+            pos=dict(((node,node[:2]) for node in g.nodes()))
         except TypeError:
             pass
 
@@ -704,7 +718,9 @@ def to_drawing(g, d=None, edges=[]):
         u,v,data=edge[0],edge[1],edge[-1]
         try:
             e=data['entity']
-        except:
+        except KeyError:
+            u=g.pos(u)
+            v=g.pos(v)
             e=geom.Segment2(u,v)
         d.append(e)
     return d
@@ -716,7 +732,7 @@ def write_dxf(g,filename):
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
     https://en.wikipedia.org/wiki/Delaunay_triangulation
-    :param nodes: list of (x,y) or (x,y,z) node positions
+    :param nodes: _Geo graph or list of (x,y) or (x,y,z) node positions
     :param qhull_options: string passed to :meth:`scipy.spatial.Delaunay`,
     which passes it to Qhull ( http://www.qhull.org/ )
     *'Qt' ensures all points are connected
@@ -726,6 +742,8 @@ def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs)
     :param kwargs: passed to the :class:`GeoGraph` constructor
     :return: :class:`GeoGraph` with delauney triangulation between nodes
     """
+    if isinstance(nodes,_Geo):
+        nodes=list(nodes.pos())
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
     points=numpy.array(nodes)
     tri = scipy.spatial.Delaunay(points, qhull_options=qhull_options, incremental=incremental)
