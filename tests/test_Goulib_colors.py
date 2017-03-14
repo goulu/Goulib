@@ -229,6 +229,11 @@ class TestPalette:
         # assert_equal(expected, palette.__repr__())
         raise SkipTest # TODO: implement your test here
 
+    def test_patches(self):
+        # palette = Palette(data, n)
+        # assert_equal(expected, palette.patches(wide, size))
+        raise SkipTest # TODO: implement your test here
+
 class TestColorLookup:
     def test_color_lookup(self):
         c=color['blue']

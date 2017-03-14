@@ -29,10 +29,14 @@ from Goulib import math2, itertools2
 import skimage.color as skcolor
 
 import matplotlib.colors as mplcolors
-rgb2hex=mplcolors.rgb2hex
-hex2rgb=mplcolors.hex2color
 
-def rgb2cmyk(rgb):
+def rgb2hex(c,illuminant='ignore'):
+    return mplcolors.rgb2hex(c)
+
+def hex2rgb(c,illuminant='ignore'):
+    return mplcolors.hex2color(c)
+
+def rgb2cmyk(rgb,**kwargs):
     """
     :param rgb: 3-tuple of floats of red,green,blue in [0..1] range
     :return: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
@@ -53,7 +57,7 @@ def rgb2cmyk(rgb):
     y = (y - k) / (1 - k)
     return (c,m,y,k)
 
-def cmyk2rgb(cmyk):
+def cmyk2rgb(cmyk,**kwargs):
     """
     :param cmyk: 4-tuple of floats (cyan, magenta, yellow, black) in [0..1] range
     :result: 3-tuple of floats (red,green,blue) 
@@ -64,7 +68,7 @@ def cmyk2rgb(cmyk):
     w=1-k
     return ((1-c)*w, (1-m)*w, (1-y)*w)
 
-def xyz2xyy(xyz):
+def xyz2xyy(xyz,**kwargs):
     """
     Convert from XYZ to xyY
     
@@ -84,7 +88,7 @@ def xyz2xyy(xyz):
         return (x, y, 0.0)
     return (xyz[0]/s, xyz[1]/s, xyz[1])
 
-def xyy2xyz(xyY):
+def xyy2xyz(xyY,**kwargs):
     """
     Convert from xyY to XYZ to
     
@@ -107,14 +111,18 @@ def xyy2xyz(xyY):
 # skimage.color has several useful color conversion routines, but for images
 # so here is a generic adapter that allows to call them with colors
 
-def _skadapt(f):
-    def adapted(arr):
+def _skadapt(f,**kwargs):
+    def adapted(arr,**kwargs):
         arr = np.asanyarray(arr)
         if arr.ndim ==1:
-            res=f(arr.reshape(1,1,arr.shape[-1]))
+            a=arr.reshape(1,1,arr.shape[-1])
+            try:
+                res=f(a,**kwargs)
+            except TypeError: #unsupported params. retry without
+                res=f(a)
             return res.reshape(arr.shape[-1])
         else:
-            return f(arr)
+            return f(arr,**kwargs)
     return adapted
 
 #supported colorspaces. need more ? just add it :-)
@@ -164,13 +172,17 @@ class Color(object):
     """A color with math operations and conversions
     Color is immutable (._values caches representations)
     """
-    def __init__(self, value, space='RGB', name=None):
+    def __init__(self, value, space='RGB', name=None, illuminant='D65'):
         """constructor
-
         :param value: string color name, hex string, or values tuple
         :param space: string defining the color space of value
+        :param name: string for color name
+        :param illuminant: string in {“A”, “D50”, “D55”, “D65”, “D75”, “E”} 
+            * D65 is used by default in skimage, see http://scikit-image.org/docs/dev/api/skimage.color.html
+            * D50 is used in Pantone and other graphic arts
         """
         self._name=name
+        self.illuminant=illuminant
         space=space.lower() # for easier conversions
 
         if isinstance(value,Color): #copy constructor
@@ -207,6 +219,7 @@ class Color(object):
 
     def _copy_from_(self,c):
         self.space=c.space
+        self.illuminant=c.illuminant
         self._name=c._name
         self._values=c._values
 
@@ -219,7 +232,7 @@ class Color(object):
                 self._name='~'+nearest_color(self).name
         return self._name
 
-    def convert(self, target):
+    def convert(self, target, **kwargs):
         """ 
         :param target: str of desired colorspace, or none for default
         :return: color in target colorspace
@@ -234,10 +247,12 @@ class Color(object):
                     'no conversion between %s and %s color spaces'
                     %(self.space, target)
                 )
+            kwargs['illuminant']=self.illuminant # to avoid incoherent cached values
             for u,v in itertools2.pairwise(path):
                 if v not in self._values:
                     edge=converters[u][v][0]
-                    c=edge['f'](self._values[u])
+                    c=edge['f'](self._values[u],**kwargs)
+
                     if itertools2.isiterable(c): #but not a string
                         c=tuple(map(float,c))
                     self._values[v]=c
@@ -290,7 +305,11 @@ class Color(object):
         """
         if not isinstance(other, Color):
             other=Color(other,mode)
-        return f(self.convert(mode),other.convert(mode))
+        res=f(self.convert(mode),other.convert(mode))
+        min=-1 if mode=='lab' else 0
+        max=1
+        res=[math2.sat(_,min,max) for _ in res]
+        return res
 
     def __add__(self,other):
         from Goulib.image import Image
@@ -326,6 +345,7 @@ class Color(object):
         """color difference according to CIEDE2000
         https://en.wikipedia.org/wiki/Color_difference
         """
+        assert(self.illuminant==other.illuminant)
         return skcolor.deltaE_ciede2000(self.lab, other.lab)
     
     def isclose(self,other,abs_tol=1):
@@ -407,7 +427,7 @@ class Palette(OrderedDict):
         """
         from Goulib.image import Image
         n=len(self)
-        data=itertools2.reshape(range(n),(wide,n//wide))
+        data=itertools2.reshape(range(n),(n//wide,wide))
         res=Image(data,'P',palette=self)
         res=res.scale(size)
         return res
@@ -434,7 +454,7 @@ class Palette(OrderedDict):
         # http://stackoverflow.com/questions/8031418/how-to-sort-ordereddict-of-ordereddict-python
         return Palette(dict(sorted(self.items(), key=key)))
     
-def ColorTable(colors,key,width=10):
+def ColorTable(colors,key=None,width=10):
     from Goulib.table import Table, Cell
     from Goulib.itertools2 import reshape
     
@@ -443,7 +463,10 @@ def ColorTable(colors,key,width=10):
 
     labels=(color['black'],color['white']) #possible colors for labels
     t=[]
-    for c in sorted(colors.values(),key=key):
+    colors=colors.values()
+    if key:
+        colors.sort(key=key)
+    for c in colors:
         c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
         s='<span title="%s" style="color:%s">%s</span>'%(tooltip(c),c2.hex,c.name)
         t.append(Cell(s,style={'background-color':c.hex}))
@@ -469,19 +492,19 @@ pantone=Palette() #dict of pantone colors
 for c in table['websafe'].asdict():
     id=c['name'].lower()
     hex=c['hex']
-    c=Color(hex,name=id)
+    c=Color(hex,name=id,illuminant='D65')
     color[id]=c
     color_lookup[c.hex]=c
 
 for c in table['Pantone'].asdict():
     id=c['name']
-    pantone[id]=Color((c['L'],c['a'],c['b']),space='Lab',name=id)
-    # assert p.hex==c['hex'] is always wrong
+    pantone[id]=Color((c['L'],c['a'],c['b']),space='Lab',name=id,illuminant='D50')
+    # pantones are defined with D50 illuminant
 
 acadcolors=[None]*256 #table of Autocad indexed colors
 for c in table['autocad'].asdict():
     id=c['name']
-    acadcolors[id]=Color(c['hex'],name=id) #color name is a 0..255 number
+    acadcolors[id]=Color(c['hex'],name=id,illuminant='D65') #color name is a 0..255 number
 
 
 def color_to_aci(x, nearest=True):
@@ -493,7 +516,7 @@ def color_to_aci(x, nearest=True):
     x=Color(x)
     try:
         return acadcolors.index(x)
-    except:
+    except ValueError:
         pass
     if nearest:
         return nearest_color(x,acadcolors).name # name = int id
