@@ -315,7 +315,7 @@ class Color(object):
         from Goulib.image import Image
         if isinstance(other, Image):
             return Image(size=other.size,color=self.native,mode=self.space)+other
-        return Color(self.compose(other,math2.vecadd))
+        return Color(self.compose(other,math2.vecadd),illuminant=self.illuminant)
         
     def __radd__(self,other):
         """only to allow sum(colors) easily"""
@@ -327,14 +327,14 @@ class Color(object):
         if isinstance(other, Image):
             mode=other.mode
             return Image(size=other.size,color=self.convert(mode),mode=mode)-other
-        return Color(self.compose(other,math2.vecsub))
+        return Color(self.compose(other,math2.vecsub),illuminant=self.illuminant)
         
     def __mul__(self,factor):
         if factor<0:
             return (-self)*(-factor)
         l,a,b=self.lab
         l*=factor
-        res=Color((l,a,b),'lab')
+        res=Color((l,a,b),'lab',illuminant=self.illuminant)
         return res
     
     def __neg__(self):
@@ -405,7 +405,7 @@ class Palette(OrderedDict):
     def _repr_html_(self):
         def tooltip(k):
             c=self[k]
-            res='[%s] %s '%(k,c.name)
+            res='[%s] %s (%s)\n'%(k,c.name,c.illuminant)
             return res+'\n'.join('%s = %s'%(k,c.str(k)) for k in c._values)
         
         mode='inline' if len(self)>256 else 'flex'
