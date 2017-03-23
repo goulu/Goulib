@@ -19,8 +19,6 @@ import six, os, sys, logging
 import numpy as np
 
 from collections import OrderedDict
-from matplotlib.colors import Colormap
-
 from Goulib import math2, itertools2
 
 # color conversion
@@ -371,23 +369,30 @@ class Color(object):
         return self.isclose(other,1) #difference not perceptible to human eye
 
 class Palette(OrderedDict):
-    def __init__(self, data=[], n=256):
+    """dict of Colors indexed by anything"""
+    def __init__(self, data=[], keys=256):
         super(Palette, self).__init__() #mandatory http://stackoverflow.com/questions/11174702/how-to-subclass-an-ordereddict
         if data:
-            self.update(data,n)
+            self.update(data,keys)
         
-    def update(self,data, n=256):
+    def update(self,data,keys=256):
+        """updates the dictionary with new colors
+        :param data: colors to add
+        :param keys: keys to use in dict, or int to discretize the Colormap
+        """
+        from matplotlib.colors import Colormap
         if isinstance(data, Colormap):
-            for i in range(n):
-                self[i]=Color(data(i/(n-1)))
-        elif isinstance(data, dict):
-            for k in data:
-                self[k]=Color(data[k])
-        elif isinstance(data, list):
-            for i in range(len(data)):
-                self[i]=Color(data[i])
+            for i in range(keys):
+                self[i]=Color(data(i/(keys-1))) #RGB 
+        elif isinstance(keys, six.integer_types): 
+            for i,v in itertools2.enumerates(data):
+                    self[i]=Color(v) # v.space of RGB
         else:
-            raise(NotImplementedError())
+            for i,v in six.moves.zip(keys,data):
+                self[i]=Color(v) # v.space of RGB
+                
+        return self
+
         
     def index(self,c,dE=5):
         """
@@ -465,6 +470,7 @@ def ColorTable(colors,key=None,width=10):
     t=[]
     colors=colors.values()
     if key:
+        colors=list(colors)
         colors.sort(key=key)
     for c in colors:
         c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color

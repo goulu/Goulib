@@ -192,9 +192,14 @@ class TestPalette:
     @classmethod
     def setup_class(self):
         self.spectral=Palette(cm.spectral)
+        self.cmyk=Palette(['cyan','magenta','yellow','black'],'CMYK') #indexed by letters
+        self.cmyk_int=Palette(['cyan','magenta','yellow','black']) #indexed by ints
         
     def test___init__(self):
         assert_equal(len(self.spectral),256)
+        assert_equal(len(self.cmyk),4)
+        assert_equal(self.cmyk['M'].name,'magenta')
+        assert_equal(self.cmyk_int[2].name,'yellow')
 
     def test_index(self):
         # palette = Palette(data, n)
