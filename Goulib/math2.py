@@ -228,17 +228,14 @@ cumsum=accsum #numpy alias
 
 def dot(a,b,default=0):
     """dot product"""
-    try: #vector*vector
+    if itertools2.ndim(a)==2: # matrix
+        if itertools2.ndim(b)==2: # matrix*matrix
+            res= [dot(a,col) for col in zip(*b)]
+            return transpose(res)
+        else: # matrix*vector
+            return [dot(line,b) for line in a]
+    else: #vector*vector
         return sum(map( operator.mul, a, b),default)
-    except Exception as e:
-        pass
-    try: #matrix*vector
-        return [dot(line,b) for line in a]
-    except:
-        pass
-    #matrix*matrix
-    res=[dot(a,col) for col in zip(*b)]
-    return list(map(list,list(zip(*res))))
 
 def mul(nums,init=1):
     """
@@ -248,7 +245,8 @@ def mul(nums,init=1):
 
 def transpose(m):
     """:return: matrix m transposed"""
-    return list(zip(*m)) #trivially simple once you know it
+    # ensures the result is a list of list
+    return list(map(list,list(zip(*m))))
 
 def maximum(m):
     """
@@ -400,9 +398,19 @@ def fibonacci_gen(max=None):
     """Generate fibonacci serie"""
     return recurrence([1,1],[0,1],0,max)
 
-def fibonacci(n):
-    #http://blog.dreamshire.com/common-functions-routines-project-euler/
+def fibonacci(n,mod=0):
+    """ fibonacci series n-th element
+    :param n: int can be extremely high, like 1e19 !
+    :param mod: int optional modulo
     """
+    if n < 0:
+        raise ValueError("Negative arguments not implemented")
+    #http://stackoverflow.com/a/28549402/1395973 
+    #uses http://mathworld.wolfram.com/FibonacciQ-Matrix.html
+    return mod_matpow([[1,1],[1,0]],n,mod)[0][1]
+    
+    """ old algorithm for reference:
+    #http://blog.dreamshire.com/common-functions-routines-project-euler/
     Find the nth number in the Fibonacci series.  Example:
 
     >>>fibonacci(100)
@@ -411,7 +419,7 @@ def fibonacci(n):
     Algorithm & Python source: Copyright (c) 2013 Nayuki Minase
     Fast doubling Fibonacci algorithm
     http://nayuki.eigenstate.org/page/fast-fibonacci-algorithms
-    """
+
     # Returns a tuple (F(n), F(n+1))
     def _fib(n):
         if n == 0:
@@ -424,10 +432,10 @@ def fibonacci(n):
                 return (c, d)
             else:
                 return (d, c + d)
-    if n < 0:
-        raise ValueError("Negative arguments not implemented")
+    
     return _fib(n)[0]
-
+    """
+    
 def pascal_gen():
     """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
     https://oeis.org/A007318
@@ -1434,17 +1442,6 @@ def mod_pow(a,b,m):
         b=b//2
     return x
 
-""" this code is wrong and not used anymore
-def egcd(a, b):
-    # http://www.algorithmist.com/index.php/Modular_inverse
-    x,y, u,v = 0,1, 1,0
-    while a >1:
-        q,r = divmod(a,b) # b//a, b%a # use x//y for floor "floor division"
-        m,n = x-u*q, y-v*q
-        b,a, x,y, u,v = a,r, u,v, m,n
-    return b, x, y
-"""
-
 def mod_inv(a,b):
      # http://rosettacode.org/wiki/Chinese_remainder_theorem#Python
     if is_prime(b): #Use Euler's Theorem
@@ -1549,4 +1546,41 @@ def baby_step_giant_step(y, a, n):
         value = pow(a, t*s, n)
         if value in A:
             return (t * s - A.index(value)) % n
+        
+#http://stackoverflow.com/questions/28548457/nth-fibonacci-number-for-n-as-big-as-1019
 
+def mod_matmul(A,B, mod=0):
+    if not mod:
+        return dot(A,B)
+    return [[sum(a*b for a,b in zip(A_row,B_col))%mod for B_col in zip(*B)] for A_row in A]
+
+def mod_matpow(M, power, mod=0):
+    
+    if power < 0:
+        raise NotImplementedError
+    elif power==0:
+        return M #Special definition for power=0:
+
+    powers =  list(reversed([i=="1" for i in bin(power)[2:]])) #Order is 1,2,4,8,16,...
+
+    matrices = [None for _ in powers]
+    matrices[0] = M
+
+    for i in range(1,len(powers)):
+        matrices[i] = mod_matmul(matrices[i-1], matrices[i-1], mod)
+
+
+    result = None
+
+    for matrix, power in zip(matrices, powers):
+        if power:
+            if result is None:
+                result = matrix
+            else:
+                result = mod_matmul(result, matrix, mod)
+
+    return result
+# in fact numpy.linalg.matrix_power has a bug for large powers
+# https://github.com/numpy/numpy/issues/5166
+# so our function here is better :-)
+matrix_power=mod_matpow

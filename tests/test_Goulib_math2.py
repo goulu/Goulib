@@ -162,6 +162,9 @@ class TestFibonacci:
         assert_equal(problem2(10),10)
         assert_equal(problem2(100),44)
         assert_equal(problem2(4E6),4613732)
+        
+        #mod 1000000007 has the effect of using int32 only
+        assert_equal(fibonacci(int(1E19),1000000007),647754067)
 
 class TestIsInteger:
     def test_is_integer(self):
@@ -903,6 +906,26 @@ class TestMultiply:
             b=getrandbits(bits)
             assert_equal(multiply(a,b),a*b)
             
+
+class TestSqrt:
+    def test_sqrt(self):
+        # assert_equal(expected, sqrt(n))
+        raise SkipTest # TODO: implement your test here
+
+class TestModMatmul:
+    def test_mod_matmul(self):
+        # assert_equal(expected, mod_matmul(A, B, mod))
+        raise SkipTest # TODO: implement your test here
+
+class TestModMatpow:
+    def test_mod_matpow(self):
+        a=[[1, 2],[1, 0]]
+        b=matrix_power(a,50)
+        assert_equal(
+            b, 
+            [[750599937895083, 750599937895082], 
+             [375299968947541, 375299968947542]]
+        )
 
 if __name__ == "__main__":
     runmodule()
