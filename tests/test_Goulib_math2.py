@@ -146,22 +146,12 @@ class TestVeccompare:
 
 class TestFibonacci:
     def test_fibonacci(self):
-        
+        f=[fibonacci(i) for i in range(10)]
+        assert_equal(f,[0,1,1,2,3,5,8,13,21,34])
+        assert_equal(f,itertools2.take(10,fibonacci_gen()))
+
         #http://controlfd.com/2016/07/05/using-floats-in-python.html
         assert_equal(fibonacci(78),8944394323791464)
-        
-        # https://projecteuler.net/problem=2
-        from itertools import takewhile
-
-        def problem2(n):
-            """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
-            even_fibonacci = (x for x in fibonacci_gen() if x % 2 ==0)
-            l=list(takewhile(lambda x: x < n, even_fibonacci))
-            return sum(l)
-
-        assert_equal(problem2(10),10)
-        assert_equal(problem2(100),44)
-        assert_equal(problem2(4E6),4613732)
         
         #mod 1000000007 has the effect of using int32 only
         assert_equal(fibonacci(int(1E19),1000000007),647754067)
@@ -623,7 +613,20 @@ class TestCeildiv:
 
 class TestFibonacciGen:
     def test_fibonacci_gen(self):
-        pass #tested in test_oeis
+        #also tested in test_oeis
+        
+        # https://projecteuler.net/problem=2
+        from itertools import takewhile
+
+        def problem2(n):
+            """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
+            even_fibonacci = (x for x in fibonacci_gen() if x % 2 ==0)
+            l=list(takewhile(lambda x: x < n, even_fibonacci))
+            return sum(l)
+
+        assert_equal(problem2(10),10)
+        assert_equal(problem2(100),44)
+        assert_equal(problem2(4E6),4613732)
 
 class TestCatalanGen:
     def test_catalan_gen(self):

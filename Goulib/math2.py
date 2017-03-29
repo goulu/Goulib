@@ -225,6 +225,12 @@ def accsum(it):
 
 cumsum=accsum #numpy alias
 
+def mul(nums,init=1):
+    """
+    :return: Product of nums
+    """
+    return reduce(operator.mul, nums, init)
+
 
 def dot(a,b,default=0):
     """dot product"""
@@ -236,12 +242,35 @@ def dot(a,b,default=0):
             return [dot(line,b) for line in a]
     else: #vector*vector
         return sum(map( operator.mul, a, b),default)
+    
+# some basic matrix ops
+def zeros(shape):
+    """
+    https://docs.scipy.org/doc/numpy/reference/generated/numpy.zeros.html
+    """
+    return ([0]*shape[1])*shape[0]
+    
+def diag(v):
+    """
+    Create a two-dimensional array with the flattened input as a diagonal.
+    :param v: If v is a 2-D array, return a copy of its diagonal. 
+        If v is a 1-D array, return a 2-D array with v on the diagonal
+    :see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.diag.html#numpy.diag
+    """
+    s=len(v)
+    if itertools2.ndim(v)==2:
+        return [v[i][i] for i in range(s)]
+    res=[]
+    for i,x in enumerate(v):
+        line=[x]+[0]*(s-1)
+        line=line[-i:]+line[:-i]
+        res.append(line)
+    return  res
 
-def mul(nums,init=1):
-    """
-    :return: Product of nums
-    """
-    return reduce(operator.mul, nums, init)
+def identity(n):
+    return diag([1]*n)
+
+eye=identity # alias for now
 
 def transpose(m):
     """:return: matrix m transposed"""
@@ -834,7 +863,9 @@ def digits(num, base=10, rev=False):
     :return: list of digits of num expressed in base, optionally reversed
     """
     res=list(digits_gen(num,base))
-    return res if rev else reversed(res)
+    if not rev:
+        res.reverse()
+    return res
 
 def digsum(num, base=10, f=None):
     """
@@ -1547,7 +1578,7 @@ def baby_step_giant_step(y, a, n):
         if value in A:
             return (t * s - A.index(value)) % n
         
-#http://stackoverflow.com/questions/28548457/nth-fibonacci-number-for-n-as-big-as-1019
+# inspired from http://stackoverflow.com/questions/28548457/nth-fibonacci-number-for-n-as-big-as-1019
 
 def mod_matmul(A,B, mod=0):
     if not mod:
@@ -1558,29 +1589,15 @@ def mod_matpow(M, power, mod=0):
     
     if power < 0:
         raise NotImplementedError
-    elif power==0:
-        return M #Special definition for power=0:
-
-    powers =  list(reversed([i=="1" for i in bin(power)[2:]])) #Order is 1,2,4,8,16,...
-
-    matrices = [None for _ in powers]
-    matrices[0] = M
-
-    for i in range(1,len(powers)):
-        matrices[i] = mod_matmul(matrices[i-1], matrices[i-1], mod)
-
-
-    result = None
-
-    for matrix, power in zip(matrices, powers):
+    result = identity(2)
+    for power in digits(power,2,True):
         if power:
-            if result is None:
-                result = matrix
-            else:
-                result = mod_matmul(result, matrix, mod)
-
+            result = mod_matmul(result, M, mod)
+        M = mod_matmul(M, M, mod)
     return result
+
 # in fact numpy.linalg.matrix_power has a bug for large powers
 # https://github.com/numpy/numpy/issues/5166
-# so our function here is better :-)
+# so our function here above is better :-)
+
 matrix_power=mod_matpow
