@@ -20,7 +20,7 @@ from collections import OrderedDict
 import operator
 
 from itertools import count, tee, islice
-from Goulib import itertools2
+from Goulib import itertools2, tests
 
 class Record(OrderedDict):
     #http://stackoverflow.com/questions/5227839/why-python-does-not-support-record-type-i-e-mutable-namedtuple
@@ -261,7 +261,7 @@ class Sequence(object):
         else:
             try: #evaluate function into iterator
                 iterf=iterf()
-            except:
+            except Exception:
                 pass
             self.offset=0
             self.iterf=iterf
@@ -273,7 +273,6 @@ class Sequence(object):
         self.desc=desc
 
     def __repr__(self):     
-        return self.name
         s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
         return '%s (%s ...)'%(self.name,s)
 

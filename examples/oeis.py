@@ -227,7 +227,8 @@ A046867=exp_sequences(10,11,-1)[2]
 A079907=exp_sequences(11,12,-1)[2]
 
 
-A019434=A000215.filter(math2.is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
+#TODO: became too slow. find why
+#A019434=A000215.filter(math2.is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
 
 A090748=A000043.apply(lambda n:n-1,desc='Numbers n such that 2^(n+1) - 1 is prime.')
 
