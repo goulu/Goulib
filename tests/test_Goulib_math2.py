@@ -930,5 +930,15 @@ class TestModMatpow:
              [375299968947541, 375299968947542]]
         )
 
+class TestZeros:
+    def test_zeros(self):
+        # assert_equal(expected, zeros(shape))
+        raise SkipTest # TODO: implement your test here
+
+class TestDiag:
+    def test_diag(self):
+        # assert_equal(expected, diag(v))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
