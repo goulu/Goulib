@@ -17,7 +17,7 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import logging, math, six
+import logging, math, six, json
 
 import networkx as nx # http://networkx.github.io/
 
@@ -33,6 +33,12 @@ except Exception:
 
 from . import math2
 from . import itertools2
+
+"""
+finding the nearest neighbor in a large GeoGraph is much faster with the
+RTree package, but it's not generally available, so a pure python fallback
+is provided
+"""
 
 try:
     from rtree import index # http://toblerity.org/rtree/
@@ -207,7 +213,7 @@ class _Geo(plot.Plot):
             return True
 
     def pos(self,nodes=None):
-        """ 
+        """
         :param nodes: a single node, an iterator of all nodes if None
         :return: the position of node(s)
         """
@@ -317,13 +323,13 @@ class _Geo(plot.Plot):
         """
         if p in self.node: #point already exists
             return p
-        
+
         a={}
         if attr_dict :
             a.update(attr_dict)
         if attr :
             a.update(**attr)
-            
+
         id=p #save the node id as the position might differ
 
         if type(p) is not tuple:
@@ -444,7 +450,7 @@ class _Geo(plot.Plot):
                 k=0
 
         res=self.parent.add_edge(self,u, v, k, **a)
-        
+
         #Goulib returns the data dict, becasue that's what the most useful
         if isinstance(res,dict):
             return res
@@ -545,7 +551,9 @@ class _Geo(plot.Plot):
         if ext=='dxf':
             write_dxf(self,filename)
         elif ext=='dot':
-            nx.nx_pydot.write_dot(self, filename)
+            write_dot(self, filename)
+        elif ext=='json':
+            write_json(self,filename,**kwargs)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
         return self
@@ -629,7 +637,7 @@ def draw_networkx(g, pos=None, **kwargs):
 
     if six.callable(pos): #mapping function
         pos=dict(((node,pos(node)) for node in g.nodes()))
-        
+
     if pos is None:
         try:
             pos=dict((node,data['pos'][:2]) for node,data in g.nodes(True))
@@ -689,7 +697,7 @@ def draw_networkx(g, pos=None, **kwargs):
 
     nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
 
-    labels=kwargs.pop('labels',False) # True in nx.draw_networkx they're 
+    labels=kwargs.pop('labels',False) # True in nx.draw_networkx they're
     if labels:
         if labels==True: labels=None #will be set automatically
         if six.callable(labels): #mapping function ?
@@ -728,6 +736,67 @@ def to_drawing(g, d=None, edges=[]):
 def write_dxf(g,filename):
     """writes :class:`networkx.Graph` in .dxf format"""
     to_drawing(g).save(filename)
+
+def write_dot(g,filename):
+    try:
+        import pygraphviz
+        from networkx.drawing.nx_agraph import write_dot as _write_dot
+        logging.info("using package pygraphviz")
+    except ImportError:
+        try:
+            import pydot
+            from networkx.drawing.nx_pydot import write_dot as _write_dot
+            logging.info("using package pydot")
+        except ImportError:
+            logging.error("Both pygraphviz and pydot were not found. See \
+                http://networkx.github.io/documentation/latest/reference/drawing.html \
+                for info")
+            raise
+
+    if isinstance(g, _Geo) or any(map(lambda n:hasattr(n,'pos'),g.nodes())):
+        g=g.copy()
+
+    for n in g.nodes(data=True):
+        try:
+            pos=g.pos(n[0])
+        except AttributeError:
+            pos=n[1].get('pos',None)
+        if pos is not None: # format pos as neato wants it : "x,y"
+            n[1]['pos']='"%s,%s"'%pos
+
+    _write_dot(g,filename)
+
+def to_json(g, **kwargs):
+    """
+    :return: string JSON representation of a graph
+    """
+    from datetime import datetime, date, time, timedelta
+    def json_serial(obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        try:
+            return str(obj)
+        except Exception:
+            pass
+        raise TypeError ("Type %s not serializable"%(type(obj)))
+    from networkx.readwrite import json_graph
+    g=json_graph.node_link_data(g)
+    for node in g['nodes']:
+        pos=node.pop('pos',None)
+        if pos:
+            node['x']=pos[0]
+            node['y']=pos[1]
+            #node['fixed']=True
+    kwargs.setdefault('default',json_serial)
+    return json.dumps(g, **kwargs)
+
+def write_json(g,filename, **kwargs):
+    """write a JSON file, suitable for D*.js representation
+    """
+    with open(filename, 'w') as file:
+        file.write(to_json(g,**kwargs))
+
 
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
