@@ -862,7 +862,8 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
 
 def disk(radius,antialias=PILImage.ANTIALIAS):
     from skimage.draw import circle, circle_perimeter_aa
-    size = (2*radius, 2*radius)
+    size = math2.rint(2*radius)
+    size=(size,size)
     img = np.zeros(size, dtype=np.double)
     rr, cc = circle(radius,radius,radius)
     img[rr, cc] = 1
