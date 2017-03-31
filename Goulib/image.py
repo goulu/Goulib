@@ -3,7 +3,6 @@
 
 
 from __future__ import division #"true division" everywhere
-from _hashlib import new
 
 """
 image processing with PIL's ease and skimage's power
@@ -212,7 +211,7 @@ class Image(Plot):
             with io.util.file_or_url_context(path) as context:
                 data = io.imread(context)
         mode=guessmode(data)
-        self._set(data,'F' if mode in 'U' else mode)
+        self._set(data,mode)
         return self
 
     def save(self, path, autoconvert=True, format_str=None, **kwargs):
@@ -312,6 +311,8 @@ class Image(Plot):
             return self.array[yx[0],yx[1],:]
 
     def putpixel(self,yx,value):
+        if isinstance(value,Color):
+            value=value.convert(self.mode)
         if self.nchannels==1:
             self.array[yx[0],yx[1]]=value
         else:
@@ -998,10 +999,12 @@ class Ditherer(object):
         return self.name
 
 class ErrorDiffusion(Ditherer):
-    def __init__(self,name, positions,weights):
+    def __init__(self,name, positions,weights,wsum=None):
         Ditherer.__init__(self,name,None)
-        self.weights = weights / np.sum(weights)
-        self.positions=positions
+        if not wsum :
+            wsum=sum(weights)
+        weights=math2.vecdiv(weights,wsum)
+        self.matrix=list(zip(positions, weights))
 
     def __call__(self, image, N=2):
         image=skimage.img_as_float(image, True) #normalize to [0..1]
@@ -1016,7 +1019,7 @@ class ErrorDiffusion(Ditherer):
 
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
-                for (ii, jj), w in zip(self.positions, self.weights):
+                for (ii, jj), w in self.matrix:
                     ii = i + ii
                     jj = j + jj
                     if ii < rows and jj < cols:
@@ -1037,9 +1040,12 @@ class FloydSteinberg(ErrorDiffusion):
 #PIL+SKIMAGE dithering methods
 from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
 PHILIPS=FLOYDSTEINBERG+1
-SIERRA=FLOYDSTEINBERG+2
-STUCKI=FLOYDSTEINBERG+3
-RANDOM=FLOYDSTEINBERG+10
+SIERRA=PHILIPS+1
+STUCKI=SIERRA+1
+JARVIS=STUCKI+1
+ATKINSON=JARVIS+1
+BURKES=ATKINSON+1
+RANDOM=JARVIS+10
 
 dithering={
     NEAREST : Ditherer('nearest',quantize),
@@ -1052,13 +1058,35 @@ dithering={
     SIERRA: ErrorDiffusion('sierra lite',
         [(0, 1), (1, -1), (1, 0)],[2, 1, 1]),
     STUCKI: ErrorDiffusion('stucki',
-        positions = [(0, 1), (0, 2), (1, -2), (1, -1),
-            (1, 0), (1, 1), (1, 2),
+        positions = [(0, 1), (0, 2), 
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2),
             (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)],
         weights = [ 8, 4,
                    2, 4, 8, 4, 2,
                    1, 2, 4, 2, 1]
         ),
+    JARVIS: ErrorDiffusion('Jarvis, Judice, and Ninke',
+    #http://www.tannerhelland.com/4660/dithering-eleven-algorithms-source-code/
+        positions = [(0, 1), (0, 2), 
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2),
+            (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)],
+        weights = [ 7, 5,
+                   3, 5, 7, 5, 3,
+                   1, 3, 4, 3, 1]
+        ),
+    ATKINSON: ErrorDiffusion('Atkinson',
+        positions = [(0, 1), (0, 2),
+            (1, -1), (1, 0), (1, 1),
+            (2, 0)],
+        weights = [1,1,1,1,1,1],
+        wsum=8
+        ),
+        
+    BURKES:  ErrorDiffusion('Burkes',
+        positions = [(0, 1), (0, 2),
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2)],
+        weights = [8, 4, 2, 4, 8, 4, 2]
+    ),
 }
 
 def dither(image, method=FLOYDSTEINBERG, N=2):
