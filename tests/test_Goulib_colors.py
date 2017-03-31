@@ -302,6 +302,16 @@ class TestXyy2xyz:
     
         
 
+class TestRgb2hex:
+    def test_rgb2hex(self):
+        # assert_equal(expected, rgb2hex(c, illuminant))
+        raise SkipTest # TODO: implement your test here
+
+class TestHex2rgb:
+    def test_hex2rgb(self):
+        # assert_equal(expected, hex2rgb(c, illuminant))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
 
