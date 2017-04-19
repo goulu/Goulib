@@ -18,6 +18,7 @@ import sys, os
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+""" not required anymore
 if on_rtd:
     import mock
     mock.Mock.__all__ = []
@@ -28,7 +29,7 @@ if on_rtd:
     ]
     for mod_name in MOCK_MODULES:
         sys.modules[mod_name] = mock.Mock()
-
+"""
 
 def read(*parts):
     return open(os.path.join(os.path.dirname(__file__), *parts)).read()
