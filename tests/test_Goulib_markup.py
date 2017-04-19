@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf8
+# -*- coding: utf-8 -*-
 
 from nose.tools import assert_equal
 from nose import SkipTest
@@ -15,7 +15,7 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        t=tag('tag', u'bétweêñ', class_='class')
+        t=tag('tag', u'bÃ©tweÃªÃ±', class_='class')
         assert_true(t in (
             '<tag class="class">b&#233;twe&#234;&#241;</tag>', #Py 3
             '<tag class="class">b\xc3\xa9twe\xc3\xaa\xc3\xb1</tag>', #Py 2.7
