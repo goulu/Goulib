@@ -274,6 +274,20 @@ class TestToDrawing:
         # assert_equal(expected, to_drawing(g, d, edges))
         raise SkipTest # TODO: implement your test here
 
+class TestWriteDot:
+    def test_write_dot(self):
+        # assert_equal(expected, write_dot(g, filename))
+        raise SkipTest # TODO: implement your test here
+
+class TestToJson:
+    def test_to_json(self):
+        # assert_equal(expected, to_json(g, **kwargs))
+        raise SkipTest # TODO: implement your test here
+
+class TestWriteJson:
+    def test_write_json(self):
+        # assert_equal(expected, write_json(g, filename, **kwargs))
+        raise SkipTest # TODO: implement your test here
 
 if __name__=="__main__":
     runmodule()
