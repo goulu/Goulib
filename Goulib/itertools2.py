@@ -763,6 +763,8 @@ class keep(collections.Iterator):
     def __next__(self):
         self.val = next(self.it)
         return self.val
+    
+    next=__next__ # 2.7 compatibility
  
  
 def first_match(iter1,iter2):
