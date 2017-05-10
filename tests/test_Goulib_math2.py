@@ -59,10 +59,12 @@ class TestLcm:
     def test_lcm(self):
         assert_equal(lcm(101, -3),-303)
         assert_equal(lcm(4,6),12)
+        assert_equal(lcm(3,4,6),12)
 
 class TestGcd:
     def test_gcd(self):
         assert_equal(gcd(54,24),6)
+        assert_equal(gcd(24,54),6)
         assert_equal(gcd(68, 14, 9, 36, 126),1)
         assert_equal(gcd(7, 14, 35, 7000),7)
         assert_equal(gcd(1548),1548)
@@ -155,6 +157,12 @@ class TestFibonacci:
         
         #mod 1000000007 has the effect of using int32 only
         assert_equal(fibonacci(int(1E19),1000000007),647754067)
+        assert_equal(fibonacci(int(1E19),10),5)
+        
+class TestPisanoPeriod:
+    def test_pisano_period(self):
+        assert_equal(pisano_period(3),8)
+        assert_equal(pisano_period(10),60)
 
 class TestIsInteger:
     def test_is_integer(self):
@@ -938,6 +946,31 @@ class TestZeros:
 class TestDiag:
     def test_diag(self):
         # assert_equal(expected, diag(v))
+        raise SkipTest # TODO: implement your test here
+
+class TestDotVv:
+    def test_dot_vv(self):
+        # assert_equal(expected, dot_vv(a, b, default))
+        raise SkipTest # TODO: implement your test here
+
+class TestDotMv:
+    def test_dot_mv(self):
+        # assert_equal(expected, dot_mv(a, b, default))
+        raise SkipTest # TODO: implement your test here
+
+class TestDotMm:
+    def test_dot_mm(self):
+        # assert_equal(expected, dot_mm(a, b, default))
+        raise SkipTest # TODO: implement your test here
+
+class TestPisanoCycle:
+    def test_pisano_cycle(self):
+        # assert_equal(expected, pisano_cycle(mod))
+        raise SkipTest # TODO: implement your test here
+
+class TestFactors:
+    def test_factors(self):
+        # assert_equal(expected, factors(n))
         raise SkipTest # TODO: implement your test here
 
 if __name__ == "__main__":

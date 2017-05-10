@@ -14,7 +14,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, math, cmath, operator, itertools, fractions, numbers
+import six, math, cmath, operator, itertools, fractions, numbers, logging
 from six.moves import map, reduce, filter, zip_longest
 
 from Goulib import itertools2
@@ -43,15 +43,12 @@ if six.PY3:
         return sign(x-y)
 
 def gcd(*args):
-    """greatest common divisor of an arbitrary list"""
+    """greatest common divisor of an arbitrary number of args"""
     #http://code.activestate.com/recipes/577512-gcd-of-an-arbitrary-list/
-    if len(args) == 2:
-        return fractions.gcd(args[0],args[1])
-
-    if len(args) == 1:
-        return args[0]
-
-    L = list(args)
+    
+    L = list(args) #in case args are generated
+    
+    b=L[0] # will be returned if only one arg
 
     while len(L) > 1:
         a = L[-2]
@@ -90,9 +87,15 @@ def coprimes_gen(limit):
             else:
                 break
 
-def lcm(a,b):
-    """least common multiple"""
-    return abs(a * b) // gcd(a,b) if a and b else 0
+def lcm(*args):
+    """least common multiple of any number of integers"""
+    if len(args)<=2:
+        return mul(args) // gcd(*args)
+    # TODO : better
+    res=lcm(args[0],args[1])
+    for n in args[2:]:
+        res=lcm(res,n)
+    return res
 
 def xgcd(a,b):
     """Extended GCD:
@@ -231,17 +234,41 @@ def mul(nums,init=1):
     """
     return reduce(operator.mul, nums, init)
 
+def dot_vv(a,b,default=0):
+    """dot product for vectors
+    :param a: vector (iterable)
+    :param b: vector (iterable)
+    :param default: default value of the multiplication operator
+    """
+    return sum(map( operator.mul, a, b),default)
+
+def dot_mv(a,b,default=0):
+    """dot product for vectors
+    :param a: matrix (iterable or iterables)
+    :param b: vector (iterable)
+    :param default: default value of the multiplication operator
+    """
+    return [dot_vv(line,b,default) for line in a]
+
+def dot_mm(a,b,default=0):
+    """dot product for matrices
+    :param a: matrix (iterable or iterables)
+    :param b: matrix (iterable or iterables)
+    :param default: default value of the multiplication operator
+    """
+    return transpose([dot_mv(a,col) for col in zip(*b)])
 
 def dot(a,b,default=0):
-    """dot product"""
+    """dot product
+    general but slow : use dot_vv, dot_mv or dot_mm if you know a and b's dimensions
+    """
     if itertools2.ndim(a)==2: # matrix
         if itertools2.ndim(b)==2: # matrix*matrix
-            res= [dot(a,col) for col in zip(*b)]
-            return transpose(res)
+            return dot_mm(a,b,default)
         else: # matrix*vector
-            return [dot(line,b) for line in a]
+            return dot_mv(a,b,default)
     else: #vector*vector
-        return sum(map( operator.mul, a, b),default)
+        return dot_vv(a,b,default)
     
 # some basic matrix ops
 def zeros(shape):
@@ -408,24 +435,28 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(coefficients,values,cst=0, max=None):
+def recurrence(coefficients,values,cst=0, max=None, mod=0):
     """general generator for recurrences
     
     :param values: list of initial values
     :param coefficients: list of factors defining the recurrence
     """
     for n in values:
+        if mod:
+            n=n%mod
         yield n
     while True:
-        n=dot(coefficients,values)
+        n=dot_vv(coefficients,values)
         if max and n>max: break
-        yield n+cst
+        n=n+cst
+        if mod: n=n%mod
+        yield n
         values=values[1:]
-        values.append(n+cst)
+        values.append(n)
 
-def fibonacci_gen(max=None):
+def fibonacci_gen(max=None,mod=0):
     """Generate fibonacci serie"""
-    return recurrence([1,1],[0,1],0,max)
+    return recurrence([1,1],[0,1],max=max,mod=mod)
 
 def fibonacci(n,mod=0):
     """ fibonacci series n-th element
@@ -438,32 +469,26 @@ def fibonacci(n,mod=0):
     #uses http://mathworld.wolfram.com/FibonacciQ-Matrix.html
     return mod_matpow([[1,1],[1,0]],n,mod)[0][1]
     
-    """ old algorithm for reference:
-    #http://blog.dreamshire.com/common-functions-routines-project-euler/
-    Find the nth number in the Fibonacci series.  Example:
-
-    >>>fibonacci(100)
-    354224848179261915075
-
-    Algorithm & Python source: Copyright (c) 2013 Nayuki Minase
-    Fast doubling Fibonacci algorithm
-    http://nayuki.eigenstate.org/page/fast-fibonacci-algorithms
-
-    # Returns a tuple (F(n), F(n+1))
-    def _fib(n):
-        if n == 0:
-            return (0, 1)
-        else:
-            a, b = _fib(n // 2)
-            c = a * (2 * b - a)
-            d = b * b + a * a
-            if n % 2 == 0:
-                return (c, d)
-            else:
-                return (d, c + d)
-    
-    return _fib(n)[0]
-    """
+def pisano_cycle(mod):
+    if mod<2: return [0]
+    seq=[0,1]
+    l=len(seq)
+    s=[]
+    for i,n in enumerate(fibonacci_gen(mod=mod)):
+        s.append(n)
+        if i>l and s[-l:]==seq:
+            return s[:-l]
+        
+def pisano_period(mod):
+    if mod<2: return 1
+    flag=False # 0 was found
+    for i,n in enumerate(fibonacci_gen(mod=mod)):
+        if not flag:
+            flag=n==0
+        elif i>3:
+            if n==1:
+                return i-1
+            flag=False
     
 def pascal_gen():
     """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
@@ -717,35 +742,9 @@ def factorize(n):
         return [(1,1)]
     return itertools2.compress(prime_factors(n))
 
-    #TODO: check if code below is faster for "small" n
-
-    """
-    def trial_division(n, bound=None):
-        if n == 1: return 1
-        for p in [2, 3, 5]:
-            if n%p == 0: return p
-        if bound == None: bound = n
-        dif = [6, 4, 2, 4, 2, 4, 6, 2]
-        m = 7; i = 1
-        while m <= bound and m*m <= n:
-            if n%m == 0:
-                return m
-            m += dif[i%8]
-            i += 1
-        return n
-
-
-    if n==0: return
-    if n < 0: n = -n
-    if n==1: yield (1,1) #for coherency
-    while n != 1:
-        p = trial_division(n)
-        e = 1
-        n /= p
-        while n%p == 0:
-            e += 1; n /= p
-        yield (p,e)
-    """
+def factors(n):
+    for (p,e) in factorize(n):
+        yield p**e
 
 def number_of_divisors(n):
     #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
@@ -1335,7 +1334,7 @@ def angle(u,v,unit=True):
     if not unit:
         u=vecunit(u)
         v=vecunit(v)
-    if dot(u,v) >=0:
+    if dot_vv(u,v) >=0:
         return 2.*math.asin(dist(v,u)/2)
     else:
         return math.pi - 2.*math.asin(dist(vecneg(v),u)/2)
@@ -1582,7 +1581,7 @@ def baby_step_giant_step(y, a, n):
 
 def mod_matmul(A,B, mod=0):
     if not mod:
-        return dot(A,B)
+        return dot_mm(A,B)
     return [[sum(a*b for a,b in zip(A_row,B_col))%mod for B_col in zip(*B)] for A_row in A]
 
 def mod_matpow(M, power, mod=0):
