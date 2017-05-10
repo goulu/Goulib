@@ -95,6 +95,27 @@ class TestMinimum:
     def test_minimum(self):
         m=[(1,2,3),(1,-2,0),(4,0,0)]
         assert_equal(minimum(m),[1,-2,0])
+        
+class TestDotVv:
+    def test_dot_vv(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        assert_equal(dot_vv(v1, v2),7)
+
+class TestDotMv:
+    def test_dot_mv(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        m1=[v1,v2,vecsub(v2,v1)]
+        assert_equal(dot_mv(m1,v1),[5,7,2])
+
+class TestDotMm:
+    def test_dot_mm(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        m1=[v1,v2,vecsub(v2,v1)]
+        m2=transpose(m1)
+        assert_equal(dot_mm(m1,m2),[[5, 7, 2], [7, 10, 3], [2, 3, 1]])
 
 class TestDot:
     def test_dot(self):
@@ -948,20 +969,7 @@ class TestDiag:
         # assert_equal(expected, diag(v))
         raise SkipTest # TODO: implement your test here
 
-class TestDotVv:
-    def test_dot_vv(self):
-        # assert_equal(expected, dot_vv(a, b, default))
-        raise SkipTest # TODO: implement your test here
 
-class TestDotMv:
-    def test_dot_mv(self):
-        # assert_equal(expected, dot_mv(a, b, default))
-        raise SkipTest # TODO: implement your test here
-
-class TestDotMm:
-    def test_dot_mm(self):
-        # assert_equal(expected, dot_mm(a, b, default))
-        raise SkipTest # TODO: implement your test here
 
 class TestPisanoCycle:
     def test_pisano_cycle(self):
@@ -972,6 +980,19 @@ class TestFactors:
     def test_factors(self):
         # assert_equal(expected, factors(n))
         raise SkipTest # TODO: implement your test here
+
+class TestIsPrimitiveRoot:
+    def test_is_primitive_root(self):
+        pass #tested below
+        raise SkipTest # TODO: implement your test here
+
+class TestPrimitiveRootGen:
+    def test_primitive_root_gen(self):
+        pass #tested below
+
+class TestPrimitiveRoots:
+    def test_primitive_roots(self):
+        assert_equal(primitive_roots(17),[3, 5, 6, 7, 10, 11, 12, 14]  )
 
 if __name__ == "__main__":
     runmodule()
