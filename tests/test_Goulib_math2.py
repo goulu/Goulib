@@ -95,7 +95,7 @@ class TestMinimum:
     def test_minimum(self):
         m=[(1,2,3),(1,-2,0),(4,0,0)]
         assert_equal(minimum(m),[1,-2,0])
-        
+
 class TestDotVv:
     def test_dot_vv(self):
         v1=list(range(3))
@@ -166,24 +166,56 @@ class TestVeccompare:
         v2=list(accsum(v1))
         v2[-1]=2 #force to test ai>bi
         assert_equal(veccompare(v1,v2),[2,2,1])
+        
+class TestFibonacciGen:
+    def test_fibonacci_gen(self):
+        #also tested in test_oeis
+
+        # https://projecteuler.net/problem=2
+        from itertools import takewhile
+
+        def problem2(n):
+            """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
+            even_fibonacci = (x for x in fibonacci_gen() if x % 2 ==0)
+            l=list(takewhile(lambda x: x < n, even_fibonacci))
+            return sum(l)
+
+        assert_equal(problem2(10),10)
+        assert_equal(problem2(100),44)
+        assert_equal(problem2(4E6),4613732)
 
 class TestFibonacci:
     def test_fibonacci(self):
+        # checks that fibonacci and fibonacci_gen give the same results
         f=[fibonacci(i) for i in range(10)]
         assert_equal(f,[0,1,1,2,3,5,8,13,21,34])
         assert_equal(f,itertools2.take(10,fibonacci_gen()))
 
         #http://controlfd.com/2016/07/05/using-floats-in-python.html
         assert_equal(fibonacci(78),8944394323791464)
-        
+
         #mod 1000000007 has the effect of using int32 only
         assert_equal(fibonacci(int(1E19),1000000007),647754067)
         assert_equal(fibonacci(int(1E19),10),5)
         
+class TestIsFibonacci:
+    def test_is_fibonacci(self):
+        assert_true(is_fibonacci(0))
+        assert_true(is_fibonacci(1))
+        assert_true(is_fibonacci(2))
+        assert_true(is_fibonacci(3))
+        assert_false(is_fibonacci(4))
+        assert_true(is_fibonacci(8944394323791464))
+        assert_false(is_fibonacci(8944394323791464+1))
+
 class TestPisanoPeriod:
     def test_pisano_period(self):
         assert_equal(pisano_period(3),8)
         assert_equal(pisano_period(10),60)
+        
+class TestPisanoCycle:
+    def test_pisano_cycle(self):
+        assert_equal(pisano_cycle(3),[0, 1, 1, 2, 0, 2, 2, 1]) #A082115
 
 class TestIsInteger:
     def test_is_integer(self):
@@ -301,12 +333,12 @@ class TestIsPrime:
         assert_false(is_prime(0))
         assert_false(is_prime(1))
         assert_true(is_prime(2))
-        
+
         #https://oeis.org/A014233
         pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
         for pp in pseudoprimes:
             assert_false(is_prime(pp))
-        
+
         assert_true(is_prime(201420142013))
         assert_true(is_prime(4547337172376300111955330758342147474062293202868155909489))
         assert_false(is_prime(4547337172376300111955330758342147474062293202868155909393))
@@ -640,27 +672,10 @@ class TestCeildiv:
         # assert_equal(expected, ceildiv(a, b))
         raise SkipTest #
 
-class TestFibonacciGen:
-    def test_fibonacci_gen(self):
-        #also tested in test_oeis
-        
-        # https://projecteuler.net/problem=2
-        from itertools import takewhile
-
-        def problem2(n):
-            """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
-            even_fibonacci = (x for x in fibonacci_gen() if x % 2 ==0)
-            l=list(takewhile(lambda x: x < n, even_fibonacci))
-            return sum(l)
-
-        assert_equal(problem2(10),10)
-        assert_equal(problem2(100),44)
-        assert_equal(problem2(4E6),4613732)
-
 class TestCatalanGen:
     def test_catalan_gen(self):
         assert_equal(index(20,catalan_gen()),6564120420) # https://oeis.org/A000108
-    
+
 class TestCatalan:
     def test_catalan(self):
         assert_equal(catalan(20),6564120420) # https://oeis.org/A000108
@@ -798,7 +813,7 @@ class TestModBinomial:
         assert_equal(  mod_binomial(938977945,153121024,m),47619)
         assert_equal(  mod_binomial(906601285,527203335,m),0)
         assert_equal(  mod_binomial(993051461,841624879,m),104247)
-        
+
 class TestDeBrujin:
     def test_de_brujin(self):
         assert_equal(de_bruijn('1234',3),'1112113114122123124132133134142143144222322423323424324433343444')
@@ -929,7 +944,7 @@ class TestFormat:
     def test_format(self):
         # assert_equal(expected, format(x, decimals))
         raise SkipTest # TODO: implement your test here
-    
+
 class TestMultiply:
     def test_multiply(self):
         from random import getrandbits
@@ -937,7 +952,7 @@ class TestMultiply:
             a=getrandbits(bits)
             b=getrandbits(bits)
             assert_equal(multiply(a,b),a*b)
-            
+
 
 class TestSqrt:
     def test_sqrt(self):
@@ -954,8 +969,8 @@ class TestModMatpow:
         a=[[1, 2],[1, 0]]
         b=matrix_power(a,50)
         assert_equal(
-            b, 
-            [[750599937895083, 750599937895082], 
+            b,
+            [[750599937895083, 750599937895082],
              [375299968947541, 375299968947542]]
         )
 
@@ -969,13 +984,6 @@ class TestDiag:
         # assert_equal(expected, diag(v))
         raise SkipTest # TODO: implement your test here
 
-
-
-class TestPisanoCycle:
-    def test_pisano_cycle(self):
-        # assert_equal(expected, pisano_cycle(mod))
-        raise SkipTest # TODO: implement your test here
-
 class TestFactors:
     def test_factors(self):
         # assert_equal(expected, factors(n))
@@ -984,7 +992,6 @@ class TestFactors:
 class TestIsPrimitiveRoot:
     def test_is_primitive_root(self):
         pass #tested below
-        raise SkipTest # TODO: implement your test here
 
 class TestPrimitiveRootGen:
     def test_primitive_root_gen(self):
@@ -993,6 +1000,13 @@ class TestPrimitiveRootGen:
 class TestPrimitiveRoots:
     def test_primitive_roots(self):
         assert_equal(primitive_roots(17),[3, 5, 6, 7, 10, 11, 12, 14]  )
+        # assert_equal(primitive_roots(1),[1]  ) # how is it defined ?
+
+
+class TestRandomPrime:
+    def test_random_prime(self):
+        for b in range(8,128,8):
+            assert_true(is_prime(random_prime(b)))
 
 if __name__ == "__main__":
     runmodule()

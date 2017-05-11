@@ -490,6 +490,11 @@ def fibonacci(n,mod=0):
     #uses http://mathworld.wolfram.com/FibonacciQ-Matrix.html
     return mod_matpow([[1,1],[1,0]],n,mod)[0][1]
 
+def is_fibonacci(n):
+    """returns True if n is in Fibonacci series"""
+    # http://www.geeksforgeeks.org/check-number-fibonacci-number/
+    return is_square(5*n*n + 4) or is_square(5*n*n - 4)
+    
 def pisano_cycle(mod):
     if mod<2: return [0]
     seq=[0,1]
@@ -730,6 +735,16 @@ def primes_gen(start=2,stop=None):
     for n in candidates:
         if is_prime(n):
             yield n
+            
+def random_prime(bits):
+    """returns a random number of the specified bit length"""
+    import random
+    n = random.getrandbits(bits);
+    if n%2 == 0:
+        n+=1
+    while not is_prime(n):
+        n+=2
+    return n
 
 def euclid_gen():
     """generates Euclid numbers: 1 + product of the first n primes"""
