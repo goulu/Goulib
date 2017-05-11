@@ -15,7 +15,7 @@ import six #Python2+3 compatibility utilities
 from six.moves import reduce, zip
 
 from itertools import *
-import random, operator, collections, heapq
+import random, operator, collections, heapq, logging
 
 #reciepes from Python manual
 
@@ -236,7 +236,7 @@ def pairwise(iterable,op=None,loop=False):
 
 def shape(iterable):
     """ shape of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: list of n ints corresponding to iterable's len of each dimension
     :warning: if iterable is not a (hyper) rect matrix, shape is evaluated from
@@ -248,13 +248,12 @@ def shape(iterable):
         while True:
             res.append(ilen(iterable))
             iterable=first(iterable)
-    except:
-        pass
-    return res
+    except TypeError:
+        return res
 
 def ndim(iterable):
     """ number of dimensions of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: int number of dimensions
     """
@@ -375,7 +374,7 @@ def cartesian_product(*iterables, **kwargs):
         for item in it() if iscallable(it) else iter(it):
             for items in cartesian_product(*iterables[1:]):
                 yield (item, ) + items
-                
+
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC
     same as combinations_with_replacement except it doesn't generate
@@ -695,7 +694,7 @@ class SortingError(Exception):
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
     :yields: items of iterable
-    :raise: SortingError if not 
+    :raise: SortingError if not
     """
     key=key or identity
     prev,n=None,0
@@ -705,7 +704,7 @@ def ensure_sorted(iterable,key=None):
         prev=x
         yield x
         n+=1
-    
+
 
 def sorted_iterable(iterable, key=None, buffer=100):
     """sorts an "almost sorted" (infinite) iterable
@@ -722,7 +721,7 @@ def sorted_iterable(iterable, key=None, buffer=100):
             yield res
         b.insert(x)
     for x in b: # this never happens if iterable is infinite
-        yield x 
+        yield x
 
 # operations on sorted iterators
 
@@ -740,12 +739,12 @@ merge=heapq.merge
 
 def intersect(*its):
     """ generates itersection of N iterables
-    
+
     :param its: any number of SORTED iterables
     :yields: elements that belong to all iterables
     :see: http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
     """
-    
+
     for key, values in groupby(heapq.merge(*its)):
         if len(list(values)) == len(its):
             yield key
@@ -756,53 +755,66 @@ def intersect(*its):
 
 class keep(collections.Iterator):
     """iterator that keeps the last value"""
-    def __init__(self,iterable):       
+    def __init__(self,iterable):
         self.it = iter(iterable)
-        self.val = next(self.it) #get the first value
- 
-    def __next__(self):
+        self.stop=False
         self.val = next(self.it)
-        return self.val
-    
+
+    def __next__(self):
+        if self.stop:
+            raise StopIteration
+        prev=self.val
+        try:
+            self.val = next(self.it)
+        except StopIteration:
+            self.stop=True
+        return prev
+
     next=__next__ # 2.7 compatibility
- 
- 
-def first_match(iter1,iter2):
+
+def first_match(iter1,iter2,limit=None):
     """"
-    :return: integer i first index where iter1[i]==iter2[i] 
+    :param limit: int max number of loops
+    :return: integer i first index where iter1[i]==iter2[i]
     """
     for n,(i1,i2) in enumerate(zip(iter1,iter2)):
+        logging.debug((i1,i2))
         if i1==i2:
             return n
+        if limit and n>limit:
+            break
     return None
- 
-def detect_cycle(iterable):
-    
-    """Detect a cycle in iterable object
-    uses Floyd "tortue hand hare" algorithm
+
+def floyd(iterable,limit=1e6):
+    """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
     :see: https://en.wikipedia.org/wiki/Cycle_detection
     :param iterable: iterable
+    :param limit: int limit to prevent infinite loop. no limit if None
     :result: (i,l) tuple of integers where i=index of cycle start, l=length
         if no cycle is found, return (None,None)
     """
- 
-    tortoise = keep(iterable)
-    hare = keep(takeevery(2, iterable, None))
+
+    iterable,tortoise,hare = tee(iterable,3)
+    tortoise = keep(tortoise)
+    hare = keep(takeevery(2, hare, 1))
     #it will start from the first value and only then will be advancing 2 values at a time
- 
-    first_match(tortoise,hare)
- 
+
+    first_match(tortoise,hare,limit=limit)
+
     hare = tortoise #put hare in the place of tortoise
     tortoise = keep(iterable) #start tortoise from the very beginning
-    i = first_match(chain([tortoise.val],tortoise), chain([hare.val],hare))
-    if i is None: 
+    i = first_match(tortoise,hare,limit=limit)
+    if i is None:
         return (None,None)
     #begin with the current val of hare.val and the value of tortoise which is in the first position
- 
+
     hare = tortoise
     tortoise_val = tortoise.val
+    hare.next()
     l = first_match(repeat(tortoise_val),hare)
- 
+
     return i,l+1
 
+def detect_cycle(iterable,limit=1e6):
+    return floyd(iterable,limit)
 

@@ -373,8 +373,11 @@ class TestItemgetter:
 
 class TestTee:
     def test_tee(self):
-        # assert_equal(expected, tee(iterable, n, copy))
-        raise SkipTest
+        it=count()
+        it,it1,it2=tee(it,n=3)
+        assert_equal(next(it1),next(it2))
+        assert_equal(next(it1),next(it2))
+        assert_equal(next(it),0)
 
 class TestIremove:
     def test_iremove(self):
@@ -422,6 +425,14 @@ class TestIntersect:
         assert_equal(intersect(*postings),[100, 322])
 
 class TestKeep:
+    @classmethod
+    def setup_class(self):
+        l=[1,2,3,4,5,6,7,8,9]
+        k=keep(l)
+        kl=list(k)
+        assert_equal(kl,l)
+        assert_equal(k.val,l[-1])
+        
     def test___init__(self):
         pass #tested in test_detect_cycle
 
@@ -431,17 +442,44 @@ class TestKeep:
     def test_next(self):
         pass #tested in test_detect_cycle
 
+    def test___next__(self):
+        # keep = keep(iterable)
+        # assert_equal(expected, keep.__next__())
+        raise SkipTest # TODO: implement your test here
+
 class TestFirstMatch:
     def test_first_match(self):
         pass #tested in test_detect_cycle
 
 class TestDetectCycle:
     def test_detect_cycle(self):
+        
         assert_equal(detect_cycle(list('123412341')),(0,4))
-        assert_equal(detect_cycle(list('0123456786786')),(6,3))
-        assert_equal(detect_cycle(list('0123456786789')),(None,None))
+        
+        assert_equal(detect_cycle(list('012345'+'678'*4)),(6,3))
+        # but the repetition should be long enough (2*i ?):
+        assert_equal(detect_cycle(list('012345'+'678'*3)),(None,None))
+        
+        #test from https://rosettacode.org/wiki/Cycle_detection
         assert_equal(detect_cycle([3,10,101,2,5,26,167,95,101,2,5,26,167,95]),(2,6))
+        
+        """ does not work yet because of repeating digits
+        
+        p3=[1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 
+            1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 
+            2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 
+            2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 
+            0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2]
+        assert_equal(detect_cycle(p3)[1],8)
+        
         from math import pi
-        #assert_equal(detect_cycle(list(str(pi))),(2,2)) #TODO: find why it's wrong
+        assert_equal(detect_cycle(list(str(pi))),(None,None)) #TODO: find why it's wrong
+        """
+        
+class TestFloyd:
+    def test_floyd(self):
+        # assert_equal(expected, floyd(iterable, limit))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
