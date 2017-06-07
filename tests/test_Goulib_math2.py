@@ -103,6 +103,8 @@ class TestDot:
         assert_equal(dot(m1,v1),[5,7,2])
         m2=transpose(m1)
         assert_equal(dot(m1,m2),[[5, 7, 2], [7, 10, 3], [2, 3, 1]])
+        v1=[715827883, 715827882]
+        assert_equal(dot(v1,v1),1024819114728867613) #fails with numpy.dot !
 
 class TestVecadd:
     def test_vecadd(self):
@@ -152,6 +154,11 @@ class TestFibonacci:
 
         #http://controlfd.com/2016/07/05/using-floats-in-python.html
         assert_equal(fibonacci(78),8944394323791464)
+        
+        f50=fibonacci(50)
+        f51=fibonacci(51)
+        phi=(1+sqrt(5))/2
+        assert_equal(f51/f50,phi)
         
         #mod 1000000007 has the effect of using int32 only
         assert_equal(fibonacci(int(1E19),1000000007),647754067)
