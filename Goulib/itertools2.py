@@ -7,13 +7,15 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
                "algos from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
-               "tools from http://docs.python.org/dev/py3k/library/itertools.html",
+               "tools from http://docs.python.org/dev/py3k/library/html",
                ]
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
-from six.moves import reduce,zip
-import random, operator, collections, heapq, itertools
+from six.moves import reduce, zip
+
+from itertools import *
+import random, operator, collections, heapq, logging
 
 #reciepes from Python manual
 
@@ -21,7 +23,7 @@ def take(n, iterable):
     """
     :result: first n items from iterable
     """
-    return itertools.islice(iterable, n)
+    return islice(iterable, n)
 
 def index(n, iterable):
     """
@@ -51,15 +53,15 @@ def last(iterable):
         return x
     raise IndexError
 
-def takeevery(n, iterable, first=0):
+def takeevery(n, iterable, start=0):
     """Take an element from iterator every n elements"""
-    return itertools.islice(iterable, first, None, n)
+    return islice(iterable, start, None, n)
 
 every=takeevery
 
 def drop(n, iterable):
     """Drop n elements from iterable and return the rest"""
-    return itertools.islice(iterable, n, None)
+    return islice(iterable, n, None)
 
 def ilen(it):
     """
@@ -78,7 +80,7 @@ def irange(start_or_end, optional_end=None):
         start, end = 0, start_or_end
     else:
         start, end = start_or_end, optional_end
-    return take(max(end - start + 1, 0), itertools.count(start))
+    return take(max(end - start + 1, 0), count(start))
 
 def isiterable(obj):
     """
@@ -138,7 +140,7 @@ def linspace(start,end,n=100):
     # like http://www.mathworks.com/help/matlab/ref/linspace.html
     # http://docs.scipy.org/doc/numpy/reference/generated/numpy.linspace.html has more options
     if start==end: #generate n times the same value for consistency
-        return itertools.repeat(start,n)
+        return repeat(start,n)
     else: #make sure we generate n values including start and end
         step=float(end-start)/(n-1)
         return arange(start,end+step/2,step)
@@ -205,13 +207,14 @@ def tee(iterable, n=2, copy=None):
         else:
             res=[copy(iterable) for _ in range(n)]
         return tuple(res)
+    import itertools
     return itertools.tee(iterable,n) # make independent iterators
 
 def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n=n, copy=None)
-    onestepit = six.moves.zip(*(itertools.starmap(drop, enumerate(itlist))))
+    onestepit = six.moves.zip(*(starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
 def pairwise(iterable,op=None,loop=False):
@@ -224,7 +227,7 @@ def pairwise(iterable,op=None,loop=False):
     :result: pairs iterator (s1,s2), (s2,s3) ... (si,si+1), ... (sn-1,sn) + optional pair to close the loop
     """
 
-    i=itertools.chain(iterable,[first(iterable)]) if loop else iterable
+    i=chain(iterable,[first(iterable)]) if loop else iterable
     for x in groups(i,2,1):
         if op:
             yield op(x[1],x[0]) #reversed ! (for sub or div)
@@ -233,7 +236,7 @@ def pairwise(iterable,op=None,loop=False):
 
 def shape(iterable):
     """ shape of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: list of n ints corresponding to iterable's len of each dimension
     :warning: if iterable is not a (hyper) rect matrix, shape is evaluated from
@@ -245,13 +248,12 @@ def shape(iterable):
         while True:
             res.append(ilen(iterable))
             iterable=first(iterable)
-    except:
-        pass
-    return res
+    except TypeError:
+        return res
 
 def ndim(iterable):
     """ number of dimensions of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: int number of dimensions
     """
@@ -285,7 +287,7 @@ def iterate(func, arg):
         arg = func(arg)
 
 def accumulate(iterable, func=operator.add, skip_first=False):
-    """Return running totals. extends `python.itertools.accumulate`
+    """Return running totals. extends `python.accumulate`
 
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
     # accumulate([1,2,3,4,5], operator.mul) --> 1 2 6 24 120
@@ -372,10 +374,10 @@ def cartesian_product(*iterables, **kwargs):
         for item in it() if iscallable(it) else iter(it):
             for items in cartesian_product(*iterables[1:]):
                 yield (item, ) + items
-                
+
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC
-    same as itertools.combinations_with_replacement except it doesn't generate
+    same as combinations_with_replacement except it doesn't generate
     duplicates
     """
     pool = tuple(iterable)
@@ -408,8 +410,8 @@ def takenth(n, iterable, default=None):
     """
     :result: nth item of iterable
     """
-    # https://docs.python.org/2/library/itertools.html#recipes
-    return six.next(itertools.islice(iterable, n, n+1),default)
+    # https://docs.python.org/2/library/html#recipes
+    return six.next(islice(iterable, n, n+1),default)
 
 nth=takenth
 
@@ -555,9 +557,9 @@ def isplit(iterable,sep,include_sep=False):
     :result: iterates through slices before, between, and after separators
     """
     indexes=(i for i,_ in ifind(iterable,sep))
-    indexes=itertools.chain([0 if include_sep else -1],indexes,[None]) # will be the last j
+    indexes=chain([0 if include_sep else -1],indexes,[None]) # will be the last j
     for i,j in pairwise(indexes):
-        yield itertools.islice(iterable,i if include_sep else i+1,j)
+        yield islice(iterable,i if include_sep else i+1,j)
 
 def split(iterable,sep,include_sep=False):
     """ like https://docs.python.org/2/library/stdtypes.html#str.split, but for iterable
@@ -659,15 +661,15 @@ class iter2(object):
         self._iter = iter(iterable)
 
     def append(self, iterable):
-        self._iter = itertools.chain(self._iter, iter(iterable))
+        self._iter = chain(self._iter, iter(iterable))
 
     def insert(self, place, iterable):
         if place != 0:
             raise ValueError('Can only insert at index of 0')
-        self._iter = itertools.chain(iter(iterable), self._iter)
+        self._iter = chain(iter(iterable), self._iter)
 
     def __add__(self, iterable):
-        return itertools.chain(self._iter, iter(iterable))
+        return chain(self._iter, iter(iterable))
 
     def __next__(self):
         return six.next(self._iter)
@@ -692,7 +694,7 @@ class SortingError(Exception):
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
     :yields: items of iterable
-    :raise: SortingError if not 
+    :raise: SortingError if not
     """
     key=key or identity
     prev,n=None,0
@@ -702,7 +704,7 @@ def ensure_sorted(iterable,key=None):
         prev=x
         yield x
         n+=1
-    
+
 
 def sorted_iterable(iterable, key=None, buffer=100):
     """sorts an "almost sorted" (infinite) iterable
@@ -719,7 +721,7 @@ def sorted_iterable(iterable, key=None, buffer=100):
             yield res
         b.insert(x)
     for x in b: # this never happens if iterable is infinite
-        yield x 
+        yield x
 
 # operations on sorted iterators
 
@@ -737,14 +739,82 @@ merge=heapq.merge
 
 def intersect(*its):
     """ generates itersection of N iterables
-    
+
     :param its: any number of SORTED iterables
     :yields: elements that belong to all iterables
     :see: http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
     """
-    
-    for key, values in itertools.groupby(heapq.merge(*its)):
+
+    for key, values in groupby(heapq.merge(*its)):
         if len(list(values)) == len(its):
             yield key
 
+# cycle detection (Floyd "tortue hand hare" algorithm"
+# taken from https://codereview.stackexchange.com/questions/7847/tortoise-and-hare-cycle-detection-algorithm-using-iterators-in-python
+# http://ideone.com/fgrwM
+
+class keep(collections.Iterator):
+    """iterator that keeps the last value"""
+    def __init__(self,iterable):
+        self.it = iter(iterable)
+        self.stop=False
+        self.val = next(self.it)
+
+    def __next__(self):
+        if self.stop:
+            raise StopIteration
+        prev=self.val
+        try:
+            self.val = next(self.it)
+        except StopIteration:
+            self.stop=True
+        return prev
+
+    next=__next__ # 2.7 compatibility
+
+def first_match(iter1,iter2,limit=None):
+    """"
+    :param limit: int max number of loops
+    :return: integer i first index where iter1[i]==iter2[i]
+    """
+    for n,(i1,i2) in enumerate(zip(iter1,iter2)):
+        logging.debug((i1,i2))
+        if i1==i2:
+            return n
+        if limit and n>limit:
+            break
+    return None
+
+def floyd(iterable,limit=1e6):
+    """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
+    :see: https://en.wikipedia.org/wiki/Cycle_detection
+    :param iterable: iterable
+    :param limit: int limit to prevent infinite loop. no limit if None
+    :result: (i,l) tuple of integers where i=index of cycle start, l=length
+        if no cycle is found, return (None,None)
+    """
+
+    iterable,tortoise,hare = tee(iterable,3)
+    tortoise = keep(tortoise)
+    hare = keep(takeevery(2, hare, 1))
+    #it will start from the first value and only then will be advancing 2 values at a time
+
+    first_match(tortoise,hare,limit=limit)
+
+    hare = tortoise #put hare in the place of tortoise
+    tortoise = keep(iterable) #start tortoise from the very beginning
+    i = first_match(tortoise,hare,limit=limit)
+    if i is None:
+        return (None,None)
+    #begin with the current val of hare.val and the value of tortoise which is in the first position
+
+    hare = tortoise
+    tortoise_val = tortoise.val
+    hare.next()
+    l = first_match(repeat(tortoise_val),hare)
+
+    return i,l+1
+
+def detect_cycle(iterable,limit=1e6):
+    return floyd(iterable,limit)
 

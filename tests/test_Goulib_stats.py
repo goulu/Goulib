@@ -59,14 +59,63 @@ class TestStats:
         assert_equal(self.h.avg,hmean)
         
     def test_variance(self):
-        assert_equal(self.f.variance,fvar)
-        assert_equal(self.h.var,hvar)
+        assert_equal(self.f.variance,fvar,places=3)
+        assert_equal(math2.rint(self.h.var),hvar)
 
 
     def test_stddev(self):
         # Stats = Stats(data, mean, var)
         # assert_equal(expected, Stats.stddev())
         raise SkipTest 
+
+    def test_stats(self):
+        # assert_equal(expected, stats(l))
+        raise SkipTest # TODO: implement your test here
+
+    def test___add__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__add__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___mul__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__mul__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test___neg__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__neg__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___pow__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__pow__(n))
+        raise SkipTest # TODO: implement your test here
+
+    def test___repr__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__repr__())
+        raise SkipTest # TODO: implement your test here
+
+    def test___sub__(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.__sub__(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_covariance(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.covariance(other))
+        raise SkipTest # TODO: implement your test here
+
+    def test_sum(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.sum())
+        raise SkipTest # TODO: implement your test here
+
+    def test_sum2(self):
+        # stats = Stats(data, mean, var)
+        # assert_equal(expected, stats.sum2())
+        raise SkipTest # TODO: implement your test here
 
 class TestStddev:
     def test_stddev(self):
@@ -97,141 +146,8 @@ class TestMode:
         # assert_equal(expected, mode.__repr__())
         raise SkipTest # TODO: implement your test here
 
-class TestStats:
-    def test_stats(self):
-        # https://www.hackerrank.com/challenges/stat-warmup
-        min,max,sum,sum2,avg,var=stats(h)
-        assert_equal(min,4978)
-        assert_equal(max,99233)
-        assert_equal(sum,439006)
-        assert_equal(sum2,math2.dot(h,h))
-        assert_equal(avg,hmean)
-        assert_equal(var,hvar,0)
 
-        min,max,sum,sum2,avg,var=stats(f)
-        assert_equal(min,0.,1)
-        assert_equal(max,1.,1)
-        assert_equal(sum,(n+1)/2.,2)
-        assert_equal(sum2,(n+2)/3.,0)
-        assert_equal(avg,0.5,4)
-        assert_equal(var,1./12,4)
 
-    def test_stats(self):
-        # assert_equal(expected, stats(l))
-        raise SkipTest 
-
-    def test___repr__(self):
-        # stats = Stats(data)
-        # assert_equal(expected, stats.__repr__())
-        raise SkipTest 
-
-    def test_sum(self):
-        # stats = Stats(data)
-        # assert_equal(expected, stats.sum())
-        raise SkipTest 
-
-    def test_sum2(self):
-        # stats = Stats(data)
-        # assert_equal(expected, stats.sum2())
-        raise SkipTest 
-
-    def test_stats(self):
-        # assert_equal(expected, stats(l))
-        raise SkipTest # TODO: implement your test here
-
-    def test___add__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__add__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___mul__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__mul__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___neg__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__neg__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___pow__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__pow__(n))
-        raise SkipTest # TODO: implement your test here
-
-    def test___repr__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__repr__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___sub__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__sub__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_covariance(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.covariance(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_sum(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.sum())
-        raise SkipTest # TODO: implement your test here
-
-    def test_sum2(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.sum2())
-        raise SkipTest # TODO: implement your test here
-
-    def test_stats(self):
-        # assert_equal(expected, stats(l))
-        raise SkipTest # TODO: implement your test here
-
-    def test___add__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__add__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___mul__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__mul__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test___neg__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__neg__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___pow__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__pow__(n))
-        raise SkipTest # TODO: implement your test here
-
-    def test___repr__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__repr__())
-        raise SkipTest # TODO: implement your test here
-
-    def test___sub__(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.__sub__(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_covariance(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.covariance(other))
-        raise SkipTest # TODO: implement your test here
-
-    def test_sum(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.sum())
-        raise SkipTest # TODO: implement your test here
-
-    def test_sum2(self):
-        # stats = Stats(data, mean, var)
-        # assert_equal(expected, stats.sum2())
-        raise SkipTest # TODO: implement your test here
 
 class TestLinearRegression:
     def test_linear_regression(self):

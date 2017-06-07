@@ -736,6 +736,11 @@ class TestEllipse:
         s=str(self.e1)
         assert_equal(s,'Ellipse(Point2(1, 2),2,2)')
 
+    def test___eq__(self):
+        # ellipse = Ellipse(*args)
+        # assert_equal(expected, ellipse.__eq__(other))
+        raise SkipTest # TODO: implement your test here
+
 if __name__ == "__main__":
     runmodule()
 

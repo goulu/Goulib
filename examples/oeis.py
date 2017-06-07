@@ -256,7 +256,7 @@ A034386=Sequence(
 )
 
 
-#TODO: understand why A000720 creates a hudge bad side effect on myna other serquences
+#TODO: understand why A000720 creates a hudge bad side effect on many other serquences
 """
 A000720=Sequence(
     1,
@@ -353,9 +353,69 @@ A000006=A000040.apply(math2.isqrt,desc="Integer part of square root of n-th prim
 A001221=Sequence(1,math2.omega)
 A001222=Sequence(1,math2.bigomega)
 
-# famous series
+# primitive roots
 
-A000045=Sequence(math2.fibonacci_gen,math2.fibonacci) #Fibonacci numbers: F(n) = F(n-1) + F(n-2) with F(0) = 0 and F(1) = 1
+def has_primitive_root(n):
+    if n==1 : return True # to match A033948, but why ?
+    try:
+        six.next(math2.primitive_root_gen(n))
+        return True
+    except StopIteration:
+        return False
+
+A033948=Sequence(1,containf=has_primitive_root,
+    desc='numbers that have a primitive_root'
+)
+
+A001918=A000040.apply(lambda n:itertools2.first(math2.primitive_root_gen(n)),
+    desc="Least positive primitive root of n-th prime. )"
+)
+
+A001122=A000040.filter(lambda n:2==itertools2.first(math2.primitive_root_gen(n)),
+    desc="Primes with primitive root 2."
+    # we know  2 is first in primitive_root_gen
+)
+
+def is_in(n,gen):
+    for x in gen:
+        if x==n: return True
+        if x>n : break
+    return False
+
+A001913=A000040.filter(
+    lambda n:n==7 or is_in(10,math2.primitive_root_gen(n)),
+    desc="Primes with primitive root 10."
+    # but why is 7 in A001913 ???
+)
+
+""" not correct
+A003147=A000040.filter(
+    lambda n:itertools2.find(
+        math2.primitive_root_gen(n),
+        math2.is_fibonacci
+    ),
+    desc="Primes with a fibonacci primitive root"
+    # but why is 7 in A001913 ???
+)
+"""            
+
+# Fibonacci & co
+
+A000045=Sequence(math2.fibonacci_gen,math2.fibonacci, math2.is_fibonacci,
+    desc="Fibonacci numbers: F(n) = F(n-1) + F(n-2) with F(0) = 0 and F(1) = 1")
+
+A082115=Sequence(math2.fibonacci_gen(mod=3), desc='Fibonacci numbers modulo 3')
+A003893=Sequence(math2.fibonacci_gen(mod=10), desc='Fibonacci numbers modulo 10')
+
+A001175=Sequence(1,math2.pisano_period, desc='Pisano period')
+
+A060305=A000040.apply(math2.pisano_period, desc='Period of Fibonacci numbers mod prime(n).')
+
+A134816=Sequence(math2.recurrence([1,1,0],[1,1,1]), desc="Padovan's spiral numbers.") 
+A000931=Sequence(math2.recurrence([1,1,0],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ") 
+
+A050935=Sequence(math2.recurrence([-1,0,1],[0,0,1]), desc="a(1)=0, a(2)=0, a(3)=1, a(n+1) = a(n) - a(n-2).")
+# other famous series
 
 A007318=Sequence(math2.pascal_gen)
 
@@ -541,13 +601,12 @@ A046086=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0])
     # .sort(key=lambda x:x[2]) \ #not needed anymore
     # .apply(lambda x:x[0])
     
-""" found a bug in OEIS ! 20th term of the serie is 145, not 142 !
+# 2016 found a bug in OEIS ! 20th term of the serie is 145, not 142 !
 
 desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
 A121727=Sequence(math2.primitive_triples,desc=desc) \
     .sort(lambda x:(x[0]*x[1],x[2])) \
     .apply(lambda x:x[2])
-"""
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -560,6 +619,7 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
+    print(A003147)
     pass
 
 

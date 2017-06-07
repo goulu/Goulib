@@ -14,7 +14,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, math, cmath, operator, itertools, fractions, numbers
+import six, math, cmath, operator, itertools, fractions, numbers, logging
 from six.moves import map, reduce, filter, zip_longest
 
 from Goulib import itertools2
@@ -43,15 +43,12 @@ if six.PY3:
         return sign(x-y)
 
 def gcd(*args):
-    """greatest common divisor of an arbitrary list"""
+    """greatest common divisor of an arbitrary number of args"""
     #http://code.activestate.com/recipes/577512-gcd-of-an-arbitrary-list/
-    if len(args) == 2:
-        return fractions.gcd(args[0],args[1])
 
-    if len(args) == 1:
-        return args[0]
+    L = list(args) #in case args are generated
 
-    L = list(args)
+    b=L[0] # will be returned if only one arg
 
     while len(L) > 1:
         a = L[-2]
@@ -65,6 +62,30 @@ def gcd(*args):
 
     return abs(b)
 
+def lcm(*args):
+    """least common multiple of any number of integers"""
+    if len(args)<=2:
+        return mul(args) // gcd(*args)
+    # TODO : better
+    res=lcm(args[0],args[1])
+    for n in args[2:]:
+        res=lcm(res,n)
+    return res
+
+def xgcd(a,b):
+    """Extended GCD:
+    Returns (gcd, x, y) where gcd is the greatest common divisor of a and b
+    with the sign of b if b is nonzero, and with the sign of a if b is 0.
+    The numbers x,y are such that gcd = ax+by."""
+    #taken from http://anh.cs.luc.edu/331/code/xgcd.py
+    prevx, x = 1, 0;  prevy, y = 0, 1
+    while b:
+        q, r = divmod(a,b)
+        x, prevx = prevx - q*x, x
+        y, prevy = prevy - q*y, y
+        a, b = b, r
+    return a, prevx, prevy
+
 def coprime(*args):
     return gcd(*args)==1
 
@@ -72,7 +93,7 @@ def coprimes_gen(limit):
     """Fast computation using Farey sequence as a generator
     """
     # https://www.quora.com/What-are-the-fastest-algorithms-for-generating-coprime-pairs
-    
+
     pend = []
     n,d = 0,1 # n, d is the start fraction n/d (0,1) initially
     N = D = 1 # N, D is the stop fraction N/D (1,1) initially
@@ -90,23 +111,26 @@ def coprimes_gen(limit):
             else:
                 break
 
-def lcm(a,b):
-    """least common multiple"""
-    return abs(a * b) // gcd(a,b) if a and b else 0
+#https://en.wikipedia.org/wiki/Primitive_root_modulo_n
+#code decomposed from http://stackoverflow.com/questions/40190849/efficient-finding-primitive-roots-modulo-n-using-python
 
-def xgcd(a,b):
-    """Extended GCD:
-    Returns (gcd, x, y) where gcd is the greatest common divisor of a and b
-    with the sign of b if b is nonzero, and with the sign of a if b is 0.
-    The numbers x,y are such that gcd = ax+by."""
-    #taken from http://anh.cs.luc.edu/331/code/xgcd.py
-    prevx, x = 1, 0;  prevy, y = 0, 1
-    while b:
-        q, r = divmod(a,b)
-        x, prevx = prevx - q*x, x
-        y, prevy = prevy - q*y, y
-        a, b = b, r
-    return a, prevx, prevy
+def is_primitive_root(x,m,s={}):
+    """returns True if x is a primitive root of m
+    :param s: set of coprimes to m, if already known
+    """
+    if not s:
+        s={n for n in range(1, m) if coprime(n, m) }
+    return {pow(x, p, m) for p in range(1, m)}==s
+
+def primitive_root_gen(m):
+    """generate primitive roots modulo m"""
+    required_set = {num for num in range(1, m) if coprime(num, m) }
+    for n in range(1, m):
+        if is_primitive_root(n,m,required_set):
+            yield n
+            
+def primitive_roots(modulo):
+    return list(primitive_root_gen(modulo))
 
 def quad(a, b, c, allow_complex=False):
     """ solves quadratic equations
@@ -177,8 +201,8 @@ def isqrt(n):
 
 def sqrt(n):
     """improved square root
-    
-    :return: int or float 
+
+    :return: int or float
     """
     if type(n) is int:
         s=isqrt(n)
@@ -231,29 +255,53 @@ def mul(nums,init=1):
     """
     return reduce(operator.mul, nums, init)
 
+def dot_vv(a,b,default=0):
+    """dot product for vectors
+    :param a: vector (iterable)
+    :param b: vector (iterable)
+    :param default: default value of the multiplication operator
+    """
+    return sum(map( operator.mul, a, b),default)
+
+def dot_mv(a,b,default=0):
+    """dot product for vectors
+    :param a: matrix (iterable or iterables)
+    :param b: vector (iterable)
+    :param default: default value of the multiplication operator
+    """
+    return [dot_vv(line,b,default) for line in a]
+
+def dot_mm(a,b,default=0):
+    """dot product for matrices
+    :param a: matrix (iterable or iterables)
+    :param b: matrix (iterable or iterables)
+    :param default: default value of the multiplication operator
+    """
+    return transpose([dot_mv(a,col) for col in zip(*b)])
 
 def dot(a,b,default=0):
-    """dot product"""
+    """dot product
+    general but slow : use dot_vv, dot_mv or dot_mm if you know a and b's dimensions
+    """
     if itertools2.ndim(a)==2: # matrix
         if itertools2.ndim(b)==2: # matrix*matrix
-            res= [dot(a,col) for col in zip(*b)]
-            return transpose(res)
+            return dot_mm(a,b,default)
         else: # matrix*vector
-            return [dot(line,b) for line in a]
+            return dot_mv(a,b,default)
     else: #vector*vector
-        return sum(map( operator.mul, a, b),default)
-    
+        return dot_vv(a,b,default)
+
 # some basic matrix ops
 def zeros(shape):
     """
     https://docs.scipy.org/doc/numpy/reference/generated/numpy.zeros.html
     """
     return ([0]*shape[1])*shape[0]
-    
+
 def diag(v):
     """
     Create a two-dimensional array with the flattened input as a diagonal.
-    :param v: If v is a 2-D array, return a copy of its diagonal. 
+    :param v: If v is a 2-D array, return a copy of its diagonal.
         If v is a 1-D array, return a 2-D array with v on the diagonal
     :see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.diag.html#numpy.diag
     """
@@ -291,7 +339,7 @@ def minimum(m):
     """
     Compare N arrays and returns a new array containing the element-wise minima
     http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html
-    
+
     :param m: list of arrays (matrix)
     :return: list of minimal values found in each column of m
     """
@@ -379,7 +427,7 @@ def sets_dist(a,b):
 
 def sets_levenshtein(a,b):
     """levenshtein distance on sets
-    
+
     :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
     c = a.intersection(b)
@@ -408,24 +456,28 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(coefficients,values,cst=0, max=None):
+def recurrence(coefficients,values,cst=0, max=None, mod=0):
     """general generator for recurrences
-    
+
     :param values: list of initial values
     :param coefficients: list of factors defining the recurrence
     """
     for n in values:
+        if mod:
+            n=n%mod
         yield n
     while True:
-        n=dot(coefficients,values)
+        n=dot_vv(coefficients,values)
         if max and n>max: break
-        yield n+cst
+        n=n+cst
+        if mod: n=n%mod
+        yield n
         values=values[1:]
-        values.append(n+cst)
+        values.append(n)
 
-def fibonacci_gen(max=None):
+def fibonacci_gen(max=None,mod=0):
     """Generate fibonacci serie"""
-    return recurrence([1,1],[0,1],0,max)
+    return recurrence([1,1],[0,1],max=max,mod=mod)
 
 def fibonacci(n,mod=0):
     """ fibonacci series n-th element
@@ -434,37 +486,36 @@ def fibonacci(n,mod=0):
     """
     if n < 0:
         raise ValueError("Negative arguments not implemented")
-    #http://stackoverflow.com/a/28549402/1395973 
+    #http://stackoverflow.com/a/28549402/1395973
     #uses http://mathworld.wolfram.com/FibonacciQ-Matrix.html
     return mod_matpow([[1,1],[1,0]],n,mod)[0][1]
-    
-    """ old algorithm for reference:
-    #http://blog.dreamshire.com/common-functions-routines-project-euler/
-    Find the nth number in the Fibonacci series.  Example:
 
-    >>>fibonacci(100)
-    354224848179261915075
-
-    Algorithm & Python source: Copyright (c) 2013 Nayuki Minase
-    Fast doubling Fibonacci algorithm
-    http://nayuki.eigenstate.org/page/fast-fibonacci-algorithms
-
-    # Returns a tuple (F(n), F(n+1))
-    def _fib(n):
-        if n == 0:
-            return (0, 1)
-        else:
-            a, b = _fib(n // 2)
-            c = a * (2 * b - a)
-            d = b * b + a * a
-            if n % 2 == 0:
-                return (c, d)
-            else:
-                return (d, c + d)
+def is_fibonacci(n):
+    """returns True if n is in Fibonacci series"""
+    # http://www.geeksforgeeks.org/check-number-fibonacci-number/
+    return is_square(5*n*n + 4) or is_square(5*n*n - 4)
     
-    return _fib(n)[0]
-    """
-    
+def pisano_cycle(mod):
+    if mod<2: return [0]
+    seq=[0,1]
+    l=len(seq)
+    s=[]
+    for i,n in enumerate(fibonacci_gen(mod=mod)):
+        s.append(n)
+        if i>l and s[-l:]==seq:
+            return s[:-l]
+
+def pisano_period(mod):
+    if mod<2: return 1
+    flag=False # 0 was found
+    for i,n in enumerate(fibonacci_gen(mod=mod)):
+        if not flag:
+            flag=n==0
+        elif i>3:
+            if n==1:
+                return i-1
+            flag=False
+
 def pascal_gen():
     """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
     https://oeis.org/A007318
@@ -493,7 +544,7 @@ def catalan_gen():
     for n in itertools.count(1):
         last=last*(4*n+2)//(n+2)
         yield last
-        
+
 def is_pythagorean_triple(a,b,c):
     return a*a+b*b == c*c
 
@@ -524,7 +575,7 @@ def primitive_triples():
             triples.insert(triple)
 
 def triples():
-    """ generates all Pythagorean triplets triplets x<y<z 
+    """ generates all Pythagorean triplets triplets x<y<z
     sorted by hypotenuse z, then longest side y
     """
     prim=[] #list of primitive triples up to now
@@ -544,7 +595,7 @@ def triples():
                 mz=m*p[2]
                 if mz < z:
                     buffer.insert(tuple(m*x for x in p))
-                elif mz == z: 
+                elif mz == z:
                     # we need another buffer because next pt might have
                     # the same z as the previous one, but a smaller y than
                     # a multiple of a previous pt ...
@@ -556,7 +607,7 @@ def triples():
         while buffer: #flush buffer
             yield buffer.pop(0)
         prim.append([pt,2]) #add primitive to the list
-                
+
 def divisors(n):
     """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
     including 1 and n,
@@ -605,7 +656,7 @@ _primes_set = set(_primes) # to speed us primality tests below
 
 def primes(n):
     """memoized list of n first primes
-    
+
     :warning: do not call with large n, use prime_gen instead
     """
     m=n-len(_primes)
@@ -618,7 +669,7 @@ def primes(n):
 
 def is_prime(n, oneisprime=False, precision_for_huge_n=16):
     """primality test. Uses Miller-Rabin for large n
-    
+
     :param n: int number to test
     :param oneisprime: bool True if 1 should be considered prime (it was, a long time ago)
     :param precision_for_huge_n: int number of primes to use in Miller
@@ -673,8 +724,8 @@ def primes_gen(start=2,stop=None):
     if start<=2:
         yield 2
     elif start%2==0:
-        start+=1 
-    
+        start+=1
+
     if stop is None:
         candidates=itertools.count(max(start,3),2)
     elif stop>start:
@@ -684,6 +735,16 @@ def primes_gen(start=2,stop=None):
     for n in candidates:
         if is_prime(n):
             yield n
+            
+def random_prime(bits):
+    """returns a random number of the specified bit length"""
+    import random
+    n = random.getrandbits(bits);
+    if n%2 == 0:
+        n+=1
+    while not is_prime(n):
+        n+=2
+    return n
 
 def euclid_gen():
     """generates Euclid numbers: 1 + product of the first n primes"""
@@ -717,35 +778,9 @@ def factorize(n):
         return [(1,1)]
     return itertools2.compress(prime_factors(n))
 
-    #TODO: check if code below is faster for "small" n
-
-    """
-    def trial_division(n, bound=None):
-        if n == 1: return 1
-        for p in [2, 3, 5]:
-            if n%p == 0: return p
-        if bound == None: bound = n
-        dif = [6, 4, 2, 4, 2, 4, 6, 2]
-        m = 7; i = 1
-        while m <= bound and m*m <= n:
-            if n%m == 0:
-                return m
-            m += dif[i%8]
-            i += 1
-        return n
-
-
-    if n==0: return
-    if n < 0: n = -n
-    if n==1: yield (1,1) #for coherency
-    while n != 1:
-        p = trial_division(n)
-        e = 1
-        n /= p
-        while n%p == 0:
-            e += 1; n /= p
-        yield (p,e)
-    """
+def factors(n):
+    for (p,e) in factorize(n):
+        yield p**e
 
 def number_of_divisors(n):
     #http://mathschallenge.net/index.php?section=faq&ref=number/number_of_divisors
@@ -789,7 +824,7 @@ totient=euler_phi #alias. totient is available in sympy
 def prime_ktuple(constellation):
     """
     generates tuples of primes with specified differences
-    
+
     :param constellation: iterable of int differences betwwen primes to return
     :note: negative int means the difference must NOT be prime
     :see: https://en.wikipedia.org/wiki/Prime_k-tuple
@@ -802,7 +837,7 @@ def prime_ktuple(constellation):
     (0, 6, 12, 18)    sexy prime quadruplets
     (0, 2, 6, 8, 12), (0, 4, 6, 10, 12)    quintuplet primes
     (0, 4, 6, 10, 12, 16)    sextuplet primes
-    
+
     """
     diffs=constellation[1:]
     for p in primes_gen():
@@ -812,28 +847,28 @@ def prime_ktuple(constellation):
                 res=None
                 break
             res.append(p+d)
-            
+
         if res:
             yield tuple(res)
-    
-def twin_primes(): 
+
+def twin_primes():
     return prime_ktuple((0, 2))
 
-def cousin_primes(): 
+def cousin_primes():
     return prime_ktuple((0, 4))
 
-def sexy_primes(): 
+def sexy_primes():
     return prime_ktuple((0, 6))
 
-def sexy_prime_triplets(): 
+def sexy_prime_triplets():
     return prime_ktuple((0, 6, 12, -18)) #exclude quatruplets
 
-def sexy_prime_quadruplets(): 
+def sexy_prime_quadruplets():
     return prime_ktuple((0, 6, 12, 18))
 
 def lucas_lehmer (p):
     """Lucas Lehmer primality test for Mersenne exponent p
-    
+
     :param p: int
     :return: True if 2^p-1 is prime
     """
@@ -848,6 +883,8 @@ def lucas_lehmer (p):
     for i in range(3, p + 1):
         s = (s*s - 2) % m_p
     return s == 0
+
+# digits manipulation
 
 def digits_gen(num, base=10):
     """generates int digits of num in base BACKWARDS"""
@@ -875,7 +912,7 @@ def digsum(num, base=10, f=None):
       * number = elevation to the fth power
       * function(digit) or func(digit,position)
     :return: sum of f(digits) of num
-    
+
     digsum(num) -> sum of digits
     digsum(num,f=2) -> sum of the squares of digits
     digsum(num,f=lambda x:x**x) -> sum of the digits elevaed to their own power
@@ -1025,8 +1062,8 @@ def sum_of_cubes(n):
 
 def bernouilli_gen(init=1):
     """generator of Bernouilli numbers
-    
-    :param init: int -1 or +1. 
+
+    :param init: int -1 or +1.
     * -1 for "first Bernoulli numbers" with B1=-1/2
     * +1 for "second Bernoulli numbers" with B1=+1/2
     https://en.wikipedia.org/wiki/Bernoulli_number
@@ -1039,13 +1076,13 @@ def bernouilli_gen(init=1):
             B[j-1] = j*(B[j-1] - B[j])
         yield init*B[0] if m==1 else B[0]# (which is Bm)
         m += 1
-        
+
 def bernouilli(n,init=1):
     return itertools2.takenth(n,bernouilli_gen(init))
 
 def faulhaber(n,p):
     """ sum of the p-th powers of the first n positive integers
-    
+
     :return: 1^p + 2^p + 3^p + ... + n^p
     :see: https://en.wikipedia.org/wiki/Faulhaber%27s_formula
     """
@@ -1127,7 +1164,7 @@ def is_pentagonal(n):
         return False
     n=1+24*n
     s=isqrt(n)
-    if s*s != n: 
+    if s*s != n:
         return False
     return is_integer((1+s)/6.0)
 
@@ -1158,8 +1195,8 @@ def partition(n):
     """
     The partition function p(n)
     gives the number of partitions of a nonnegative integer n
-    into positive integers. 
-    (There is one partition of zero into positive integers, 
+    into positive integers.
+    (There is one partition of zero into positive integers,
     i.e. the empty partition, since the empty sum is defined as 0.)
     :see: http://oeis.org/wiki/Partition_function
     """
@@ -1335,7 +1372,7 @@ def angle(u,v,unit=True):
     if not unit:
         u=vecunit(u)
         v=vecunit(v)
-    if dot(u,v) >=0:
+    if dot_vv(u,v) >=0:
         return 2.*math.asin(dist(v,u)/2)
     else:
         return math.pi - 2.*math.asin(dist(vecneg(v),u)/2)
@@ -1577,16 +1614,16 @@ def baby_step_giant_step(y, a, n):
         value = pow(a, t*s, n)
         if value in A:
             return (t * s - A.index(value)) % n
-        
+
 # inspired from http://stackoverflow.com/questions/28548457/nth-fibonacci-number-for-n-as-big-as-1019
 
 def mod_matmul(A,B, mod=0):
     if not mod:
-        return dot(A,B)
+        return dot_mm(A,B)
     return [[sum(a*b for a,b in zip(A_row,B_col))%mod for B_col in zip(*B)] for A_row in A]
 
 def mod_matpow(M, power, mod=0):
-    
+
     if power < 0:
         raise NotImplementedError
     result = identity(2)
