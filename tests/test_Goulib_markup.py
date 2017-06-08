@@ -4,8 +4,8 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
+import six
 from Goulib.tests import *
-
 from Goulib.markup import *
 
 class TestCgiprint:
@@ -15,13 +15,14 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        t=tag('tag', u'bétweêñ', class_='class')
-        assert_true(t in (
-            '<tag class="class">b&#233;twe&#234;&#241;</tag>', #Py 3
-            '<tag class="class">b\xc3\xa9twe\xc3\xaa\xc3\xb1</tag>', #Py 2.7
-            #TODO : why is it different ? uniformize ...
-            )
-        )
+        #TODO : why is it different ? uniformize ...
+        if six.PY3:
+            t=tag('tag', u'b&#233;twe&#234;&#241;', class_='class')
+            assert_equal(t,'<tag class="class">b&#233;twe&#234;&#241;</tag>') #Py 3
+            
+        else:
+            t=tag('tag', u'b\xc3\xa9twe\xc3\xaa\xc3\xb1', class_='class')
+            assert_equal(t,'<tag class="class">b\xc3\xa9twe\xc3\xaa\xc3\xb1</tag>') #Py 2.7
         
         t=tag('tag', None, style={'align':'left', 'color':'red'}, single=True)
         assert_true(t in (
