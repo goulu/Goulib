@@ -15,14 +15,11 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        #TODO : why is it different ? uniformize ...
-        if six.PY3:
-            t=tag('tag', u'b&#233;twe&#234;&#241;', class_='class')
-            assert_equal(t,'<tag class="class">b&#233;twe&#234;&#241;</tag>') #Py 3
-            
-        else:
-            t=tag('tag', u'b\xc3\xa9twe\xc3\xaa\xc3\xb1', class_='class')
-            assert_equal(t,'<tag class="class">b\xc3\xa9twe\xc3\xaa\xc3\xb1</tag>') #Py 2.7
+        t=tag('tag', 'between', class_='class')
+        assert_equal(t,'<tag class="class">between</tag>') #Py 3
+          
+        t=tag('tag', u'b\xc3\xa9twe\xc3\xaa\xc3\xb1', class_='class')
+        assert_equal(t,'<tag class="class">b&#195;&#169;twe&#195;&#170;&#195;&#177;</tag>')
         
         t=tag('tag', None, style={'align':'left', 'color':'red'}, single=True)
         assert_true(t in (
