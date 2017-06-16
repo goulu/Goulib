@@ -73,8 +73,9 @@ def lcm(*args):
     return res
 
 def xgcd(a,b):
-    """Extended GCD:
-    Returns (gcd, x, y) where gcd is the greatest common divisor of a and b
+    """Extended GCD
+    
+    :return: (gcd, x, y) where gcd is the greatest common divisor of a and b
     with the sign of b if b is nonzero, and with the sign of a if b is 0.
     The numbers x,y are such that gcd = ax+by."""
     #taken from http://anh.cs.luc.edu/331/code/xgcd.py
@@ -87,10 +88,12 @@ def xgcd(a,b):
     return a, prevx, prevy
 
 def coprime(*args):
+    """:return: True if args are coprime to each other"""
     return gcd(*args)==1
 
 def coprimes_gen(limit):
-    """Fast computation using Farey sequence as a generator
+    """generates coprime pairs
+    using Farey sequence
     """
     # https://www.quora.com/What-are-the-fastest-algorithms-for-generating-coprime-pairs
 
@@ -116,6 +119,7 @@ def coprimes_gen(limit):
 
 def is_primitive_root(x,m,s={}):
     """returns True if x is a primitive root of m
+    
     :param s: set of coprimes to m, if already known
     """
     if not s:
@@ -133,9 +137,11 @@ def primitive_roots(modulo):
     return list(primitive_root_gen(modulo))
 
 def quad(a, b, c, allow_complex=False):
-    """ solves quadratic equations
-        form aX^2+bX+c, inputs a,b,c,
-        works for all roots(real or complex)
+    """ solves quadratic equations aX^2+bX+c=0
+    
+    :param a,b,c: floats
+    :param allow_complex: function returns complex roots if True
+    :return: x1,x2 real or complex solutions
     """
     discriminant = b*b - 4 *a*c
     if allow_complex:
@@ -144,14 +150,14 @@ def quad(a, b, c, allow_complex=False):
         d=math.sqrt(discriminant)
     return (-b + d) / (2*a), (-b - d) / (2*a)
 
-def equal(a,b,epsilon=1e-6):
-    """approximately equal. Use this instead of a==b in floating point ops
-    :return: True if a and b are less than epsilon apart
-    """
-    raise DeprecationWarning('use isclose instead')
-
 def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
-    #https://www.python.org/dev/peps/pep-0485/
+    """approximately equal. Use this instead of a==b in floating point ops
+    
+    implements https://www.python.org/dev/peps/pep-0485/
+    :param a,b: the two values to be tested to relative closeness
+    :param rel_tol: relative tolerance -- it is the amount of error allowed, relative to the larger absolute value of a or b. For example, to set a tolerance of 5%, pass tol=0.05. The default tolerance is 1e-9, which assures that the two values are the same within about 9 decimal digits. rel_tol must be greater than 0.0
+    :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
+    """
     if a==0 or b==0: #reltol probably makes no sense
         abs_tol=max(abs_tol, rel_tol)
     tol=max( rel_tol * max(abs(a), abs(b)), abs_tol )
@@ -166,7 +172,9 @@ def is_integer(x, epsilon=1e-6):
     return isclose(x,round(x),0,epsilon)
 
 def rint(v):
-    """:return: int value nearest to float v"""
+    """
+    :return: int value nearest to float v
+    """
     return int(round(v))
 
 def int_or_float(x, epsilon=1e-6):
@@ -177,7 +185,8 @@ def int_or_float(x, epsilon=1e-6):
     return rint(x) if is_integer(x, epsilon) else x
 
 def format(x, decimals=3):
-    """ formats a number
+    """ formats a float with given number of decimals, but not an int
+    
     :return: string repr of x with decimals if not int
     """
     if is_integer(x):
@@ -189,6 +198,7 @@ def ceildiv(a, b):
 
 def isqrt(n):
     """integer square root
+    
     :return: largest int x for which x * x <= n
     """
     #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
@@ -200,9 +210,8 @@ def isqrt(n):
     return x
 
 def sqrt(n):
-    """improved square root
-
-    :return: int or float
+    """square root
+    :return: float, or int if n is a perfect square
     """
     if type(n) is int:
         s=isqrt(n)
@@ -217,6 +226,7 @@ def is_square(n):
 def multiply(x, y):
     """
     Karatsuba fast multiplication algorithm
+    
     https://en.wikipedia.org/wiki/Karatsuba_algorithm
 
     Copyright (c) 2014 Project Nayuki
@@ -257,6 +267,7 @@ def mul(nums,init=1):
 
 def dot_vv(a,b,default=0):
     """dot product for vectors
+    
     :param a: vector (iterable)
     :param b: vector (iterable)
     :param default: default value of the multiplication operator
@@ -265,6 +276,7 @@ def dot_vv(a,b,default=0):
 
 def dot_mv(a,b,default=0):
     """dot product for vectors
+    
     :param a: matrix (iterable or iterables)
     :param b: vector (iterable)
     :param default: default value of the multiplication operator
@@ -273,6 +285,7 @@ def dot_mv(a,b,default=0):
 
 def dot_mm(a,b,default=0):
     """dot product for matrices
+    
     :param a: matrix (iterable or iterables)
     :param b: matrix (iterable or iterables)
     :param default: default value of the multiplication operator
@@ -281,6 +294,7 @@ def dot_mm(a,b,default=0):
 
 def dot(a,b,default=0):
     """dot product
+    
     general but slow : use dot_vv, dot_mv or dot_mm if you know a and b's dimensions
     """
     if itertools2.ndim(a)==2: # matrix
@@ -294,13 +308,14 @@ def dot(a,b,default=0):
 # some basic matrix ops
 def zeros(shape):
     """
-    https://docs.scipy.org/doc/numpy/reference/generated/numpy.zeros.html
+    :see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.zeros.html
     """
     return ([0]*shape[1])*shape[0]
 
 def diag(v):
     """
     Create a two-dimensional array with the flattened input as a diagonal.
+    
     :param v: If v is a 2-D array, return a copy of its diagonal.
         If v is a 1-D array, return a 2-D array with v on the diagonal
     :see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.diag.html#numpy.diag
@@ -321,27 +336,29 @@ def identity(n):
 eye=identity # alias for now
 
 def transpose(m):
-    """:return: matrix m transposed"""
-    # ensures the result is a list of list
+    """
+    :return: matrix m transposed
+    """
+    # ensures the result is a list of lists
     return list(map(list,list(zip(*m))))
 
 def maximum(m):
     """
     Compare N arrays and returns a new array containing the element-wise maxima
-    http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html
 
     :param m: list of arrays (matrix)
     :return: list of maximal values found in each column of m
+    :see: http://docs.scipy.org/doc/numpy/reference/generated/numpy.maximum.html
     """
     return [max(c) for c in transpose(m)]
 
 def minimum(m):
     """
     Compare N arrays and returns a new array containing the element-wise minima
-    http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html
 
     :param m: list of arrays (matrix)
     :return: list of minimal values found in each column of m
+    :see: http://docs.scipy.org/doc/numpy/reference/generated/numpy.minimum.html
     """
     return [min(c) for c in transpose(m)]
 
@@ -394,26 +411,36 @@ def sat(x,low=0,high=None):
 #norms and distances
 
 def norm_2(v):
-    """:return: "normal" euclidian norm of vector v"""
+    """
+    :return: "normal" euclidian norm of vector v
+    """
     return sqrt(sum(x*x for x in v))
 
 def norm_1(v):
-    """:return: "manhattan" norm of vector v"""
+    """
+    :return: "manhattan" norm of vector v
+    """
     return sum(abs(x) for x in v)
 
 def norm_inf(v):
-    """:return: infinite norm of vector v"""
+    """
+    :return: infinite norm of vector v
+    """
     return max(abs(x) for x in v)
 
 def norm(v,order=2):
-    """http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html"""
+    """
+    :see: http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html
+    """
     return sum(abs(x)**order for x in v)**(1./order)
 
 def dist(a,b,norm=norm_2):
     return norm(vecsub(a,b))
 
 def vecunit(v,norm=norm_2):
-    """:return: vector normalized"""
+    """
+    :return: vector normalized
+    """
     return vecdiv(v,norm(v))
 
 def hamming(s1, s2):
@@ -421,7 +448,9 @@ def hamming(s1, s2):
     return sum(c1 != c2 for c1, c2 in zip(s1, s2))
 
 def sets_dist(a,b):
-    """http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets"""
+    """
+    :see: http://stackoverflow.com/questions/11316539/calculating-the-distance-between-two-unordered-sets
+    """
     c = a.intersection(b)
     return sqrt(len(a-c)*2 + len(b-c)*2)
 
@@ -434,7 +463,9 @@ def sets_levenshtein(a,b):
     return len(a-c)+len(b-c)
 
 def levenshtein(seq1, seq2):
-    """:return: distance between 2 iterables
+    """levenshtein distance
+    
+    :return: distance between 2 iterables
     :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
     # http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
@@ -519,6 +550,7 @@ def pisano_period(mod):
 
 def pascal_gen():
     """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
+    
     https://oeis.org/A007318
     """
     __author__ = 'Nick Hobson <nickh@qbyte.org>'
@@ -553,6 +585,7 @@ from Goulib.container import SortedCollection
 
 def primitive_triples():
     """ generates primitive Pythagorean triplets x<y<z
+    
     sorted by hypotenuse z, then longest side y
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
@@ -610,7 +643,8 @@ def triples():
         prim.append([pt,2]) #add primitive to the list
 
 def divisors(n):
-    """:return: all divisors of n: divisors(12) -> 1,2,3,6,12
+    """
+    :return: all divisors of n: divisors(12) -> 1,2,3,6,12
     including 1 and n,
     except for 1 which returns a single 1 to avoid messing with sum of divisors...
     """
@@ -628,8 +662,7 @@ def proper_divisors(n):
 _sieve=list() # array of bool indicating primality
 
 def sieve(n, oneisprime=False):
-    """
-    Return a list of prime numbers from 2 to a prime < n.
+    """prime numbers from 2 to a prime < n
     Very fast (n<10,000,000) in 0.4 sec.
 
     Example:
@@ -822,7 +855,8 @@ def moebius(n):
 
 def euler_phi(n):
     """Euler totient function
-    http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
+    
+    :see: http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
     if n<=1:
         return n
@@ -914,15 +948,15 @@ def digits(num, base=10, rev=False):
     return res
 
 def digsum(num, base=10, f=None):
-    """
-    :return: sum of digits of num
-    :param f: optional function to apply to the terms:
-      * None = identity
-      * number = elevation to the fth power
-      * function(digit) or func(digit,position)
+    """sum of digits
+    
+    :param num: number
+    :param base: optional base
+    :param f: int power or function applied to each digit
     :return: sum of f(digits) of num
 
     digsum(num) -> sum of digits
+    digsum(num,base=2) -> number of 1 bits in binary represenation of num
     digsum(num,f=2) -> sum of the squares of digits
     digsum(num,f=lambda x:x**x) -> sum of the digits elevaed to their own power
     """
@@ -1054,7 +1088,9 @@ def repunit_gen(digit=1):
         n=n*10+digit
         
 def repunit(n,digit=1):
-    """:return: nth repunit"""
+    """
+    :return: nth repunit
+    """
     if n==0: return 0
     return int(str(digit)*n)
 
@@ -1066,6 +1102,7 @@ def rational_form(numerator, denominator):
     """information about the decimal representation of a rational number.
     
     :return: 5 integer : integer, decimal, shift, repeat, cycle
+    
     * shift is the len of decimal with leading zeroes if any
     * cycle is the len of repeat with leading zeroes if any
     """
@@ -1184,6 +1221,7 @@ def lychrel_seq(n):
 
 def lychrel_count(n, limit=96):
     """number of lychrel iterations before n becomes palindromic
+    
     :param n: int number to test
     :param limit: int max number of loops.
         default 96 corresponds to the known most retarded non lychrel number
@@ -1220,7 +1258,9 @@ def triangle(n):
 triangular=triangle
 
 def is_triangle(x):
-    """:return: True if x is a triangle number"""
+    """
+    :return: True if x is a triangle number
+    """
     return is_square(1 + 8*x)
 
 is_triangular=is_triangle
@@ -1236,7 +1276,9 @@ def pentagonal(n):
     return polygonal(5,n) # n*(3*n - 1)/2
 
 def is_pentagonal(n):
-    """:return: True if x is a pentagonal number"""
+    """
+    :return: True if x is a pentagonal number
+    """
     if n<1:
         return False
     n=1+24*n
@@ -1269,12 +1311,13 @@ def is_octagonal(n):
 
 #@memoize
 def partition(n):
-    """
-    The partition function p(n)
+    """The partition function p(n)
+    
     gives the number of partitions of a nonnegative integer n
     into positive integers.
     (There is one partition of zero into positive integers,
     i.e. the empty partition, since the empty sum is defined as 0.)
+    
     :see: http://oeis.org/wiki/Partition_function
     """
     def non_zero_integers(n):
@@ -1354,9 +1397,8 @@ def number_of_digits(num, base=10):
         num=num//base
 
 def chakravala(n):
-    """
-    solves x^2 - n*y^2 = 1
-    for x,y integers
+    """solves x^2 - n*y^2 = 1 for x,y integers
+    
     https://en.wikipedia.org/wiki/Pell%27s_equation
     https://en.wikipedia.org/wiki/Chakravala_method
     """
@@ -1412,22 +1454,29 @@ def binomial(n,k):
 ncombinations=binomial #alias
 
 def binomial_exponent(n,k,p):
-    """:return: int largest power of p that divides binomial(n,k)"""
+    """
+    :return: int largest power of p that divides binomial(n,k)
+    """
     if is_prime(p):
         return carries(k,n-k,p) # https://en.wikipedia.org/wiki/Kummer%27s_theorem
 
     return min(binomial_exponent(n,k,a)//b for a,b in factorize(p))
 
 def log_factorial(n):
-    """:return: float approximation of ln(n!) by Ramanujan formula"""
+    """
+    :return: float approximation of ln(n!) by Ramanujan formula
+    """
     return n*math.log(n) - n + (math.log(n*(1+4*n*(1+2*n))))/6 + math.log(math.pi)/2
 
 def log_binomial(n,k):
-    """:return: float approximation of ln(binomial(n,k))"""
+    """
+    :return: float approximation of ln(binomial(n,k))
+    """
     return log_factorial(n) - log_factorial(k) - log_factorial(n - k)
 
 def ilog(a,b,upper_bound=False):
     """discrete logarithm x such that b^x=a
+    
     :parameter a,b: integer
     :parameter upper_bound: bool. if True, returns smallest x such that b^x>=a
     :return: x integer such that b^x=a, or upper_bound, or None
@@ -1466,6 +1515,7 @@ def sin_over_x(x):
 
 def slerp(u,v,t):
     """spherical linear interpolation
+    
     :param u,v: 3D unit vectors
     :param t: float in [0,1] interval
     :return: vector interpolated between u and v
@@ -1479,6 +1529,7 @@ def slerp(u,v,t):
 #interpolations
 def proportional(nseats,votes):
     """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
+    
     :param nseats: int number of seats to assign
     :param votes: iterable of int or float weighting each party
     :result: list of ints seats allocated to each party
@@ -1500,6 +1551,7 @@ def proportional(nseats,votes):
 
 def triangular_repartition(x,n):
     """ divide 1 into n fractions such that:
+    
     - their sum is 1
     - they follow a triangular linear repartition (sorry, no better name for now) where x/1 is the maximum
     """
@@ -1518,6 +1570,7 @@ def triangular_repartition(x,n):
 
 def rectangular_repartition(x,n,h):
     """ divide 1 into n fractions such that:
+    
     - their sum is 1
     - they follow a repartition along a pulse of height h<1
     """
@@ -1541,6 +1594,7 @@ def rectangular_repartition(x,n,h):
 def de_bruijn(k, n):
     """
     De Bruijn sequence for alphabet k and subsequences of length n.
+    
     https://en.wikipedia.org/wiki/De_Bruijn_sequence
     """
     try:
@@ -1580,7 +1634,9 @@ mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoeff
 #see http://anh.cs.luc.edu/331/code/mod.py for a MOD class
 
 def mod_pow(a,b,m):
-    """:return: (a^b) mod m"""
+    """
+    :return: (a^b) mod m
+    """
     # return pow(a,b,m) #switches to floats in Py3...
     x,y=1,a
     while b>0:
@@ -1605,11 +1661,15 @@ def mod_inv(a,b):
     return x1
 
 def mod_div(a,b,m):
-    """:return: x such that (b*x) mod m = a mod m """
+    """
+    :return: x such that (b*x) mod m = a mod m
+    """
     return a*mod_inv(b,m)
 
 def mod_fact(n,m):
-    """:return: n! mod m"""
+    """
+    :return: n! mod m
+    """
     res = 1
     while n > 0:
         for i in range(2,n%m+1):
@@ -1620,8 +1680,8 @@ def mod_fact(n,m):
     return res%m
 
 def chinese_remainder(m, a):
-    """
-    http://en.wikipedia.org/wiki/Chinese_remainder_theorem
+    """http://en.wikipedia.org/wiki/Chinese_remainder_theorem
+    
     :param m: list of int moduli
     :param a: list of int remainders
     :return: smallest int x such that x mod ni=ai
@@ -1635,7 +1695,9 @@ def chinese_remainder(m, a):
     return res % prod
 
 def _count(n, p):
-    """:return: power of p in n"""
+    """
+    :return: power of p in n
+    """
     k=0;
     while n>=p:
         k+=n//p
@@ -1643,8 +1705,8 @@ def _count(n, p):
     return k;
 
 def mod_binomial(n,k,m,q=None):
-    """
-    calculates C(n,k) mod m for large n,k,m
+    """calculates C(n,k) mod m for large n,k,m
+    
     :param n: int total number of elements
     :param k: int number of elements to pick
     :param m: int modulo (or iterable of (m,p) tuples used internally)
