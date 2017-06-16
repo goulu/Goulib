@@ -49,8 +49,12 @@ def data(s):
         pass
 
     from six.moves.urllib.request import urlopen
-    file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
-    logging.info('downloading b%s.txt'%s2)
+    try: # is there a local, patched file ?
+        file = open('b%s.txt'%s2,'rb')
+        logging.warning('reading b%s.txt'%s2)
+    except FileNotFoundError: # if not, download the B-file from OEIS
+        file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
+        logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
         m=re.search(b'(\d+)\s+(-?\d+)',line)
