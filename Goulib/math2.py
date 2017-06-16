@@ -128,7 +128,7 @@ def primitive_root_gen(m):
     for n in range(1, m):
         if is_primitive_root(n,m,required_set):
             yield n
-            
+
 def primitive_roots(modulo):
     return list(primitive_root_gen(modulo))
 
@@ -481,6 +481,7 @@ def fibonacci_gen(max=None,mod=0):
 
 def fibonacci(n,mod=0):
     """ fibonacci series n-th element
+
     :param n: int can be extremely high, like 1e19 !
     :param mod: int optional modulo
     """
@@ -494,7 +495,7 @@ def is_fibonacci(n):
     """returns True if n is in Fibonacci series"""
     # http://www.geeksforgeeks.org/check-number-fibonacci-number/
     return is_square(5*n*n + 4) or is_square(5*n*n - 4)
-    
+
 def pisano_cycle(mod):
     if mod<2: return [0]
     seq=[0,1]
@@ -735,7 +736,7 @@ def primes_gen(start=2,stop=None):
     for n in candidates:
         if is_prime(n):
             yield n
-            
+
 def random_prime(bits):
     """returns a random number of the specified bit length"""
     import random
@@ -766,6 +767,14 @@ def prime_factors(num, start=2):
         while num % p==0:
             yield p
             num=num//p
+
+def prime_divisors(num, start=2):
+    """generates unique prime divisors (ordered) of num"""
+    return itertools2.unique(prime_factors(num,start))
+
+def is_multiple(n,factors) :
+    """return True if n has ONLY factors as prime factors"""
+    return not set(prime_divisors(n))-set(factors)
 
 def factorize(n):
     """find the prime factors of n along with their frequencies. Example:
@@ -1036,6 +1045,74 @@ def bouncy(n):
     s1=''.join(sorted(s))
     return s==s1,s==s1[::-1] #increasing,decreasing
 
+def repunit_gen(digit=1):
+    """generate repunits"""
+    n=digit
+    yield 0 # to be coherent with definition
+    while True:
+        yield n
+        n=n*10+digit
+        
+def repunit(n,digit=1):
+    """:return: nth repunit"""
+    if n==0: return 0
+    return int(str(digit)*n)
+
+# repeating decimals https://en.wikipedia.org/wiki/Repeating_decimal
+# https://stackoverflow.com/a/36531120/1395973
+
+
+def rational_form(numerator, denominator):    
+    """information about the decimal representation of a rational number.
+    
+    :return: 5 integer : integer, decimal, shift, repeat, cycle
+    * shift is the len of decimal with leading zeroes if any
+    * cycle is the len of repeat with leading zeroes if any
+    """
+    
+    def first_divisible_repunit(x):
+        #finds the first number in the sequence (9, 99, 999, 9999, ...) that is divisible by x.
+        assert x%2 != 0 and x%5 != 0
+        for r in itertools2.drop(1,repunit_gen(9)):
+            if r % x == 0:
+                return r
+    shift,pow = 0,1
+    for x in (10,2,5):
+        while denominator % x == 0:
+            denominator //= x
+            numerator = 10*numerator//x
+            shift += 1
+            pow *= 10
+    base,numerator = divmod(numerator,denominator)
+    integer,decimal = divmod(base,pow)
+    repunit = first_divisible_repunit(denominator)
+    repeat = numerator * (repunit // denominator)
+    cycle = number_of_digits(repunit) if repeat else 0
+    return integer, decimal, shift, repeat, cycle
+
+def rational_str(n,d):
+    integer, decimal, shift, repeat, cycle = rational_form(n,d)
+    s = str(integer)
+    if not (decimal or repeat):
+        return s
+    s = s + "."
+    if decimal or shift:
+        s = s + "{:0{}}".format(decimal, shift)
+    if repeat:
+        s = s + "({:0{}})".format(repeat, cycle)
+    return s
+
+def rational_cycle(num,den):
+    """periodic part of the decimal expansion of num/den. Any initial 0's are placed at end of cycle.
+    
+    :see: https://oeis.org/A036275
+    """
+    _, _, _, digits, cycle = rational_form(num,den)
+    lz=cycle-number_of_digits(digits)
+    return digits*rint(pow(10,lz))
+
+# polygonal numbers
+
 def tetrahedral(n):
     """
     :return: int n-th tetrahedral number
@@ -1270,8 +1347,11 @@ def is_perfect(n):
 
 def number_of_digits(num, base=10):
     """Return number of digits of num (expressed in base 'base')"""
-    if num==0: return 1
-    return int(math.log(abs(num),base)) + 1
+    # math.log(num,base) is imprecise, and len(str(num,base)) is slow and ugly
+    num=abs(num)
+    for i in itertools.count():
+        if num<base: return i+1
+        num=num//base
 
 def chakravala(n):
     """

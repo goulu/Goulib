@@ -322,7 +322,10 @@ class TestNumberOfDigits:
     def test_number_of_digits(self):
         assert_equal(number_of_digits(0),1)
         assert_equal(number_of_digits(-1),1)
+        assert_equal(number_of_digits(999),3)
+        assert_equal(number_of_digits(1000),4)
         assert_equal(number_of_digits(1234),4)
+        assert_equal(number_of_digits(9999),4)
         assert_equal(number_of_digits(2014,2),11)
         assert_equal(number_of_digits(65535,16),4)
 
@@ -1016,6 +1019,57 @@ class TestRandomPrime:
     def test_random_prime(self):
         for b in range(8,128,8):
             assert_true(is_prime(random_prime(b)))
+
+class TestPrimeDivisors:
+    def test_prime_divisors(self):
+        # assert_equal(expected, prime_divisors(num, start))
+        raise SkipTest # TODO: implement your test here
+
+class TestIsMultiple:
+    def test_is_multiple(self):
+        # assert_equal(expected, is_multiple(n, factors))
+        raise SkipTest # TODO: implement your test here
+
+class TestRepunitGen:
+    def test_repunit_gen(self):
+        assert_equal(take(5,repunit_gen(1)),[0,1,11,111,1111])
+        assert_equal(take(5,repunit_gen(9)),[0,9,99,999,9999])
+
+class TestRepunit:
+    def test_repunit(self):
+        assert_equal(repunit(0),0)
+        assert_equal(repunit(1),1)
+        assert_equal(repunit(2),11)
+        assert_equal(repunit(12),111111111111)
+        assert_equal(repunit(12,2),222222222222)
+
+class TestRationalForm:
+    def test_rational_form(self):
+        pass # tested below
+
+class TestRationalStr:
+    def test_rational_str(self):
+        assert_equal(rational_str(1,4),'0.25')
+        assert_equal(rational_str(1,3),'0.(3)')
+        assert_equal(rational_str(2,3),'0.(6)')
+        assert_equal(rational_str(1,6),'0.1(6)')
+        assert_equal(rational_str(1,9),'0.(1)')
+        assert_equal(rational_str(7,11),'0.(63)')
+        assert_equal(rational_str(29,12),'2.41(6)')
+        assert_equal(rational_str(9,11),'0.(81)')
+        assert_equal(rational_str(7,12),'0.58(3)')
+        assert_equal(rational_str(1,81),'0.(012345679)')
+        assert_equal(rational_str(22,7),'3.(142857)')
+        assert_equal(rational_str(11,23),'0.(4782608695652173913043)')
+        assert_equal(rational_str(1,97),'0.(010309278350515463917525773195876288659793814432989690721649484536082474226804123711340206185567)')
+
+class TestRationalCycle:
+    def test_rational_cycle(self):
+        assert_equal(rational_cycle(1,4),0)
+        assert_equal(rational_cycle(1,3),3)
+        assert_equal(rational_cycle(1,7),142857)
+        assert_equal(rational_cycle(1,81),123456790)
+        assert_equal(rational_cycle(1,92),8695652173913043478260)
 
 if __name__ == "__main__":
     runmodule()
