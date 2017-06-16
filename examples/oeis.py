@@ -2,6 +2,7 @@
 # coding: utf8
 
 from __future__ import division #"true division" everywhere
+from Goulib.itertools2 import take
 
 """
 OEIS sequences
@@ -54,6 +55,8 @@ A000244=Sequence(None,lambda n:3**n, desc='Powers of 3: a(n) = 3^n.')
 A067500=A000244.filter(lambda n:math2.digsum(n) in A000244,"Powers of 3 with digit sum also a power of 3.")
 
 A006521=Sequence(1,None,lambda n: (2**n + 1)%n==0,"Numbers n such that n divides 2^n + 1. ")
+
+A002275=Sequence(math2.repunit_gen(1),lambda n:math2.repunit(n,1),desc="Repunits: (10^n - 1)/9. Often denoted by R_n.")
 
 #polygonal numbers
 
@@ -160,6 +163,12 @@ A005101=Sequence(1,None,lambda x:math2.abundance(x)>0,
 A002093=Sequence(record(A000203,count(1)),
     desc='Highly abundant numbers: numbers n such that sigma(n) > sigma(m) for all m < n.'
 )
+
+# decimal expansion of 1/n
+
+A003592=Sequence(1,None,lambda n : math2.is_multiple(n,{2,5}),desc="Numbers of the form 2^i*5^j with i, j >= 0.")
+A051626=Sequence(1,lambda n:math2.rational_form(1,n)[-1],desc="Length of the period of decimal representation of 1/n, or 0 if 1/n terminates.")
+A036275=Sequence(1,lambda n:math2.rational_cycle(1,n),desc="The periodic part of the decimal expansion of 1/n. Any initial 0's are to be placed at end of cycle.")
 
 A008683=Sequence(1,math2.moebius)
 
@@ -552,9 +561,9 @@ A033665=Sequence(None,a033665)
 
 A050278=Sequence(1023456789,None,math2.is_pandigital)
 
-A009994=Sequence(None,None,lambda x:math2.bouncy(x)[0])
-A009996=Sequence(None,None,lambda x:math2.bouncy(x)[1])
-A152054=Sequence(None,None,lambda x:math2.bouncy(x)==(False,False))
+A009994=Sequence(None,None,lambda x:math2.bouncy(x)[0], desc="Numbers with digits in nondecreasing order.")
+A009996=Sequence(None,None,lambda x:math2.bouncy(x)[1], desc="Numbers with digits in nonincreasing order.")
+A152054=Sequence(None,None,lambda x:math2.bouncy(x)==(False,False), desc="Bouncy numbers (numbers whose digits form a strictly non-monotonic sequence).")
 
 #pi
 def pi_generate():
@@ -619,7 +628,6 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
-    print(A003147)
     pass
 
 
