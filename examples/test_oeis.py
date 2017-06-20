@@ -57,6 +57,9 @@ def data(s):
         logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
+        c=six.unichr(line[0])
+        if c=='#' :
+            continue # skip comment
         m=re.search(b'(\d+)\s+(-?\d+)',line)
         if m:
             m=m.groups()
@@ -68,7 +71,8 @@ def data(s):
     pickle.dump(tuple((s,res)), open(cachef,"ab"), protocol=2) #append to pickle file
 
     return res
-# data('A000001') #to force creating the file
+
+data('A004042') #to force creating the database from scratch
 with open(cachef, "rb") as f:
     while True:
         try:
@@ -88,36 +92,7 @@ class TestOEIS:
 
     @classmethod
     def setup_class(self):
-        # A009994 results has a stupid '2014' date at the beginning
-        # remove it until we find a way to avoid reading it...
-        d=data('A009994')
-        if d[0]==2014:
-            d.pop(0)
-            database['A009994']=d
-
-    def test_repeat(self):
-        #check that we can iterate twice in the same Sequence
-        l1=list(itertools2.take(20,A000040))
-        l2=list(itertools2.take(20,A000040))
-        assert_equal(l1,l2)
-
-    def test_A000040(self):
-        assert_equal(A000040[0],2)
-        assert_equal(A000040[10],31)
-        assert_false(32 in A000040)
-        assert_true(4547337172376300111955330758342147474062293202868155909489 in A000040)
-
-    def test_A000129(self):
-        assert_equal(A000129[43],10181446324101389)
-
-    def test_A000396(self):
-        assert_equal(math2.is_perfect(A000396[8]),0)
-        a=2658455991569831744654692615953842176
-        assert_equal(math2.is_perfect(a),0)
-        assert_equal(A000396[8],a)
-
-    def A057588(self):
-        assert_equal(A057588,database['A057588'])
+        pass
 
     def test_A019434(self):
         res=data('A019434')
