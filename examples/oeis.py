@@ -164,21 +164,6 @@ A002093=Sequence(record(A000203,count(1)),
     desc='Highly abundant numbers: numbers n such that sigma(n) > sigma(m) for all m < n.'
 )
 
-# decimal expansion of 1/n
-
-A003592=Sequence(1,None,lambda n : math2.is_multiple(n,{2,5}),desc="Numbers of the form 2^i*5^j with i, j >= 0.")
-A051626=Sequence(1,lambda n:math2.rational_form(1,n)[-1],desc="Length of the period of decimal representation of 1/n, or 0 if 1/n terminates.")
-A036275=Sequence(1,lambda n:math2.rational_cycle(1,n),desc="The periodic part of the decimal expansion of 1/n. Any initial 0's are to be placed at end of cycle.")
-
-A008683=Sequence(1,math2.moebius)
-
-A000010=Sequence(1,math2.euler_phi)
-
-A002088=Sequence(0,math2.euler_phi).accumulate() #strangely this one has a leading 0...
-
-A005728=A002088+1
-A005728.desc='Number of fractions in Farey series of order n.'
-
 # primes & co
 
 A000040=Sequence(math2.primes_gen,None,math2.is_prime,'The prime numbers')
@@ -235,6 +220,27 @@ A056725=exp_sequences(9,10,-1)[2]
 A046867=exp_sequences(10,11,-1)[2]
 A079907=exp_sequences(11,12,-1)[2]
 
+# decimal expansions
+
+A003592=Sequence(1,None,lambda n : math2.is_multiple(n,{2,5}),desc="Numbers of the form 2^i*5^j with i, j >= 0.")
+A051626=Sequence(1,lambda n:math2.rational_form(1,n)[-1],desc="Length of the period of decimal representation of 1/n, or 0 if 1/n terminates.")
+A036275=Sequence(1,lambda n:math2.rational_cycle(1,n),desc="The periodic part of the decimal expansion of 1/n. Any initial 0's are to be placed at end of cycle.")
+
+A006883=A000040.filter(
+    lambda n:n==2 or math2.rational_form(1,n)[-1]==n-1,
+    desc='Long period primes: the decimal expansion of 1/p has period p-1.')
+A004042=A006883.apply(
+    lambda n:math2.rational_cycle(1,n),
+    desc='Periods of reciprocals of A006883, starting with first nonzero digit.')
+
+A008683=Sequence(1,math2.moebius)
+
+A000010=Sequence(1,math2.euler_phi)
+
+A002088=Sequence(0,math2.euler_phi).accumulate() #strangely this one has a leading 0...
+
+A005728=A002088+1
+A005728.desc='Number of fractions in Farey series of order n.'
 
 #TODO: became too slow. find why
 #A019434=A000215.filter(math2.is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
