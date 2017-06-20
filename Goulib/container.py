@@ -4,7 +4,7 @@
 advanced containers : Record (struct), SortedCollection, and INFINITE Sequence
 """
 
-from __future__ import division #"true division" everywhere
+from __future__ import division, print_function
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
@@ -275,9 +275,19 @@ class Sequence(object):
     def __repr__(self):     
         s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
         return '%s (%s ...)'%(self.name,s)
+    
+    def save(self, filename, comment=None, n=1000, maxtime=10):
+        with open(filename,'wt') as f:
+            from datetime import date
+            comment = comment or "%s %s"%(self.desc,date.today())
+            print('#'+comment, file=f)
+            for i,v in enumerate(self):
+                if i>n : break
+                print(i+self.offset,v,file=f)
 
     def __iter__(self):
         """reset the generator
+        
         :return: a tee-ed copy of iterf
         """
         if self.iterf:
