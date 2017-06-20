@@ -420,13 +420,12 @@ class TestGetCardinalName:
 
 class TestIsPerfect:
     def test_is_perfect(self):
-        d=list(factorize(496))
-        d=list(divisors(496))
         assert_equal(is_perfect(496),0) #perfect
         assert_equal(is_perfect(54),1) #abundant
         assert_equal(is_perfect(2),-1) #deficient
 
         assert_equal(is_perfect(2305843008139952128),0) #Millenium 4, page 326
+        assert_equal(is_perfect(2658455991569831744654692615953842176),0)
 
 class TestIsPandigital:
     def test_is_pandigital(self):
