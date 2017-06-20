@@ -52,7 +52,7 @@ def data(s):
     try: # is there a local, patched file ?
         file = open('b%s.txt'%s2,'rb')
         logging.warning('reading b%s.txt'%s2)
-    except FileNotFoundError: # if not, download the B-file from OEIS
+    except OSError: # FileNotFoundError (not defined in Py2.7) download the B-file from OEIS
         file = urlopen('http://oeis.org/A%s/b%s.txt'%(s2,s2))
         logging.info('downloading b%s.txt'%s2)
     res=[]
@@ -72,7 +72,7 @@ def data(s):
 
     return res
 
-data('A004042') #to force creating the database from scratch
+#data('A004042') #to force creating the database from scratch
 with open(cachef, "rb") as f:
     while True:
         try:
