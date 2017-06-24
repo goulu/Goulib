@@ -189,6 +189,15 @@ def compress(iterable):
             count=1
     if count:
         yield prev,count
+        
+def recurrence(f,x):
+    while True:
+        yield x
+        x=f(x)
+        
+def swap(iterable):
+    for x in iterable:
+        yield reversed(list(x))
 
 def tee(iterable, n=2, copy=None):
     """tee or copy depending on type and goal
