@@ -702,6 +702,7 @@ class SortingError(Exception):
 
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
+    
     :yields: items of iterable
     :raise: SortingError if not
     """
@@ -717,6 +718,7 @@ def ensure_sorted(iterable,key=None):
 
 def sorted_iterable(iterable, key=None, buffer=100):
     """sorts an "almost sorted" (infinite) iterable
+    
     :param iterable: iterable
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
@@ -796,6 +798,7 @@ def first_match(iter1,iter2,limit=None):
 
 def floyd(iterable,limit=1e6):
     """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
+    
     :see: https://en.wikipedia.org/wiki/Cycle_detection
     :param iterable: iterable
     :param limit: int limit to prevent infinite loop. no limit if None
