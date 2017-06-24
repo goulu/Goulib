@@ -522,6 +522,45 @@ A005188=Sequence(1,None,lambda x:x==math2.digsum(x,f=len(str(x))))
 A005188.desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
 n-digit numbers equal to sum of n-th powers of their digits'
 
+def look_and_say(x):
+    from Goulib.itertools2 import compress, flatten,swap
+    from Goulib.math2 import digits,num_from_digits
+    return num_from_digits(flatten(swap(compress(digits(x)))))
+
+
+A001155=Sequence(itertools2.recurrence(look_and_say,0),
+    desc="Describe the previous term! (method A - initial term is 0)."
+)
+
+A005150=Sequence(itertools2.recurrence(look_and_say,1),
+    desc="Look and Say sequence: describe the previous term! (method A - initial term is 1)."
+)
+
+A006751=Sequence(itertools2.recurrence(look_and_say,2),
+    desc="Describe the previous term! (method A - initial term is 2). "
+)
+
+A006715=Sequence(itertools2.recurrence(look_and_say,3),
+    desc="Describe the previous term! (method A - initial term is 3). "
+)
+
+A010861=Sequence(itertools2.recurrence(look_and_say,22),lambda x:22,lambda x:x==22,
+    desc="Describe the previous term! (method A - initial term is 22) "
+)
+
+A045918=Sequence(0,lambda n:look_and_say(n),
+    desc='Describe n. Also called the "Say What You See" or "Look and Say" sequence LS(n).'
+)
+
+def summarize(x):
+    from Goulib.itertools2 import compress, flatten,swap
+    from Goulib.math2 import digits,num_from_digits
+    return num_from_digits(flatten(swap(compress(sorted(digits(x)))))
+)
+                           
+A005151=Sequence(itertools2.recurrence(summarize,1),
+    desc="Summarize the previous term! (in increasing order). "
+)
 # Reverse and Add
 # https://oeis.org/wiki/Index_to_OEIS:_Section_Res#RAA
 
@@ -634,6 +673,6 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
-    pass
+    A036275.save('b036275.txt','A036275 periodic part of the decimal expansion of 1/n for n=1..1000. Ph. Guglielmetti 2017.06.20')
 
 
