@@ -65,7 +65,7 @@ functions=math.__dict__ #allowed functions
 def eval(node,ctx={}):
     """safe eval of ast node : only functions and operators listed above can be used
     
-    :param node: ast.AST to evalaluate
+    :param node: ast.AST to evaluate
     :param ctx: dict of varname : value to substitute in node
     :return: number or expression string
     """
@@ -177,6 +177,10 @@ class Expr(plot.Plot):
         kwargs['self']=self #allows to call methods such as in Stats
         try:
             e=eval(self.body,kwargs)
+        except ZeroDivisionError:
+            return None
+        except OverflowError:
+            return None
         except TypeError as error: # some params remain symbolic
             return self
         if math2.is_number(e):
@@ -291,6 +295,10 @@ class Expr(plot.Plot):
 
     def __truediv__(self,right):
         return self.apply(ast.Div(),right)
+    
+    def __pow__(self,right):
+        return self.apply(ast.Pow(),right)
+
 
     __div__=__truediv__
 
@@ -352,20 +360,34 @@ class TextVisitor(ast.NodeVisitor):
             return r'%s%s' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
 
     def _Bin(self, left,op,right):
-        # commute x*2 as 2*X for clarity
-        if isinstance(op, ast.Mult):
-            if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
-                return self._Bin(right,op,left)
-
+        
+        # commute x*3 in 3*x
+        if isinstance(op, ast.Mult) and \
+            isinstance(right, ast.Num) and \
+            not isinstance(left, ast.Num): 
+            return self._Bin(right,op,left)
+        
         l,r = self.visit(left),self.visit(right)
-
         #handle precedence (parenthesis) if needed
-        if self.prec(op) > self.prec(left):
-            l = '(%s)' % l
-        if self.prec(op) > self.prec(right):
-            r = '(%s)' % r
+            
+        if isinstance(op, ast.Sub):
+            if self.prec(op) >= self.prec(left):
+                l = '(%s)' % l
+            if self.prec(op) >= self.prec(right):
+                r = '(%s)' % r
+        else:
+            if self.prec(op) > self.prec(left):
+                l = '(%s)' % l
+            if self.prec(op) > self.prec(right):
+                r = '(%s)' % r
+            
+            
+        symbol=operators[type(op)][self.dialect]
 
-        return l+operators[type(op)][self.dialect]+r
+        # check if we should have a '*' nevertheless
+        if not symbol and isinstance(op, ast.Mult) and l[-1].isdigit() and r[0].isdigit():
+            symbol='*'
+        return l+symbol+r
 
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
@@ -379,9 +401,9 @@ class TextVisitor(ast.NodeVisitor):
 
     def generic_visit(self, n):
         try:
-            l=map(self.visit, n)
+            l=list(map(self.visit, n))
             return ''.join(l)
-        except:
+        except TypeError:
             pass
 
         if isinstance(n, ast.AST):

@@ -55,6 +55,8 @@ class TestExpr:
         assert_equal(str(e),'2y')
 
     def test___str__(self):
+        assert_equal(str(Expr('3*5')),'3*5')
+        
         assert_equal(str(self.f),'3x+2')   
         assert_equal(str(self.f1),'1')     
         assert_equal(str(self.fx),'x')    
