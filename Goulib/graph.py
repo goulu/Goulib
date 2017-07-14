@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt # after import .plot
 try:
     import numpy, scipy.spatial
     SCIPY=True
-except Exception:
+except ImportError:
     logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
@@ -43,7 +43,7 @@ is provided
 try:
     from rtree import index # http://toblerity.org/rtree/
     RTREE=True
-except Exception: #fallback, especially because I couldn't manage to install rtree on travis-ci
+except ImportError: #fallback, especially because I couldn't manage to install rtree on travis-ci
     RTREE=False
 
 if not RTREE:
