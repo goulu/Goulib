@@ -1780,3 +1780,20 @@ def mod_matpow(M, power, mod=0):
 # so our function here above is better :-)
 
 matrix_power=mod_matpow
+
+def pi_digits_gen():
+    """ generates pi digits as a sequence of INTEGERS !
+    using Jeremy Gibbons spigot generator
+    
+    :see :http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/spigot.pdf
+    """
+    # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
+    q, r, t, j = 1, 180, 60, 2
+    while True:
+        u, y = 3*(3*j+1)*(3*j+2), (q*(27*j-12)+5*r)//(5*t)
+        yield y
+        q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
+    
+    
+
+

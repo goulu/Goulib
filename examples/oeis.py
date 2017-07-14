@@ -23,7 +23,7 @@ from six.moves import map, reduce, filter, zip, zip_longest
 
 from itertools import count, repeat
 
-from Goulib import math2, itertools2, decorators
+from Goulib import math2, itertools2, decorators, tests
 
 from Goulib.container import Sequence
 
@@ -611,22 +611,8 @@ A009996=Sequence(None,None,lambda x:math2.bouncy(x)[1], desc="Numbers with digit
 A152054=Sequence(None,None,lambda x:math2.bouncy(x)==(False,False), desc="Bouncy numbers (numbers whose digits form a strictly non-monotonic sequence).")
 
 #pi
-def pi_generate():
-    """
-    generator to approximate pi
-    returns a single digit of pi each time iterated
-    from https://www.daniweb.com/software-development/python/code/249177/pi-generator-update
-    https://pythonadventures.wordpress.com/2012/04/13/digits-of-pi-part-2/
-    """
-    q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
-    while True:
-        if 4 * q + r - t < m * t:
-            yield int(m)
-            q, r, t, k, m, x = (10*q, 10*(r-m*t), t, k, (10*(3*q+r))//t - 10*m, x)
-        else:
-            q, r, t, k, m, x = (q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2)
 
-A000796=Sequence(pi_generate) #Decimal expansion of Pi (or, digits of Pi).
+A000796=Sequence(math2.pi_digits_gen, desc="Decimal expansion of Pi (or, digits of Pi).0");
 
 # pythagorean triples
 A009096=Sequence(math2.triples) \
