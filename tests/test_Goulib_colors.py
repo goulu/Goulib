@@ -143,23 +143,23 @@ class TestColor:
     def test_name(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.name())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
     
 
     def test___hash__(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.__hash__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___neg__(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.__neg__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_deltaE(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.deltaE(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
     
     def test_str(self):
         c=self.blue
@@ -169,22 +169,22 @@ class TestColor:
     def test_isclose(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.isclose(other, abs_tol))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___mul__(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.__mul__(factor))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___radd__(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.__radd__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_compose(self):
         # color = Color(value, space, name)
         # assert_equal(expected, color.compose(other, f, mode))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 from matplotlib import cm #colormaps
     
@@ -204,21 +204,21 @@ class TestPalette:
     def test_index(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.index(c, dE))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_update(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.update(data, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_palette(self):
         # assert_equal(expected, palette(im, ncolors))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_pil(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.pil())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
     
     def test__repr_html_(self):
         res=self.spectral._repr_html_()
@@ -227,17 +227,17 @@ class TestPalette:
     def test_sorted(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.sorted(key))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_patches(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.patches(wide, size))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestColorLookup:
     def test_color_lookup(self):
@@ -278,39 +278,39 @@ class TestCmyk2rgb:
 class TestXyz2xyy:
     def test_xyz2xyy(self):
         # assert_equal(expected, xyz2xyy(xyz))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestConvert:
     def test_convert(self):
         # assert_equal(expected, convert(color, source, target))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDeltaE:
     def test_delta_e(self):
         # assert_equal(expected, deltaE(c1, c2))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestColorTable:
     def test_color_table(self):
         # assert_equal(expected, ColorTable(colors, key, width))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestXyy2xyz:
     def test_xyy2xyz(self):
         # assert_equal(expected, xyy2xyz(xyY))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
     
         
 
 class TestRgb2hex:
     def test_rgb2hex(self):
         # assert_equal(expected, rgb2hex(c, illuminant))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestHex2rgb:
     def test_hex2rgb(self):
         # assert_equal(expected, hex2rgb(c, illuminant))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

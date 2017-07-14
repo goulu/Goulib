@@ -70,52 +70,52 @@ class TestStats:
 
     def test_stats(self):
         # assert_equal(expected, stats(l))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___add__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__add__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___mul__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__mul__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___neg__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__neg__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___pow__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__pow__(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___sub__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__sub__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_covariance(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.covariance(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_sum(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.sum())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_sum2(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.sum2())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestStddev:
     def test_stddev(self):
@@ -139,12 +139,12 @@ class TestMode:
 
     def test___init__(self):
         # mode = Mode(name, nchannels, type, min, max)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # mode = Mode(name, nchannels, type, min, max)
         # assert_equal(expected, mode.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 
 
@@ -280,7 +280,7 @@ class TestNormal:
     def test_latex(self):
         # normal = Normal(data, mean, var)
         # assert_equal(expected, normal.latex())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMeanVar:
     def test_mean_var(self):
@@ -308,21 +308,21 @@ class TestDiscrete:
     def test___call__(self):
         # discrete = Discrete(data)
         # assert_equal(expected, discrete.__call__(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___init__(self):
         # discrete = Discrete(data)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestPDF:
     def test___call__(self):
         # p_d_f = PDF(pdf, data)
         # assert_equal(expected, p_d_f.__call__(x, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___init__(self):
         # p_d_f = PDF(pdf, data)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

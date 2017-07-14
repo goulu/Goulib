@@ -136,32 +136,32 @@ class TestSegments:
     def test___call__(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.__call__(t))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___str__(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.__str__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_end(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.end())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_insert(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.insert(segment, autoJoin))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_start(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.start())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_update(self):
         # segments = Segments(segments, label)
         # assert_equal(expected, segments.update())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestActuator:
     def test_move_horizontal(self):
@@ -211,17 +211,17 @@ class TestTimeDiagram:
         
     def test___init__(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
         # assert_equal(expected, time_diagram.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_saveAsCsv(self):
         # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
         # assert_equal(expected, time_diagram.saveAsCsv(filename))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
                         
 class TestSegmentPoly:
@@ -369,67 +369,67 @@ class TestSegment4thDegree:
 class TestMove:
     def test_move(self):
         # assert_equal(expected, move(self, newpos, relative, time, wait, vmax, acc))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestEndTime:
     def test_end_time(self):
         # assert_equal(expected, endTime(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMaxAbsAcc:
     def test_max_abs_acc(self):
         # assert_equal(expected, maxAbsAcc(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMaxAbsSpeed:
     def test_max_abs_speed(self):
         # assert_equal(expected, maxAbsSpeed(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMaxForce:
     def test_max_force(self):
         # assert_equal(expected, maxForce(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMaxTork:
     def test_max_tork(self):
         # assert_equal(expected, maxTork(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMaxRpm:
     def test_max_rpm(self):
         # assert_equal(expected, maxRpm(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDisplayLast:
     def test_display_last(self):
         # assert_equal(expected, displayLast(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDisplay:
     def test_display(self):
         # assert_equal(expected, display(self, fromTime, toTime))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestVarNames:
     def test_var_names(self):
         # assert_equal(expected, varNames(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestVarRowUnits:
     def test_var_row_units(self):
         # assert_equal(expected, varRowUnits(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestVarDict:
     def test_var_dict(self):
         # assert_equal(expected, varDict(self))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSegmentsTrapezoidalSpeed:
     def test_segments_trapezoidal_speed(self):
         # assert_equal(expected, SegmentsTrapezoidalSpeed(t0, p0, p3, a, T, vmax, v0, v3))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

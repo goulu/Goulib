@@ -70,21 +70,21 @@ class TestTimeMarker:
     def test___call__(self):
         # time_marker = TimeMarker(name)
         # assert_equal(expected, time_marker.__call__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___init__(self):
         # time_marker = TimeMarker(name)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # time_marker = TimeMarker(name)
         # assert_equal(expected, time_marker.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_set(self):
         # time_marker = TimeMarker(name)
         # assert_equal(expected, time_marker.set(time))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestStateDiagram:
     def test_state(self):
@@ -140,68 +140,68 @@ class TestStateMachine:
     def test___call__(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.__call__(time))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_checkOnTimeAndWait(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.checkOnTimeAndWait(time, what))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_herror(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.herror(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_hinfo(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.hinfo(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_hsuccess(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.hsuccess(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_hwarning(self):
         # state_machine = StateMachine(simulation, name, background_color)
         # assert_equal(expected, state_machine.hwarning(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestNoPrint:
     def test_no_print(self):
         # assert_equal(expected, noPrint(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSimulation:
     def test___init__(self):
         # simulation = Simulation()
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_setOutput(self):
         # simulation = Simulation()
         # assert_equal(expected, simulation.setOutput(h1, h2, h3, h, hinfo, hsuccess, hwarning, herror, displayState, displayObj, displayPlot))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestEventLog:
     def test_log(self):
         # event_log = EventLog()
         # assert_equal(expected, event_log.log(stateMachine))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestStateChangeLog:
     def test___init__(self):
         # state_change_log = StateChangeLog(newState)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestWaitLog:
     def test___init__(self):
         # wait_log = WaitLog(untilTime, waitForWhat)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestTooLateLog:
     def test___init__(self):
         # too_late_log = TooLateLog(pastTime, missedWhat)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()           

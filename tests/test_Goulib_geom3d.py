@@ -509,7 +509,7 @@ class TestLine3:
     def test_point(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.point(u))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestRay3:
     def test___repr__(self):

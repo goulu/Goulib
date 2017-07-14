@@ -5,6 +5,7 @@ from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+
 class TestH1:
     def test_h1(self):
         # assert_equal(expected, h1(*args))
@@ -48,17 +49,17 @@ class TestHerror:
 class TestHtml:
     def test_html(self):
         # assert_equal(expected, html(obj, sep))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestH4:
     def test_h4(self):
         # assert_equal(expected, h4(*args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestLatex:
     def test_latex(self):
         # assert_equal(expected, latex(obj))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

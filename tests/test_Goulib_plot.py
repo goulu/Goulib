@@ -41,7 +41,7 @@ class TestPlot:
     def test_html(self):
         # plot = Plot()
         # assert_equal(expected, plot.html(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestPng:
     def test_png(self):

@@ -408,12 +408,12 @@ class TestEnumerates:
 class TestEnsureSorted:
     def test_ensure_sorted(self):
         # assert_equal(expected, ensure_sorted(iterable, key))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIscallable:
     def test_iscallable(self):
         # assert_equal(expected, iscallable(f))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIntersect:
     def test_intersect(self):
@@ -445,7 +445,7 @@ class TestKeep:
     def test___next__(self):
         # keep = keep(iterable)
         # assert_equal(expected, keep.__next__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestFirstMatch:
     def test_first_match(self):
@@ -479,7 +479,7 @@ class TestDetectCycle:
 class TestFloyd:
     def test_floyd(self):
         # assert_equal(expected, floyd(iterable, limit))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

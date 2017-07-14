@@ -180,102 +180,102 @@ class TestExpr:
     def test___invert__(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.__invert__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___truediv__(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.__truediv__(right))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_isconstant(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.isconstant())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestEval:
     def test_eval(self):
         # assert_equal(expected, eval(node, ctx))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestGetFunctionSource:
     def test_get_function_source(self):
         # assert_equal(expected, get_function_source(f))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestTextVisitor:
     def test_generic_visit(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.generic_visit(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_prec(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.prec(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_prec_BinOp(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.prec_BinOp(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_prec_UnaryOp(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.prec_UnaryOp(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_BinOp(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_BinOp(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_Call(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_Call(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_Compare(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_Compare(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_Name(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_Name(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_NameConstant(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_NameConstant(node))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_Num(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_Num(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_UnaryOp(self):
         # text_visitor = TextVisitor()
         # assert_equal(expected, text_visitor.visit_UnaryOp(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___init__(self):
         # text_visitor = TextVisitor(dialect)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestLatexVisitor:
     def test_visit_Call(self):
         # latex_visitor = LatexVisitor()
         # assert_equal(expected, latex_visitor.visit_Call(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_visit_UnaryOp(self):
         # latex_visitor = LatexVisitor()
         # assert_equal(expected, latex_visitor.visit_UnaryOp(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___init__(self):
         # latex_visitor = LatexVisitor()
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

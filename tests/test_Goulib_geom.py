@@ -739,7 +739,7 @@ class TestEllipse:
     def test___eq__(self):
         # ellipse = Ellipse(*args)
         # assert_equal(expected, ellipse.__eq__(other))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

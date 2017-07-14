@@ -216,92 +216,92 @@ class TestTable:
     def test___getitem__(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.__getitem__(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_asdict(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.asdict())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_cols(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.cols(title))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_groupby_gen(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.groupby_gen(by, sort, removecol))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_json(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.json(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_load(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.load(filename, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_read_json(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.read_json(filename, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_save(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.save(filename, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_to_time(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.to_time(by, fmt, skiperrors))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_to_timedelta(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.to_timedelta(by, fmt, skiperrors))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestAttr:
     def test_attr(self):
         # assert_equal(expected, attr(args))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestCell:
     def test___init__(self):
         # cell = Cell(data, align, fmt, tag, style)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_html(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.html(**kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_read(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.read())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestRow:
     def test___init__(self):
         # row = Row(data, align, fmt, tag, style)
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test___repr__(self):
         # row = Row(data, align, fmt, tag, style)
         # assert_equal(expected, row.__repr__())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
     def test_html(self):
         # row = Row(data, align, fmt, tag, style)
         # assert_equal(expected, row.html(cell_args, **kwargs))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 if __name__=="__main__":
     runmodule()

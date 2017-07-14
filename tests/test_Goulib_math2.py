@@ -904,7 +904,7 @@ class TestBabyStepGiantStep:
 class TestIsNumber:
     def test_is_number(self):
         # assert_equal(expected, is_number(x))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):
@@ -914,47 +914,47 @@ class TestCoprimesGen:
 class TestTetrahedral:
     def test_tetrahedral(self):
         # assert_equal(expected, tetrahedral(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSumOfSquares:
     def test_sum_of_squares(self):
         # assert_equal(expected, sum_of_squares(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSumOfCubes:
     def test_sum_of_cubes(self):
         # assert_equal(expected, sum_of_cubes(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestBernouilliGen:
     def test_bernouilli_gen(self):
         # assert_equal(expected, bernouilli_gen(init))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestBernouilli:
     def test_bernouilli(self):
         # assert_equal(expected, bernouilli(n, init))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDeBruijn:
     def test_de_bruijn(self):
         # assert_equal(expected, de_bruijn(k, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestPascalGen:
     def test_pascal_gen(self):
         # assert_equal(expected, pascal_gen())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIsPythagoreanTriple:
     def test_is_pythagorean_triple(self):
         # assert_equal(expected, is_pythagorean_triple(a, b, c))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestFormat:
     def test_format(self):
         # assert_equal(expected, format(x, decimals))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestMultiply:
     def test_multiply(self):
@@ -968,12 +968,12 @@ class TestMultiply:
 class TestSqrt:
     def test_sqrt(self):
         # assert_equal(expected, sqrt(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestModMatmul:
     def test_mod_matmul(self):
         # assert_equal(expected, mod_matmul(A, B, mod))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestModMatpow:
     def test_mod_matpow(self):
@@ -988,17 +988,17 @@ class TestModMatpow:
 class TestZeros:
     def test_zeros(self):
         # assert_equal(expected, zeros(shape))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDiag:
     def test_diag(self):
         # assert_equal(expected, diag(v))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestFactors:
     def test_factors(self):
         # assert_equal(expected, factors(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIsPrimitiveRoot:
     def test_is_primitive_root(self):
@@ -1022,12 +1022,12 @@ class TestRandomPrime:
 class TestPrimeDivisors:
     def test_prime_divisors(self):
         # assert_equal(expected, prime_divisors(num, start))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIsMultiple:
     def test_is_multiple(self):
         # assert_equal(expected, is_multiple(n, factors))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestRepunitGen:
     def test_repunit_gen(self):
