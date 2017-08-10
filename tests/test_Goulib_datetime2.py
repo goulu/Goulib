@@ -43,8 +43,19 @@ class TestTimedeltaf:
         s=('%d:%d:%d'%(25*24+12,34,56))
         s=timedeltaf(s)
         assert_equal(s,td)
-        #check negative
+        #check microseconds
+        td=timedelta(0,0,123456)
+        s=str(td)
+        s=timedeltaf(s)
+        assert_equal(s,td)
+        #check miliseconds
+        td=timedeltaf('00:00:00.123')
+        assert_equal(td.microseconds,123000)
+        #check negative values
         td=timedeltaf('-1 day, 00:00:00')
+        assert_equal(str(td),'-1 day, 0:00:00')
+        
+        td=timedelta(microseconds=-1)
         s=str(td)
         s=timedeltaf(s)
         assert_equal(s,td)
