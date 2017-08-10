@@ -12,7 +12,7 @@ import six, re
 
 from Goulib import math2, interval
 from datetime import datetime,date,time,timedelta
-import datetime as dt 
+import datetime as dt
 
 # classes extending builtin
 
@@ -35,13 +35,13 @@ class timedelta2(dt.timedelta):
     def __init__(self,*args,**kwargs):
         super(timedelta2,self).__init__(*args,**kwargs)
         self.test='ok'
-        
+
     def isoformat(self):
         #allow seamless json serialization
         return str(self)
 
 #useful constants
-timedelta0=timedelta(0) 
+timedelta0=timedelta(0)
 onesecond=timedelta(seconds=1)
 oneminute=timedelta(minutes=1)
 onehour=timedelta(hours=1)
@@ -53,13 +53,13 @@ midnight=time()
 def datetimef(d,t=None,fmt='%Y-%m-%d'):
     """"converts something to a datetime
     :param d: can be:
-    
+
     - datetime : result is a copy of d with time optionally replaced
     - date : result is date at time t, (00:00AM by default)
-    - int or float : if fmt is None, d is considered as Excel date numeric format 
+    - int or float : if fmt is None, d is considered as Excel date numeric format
       (see http://answers.oreilly.com/topic/1694-how-excel-stores-date-and-time-values/ )
     - string or specified format: result is datetime parsed using specified format string
-    
+
     :param fmt: format string. See http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
     :param t: optional time. replaces the time of the datetime obtained from d. Allows datetimef(date,time)
     :return: datetime
@@ -68,14 +68,14 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
         d=d
     elif isinstance(d,dt.date):
         d=datetime(year=d.year, month=d.month, day=d.day)
-    elif isinstance(d,(six.integer_types,float)): 
+    elif isinstance(d,(six.integer_types,float)):
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
     else:
         d=datetime.strptime(str(d),fmt)
     if t:
         d=d.replace(hour=t.hour,minute=t.minute,second=t.second)
     return d
-    
+
 def datef(d,fmt='%Y-%m-%d'):
     '''converts something to a date. See datetimef'''
     if isinstance(d,dt.datetime):
@@ -85,7 +85,7 @@ def datef(d,fmt='%Y-%m-%d'):
     if isinstance(d,(six.string_types,six.integer_types,float)):
         return datetimef(d,fmt=fmt).date()
     return date(d)  #last chance...
-    
+
 def timef(t,fmt='%H:%M:%S'):
     '''converts something to a time. See datetimef'''
     if isinstance(t,dt.datetime):
@@ -101,7 +101,7 @@ def timef(t,fmt='%H:%M:%S'):
         else: # t is in days (Excel
             pass
     return datetimef(t,fmt=fmt).time()
-    
+
 _cache ={}
 def timedeltaf(t,fmt=None):
     '''converts something to a timedelta.
@@ -114,33 +114,31 @@ def timedeltaf(t,fmt=None):
         return t
     if isinstance(t,time):
         return time_sub(t,midnight)
-    elif isinstance(t,(six.integer_types,float)): 
+    elif isinstance(t,(six.integer_types,float)):
         return timedelta(days=t)
+    '''
     try: #for timedeltas < 24h
         t=datetimef(t,fmt=fmt or '%H:%M:%S').time()
         return time_sub(t,midnight)
     except ValueError:
         pass
-    
+    '''
+    #https://stackoverflow.com/a/21074460/1395973
     # http://stackoverflow.com/questions/18303301/working-with-time-values-greater-than-24-hours
     if fmt is None:
-        fmt='(%D day(s?), )?%H:%M:%S'
+        fmt='(%D day[s]*, )?%H:%M:%S'
     if not fmt in _cache:
-        expr=fmt.replace('%D','(?P<days>\d+)')
+        expr=fmt.replace('%D','(?P<days>[-\d]+)')
         expr=expr.replace('%H','(?P<hours>\d+)')
         expr=expr.replace('%M','(?P<minutes>\d+)')
-        expr=expr.replace('%S','(?P<seconds>\d+)')
-        expr='(?P<sign>-?)'+expr
+        expr=expr.replace('%S','(?P<seconds>\d[\.\d+]*)')
         _cache[fmt]=re.compile(expr)
-    try:
-        expr=_cache[fmt]
-        d = re.match(expr, t).groupdict(0)
-    except AttributeError:
-        raise ValueError('"%s" does not match fmt=%s'%(t,fmt))
-    sign=d.pop('sign',None)
-    td=timedelta(**dict(((key, int(value)) for key, value in d.items())))
-    if sign=='-':
-        td=-td
+    m=re.match(_cache[fmt],t)
+    if m is None:
+        raise ValueError('"%s" does not match fmt=%s'%(t,fmt))  
+    m=m.groupdict()   
+    d = {key: float(value) for key,value in m.items() if value is not None}
+    td=timedelta(**d)
     return td
 
 def strftimedelta(t,fmt='%H:%M:%S'):
@@ -184,7 +182,7 @@ def daysgen(start,length,step=oneday):
             start=start+step
         except:
             start=time_add(start,step)
-        
+
 def days(start,length,step=oneday):
     return [x for x in daysgen(start,length,step)]
 
@@ -192,20 +190,20 @@ def timedelta_sum(timedeltas):
     return sum((d for d in timedeltas if d), timedelta0)
 
 def timedelta_div(t1,t2):
-    '''divides a timedelta by a timedelta or a number. 
+    '''divides a timedelta by a timedelta or a number.
     should be a method of timedelta...'''
     if isinstance(t2,timedelta):
         return t1.total_seconds() / t2.total_seconds()
     else:
         return timedelta(seconds=t1.total_seconds() / t2)
-    
+
 def timedelta_mul(t1,t2):
     '''multiplies a timedelta. should be a method of timedelta...'''
     try: #timedelta is t1
         return timedelta(seconds=t1.total_seconds() * t2)
     except: #timedelta is t2
         return timedelta(seconds=t2.total_seconds() * t1)
-    
+
 def time_sub(t1,t2):
     '''substracts 2 time. should be a method of time...'''
     return datetimef(datemin,t1)-datetimef(datemin,t2)
@@ -252,4 +250,3 @@ def time_intersect(t1,t2):
     a,b=interval.intersection(t1, t2)
     if not a:return timedelta0
     return time_sub(b,a)
-        
