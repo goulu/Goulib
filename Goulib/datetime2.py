@@ -10,7 +10,7 @@ __license__ = "LGPL"
 
 import six, re
 
-from Goulib import math2, interval
+from Goulib import math2, interval, decorators
 from datetime import datetime,date,time,timedelta
 import datetime as dt
 
@@ -102,38 +102,40 @@ def timef(t,fmt='%H:%M:%S'):
             pass
     return datetimef(t,fmt=fmt).time()
 
-_cache ={}
+@decorators.memoize
+def fmt2regex(fmt):
+    """converts a date/time format string to the regex that comiles it
+    
+    :param fmt: string
+    :return: compiled regex
+    """
+    
+    expr=fmt.replace('%D','(?P<days>-?[0-9]\d*)')
+    expr=expr.replace('%H','(?P<hours>-?[0-9]\d*)')
+    expr=expr.replace('%M','(?P<minutes>\d+)')
+    expr=expr.replace('%S','(?P<seconds>\d+(\.\d+)?)')
+    return re.compile(expr)
+    
 def timedeltaf(t,fmt=None):
-    '''converts something to a timedelta.
+    """converts something to a timedelta.
+    
     :param t: can be:
+    
     * already a timedelta, or a time, or a int/float giving a number of days (Excel)
     * or a string in HH:MM:SS format by default
     * or a string in timedelta str() output format
-    '''
+    """
     if isinstance(t,timedelta):
         return t
     if isinstance(t,time):
         return time_sub(t,midnight)
     elif isinstance(t,(six.integer_types,float)):
         return timedelta(days=t)
-    '''
-    try: #for timedeltas < 24h
-        t=datetimef(t,fmt=fmt or '%H:%M:%S').time()
-        return time_sub(t,midnight)
-    except ValueError:
-        pass
-    '''
+
     #https://stackoverflow.com/a/21074460/1395973
-    # http://stackoverflow.com/questions/18303301/working-with-time-values-greater-than-24-hours
     if fmt is None:
-        fmt='(%D day[s]*, )?%H:%M:%S'
-    if not fmt in _cache:
-        expr=fmt.replace('%D','(?P<days>[-\d]+)')
-        expr=expr.replace('%H','(?P<hours>[-\d]+)')
-        expr=expr.replace('%M','(?P<minutes>\d+)')
-        expr=expr.replace('%S','(?P<seconds>\d[\.\d+]*)')
-        _cache[fmt]=re.compile(expr)
-    m=re.match(_cache[fmt],t)
+        fmt='(%D day[s]?[,]? )?%H:%M:%S*'
+    m=re.match(fmt2regex(fmt),t)
     if m is None:
         raise ValueError('"%s" does not match fmt=%s'%(t,fmt))  
     m=m.groupdict()   
