@@ -215,12 +215,12 @@ def exp_sequences(a,b,c,desc_s1=None,desc_s2=None,desc_s3=None,start=0):
     return s1,s2,s3
 
 A033484=exp_sequences(3,2,-2)[0]
-_,A007505,A002235=exp_sequences(3,2,-1,desc_s2='Thabit primes of form 3*2^n -1.')
+A083329,A007505,A002235=exp_sequences(3,2,-1,desc_s2='Thabit primes of form 3*2^n -1.')
 
 A046865=exp_sequences(4,5,-1)[2]
 A079906=exp_sequences(5,6,-1)[2]
 A046866=exp_sequences(6,7,-1,start=1)[2]
-_,A050523,A001771=exp_sequences(7,2,-1)
+A086224,A050523,A001771=exp_sequences(7,2,-1)
 A005541=exp_sequences(8,3,-1)[2]
 A056725=exp_sequences(9,10,-1)[2]
 A046867=exp_sequences(10,11,-1)[2]
