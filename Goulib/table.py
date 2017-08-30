@@ -129,7 +129,10 @@ class Table(pandas.DataFrame):
             self.loc[len.self]=data
         elif isinstance(data,dict): #lines, not columns as in Pandas
             for k in data:
-                self.loc[len(self):k]=data[k]
+                i=len(self)
+                if i==0: self.addcol(k)
+                self.loc[i]=None # create line http://pandas.pydata.org/pandas-docs/stable/indexing.html#setting-with-enlargement
+                self.loc[i,k]=data[k] #fills it
         else:
             super().append(data)
         return self
@@ -173,14 +176,16 @@ class Table(pandas.DataFrame):
         ext=filename.split('.')[-1].lower()
         kwargs.setdefault('index',False) # do not create index column
         self.sort_index(inplace=True) # make sure order is preserved
-        
         if ext in ('xls','xlsx'):
+            kwargs.setdefault('encoding','utf-8') 
             self.write_xlsx(filename,**kwargs)
         elif ext in ('htm','html'):
             self.to_html(filename, **kwargs)
         elif ext in ('json'):
             kwargs.pop('index') #unused
             kwargs.setdefault('orient','records') # 'index'
+            # see https://stackoverflow.com/questions/10286204/the-right-json-date-format
+            kwargs.setdefault('date_format','iso') # 'epoch' milliseconds 
             self.to_json(filename, **kwargs)
         else: #try ...
             kwargs.setdefault('encoding','utf-8') 
@@ -258,7 +263,9 @@ class Table(pandas.DataFrame):
         if sort:
             self.sort(by)
         for k in self[by].unique():
-            t=Table(self[by==k])
+            # https://chrisalbon.com/python/pandas_indexing_selecting.html
+            sub=self[self[by] == k] 
+            t=Table(sub,copy=True)
             if removecol: del t[by]
             yield k,t
 
