@@ -111,12 +111,17 @@ class Image(Plot):
         :param data: can be either:
         * `PIL.Image` : makes a copy
         * string : path of image to load
+        * memoryview (extracted from a db blob)
         * None : creates an empty image with kwargs parameters:
         ** size : (y,x) pixel size tuple
         ** mode : 'F' (gray) by default
         ** color: to fill None=black by default
         ** colormap: Palette or matplotlib colormap
         """
+        if isinstance(data,memoryview):
+            data=six.BytesIO(data)
+            data=PILImage.open(data)
+            
         if data is None:
             mode = mode or 'F'
             n=modes[mode].nchannels
