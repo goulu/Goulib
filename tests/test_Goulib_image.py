@@ -107,9 +107,14 @@ class TestImage:
         assert_true(h)
 
     def test_average_hash(self):
-        # image = Image(data, **kwargs)
-        # assert_equal(expected, image.average_hash(hash_size))
-        raise SkipTest # implement your test here
+        h1=self.lena.average_hash()
+        h2=self.gray.average_hash()
+        assert_equal(h1,h2)
+        
+    def test_perceptual_hash(self):
+        h1=self.lena.perceptual_hash()
+        h2=self.gray.perceptual_hash()
+        assert_equal(h1,h2)
 
     def test_base64(self):
         # image = Image(data, **kwargs)

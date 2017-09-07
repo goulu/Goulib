@@ -529,28 +529,50 @@ class Image(Plot):
 
 
     # hash and distance
-
-    def average_hash(self, hash_size=8):
-        """
-        Average Hash computation
-        Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
-
-        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
-        :return: list of hash_size*hash_size bool (=bits)
-        """
-        # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
+    
+    # http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+    # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
+    
+    def _hash_prepare(self, img_size=8):
+        """common code for image hash methods below"""
         if self.nchannels>1:
             image = self.grayscale()
         else:
             image=self
 
-        image = image.resize((hash_size, hash_size), PILImage.ANTIALIAS)
-        pixels = image.array.reshape((1,hash_size*hash_size))[0]
-        avg = pixels.mean()
-        diff=pixels > avg
-        return math2.num_from_digits(diff,2)
+        image = image.resize((img_size, img_size), PILImage.ANTIALIAS)
+        return np.array(image.array, dtype=np.float).reshape((img_size, img_size))
+    
+    @staticmethod 
+    def _hash_result(result):
+        return math2.num_from_digits(itertools2.flatten(result),2)
 
-    def dist(self,other, hash_size=8):
+    def average_hash(self, hash_size=8):
+        """Average Hash
+        
+        :see: http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: int of hash_size**2 bits
+        """
+        pixels=self._hash_prepare(hash_size)
+        return Image._hash_result(pixels > pixels.mean())
+    
+    def perceptual_hash(self, hash_size=8, highfreq_factor=4):
+        """Perceptual Hash
+        
+        :see: http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: int of hash_size**2 bits
+        """
+        import scipy.fftpack
+        pixels=self._hash_prepare(hash_size * highfreq_factor)
+        dct = scipy.fftpack.dct(scipy.fftpack.dct(pixels, axis=0), axis=1)
+        dctlowfreq = dct[:hash_size, :hash_size]
+        return Image._hash_result(dctlowfreq > np.median(dctlowfreq))
+
+    def dist(self,other, method=perceptual_hash, hash_size=8):
         """ distance between images
 
         :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
@@ -559,8 +581,8 @@ class Image(Plot):
             =1 if images are completely decorrelated (half of the hash bits are the same by luck)
             =2 if images are inverted
         """
-        h1=self.average_hash(hash_size)
-        h2=other.average_hash(hash_size)
+        h1=method(self,hash_size)
+        h2=method(other,hash_size)
         if h1==h2:
             return 0
         # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
