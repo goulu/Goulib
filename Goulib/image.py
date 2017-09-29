@@ -3,8 +3,6 @@
 
 
 from __future__ import division #"true division" everywhere
-from Crypto.SelfTest.Signature.test_dss import res
-from Goulib.itertools2 import identity, linspace, arange
 
 """
 image processing with PIL's ease and skimage's power
