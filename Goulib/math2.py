@@ -155,7 +155,11 @@ def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
     
     implements https://www.python.org/dev/peps/pep-0485/
     :param a,b: the two values to be tested to relative closeness
-    :param rel_tol: relative tolerance -- it is the amount of error allowed, relative to the larger absolute value of a or b. For example, to set a tolerance of 5%, pass tol=0.05. The default tolerance is 1e-9, which assures that the two values are the same within about 9 decimal digits. rel_tol must be greater than 0.0
+    :param rel_tol: relative tolerance
+      it is the amount of error allowed, relative to the larger absolute value of a or b. 
+      For example, to set a tolerance of 5%, pass tol=0.05. 
+      The default tolerance is 1e-9, which assures that the two values are the same within 
+      about 9 decimal digits. rel_tol must be greater than 0.0
     :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
     """
     if a==0 or b==0: #reltol probably makes no sense
@@ -1002,6 +1006,19 @@ def carries(a,b,base=10,pos=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
+
+def powertrain(n):
+    """
+    :return: v[0]**v[1]*v[2]**v[3] ...**(v[-1] or 0)
+    :author: # Chai Wah Wu, Jun 16 2017
+    :see: http://oeis.org/A133500
+    """
+    s = str(n)
+    l = len(s)
+    m = int(s[-1]) if l % 2 else 1
+    for i in range(0, l-1, 2):
+        m *= int(s[i])**int(s[i+1])
+    return m 
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """

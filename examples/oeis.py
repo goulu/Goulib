@@ -610,6 +610,8 @@ A009994=Sequence(None,None,lambda x:math2.bouncy(x)[0], desc="Numbers with digit
 A009996=Sequence(None,None,lambda x:math2.bouncy(x)[1], desc="Numbers with digits in nonincreasing order.")
 A152054=Sequence(None,None,lambda x:math2.bouncy(x)==(False,False), desc="Bouncy numbers (numbers whose digits form a strictly non-monotonic sequence).")
 
+
+A133500=Sequence(None, math2.powertrain, desc="The powertrain or power train map")
 #pi
 
 A000796=Sequence(math2.pi_digits_gen, desc="Decimal expansion of Pi (or, digits of Pi).0");
