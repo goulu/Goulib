@@ -140,6 +140,8 @@ class _Geo(plot.Plot):
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
                     data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
+                if ext=='json':
+                    data=read_json(data, directed=self.directed, multigraph=self.multi)
                 else:
                     raise(Exception('unknown file format'))
             elif isinstance(data,AGraph):
@@ -184,9 +186,10 @@ class _Geo(plot.Plot):
 
     def clear(self):
         #saves some graph attributes cleared by convert._prep_create_using
-        t,m=self.tol,self.multi
+        t,m,d=self.tol, self.multi, self.directed
         self.parent.clear(self)
         self.multi=m
+        self.directed=d
         self.graph['tol']=t
 
     @property
@@ -211,6 +214,21 @@ class _Geo(plot.Plot):
             return self.multi
         except AttributeError:
             return True
+        
+    @property
+    def directed(self):
+        return self.graph.get('directed',False)
+
+    @multi.setter
+    def directed(self, s):
+        self.graph['directed']=s
+
+    def is_directed(self):
+        """used internally in constructor"""
+        try:
+            return self.directed
+        except AttributeError:
+            return False
 
     def pos(self,nodes=None):
         """
@@ -509,7 +527,8 @@ class _Geo(plot.Plot):
         res['size']=self.box_size()
         res['nodes']=self.number_of_nodes()
         res['edges']=self.number_of_edges()
-        res['components']=nx.number_connected_components(self)
+        if not self.directed:  #not implemented for directed type
+            res['components']=nx.number_connected_components(self)
         res['length']=self.length()
         return res
 
@@ -591,12 +610,12 @@ class DiGraph(_Geo, nx.MultiDiGraph):
         properties=kwargs
         try:
             properties.update(data.graph)
-        except:
+        except AttributeError:
             pass
         properties.setdefault('tol',0.010) #default tolerance on node positions
 
         nx.MultiDiGraph.__init__(self,None, **properties)
-        _Geo.__init__(self,nx.MultiDiGraph,data,nodes)
+        _Geo.__init__(self,nx.MultiDiGraph,data,nodes,directed=True)
 
 
 def figure(g, box=None,**kwargs):
@@ -796,6 +815,11 @@ def write_json(g,filename, **kwargs):
     """
     with open(filename, 'w') as file:
         file.write(to_json(g,**kwargs))
+        
+def read_json(filename, directed=False, multigraph=True, attrs=None):
+    with open(filename) as f:
+        js_graph = json.load(f)
+    return nx.node_link_graph(js_graph, directed, multigraph, attrs)
 
 
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):

@@ -211,9 +211,6 @@ class TestRender:
 
 class TestDelauneyTriangulation:
     def test_delauney_triangulation(self):
-        if not SCIPY:
-            logging.error('scipy needed')
-            return
         import time
         n=1000 if RTREE else 100
         from random import random
