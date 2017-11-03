@@ -503,11 +503,20 @@ class Table(list):
         if six.PY3 :
             f = open(filename, 'w', newline='', encoding=encoding)
             def _encode(line): 
-                 return [s for s in line]
+                res=[]
+                for s in line:
+                    res.append(s)
+                return res
         else: #Python 2
             f = open(filename, 'wb')
             def _encode(line): 
-                return [empty if s is None else unicode(s).encode(encoding) for s in line]
+                res=[]
+                for s in line:
+                    if isinstance(s,date):
+                        s=s.strftime('%d-%m-%Y')
+                    s=unicode(s).encode(encoding)
+                    res.append(s)
+                return res
         
         writer=csv.writer(f, dialect=dialect, delimiter=delimiter)
         if self.titles:
@@ -739,7 +748,7 @@ class Table(list):
                 row[i]=f(x)
             except Exception as e:
                 if not skiperrors:
-                    raise e('could not applyf to %s'%x)
+                    raise # TODO: change message to ('could not applyf to %s'%x) for Py2+3
                 res=False
         return res
     
