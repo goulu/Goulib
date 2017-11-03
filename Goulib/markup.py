@@ -32,9 +32,12 @@ def style_str2dict(style):
     res={}
     if style: #skip if None or empty string
         for s in style.split(';'):
-            k,v=s.split(':')
-            k=k.lstrip().rstrip()
-            v=v.lstrip().rstrip()
+            try:
+                k,v=s.split(':')
+            except:
+                continue
+            k=k.strip()
+            v=v.strip()
             res[k]=v
     return res
         
