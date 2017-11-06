@@ -106,17 +106,16 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         if isinstance(create_using,_Geo):
             tol=create_using.tol
             create_using.tol=0 #zero tolerance when copying
-            for k in data.node: #create nodes
+            for k in data.nodes: #create nodes
                 create_using.add_node(k,**data.node[k])
             for u,v,d in data.edges(data=True):
                 create_using.add_edge(u,v,**d)
             create_using.tol=tol # revert original tolerance
             return create_using
 
-        # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
-        return nx.convert.to_networkx_graph(data.adj,create_using,data.is_multigraph())
-    else:
-        return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+        return nx.convert.to_networkx_graph(data,create_using,data.is_multigraph())
+
+    return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
 
 
 
@@ -140,8 +139,8 @@ class _Geo(plot.Plot):
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
                     data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
-                if ext=='json':
-                    data=read_json(data, directed=self.directed, multigraph=self.multi)
+                elif ext=='json':
+                    data=read_json(data, directed=self.is_directed(), multigraph=self.multi)
                 else:
                     raise(Exception('unknown file format'))
             elif isinstance(data,AGraph):
@@ -214,21 +213,6 @@ class _Geo(plot.Plot):
             return self.multi
         except AttributeError:
             return True
-        
-    @property
-    def directed(self):
-        return self.graph.get('directed',False)
-
-    @multi.setter
-    def directed(self, s):
-        self.graph['directed']=s
-
-    def is_directed(self):
-        """used internally in constructor"""
-        try:
-            return self.directed
-        except AttributeError:
-            return False
 
     def pos(self,nodes=None):
         """
@@ -236,7 +220,7 @@ class _Geo(plot.Plot):
         :return: the position of node(s)
         """
         try:
-            return self.node[nodes]['pos']
+            return self.nodes[nodes]['pos']
         except KeyError:
             pass
         if isinstance(nodes,tuple):
@@ -313,7 +297,7 @@ class _Geo(plot.Plot):
         """
         if skip: n+=1
         if n==1:
-            if p in self.node:
+            if p in self.nodes:
                 return [p],0
 
         res,d=[],None
@@ -339,7 +323,7 @@ class _Geo(plot.Plot):
         """add a node or return one already very close
         :return (x,y,...) node id
         """
-        if p in self.node: #point already exists
+        if p in self.nodes: #point already exists
             return p
 
         a={}
@@ -406,7 +390,7 @@ class _Geo(plot.Plot):
         if n1!=n2:
             logging.error('GeoGraph has %d!=%d'%(n1,n2))
             raise RuntimeError('Nodes/Rtree mismatch')
-        nk=self.node[n]['key']
+        nk=self.nodes[n]['key']
         self.parent.remove_node(self,n)
         self.idx.delete(nk,n) #in fact n is ignored, the nk key is used here
 
@@ -415,13 +399,13 @@ class _Geo(plot.Plot):
         :return: dict of the edge added last
         """
         try:
-            edge=self[u][v]
+            edges=self.adj[u][v]
         except: # no edge between u and v yet
             return None #not {}, to make a diff with existing empty dict
-        if len(edge)==1: #quick
-            return edge[0]
+        if len(edges)==1: #quick
+            return edges[0]
         else:
-            return edge[max(edge.keys())]
+            return edges[max(edges.keys())]
 
     def add_edge(self, u, v, k=None, attr_dict=None, **attrs):
         """add an edge to graph
@@ -493,11 +477,11 @@ class _Geo(plot.Plot):
 
         if self.is_multigraph():
             if key is None:
-                key=self.edge[u][v]
+                key=self.adj[u][v]
                 key=itertools2.first(key)
-            data=self.edge[u][v][key]
+            data=self.adj[u][v][key]
         else:
-            data=self.edge[u][v]
+            data=self.adj[u][v]
         self.parent.remove_edge(self,u,v,key)
 
         if clean:

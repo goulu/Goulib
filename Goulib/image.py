@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
 
-
 from __future__ import division #"true division" everywhere
 
 """
@@ -1312,8 +1311,6 @@ for source in modes:
         if key[0]==key[1]:
             continue
         convname='%s2%s'%key
-        if convname=='lab2ind':
-            pass
 
         converter = getattr(sys.modules[__name__], convname,None)
         if converter is None:
@@ -1342,10 +1339,16 @@ def convert(a,source,target,**kwargs):
     for u,v in itertools2.pairwise(path):
         if u==v: continue #avoid converting from gray to gray
         try:
-            a=converters[u][v][0]['f'](a,**kwargs)
+            edge=converters[u][v][0]    
+        except:
+            path=converters.shortest_path(source.name, target.name)
+            pass #but something is wrong...
+        f=edge['f']
+        try:
+            a=f(a,**kwargs)
         except TypeError as e:
             if kwargs: #maybe the converter doesn't support args ? retry!
-                a=converters[u][v][0]['f'](a)
+                a=f(a)
             else:
                 raise(e)
 
