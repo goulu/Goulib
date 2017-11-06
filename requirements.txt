@@ -1,6 +1,7 @@
 scipy
 matplotlib
 networkx
+pydot
 pydotplus
 graphviz
 six

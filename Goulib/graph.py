@@ -106,7 +106,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
         if isinstance(create_using,_Geo):
             tol=create_using.tol
             create_using.tol=0 #zero tolerance when copying
-            for k in data.nodes: #create nodes
+            for k in data: #create nodes
                 create_using.add_node(k,**data.node[k])
             for u,v,d in data.edges(data=True):
                 create_using.add_edge(u,v,**d)
@@ -185,10 +185,9 @@ class _Geo(plot.Plot):
 
     def clear(self):
         #saves some graph attributes cleared by convert._prep_create_using
-        t,m,d=self.tol, self.multi, self.directed
+        t,m=self.tol, self.multi
         self.parent.clear(self)
         self.multi=m
-        self.directed=d
         self.graph['tol']=t
 
     @property
@@ -220,13 +219,13 @@ class _Geo(plot.Plot):
         :return: the position of node(s)
         """
         try:
-            return self.nodes[nodes]['pos']
+            return self.node[nodes]['pos']
         except KeyError:
             pass
         if isinstance(nodes,tuple):
             return nodes
         if nodes is None:
-            nodes=self.nodes()
+            nodes=self
         return (self.pos(n) for n in nodes)
 
 
@@ -234,10 +233,10 @@ class _Geo(plot.Plot):
         """
         :return: float distance between nodes u and v
         """
-
         try:
-            return self[u][v]['length']
-        except Exception:
+            edge=self[u][v]
+            return edge['length']
+        except KeyError:
             return math2.dist(self.pos(u),self.pos(v))
 
     def length(self,edges=None):
@@ -297,7 +296,7 @@ class _Geo(plot.Plot):
         """
         if skip: n+=1
         if n==1:
-            if p in self.nodes:
+            if p in self:
                 return [p],0
 
         res,d=[],None
@@ -323,7 +322,7 @@ class _Geo(plot.Plot):
         """add a node or return one already very close
         :return (x,y,...) node id
         """
-        if p in self.nodes: #point already exists
+        if p in self: #point already exists
             return p
 
         a={}
@@ -390,7 +389,7 @@ class _Geo(plot.Plot):
         if n1!=n2:
             logging.error('GeoGraph has %d!=%d'%(n1,n2))
             raise RuntimeError('Nodes/Rtree mismatch')
-        nk=self.nodes[n]['key']
+        nk=self.node[n]['key']
         self.parent.remove_node(self,n)
         self.idx.delete(nk,n) #in fact n is ignored, the nk key is used here
 
@@ -511,7 +510,7 @@ class _Geo(plot.Plot):
         res['size']=self.box_size()
         res['nodes']=self.number_of_nodes()
         res['edges']=self.number_of_edges()
-        if not self.directed:  #not implemented for directed type
+        if not self.is_directed:  #not implemented for directed type
             res['components']=nx.number_connected_components(self)
         res['length']=self.length()
         return res
@@ -639,17 +638,17 @@ def draw_networkx(g, pos=None, **kwargs):
     #build node positions
 
     if six.callable(pos): #mapping function
-        pos=dict(((node,pos(node)) for node in g.nodes()))
+        pos=dict(((node,pos(node)) for node in g))
 
     if pos is None:
         try:
-            pos=dict((node,data['pos'][:2]) for node,data in g.nodes(True))
+            pos=dict((node,data['pos'][:2]) for node,data in g.nodes(data=True))
         except KeyError:
             pass
 
     if pos is None:
         try:
-            pos=dict(((node,node[:2]) for node in g.nodes()))
+            pos=dict(((node,node[:2]) for node in g))
         except TypeError:
             pass
 
