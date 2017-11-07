@@ -512,8 +512,6 @@ class Table(list):
             def _encode(line): 
                 res=[]
                 for s in line:
-                    if isinstance(s,date):
-                        s=s.strftime('%d-%m-%Y')
                     s=unicode(s).encode(encoding)
                     res.append(s)
                 return res
