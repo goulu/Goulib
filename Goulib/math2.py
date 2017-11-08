@@ -951,17 +951,17 @@ def digits(num, base=10, rev=False):
         res.reverse()
     return res
 
-def digsum(num, base=10, f=None):
+def digsum(num, f=None, base=10):
     """sum of digits
     
     :param num: number
-    :param base: optional base
     :param f: int power or function applied to each digit
+    :param base: optional base
     :return: sum of f(digits) of num
 
     digsum(num) -> sum of digits
     digsum(num,base=2) -> number of 1 bits in binary represenation of num
-    digsum(num,f=2) -> sum of the squares of digits
+    digsum(num,2) -> sum of the squares of digits
     digsum(num,f=lambda x:x**x) -> sum of the digits elevaed to their own power
     """
     d=digits_gen(num,base)
@@ -1226,7 +1226,7 @@ def faulhaber(n,p):
 def is_happy(n):
     #https://en.wikipedia.org/wiki/Happy_number
     while n > 1 and n != 89 and n != 4:
-        n = digsum(n,f=2) #sum of squares of digits
+        n = digsum(n,2) #sum of squares of digits
     return n==1
 
 def lychrel_seq(n):

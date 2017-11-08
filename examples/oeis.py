@@ -511,16 +511,36 @@ A046034=Sequence(None,None,lambda n:digits_in(n,set((2,3,5,7))),
 
 def sumdigpow(p,desc=None):
     """sum of p-th powers of digits"""
-    return Sequence(None,lambda x:math2.digsum(x,f=p),desc=desc)
+    return Sequence(None,lambda x:math2.digsum(x,p),desc=desc)
                     
 A003132=sumdigpow(2,desc='Sum of squares of digits of n. ')
+
 A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose trajectory under iteration of sum of squares of digits map (see A003132) includes 1.')
 
 A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-A005188=Sequence(1,None,lambda x:x==math2.digsum(x,f=len(str(x))))
+A005188=Sequence(1,None,lambda x:x==math2.digsum(x,len(str(x))))
 A005188.desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
 n-digit numbers equal to sum of n-th powers of their digits'
+
+def digsum2(n): return math2.digsum(n,2)
+
+def itersumdig2(start):
+    """Take sum of squares of digits of previous term."""
+    return Sequence(
+        itertools2.iterate(lambda x:math2.digsum(x,2),start),
+        desc="Take sum of squares of digits of previous term, starting with %d"%start
+    )
+
+A000216=itersumdig2(2)
+A000218=itersumdig2(3)
+A080709=itersumdig2(4)
+A000221=itersumdig2(5)
+A008460=itersumdig2(6)
+A008462=itersumdig2(8)
+A008463=itersumdig2(9)
+A139566=itersumdig2(15)
+A122065=itersumdig2(74169)
 
 def look_and_say(x):
     from Goulib.itertools2 import compress, flatten,swap
@@ -661,6 +681,4 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
-    A036275.save('b036275.txt','A036275 periodic part of the decimal expansion of 1/n for n=1..1000. Ph. Guglielmetti 2017.06.20')
-
 

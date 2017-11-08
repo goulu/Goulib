@@ -287,11 +287,11 @@ class TestDigits:
 class TestDigsum:
     def test_digsum(self):
         assert_equal(digsum(1234567890),45)
-        assert_equal(digsum(255,2),8) # sum of ones in binary rep
-        assert_equal(digsum(255,16),30) # $FF in hex
-        assert_equal(digsum(1234567890,f=2),sum_of_squares(9))
-        assert_equal(digsum(548834,f=6),548834) #narcissic number
-        assert_equal(digsum(3435,f=lambda x:x**x),3435) #Munchausen number
+        assert_equal(digsum(255,base=2),8) # sum of ones in binary rep
+        assert_equal(digsum(255,base=16),30) # $FF in hex
+        assert_equal(digsum(1234567890,2),sum_of_squares(9))
+        assert_equal(digsum(548834,6),548834) #narcissic number
+        assert_equal(digsum(3435,lambda x:x**x),3435) #Munchausen number
 
 class TestIntegerExponent:
     def test_integer_exponent(self):
