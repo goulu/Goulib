@@ -101,21 +101,24 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
             create_using.add_edge(p[0],p[1])
             create_using.add_edge(p[1],p[2])
             create_using.add_edge(p[2],p[0])
-        return create_using
-    elif isinstance(data,nx.Graph):
-        if isinstance(create_using,_Geo):
-            tol=create_using.tol
-            create_using.tol=0 #zero tolerance when copying
-            for k in data: #create nodes
-                create_using.add_node(k,**data.node[k])
-            for u,v,d in data.edges(data=True):
-                create_using.add_edge(u,v,**d)
-            create_using.tol=tol # revert original tolerance
-            return create_using
+    
+    elif isinstance(create_using,_Geo):
+        tol=create_using.tol
+        create_using.tol=0 #zero tolerance when copying
+    
+        if isinstance(data,nx.Graph):
+            create_using.clear()
+            create_using.add_nodes_from(data.nodes(data=True))
+            create_using.add_edges_from(data.edges(data=True))
+        else:
+            create_using=nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+        create_using.tol=tol #revert tolerance
 
-        return nx.convert.to_networkx_graph(data,create_using,data.is_multigraph())
+    else:
+        create_using=nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+        
+    return create_using
 
-    return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
 
 
 
@@ -233,6 +236,7 @@ class _Geo(plot.Plot):
         """
         :return: float distance between nodes u and v
         """
+
         try:
             edge=self[u][v]
             return edge['length']
@@ -318,18 +322,12 @@ class _Geo(plot.Plot):
 
         return edges,d
 
-    def add_node(self, p, attr_dict=None, **attr):
+    def add_node(self, p, **attr):
         """add a node or return one already very close
         :return (x,y,...) node id
         """
         if p in self: #point already exists
             return p
-
-        a={}
-        if attr_dict :
-            a.update(attr_dict)
-        if attr :
-            a.update(**attr)
 
         id=p #save the node id as the position might differ
 
@@ -338,14 +336,14 @@ class _Geo(plot.Plot):
             if p in self._map:
                 return self._map[p]
 
-            p=a.get('pos',id)
+            p=attr.get('pos',id)
             if isinstance(p,six.string_types):
                 p=p.split(',')
             try:
                 p=tuple(float(x) for x in p)
-            except: # assign a random position, but keep node id
+            except ValueError: # assign a random position, but keep node id
                 from random import random
-                a['pos']=p=tuple((random(),random()))
+                attr['pos']=p=tuple((random(),random()))
 
 
         if self.idx is None: #now we know the dimension, so we can create the index
@@ -354,30 +352,30 @@ class _Geo(plot.Plot):
             prop.set_dimension(n)
             self.idx = index.Index(properties=prop)
 
-        close,d=self.closest_nodes(p) #search for those within tolerance
-        if close and d<=self.tol:
-            return close[0]
-        else: # point doesn't exist yet : create it
-            #RTREE uses unique int node identifiers
-            global _nk
-            _nk+=1
-            self.idx.insert(_nk,p,p)
-            # networkX uses any id type, but the RTREE key is kept
-            a['key']=_nk
-            self.parent.add_node(self,id, **a)
-            #._map links both id
-            self._map[id]=p
+        if self.tol>0:
+            close,d=self.closest_nodes(p) #search for those within tolerance
+            if close and d<=self.tol:
+                return close[0]
+            
+        # point doesn't exist yet : create it
+
+        global _nk #unique int node identifier for RTREE
+        _nk+=1
+        self.idx.insert(_nk,p,p)
+        # use RTREE key for networkX
+        attr['key']=_nk
+        self.parent.add_node(self,id, **attr)
+        #._map links both id
+        self._map[id]=p
         return id
 
     def add_nodes_from(self, nodes, **attr):
-        """must be here because Graph.add_nodes_from doesn't call add_node cleanly as it should..."""
-        for node in nodes:
-            try:
-                nn,d=node
-                attr.update(d)
-            except:
-                nn=node
-            self.add_node(nn,**attr)
+        # must override here because Graph.add_nodes_from doesn't call add_node 
+        # so attributes and self.idx wouldn't be handled correctly
+
+        for n in nodes:
+            attr.update(n[1])
+            self.add_node(n[0],**attr)
 
     def remove_node(self,n):
         """
@@ -406,61 +404,33 @@ class _Geo(plot.Plot):
         else:
             return edges[max(edges.keys())]
 
-    def add_edge(self, u, v, k=None, attr_dict=None, **attrs):
+    def add_edge(self, u, v, key=None, **attrs):
+        """add an edge to graph
+        :return: edge key
+        """
+        u=self.add_node(u) # create or find nearest in tol
+        v=self.add_node(v) # create or find nearest in tol
+        
+        if not self.is_multigraph():
+            try:
+                d = self._adj[u][v][0]
+                d.update(attrs)
+                return 0
+            except KeyError:
+                pass
+        if 'length' not in attrs:
+            attrs['length']=self.dist(u,v)
+        key=self.parent.add_edge(self,u, v, key, **attrs)
+
+        return key
+
+    def add_edge2(self, u, v, key=None, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         """
+        key=self.add_edge(u, v, key, **attrs)
 
-        if type(k) is dict: #old syntax : previous versions of NetworkX didn't require a key
-            attr_dict,k=k,None
-
-        #adjust to existing nodes within tolerance and keep track of actual precision
-        u=self.add_node(u)
-        v=self.add_node(v)
-
-        #attr and kwargs will be merged and copied here.
-        #this is important because we want to handle the
-        #length parameter separately for each edge
-        a={}
-        if attr_dict :
-            a.update(**attr_dict)
-        if attrs :
-            a.update(**attrs)
-
-        if not self.is_multigraph():
-            try:
-                data=self[u][v][0] # 0 because there is only one entry if not multi
-            except:
-                data=None
-            if data:
-                data.update(a)
-                return data #return existing edge data
-            else:
-                pass #and add the edge normally below
-
-
-        #if no length is explicitly defined, we calculate it and set it as parameter
-        #therefore all edges in a GeoGraph have a length attribute
-        a.setdefault('length',self.dist(u,v))
-        if k is None: #try to guess the key
-            try:
-                keys=set(self[u][v].keys()) #existing keys
-                k=0 if len(keys)==0 else None #if k=None, it will be determined below
-            except:
-                keys=set()
-                k=0
-
-        res=self.parent.add_edge(self,u, v, k, **a)
-
-        #Goulib returns the data dict, becasue that's what the most useful
-        if isinstance(res,dict):
-            return res
-        # but NetworkX 1.x returns None and 2.0 returns the ink key...
-        # so we have to search the dict object that was just created
-
-        if k is None:
-            k=next(iter(set(self[u][v].keys())-keys))
-        return self[u][v][k]
+        return self[u][v][key]
 
     def remove_edge(self,u,v=None,key=None,clean=False):
         """
@@ -836,8 +806,7 @@ def euclidean_minimum_spanning_tree(nodes,**kwargs):
     """
     g=GeoGraph(None,**kwargs)
     d=delauney_triangulation(nodes,**kwargs)
-    for edge in nx.minimum_spanning_edges(d, weight='length'):
-        g.add_edge(*edge)
+    g.add_edges_from(nx.minimum_spanning_edges(d, weight='length'))
     return g
 
 # Function to distribute N points on the surface of a sphere

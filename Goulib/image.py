@@ -1317,7 +1317,7 @@ for source in modes:
             converter=getattr(skcolor, convname,None)
 
         if converter:
-            converters.add_edge(key[0],key[1],{'f':converter})
+            converters.add_edge(key[0],key[1],f=converter)
 
 def convert(a,source,target,**kwargs):
     """convert an image between modes, eventually using intermediary steps

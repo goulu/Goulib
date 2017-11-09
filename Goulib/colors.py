@@ -153,7 +153,7 @@ for source in colorspaces:
                 if converter: #adapt it:
                     converter=_skadapt(converter)
         if converter:
-            converters.add_edge(key[0],key[1],{'f':converter})
+            converters.add_edge(key[0],key[1],f=converter)
 
 def convert(color,source,target):
     """convert a color between colorspaces,

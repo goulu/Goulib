@@ -82,19 +82,19 @@ class TestGeoGraph:
     def test_add_edge(self):
         g=self.cube.copy()
         assert_equal(g.length(),12)
-        edge=g.add_edge((0,0,0),(1,1,1),length=3)
+        g.add_edge((0,0,0),(1,1,1),length=3)
         assert_equal(g.number_of_edges(),13)
         assert_equal(g.length(),15)
         #try recreating the same edge when multi is False
         g.multi=False
         assert_equal(g.number_of_edges(),13)
-        edge=g.add_edge((0,0,0),(1,1,1),length=2) #it should only change the attribute
+        g.add_edge((0,0,0),(1,1,1),length=2) #it should only change the attribute
 
         assert_equal(g.number_of_edges(),13)
         assert_equal(g.length(),14)
         #try recreating the same edge when multi is False
         g.multi=True
-        edge=g.add_edge((0,0,0),(1,1,1),length=3) #now this one should be added
+        edge=g.add_edge2((0,0,0),(1,1,1),length=3) #now this one should be added
         assert_equal(edge['length'],3)
         assert_equal(g.number_of_edges(),14)
         assert_equal(g.length(),17)
