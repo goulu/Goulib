@@ -163,6 +163,16 @@ class Expr(plot.Plot):
                 f='sqrt(%d)'%math2.rint(f*f)
 
         self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
+        
+    @property
+    def isNum(self):
+        return isinstance(self.body,ast.Num)
+    
+    @property
+    def isconstant(self):
+        """:return: True if Expr evaluates to a constant number of bool"""
+        res=self()
+        return not isinstance(res,six.string_types)
 
     def __call__(self,x=None,**kwargs):
         """evaluate the Expr at x OR compose self(x())"""
@@ -249,12 +259,6 @@ class Expr(plot.Plot):
         node=copy.deepcopy(self.body)
         return Expr(Subst().visit(node))
 
-    @property
-    def isconstant(self):
-        """:return: True if Expr evaluates to a constant number of bool"""
-        res=self()
-        return not isinstance(res,six.string_types)
-
     def __eq__(self,other):
         if math2.is_number(other):
             try:
@@ -264,19 +268,28 @@ class Expr(plot.Plot):
         if not isinstance(other,Expr):
             other=Expr(other)
         return str(self())==str(other())
+    
+    def __ne__(self, other):
+        return not self==other
 
     def __lt__(self,other):
         if math2.is_number(other):
             try:
-                return self()<=other
+                return self()<other
             except:
                 return False
         if not isinstance(other,Expr):
             other=Expr(other)
-        try:
-            return float(self())==float(other())
-        except:
-            return False
+        return float(self())==float(other())
+        
+    def __le__(self, other):
+        return self<other or self==other
+    
+    def __ge__(self, other):
+        return not self<other
+    
+    def __gt__(self,other):
+        return self>=other and not self==other
 
     def __add__(self,right):
         return self.apply(ast.Add(),right)
