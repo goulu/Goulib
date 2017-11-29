@@ -280,7 +280,7 @@ class Expr(plot.Plot):
                 return False
         if not isinstance(other,Expr):
             other=Expr(other)
-        return float(self())==float(other())
+        return float(self())<float(other())
         
     def __le__(self, other):
         return self<other or self==other
@@ -332,6 +332,27 @@ class Expr(plot.Plot):
 
     def __rshift__(self,dx):
         return self.applx(ast.BinOp(ast.Name('x',None),ast.Sub(),ast.Num(dx)))
+    
+    def complexity(self):
+        """ measures the complexity of Expr
+        :return: int, sum of the precedence of used ops
+        """
+        def _node_complexity(node):
+            res=0
+            try:
+                res=operators[type(node.op)][1]
+            except:
+                pass
+            try:
+                res+=_node_complexity(node.left)
+            except:
+                pass
+            try:
+                res+=_node_complexity(node.right)
+            except:
+                pass
+            return res
+        return _node_complexity(self.body)
 
 
 #http://stackoverflow.com/questions/3867028/converting-a-python-numeric-expression-to-latex
