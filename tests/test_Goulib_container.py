@@ -9,37 +9,48 @@ from Goulib.container import *
 
 from Goulib import math2
 
-def ve2no(f, *args):
-    'Convert ValueError result to -1'
-    try:
-        return f(*args)
-    except ValueError:
-        return -1
+class TestRecord:
+    @classmethod
+    def setup_class(self):
+        self.d={'first':'Albert', 'last':'Einstein'}
+        self.r=Record(self.d)
+        assert_raises(AttributeError,lambda:self.r.birth)
+        
+    def test___init__(self):
+        pass
+    
+    def test___getattr__(self):
+        assert_equal(self.r.first,self.d['first'])
+        assert_equal(self.r['first'],self.d['first'])
+
+    def test___setattr__(self):
+        self.r.born=1879
+        assert_equal(self.r['born'],1879)
+        
+        r2=self.r.copy()
+        r2.first='Franck' # Franck Enstein ;-)
+        #check the fields are copied
+        assert_equal(self.r.first,self.d['first'])
+        
+
+    def test___str__(self):
+        # record = Record(*args, **kwargs)
+        # assert_equal(expected, record.__str__())
+        raise SkipTest # implement your test here
 
 class TestSortedCollection:
     
     @classmethod
     def setup_class(self):
-        from random import choice
-        self.pool = [1.5, 2, 2.0, 3, 3.0, 3.5, 4, 4.0, 4.5]
-        self.testSC=[]
-        for i in range(500):
-            for n in range(6):
-                s = [choice(self.pool) for i in range(n)]
-                sc = SortedCollection(s)
-                s.sort()
-                self.testSC.append((sc,s))
-                
-    def test_index(self):
-        def slow_index(seq, k):
-            'Location of match or -1 if not found'
-            for i, item in enumerate(seq):
-                if item == k:
-                    return i
-            return -1
-        for sc,s in self.testSC:
-            for probe in self.pool:
-                assert_equal(ve2no(sc.index, probe),slow_index(s, probe))
+        from operator import itemgetter
+        self.s=SortedCollection(key=itemgetter(2))
+        for record in [
+            ('roger', 'young', 30),
+            ('angela', 'jones', 28),
+            ('bill', 'smith', 22),
+            ('david', 'thomas', 32)]:
+                self.s.insert(record)
+        
         
     def test___contains__(self):
         # sorted_collection = SortedCollection(iterable, key)
@@ -99,26 +110,22 @@ class TestSortedCollection:
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.find(k))
         raise SkipTest 
+    
+    def test_index(self):
+        pass # tested below
 
     def test_find_ge(self):
-        # sorted_collection = SortedCollection(iterable, key)
-        # assert_equal(expected, sorted_collection.find_ge(k))
-        raise SkipTest 
+        r = self.s.find_ge(32)
+        assert_equal(self.s.index(r),3)
 
     def test_find_gt(self):
-        # sorted_collection = SortedCollection(iterable, key)
-        # assert_equal(expected, sorted_collection.find_gt(k))
-        raise SkipTest 
+        assert_equal(self.s.find_gt(28),('roger', 'young', 30))
 
     def test_find_le(self):
-        # sorted_collection = SortedCollection(iterable, key)
-        # assert_equal(expected, sorted_collection.find_le(k))
-        raise SkipTest 
+        assert_equal(self.s.find_le(29),('angela', 'jones', 28))
 
     def test_find_lt(self):
-        # sorted_collection = SortedCollection(iterable, key)
-        # assert_equal(expected, sorted_collection.find_lt(k))
-        raise SkipTest 
+        assert_equal(self.s.find_lt(28),('bill', 'smith', 22))
 
 
 
@@ -141,35 +148,6 @@ class TestSortedCollection:
         # sorted_collection = SortedCollection(iterable, key)
         # assert_equal(expected, sorted_collection.remove(item))
         raise SkipTest 
-    
-class TestRecord:
-    @classmethod
-    def setup_class(self):
-        self.d={'first':'Albert', 'last':'Einstein'}
-        self.r=Record(self.d)
-        assert_raises(AttributeError,lambda:self.r.birth)
-        
-    def test___init__(self):
-        pass
-    
-    def test___getattr__(self):
-        assert_equal(self.r.first,self.d['first'])
-        assert_equal(self.r['first'],self.d['first'])
-
-    def test___setattr__(self):
-        self.r.born=1879
-        assert_equal(self.r['born'],1879)
-        
-        r2=self.r.copy()
-        r2.first='Franck' # Franck Enstein ;-)
-        #check the fields are copied
-        assert_equal(self.r.first,self.d['first'])
-        
-
-    def test___str__(self):
-        # record = Record(*args, **kwargs)
-        # assert_equal(expected, record.__str__())
-        raise SkipTest # implement your test here
 
 
 class TestSequence:
