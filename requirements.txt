@@ -15,6 +15,7 @@ dxfgrabber
 dxfwrite
 svg.path
 pdfminer.six
+sortedcontainers
 pint
 nose       
 sphinx>=1.4.2

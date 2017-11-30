@@ -585,8 +585,6 @@ def catalan_gen():
 def is_pythagorean_triple(a,b,c):
     return a*a+b*b == c*c
 
-from Goulib.container import SortedCollection
-
 def primitive_triples():
     """ generates primitive Pythagorean triplets x<y<z
     
@@ -595,8 +593,9 @@ def primitive_triples():
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
     """
     key=lambda x:(x[2],x[1])
-    triples=SortedCollection(key=key)
-    triples.insert([3,4,5])
+    from sortedcontainers import SortedListWithKey
+    triples=SortedListWithKey(key=key)
+    triples.add([3,4,5])
     A = [[ 1,-2, 2], [ 2,-1, 2], [ 2,-2, 3]]
     B = [[ 1, 2, 2], [ 2, 1, 2], [ 2, 2, 3]]
     C = [[-1, 2, 2], [-2, 1, 2], [-2, 2, 3]]
@@ -610,7 +609,7 @@ def primitive_triples():
             triple=[sum(x*y for (x,y) in zip([a,b,c],X[i])) for i in range(3)]
             if triple[0]>triple[1]: # ensure x<y<z
                 triple[0],triple[1]=triple[1],triple[0]
-            triples.insert(triple)
+            triples.add(triple)
 
 def triples():
     """ generates all Pythagorean triplets triplets x<y<z
@@ -618,26 +617,27 @@ def triples():
     """
     prim=[] #list of primitive triples up to now
     key=lambda x:(x[2],x[1])
-    samez=SortedCollection(key=key) # temp triplets with same z
-    buffer=SortedCollection(key=key) # temp for triplets with smaller z
+    from sortedcontainers import SortedListWithKey
+    samez=SortedListWithKey(key=key) # temp triplets with same z
+    buffer=SortedListWithKey(key=key) # temp for triplets with smaller z
     for pt in primitive_triples():
         z=pt[2]
         if samez and z!=samez[0][2]: #flush samez
             while samez:
                 yield samez.pop(0)
-        samez.insert(pt)
+        samez.add(pt)
         #build buffer of smaller multiples of the primitives already found
         for i,pm in enumerate(prim):
             p,m=pm[0:2]
             while True:
                 mz=m*p[2]
                 if mz < z:
-                    buffer.insert(tuple(m*x for x in p))
+                    buffer.add(tuple(m*x for x in p))
                 elif mz == z:
                     # we need another buffer because next pt might have
                     # the same z as the previous one, but a smaller y than
                     # a multiple of a previous pt ...
-                    samez.insert(tuple(m*x for x in p))
+                    samez.add(tuple(m*x for x in p))
                 else:
                     break
                 m+=1

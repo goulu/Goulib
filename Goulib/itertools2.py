@@ -724,13 +724,13 @@ def sorted_iterable(iterable, key=None, buffer=100):
     :param buffer: int size of buffer. elements to swap should not be further than that
     """
     key=key or identity
-    from Goulib.container import SortedCollection
-    b=SortedCollection(key=key)
+    from sortedcontainers import SortedListWithKey
+    b=SortedListWithKey(key=key)
     for x in iterable:
         if len(b)>=buffer:
             res=b.pop(0)
             yield res
-        b.insert(x)
+        b.add(x)
     for x in b: # this never happens if iterable is infinite
         yield x
 
