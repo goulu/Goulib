@@ -195,7 +195,7 @@ class Intervals(SortedListWithKey):
             item=self.pop(i).hull(item)
             return self.add(item)
         
-        super().add(item)
+        super(Intervals,self).add(item)
         return self
     
     def insert(self, item):
