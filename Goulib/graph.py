@@ -214,7 +214,7 @@ class _Geo(plot.Plot):
         try:
             return self.multi
         except AttributeError:
-            return True
+            return self.parent.is_multigraph(self)
 
     def pos(self,nodes=None):
         """
@@ -404,33 +404,61 @@ class _Geo(plot.Plot):
         else:
             return edges[max(edges.keys())]
 
-    def add_edge(self, u, v, key=None, **attrs):
+    def _add_edge(self, u, v, key=None,  **attr):
         """add an edge to graph
+        
         :return: edge key
         """
         u=self.add_node(u) # create or find nearest in tol
         v=self.add_node(v) # create or find nearest in tol
         
-        if not self.is_multigraph():
+        if 'length' not in attr:
+            attr['length']=self.dist(u,v)
+            
+        if not self.is_multigraph(): # update already existing edge
             try:
-                d = self._adj[u][v][0]
-                d.update(attrs)
-                return 0
-            except KeyError:
+                self[u][v]
+            except KeyError: # no edge
                 pass
-        if 'length' not in attrs:
-            attrs['length']=self.dist(u,v)
-        key=self.parent.add_edge(self,u, v, key, **attrs)
+            else:
+                k=key or 0
+                self[u][v][k].update(attr)
+                return k
 
+        key=self.parent.add_edge(self,u, v, key=key)
+        # note : NetworkX 1.x doesn't return the key ...
+        if self.parent.is_multigraph(self):
+            if key is None: # ... so we have to retrieve it now 
+                key=len(self[u][v])-1
+            self[u][v][key].update(attr)
+        else:
+            self[u][v].update(attr)
+            key=None
         return key
+    
+    if nx.__version__ < '2': #backward compatibility for now
+        def add_edge(self, u, v, key=None,  attr_dict=None, **attr):
+        # set up attribute dict # code copied from nx 1,11
+            if attr_dict is None:
+                attr_dict = attr
+            else:
+                attr_dict.update(attr)
+            return self._add_edge( u, v, key=key, **attr_dict)
+    else:
+        add_edge = _add_edge
+    
 
     def add_edge2(self, u, v, key=None, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         """
-        key=self.add_edge(u, v, key, **attrs)
-
-        return self[u][v][key]
+        key=self._add_edge(u, v, key, **attrs)
+        
+        try:
+            return self[u][v][key or 0]
+        except KeyError:
+            return self[u][v]
+            
 
     def remove_edge(self,u,v=None,key=None,clean=False):
         """
