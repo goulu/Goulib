@@ -24,7 +24,7 @@ import ast
 import operator as op
 
 # supported operators with precedence and text + LaTeX repr
-# precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
+# precedence as in https://docs.python.org/reference/expressions.html#operator-precedence
 #
 operators = {
     ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
@@ -161,8 +161,10 @@ class Expr(plot.Plot):
                 f='1/%d'%math2.rint(1/f)
             elif math2.is_integer(f*f):
                 f='sqrt(%d)'%math2.rint(f*f)
+                
+        f=str(f).replace('^','**') #accept ^ as power operator rather than xor ...
 
-        self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
+        self.body=compile(f,'Expr','eval',ast.PyCF_ONLY_AST).body
         
     @property
     def isNum(self):
@@ -178,24 +180,23 @@ class Expr(plot.Plot):
         """evaluate the Expr at x OR compose self(x())"""
         if isinstance(x,Expr): #composition
             return self.applx(x)
-        try: #is x iterable ?
-            return [self(x) for x in x]
-        except:
-            pass
+        if itertools2.isiterable(x):
+            return (self(x) for x in x)
         if x is not None:
             kwargs['x']=x
         kwargs['self']=self #allows to call methods such as in Stats
         try:
             e=eval(self.body,kwargs)
-        except ZeroDivisionError:
-            return None
-        except OverflowError:
-            return None
-        except TypeError as error: # some params remain symbolic
+        except TypeError: # some params remain symbolic
             return self
+        except Exception as error:# ZeroDivisionError, OverflowError
+            return None
         if math2.is_number(e):
             return e
         return Expr(e)
+    
+    def __float__(self):
+        return float(self())
 
     def __repr__(self):
         return TextVisitor(_dialect_python).visit(self.body)
@@ -221,12 +222,15 @@ class Expr(plot.Plot):
         x=list(x)
         if y is None:
             y=self(x)
-        y=list(y)
 
         offset=kwargs.pop('offset',0) #slightly shift the points to make superimposed curves more visible
-        x=[_+offset for _ in x] # listify at the same time
-        y=[_+offset for _ in y] # listify at the same time
-        ax.plot(x,y, **kwargs)
+        
+        points=list(zip(x,y)) # might contain (x,None) for undefined points
+        for xy in itertools2.isplit(points,lambda _:_[1] is None): # curves between defined points
+            xy=list(xy)
+            x=[v[0]+offset for v in xy]
+            y=[v[1]+offset for v in xy]
+            ax.plot(x,y, **kwargs)
         return ax
 
     def apply(self,f,right=None):
@@ -375,11 +379,15 @@ class TextVisitor(ast.NodeVisitor):
 
     def prec_BinOp(self, n):
         return self.prec(n.op)
+    
+    @staticmethod
+    def _par(content):
+        return r'(%s)'%content
 
     def visit_Call(self, n):
         func = self.visit(n.func)
-        args = ', '.join(map(self.visit, n.args))
-        return '%s(%s)' % (func, args)
+        args = r', '.join(map(self.visit, n.args))
+        return str(func)+self._par(args)
 
     def visit_Name(self, n):
         return n.id
@@ -388,10 +396,11 @@ class TextVisitor(ast.NodeVisitor):
         return str(node.value)
 
     def visit_UnaryOp(self, n):
+        symbol=operators[type(n.op)][self.dialect]
+        left=self.visit(n.operand)
         if self.prec(n.op) > self.prec(n.operand):
-            return r'%s(%s)' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
-        else:
-            return r'%s%s' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
+            left=self._par(left)
+        return symbol+left
 
     def _Bin(self, left,op,right):
         
@@ -404,16 +413,18 @@ class TextVisitor(ast.NodeVisitor):
         l,r = self.visit(left),self.visit(right)
         #handle precedence (parenthesis) if needed
             
-        if isinstance(op, ast.Sub):
+        if isinstance(op, ast.Sub): # forces (a-b)-(c+d) and a-(-b) 
             if self.prec(op) >= self.prec(left):
-                l = '(%s)' % l
-            if self.prec(op) >= self.prec(right):
-                r = '(%s)' % r
+                l = self._par(l)
+            if self.prec(op) >= self.prec(right) or isinstance(right, ast.UnaryOp):
+                r = self._par(r)
         else:
             if self.prec(op) > self.prec(left):
-                l = '(%s)' % l
-            if self.prec(op) > self.prec(right):
-                r = '(%s)' % r
+                l = self._par(l)
+            if self.prec(op) > self.prec(right) or (
+                isinstance(right, ast.UnaryOp) and isinstance(op, ast.Add)
+            ):
+                r = self._par(r)
             
             
         symbol=operators[type(op)][self.dialect]
@@ -456,11 +467,13 @@ class LatexVisitor(TextVisitor):
         args = ', '.join(map(self.visit, n.args))
         if func in ['sqrt']:
             return r'\%s {%s}' % (func, args)
+        if func in ['factorial']:
+            return r'%s!' % args
             
         return r'\%s \left(%s\right)' % (func, args)
 
     def visit_UnaryOp(self, n):
-        if self.prec(n.op) > self.prec(n.operand):
+        if self.prec(n.op) >= self.prec(n.operand):
             return r'%s\left(%s\right)' % (operators[type(n.op)][_dialect_latex], self.visit(n.operand))
         else:
             try:

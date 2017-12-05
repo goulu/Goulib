@@ -39,41 +39,42 @@ class Plot(object):
         return ax
     
     def render(self, fmt='svg', **kwargs):
-        return render([self],fmt, **kwargs) # call global function
+        try:
+            return render([self],fmt, **kwargs) # call global function
+        except:
+            raise AttributeError('%s has no %s representation'%(self,fmt))
     
     def save(self,filename,**kwargs):
         return save([self],filename, **kwargs) # call global function
     
     # for IPython notebooks
-    
-    def _repr_png_(self,**kwargs):
-        return self.render(fmt='png',**kwargs)
-
-    def _repr_svg_(self,**kwargs):
-        return self.render(fmt='svg',**kwargs).decode('utf-8')
         
     def _repr_html_(self):
         """default rich format is svg plot"""
-        try:
-            return self._repr_svg_()
-        except:
-            pass
+        return self._repr_svg_()
         #this returns  the same as _repr_png_, but is Table compatible
         buffer=self.render('png')
         s=base64.b64encode(buffer).decode('utf-8')
         return '<img src="data:image/png;base64,%s">'%s
     
-    def png(self,**kwargs):
-        from IPython.display import Image
-        return Image(self._repr_png_(**kwargs), embed=True)
+    def html(self,**kwargs):
+        from IPython.display import HTML
+        return HTML(self._repr_html_(**kwargs))
     
     def svg(self,**kwargs):
         from IPython.display import SVG
         return SVG(self._repr_svg_(**kwargs))
     
-    def html(self,**kwargs):
-        from IPython.display import HTML
-        return HTML(self._repr_html_(**kwargs))
+    def _repr_svg_(self,**kwargs):
+        return self.render(fmt='svg',**kwargs).decode('utf-8')
+    
+    def png(self,**kwargs):
+        from IPython.display import Image
+        return Image(self._repr_png_(**kwargs), embed=True)
+    
+    def _repr_png_(self,**kwargs):
+        return self.render(fmt='png',**kwargs)
+
     
     def plot(self,**kwargs):
         """ renders on IPython Notebook
