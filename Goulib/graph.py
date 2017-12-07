@@ -28,7 +28,7 @@ try:
     import numpy, scipy.spatial
     SCIPY=True
 except ImportError:
-    logging.warning('scipy not available, delauney triangulation is not supported')
+    #logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
 from . import math2
@@ -47,7 +47,7 @@ except ImportError: #fallback, especially because I couldn't manage to install r
     RTREE=False
 
 if not RTREE:
-    logging.warning('rtree not available')
+    #logging.warning('rtree not available')
 
     class index: #mimics rtree.index module
 
@@ -101,11 +101,11 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
             create_using.add_edge(p[0],p[1])
             create_using.add_edge(p[1],p[2])
             create_using.add_edge(p[2],p[0])
-    
+
     elif isinstance(create_using,_Geo):
         tol=create_using.tol
         create_using.tol=0 #zero tolerance when copying
-    
+
         if isinstance(data,nx.Graph):
             create_using.clear()
             create_using.add_nodes_from(data.nodes(data=True))
@@ -116,7 +116,7 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
 
     else:
         create_using=nx.convert.to_networkx_graph(data,create_using,multigraph_input)
-        
+
     return create_using
 
 
@@ -356,7 +356,7 @@ class _Geo(plot.Plot):
             close,d=self.closest_nodes(p) #search for those within tolerance
             if close and d<=self.tol:
                 return close[0]
-            
+
         # point doesn't exist yet : create it
 
         global _nk #unique int node identifier for RTREE
@@ -370,7 +370,7 @@ class _Geo(plot.Plot):
         return id
 
     def add_nodes_from(self, nodes, **attr):
-        # must override here because Graph.add_nodes_from doesn't call add_node 
+        # must override here because Graph.add_nodes_from doesn't call add_node
         # so attributes and self.idx wouldn't be handled correctly
 
         for n in nodes:
@@ -406,15 +406,15 @@ class _Geo(plot.Plot):
 
     def _add_edge(self, u, v, key=None,  **attr):
         """add an edge to graph
-        
+
         :return: edge key
         """
         u=self.add_node(u) # create or find nearest in tol
         v=self.add_node(v) # create or find nearest in tol
-        
+
         if 'length' not in attr:
             attr['length']=self.dist(u,v)
-            
+
         if not self.is_multigraph(): # update already existing edge
             try:
                 self[u][v]
@@ -428,14 +428,14 @@ class _Geo(plot.Plot):
         key=self.parent.add_edge(self,u, v, key=key)
         # note : NetworkX 1.x doesn't return the key ...
         if self.parent.is_multigraph(self):
-            if key is None: # ... so we have to retrieve it now 
+            if key is None: # ... so we have to retrieve it now
                 key=len(self[u][v])-1
             self[u][v][key].update(attr)
         else:
             self[u][v].update(attr)
             key=None
         return key
-    
+
     if nx.__version__ < '2': #backward compatibility for now
         def add_edge(self, u, v, key=None,  attr_dict=None, **attr):
         # set up attribute dict # code copied from nx 1,11
@@ -446,19 +446,19 @@ class _Geo(plot.Plot):
             return self._add_edge( u, v, key=key, **attr_dict)
     else:
         add_edge = _add_edge
-    
+
 
     def add_edge2(self, u, v, key=None, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         """
         key=self._add_edge(u, v, key, **attrs)
-        
+
         try:
             return self[u][v][key or 0]
         except KeyError:
             return self[u][v]
-            
+
 
     def remove_edge(self,u,v=None,key=None,clean=False):
         """
@@ -796,7 +796,7 @@ def write_json(g,filename, **kwargs):
     """
     with open(filename, 'w') as file:
         file.write(to_json(g,**kwargs))
-        
+
 def read_json(filename, directed=False, multigraph=True, attrs=None):
     with open(filename) as f:
         js_graph = json.load(f)
