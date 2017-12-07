@@ -13,7 +13,10 @@ from Goulib.expr import *
 from math import *
 
 import os
+from Goulib.plot import save
+
 path=os.path.dirname(os.path.abspath(__file__))
+results=path+'/results/expr/' #path for results
 
 class TestExpr:
     
@@ -38,6 +41,8 @@ class TestExpr:
         self.true=Expr(True) #make sure it works
         self.false=Expr('False') #make sure it creates a bool
         
+        self.sqrt=Expr(math.sqrt)
+        
         
     def test___init__(self):
         e2=Expr(lambda x:3*x+2) # same as e1
@@ -55,7 +60,11 @@ class TestExpr:
         assert_equal(str(e),'2y')
 
     def test___str__(self):
+        assert_equal(str(Expr(pi)),'pi')
+        
         assert_equal(str(Expr('3*5')),'3*5')
+        assert_equal(str(Expr('3+(-2)')),'3+(-2)')
+        assert_equal(str(Expr('-(3+2)')),'-(3+2)')
         
         assert_equal(str(self.f),'3x+2')   
         assert_equal(str(self.f1),'1')     
@@ -74,22 +83,30 @@ class TestExpr:
         assert_equal(repr(self.fs),'sin(x)')    
         assert_equal(repr(self.fb1),'x > 1')    
         assert_equal(repr(self.long),'(3*x+(a+b)*y)/x**(3*a*y)')
+        assert_equal(repr(self.sqrt),'sqrt(x)')
         
         #test multiplication commutativity and simplification
         assert_equal(repr(Expr('x*3+(a+b)')),'3*x+a+b')
+        
+    def test__repr_html_(self):
+        assert_equal(self.sqrt._repr_html_(),r'$\sqrt{x}$')
+        
+    def test_plot(self):
+        save([Expr('1/x')],results+'oneoverx.png',x=range(-100,100))
+        save([Expr('sin(x/10)/(x/10)')],results+'sinxoverx.png',x=range(-100,100))
         
     def test_latex(self):
         assert_equal(self.f.latex(),'3x+2')   
         assert_equal(self.f1.latex(),'1')     
         assert_equal(self.fx.latex(),'x')    
-        assert_equal(self.fs.latex(),'\\sin \\left(x\\right)')    
-        assert_equal(self.fb1.latex(),'x \\gtr 1')      
-        assert_equal(self.fs(self.fx2).latex(),'\\sin \\left(x^2\\right)') 
-        assert_equal(self.long.latex(),'\\frac{3x+\\left(a+b\\right) \\cdot y}{x^{3a \\cdot y}}')
-        assert_equal(Expr(sqrt(3)).latex(),'\\sqrt {3}')
-        assert_equal(Expr(1./3).latex(),'\\frac{1}{3}')
+        assert_equal(self.fs.latex(),r'\sin\left(x\right)')    
+        assert_equal(self.fb1.latex(),r'x \gtr 1')      
+        assert_equal(self.fs(self.fx2).latex(),r'\sin\left(x^2\right)') 
+        assert_equal(self.long.latex(),r'\frac{3x+\left(a+b\right)y}{x^{3ay}}')
+        assert_equal(self.sqrt.latex(),r'\sqrt{x}')
+        assert_equal(Expr(1./3).latex(),r'\frac{1}{3}')
         l=Expr('sqrt(x*3+(a+b)*y)/x**(3*a*y)').latex()
-        assert_equal(l,'\\frac{\\sqrt {3x+\\left(a+b\\right) \\cdot y}}{x^{3a \\cdot y}}')
+        assert_equal(l,r'\frac{\sqrt{3x+\left(a+b\right)y}}{x^{3ay}}')
 
     def test___add__(self):
         f=self.fx+self.f1
