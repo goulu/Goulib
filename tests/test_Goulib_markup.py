@@ -28,6 +28,9 @@ class TestTag:
             )
         )
         
+        t=tag('test',r'$\left(x\right)$')
+        assert_equal(t,r'<test>$\left(x\right)$</test>')
+        
 
 class TestElement:
     def test___call__(self):
@@ -180,26 +183,6 @@ class TestStyleStr2dict:
     def test_style_str2dict(self):
         # assert_equal(expected, style_str2dict(style))
         raise SkipTest 
-
-class test__oneliner:
-    def test___getattr__(self):
-        # _oneliner = _oneliner(case)
-        # assert_equal(expected, _oneliner.__getattr__(attr))
-        raise SkipTest # implement your test here
-
-    def test___init__(self):
-        # _oneliner = _oneliner(case)
-        raise SkipTest # implement your test here
-
-class test__oneliner:
-    def test___getattr__(self):
-        # _oneliner = _oneliner(case)
-        # assert_equal(expected, _oneliner.__getattr__(attr))
-        raise SkipTest # implement your test here
-
-    def test___init__(self):
-        # _oneliner = _oneliner(case)
-        raise SkipTest # implement your test here
 
 class test__oneliner:
     def test___getattr__(self):
