@@ -38,7 +38,8 @@ urlopen = request.urlopen
 
 import os, sys, math, base64, functools, logging
 
-from Goulib import math2, itertools2
+from Goulib import math2
+from Goulib.itertools2 import flatten, pairwise, identity
 from Goulib.drawing import Drawing #to read vector pdf files as images
 from Goulib.colors import Color, Palette
 from Goulib.plot import Plot
@@ -572,7 +573,7 @@ class Image(Plot):
 
     @staticmethod
     def _hash_result(result):
-        return math2.num_from_digits(itertools2.flatten(result),2)
+        return math2.num_from_digits(flatten(result),2)
 
     def average_hash(self, hash_size=8):
         """Average Hash
@@ -1276,7 +1277,7 @@ def lab2ind(im,colors=256):
         pal=[Color(c,'lab') for c in p]
     else:
         pal=colors
-        p=[c.lab for c in itertools2.flatten(pal)]
+        p=[c.lab for c in flatten(pal)]
     w, h, d = im.shape
     s=w*h #number of pixels
     flat = np.reshape(im, (s, d))
@@ -1336,7 +1337,7 @@ def convert(a,source,target,**kwargs):
             %(source.name, target.name)
         )
 
-    for u,v in itertools2.pairwise(path):
+    for u,v in pairwise(path):
         if u==v: continue #avoid converting from gray to gray
         try:
             edge=converters[u][v][0]    

@@ -51,7 +51,10 @@ class Plot(object):
         
     def _repr_html_(self):
         """default rich format is svg plot"""
-        return self._repr_svg_()
+        try:
+            return self._repr_svg_()
+        except NotImplementedError:
+            pass
         #this returns  the same as _repr_png_, but is Table compatible
         buffer=self.render('png')
         s=base64.b64encode(buffer).decode('utf-8')
