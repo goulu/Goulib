@@ -106,6 +106,11 @@ class TestTable:
         h=t.html()
         assert_true(h)
         
+        #table with LaTex should not convert r'\right' in '\r ight'
+        t=Table([[r'$\left(x\right)$']])
+        h=t.html()
+        assert_equal(h,'<table><tr><td>$\\left(x\\right)$</td></tr>\n</table>\n')
+        
     def test_append(self):
         ta = Table()
         ta.append({'col1':1,'col2':2})
