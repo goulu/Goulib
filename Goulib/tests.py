@@ -112,7 +112,7 @@ class TestCase(unittest.TestCase):
         :param first, second: objects to compare for (quasi) equality
         :param places: int number of digits to consider in float comparisons.
                         If None, forces strict equality
-        :param msg: optional string error message to display in cas of failure
+        :param msg: optional string error message to display in case of failure
         :param delta: optional float absolute tolerance value
         :param reltol: optional float relative tolerance value
         """
@@ -201,7 +201,7 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
         
 setlog()
         
-def runmodule(level=logging.INFO, argv=[]):
+def runmodule(level=logging.INFO, verbosity=1, argv=[]):
     """
     :param argv: optional list of string with additional options passed to nose.run
     see http://nose.readthedocs.org/en/latest/usage.html
@@ -220,7 +220,12 @@ def runmodule(level=logging.INFO, argv=[]):
     sys.stdout = mystdout = StringIO()
     
     result = nose.run(
-        argv=[sys.argv[0], module_name,'-s','--nologcapture']+argv
+        argv=[
+            sys.argv[0], 
+            module_name,
+            '-s','--nologcapture', 
+            '--verbosity=%d'%verbosity,
+        ]+argv
     )
     
     sys.stdout = old_stdout
