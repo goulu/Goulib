@@ -22,18 +22,7 @@ from Goulib import itertools2
 
 inf=float('Inf') #infinity
 
-def is_number(x):
-    """:return: True if x is a number of any type"""
-    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
-    return isinstance(x, numbers.Number)
-
-def sign(number):
-    """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
-    if number<0:
-        return -1
-    if number>0:
-        return 1
-    return 0
+# define some math functions that are not available in all supported versions of python
 
 try:
     cmp=math.cmp
@@ -43,6 +32,13 @@ except AttributeError:
         The return value is negative if x < y, zero if x == y and strictly positive if x > y.
         """
         return sign(x-y)
+    
+try:
+    log2=math.log2
+except AttributeError:
+    def log2(x):return math.log(x,2)
+
+# improved versions of math functions
 
 def gcd(*args):
     """greatest common divisor of an arbitrary number of args"""
@@ -63,6 +59,22 @@ def gcd(*args):
         L.append(b)
 
     return abs(b)
+
+# basic useful functions
+
+def is_number(x):
+    """:return: True if x is a number of any type"""
+    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
+    return isinstance(x, numbers.Number)
+
+
+def sign(number):
+    """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
+    if number<0:
+        return -1
+    if number>0:
+        return 1
+    return 0
 
 def lcm(*args):
     """least common multiple of any number of integers"""
