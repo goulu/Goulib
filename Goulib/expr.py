@@ -64,8 +64,8 @@ _operators = {
 }
 
 
-#defined functions
-_functions={}
+
+_functions={} #only functions listed in this dict can be used in Expr
 
 def add_function(f,s=None,r=None,l=None):
     ''' add a function to those allowed in Expr.
@@ -76,24 +76,40 @@ def add_function(f,s=None,r=None,l=None):
     :param l: LaTeX representation
     '''
     _functions[f.__name__]=(f,9999,s,r,l)
+    
+_constants = { # constants in this dict are recognized in output
+    bool : {},
+    float : {},
+    complex : {},
+    } 
+    
+def add_constant(c, name, s=None,r=None,l=None):
+    ''' add a constant to those recognized in Expr.
+    
+    :param c: constant
+    :param s: string representation, should be formula-like
+    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
+    :param l: LaTeX representation
+    '''
+    _constants[type(c)][c]=(None,None,s or name,r or name ,l or '\\'+name)
 
 def add_module(module):
     for fname,f in six.iteritems(module.__dict__):
         if fname[0]=='_': continue
         if isinstance(f, collections.Callable):
             add_function(f)
+        elif math2.is_number(f):
+            add_constant(f,fname)
+            
+add_constant(True,'True')
+add_constant(False,'False')
 
 import math
 add_module(math)
 add_function(math.factorial,'%s!','fact','%s!')
 add_function(math.sqrt,l='\\sqrt{%s}')
 
-
-_constants = {
-    math.e: (None,None,'e','e','e'),
-    math.pi: (None,None,'pi','pi',r'\pi'),
-}
-
+add_constant(complex(0,1),'i')
 
 def eval(node,ctx={}):
     """safe eval of ast node : only _functions and _operators listed above can be used
@@ -191,7 +207,7 @@ class Expr(plot.Plot):
         elif isinstance(f, collections.Callable): # builtin function
             f='%s(x)'%f.__name__
         elif f in ('True','False'):
-            f=bool(f)
+            f=bool(f=='True')
 
         if type(f) is bool:
             self.body=ast.Num(f)
@@ -519,7 +535,8 @@ class TextVisitor(ast.NodeVisitor):
 
     def visit_Num(self, n):
         try:
-            return _constants[n.n][self.dialect]
+            d=_constants[type(n.n)]
+            return d[n.n][self.dialect]
         except KeyError:
             pass
         return str(math2.int_or_float(n.n))
