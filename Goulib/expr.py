@@ -64,8 +64,8 @@ _operators = {
 }
 
 
-
-_functions={} #only functions listed in this dict can be used in Expr
+from sortedcollections import SortedDict
+functions=SortedDict() #only functions listed in this dict can be used in Expr
 
 def add_function(f,s=None,r=None,l=None):
     ''' add a function to those allowed in Expr.
@@ -75,7 +75,12 @@ def add_function(f,s=None,r=None,l=None):
     :param r: repr representation, should be cut&pastable in a calculator, or in python ...
     :param l: LaTeX representation
     '''
-    _functions[f.__name__]=(f,9999,s,r,l)
+    try:
+        f(2,2)
+        return
+    except TypeError:
+        pass
+    functions[f.__name__]=(f,9999,s,r or s,l)
     
 _constants = { # constants in this dict are recognized in output
     bool : {},
@@ -106,13 +111,31 @@ add_constant(False,'False')
 
 import math
 add_module(math)
+add_function(abs,l='\\lvert{%s}\\rvert')
+add_function(math.fabs,l='\\lvert{%s}\\rvert')
 add_function(math.factorial,'%s!','fact','%s!')
 add_function(math.sqrt,l='\\sqrt{%s}')
+add_function(math.trunc,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.floor,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.ceil,l='\\left\\lceil{%s}\\right\\rceil')
+add_function(math.asin,l='\\arcsin')
+add_function(math.acos,l='\\arccos')
+add_function(math.atan,l='\\arctan')
+add_function(math.asinh,l='\\sinh^{-1}')
+add_function(math.acosh,l='\\cosh^{-1}')
+add_function(math.atanh,l='\\tanh^{-1}')
+add_function(math.log,l='\\ln')
+add_function(math.log10,l='\\log_{10}')
+add_function(math2.log2,l='\\log_2')
+add_function(math.gamma,l='\\Gamma')
+add_function(math.lgamma,'log(abs(gamma(%s)))',l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
+add_function(math.degrees,l='\\frac{360*%s}{\\pi}')
+add_function(math.radians,l='\\frac{\\pi*%s}{360}')
 
 add_constant(complex(0,1),'i')
 
 def eval(node,ctx={}):
-    """safe eval of ast node : only _functions and _operators listed above can be used
+    """safe eval of ast node : only functions and _operators listed above can be used
 
     :param node: ast.AST to evaluate
     :param ctx: dict of varname : value to substitute in node
@@ -128,9 +151,9 @@ def eval(node,ctx={}):
         return tuple(eval(e,ctx) for e in node.elts)
     elif isinstance(node, ast.Call):
         params=[eval(arg,ctx) for arg in node.args]
-        if not node.func.id in _functions:
+        if not node.func.id in functions:
             raise NameError('%s function not allowed'%node.func.id)
-        f=_functions[node.func.id][0]
+        f=functions[node.func.id][0]
         return f(*params)
     elif isinstance(node, ast.BinOp): # <left> <operator> <right>
         op=_operators[type(node.op)]
@@ -454,7 +477,7 @@ class TextVisitor(ast.NodeVisitor):
         args = r', '.join(map(self.visit, n.args))
 
         func = self.visit(n.func)
-        fname = _functions[func][self.dialect]
+        fname = functions[func][self.dialect]
         if fname is None:
             if self.dialect == _dialect_latex:
                 fname = '\\'+func
