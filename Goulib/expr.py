@@ -3,6 +3,7 @@
 """
 simple symbolic math expressions
 """
+from _ast import USub
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -52,8 +53,8 @@ _operators = {
     ast.FloorDiv: (op.truediv, 1200,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
     ast.Mod: (op.mod, 1200,' mod ','%',' \\bmod '),
     ast.Invert: (op.not_,1300,'~','~','\\sim '),
-    ast.UAdd: (op.pos,1300,'+','+','+'),
-    ast.USub: (op.neg,1300,'-','-','-'),
+    ast.UAdd: (op.pos,1150,'+','+','+'),
+    ast.USub: (op.neg,1150,'-','-','-'),
     ast.Pow: (op.pow,1400,'^','**','^'),
 
     # precedence of other types below
@@ -159,13 +160,15 @@ def get_function_source(f):
         res=g.group(2)
     return res
 
-def plouffe(f):
-    if f!=0 and math2.is_integer(1/f):
-        if f>0:
-            f='1/%d'%math2.rint(1/f)
-        else:
-            f='-1/%d'%math2.rint(1/-f)
-    elif f>0 and math2.is_integer(f*f):
+def plouffe(f,epsilon=1e-6):
+    if f<0 :
+        r=plouffe(-f)
+        if isinstance(r,six.string_types):
+            return '-'+r
+        return f
+    if f!=0 and math2.is_integer(1/f,epsilon):
+        f='1/%d'%math2.rint(1/f)
+    elif math2.is_integer(f*f,epsilon):
         f='sqrt(%d)'%math2.rint(f*f)
     return f
 
@@ -199,6 +202,11 @@ class Expr(plot.Plot):
                 f=math2.rint(f)
             else:
                 f=plouffe(f)
+                
+        if math2.is_number(f): # store it with full precision 
+            # (otherwise Py2 doesn't find pi in _constants ...)
+            self.body=ast.Num(f)
+            return
 
         if isinstance(f,Expr): #copy constructor
             self.body=f.body
@@ -412,17 +420,13 @@ class TextVisitor(ast.NodeVisitor):
         '''
         self.dialect=dialect
 
-    def prec(self, n):
-        try:
-            return _operators[type(n)][1]
-        except KeyError:
-            return _operators[type(n.op)][1]
-
-    def prec_UnaryOp(self, n):
-        return self.prec(n.op)
-
-    def prec_BinOp(self, n):
-        return self.prec(n.op)
+    def prec(self, op):
+        ''' calculate the precedence of op '''
+        if isinstance(op,(ast.BinOp, ast.UnaryOp)):
+            op=op.op
+        if isinstance(op,ast.Num) and op.n<0:
+            return _operators[ast.USub][1]
+        return _operators[type(op)][1]
 
     def _par(self,content):
         if self.dialect == _dialect_latex:
@@ -482,28 +486,29 @@ class TextVisitor(ast.NodeVisitor):
         
         #handle precedence (parenthesis) if needed
 
-        if isinstance(op, ast.Sub): # forces (a-b)-(c+d) and a-(-b)
-            if self.prec(op) >= self.prec(left):
-                l = self._par(l)
-            if self.prec(op) >= self.prec(right) or isinstance(right, ast.UnaryOp):
+        if self.prec(op) > self.prec(left):
+            l = self._par(l)
+            
+            
+        if self.prec(op) > self.prec(right):
+            if self.dialect == _dialect_latex and isinstance(op, ast.Pow):
+                r='{'+r+'}'
+            else:
                 r = self._par(r)
-        else:
-            if self.prec(op) > self.prec(left):
-                l = self._par(l)
-            if self.prec(op) > self.prec(right) or (
-                isinstance(right, ast.UnaryOp) and isinstance(op, ast.Add)
-            ):
-                if self.dialect == _dialect_latex and isinstance(op, ast.Pow):
-                    r='{'+r+'}'
-                else:
-                    r = self._par(r)
                     
         # remove * if possible
         if self.dialect != _dialect_python and isinstance(op, ast.Mult):
             if not l[-1].isdigit() or not r[0].isdigit():
                 symbol=''
 
-        return l+symbol+r
+        res=l+symbol+r
+        
+        # TODO: find a better way to do this ...
+        plusminus=_operators[ast.Add][self.dialect]+_operators[ast.USub][self.dialect]
+        minusminus=_operators[ast.Sub][self.dialect]+_operators[ast.USub][self.dialect]
+        res=res.replace(plusminus,_operators[ast.Sub][self.dialect])
+        res=res.replace(minusminus,_operators[ast.Add][self.dialect])
+        return res
 
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
@@ -513,8 +518,10 @@ class TextVisitor(ast.NodeVisitor):
         return self._Bin(n.left,n.ops[0],n.comparators[0])
 
     def visit_Num(self, n):
-        if n.n in _constants:
+        try:
             return _constants[n.n][self.dialect]
+        except KeyError:
+            pass
         return str(math2.int_or_float(n.n))
 
     def generic_visit(self, n):

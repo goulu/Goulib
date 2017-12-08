@@ -63,7 +63,9 @@ class TestExpr:
         assert_equal(str(Expr(pi)),'pi')
         
         assert_equal(str(Expr('3*5')),'3*5')
-        assert_equal(str(Expr('3+(-2)')),'3+(-2)')
+        assert_equal(str(Expr('3+(-2)')),'3-2')
+        assert_equal(str(Expr('3-(-2)')),'3+2')
+        assert_equal(str(Expr('3*(-2)')),'3(-2)')
         assert_equal(str(Expr('-(3+2)')),'-(3+2)')
         
         assert_equal(str(self.f),'3x+2')   
@@ -76,7 +78,18 @@ class TestExpr:
         #test multiplication commutativity and simplification
         assert_equal(str(Expr('x*3+(a+b)')),'3x+a+b')
         
+        #test multiplication commutativity and simplification
+        assert_equal(str(Expr('x*3+(a+b)')),'3x+a+b')
+        
     def test___repr__(self):
+        assert_equal(str(Expr(pi)),'pi')
+        
+        assert_equal(repr(Expr('3*5')),'3*5')
+        assert_equal(repr(Expr('3+(-2)')),'3-2')
+        assert_equal(repr(Expr('3-(-2)')),'3+2')
+        assert_equal(repr(Expr('3*(-2)')),'3*(-2)')
+        assert_equal(repr(Expr('-(3+2)')),'-(3+2)')
+        
         assert_equal(repr(self.f),'3*x+2')   
         assert_equal(repr(self.f1),'1')     
         assert_equal(repr(self.fx),'x')    
@@ -87,13 +100,6 @@ class TestExpr:
         
         #test multiplication commutativity and simplification
         assert_equal(repr(Expr('x*3+(a+b)')),'3*x+a+b')
-        
-    def test__repr_html_(self):
-        assert_equal(self.sqrt._repr_html_(),r'$\sqrt{x}$')
-        
-    def test_plot(self):
-        save([Expr('1/x')],results+'oneoverx.png',x=range(-100,100))
-        save([Expr('sin(x/10)/(x/10)')],results+'sinxoverx.png',x=range(-100,100))
         
     def test_latex(self):
         assert_equal(self.f.latex(),'3x+2')   
@@ -107,6 +113,13 @@ class TestExpr:
         assert_equal(Expr(1./3).latex(),r'\frac{1}{3}')
         l=Expr('sqrt(x*3+(a+b)*y)/x**(3*a*y)').latex()
         assert_equal(l,r'\frac{\sqrt{3x+\left(a+b\right)y}}{x^{3ay}}')
+        
+    def test__repr_html_(self):
+        assert_equal(self.sqrt._repr_html_(),r'$\sqrt{x}$')
+        
+    def test_plot(self):
+        save([Expr('1/x')],results+'oneoverx.png',x=range(-100,100))
+        save([Expr('sin(x/10)/(x/10)')],results+'sinxoverx.png',x=range(-100,100))
 
     def test___add__(self):
         f=self.fx+self.f1
