@@ -903,8 +903,10 @@ class TestBabyStepGiantStep:
 
 class TestIsNumber:
     def test_is_number(self):
-        # assert_equal(expected, is_number(x))
-        raise SkipTest # implement your test here
+        assert_true(is_number(0))
+        assert_true(is_number(2))
+        assert_true(is_number(2.))
+        assert_false(is_number(None))
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):
