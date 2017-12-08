@@ -21,43 +21,70 @@ from Goulib import math2, itertools2
 from Goulib.expr import Expr
 from sortedcontainers import SortedDict
 
-class Results(SortedDict):
-    """ Expr indexed by their result """
+class ExprDict(SortedDict):
+    '''Expr indexed by their result'''
 
     def __init__(self, int=False, min=0, max=None, improve=True):
-        super(Results,self).__init__()
+        super(ExprDict,self).__init__()
         self.int=int # if only ints should be stored
         self.min=min
         self.max=max
         self.improve = improve # whether insert should replace complex formula by simpler
 
     def add(self,expr):
+        ''' add expr
+        :return: bool True if it has been added
+        '''
         if expr is None:
-            return
-        k=expr() # the key is the numeric value of expr
+            return False
+        try:
+            k=expr() # the key is the numeric value of expr
+        except ValueError:
+            return False
         
         if k is None: 
             return # NaN such as /0
+        
+        k=math2.int_or_float(k,1e-12)
 
         if self.int:
             if type(k) is complex or not math2.is_integer(k):
-                return
-            k=math2.rint(k)
+                return False
 
         if self.min is not None and k<self.min :
-            return
+            return False
 
         if self.max is not None and k>self.max :
-            return
+            return False
 
         if k in self:
-            if self.improve and expr.complexity() < self[k].complexity():
-                pass
-            else:
-                return
+            if self.improve and expr.complexity() >= self[k].complexity():
+                return False
         
         self[k]=expr
-
+        return True
+        
+_sqrt=Expr(math.sqrt)
+_fact=Expr(math.factorial)
+        
+class Monadic(ExprDict):
+    def __init__(self,n,ops,iter=1):
+        super(Monadic,self).__init__(int=False, min=0, max=1E100, improve=True)
+        self.ops=ops
+        self.add(Expr(n))
+        for _ in range(iter):
+            for op in ops:
+                if op=='s':
+                    self.apply(_sqrt,lambda x:x!=1)
+                elif op=='!':
+                    self.apply(_fact,lambda x:x<100)
+                    
+    def apply(self,f,condition=lambda _:True):
+        keys=[k for k in self.keys() if condition(k)]
+        res=False
+        for k in keys:
+            res = self.add(f(self[k])) or res # ! lazy
+        return res
 
 
 # supported operators with precedence and text + LaTeX repr
@@ -128,7 +155,7 @@ def seq(digits,monadic,diadic,permut):
     which evaluate to 0,1,...
     """
 
-    b=Results(int=True)
+    b=ExprDict(int=True)
     i=0
     for e in gen(digits,monadic, diadic, permut):
         b.min=i
@@ -136,21 +163,16 @@ def seq(digits,monadic,diadic,permut):
         while i in b:
             yield (i,b.pop(i))
             i+=1
+    logging.warning('%d has no solution'%i)
     for k in b:
         yield (k,b[k])
 
 def pp(e):
-    """ pretty print, clean the formula (should be dont in Expr...="""
+    """ pretty print, clean the formula (should be done in Expr...="""
     f=str(e[1])
     # f=f.replace('--','+')
     # f=f.replace('+-','-')
     print('%d = %s'%(e[0],f))
-
-def yeargame(num):
-    return seq(num,'-s','+-*/_',True)
-
-def fourfour():
-    return seq(4444,'-s','+-*/_',False)
 
 def friedman(num):
     for e in gen(num):
@@ -166,14 +188,17 @@ def friedman(num):
 
 if __name__ == "__main__":
 
+    print('\n123456789')
+    for e in seq(123456789,'-s','+-*/_',False):
+        pp(e)
 
     print('\n4444')
-    for e in fourfour():
+    for e in seq(4444,'-s','+-*/_',False):
         pp(e)
 
 
     print('\nyeargame')
-    for e in yeargame(2017):
+    for e in seq(2018,'-s','+-*/_',True):
         pp(e)
 
 
