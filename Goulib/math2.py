@@ -35,7 +35,9 @@ def sign(number):
         return 1
     return 0
 
-if six.PY3:
+try:
+    cmp=math.cmp
+except AttributeError:
     def cmp(x,y):
         """Compare the two objects x and y and return an integer according to the outcome.
         The return value is negative if x < y, zero if x == y and strictly positive if x > y.
@@ -150,30 +152,47 @@ def quad(a, b, c, allow_complex=False):
         d=math.sqrt(discriminant)
     return (-b + d) / (2*a), (-b - d) / (2*a)
 
-def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
-    """approximately equal. Use this instead of a==b in floating point ops
+try:
+    isclose=math.isclose
+except AttributeError:
+    def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
+        """approximately equal. Use this instead of a==b in floating point ops
+        
+        implements https://www.python.org/dev/peps/pep-0485/
+        :param a,b: the two values to be tested to relative closeness
+        :param rel_tol: relative tolerance
+          it is the amount of error allowed, relative to the larger absolute value of a or b. 
+          For example, to set a tolerance of 5%, pass tol=0.05. 
+          The default tolerance is 1e-9, which assures that the two values are the same within 
+          about 9 decimal digits. rel_tol must be greater than 0.0
+        :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
+        """
+        # https://github.com/PythonCHB/close_pep/blob/master/isclose.py
+        if a == b:  # short-circuit exact equality
+            return True
     
-    implements https://www.python.org/dev/peps/pep-0485/
-    :param a,b: the two values to be tested to relative closeness
-    :param rel_tol: relative tolerance
-      it is the amount of error allowed, relative to the larger absolute value of a or b. 
-      For example, to set a tolerance of 5%, pass tol=0.05. 
-      The default tolerance is 1e-9, which assures that the two values are the same within 
-      about 9 decimal digits. rel_tol must be greater than 0.0
-    :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
-    """
-    if a==0 or b==0: #reltol probably makes no sense
-        abs_tol=max(abs_tol, rel_tol)
-    tol=max( rel_tol * max(abs(a), abs(b)), abs_tol )
-    return abs(a-b) <= tol
+        if rel_tol < 0.0 or abs_tol < 0.0:
+            raise ValueError('error tolerances must be non-negative')
+    
+        # use cmath so it will work with complex ot float
+        if math.isinf(abs(a)) or math.isinf(abs(b)):
+            # This includes the case of two infinities of opposite sign, or
+            # one infinity and one finite number. Two infinities of opposite sign
+            # would otherwise have an infinite relative tolerance.
+            return False
+        diff = abs(b - a)
+    
+        return (((diff <= abs(rel_tol * b)) or
+                 (diff <= abs(rel_tol * a))) or
+                (diff <= abs_tol))
 
-def is_integer(x, epsilon=1e-6):
+def is_integer(x, rel_tol=1e-9, abs_tol=0.0):
     """
     :return: True if  float x is almost an integer
     """
     if type(x) is int:
         return True
-    return isclose(x,round(x),0,epsilon)
+    return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
 
 def rint(v):
     """
@@ -181,12 +200,12 @@ def rint(v):
     """
     return int(round(v))
 
-def int_or_float(x, epsilon=1e-6):
+def int_or_float(x, rel_tol=1e-9, abs_tol=0.0):
     """
     :param x: int or float
     :return: int if x is (almost) an integer, otherwise float
     """
-    return rint(x) if is_integer(x, epsilon) else x
+    return rint(x) if is_integer(x, rel_tol, abs_tol) else x
 
 def format(x, decimals=3):
     """ formats a float with given number of decimals, but not an int
@@ -215,12 +234,14 @@ def isqrt(n):
 
 def sqrt(n):
     """square root
-    :return: float, or int if n is a perfect square
+    :return: int, float or complex depending on n
     """
     if type(n) is int:
         s=isqrt(n)
         if s*s==n:
             return s
+    if n<0:
+        return cmath.sqrt(n)
     return math.sqrt(n)
 
 def is_square(n):
