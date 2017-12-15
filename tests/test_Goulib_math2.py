@@ -675,8 +675,11 @@ class TestAbundance:
 
 class TestFactorial:
     def test_factorial(self):
-        # assert_equal(expected, factorial())
-        raise SkipTest #
+        assert_equal(factorial(0),1)
+        assert_equal(factorial2(0),1)
+        assert_equal([factorial2(x) for x in [7, 8, 9]],[105, 384, 945])
+        assert_equal(factorialk(5, 1), 120)
+        assert_equal(factorialk(5, 3), 10)
 
 class TestCeildiv:
     def test_ceildiv(self):

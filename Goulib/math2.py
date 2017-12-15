@@ -15,7 +15,7 @@ __credits__ = [
 __license__ = "LGPL"
 
 import six, math, cmath, operator, itertools, fractions, numbers, logging
-from six.moves import map, reduce, filter, zip_longest
+from six.moves import map, reduce, filter, zip_longest, range
 
 from Goulib import itertools2
 
@@ -1474,6 +1474,30 @@ def chakravala(n):
 #combinatorics
 
 factorial=math.factorial #didn't knew it was there...
+
+def factorialk(n,k):
+    """Multifactorial of n of order k, n(!!...!).
+    
+    This is the multifactorial of n skipping k values.  For example,
+      factorialk(17, 4) = 17!!!! = 17 * 13 * 9 * 5 * 1
+    In particular, for any integer ``n``, we have
+      factorialk(n, 1) = factorial(n)
+      factorialk(n, 2) = factorial2(n)
+      
+    :param n: int Calculate multifactorial. If `n` < 0, the return value is 0.
+    :param k : int Order of multifactorial.
+    :return: int Multifactorial of `n`.
+    """
+    # code from scipy, with extact=true
+    if n < -1:
+        return 0
+    if n <= 0:
+        return 1
+    val=mul(range(n, 0, -k))
+    return val
+
+def factorial2(n):
+    return factorialk(n,2)
 
 def factorial_gen():
     """Generator of factorial"""
