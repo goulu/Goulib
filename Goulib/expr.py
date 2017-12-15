@@ -3,7 +3,6 @@
 """
 simple symbolic math expressions
 """
-from _ast import USub
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -20,6 +19,7 @@ from . import plot #sets matplotlib backend
 from . import itertools2, math2
 
 # http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
+# https://github.com/erwanp/pytexit
 
 import ast
 
@@ -28,111 +28,10 @@ _dialect_str = 2
 _dialect_python = 3
 _dialect_latex = 4
 
-# supported _operators with precedence and text + LaTeX repr
-# precedence as in https://docs.python.org/reference/expressions.html#operator-precedence
-#
-
-import operator as op
-
-_operators = {
-    ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
-    ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
-    ast.Not: (op.not_,500,'not ','not ','\\neg'),
-    ast.Eq: (op.eq,600,'=',' == ',' = '),
-    ast.Gt: (op.gt,600,' > ',' > ',' \\gtr '),
-    ast.GtE:(op.ge,600,' >= ',' >= ',' \\gec '),
-    ast.Lt: (op.lt,600,' < ',' < ',' \\ltr '),
-    ast.LtE: (op.le,600,' <= ',' <= ',' \\leq '),
-    ast.BitXor: (op.xor,800,' xor ',' xor ',' xor '),
-    ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
-    ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
-    ast.Add: (op.add, 1100,'+','+','+'),
-    ast.Sub: (op.sub, 1100,'-','-','-'),
-    ast.Mult: (op.mul, 1200,'*','*',' \\cdot '),
-    ast.Div: (op.truediv, 1200,'/','/','\\frac{%s}{%s}'),
-    ast.FloorDiv: (op.truediv, 1200,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
-    ast.Mod: (op.mod, 1200,' mod ','%',' \\bmod '),
-    ast.Invert: (op.not_,1300,'~','~','\\sim '),
-    ast.UAdd: (op.pos,1150,'+','+','+'),
-    ast.USub: (op.neg,1150,'-','-','-'),
-    ast.Pow: (op.pow,1400,'^','**','^'),
-
-    # precedence of other types below
-    ast.Name:(None,9999),
-    ast.Num:(None,9999),
-    ast.Call:(None,9999),
-}
 
 
 from sortedcollections import SortedDict
 functions=SortedDict() #only functions listed in this dict can be used in Expr
-
-def add_function(f,s=None,r=None,l=None):
-    ''' add a function to those allowed in Expr.
-    
-    :param f: function
-    :param s: string representation, should be formula-like
-    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
-    :param l: LaTeX representation
-    '''
-    try:
-        f(2,2)
-        return
-    except TypeError:
-        pass
-    functions[f.__name__]=(f,9999,s,r or s,l)
-    
-_constants = { # constants in this dict are recognized in output
-    bool : {},
-    float : {},
-    complex : {},
-    } 
-    
-def add_constant(c, name, s=None,r=None,l=None):
-    ''' add a constant to those recognized in Expr.
-    
-    :param c: constant
-    :param s: string representation, should be formula-like
-    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
-    :param l: LaTeX representation
-    '''
-    _constants[type(c)][c]=(None,None,s or name,r or name ,l or '\\'+name)
-
-def add_module(module):
-    for fname,f in six.iteritems(module.__dict__):
-        if fname[0]=='_': continue
-        if isinstance(f, collections.Callable):
-            add_function(f)
-        elif math2.is_number(f):
-            add_constant(f,fname)
-            
-add_constant(True,'True')
-add_constant(False,'False')
-
-import math
-add_module(math)
-add_function(abs,l='\\lvert{%s}\\rvert')
-add_function(math.fabs,l='\\lvert{%s}\\rvert')
-add_function(math.factorial,'%s!','fact','%s!')
-add_function(math.sqrt,l='\\sqrt{%s}')
-add_function(math.trunc,l='\\left\\lfloor{%s}\\right\\rfloor')
-add_function(math.floor,l='\\left\\lfloor{%s}\\right\\rfloor')
-add_function(math.ceil,l='\\left\\lceil{%s}\\right\\rceil')
-add_function(math.asin,l='\\arcsin')
-add_function(math.acos,l='\\arccos')
-add_function(math.atan,l='\\arctan')
-add_function(math.asinh,l='\\sinh^{-1}')
-add_function(math.acosh,l='\\cosh^{-1}')
-add_function(math.atanh,l='\\tanh^{-1}')
-add_function(math.log,l='\\ln')
-add_function(math.log10,l='\\log_{10}')
-add_function(math2.log2,l='\\log_2')
-add_function(math.gamma,l='\\Gamma')
-add_function(math.lgamma,'log(abs(gamma(%s)))',l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
-add_function(math.degrees,l='\\frac{360*%s}{\\pi}')
-add_function(math.radians,l='\\frac{\\pi*%s}{360}')
-
-add_constant(complex(0,1),'i')
 
 def eval(node,ctx={}):
     """safe eval of ast node : only functions and _operators listed above can be used
@@ -241,8 +140,8 @@ class Expr(plot.Plot):
                 f=math2.rint(f)
             else:
                 f=plouffe(f)
-                
-        if math2.is_number(f): # store it with full precision 
+
+        if math2.is_number(f): # store it with full precision
             # (otherwise Py2 doesn't find pi in _constants ...)
             self.body=ast.Num(f)
             return
@@ -287,7 +186,7 @@ class Expr(plot.Plot):
             return e
         return Expr(e)
 
-    def __float__(self): 
+    def __float__(self):
         return float(self())
 
     def __repr__(self):
@@ -448,6 +347,110 @@ class Expr(plot.Plot):
                 pass
             return res
         return _node_complexity(self.body)
+    
+# supported _operators with precedence and text + LaTeX repr
+# precedence as in https://docs.python.org/reference/expressions.html#operator-precedence
+#
+
+import operator as op
+
+_operators = {
+    ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
+    ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
+    ast.Not: (op.not_,500,'not ','not ','\\neg'),
+    ast.Eq: (op.eq,600,'=',' == ',' = '),
+    ast.Gt: (op.gt,600,' > ',' > ',' \\gtr '),
+    ast.GtE:(op.ge,600,' >= ',' >= ',' \\gec '),
+    ast.Lt: (op.lt,600,' < ',' < ',' \\ltr '),
+    ast.LtE: (op.le,600,' <= ',' <= ',' \\leq '),
+    ast.BitXor: (op.xor,800,' xor ',' xor ',' xor '),
+    ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
+    ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
+    ast.Add: (op.add, 1100,'+','+','+'),
+    ast.Sub: (op.sub, 1100,'-','-','-'),
+    ast.Mult: (op.mul, 1200,'*','*',' \\cdot '),
+    ast.Div: (op.truediv, 1200,'/','/','\\frac{%s}{%s}'),
+    ast.FloorDiv: (op.truediv, 1200,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
+    ast.Mod: (op.mod, 1200,' mod ','%',' \\bmod '),
+    ast.Invert: (op.not_,1300,'~','~','\\sim '),
+    ast.UAdd: (op.pos,1150,'+','+','+'),
+    ast.USub: (op.neg,1150,'-','-','-'),
+    ast.Pow: (op.pow,1400,'^','**','^'),
+
+    # precedence of other types below
+    ast.Call:(None,9000),
+    ast.Name:(None,9000),
+    ast.Num:(None,9000),
+}
+
+    
+def add_function(f,s=None,r=None,l=None):
+    ''' add a function to those allowed in Expr.
+
+    :param f: function
+    :param s: string representation, should be formula-like
+    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
+    :param l: LaTeX representation
+    '''
+    try:
+        f(2,2)
+        return
+    except TypeError:
+        pass
+    functions[f.__name__]=(f,9999,s,r or s,l)
+
+_constants = { # constants in this dict are recognized in output
+    bool : {},
+    float : {},
+    complex : {},
+    }
+
+def add_constant(c, name, s=None,r=None,l=None):
+    ''' add a constant to those recognized in Expr.
+
+    :param c: constant
+    :param s: string representation, should be formula-like
+    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
+    :param l: LaTeX representation
+    '''
+    _constants[type(c)][c]=(None,None,s or name,r or name ,l or '\\'+name)
+
+def add_module(module):
+    for fname,f in six.iteritems(module.__dict__):
+        if fname[0]=='_': continue
+        if isinstance(f, collections.Callable):
+            add_function(f)
+        elif math2.is_number(f):
+            add_constant(f,fname)
+
+add_constant(True,'True')
+add_constant(False,'False')
+
+import math
+add_module(math)
+add_function(abs,l='\\lvert{%s}\\rvert')
+add_function(math.fabs,l='\\lvert{%s}\\rvert')
+add_function(math.factorial,'%s!','fact','%s!')
+add_function(math2.factorial2,'%s!','fact','%s!!')
+add_function(math.sqrt,l='\\sqrt{%s}')
+add_function(math.trunc,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.floor,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.ceil,l='\\left\\lceil{%s}\\right\\rceil')
+add_function(math.asin,l='\\arcsin')
+add_function(math.acos,l='\\arccos')
+add_function(math.atan,l='\\arctan')
+add_function(math.asinh,l='\\sinh^{-1}')
+add_function(math.acosh,l='\\cosh^{-1}')
+add_function(math.atanh,l='\\tanh^{-1}')
+add_function(math.log,l='\\ln')
+add_function(math.log10,l='\\log_{10}')
+add_function(math2.log2,l='\\log_2')
+add_function(math.gamma,l='\\Gamma')
+add_function(math.lgamma,'log(abs(gamma(%s)))',l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
+add_function(math.degrees,l='\\frac{360*%s}{\\pi}')
+add_function(math.radians,l='\\frac{\\pi*%s}{360}')
+
+add_constant(complex(0,1),'i')
 
 
 #http://stackoverflow.com/questions/3867028/converting-a-python-numeric-expression-to-latex
@@ -485,6 +488,8 @@ class TextVisitor(ast.NodeVisitor):
                 fname=func
 
         if '%s' in fname:
+            if len(n.args)>1: #TODO: or ... what ?
+                args=self._par(args)
             return fname%args
 
         return fname+self._par(args)
@@ -516,32 +521,32 @@ class TextVisitor(ast.NodeVisitor):
             return self._Bin(right,op,left)
 
         l,r = self.visit(left),self.visit(right)
-        
+
         symbol=_operators[type(op)][self.dialect]
 
 
         if '%s' in symbol: # no parenthesis required in this case
             return symbol%(l,r)
-        
+
         #handle precedence (parenthesis) if needed
 
         if self.prec(op) > self.prec(left):
             l = self._par(l)
-            
-            
+
+
         if self.prec(op) > self.prec(right):
             if self.dialect == _dialect_latex and isinstance(op, ast.Pow):
                 r='{'+r+'}'
             else:
                 r = self._par(r)
-                    
+
         # remove * if possible
         if self.dialect != _dialect_python and isinstance(op, ast.Mult):
             if not l[-1].isdigit() or not r[0].isdigit():
                 symbol=''
 
         res=l+symbol+r
-        
+
         # TODO: find a better way to do this ...
         plusminus=_operators[ast.Add][self.dialect]+_operators[ast.USub][self.dialect]
         minusminus=_operators[ast.Sub][self.dialect]+_operators[ast.USub][self.dialect]
