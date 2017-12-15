@@ -17,17 +17,15 @@ import six
 import logging
 from itertools import permutations, product, count, chain
 import math
-from Goulib import math2, itertools2
-from Goulib.expr import Expr, functions
+from Goulib import math2, itertools2, expr
 from sortedcontainers import SortedDict
 
 class ExprDict(SortedDict):
     '''Expr indexed by their result'''
 
-    def __init__(self, int=False, min=0, max=None, improve=True):
+    def __init__(self, int=False, max=None, improve=True):
         super(ExprDict,self).__init__()
         self.int=int # if only ints should be stored
-        self.min=min
         self.max=max
         self.improve = improve # whether insert should replace complex formula by simpler
 
@@ -52,8 +50,8 @@ class ExprDict(SortedDict):
             if type(k) is complex or not math2.is_integer(k):
                 return False
 
-        if self.min is not None and k<self.min :
-            return False
+        if k<0 :
+            return self.add(-expr)
 
         if self.max is not None and k>self.max :
             return False
@@ -65,25 +63,35 @@ class ExprDict(SortedDict):
         self[k]=expr
         return True
         
-_sqrt=Expr(math.sqrt)
-_fact=Expr(math.factorial)
+functions = SortedDict(expr.functions)
+#remove functions that are irrelevant or redundant
+del functions['isinf']
+assert(expr.functions['isinf']) # make sure we don't delete these...
+del functions['isnan']
+del functions['isfinite']
+del functions['erf']
+del functions['erfc']
+del functions['expm1']
+del functions['log1p']
+del functions['lgamma']
+del functions['radians']
+del functions['degrees']
         
 class Monadic(ExprDict):
     def __init__(self,n,ops, levels=1):
-        super(Monadic,self).__init__(int=False, min=0, max=1E100, improve=True)
+        super(Monadic,self).__init__(int=False, max=1E100, improve=True)
         self.ops=ops
-        self.add(Expr(n))
+        self.add(expr.Expr(n))
         for _ in range(levels):
             keys=list(self._list) # freeze it for this level
             for op in ops:
                 if op=='s':
-                    self._apply(keys,_sqrt)
+                    op='sqrt'
                 elif op=='!':
-                    self._apply(keys,_fact,lambda x:x<100)
-                elif isinstance(op,Expr):
-                    self._apply(keys,op)
-                else:
-                    self._apply(keys,Expr(functions[op][0]))
+                    op='factorial'
+                elif op=='!!':
+                    op='factorial2'
+                self._apply(keys,expr.Expr(expr.functions[op][0]))
                     
     def _apply(self,keys,f,condition=lambda _:True):
         ''' applies f to all keys satisfying condition
@@ -231,7 +239,7 @@ def friedman(num):
 
 if __name__ == "__main__":
     
-    m=Monadic(math.pi,functions,3)
+    m=Monadic(math.pi,functions,2)
 
     for x in m:
         print('%s = %s'%(x,m[x]))
