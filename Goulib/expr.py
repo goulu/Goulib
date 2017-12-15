@@ -332,11 +332,10 @@ class Expr(plot.Plot):
         :return: int, sum of the precedence of used ops
         """
         def _node_complexity(node):
-            res=0
             try:
                 res=_operators[type(node.op)][1]
             except:
-                pass
+                res=_operators[type(node)][1]
             try:
                 res+=_node_complexity(node.left)
             except:
@@ -443,12 +442,15 @@ add_function(math.asinh,l='\\sinh^{-1}')
 add_function(math.acosh,l='\\cosh^{-1}')
 add_function(math.atanh,l='\\tanh^{-1}')
 add_function(math.log,l='\\ln')
+add_function(math.log1p,l='\\ln\\left(1-{%s}\\rvert)')
 add_function(math.log10,l='\\log_{10}')
 add_function(math2.log2,l='\\log_2')
 add_function(math.gamma,l='\\Gamma')
+add_function(math.exp,l='e^{%s}')
+add_function(math.expm1,l='e^{%s}-1')
 add_function(math.lgamma,'log(abs(gamma(%s)))',l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
-add_function(math.degrees,l='\\frac{360*%s}{\\pi}')
-add_function(math.radians,l='\\frac{\\pi*%s}{360}')
+add_function(math.degrees,l='%s\\cdot\\frac{360}{2\\pi}')
+add_function(math.radians,l='%s\\cdot\\frac{2\\pi}{360}')
 
 add_constant(complex(0,1),'i')
 
