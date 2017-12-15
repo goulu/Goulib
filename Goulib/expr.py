@@ -3,6 +3,7 @@
 """
 simple symbolic math expressions
 """
+from Goulib.math2 import int_or_float
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -14,9 +15,9 @@ __license__ = "LGPL"
 
 import six, logging, copy, collections, inspect, re
 
-from . import plot #sets matplotlib backend
+from Goulib import plot #sets matplotlib backend
 
-from . import itertools2, math2
+from Goulib import itertools2, math2
 
 # http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
 # https://github.com/erwanp/pytexit
@@ -167,7 +168,7 @@ class Expr(plot.Plot):
         res=self()
         return not isinstance(res,six.string_types)
 
-    def __call__(self,x=None,**kwargs):
+    def __call__(self ,x=None, **kwargs):
         """evaluate the Expr at x OR compose self(x())"""
         if isinstance(x,Expr): #composition
             return self.applx(x)
@@ -187,7 +188,7 @@ class Expr(plot.Plot):
         return Expr(e)
 
     def __float__(self):
-        return float(self())
+        return self()
 
     def __repr__(self):
         return TextVisitor(_dialect_python).visit(self.body)

@@ -16,9 +16,12 @@ __revision__ = '$Revision$'
 import six
 import logging
 from itertools import permutations, product, count, chain
-import math
-from Goulib import math2, itertools2, expr
 from sortedcontainers import SortedDict
+
+import math
+from Goulib import math2, expr
+from Goulib.expr import Expr
+
 
 class ExprDict(SortedDict):
     '''Expr indexed by their result'''
@@ -36,15 +39,14 @@ class ExprDict(SortedDict):
         if expr is None:
             return False
         try:
-            k=expr() # the key is the numeric value of expr
-        except ValueError:
+            k=expr(abs) # the key is the numeric value of expr
+        except (TypeError,ValueError):
             return False
         
         if not math2.is_number(k): 
             return False
         
-        k=math2.int_or_float(k,abs_tol=1e-12)
-
+        k=math2.int_or_float(k, rel_tol=0, abs_tol=1e-12) #TODO: improve
 
         if self.int:
             if type(k) is complex or not math2.is_integer(k):
@@ -81,7 +83,7 @@ class Monadic(ExprDict):
     def __init__(self,n,ops, levels=1):
         super(Monadic,self).__init__(int=False, max=1E100, improve=True)
         self.ops=ops
-        self.add(expr.Expr(n))
+        self.add(Expr(n))
         for _ in range(levels):
             keys=list(self._list) # freeze it for this level
             for op in ops:
@@ -91,7 +93,7 @@ class Monadic(ExprDict):
                     op='factorial'
                 elif op=='!!':
                     op='factorial2'
-                self._apply(keys,expr.Expr(expr.functions[op][0]))
+                self._apply(keys,Expr(expr.functions[op][0]))
                     
     def _apply(self,keys,f,condition=lambda _:True):
         ''' applies f to all keys satisfying condition
@@ -181,12 +183,13 @@ def gen(digits,monadic='-', diadic='-+*/^_',permut=True):
     if len(digits)==1 or '_' in diadic:
         try:
             e=Expr(''.join(digits))
+        except SyntaxError:
+            pass
+        else:
             if e.isNum:
                 yield e
                 for op in monadic:
                     yield _monadic(op,e)
-        except:
-            pass
 
     for i in range(1,len(digits)):
         try:
@@ -238,6 +241,9 @@ def friedman(num):
 
 
 if __name__ == "__main__":
+    
+    for x in seq(2018,'-s','+-*/_',True):
+        print(x)
     
     m=Monadic(math.pi,functions,2)
 
