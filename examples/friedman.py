@@ -64,20 +64,23 @@ class ExprDict(SortedDict):
         
         self[k]=expr
         return True
+    
+    def __add__(self,other):
+        ''' merges 2 ExprDict
+        '''
+        result=ExprDict(int=self.int, max=self.max, improve=self.improve)
+        result.update(self)
+        result.update(other)
+        return result
         
 functions = SortedDict(expr.functions)
 #remove functions that are irrelevant or redundant
-del functions['isinf']
-assert(expr.functions['isinf']) # make sure we don't delete these...
-del functions['isnan']
-del functions['isfinite']
-del functions['erf']
-del functions['erfc']
-del functions['expm1']
-del functions['log1p']
-del functions['lgamma']
-del functions['radians']
-del functions['degrees']
+for f in ['isinf','isnan','isfinite','frexp', 
+          'abs','fabs','ceil','floor','trunc',
+          'erf','erfc',
+          'fsum', 'expm1','log1p','lgamma',
+          'radians','degrees']:
+    del functions[f]
         
 class Monadic(ExprDict):
     def __init__(self,n,ops, levels=1):
