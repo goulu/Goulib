@@ -3,7 +3,6 @@
 """
 simple symbolic math expressions
 """
-from Goulib.math2 import int_or_float
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -166,7 +165,9 @@ class Expr(plot.Plot):
     def isconstant(self):
         """:return: True if Expr evaluates to a constant number or bool"""
         res=self()
-        return not isinstance(res,six.string_types)
+        if math2.is_number(res): return True
+        if isinstance(res,bool): return True
+        return False
 
     def __call__(self ,x=None, **kwargs):
         """evaluate the Expr at x OR compose self(x())"""
@@ -335,15 +336,19 @@ class Expr(plot.Plot):
         def _node_complexity(node):
             try:
                 res=_operators[type(node.op)][1]
-            except:
+            except AttributeError:
                 res=_operators[type(node)][1]
             try:
+                res+=_node_complexity(node.operand)
+            except AttributeError:
+                pass
+            try:
                 res+=_node_complexity(node.left)
-            except:
+            except AttributeError:
                 pass
             try:
                 res+=_node_complexity(node.right)
-            except:
+            except AttributeError: 
                 pass
             return res
         return _node_complexity(self.body)
@@ -354,6 +359,8 @@ class Expr(plot.Plot):
 
 import operator as op
 
+# table of allowed operators
+# note we very slightly prefer + over - and * over / for simpler expression generation
 _operators = {
     ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
     ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
@@ -367,15 +374,15 @@ _operators = {
     ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
     ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
     ast.Add: (op.add, 1100,'+','+','+'),
-    ast.Sub: (op.sub, 1100,'-','-','-'),
+    ast.Sub: (op.sub, 1101,'-','-','-'),
     ast.Mult: (op.mul, 1200,'*','*',' \\cdot '),
-    ast.Div: (op.truediv, 1200,'/','/','\\frac{%s}{%s}'),
-    ast.FloorDiv: (op.truediv, 1200,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
+    ast.Div: (op.truediv, 1201,'/','/','\\frac{%s}{%s}'),
+    ast.FloorDiv: (op.truediv, 1201,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
     ast.Mod: (op.mod, 1200,' mod ','%',' \\bmod '),
     ast.Invert: (op.not_,1300,'~','~','\\sim '),
     ast.UAdd: (op.pos,1150,'+','+','+'),
     ast.USub: (op.neg,1150,'-','-','-'),
-    ast.Pow: (op.pow,1400,'^','**','^'),
+    ast.Pow: (math2.ipow,1400,'^','**','^'), # ipow returns an integer when result is integer ...
 
     # precedence of other types below
     ast.Call:(None,9000),
@@ -518,10 +525,10 @@ class TextVisitor(ast.NodeVisitor):
     def _Bin(self, left,op,right):
 
         # commute x*3 in 3*x
-        if isinstance(op, ast.Mult) and \
-            isinstance(right, ast.Num) and \
-            not isinstance(left, ast.Num):
-            return self._Bin(right,op,left)
+        if isinstance(op, ast.Mult):
+            if isinstance(right, ast.Num):
+                if not Expr(left).isconstant:
+                        return self._Bin(right,op,left)
 
         l,r = self.visit(left),self.visit(right)
 
