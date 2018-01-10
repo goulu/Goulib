@@ -46,11 +46,13 @@ class ExprDict(SortedDict):
         if not math2.is_number(k): 
             return False
         
-        k=math2.int_or_float(k, rel_tol=0, abs_tol=1e-12) #TODO: improve
+        if type(k) is complex:
+            return False
+        
+        k=math2.int_or_float(k, 0,0)
 
-        if self.int:
-            if type(k) is complex or not math2.is_integer(k):
-                return False
+        if self.int and not type(k) is int:
+            return False
 
         if k<0 :
             return self.add(-expr)
@@ -218,7 +220,7 @@ def seq(digits,monadic,diadic,permut):
         b.min=i
         b.add(e)
         while i in b:
-            yield (i,b.pop(i))
+            # yield (i,b.pop(i))
             i+=1
     logging.warning('%d has no solution'%i)
     for k in b:
@@ -245,7 +247,7 @@ def friedman(num):
 
 if __name__ == "__main__":
     
-    for x in seq(2018,'-s','+-*/_',True):
+    for x in seq(123456789,'-s','+-*/^_',False):
         print(x)
     
     m=Monadic(math.pi,functions,2)
