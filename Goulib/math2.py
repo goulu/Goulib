@@ -198,11 +198,11 @@ except AttributeError:
                  (diff <= abs(rel_tol * a))) or
                 (diff <= abs_tol))
 
-def is_integer(x, rel_tol=1e-9, abs_tol=0.0):
+def is_integer(x, rel_tol=0, abs_tol=0):
     """
     :return: True if  float x is almost an integer
     """
-    if type(x) is int:
+    if isinstance(x, six.integer_types):
         return True
     return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
 
@@ -212,7 +212,7 @@ def rint(v):
     """
     return int(round(v))
 
-def int_or_float(x, rel_tol=1e-9, abs_tol=0.0):
+def int_or_float(x, rel_tol=0, abs_tol=0):
     """
     :param x: int or float
     :return: int if x is (almost) an integer, otherwise float
@@ -230,6 +230,29 @@ def format(x, decimals=3):
 
 def ceildiv(a, b):
     return -(-a // b) #simple and clever
+
+
+def ipow(x,y,z=0):
+    """
+    :return: (x**y) % z as integer
+    """
+    if not isinstance(y,six.integer_types):
+        if z==0:
+            return pow(x,y) #switches to floats in Py3...
+        else:
+            return pow(x,y,z) #switches to floats in Py3...
+    
+    if y<0 :
+        if z: raise NotImplementedError('no modulus allowed for negative power')
+        return 1/ipow(x,-y)
+    
+    a,b=1,x
+    while y>0:
+        if y%2 == 1:
+            a=(a*b)%z if z else a*b
+        b = (b*b)%z if z else b*b
+        y=y//2
+    return a
 
 def isqrt(n):
     """integer square root
@@ -1163,15 +1186,15 @@ def rational_form(numerator, denominator):
         for r in itertools2.drop(1,repunit_gen(9)):
             if r % x == 0:
                 return r
-    shift,pow = 0,1
+    shift,p = 0,1
     for x in (10,2,5):
         while denominator % x == 0:
             denominator //= x
             numerator = 10*numerator//x
             shift += 1
-            pow *= 10
+            p *= 10
     base,numerator = divmod(numerator,denominator)
-    integer,decimal = divmod(base,pow)
+    integer,decimal = divmod(base,p)
     repunit = first_divisible_repunit(denominator)
     repeat = numerator * (repunit // denominator)
     cycle = number_of_digits(repunit) if repeat else 0
@@ -1196,7 +1219,7 @@ def rational_cycle(num,den):
     """
     _, _, _, digits, cycle = rational_form(num,den)
     lz=cycle-number_of_digits(digits)
-    return digits*rint(pow(10,lz))
+    return digits*ipow(10,lz)
 
 # polygonal numbers
 
@@ -1707,23 +1730,10 @@ mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoeff
 """
 #see http://anh.cs.luc.edu/331/code/mod.py for a MOD class
 
-def mod_pow(a,b,m):
-    """
-    :return: (a^b) mod m
-    """
-    # return pow(a,b,m) #switches to floats in Py3...
-    x,y=1,a
-    while b>0:
-        if b%2 == 1:
-            x=(x*y)%m
-        y = (y*y)%m;
-        b=b//2
-    return x
-
 def mod_inv(a,b):
      # http://rosettacode.org/wiki/Chinese_remainder_theorem#Python
     if is_prime(b): #Use Euler's Theorem
-        return mod_pow(a,b-2,b)
+        return ipow(a,b-2,b)
     b0 = b
     x0, x1 = 0, 1
     if b == 1: return 1

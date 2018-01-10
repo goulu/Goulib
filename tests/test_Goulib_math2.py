@@ -662,11 +662,22 @@ class TestLychrelCount:
     def test_lychrel_count(self):
         # assert_equal(expected, lychrel_count(n, limit))
         raise SkipTest #
+    
+class TestIpow:
+    def test_ipow(self):
+        assert_equal(ipow(10,100),1E100)
+        assert_not_equal(ipow(10,-100),0)
+        
+        assert_equal( ipow(2,10,100),24)
+        assert_equal( ipow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
+        assert_equal( ipow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
+
 
 class TestIsqrt:
     def test_isqrt(self):
-        # assert_equal(expected, isqrt(n))
-        raise SkipTest #
+        assert_equal(isqrt(256),16)
+        assert_equal(isqrt(257),16)
+        assert_equal(isqrt(255),15)
 
 class TestAbundance:
     def test_abundance(self):
@@ -772,12 +783,6 @@ class TestEuclidGen:
     def test_euclid_gen(self):
         # assert_equal(expected, euclid_gen())
         raise SkipTest
-
-class TestModPow:
-    def test_mod_pow(self):
-        assert_equal( mod_pow(2,10,100),24)
-        assert_equal( mod_pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
-        assert_equal( mod_pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
 
 class TestEgcd:
     def test_egcd(self):
