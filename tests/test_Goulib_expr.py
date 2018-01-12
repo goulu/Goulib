@@ -138,20 +138,20 @@ class TestExpr:
 
     def test___add__(self):
         f=self.fx+self.f1
-        assert_equal(f([-1,0,1]),[0,1,2])
-        assert_equal(str(f),'x+1')        
+        assert_equal(str(f),'x+1')       
+        assert_equal(f([-1,0,1]),[0,1,2]) 
         
     def test___neg__(self):
         f=-self.f1
         assert_equal(str(f),'-1')        
         f=-self.fx
-        assert_equal(f([-1,0,1]),[1,0,-1])
         assert_equal(str(f),'-x')
+        assert_equal(f([-1,0,1]),[1,0,-1])
         
     def test___sub__(self):
         f=self.f1-self.fx
-        assert_equal(f([-1,0,1]),[2,1,0])
-        assert_equal(str(f),'1-x')   
+        assert_equal(str(f),'1-x')  
+        assert_equal(f([-1,0,1]),[2,1,0]) 
         
     def test___mul__(self):
         f2=self.f1*2
@@ -236,6 +236,17 @@ class TestExpr:
         # expr = Expr(f)
         # assert_equal(expected, expr.isconstant())
         raise SkipTest # implement your test here
+    
+    def test_complexity(self):
+        e1=Expr('44+4*(-4)')
+        e2=Expr('44-4*4')
+        assert_equal(e1(),e2())
+        assert_true(e1.complexity()>e2.complexity())  
+        
+        e1=Expr('2/sqrt(3)/sqrt(5)')
+        e2=Expr('2/(sqrt(3)*sqrt(5))')
+        assert_equal(e1(),e2())
+        assert_true(e1.complexity()>e2.complexity())  
 
 class TestEval:
     def test_eval(self):
