@@ -233,6 +233,9 @@ class TestIsInteger:
 
 class TestIntOrFloat:
     def test_int_or_float(self):
+        # comparing values would always pass, so we must compare types
+        assert_equal(type(int_or_float(1.0)),int)
+        assert_equal(type(int_or_float(1.0+eps)),float)
         assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
         assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
 
@@ -663,14 +666,15 @@ class TestLychrelCount:
         # assert_equal(expected, lychrel_count(n, limit))
         raise SkipTest #
     
-class TestIpow:
-    def test_ipow(self):
-        assert_equal(ipow(10,100),1E100)
-        assert_not_equal(ipow(10,-100),0)
+class TestPow:
+    def test_pow(self):
+        from Goulib.math2 import  pow # make sure we don't use builtins
+        assert_equal(pow(10,100),1E100)
+        assert_not_equal(pow(10,-100),0)
         
-        assert_equal( ipow(2,10,100),24)
-        assert_equal( ipow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
-        assert_equal( ipow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
+        assert_equal(pow(2,10,100),24)
+        assert_equal(pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
+        assert_equal(pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
 
 
 class TestIsqrt:

@@ -22,6 +22,32 @@ import math
 from Goulib import math2, expr
 from Goulib.expr import Expr
 
+# "safe" operators
+
+# import numpy
+
+def add(a,b):
+    if a==0: return b
+    if b==0: return a
+    res=a+b
+    if res==a: 
+        res=res+math2.eps*math2.sign(b) # numpy.nextafter(res,res+math2.sign(b))
+        assert res!=a
+    elif res==b: 
+        res=res+math2.eps*math2.sign(a) # res=numpy.nextafter(res,res+math2.sign(a))
+        assert res!=b
+    return res
+
+def sub(a,b):
+    return add(a,-b)
+
+def div(a,b):
+    res=math2.int_or_float(a/b)
+    a2=res*b
+    if a==a2: return res
+    #the division has rounded somthing, like (a+eps)/a =1
+    return res+math2.eps*math2.sign(a*b) #  numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+
 
 class ExprDict(SortedDict):
     '''Expr indexed by their result'''
@@ -36,10 +62,11 @@ class ExprDict(SortedDict):
         ''' add expr
         :return: bool True if it has been added
         '''
+        
         if expr is None:
             return False
         try:
-            k=expr(abs) # the key is the numeric value of expr
+            k=expr() # the key is the numeric value of expr
         except (TypeError,ValueError):
             return False
         
@@ -49,10 +76,10 @@ class ExprDict(SortedDict):
         if type(k) is complex:
             return False
         
-        k=math2.int_or_float(k, 0,0)
-
-        if self.int and not type(k) is int:
+        if self.int and not isinstance(k,six.integer_types): #dont use math2.is_integer, not precise enough
             return False
+        
+
 
         if k<0 :
             return self.add(-expr)
@@ -249,6 +276,9 @@ if __name__ == "__main__":
     
     for x in seq(123456789,'-s','+-*/^_',False):
         print(x)
+        if x[0]>=100: break
+        
+    exit()
     
     m=Monadic(math.pi,functions,2)
 
