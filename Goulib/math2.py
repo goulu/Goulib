@@ -17,10 +17,12 @@ __license__ = "LGPL"
 import six, math, cmath, operator, itertools, fractions, numbers, logging
 from six.moves import map, reduce, filter, zip_longest, range
 
-from Goulib import itertools2
+from Goulib import itertools2, decorators
 
 
 inf=float('Inf') #infinity
+eps = 2.2204460492503131e-16 # numpy.finfo(np.float64).eps
+
 
 # define some math functions that are not available in all supported versions of python
 
@@ -32,11 +34,95 @@ except AttributeError:
         The return value is negative if x < y, zero if x == y and strictly positive if x > y.
         """
         return sign(x-y)
-    
+
 try:
     log2=math.log2
 except AttributeError:
     def log2(x):return math.log(x,2)
+
+try:
+    isclose=math.isclose
+except AttributeError:
+    def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+        """approximately equal. Use this instead of a==b in floating point ops
+
+        implements https://www.python.org/dev/peps/pep-0485/
+        :param a,b: the two values to be tested to relative closeness
+        :param rel_tol: relative tolerance
+          it is the amount of error allowed, relative to the larger absolute value of a or b.
+          For example, to set a tolerance of 5%, pass tol=0.05.
+          The default tolerance is 1e-9, which assures that the two values are the same within
+          about 9 decimal digits. rel_tol must be greater than 0.0
+        :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
+        """
+        # https://github.com/PythonCHB/close_pep/blob/master/isclose.py
+        if a == b:  # short-circuit exact equality
+            return True
+
+        if rel_tol < 0.0 or abs_tol < 0.0:
+            raise ValueError('error tolerances must be non-negative')
+
+        # use cmath so it will work with complex ot float
+        if math.isinf(abs(a)) or math.isinf(abs(b)):
+            # This includes the case of two infinities of opposite sign, or
+            # one infinity and one finite number. Two infinities of opposite sign
+            # would otherwise have an infinite relative tolerance.
+            return False
+        diff = abs(b - a)
+
+        return (((diff <= abs(rel_tol * b)) or
+                 (diff <= abs(rel_tol * a))) or
+                (diff <= abs_tol))
+
+# basic useful functions
+
+def is_number(x):
+    """:return: True if x is a number of any type"""
+    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
+    return isinstance(x, numbers.Number)
+
+
+def sign(number):
+    """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
+    if number<0:
+        return -1
+    if number>0:
+        return 1
+    return 0
+
+# rounding
+
+def rint(v):
+    """
+    :return: int value nearest to float v
+    """
+    return int(round(v))
+
+def is_integer(x, rel_tol=0, abs_tol=0):
+    """
+    :return: True if  float x is an integer within tolerances
+    """
+    if isinstance(x, six.integer_types):
+        return True
+    if rel_tol+abs_tol==0:
+        return x==rint(x)
+    return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
+
+def int_or_float(x, rel_tol=0, abs_tol=0):
+    """
+    :param x: int or float
+    :return: int if x is (almost) an integer, otherwise float
+    """
+    return rint(x) if is_integer(x, rel_tol, abs_tol) else x
+
+def format(x, decimals=3):
+    """ formats a float with given number of decimals, but not an int
+
+    :return: string repr of x with decimals if not int
+    """
+    if is_integer(x):
+        decimals = 0
+    return '{0:.{1}f}'.format(x, decimals)
 
 # improved versions of math functions
 
@@ -60,21 +146,7 @@ def gcd(*args):
 
     return abs(b)
 
-# basic useful functions
 
-def is_number(x):
-    """:return: True if x is a number of any type"""
-    # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
-    return isinstance(x, numbers.Number)
-
-
-def sign(number):
-    """:return: 1 if number is positive, -1 if negative, 0 if ==0"""
-    if number<0:
-        return -1
-    if number>0:
-        return 1
-    return 0
 
 def lcm(*args):
     """least common multiple of any number of integers"""
@@ -88,7 +160,7 @@ def lcm(*args):
 
 def xgcd(a,b):
     """Extended GCD
-    
+
     :return: (gcd, x, y) where gcd is the greatest common divisor of a and b
     with the sign of b if b is nonzero, and with the sign of a if b is 0.
     The numbers x,y are such that gcd = ax+by."""
@@ -133,7 +205,7 @@ def coprimes_gen(limit):
 
 def is_primitive_root(x,m,s={}):
     """returns True if x is a primitive root of m
-    
+
     :param s: set of coprimes to m, if already known
     """
     if not s:
@@ -152,7 +224,7 @@ def primitive_roots(modulo):
 
 def quad(a, b, c, allow_complex=False):
     """ solves quadratic equations aX^2+bX+c=0
-    
+
     :param a,b,c: floats
     :param allow_complex: function returns complex roots if True
     :return: x1,x2 real or complex solutions
@@ -164,69 +236,9 @@ def quad(a, b, c, allow_complex=False):
         d=math.sqrt(discriminant)
     return (-b + d) / (2*a), (-b - d) / (2*a)
 
-try:
-    isclose=math.isclose
-except AttributeError:
-    def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
-        """approximately equal. Use this instead of a==b in floating point ops
-        
-        implements https://www.python.org/dev/peps/pep-0485/
-        :param a,b: the two values to be tested to relative closeness
-        :param rel_tol: relative tolerance
-          it is the amount of error allowed, relative to the larger absolute value of a or b. 
-          For example, to set a tolerance of 5%, pass tol=0.05. 
-          The default tolerance is 1e-9, which assures that the two values are the same within 
-          about 9 decimal digits. rel_tol must be greater than 0.0
-        :param abs_tol: minimum absolute tolerance level -- useful for comparisons near zero.
-        """
-        # https://github.com/PythonCHB/close_pep/blob/master/isclose.py
-        if a == b:  # short-circuit exact equality
-            return True
-    
-        if rel_tol < 0.0 or abs_tol < 0.0:
-            raise ValueError('error tolerances must be non-negative')
-    
-        # use cmath so it will work with complex ot float
-        if math.isinf(abs(a)) or math.isinf(abs(b)):
-            # This includes the case of two infinities of opposite sign, or
-            # one infinity and one finite number. Two infinities of opposite sign
-            # would otherwise have an infinite relative tolerance.
-            return False
-        diff = abs(b - a)
-    
-        return (((diff <= abs(rel_tol * b)) or
-                 (diff <= abs(rel_tol * a))) or
-                (diff <= abs_tol))
 
-def is_integer(x, rel_tol=0, abs_tol=0):
-    """
-    :return: True if  float x is almost an integer
-    """
-    if isinstance(x, six.integer_types):
-        return True
-    return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
 
-def rint(v):
-    """
-    :return: int value nearest to float v
-    """
-    return int(round(v))
 
-def int_or_float(x, rel_tol=0, abs_tol=0):
-    """
-    :param x: int or float
-    :return: int if x is (almost) an integer, otherwise float
-    """
-    return rint(x) if is_integer(x, rel_tol, abs_tol) else x
-
-def format(x, decimals=3):
-    """ formats a float with given number of decimals, but not an int
-    
-    :return: string repr of x with decimals if not int
-    """
-    if is_integer(x):
-        decimals = 0
-    return '{0:.{1}f}'.format(x, decimals)
 
 def ceildiv(a, b):
     return -(-a // b) #simple and clever
@@ -234,18 +246,18 @@ def ceildiv(a, b):
 
 def ipow(x,y,z=0):
     """
-    :return: (x**y) % z as integer
+    :param x: number (int or float)
+    :param y: int power
+    :param z: int optional modulus
+    :return: (x**y) % z as integer if possible
     """
-    if not isinstance(y,six.integer_types):
-        if z==0:
-            return pow(x,y) #switches to floats in Py3...
-        else:
-            return pow(x,y,z) #switches to floats in Py3...
-    
+
     if y<0 :
-        if z: raise NotImplementedError('no modulus allowed for negative power')
-        return 1/ipow(x,-y)
-    
+        if z:
+            raise NotImplementedError('no modulus allowed for negative power')
+        else:
+            return 1/ipow(x,-y)
+
     a,b=1,x
     while y>0:
         if y%2 == 1:
@@ -254,9 +266,21 @@ def ipow(x,y,z=0):
         y=y//2
     return a
 
+def pow(x,y,z=0):
+    """
+    :return: (x**y) % z as integer
+    """
+    if not isinstance(y,six.integer_types):
+        if z==0:
+            return six.builtins.pow(x,y) #switches to floats in Py3...
+        else:
+            return six.builtins.pow(x,y,z) #switches to floats in Py3...
+    else:
+        return ipow(x,y,z)
+
 def isqrt(n):
     """integer square root
-    
+
     :return: largest int x for which x * x <= n
     """
     #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
@@ -286,7 +310,7 @@ def is_square(n):
 def multiply(x, y):
     """
     Karatsuba fast multiplication algorithm
-    
+
     https://en.wikipedia.org/wiki/Karatsuba_algorithm
 
     Copyright (c) 2014 Project Nayuki
@@ -327,7 +351,7 @@ def mul(nums,init=1):
 
 def dot_vv(a,b,default=0):
     """dot product for vectors
-    
+
     :param a: vector (iterable)
     :param b: vector (iterable)
     :param default: default value of the multiplication operator
@@ -336,7 +360,7 @@ def dot_vv(a,b,default=0):
 
 def dot_mv(a,b,default=0):
     """dot product for vectors
-    
+
     :param a: matrix (iterable or iterables)
     :param b: vector (iterable)
     :param default: default value of the multiplication operator
@@ -345,7 +369,7 @@ def dot_mv(a,b,default=0):
 
 def dot_mm(a,b,default=0):
     """dot product for matrices
-    
+
     :param a: matrix (iterable or iterables)
     :param b: matrix (iterable or iterables)
     :param default: default value of the multiplication operator
@@ -354,7 +378,7 @@ def dot_mm(a,b,default=0):
 
 def dot(a,b,default=0):
     """dot product
-    
+
     general but slow : use dot_vv, dot_mv or dot_mm if you know a and b's dimensions
     """
     if itertools2.ndim(a)==2: # matrix
@@ -375,7 +399,7 @@ def zeros(shape):
 def diag(v):
     """
     Create a two-dimensional array with the flattened input as a diagonal.
-    
+
     :param v: If v is a 2-D array, return a copy of its diagonal.
         If v is a 1-D array, return a 2-D array with v on the diagonal
     :see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.diag.html#numpy.diag
@@ -524,7 +548,7 @@ def sets_levenshtein(a,b):
 
 def levenshtein(seq1, seq2):
     """levenshtein distance
-    
+
     :return: distance between 2 iterables
     :see: http://en.wikipedia.org/wiki/Levenshtein_distance
     """
@@ -610,7 +634,7 @@ def pisano_period(mod):
 
 def pascal_gen():
     """Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
-    
+
     https://oeis.org/A007318
     """
     __author__ = 'Nick Hobson <nickh@qbyte.org>'
@@ -643,7 +667,7 @@ def is_pythagorean_triple(a,b,c):
 
 def primitive_triples():
     """ generates primitive Pythagorean triplets x<y<z
-    
+
     sorted by hypotenuse z, then longest side y
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
@@ -915,7 +939,7 @@ def moebius(n):
 
 def euler_phi(n):
     """Euler totient function
-    
+
     :see: http://stackoverflow.com/questions/1019040/how-many-numbers-below-n-are-coprimes-to-n
     """
     if n<=1:
@@ -1009,7 +1033,7 @@ def digits(num, base=10, rev=False):
 
 def digsum(num, f=None, base=10):
     """sum of digits
-    
+
     :param num: number
     :param f: int power or function applied to each digit
     :param base: optional base
@@ -1074,7 +1098,7 @@ def powertrain(n):
     m = int(s[-1]) if l % 2 else 1
     for i in range(0, l-1, 2):
         m *= int(s[i])**int(s[i+1])
-    return m 
+    return m
 
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     """
@@ -1159,7 +1183,7 @@ def repunit_gen(digit=1):
     while True:
         yield n
         n=n*10+digit
-        
+
 def repunit(n,digit=1):
     """
     :return: nth repunit
@@ -1171,15 +1195,15 @@ def repunit(n,digit=1):
 # https://stackoverflow.com/a/36531120/1395973
 
 
-def rational_form(numerator, denominator):    
+def rational_form(numerator, denominator):
     """information about the decimal representation of a rational number.
-    
+
     :return: 5 integer : integer, decimal, shift, repeat, cycle
-    
+
     * shift is the len of decimal with leading zeroes if any
     * cycle is the len of repeat with leading zeroes if any
     """
-    
+
     def first_divisible_repunit(x):
         #finds the first number in the sequence (9, 99, 999, 9999, ...) that is divisible by x.
         assert x%2 != 0 and x%5 != 0
@@ -1214,7 +1238,7 @@ def rational_str(n,d):
 
 def rational_cycle(num,den):
     """periodic part of the decimal expansion of num/den. Any initial 0's are placed at end of cycle.
-    
+
     :see: https://oeis.org/A036275
     """
     _, _, _, digits, cycle = rational_form(num,den)
@@ -1294,7 +1318,7 @@ def lychrel_seq(n):
 
 def lychrel_count(n, limit=96):
     """number of lychrel iterations before n becomes palindromic
-    
+
     :param n: int number to test
     :param limit: int max number of loops.
         default 96 corresponds to the known most retarded non lychrel number
@@ -1382,17 +1406,18 @@ def octagonal(n):
 def is_octagonal(n):
     return (2 + sqrt(4 + (12 * n))) % 6 == 0
 
-#@memoize
+@decorators.memoize
 def partition(n):
     """The partition function p(n)
-    
+
     gives the number of partitions of a nonnegative integer n
     into positive integers.
     (There is one partition of zero into positive integers,
     i.e. the empty partition, since the empty sum is defined as 0.)
-    
-    :see: http://oeis.org/wiki/Partition_function
+
+    :see: http://oeis.org/wiki/Partition_function https://oeis.org/A000041
     """
+    #TODO : http://code.activestate.com/recipes/218332-generator-for-integer-partitions/
     def non_zero_integers(n):
         for k in range(1, n):
             yield k
@@ -1405,10 +1430,20 @@ def partition(n):
 
     result = 0
     for k in non_zero_integers(n + 1):
-        # sign = (-1) ** ((k - 1) % 2)
         sign = 1 if (k - 1) % 2==0 else -1
         result += sign * partition(n - pentagonal(k))
     return result
+
+@decorators.memoize
+def partitionsQ(n,d=0):
+    #http://mathworld.wolfram.com/PartitionFunctionQ.html
+    #http://reference.wolfram.com/language/ref/PartitionsQ.html
+    #https://oeis.org/A000009
+    #https://codegolf.stackexchange.com/a/71945/17547
+    
+    if n==0: return 1
+    return sum(partitionsQ(n-k,n-2*k+1) for k in range(1,n-d+1))
+
 
 def get_cardinal_name(num):
     """Get cardinal name for number (0 to 1 million)"""
@@ -1471,7 +1506,7 @@ def number_of_digits(num, base=10):
 
 def chakravala(n):
     """solves x^2 - n*y^2 = 1 for x,y integers
-    
+
     https://en.wikipedia.org/wiki/Pell%27s_equation
     https://en.wikipedia.org/wiki/Chakravala_method
     """
@@ -1500,13 +1535,13 @@ factorial=math.factorial #didn't knew it was there...
 
 def factorialk(n,k):
     """Multifactorial of n of order k, n(!!...!).
-    
+
     This is the multifactorial of n skipping k values.  For example,
       factorialk(17, 4) = 17!!!! = 17 * 13 * 9 * 5 * 1
     In particular, for any integer ``n``, we have
       factorialk(n, 1) = factorial(n)
       factorialk(n, 2) = factorial2(n)
-      
+
     :param n: int Calculate multifactorial. If `n` < 0, the return value is 0.
     :param k : int Order of multifactorial.
     :return: int Multifactorial of `n`.
@@ -1573,7 +1608,7 @@ def log_binomial(n,k):
 
 def ilog(a,b,upper_bound=False):
     """discrete logarithm x such that b^x=a
-    
+
     :parameter a,b: integer
     :parameter upper_bound: bool. if True, returns smallest x such that b^x>=a
     :return: x integer such that b^x=a, or upper_bound, or None
@@ -1612,7 +1647,7 @@ def sin_over_x(x):
 
 def slerp(u,v,t):
     """spherical linear interpolation
-    
+
     :param u,v: 3D unit vectors
     :param t: float in [0,1] interval
     :return: vector interpolated between u and v
@@ -1626,7 +1661,7 @@ def slerp(u,v,t):
 #interpolations
 def proportional(nseats,votes):
     """assign n seats proportionaly to votes using the https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota method
-    
+
     :param nseats: int number of seats to assign
     :param votes: iterable of int or float weighting each party
     :result: list of ints seats allocated to each party
@@ -1648,7 +1683,7 @@ def proportional(nseats,votes):
 
 def triangular_repartition(x,n):
     """ divide 1 into n fractions such that:
-    
+
     - their sum is 1
     - they follow a triangular linear repartition (sorry, no better name for now) where x/1 is the maximum
     """
@@ -1667,7 +1702,7 @@ def triangular_repartition(x,n):
 
 def rectangular_repartition(x,n,h):
     """ divide 1 into n fractions such that:
-    
+
     - their sum is 1
     - they follow a repartition along a pulse of height h<1
     """
@@ -1691,7 +1726,7 @@ def rectangular_repartition(x,n,h):
 def de_bruijn(k, n):
     """
     De Bruijn sequence for alphabet k and subsequences of length n.
-    
+
     https://en.wikipedia.org/wiki/De_Bruijn_sequence
     """
     try:
@@ -1765,7 +1800,7 @@ def mod_fact(n,m):
 
 def chinese_remainder(m, a):
     """http://en.wikipedia.org/wiki/Chinese_remainder_theorem
-    
+
     :param m: list of int moduli
     :param a: list of int remainders
     :return: smallest int x such that x mod ni=ai
@@ -1790,7 +1825,7 @@ def _count(n, p):
 
 def mod_binomial(n,k,m,q=None):
     """calculates C(n,k) mod m for large n,k,m
-    
+
     :param n: int total number of elements
     :param k: int number of elements to pick
     :param m: int modulo (or iterable of (m,p) tuples used internally)
@@ -1868,7 +1903,7 @@ matrix_power=mod_matpow
 def pi_digits_gen():
     """ generates pi digits as a sequence of INTEGERS !
     using Jeremy Gibbons spigot generator
-    
+
     :see :http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/spigot.pdf
     """
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
@@ -1877,7 +1912,7 @@ def pi_digits_gen():
         u, y = 3*(3*j+1)*(3*j+2), (q*(27*j-12)+5*r)//(5*t)
         yield y
         q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
-    
-    
+
+
 
 
