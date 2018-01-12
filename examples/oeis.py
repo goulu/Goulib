@@ -468,6 +468,13 @@ A057166=Sequence(
 
 A000041=Sequence(None,math2.partition,desc='number of partitions of n (the partition numbers)')
 
+A000009=Sequence(None,math2.partitionsQ,desc='Expansion of Product_{m >= 1} (1 + x^m); \
+    number of partitions of n into distinct parts; \
+    number of partitions of n into odd parts (if n > 0). ')
+
+A051005=A000009.filter(math2.is_prime)        
+A051005.desc='prime values of PartitionsQ.'
+
 def bell():
     """Bell or exponential numbers: number of ways to partition a set of n labeled elements.
     """
@@ -681,4 +688,5 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
+    print(A000009)
 
