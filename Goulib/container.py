@@ -144,6 +144,20 @@ class Sequence(object):
         if type(other) is int:
             return self+(-other)
         return self % other
+    
+    def __mul__(self,other):
+        return self.apply(
+            lambda n:n*other,
+            containf=lambda n:other/n in self,
+            desc='%d*%s'%(other,self.name)
+        )
+        
+    def __div__(self,other):
+        return self.apply(
+            lambda n:n/other,
+            containf=lambda n:other*n in self,
+            desc='%s/%d'%(self.name,other)
+        )
             
     def __or__(self,other):
         """
