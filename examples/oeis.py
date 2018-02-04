@@ -58,18 +58,6 @@ A006521=Sequence(1,None,lambda n: (2**n + 1)%n==0,"Numbers n such that n divides
 
 A002275=Sequence(math2.repunit_gen(1),lambda n:math2.repunit(n,1),desc="Repunits: (10^n - 1)/9. Often denoted by R_n.")
 
-def pow10m3():
-    p,n=0,1
-    while True:
-        if math2.is_prime(n-3):
-            yield p
-        p=p+1
-        n=n*10
-        
-A089675=Sequence(pow10m3,None,lambda n:math2.is_prime(10**n-3))
-A089675.desc="Numbers n such that 9*R_n - 2 is a prime number, where R_n = 11...1 is the repunit (A002275) of length n.\
-Also numbers n such that 10^n - 3 is prime"
-
 #polygonal numbers
 
 A000217=Sequence(None,math2.triangle,math2.is_triangle,'triangle numbers')
@@ -231,6 +219,27 @@ A005541=exp_sequences(8,3,-1)[2]
 A056725=exp_sequences(9,10,-1)[2]
 A046867=exp_sequences(10,11,-1)[2]
 A079907=exp_sequences(11,12,-1)[2]
+
+def pow10m3():
+    p,n=0,1
+    while True:
+        if math2.is_prime(n-3):
+            yield p
+        p=p+1
+        n=n*10
+        
+A089675=Sequence(pow10m3,None,lambda n:math2.is_prime(10**n-3))
+A089675.desc="Numbers n such that 9*R_n - 2 is a prime number, where R_n = 11...1 is the repunit (A002275) of length n.\
+Also numbers n such that 10^n - 3 is prime"
+
+A002385=A000040.filter(math2.is_palindromic)
+A002385.desc="Palindromic primes: prime numbers whose decimal expansion is a palindrome."
+
+A007500=A000040.filter(lambda x:math2.is_prime(math2.reverse(x)))
+A007500.desc="Primes whose reversal in base 10 is also prime"
+
+A006567=A000040.filter(lambda x:not math2.is_palindromic(x) and math2.is_prime(math2.reverse(x)))
+A006567.desc="Emirps (primes whose reversal is a different prime). "
 
 # decimal expansions
 
@@ -700,6 +709,6 @@ for id in seqs:
         
 if __name__ == "__main__": 
     """local tests"""
-    for x in A089675:
+    for x in A002385:
         print(x)
 
