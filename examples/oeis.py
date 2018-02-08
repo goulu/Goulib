@@ -2,7 +2,6 @@
 # coding: utf8
 
 from __future__ import division #"true division" everywhere
-from Goulib.itertools2 import take
 
 """
 OEIS sequences
@@ -547,9 +546,22 @@ A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose tra
 
 A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-A005188=Sequence(1,None,lambda x:x==math2.digsum(x,len(str(x))))
-A005188.desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
-n-digit numbers equal to sum of n-th powers of their digits'
+def armstrong_gen(): 
+    """generates narcissistic numbers, but not in sequence""" 
+    from itertools import combinations_with_replacement
+    for k in count(1):
+        a = [i**k for i in range(10)]
+        for b in combinations_with_replacement(range(10), k):
+            x = sum(map(lambda y:a[y], b))
+            if x > 0 and tuple(int(d) for d in sorted(str(x))) == b:
+                yield x
+                
+A005188=Sequence(
+    iterf=itertools2.sorted_iterable(armstrong_gen(),buffer=5),
+    containf=lambda x:x==math2.digsum(x,len(str(x))),
+    desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
+    n-digit numbers equal to sum of n-th powers of their digits'
+)
 
 def digsum2(n): return math2.digsum(n,2)
 
@@ -708,7 +720,7 @@ for id in seqs:
         
         
 if __name__ == "__main__": 
-    """local tests"""
-    for x in A002385:
+    for x in A005188:
         print(x)
+
 
