@@ -350,7 +350,7 @@ class TestIsPrime:
         assert_true(is_prime(2))
 
         #https://oeis.org/A014233
-        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
+        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
         for pp in pseudoprimes:
             assert_false(is_prime(pp))
 
@@ -903,8 +903,9 @@ class TestLogBinomial:
 
 class TestIlog:
     def test_ilog(self):
-        # assert_equal(expected, ilog(a, b, upper_bound))
-        raise SkipTest
+        assert_equal(ilog(ipow(2,5),2),5)
+        assert_equal(ilog(ipow(10,5),10),5)
+        assert_equal(ilog(ipow(7,13),7),13)
 
 class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):

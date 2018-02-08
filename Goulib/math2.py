@@ -9,6 +9,7 @@ from __future__ import division #"true division" everywhere
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = [
+    "https://pypi.python.org/pypi/primefac"
     "https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
     "http://blog.dreamshire.com/common-functions-routines-project-euler/",
     ]
@@ -306,6 +307,28 @@ def sqrt(n):
 def is_square(n):
     s=isqrt(n)
     return s*s==n
+
+def introot(n, r=2):
+    """ integer r-th root
+
+    :return: int, greatest integer less than or equal to the r-th root of n.
+
+    For negative n, returns the least integer greater than or equal to the r-th root of n, or None if r is even.
+    """
+    # copied from https://pypi.python.org/pypi/primefac
+    if n < 0: return None if r%2 == 0 else -introot(-n, r)
+    if n < 2: return n
+    if r == 2: return isqrt(n)
+    lower, upper = 0, n
+    while lower != upper - 1:
+        mid = (lower + upper) // 2
+        m = mid**r
+        if   m == n: return  mid
+        elif m <  n: lower = mid
+        elif m >  n: upper = mid
+    return lower
+
+
 
 def multiply(x, y):
     """
@@ -785,74 +808,202 @@ def primes(n):
 
     return _primes[:n]
 
-def is_prime(n, oneisprime=False, precision_for_huge_n=16):
-    """primality test. Uses Miller-Rabin for large n
+def pfactor(n):
+    """Helper function for sprp.
+
+    Returns the tuple (x,y) where n - 1 == (2 ** x) * y and y is odd.
+    We have this bit separated out so that we don’t waste time
+    recomputing s and d for each base when we want to check n against multiple bases.
+    """
+    # https://pypi.python.org/pypi/primefac
+    s, d, q = 0, n-1, 2
+    while not d & q - 1:
+        s, q = s+1, q*2
+    return s, d // (q // 2)
+
+def sprp(n, a, s=None, d=None):
+    """Checks n for primality using the Strong Probable Primality Test to base a.
+    If present, s and d should be the first and second items, respectively,
+    of the tuple returned by the function pfactor(n)"""
+    # https://pypi.python.org/pypi/primefac
+    if n%2 == 0:
+        return False
+    if (s is None) or (d is None):
+        s, d = pfactor(n)
+    x = pow(a, d, n)
+    if x == 1:
+        return True
+    for i in range(s):
+        if x == n - 1: return True
+        x = pow(x, 2, n)
+    return False
+
+def jacobi(a, p):
+    """Computes the Jacobi symbol (a|p), where p is a positive odd number.
+    :see: https://en.wikipedia.org/wiki/Jacobi_symbol
+    """
+    # https://pypi.python.org/pypi/primefac
+    if (p%2 == 0) or (p < 0): return None # p must be a positive odd number
+    if (a == 0) or (a == 1): return a
+    a, t = a%p, 1
+    while a != 0:
+        while not a & 1:
+            a //= 2
+            if p & 7 in (3, 5): t *= -1
+        a, p = p, a
+        if (a & 3 == 3) and (p & 3) == 3:
+            t *= -1
+        a %= p
+    return t if p == 1 else 0
+
+def is_prime_euler(n,eb=(2,)):
+    """Euler's primality test
+
+    :param n: int number to test
+    :param eb: test basis
+    :return: False if not prime, True if prime, but also for many pseudoprimes...
+    :see: https://en.wikipedia.org/wiki/Euler_pseudoprime
+    """
+    # https://pypi.python.org/pypi/primefac
+    for b in eb:
+        if b >= n: continue
+        if not pow(b, n-1, n) == 1:
+            return False
+        r = n - 1
+        while r%2 == 0: r //= 2
+        c = pow(b, r, n)
+        if c == 1: continue
+        while c != 1 and c != n-1: c = pow(c, 2, n)
+        if c == 1: return False
+    return True # according to Euler, but there are
+
+def is_prime(n, oneisprime=False, tb=(3,5,7,11), eb=(2,), mrb=None):
+    """main primality test.
 
     :param n: int number to test
     :param oneisprime: bool True if 1 should be considered prime (it was, a long time ago)
-    :param precision_for_huge_n: int number of primes to use in Miller
-    :return: True if n is a prime number"""
+    :param tb: trial division basis
+    :param eb: Euler's test basis
+    :param mrb: Miller-Rabin basis, automatic if None
 
+    :see: https://en.wikipedia.org/wiki/Baillie%E2%80%93PSW_primality_test
+
+    It’s an implementation of the BPSW test (Baillie-Pomerance-Selfridge-Wagstaff)
+    with some prefiltes for speed and is deterministic for all numbers less than 2^64
+    Iin fact, while infinitely many false positives are conjectured to exist,
+    no false positives are currently known.
+    The prefilters consist of trial division against 2 and the elements of the tuple tb,
+    checking whether n is square, and Euler’s primality test to the bases in the tuple eb.
+    If the number is less than 3825123056546413051, we use the Miller-Rabin test
+    on a set of bases for which the test is known to be deterministic over this range.
+    """
+    # https://pypi.python.org/pypi/primefac
+    
     if n <= 0: return False
+
     if n == 1: return oneisprime
-    if n<len(_sieve):
-        return _sieve[n]
-    if n in _primes_set:
-        return True
-    if any((n % p) == 0 for p in _primes_set):
+
+    if n<len(_sieve): return _sieve[n]
+
+    if n in _primes_set: return True
+    
+    if any(n%p == 0 for p in tb): return False
+
+    if is_square(n): return False # it's quick ...
+
+    if not is_prime_euler(n): return False  # Euler's test
+
+    s, d = pfactor(n)
+    if not sprp(n, 2, s, d): return False
+    if n < 2047: return True
+
+    # BPSW has two phases: SPRP with base 2 and SLPRP.
+    # We just did the SPRP; now we do the SLPRP
+    if n >= 3825123056546413051:
+        d = 5
+        while True:
+            if gcd(d, n) > 1:
+                p, q = 0, 0
+                break
+            if jacobi(d, n) == -1:
+                p, q = 1, (1 - d) // 4
+                break
+            d = -d - 2*d//abs(d)
+        if p == 0: return n == d
+        s, t = pfactor(n + 2)
+        u, v, u2, v2, m = 1, p, 1, p, t//2
+        k = q
+        while m > 0:
+            u2, v2, q = (u2*v2)%n, (v2*v2-2*q)%n, (q*q)%n
+            if m%2 == 1:
+                u, v = u2*v+u*v2, v2*v+u2*u*d
+                if u%2 == 1: u += n
+                if v%2 == 1: v += n
+                u, v, k = (u//2)%n, (v//2)%n, (q*k)%n
+            m //= 2
+        if (u == 0) or (v == 0): return True
+        for i in range(1, s):
+            v, k = (v*v-2*k)%n, (k*k)%n
+            if v == 0: return True
         return False
 
-    # http://rosettacode.org/wiki/Miller-Rabin_primality_test#Python
+     # Miller-Rabin
+    if not mrb:
+        if   n <             1373653: mrb = [3]
+        elif n <            25326001: mrb = [3,5]
+        elif n <          3215031751: mrb = [3,5,7]
+        elif n <       2152302898747: mrb = [3,5,7,11]
+        elif n <       3474749660383: mrb = [3,5,6,11,13]
+        elif n <     341550071728321: mrb = [3,5,7,11,13,17]   # This number is also a false positive for primes(19+1).
+        elif n < 3825123056546413051: mrb = [3,5,7,11,13,17,19,23]   # Also a false positive for primes(31+1).
+    return all(sprp(n, b, s, d) for b in mrb)
 
-    d, s = n - 1, 0
-    while not d % 2:
-        d, s = d >> 1, s + 1
+def nextprime(n):
+    """Determines, with some semblance of efficiency, the least prime number strictly greater than n."""
+    # from https://pypi.python.org/pypi/primefac
+    if n < 2: return 2
+    if n == 2: return 3
+    n = (n + 1) | 1    # first odd larger than n
+    m = n % 6
+    if m == 3:
+        if is_prime(n+2): return n+2
+        n += 4
+    elif m == 5:
+        if is_prime(n): return n
+        n += 2
+    for m in itertools.count(n, 6):
+        if is_prime(m  ): return m
+        if is_prime(m+4): return m+4
 
-    def _try_composite(a, d, n, s):
-        # exact according to http://primes.utm.edu/prove/prove2_3.html
-        if pow(a, d, n) == 1:
-            return False
-        for i in range(s):
-            if pow(a, 2**i * d, n) == n-1:
-                return False
-        return True # n  is definitely composite
-
-    if n < 1373653:
-        return not any(_try_composite(a, d, n, s) for a in (2, 3))
-    if n < 25326001:
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5))
-    if n < 118670087467:
-        if n == 3215031751:
-            return False
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7))
-    if n < 2152302898747:
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11))
-    if n < 3474749660383:
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
-    if n < 341550071728321:
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
-    # otherwise
-    return not any(_try_composite(a, d, n, s)
-        for a in _primes[:precision_for_huge_n])
+def prevprime(n):
+    """Determines, very inefficiently, the largest prime number strictly smaller than n."""
+    n = n | 1  # n if it is odd, or n+1 if it is even
+    while True:
+        n-=2
+        if is_prime(n):
+            return n
 
 def primes_gen(start=2,stop=None):
     """generate prime numbers from 'start'"""
     if start==1:
         yield 1 #if we asked for it explicitly
-    if start<=2:
-        yield 2
-    elif start%2==0:
-        start+=1
-
-    if stop is None:
-        candidates=itertools.count(max(start,3),2)
-    elif stop>start:
-        candidates=itertools2.arange(max(start,3),stop+1,2)
-    else: #
-        candidates=itertools2.arange(start if start%2 else start-1,stop-1,-2)
-    for n in candidates:
-        if is_prime(n):
-            yield n
+        start=2
+    if stop is None or stop>start:
+        n=start-1 # to include start if it is prime
+        while True:
+            n=nextprime(n)
+            if (stop is None) or n<=stop:
+                yield n
+            else:
+                break
+    else: # backwards
+        n=start+1
+        while True:
+            n=prevprime(n)
+            if n>=stop:
+                yield n
+            else:
+                break
 
 def random_prime(bits):
     """returns a random number of the specified bit length"""
@@ -1440,7 +1591,7 @@ def partitionsQ(n,d=0):
     #http://reference.wolfram.com/language/ref/PartitionsQ.html
     #https://oeis.org/A000009
     #https://codegolf.stackexchange.com/a/71945/17547
-    
+
     if n==0: return 1
     return sum(partitionsQ(n-k,n-2*k+1) for k in range(1,n-d+1))
 
@@ -1616,6 +1767,12 @@ def ilog(a,b,upper_bound=False):
     """
     # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
     #for now it's brute force...
+    l = 0
+    while a >= b:
+        a //= b
+        l += 1
+    return l
+
     p=1
     for x in itertools.count():
         if p==a: return x
