@@ -328,7 +328,17 @@ def introot(n, r=2):
         elif m >  n: upper = mid
     return lower
 
-
+def is_power(n):
+    """
+    :return: integer that, when squared/cubed/etc, yields n, 
+    or 0 if no such integer exists. 
+    Note that the power to which this number is raised will be prime."""
+    # copied from https://pypi.python.org/pypi/primefac
+    for p in primes_gen():
+        r = introot(n, p)
+        if r is None: continue
+        if r ** p == n: return r
+        if r == 1: return 0
 
 def multiply(x, y):
     """
@@ -2057,6 +2067,37 @@ def mod_matpow(M, power, mod=0):
 
 matrix_power=mod_matpow
 
+
+def mod_sqrt(n, p):
+    """modular sqrt(n) mod p
+    """
+    assert is_prime(p),'p must be prime'
+    a = n%p
+    if p%4 == 3: return pow(a, (p+1) >> 2, p)
+    elif p%8 == 5:
+        v = pow(a << 1, (p-5) >> 3, p)
+        i = ((a*v*v << 1) % p) - 1
+        return (a*v*i)%p
+    elif p%8 == 1: # Shank's method
+        q, e = p-1, 0
+        while q&1 == 0:
+            e += 1
+            q >>= 1
+        n = 2
+        while legendre(n, p) != -1: n += 1
+        w, x, y, r = pow(a, q, p), pow(a, (q+1) >> 1, p), pow(n, q, p), e
+        while True:
+            if w == 1: return x
+            v, k = w, 0
+            while v != 1 and k+1 < r:
+                v = (v*v)%p
+                k += 1
+            if k == 0: return x
+            d = pow(y, 1 << (r-k-1), p)
+            x, y = (x*d)%p, (d*d)%p
+            w, r = (w*y)%p, k
+    else: return a # p == 2
+
 def pi_digits_gen():
     """ generates pi digits as a sequence of INTEGERS !
     using Jeremy Gibbons spigot generator
@@ -2069,7 +2110,202 @@ def pi_digits_gen():
         u, y = 3*(3*j+1)*(3*j+2), (q*(27*j-12)+5*r)//(5*t)
         yield y
         q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
+        
+#------------------------------------------------------------------------------
+# factorization code taken from https://pypi.python.org/pypi/primefac
+#
+# http://programmingpraxis.com/2010/04/23/modern-elliptic-curve-factorization-part-1/
+# http://programmingpraxis.com/2010/04/27/modern-elliptic-curve-factorization-part-2/
+#------------------------------------------------------------------------------
+from random import randrange
 
+def pollardRho_brent(n):
+    """Brent’s improvement on Pollard’s rho algorithm. 
+    
+    :return: int n if n is prime
+    otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
+    :see: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
+    """
+    
+    if is_prime(n): return n
+    g = n
+    while g == n:
+        y, c, m, g, r, q = randrange(1, n), randrange(1, n), randrange(1, n), 1, 1, 1
+        while g==1:
+            x, k = y, 0
+            for i in range(r): y = (y**2 + c) % n
+            while k < r and g == 1:
+                ys = y
+                for i in range(min(m, r-k)):
+                    y = (y**2 + c) % n
+                    q = q * abs(x-y) % n
+                g, k = gcd(q, n), k+m
+            r *= 2
+        if g==n:
+            while True:
+                ys = (ys**2+c)%n
+                g = gcd(abs(x-ys), n)
+                if g > 1: break
+    return g
+
+
+def pollard_pm1(n, B1=100, B2=1000):       # TODO: What are the best default bounds and way to increment them?
+    """Pollard’s p+1 algorithm, two-phase version. 
+    
+    :return: n if n is prime; otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
+    """
+    if is_prime(n): return n
+    m = is_power(n)
+    if m: return m
+    while True:
+        pg = primes_gen()
+        q = 2           # TODO: what about other initial values of q?
+        p = pg.next()
+        while p <= B1: q, p = pow(q, p**ilog(B1, p), n), pg.next()
+        g = gcd(q-1, n)
+        if 1 < g < n: return g
+        while p <= B2: q, p = pow(q, p, n), pg.next()
+        g = gcd(q-1, n)
+        if 1 < g < n: return g
+        # These bounds failed.  Increase and try again.
+        B1 *= 10
+        B2 *= 10
+
+def mlucas(v, a, n):
+    """ Helper function for williams_pp1().  
+    Multiplies along a Lucas sequence modulo n.
+    """
+    v1, v2 = v, (v**2 - 2) % n
+    for bit in bin(a)[3:]: 
+        if bit == "0":
+            v1, v2 = ((v1**2 - 2) % n, (v1*v2 - v) % n)
+        else:
+            v1, v2 =  ((v1*v2 - v) % n, (v2**2 - 2) % n)
+    return v1
+
+def williams_pp1(n):
+    """Williams’ p+1 algorithm. 
+    :return: n if n is prime
+    otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
+    """
+    if is_prime(n): return n
+    m = is_power(n)
+    if m: return m
+    for v in itertools.count(1):
+        for p in primes_gen():
+            e = ilog(isqrt(n), p)
+            if e == 0: break
+            for _ in range(e): v = mlucas(v, p, n)
+            g = gcd(v - 2, n)
+            if 1 < g < n: return g
+            if g == n: break
+
+
+def ecadd(p1, p2, p0, n): 
+    # Add two points p1 and p2 given point P0 = P1-P2 modulo n
+    x1,z1 = p1; x2,z2 = p2; x0,z0 = p0
+    t1, t2 = (x1-z1)*(x2+z2), (x1+z1)*(x2-z2)
+    return (z0*pow(t1+t2,2,n) % n, x0*pow(t1-t2,2,n) % n)
+
+def ecdub(p, A, n): 
+    # double point p on A modulo n
+    x, z = p; An, Ad = A
+    t1, t2 = pow(x+z,2,n), pow(x-z,2,n)
+    t = t1 - t2
+    return (t1*t2*4*Ad % n, (4*Ad*t2 + t*An)*t % n)
+
+def ecmul(m, p, A, n): 
+    # multiply point p by m on curve A modulo n
+    if m == 0: return (0, 0)
+    elif m == 1: return p
+    else:
+        q = ecdub(p, A, n)
+        if m == 2: return q
+        b = 1
+        while b < m: b *= 2
+        b //= 4
+        r = p
+        while b:
+            if m&b: q, r = ecdub(q, A, n), ecadd(q, r, p, n)
+            else:   q, r = ecadd(r, q, p, n), ecdub(r, A, n)
+            b //= 2
+        return r
+    
+def ecm(n, B1=10, B2=20):  
+    """ Factors n using the elliptic curve method, 
+    using Montgomery curves and an algorithm analogous 
+    to the two-phase variant of Pollard’s p-1 method. 
+    :return: n if n is prime
+    otherwise, we keep chugging until we find a factor of n strictly between 1 and n
+
+    """     
+    # TODO: Determine the best defaults for B1 and B2 and the best way to increment them and iters
+    # TODO: We currently compute the prime lists from the sieve as we need them, but this means that we recompute them at every
+    #       iteration.  While it would not be particularly efficient memory-wise, we might be able to increase time-efficiency
+    #       by computing the primes we need ahead of time (say once at the beginning and then once each time we increase the
+    #       bounds) and saving them in lists, and then iterate the inner while loops over those lists.
+    if is_prime(n): return n
+    m = is_power(n)
+    if m: return m
+    iters = 1
+    while True:
+        for _ in range(iters):     # TODO: multiprocessing?
+            # TODO: Do we really want to call the randomizer?  Why not have seed be a function of B1, B2, and iters?
+            # TODO: Are some seeds better than others?
+            seed = randrange(6, n)
+            u, v = (seed**2 - 5) % n, 4*seed % n
+            p = pow(u, 3, n)
+            Q, C = (pow(v-u,3,n)*(3*u+v) % n, 4*p*v % n), (p, pow(v,3,n))
+            pg = primes_gen()
+            p = pg.next()
+            while p <= B1: Q, p = ecmul(p**ilog(B1, p), Q, C, n), pg.next()
+            g = gcd(Q[1], n)
+            if 1 < g < n: return g
+            while p <= B2:
+                # "There is a simple coding trick that can speed up the second stage. Instead of multiplying each prime times Q,
+                # we iterate over i from B1 + 1 to B2, adding 2Q at each step; when i is prime, the current Q can be accumulated
+                # into the running solution. Again, we defer the calculation of the greatest common divisor until the end of the
+                # iteration."                                                TODO: Implement this trick and compare performance.
+                Q = ecmul(p, Q, C, n)
+                g *= Q[1]
+                g %= n
+                p = pg.next()
+            g = gcd(g, n)
+            if 1 < g < n: return g
+            # This seed failed.  Try again with a new one.
+        # These bounds failed.  Increase and try again.
+        B1 *= 3
+        B2 *= 3
+        iters *= 2
+
+
+# legendre symbol (a|m)
+# TODO: which is faster?
+def legendre(a, p): 
+    """Functions to comptue the Legendre symbol (a|p). 
+    The return value isn’t meaningful if p is composite
+    :see: https://en.wikipedia.org/wiki/Legendre_symbol
+    """
+    return ((pow(a, (p-1) >> 1, p) + 1) % p) - 1
+
+def legendre2(a, p):                                                 # TODO: pretty sure this computes the Jacobi symbol
+    """Functions to comptue the Legendre symbol (a|p). 
+    The return value isn’t meaningful if p is composite
+    :see: https://en.wikipedia.org/wiki/Legendre_symbol
+    """
+    if a == 0: return 0
+    x, y, L = a, p, 1
+    while 1:
+        if x > (y >> 1):
+            x = y - x
+            if y & 3 == 3: L = -L
+        while x & 3 == 0: x >>= 2
+        if x & 1 == 0:
+            x >>= 1
+            if y & 7 == 3 or y & 7 == 5: L = -L
+        if x == 1: return ((L+1) % p) - 1
+        if x & 3 == 3 and y & 3 == 3: L = -L
+        x, y = y % x, x
 
 
 
