@@ -233,6 +233,9 @@ class TestIsInteger:
 
 class TestIntOrFloat:
     def test_int_or_float(self):
+        # comparing values would always pass, so we must compare types
+        assert_equal(type(int_or_float(1.0)),int)
+        assert_equal(type(int_or_float(1.0+eps)),float)
         assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
         assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
 
@@ -347,7 +350,7 @@ class TestIsPrime:
         assert_true(is_prime(2))
 
         #https://oeis.org/A014233
-        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
+        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
         for pp in pseudoprimes:
             assert_false(is_prime(pp))
 
@@ -662,11 +665,23 @@ class TestLychrelCount:
     def test_lychrel_count(self):
         # assert_equal(expected, lychrel_count(n, limit))
         raise SkipTest #
+    
+class TestPow:
+    def test_pow(self):
+        from Goulib.math2 import  pow # make sure we don't use builtins
+        assert_equal(pow(10,100),1E100)
+        assert_not_equal(pow(10,-100),0)
+        
+        assert_equal(pow(2,10,100),24)
+        assert_equal(pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
+        assert_equal(pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
+
 
 class TestIsqrt:
     def test_isqrt(self):
-        # assert_equal(expected, isqrt(n))
-        raise SkipTest #
+        assert_equal(isqrt(256),16)
+        assert_equal(isqrt(257),16)
+        assert_equal(isqrt(255),15)
 
 class TestAbundance:
     def test_abundance(self):
@@ -675,8 +690,11 @@ class TestAbundance:
 
 class TestFactorial:
     def test_factorial(self):
-        # assert_equal(expected, factorial())
-        raise SkipTest #
+        assert_equal(factorial(0),1)
+        assert_equal(factorial2(0),1)
+        assert_equal([factorial2(x) for x in [7, 8, 9]],[105, 384, 945])
+        assert_equal(factorialk(5, 1), 120)
+        assert_equal(factorialk(5, 3), 10)
 
 class TestCeildiv:
     def test_ceildiv(self):
@@ -769,12 +787,6 @@ class TestEuclidGen:
     def test_euclid_gen(self):
         # assert_equal(expected, euclid_gen())
         raise SkipTest
-
-class TestModPow:
-    def test_mod_pow(self):
-        assert_equal( mod_pow(2,10,100),24)
-        assert_equal( mod_pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
-        assert_equal( mod_pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
 
 class TestEgcd:
     def test_egcd(self):
@@ -891,8 +903,9 @@ class TestLogBinomial:
 
 class TestIlog:
     def test_ilog(self):
-        # assert_equal(expected, ilog(a, b, upper_bound))
-        raise SkipTest
+        assert_equal(ilog(ipow(2,5),2),5)
+        assert_equal(ilog(ipow(10,5),10),5)
+        assert_equal(ilog(ipow(7,13),7),13)
 
 class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):
@@ -903,8 +916,10 @@ class TestBabyStepGiantStep:
 
 class TestIsNumber:
     def test_is_number(self):
-        # assert_equal(expected, is_number(x))
-        raise SkipTest # implement your test here
+        assert_true(is_number(0))
+        assert_true(is_number(2))
+        assert_true(is_number(2.))
+        assert_false(is_number(None))
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):

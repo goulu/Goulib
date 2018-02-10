@@ -21,7 +21,7 @@ import operator, six, abc
 from math import pi,sin,cos,atan2,sqrt,hypot,copysign
 from .math2 import angle, sat, sign, isclose
 
-_reltol=1e-6 #relative tolerance used for isclose comparisons
+rel_tol=1e-6 #relative tolerance used in isclose comparisons
 
 def _hash(v):
     """hash function for vectors"""
@@ -118,7 +118,7 @@ class Geometry(object):
         raise NotImplementedError
 
     def __contains__(self,pt):
-        return isclose(self.distance(pt),0,_reltol)
+        return isclose(self.distance(pt),0,rel_tol=rel_tol)
 
 def argPair(x,y=None):
     """Process a pair of values passed in various ways."""
@@ -339,7 +339,7 @@ class Vector2(object):
             if self.x == other[0] and self.y == other[1]: return True
         except:
             pass
-        return isclose((self-Vector2(other)).mag(),0,_reltol)
+        return isclose((self-Vector2(other)).mag(), 0, abs_tol=rel_tol)
 
     def __len__(self):
         return 2
@@ -674,7 +674,7 @@ class Point2(Vector2, Geometry):
         needed for coherency
         """
         if not isinstance(pt,Point2): return False
-        return isclose(self.distance(pt),0,_reltol)
+        return isclose(self.distance(pt),0,rel_tol=rel_tol)
 
     def intersect(self, other):
         """Point2/object intersection
@@ -947,7 +947,7 @@ class Circle(Geometry):
         ":return: True if pt is ON or IN the circle"
         d=self.c.distance(pt)
         if d<self.r: return True #IN the circle
-        return isclose(d,self.r,_reltol)
+        return isclose(d,self.r,rel_tol=rel_tol)
 
     def intersect(self, other):
         """
@@ -1064,7 +1064,8 @@ class Arc2(Circle):
         """:return: float signed arc angle"""
         a=self.a
         if b is None: b=self.b 
-        if isclose(a,b,_reltol): b=a #handle complete arcs
+        if isclose(a,b,rel_tol=rel_tol,abs_tol=rel_tol): #handle complete arcs
+            b=a 
         res=b-a
         if sign(res)==self.dir:
             return res

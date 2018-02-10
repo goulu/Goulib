@@ -15,49 +15,161 @@ __revision__ = '$Revision$'
 
 import six
 import logging
-from itertools import permutations, product, count
-import math
-from Goulib import math2, itertools2
-from Goulib.expr import Expr
+from itertools import permutations, product, count, chain
 from sortedcontainers import SortedDict
 
-class Results(SortedDict):
-    """ Expr indexed by their result """
+import math
+from Goulib import math2, expr
+from Goulib.expr import Expr
 
-    def __init__(self, int=False, min=0, max=None, improve=True):
-        super(Results,self).__init__()
+# "safe" operators
+
+# import numpy
+
+def add(a,b):
+    if a==0: return b
+    if b==0: return a
+    res=a+b
+    if res==a: 
+        res=res+math2.eps*math2.sign(b) # numpy.nextafter(res,res+math2.sign(b))
+        assert res!=a
+    elif res==b: 
+        res=res+math2.eps*math2.sign(a) # res=numpy.nextafter(res,res+math2.sign(a))
+        assert res!=b
+    return res
+
+def sub(a,b):
+    return add(a,-b)
+
+def div(a,b):
+    res=math2.int_or_float(a/b)
+    a2=res*b
+    if a==a2: return res
+    #the division has rounded somthing, like (a+eps)/a =1
+    return res+math2.eps*math2.sign(a*b) #  numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+
+
+class ExprDict(SortedDict):
+    '''Expr indexed by their result'''
+
+    def __init__(self, int=False, max=None, improve=True):
+        super(ExprDict,self).__init__()
         self.int=int # if only ints should be stored
-        self.min=min
         self.max=max
         self.improve = improve # whether insert should replace complex formula by simpler
 
     def add(self,expr):
-        if expr is None:
-            return
-        k=expr() # the key is the numeric value of expr
+        ''' add expr
+        :return: bool True if it has been added
+        '''
         
-        if k is None: 
-            return # NaN such as /0
+        if expr is None:
+            return False
+        try:
+            k=expr() # the key is the numeric value of expr
+        except (TypeError,ValueError):
+            return False
+        
+        if not math2.is_number(k): 
+            return False
+        
+        if type(k) is complex:
+            return False
+        
+        if self.int and not isinstance(k,six.integer_types): #dont use math2.is_integer, not precise enough
+            return False
+        
 
-        if self.int:
-            if type(k) is complex or not math2.is_integer(k):
-                return
-            k=math2.rint(k)
 
-        if self.min is not None and k<self.min :
-            return
+        if k<0 :
+            return self.add(-expr)
 
         if self.max is not None and k>self.max :
-            return
+            return False
 
         if k in self:
-            if self.improve and expr.complexity() < self[k].complexity():
-                pass
-            else:
-                return
+            if self.improve and expr.complexity() >= self[k].complexity():
+                return False
         
         self[k]=expr
+        return True
+    
+    def __add__(self,other):
+        ''' merges 2 ExprDict
+        '''
+        result=ExprDict(int=self.int, max=self.max, improve=self.improve)
+        result.update(self)
+        result.update(other)
+        return result
+        
+functions = SortedDict(expr.functions)
+#remove functions that are irrelevant or redundant
+for f in ['isinf','isnan','isfinite','frexp', 
+          'abs','fabs','ceil','floor','trunc',
+          'erf','erfc',
+          'fsum', 'expm1','log1p','lgamma',
+          'radians','degrees']:
+    del functions[f]
+        
+class Monadic(ExprDict):
+    def __init__(self,n,ops, levels=1):
+        super(Monadic,self).__init__(int=False, max=1E100, improve=True)
+        self.ops=ops
+        self.add(Expr(n))
+        for _ in range(levels):
+            keys=list(self._list) # freeze it for this level
+            for op in ops:
+                if op=='s':
+                    op='sqrt'
+                elif op=='!':
+                    op='factorial'
+                elif op=='!!':
+                    op='factorial2'
+                self._apply(keys,Expr(expr.functions[op][0]))
+                    
+    def _apply(self,keys,f,condition=lambda _:True):
+        ''' applies f to all keys satisfying condition
+        returns True if at least one new result was added
+        '''
+        res=False
+        for k in keys:
+            if condition(k):
+                res = self.add(f(self[k])) or res # ! lazy
+        return res
+    
+    def __getitem__(self, index):
+        """Return the key at position *index*."""
+        try:
+            return super(Monadic,self).__getitem__(index)
+        except KeyError:
+            pass
+        if index<0 and '-' in self.ops:
+            return -super(Monadic,self).__getitem__(-index)
+        else:
+            raise KeyError(index)
+        
+    
+    def __iter__(self):
+        ''' return real keys followed by fake negatives ones if needed'''
+        if '-' in self.ops:
+            return chain(self._list,(-x for x in self._list if x !=0))
+        else:
+            return iter(self._list)
 
+    def iteritems(self):
+        """
+        Return an iterator over the items (``(key, value)`` pairs).
+
+        Iterating the Mapping while adding or deleting keys may raise a
+        `RuntimeError` or fail to iterate over all entries.
+        """
+        for key in self:
+            value=self[key]
+            yield (key, value)
+            
+    def items(self):
+        return list(self.iteritems())
+            
 
 
 # supported operators with precedence and text + LaTeX repr
@@ -103,12 +215,13 @@ def gen(digits,monadic='-', diadic='-+*/^_',permut=True):
     if len(digits)==1 or '_' in diadic:
         try:
             e=Expr(''.join(digits))
+        except SyntaxError:
+            pass
+        else:
             if e.isNum:
                 yield e
                 for op in monadic:
                     yield _monadic(op,e)
-        except:
-            pass
 
     for i in range(1,len(digits)):
         try:
@@ -128,29 +241,24 @@ def seq(digits,monadic,diadic,permut):
     which evaluate to 0,1,...
     """
 
-    b=Results(int=True)
+    b=ExprDict(int=True)
     i=0
     for e in gen(digits,monadic, diadic, permut):
         b.min=i
         b.add(e)
         while i in b:
-            yield (i,b.pop(i))
+            # yield (i,b.pop(i))
             i+=1
+    logging.warning('%d has no solution'%i)
     for k in b:
         yield (k,b[k])
 
 def pp(e):
-    """ pretty print, clean the formula (should be dont in Expr...="""
+    """ pretty print, clean the formula (should be done in Expr...="""
     f=str(e[1])
     # f=f.replace('--','+')
     # f=f.replace('+-','-')
     print('%d = %s'%(e[0],f))
-
-def yeargame(num):
-    return seq(num,'-s','+-*/_',True)
-
-def fourfour():
-    return seq(4444,'-s','+-*/_',False)
 
 def friedman(num):
     for e in gen(num):
@@ -165,25 +273,18 @@ def friedman(num):
 
 
 if __name__ == "__main__":
+    
+    for x in seq(123456789,'-s','+-*/^_',False):
+        print(x)
+        if x[0]>=100: break
+        
+    exit()
+    
+    m=Monadic(math.pi,functions,2)
 
-
-    print('\n4444')
-    for e in fourfour():
-        pp(e)
-
-
-    print('\nyeargame')
-    for e in yeargame(2017):
-        pp(e)
-
-
-    print('\nfriedman')
-    for x in count(10):
-        try:
-            e=itertools2.first(friedman(x))
-            pp(e)
-        except IndexError: # no solution found
-            pass
+    for x in m:
+        print('%s = %s'%(x,m[x]))
+        
 
 
 

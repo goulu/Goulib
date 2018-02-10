@@ -747,7 +747,7 @@ class Chain(Group):
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
     
-    def contiguous(self, edge, tol=1E-6, allow_swap=True):
+    def contiguous(self, edge, abs_tol=1E-6, allow_swap=True):
         """
         check if edge can be appended to the chain
         :param edge: :class:`Entity` to append
@@ -759,18 +759,18 @@ class Chain(Group):
         if len(self)==0: #init the chain with edge
             return -1,False
         
-        if isclose(self.end.distance(edge.start),0,tol):
+        if isclose(self.end.distance(edge.start),0,abs_tol=abs_tol):
             return -1,False #append
         
-        if isclose(self.start.distance(edge.end),0,tol):
+        if isclose(self.start.distance(edge.end),0,abs_tol=abs_tol):
             return 0,False #prepend
         
         if not allow_swap:
             return None,False
         
-        if isclose(self.end.distance(edge.end),0,tol):
+        if isclose(self.end.distance(edge.end),0,abs_tol=abs_tol):
             return -1,True #append swapped
-        if isclose(self.start.distance(edge.start),0,tol):
+        if isclose(self.start.distance(edge.start),0,abs_tol=abs_tol):
             return 0,True #prepend swapped
         
         return None, False

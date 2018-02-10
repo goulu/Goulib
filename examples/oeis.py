@@ -2,7 +2,6 @@
 # coding: utf8
 
 from __future__ import division #"true division" everywhere
-from Goulib.itertools2 import take
 
 """
 OEIS sequences
@@ -219,6 +218,27 @@ A005541=exp_sequences(8,3,-1)[2]
 A056725=exp_sequences(9,10,-1)[2]
 A046867=exp_sequences(10,11,-1)[2]
 A079907=exp_sequences(11,12,-1)[2]
+
+def pow10m3():
+    p,n=0,1
+    while True:
+        if math2.is_prime(n-3):
+            yield p
+        p=p+1
+        n=n*10
+        
+A089675=Sequence(pow10m3,None,lambda n:math2.is_prime(10**n-3))
+A089675.desc="Numbers n such that 9*R_n - 2 is a prime number, where R_n = 11...1 is the repunit (A002275) of length n.\
+Also numbers n such that 10^n - 3 is prime"
+
+A002385=A000040.filter(math2.is_palindromic)
+A002385.desc="Palindromic primes: prime numbers whose decimal expansion is a palindrome."
+
+A007500=A000040.filter(lambda x:math2.is_prime(math2.reverse(x)))
+A007500.desc="Primes whose reversal in base 10 is also prime"
+
+A006567=A000040.filter(lambda x:not math2.is_palindromic(x) and math2.is_prime(math2.reverse(x)))
+A006567.desc="Emirps (primes whose reversal is a different prime). "
 
 # decimal expansions
 
@@ -468,6 +488,13 @@ A057166=Sequence(
 
 A000041=Sequence(None,math2.partition,desc='number of partitions of n (the partition numbers)')
 
+A000009=Sequence(None,math2.partitionsQ,desc='Expansion of Product_{m >= 1} (1 + x^m); \
+    number of partitions of n into distinct parts; \
+    number of partitions of n into odd parts (if n > 0). ')
+
+A051005=A000009.filter(math2.is_prime)        
+A051005.desc='prime values of PartitionsQ.'
+
 def bell():
     """Bell or exponential numbers: number of ways to partition a set of n labeled elements.
     """
@@ -519,9 +546,22 @@ A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose tra
 
 A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-A005188=Sequence(1,None,lambda x:x==math2.digsum(x,len(str(x))))
-A005188.desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
-n-digit numbers equal to sum of n-th powers of their digits'
+def armstrong_gen(): 
+    """generates narcissistic numbers, but not in sequence""" 
+    from itertools import combinations_with_replacement
+    for k in count(1):
+        a = [i**k for i in range(10)]
+        for b in combinations_with_replacement(range(10), k):
+            x = sum(map(lambda y:a[y], b))
+            if x > 0 and tuple(int(d) for d in sorted(str(x))) == b:
+                yield x
+                
+A005188=Sequence(
+    iterf=itertools2.sorted_iterable(armstrong_gen(),buffer=5),
+    containf=lambda x:x==math2.digsum(x,len(str(x))),
+    desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
+    n-digit numbers equal to sum of n-th powers of their digits'
+)
 
 def digsum2(n): return math2.digsum(n,2)
 
@@ -680,5 +720,7 @@ for id in seqs:
         
         
 if __name__ == "__main__": 
-    """local tests"""
+    for x in A005188:
+        print(x)
+
 
