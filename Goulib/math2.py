@@ -15,8 +15,10 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, math, cmath, operator, itertools, fractions, numbers, logging
+import six, logging
 from six.moves import map, reduce, filter, zip_longest, range
+
+import math, cmath, operator, itertools, fractions, numbers, random
 
 from Goulib import itertools2, decorators
 
@@ -818,54 +820,6 @@ def primes(n):
 
     return _primes[:n]
 
-def pfactor(n):
-    """Helper function for sprp.
-
-    Returns the tuple (x,y) where n - 1 == (2 ** x) * y and y is odd.
-    We have this bit separated out so that we don’t waste time
-    recomputing s and d for each base when we want to check n against multiple bases.
-    """
-    # https://pypi.python.org/pypi/primefac
-    s, d, q = 0, n-1, 2
-    while not d & q - 1:
-        s, q = s+1, q*2
-    return s, d // (q // 2)
-
-def sprp(n, a, s=None, d=None):
-    """Checks n for primality using the Strong Probable Primality Test to base a.
-    If present, s and d should be the first and second items, respectively,
-    of the tuple returned by the function pfactor(n)"""
-    # https://pypi.python.org/pypi/primefac
-    if n%2 == 0:
-        return False
-    if (s is None) or (d is None):
-        s, d = pfactor(n)
-    x = pow(a, d, n)
-    if x == 1:
-        return True
-    for i in range(s):
-        if x == n - 1: return True
-        x = pow(x, 2, n)
-    return False
-
-def jacobi(a, p):
-    """Computes the Jacobi symbol (a|p), where p is a positive odd number.
-    :see: https://en.wikipedia.org/wiki/Jacobi_symbol
-    """
-    # https://pypi.python.org/pypi/primefac
-    if (p%2 == 0) or (p < 0): return None # p must be a positive odd number
-    if (a == 0) or (a == 1): return a
-    a, t = a%p, 1
-    while a != 0:
-        while not a & 1:
-            a //= 2
-            if p & 7 in (3, 5): t *= -1
-        a, p = p, a
-        if (a & 3 == 3) and (p & 3) == 3:
-            t *= -1
-        a %= p
-    return t if p == 1 else 0
-
 def is_prime_euler(n,eb=(2,)):
     """Euler's primality test
 
@@ -1018,12 +972,10 @@ def primes_gen(start=2,stop=None):
 def random_prime(bits):
     """returns a random number of the specified bit length"""
     import random
-    n = random.getrandbits(bits);
-    if n%2 == 0:
-        n+=1
-    while not is_prime(n):
-        n+=2
-    return n
+    while True:
+        n = random.getrandbits(bits-1)+2**(bits-1);
+        n=nextprime(n-1)
+        if n<2**bits: return n
 
 def euclid_gen():
     """generates Euclid numbers: 1 + product of the first n primes"""
@@ -2117,7 +2069,54 @@ def pi_digits_gen():
 # http://programmingpraxis.com/2010/04/23/modern-elliptic-curve-factorization-part-1/
 # http://programmingpraxis.com/2010/04/27/modern-elliptic-curve-factorization-part-2/
 #------------------------------------------------------------------------------
-from random import randrange
+
+def pfactor(n):
+    """Helper function for sprp.
+
+    Returns the tuple (x,y) where n - 1 == (2 ** x) * y and y is odd.
+    We have this bit separated out so that we don’t waste time
+    recomputing s and d for each base when we want to check n against multiple bases.
+    """
+    # https://pypi.python.org/pypi/primefac
+    s, d, q = 0, n-1, 2
+    while not d & q - 1:
+        s, q = s+1, q*2
+    return s, d // (q // 2)
+
+def sprp(n, a, s=None, d=None):
+    """Checks n for primality using the Strong Probable Primality Test to base a.
+    If present, s and d should be the first and second items, respectively,
+    of the tuple returned by the function pfactor(n)"""
+    # https://pypi.python.org/pypi/primefac
+    if n%2 == 0:
+        return False
+    if (s is None) or (d is None):
+        s, d = pfactor(n)
+    x = pow(a, d, n)
+    if x == 1:
+        return True
+    for i in range(s):
+        if x == n - 1: return True
+        x = pow(x, 2, n)
+    return False
+
+def jacobi(a, p):
+    """Computes the Jacobi symbol (a|p), where p is a positive odd number.
+    :see: https://en.wikipedia.org/wiki/Jacobi_symbol
+    """
+    # https://pypi.python.org/pypi/primefac
+    if (p%2 == 0) or (p < 0): return None # p must be a positive odd number
+    if (a == 0) or (a == 1): return a
+    a, t = a%p, 1
+    while a != 0:
+        while not a & 1:
+            a //= 2
+            if p & 7 in (3, 5): t *= -1
+        a, p = p, a
+        if (a & 3 == 3) and (p & 3) == 3:
+            t *= -1
+        a %= p
+    return t if p == 1 else 0
 
 def pollardRho_brent(n):
     """Brent’s improvement on Pollard’s rho algorithm. 
@@ -2231,7 +2230,7 @@ def ecmul(m, p, A, n):
             b //= 2
         return r
     
-def ecm(n, B1=10, B2=20):  
+def factor_ecm(n, B1=10, B2=20):  
     """ Factors n using the elliptic curve method, 
     using Montgomery curves and an algorithm analogous 
     to the two-phase variant of Pollard’s p-1 method. 
@@ -2252,24 +2251,25 @@ def ecm(n, B1=10, B2=20):
         for _ in range(iters):     # TODO: multiprocessing?
             # TODO: Do we really want to call the randomizer?  Why not have seed be a function of B1, B2, and iters?
             # TODO: Are some seeds better than others?
-            seed = randrange(6, n)
+            seed = random.randrange(6, n)
             u, v = (seed**2 - 5) % n, 4*seed % n
             p = pow(u, 3, n)
             Q, C = (pow(v-u,3,n)*(3*u+v) % n, 4*p*v % n), (p, pow(v,3,n))
             pg = primes_gen()
-            p = pg.next()
-            while p <= B1: Q, p = ecmul(p**ilog(B1, p), Q, C, n), pg.next()
+            p = six.next(pg)
+            while p <= B1: Q, p = ecmul(p**ilog(B1, p), Q, C, n), six.next(pg)
             g = gcd(Q[1], n)
             if 1 < g < n: return g
             while p <= B2:
                 # "There is a simple coding trick that can speed up the second stage. Instead of multiplying each prime times Q,
                 # we iterate over i from B1 + 1 to B2, adding 2Q at each step; when i is prime, the current Q can be accumulated
                 # into the running solution. Again, we defer the calculation of the greatest common divisor until the end of the
-                # iteration."                                                TODO: Implement this trick and compare performance.
+                # iteration.
+                # TODO: Implement this trick and compare performance.
                 Q = ecmul(p, Q, C, n)
                 g *= Q[1]
                 g %= n
-                p = pg.next()
+                p = six.next(pg)
             g = gcd(g, n)
             if 1 < g < n: return g
             # This seed failed.  Try again with a new one.
@@ -2306,6 +2306,4 @@ def legendre2(a, p):                                                 # TODO: pre
         if x == 1: return ((L+1) % p) - 1
         if x & 3 == 3 and y & 3 == 3: L = -L
         x, y = y % x, x
-
-
 

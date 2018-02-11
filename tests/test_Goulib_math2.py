@@ -2,7 +2,7 @@
 # coding: utf8
 from __future__ import division #"true division" everywhere
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_greater
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
@@ -364,6 +364,15 @@ class TestIsPrime:
         assert_true(is_prime(643808006803554439230129854961492699151386107534013432918073439524138264842370630061369715394739134090922937332590384720397133335969549256322620979036686633213903952966175107096769180017646161851573147596390153))
         assert_false(is_prime(743808006803554439230129854961492699151386107534013432918073439524138264842370630061369715394739134090922937332590384720397133335969549256322620979036686633213903952966175107096769180017646161851573147596390153))
 
+class TestFactorEcm:
+    def test_factor_ecm(self):
+        for _ in range(10):
+            size=32
+            a=random_prime(size)
+            b=random_prime(size)
+            c=factor_ecm(a*b)
+            assert_true(c in (a,b))
+        
 class TestPrimeFactors:
     def test_prime_factors(self):
         assert_equal(prime_factors(2014),[2, 19, 53])
@@ -1032,7 +1041,10 @@ class TestPrimitiveRoots:
 class TestRandomPrime:
     def test_random_prime(self):
         for b in range(8,128,8):
-            assert_true(is_prime(random_prime(b)))
+            r=random_prime(b)
+            assert_true(is_prime(r))
+            assert_true(r>2**(b-1))
+            assert_true(r<2**b)
 
 class TestPrimeDivisors:
     def test_prime_divisors(self):
