@@ -457,13 +457,15 @@ class TestDetectCycle:
         assert_equal(detect_cycle(list('123412341')),(0,4))
         
         assert_equal(detect_cycle(list('012345'+'678'*4)),(6,3))
-        # but the repetition should be long enough (2*i ?):
-        assert_equal(detect_cycle(list('012345'+'678'*3)),(None,None))
+        assert_equal(detect_cycle(list('012345'+'678'*3)),(6,3))
+        
+        #Floyd fails when repetition isn't long enough (2*i ?):
+        assert_equal(floyd(list('012345'+'678'*3)),(None,None))
         
         #test from https://rosettacode.org/wiki/Cycle_detection
         assert_equal(detect_cycle([3,10,101,2,5,26,167,95,101,2,5,26,167,95]),(2,6))
         
-        """ does not work yet because of repeating digits
+        """does not work yet because of repeating digits
         
         p3=[1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 
             1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 
@@ -471,10 +473,9 @@ class TestDetectCycle:
             2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 
             0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2]
         assert_equal(detect_cycle(p3)[1],8)
-        
-        from math import pi
-        assert_equal(detect_cycle(list(str(pi))),(None,None)) #TODO: find why it's wrong
         """
+        from Goulib.math2 import pi_digits_gen
+        assert_equal(detect_cycle(pi_digits_gen()),(1,2)) # same problem ..
         
 class TestFloyd:
     def test_floyd(self):

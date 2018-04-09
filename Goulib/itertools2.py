@@ -215,15 +215,19 @@ def tee(iterable, n=2, copy=None):
             res=[iterable]*n
         else:
             res=[copy(iterable) for _ in range(n)]
-        return tuple(res)
-    import itertools
-    return itertools.tee(iterable,n) # make independent iterators
+        res=tuple(res)
+    else:
+        import itertools
+        res=itertools.tee(iterable,n) # make independent align_iterators
+        if isinstance(iterable,keep):
+            res=tuple(map(iterable.__class__,res))
+    return res
 
 def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n=n, copy=None)
-    onestepit = six.moves.zip(*(starmap(drop, enumerate(itlist))))
+    onestepit = zip(*(starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
 def pairwise(iterable,op=None,loop=False):
@@ -370,7 +374,7 @@ def identity(x):
 
 def occurrences(it, exchange=False):
     """Return dictionary with occurrences from iterable"""
-    return six.moves.reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
+    return reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
 def cartesian_product(*iterables, **kwargs):
     """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
@@ -799,7 +803,7 @@ def first_match(iter1,iter2,limit=None):
 def floyd(iterable,limit=1e6):
     """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
     
-    :see: https://en.wikipedia.org/wiki/Cycle_detection
+    :see: https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
     :param iterable: iterable
     :param limit: int limit to prevent infinite loop. no limit if None
     :result: (i,l) tuple of integers where i=index of cycle start, l=length
@@ -827,6 +831,46 @@ def floyd(iterable,limit=1e6):
 
     return i,l+1
 
+def brent(iterable,limit=1e6):
+    """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
+    
+    :see: https://en.wikipedia.org/wiki/Cycle_detection#Brent's_algorithm
+    :param iterable: iterable
+    :param limit: int limit to prevent infinite loop. no limit if None
+    :result: (i,l) tuple of integers where i=index of cycle start, l=length
+        if no cycle is found, return (None,None)
+    """
+    # main phase: search successive powers of two
+    power = lam = 1
+    import copy
+    iterable,tortoise,hare = tee(keep(iterable),3)
+    hare.next()
+    while tortoise.val != hare.val:
+        if power == lam:  # time to start a new power of two?
+            tortoise,hare = tee(hare)
+            power *= 2
+            lam = 0
+        hare.next()
+        lam += 1
+
+    # Find the position of the first repetition of length λ
+    mu = 0
+    iterable,tortoise,hare = tee(iterable,3)
+    for i in range(lam):
+        hare.next()
+    # The distance between the hare and tortoise is now lam
+
+    # Next, the hare and tortoise move at same speed until they agree
+    while tortoise.val != hare.val:
+        tortoise.next()
+        hare.next()
+        mu += 1
+ 
+    return mu, lam
+
 def detect_cycle(iterable,limit=1e6):
-    return floyd(iterable,limit)
+    try:
+        return brent(iterable,limit)
+    except StopIteration:
+        return (None, None) # no cycle found
 
