@@ -393,6 +393,8 @@ class TestDivisors:
         assert_equal(d,[1])
         d=list(divisors(2014))
         assert_equal(d,[1, 53, 19, 1007, 2, 106, 38, 2014])
+        d=list(divisors(2**3*3**2))
+        assert_equal(sorted(d),sorted([1, 2, 4, 8, 3, 9, 6, 12, 24, 18, 36, 72]))
 
 class TestProperDivisors:
     def test_proper_divisors(self):
@@ -643,6 +645,15 @@ class Omega:
 class TestEulerPhi:
     def test_euler_phi(self):
         assert_equal(euler_phi(8849513),8843520)
+        
+class TestKempner:
+    def test_kempner(self):
+        # from https://projecteuler.net/problem=549
+        assert_equal(kempner(1),1)
+        assert_equal(kempner(8),4)
+        assert_equal(kempner(10),5)
+        assert_equal(kempner(25),10)
+        assert_equal(sum(kempner(x) for x in range(2,100+1)),2012)
 
 class TestRecurrence:
     def test_recurrence(self):

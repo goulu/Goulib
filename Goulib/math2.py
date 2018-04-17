@@ -763,6 +763,7 @@ def triples():
 
 def divisors(n):
     """
+    :param n: int
     :return: all divisors of n: divisors(12) -> 1,2,3,6,12
     including 1 and n,
     except for 1 which returns a single 1 to avoid messing with sum of divisors...
@@ -791,6 +792,7 @@ def sieve(n, oneisprime=False):
     Algorithm & Python source: Robert William Hanks
     http://stackoverflow.com/questions/17773352/python-sieve-prime-numbers
     """
+    n=int(n) # to tolerate n=1E9, which is float
     if n<2: return []
     if n==2: return [1] if oneisprime else []
     global _sieve
@@ -1060,6 +1062,37 @@ def euler_phi(n):
     return int(mul((1 - 1.0 / p for p, _ in factorize(n)),n))
 
 totient=euler_phi #alias. totient is available in sympy
+
+
+def kempner(n):
+    """"Kempner function, also called Smarandache function 
+    
+    :return: int smallest positive integer m such that n divides m!.
+    
+    :param n: int
+    
+    :see: https://en.wikipedia.org/wiki/Kempner_function
+    :see: http://mathworld.wolfram.com/SmarandacheFunction.html
+    """
+    if n==1: return 1
+    if is_prime(n) : return n
+    
+    @decorators.memoize
+    def _np(n,p):
+        #n^p . use https://codereview.stackexchange.com/a/129868/37671     
+        k=0
+        while p > n:
+            k += n
+            p -= n + 1
+            t=k
+            while t%n!=0:
+                t=t//n
+                p-=1
+        p=max(0,p)
+    
+        return (k + p) * n;
+    
+    return max(_np(f,p) for f,p in factorize(n))
 
 def prime_ktuple(constellation):
     """

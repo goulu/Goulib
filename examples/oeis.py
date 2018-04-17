@@ -352,10 +352,7 @@ A046123=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 2))
 A046124=Sequence(itertools2.itemgetter(math2.sexy_prime_quadruplets(), 3))
 
 def is_squarefree(n):
-    for p,q in math2.factorize(n):
-        if q>=2:
-            return False
-    return True
+    return all(q==1 for p,q in math2.factorize(n))
 
 A005117=Sequence(1,None,is_squarefree) #Squarefree numbers (or square-free numbers): numbers that are not divisible by a square greater than 1.
 
@@ -709,6 +706,9 @@ desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), th
 A121727=Sequence(math2.primitive_triples,desc=desc) \
     .sort(lambda x:(x[0]*x[1],x[2])) \
     .apply(lambda x:x[2])
+   
+desc="Kempner numbers: smallest positive integer m such that n divides m!."
+A002034=Sequence(1,math2.kempner,desc=desc)
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -720,7 +720,7 @@ for id in seqs:
         
         
 if __name__ == "__main__": 
-    for x in A005188:
+    for x in A002034:
         print(x)
 
 
