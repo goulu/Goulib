@@ -170,7 +170,7 @@ class TestVeccompare:
         v2=list(accsum(v1))
         v2[-1]=2 #force to test ai>bi
         assert_equal(veccompare(v1,v2),[2,2,1])
-        
+
 class TestFibonacciGen:
     def test_fibonacci_gen(self):
         #also tested in test_oeis
@@ -202,11 +202,11 @@ class TestFibonacci:
         f51=fibonacci(51)
         phi=(1+sqrt(5))/2
         assert_equal(f51/f50,phi)
-        
+
         #mod 1000000007 has the effect of using int32 only
         assert_equal(fibonacci(int(1E19),1000000007),647754067)
         assert_equal(fibonacci(int(1E19),10),5)
-        
+
 class TestIsFibonacci:
     def test_is_fibonacci(self):
         assert_true(is_fibonacci(0))
@@ -221,7 +221,7 @@ class TestPisanoPeriod:
     def test_pisano_period(self):
         assert_equal(pisano_period(3),8)
         assert_equal(pisano_period(10),60)
-        
+
 class TestPisanoCycle:
     def test_pisano_cycle(self):
         assert_equal(pisano_cycle(3),[0, 1, 1, 2, 0, 2, 2, 1]) #A082115
@@ -372,7 +372,7 @@ class TestFactorEcm:
             b=random_prime(size)
             c=factor_ecm(a*b)
             assert_true(c in (a,b))
-        
+
 class TestPrimeFactors:
     def test_prime_factors(self):
         assert_equal(prime_factors(2014),[2, 19, 53])
@@ -645,7 +645,7 @@ class Omega:
 class TestEulerPhi:
     def test_euler_phi(self):
         assert_equal(euler_phi(8849513),8843520)
-        
+
 class TestKempner:
     def test_kempner(self):
         # from https://projecteuler.net/problem=549
@@ -653,6 +653,7 @@ class TestKempner:
         assert_equal(kempner(8),4)
         assert_equal(kempner(10),5)
         assert_equal(kempner(25),10)
+        #assert_equal(kempner(128),8) #TODO: find why it fails ...
         assert_equal(sum(kempner(x) for x in range(2,100+1)),2012)
 
 class TestRecurrence:
@@ -685,13 +686,13 @@ class TestLychrelCount:
     def test_lychrel_count(self):
         # assert_equal(expected, lychrel_count(n, limit))
         raise SkipTest #
-    
+
 class TestPow:
     def test_pow(self):
         from Goulib.math2 import  pow # make sure we don't use builtins
         assert_equal(pow(10,100),1E100)
         assert_not_equal(pow(10,-100),0)
-        
+
         assert_equal(pow(2,10,100),24)
         assert_equal(pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
         assert_equal(pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf

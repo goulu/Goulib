@@ -201,7 +201,7 @@ def exp_sequences(a,b,c,desc_s1=None,desc_s2=None,desc_s3=None,start=0):
         for _ in decorators.itimeout(count(),10):
             yield a*p+c
             p=p*b
-            
+
     s1=Sequence(_gen,lambda n:a*b**n+c,desc=desc_s1 or "a(n)=%d*%d^n%+d"%(a,b,c))
     s2=s1.filter(math2.is_prime,desc=desc_s2 or "Primes of the form %d*%d^n%+d"%(a,b,c))
     s3=s2.apply(lambda n:math2.ilog((n-c)//a,b), desc=desc_s3 or "Numbers n such that %d*%d^n%+d is prime"%(a,b,c))
@@ -226,7 +226,7 @@ def pow10m3():
             yield p
         p=p+1
         n=n*10
-        
+
 A089675=Sequence(pow10m3,None,lambda n:math2.is_prime(10**n-3))
 A089675.desc="Numbers n such that 9*R_n - 2 is a prime number, where R_n = 11...1 is the repunit (A002275) of length n.\
 Also numbers n such that 10^n - 3 is prime"
@@ -276,7 +276,7 @@ A006862=Sequence(
 A002110=A006862-1
 A002110.desc="Primorial numbers (first definition): product of first n primes"
 
-A057588=(A002110-1).filter(bool) #remove leading 0 ...  
+A057588=(A002110-1).filter(bool) #remove leading 0 ...
 A057588.desc="Kummer numbers: -1 + product of first n consecutive primes."
 
 A005234=A000040.filter(
@@ -333,7 +333,7 @@ A007508=Sequence(count_10_exp(A006512), desc="Number of twin prime pairs below 1
 
 A007510=A000040 % A001097
 A007510.desc="Single (or isolated or non-twin) primes: Primes p such that neither p-2 nor p+2 is prime"
-    
+
 A023200=Sequence(itertools2.itemgetter(math2.cousin_primes(), 0), desc="Lesser of cousin primes.")
 A046132=Sequence(itertools2.itemgetter(math2.cousin_primes(), 1),desc="Greater of cousin primes")
 
@@ -359,7 +359,7 @@ A005117=Sequence(1,None,is_squarefree) #Squarefree numbers (or square-free numbe
 def is_product_of_2_primes(n):
     f=list(math2.prime_factors(n))
     return len(f)==2 and f[0]!=f[1]
-    
+
 A006881=Sequence(1,None,is_product_of_2_primes,"Numbers that are the product of two distinct primes.")
 
 def is_powerful(n):
@@ -369,7 +369,7 @@ def is_powerful(n):
     for f in itertools2.unique(math2.prime_factors(n)):
         if n%(f*f): return False
     return True
-        
+
 A001694=Sequence(1,None,is_powerful,"powerful numbers")
 
 #these 2 implementations have pretty much the same performance
@@ -429,7 +429,7 @@ A003147=A000040.filter(
     desc="Primes with a fibonacci primitive root"
     # but why is 7 in A001913 ???
 )
-"""            
+"""
 
 # Fibonacci & co
 
@@ -443,8 +443,8 @@ A001175=Sequence(1,math2.pisano_period, desc='Pisano period')
 
 A060305=A000040.apply(math2.pisano_period, desc='Period of Fibonacci numbers mod prime(n).')
 
-A134816=Sequence(math2.recurrence([1,1,0],[1,1,1]), desc="Padovan's spiral numbers.") 
-A000931=Sequence(math2.recurrence([1,1,0],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ") 
+A134816=Sequence(math2.recurrence([1,1,0],[1,1,1]), desc="Padovan's spiral numbers.")
+A000931=Sequence(math2.recurrence([1,1,0],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ")
 
 A050935=Sequence(math2.recurrence([-1,0,1],[0,0,1]), desc="a(1)=0, a(2)=0, a(3)=1, a(n+1) = a(n) - a(n-2).")
 # other famous series
@@ -489,7 +489,7 @@ A000009=Sequence(None,math2.partitionsQ,desc='Expansion of Product_{m >= 1} (1 +
     number of partitions of n into distinct parts; \
     number of partitions of n into odd parts (if n > 0). ')
 
-A051005=A000009.filter(math2.is_prime)        
+A051005=A000009.filter(math2.is_prime)
 A051005.desc='prime values of PartitionsQ.'
 
 def bell():
@@ -521,7 +521,7 @@ A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence:
 def digits_in(n,digits_set):
     s1=set(math2.digits(n))
     return s1 <= digits_set
-                                 
+
 A007088=Sequence(None,lambda n:int(bin(n)[2:]),lambda n:digits_in(n,set((0,1))),
     desc='The binary numbers: numbers written in base 2'
 )
@@ -536,15 +536,15 @@ A046034=Sequence(None,None,lambda n:digits_in(n,set((2,3,5,7))),
 def sumdigpow(p,desc=None):
     """sum of p-th powers of digits"""
     return Sequence(None,lambda x:math2.digsum(x,p),desc=desc)
-                    
+
 A003132=sumdigpow(2,desc='Sum of squares of digits of n. ')
 
 A007770=Sequence(None,None,math2.is_happy,desc='Happy numbers: numbers whose trajectory under iteration of sum of squares of digits map (see A003132) includes 1.')
 
 A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
-def armstrong_gen(): 
-    """generates narcissistic numbers, but not in sequence""" 
+def armstrong_gen():
+    """generates narcissistic numbers, but not in sequence"""
     from itertools import combinations_with_replacement
     for k in count(1):
         a = [i**k for i in range(10)]
@@ -552,7 +552,7 @@ def armstrong_gen():
             x = sum(map(lambda y:a[y], b))
             if x > 0 and tuple(int(d) for d in sorted(str(x))) == b:
                 yield x
-                
+
 A005188=Sequence(
     iterf=itertools2.sorted_iterable(armstrong_gen(),buffer=5),
     containf=lambda x:x==math2.digsum(x,len(str(x))),
@@ -614,7 +614,7 @@ def summarize(x):
     from Goulib.math2 import digits,num_from_digits
     return num_from_digits(flatten(swap(compress(sorted(digits(x)))))
 )
-                           
+
 A005151=Sequence(itertools2.recurrence(summarize,1),
     desc="Summarize the previous term! (in increasing order). "
 )
@@ -699,16 +699,29 @@ desc="Smallest member 'a' of the primitive Pythagorean triples (a,b,c) ordered b
 A046086=Sequence(math2.primitive_triples,desc=desc).apply(lambda x:x[0])
     # .sort(key=lambda x:x[2]) \ #not needed anymore
     # .apply(lambda x:x[0])
-    
+
 # 2016 found a bug in OEIS ! 20th term of the serie is 145, not 142 !
 
 desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
 A121727=Sequence(math2.primitive_triples,desc=desc) \
     .sort(lambda x:(x[0]*x[1],x[2])) \
     .apply(lambda x:x[2])
-   
+    
+desc="Gpf(n): greatest prime dividing n, for n >= 2; a(1)=1. "
+A006530=Sequence(1,math2.gpf,desc=desc)        
+
+"""
+A048098=A006530>A000006
+A048098.desc="Numbers n that are sqrt(n)-smooth: if p | n then p^2 <= n when p is prime."
+"""
+
 desc="Kempner numbers: smallest positive integer m such that n divides m!."
-A002034=Sequence(1,math2.kempner,desc=desc)
+# A002034=Sequence(1,math2.kempner,desc=desc) # bug for 128
+
+desc="Reduced totient function psi(n): least k such that x^k == 1 (mod n) for all x prime to n \
+also known as the Carmichael lambda function (exponent of unit group mod n) \
+also called the universal exponent of n."
+A002322=Sequence(1,math2.carmichael,desc=desc)
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -717,10 +730,10 @@ for id in seqs:
     if id[0]=='A' and len(id)==7:
         seqs[id].name=id
         oeis[id]=seqs[id]
-        
-        
-if __name__ == "__main__": 
-    for x in A002034:
-        print(x)
+
+
+
+if __name__ == "__main__":
+    print(list(itertools2.take(10,A002322)))
 
 

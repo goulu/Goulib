@@ -111,7 +111,7 @@ class TestOEIS:
 
             yield assert_generator,oeis[name],data(name),name, time_limit
 
-_DEBUG=True
+_DEBUG=False
 if __name__ == "__main__":
     if _DEBUG:
         runmodule(logging.DEBUG,argv=['-x'])

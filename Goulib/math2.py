@@ -5,6 +5,8 @@ more math than :mod:`math` standard library, without numpy
 """
 
 from __future__ import division #"true division" everywhere
+from _ast import Num
+from Goulib.itertools2 import last
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
@@ -202,6 +204,22 @@ def coprimes_gen(limit):
                 n, d, N, D = pend.pop()
             else:
                 break
+            
+def carmichael(n):
+    """
+    Carmichael function
+    :return : int smallest positive integer m such that a^m mod n = 1 for every integer a between 1 and n that is coprime to n.
+    :param n: int
+    :see: https://en.wikipedia.org/wiki/Carmichael_function
+    :see: https://oeis.org/A002322
+    
+    also known as the reduced totient function or the least universal exponent function.
+    """
+    coprimes = [x for x in range(1, n) if gcd(x, n) == 1]
+    k = 1
+    while not all(pow(x, k, n) == 1 for x in coprimes):
+        k += 1
+    return k
 
 #https://en.wikipedia.org/wiki/Primitive_root_modulo_n
 #code decomposed from http://stackoverflow.com/questions/40190849/efficient-finding-primitive-roots-modulo-n-using-python
@@ -999,6 +1017,11 @@ def prime_factors(num, start=2):
         while num % p==0:
             yield p
             num=num//p
+            
+def gpf(n):
+    """greatest prime factor"""
+    if n==1: return 1
+    return last(prime_factors(n))
 
 def prime_divisors(num, start=2):
     """generates unique prime divisors (ordered) of num"""
