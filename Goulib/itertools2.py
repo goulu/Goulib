@@ -246,6 +246,9 @@ def pairwise(iterable,op=None,loop=False):
             yield op(x[1],x[0]) #reversed ! (for sub or div)
         else:
             yield x[0],x[1]
+            
+def select(it1,it2,op):
+    return (x[0] for x in zip(it1,it2) if op(*x))
 
 def shape(iterable):
     """ shape of a mutidimensional array, without numpy
