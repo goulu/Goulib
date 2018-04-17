@@ -202,6 +202,16 @@ class Sequence(object):
             lambda n:f(n) and n in self,
             desc
         )
+        
+    def __le__(self, other):
+        return Sequence(
+            itertools2.select(self,other,operator.le)
+        )
+        
+    def __gt__(self, other):
+        return Sequence(
+            itertools2.select(self,other,operator.gt)
+        )
 
     def accumulate(self,op=operator.add,skip_first=False):
         return Sequence(itertools2.accumulate(self,op,skip_first))
