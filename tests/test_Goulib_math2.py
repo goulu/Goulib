@@ -248,6 +248,20 @@ class TestPrimes:
     def test_primes(self):
         last=primes(1001)[999] #more than _primes for coverage
         assert_equal(last,7919)
+        
+class TestNextprime:
+    def test_nextprime(self):
+        assert_equal(nextprime(0),2)
+        assert_equal(nextprime(1),2)
+        assert_equal(nextprime(2),3)
+        assert_equal(nextprime(1548),1549)
+        
+class TestPrevprime:
+    def test_prevprime(self):
+        assert_equal(prevprime(1),None)
+        assert_equal(prevprime(2),None)
+        assert_equal(prevprime(3),2)
+        assert_equal(prevprime(1548),1543)
 
 class TestPrimesGen:
     def test_primes_gen(self):
