@@ -734,6 +734,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(itertools2.take(10,A002322)))
+    print(list(itertools2.take(10,A006530)))
 
 
