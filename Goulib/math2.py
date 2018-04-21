@@ -961,6 +961,8 @@ def nextprime(n):
 
 def prevprime(n):
     """Determines, very inefficiently, the largest prime number strictly smaller than n."""
+    if n<3: return None
+    if n==3: return 2
     n = n | 1  # n if it is odd, or n+1 if it is even
     while True:
         n-=2
@@ -1020,8 +1022,8 @@ def prime_factors(num, start=2):
             
 def gpf(n):
     """greatest prime factor"""
-    if n==1: return 1
-    return last(prime_factors(n))
+    if n<4 : return n
+    return itertools2.last(prime_factors(n))
 
 def prime_divisors(num, start=2):
     """generates unique prime divisors (ordered) of num"""
