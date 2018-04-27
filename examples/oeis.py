@@ -380,7 +380,9 @@ A030513.desc="Numbers with 4 divisors"
 A035533=Sequence(count_10_exp(A030513))
 A035533.desc="Number of numbers up to 10^n with exactly 4 divisors"
 
+A000196=Sequence(0,math2.isqrt,lambda _:True,"    Integer part of square root of n. Or, number of positive squares <= n. Or, n appears 2n+1 times")
 A000006=A000040.apply(math2.isqrt,desc="Integer part of square root of n-th prime.")
+
 
 A001221=Sequence(1,math2.omega)
 A001222=Sequence(1,math2.bigomega)
@@ -663,9 +665,9 @@ A033665=Sequence(None,a033665)
 
 A050278=Sequence(1023456789,None,math2.is_pandigital)
 
-A009994=Sequence(None,None,lambda x:math2.bouncy(x)[0], desc="Numbers with digits in nondecreasing order.")
-A009996=Sequence(None,None,lambda x:math2.bouncy(x)[1], desc="Numbers with digits in nonincreasing order.")
-A152054=Sequence(None,None,lambda x:math2.bouncy(x)==(False,False), desc="Bouncy numbers (numbers whose digits form a strictly non-monotonic sequence).")
+A009994=Sequence(None,None,lambda x:math2.bouncy(x,True,None), desc="Numbers with digits in nondecreasing order.")
+A009996=Sequence(None,None,lambda x:math2.bouncy(x,None,True), desc="Numbers with digits in nonincreasing order.")
+A152054=Sequence(None,None,lambda x:math2.bouncy(x), "Bouncy numbers (numbers whose digits form a strictly non-monotonic sequence).")
 
 
 A133500=Sequence(None, math2.powertrain, desc="The powertrain or power train map")
@@ -734,6 +736,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(itertools2.take(10,A006530)))
+    print(list(itertools2.take(20,A009994)))
 
 

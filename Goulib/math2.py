@@ -299,18 +299,6 @@ def pow(x,y,z=0):
     else:
         return ipow(x,y,z)
 
-def isqrt(n):
-    """integer square root
-
-    :return: largest int x for which x * x <= n
-    """
-    #http://stackoverflow.com/questions/15390807/integer-square-root-in-python
-    x = n
-    y = (x + 1) // 2
-    while y < x:
-        x = y
-        y = (x + n // x) // 2
-    return x
 
 def sqrt(n):
     """square root
@@ -323,6 +311,36 @@ def sqrt(n):
     if n<0:
         return cmath.sqrt(n)
     return math.sqrt(n)
+
+def isqrt(n):
+    """integer square root
+
+    :return: largest int x for which x * x <= n
+    """
+    # http://stackoverflow.com/questions/15390807/integer-square-root-in-python
+    # https://projecteuler.net/thread=549#235536
+    n=int(n)
+    x = n
+    y = (x + 1) // 2
+    while y < x:
+        x = y
+        y = (x + n // x) // 2
+    return x
+
+def icbrt(n):
+    """integer cubic root
+
+    :return: largest int x for which x * x * x <= n
+    """
+    # https://projecteuler.net/thread=549#235536
+    if n <= 0:
+        return 0
+    x = int(n ** (1. / 3.) * (1 + 1e-12))
+    while True:
+        y = (2 * x + n // (x * x)) // 3
+        if y >= x:
+            return x
+        x = y
 
 def is_square(n):
     s=isqrt(n)
@@ -1341,11 +1359,24 @@ def is_pandigital(num, base=10):
     return len(n)>=base and not '123456789abcdefghijklmnopqrstuvwxyz'[:base-1].strip(n)
     # return set(sorted(digits_from_num(num,base))) == set(range(base)) #slow
 
-def bouncy(n):
-    #http://oeis.org/A152054
+def bouncy(n,up=False,down=False):
+    """
+    :param n: int number to test
+    :param up: bool
+    :param down: bool
+    
+    bouncy(x) returns True for Bouncy numbers (digits form a strictly non-monotonic sequence) (A152054)
+    bouncy(x,True,None) returns True for Numbers with digits in nondecreasing order (OEIS A009994)
+    bouncy(x,None,True) returns True for Numbers with digits in nonincreasing order (OEIS A009996)
+    """
     s=str(n)
     s1=''.join(sorted(s))
-    return s==s1,s==s1[::-1] #increasing,decreasing
+    res=True
+    if up is not None:
+        res = res and up==(s==s1)
+    if down is not None:
+        res = res and down==(s==s1[::-1])
+    return res
 
 def repunit_gen(digit=1):
     """generate repunits"""
