@@ -57,7 +57,7 @@ class TestImage:
         a=[[-x*x+y*y for x in range(128)] for y in range(128)]
         a=normalize(a)
         assert_image(Image(a),'generated.png')
-        assert_image(Image(a,colormap=cm.spectral),'gen_colormap.png',True)
+        assert_image(Image(a,colormap=cm.nipy_spectral),'gen_colormap.png',True)
 
     def test___hash__(self):
         h1=hash(self.lena)
