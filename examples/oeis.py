@@ -663,6 +663,9 @@ def a033665(n):
 
 A033665=Sequence(None,a033665)
 
+A061602=Sequence(0,lambda n:sum(map(math2.factorial,math2.digits(n))))
+A061602.desc="Sum of factorials of the digits of n."
+
 A050278=Sequence(1023456789,None,math2.is_pandigital)
 
 A009994=Sequence(None,None,lambda x:math2.bouncy(x,True,None), desc="Numbers with digits in nondecreasing order.")
@@ -736,6 +739,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(itertools2.take(20,A009994)))
+    print(list(itertools2.take(20,A061602)))
 
 
