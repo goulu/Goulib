@@ -1768,8 +1768,11 @@ def factorial_gen():
         yield last
 
 def binomial(n,k):
-    """
-    https://en.wikipedia.org/wiki/binomial
+    """binomial coefficient "n choose k"
+    :param: n, k int
+    :return: int, number of ways to chose n items in k, unordered
+    
+    :see: https://en.wikipedia.org/wiki/binomial
     """
     #return factorial(n) // (factorial(k) * factorial(n - k)) # is very slow
     # code from https://en.wikipedia.org/wiki/binomial#binomial_in_programming_languages
@@ -1785,6 +1788,7 @@ def binomial(n,k):
         c = c * (n - i) // (i + 1)
     return int(c)
 
+choose=binomial #alias
 ncombinations=binomial #alias
 
 def binomial_exponent(n,k,p):
