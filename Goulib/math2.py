@@ -204,7 +204,7 @@ def coprimes_gen(limit):
                 n, d, N, D = pend.pop()
             else:
                 break
-            
+
 def carmichael(n):
     """
     Carmichael function
@@ -212,7 +212,7 @@ def carmichael(n):
     :param n: int
     :see: https://en.wikipedia.org/wiki/Carmichael_function
     :see: https://oeis.org/A002322
-    
+
     also known as the reduced totient function or the least universal exponent function.
     """
     coprimes = [x for x in range(1, n) if gcd(x, n) == 1]
@@ -368,8 +368,8 @@ def introot(n, r=2):
 
 def is_power(n):
     """
-    :return: integer that, when squared/cubed/etc, yields n, 
-    or 0 if no such integer exists. 
+    :return: integer that, when squared/cubed/etc, yields n,
+    or 0 if no such integer exists.
     Note that the power to which this number is raised will be prime."""
     # copied from https://pypi.python.org/pypi/primefac
     for p in primes_gen():
@@ -836,7 +836,7 @@ def sieve(n, oneisprime=False):
         #TODO: enlarge the sieve...
         # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
         _sieve = [False,False,True,True]+[False,True] * ((n-4)//2)
-        assert(len(_sieve)==n)
+        #assert(len(_sieve)==n)
         for i in range(3,int(n**0.5)+1,2):
             if _sieve[i]:
                 _sieve[i*i::2*i]=[False]*int((n-i*i-1)/(2*i)+1)
@@ -900,7 +900,7 @@ def is_prime(n, oneisprime=False, tb=(3,5,7,11), eb=(2,), mrb=None):
     on a set of bases for which the test is known to be deterministic over this range.
     """
     # https://pypi.python.org/pypi/primefac
-    
+
     if n <= 0: return False
 
     if n == 1: return oneisprime
@@ -908,7 +908,7 @@ def is_prime(n, oneisprime=False, tb=(3,5,7,11), eb=(2,), mrb=None):
     if n<len(_sieve): return _sieve[n]
 
     if n in _primes_set: return True
-    
+
     if any(n%p == 0 for p in tb): return False
 
     if is_square(n): return False # it's quick ...
@@ -1037,7 +1037,7 @@ def prime_factors(num, start=2):
         while num % p==0:
             yield p
             num=num//p
-            
+
 def gpf(n):
     """greatest prime factor"""
     if n<4 : return n
@@ -1108,21 +1108,21 @@ totient=euler_phi #alias. totient is available in sympy
 
 
 def kempner(n):
-    """"Kempner function, also called Smarandache function 
-    
+    """"Kempner function, also called Smarandache function
+
     :return: int smallest positive integer m such that n divides m!.
-    
+
     :param n: int
-    
+
     :see: https://en.wikipedia.org/wiki/Kempner_function
     :see: http://mathworld.wolfram.com/SmarandacheFunction.html
     """
     if n==1: return 1
     if is_prime(n) : return n
-    
+
     @decorators.memoize
     def _np(n,p):
-        #n^p . use https://codereview.stackexchange.com/a/129868/37671     
+        #n^p . use https://codereview.stackexchange.com/a/129868/37671
         k=0
         while p > n:
             k += n
@@ -1132,9 +1132,9 @@ def kempner(n):
                 t=t//n
                 p-=1
         p=max(0,p)
-    
+
         return (k + p) * n;
-    
+
     return max(_np(f,p) for f,p in factorize(n))
 
 def prime_ktuple(constellation):
@@ -1364,7 +1364,7 @@ def bouncy(n,up=False,down=False):
     :param n: int number to test
     :param up: bool
     :param down: bool
-    
+
     bouncy(x) returns True for Bouncy numbers (digits form a strictly non-monotonic sequence) (A152054)
     bouncy(x,True,None) returns True for Numbers with digits in nondecreasing order (OEIS A009994)
     bouncy(x,None,True) returns True for Numbers with digits in nonincreasing order (OEIS A009996)
@@ -1771,7 +1771,7 @@ def binomial(n,k):
     """binomial coefficient "n choose k"
     :param: n, k int
     :return: int, number of ways to chose n items in k, unordered
-    
+
     :see: https://en.wikipedia.org/wiki/binomial
     """
     #return factorial(n) // (factorial(k) * factorial(n - k)) # is very slow
@@ -2155,7 +2155,7 @@ def pi_digits_gen():
         u, y = 3*(3*j+1)*(3*j+2), (q*(27*j-12)+5*r)//(5*t)
         yield y
         q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
-        
+
 #------------------------------------------------------------------------------
 # factorization code taken from https://pypi.python.org/pypi/primefac
 #
@@ -2212,13 +2212,13 @@ def jacobi(a, p):
     return t if p == 1 else 0
 
 def pollardRho_brent(n):
-    """Brent’s improvement on Pollard’s rho algorithm. 
-    
+    """Brent’s improvement on Pollard’s rho algorithm.
+
     :return: int n if n is prime
     otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
     :see: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
     """
-    
+
     if is_prime(n): return n
     g = n
     while g == n:
@@ -2242,8 +2242,8 @@ def pollardRho_brent(n):
 
 
 def pollard_pm1(n, B1=100, B2=1000):       # TODO: What are the best default bounds and way to increment them?
-    """Pollard’s p+1 algorithm, two-phase version. 
-    
+    """Pollard’s p+1 algorithm, two-phase version.
+
     :return: n if n is prime; otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
     """
     if is_prime(n): return n
@@ -2264,11 +2264,11 @@ def pollard_pm1(n, B1=100, B2=1000):       # TODO: What are the best default bou
         B2 *= 10
 
 def mlucas(v, a, n):
-    """ Helper function for williams_pp1().  
+    """ Helper function for williams_pp1().
     Multiplies along a Lucas sequence modulo n.
     """
     v1, v2 = v, (v**2 - 2) % n
-    for bit in bin(a)[3:]: 
+    for bit in bin(a)[3:]:
         if bit == "0":
             v1, v2 = ((v1**2 - 2) % n, (v1*v2 - v) % n)
         else:
@@ -2276,7 +2276,7 @@ def mlucas(v, a, n):
     return v1
 
 def williams_pp1(n):
-    """Williams’ p+1 algorithm. 
+    """Williams’ p+1 algorithm.
     :return: n if n is prime
     otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
     """
@@ -2293,20 +2293,20 @@ def williams_pp1(n):
             if g == n: break
 
 
-def ecadd(p1, p2, p0, n): 
+def ecadd(p1, p2, p0, n):
     # Add two points p1 and p2 given point P0 = P1-P2 modulo n
     x1,z1 = p1; x2,z2 = p2; x0,z0 = p0
     t1, t2 = (x1-z1)*(x2+z2), (x1+z1)*(x2-z2)
     return (z0*pow(t1+t2,2,n) % n, x0*pow(t1-t2,2,n) % n)
 
-def ecdub(p, A, n): 
+def ecdub(p, A, n):
     # double point p on A modulo n
     x, z = p; An, Ad = A
     t1, t2 = pow(x+z,2,n), pow(x-z,2,n)
     t = t1 - t2
     return (t1*t2*4*Ad % n, (4*Ad*t2 + t*An)*t % n)
 
-def ecmul(m, p, A, n): 
+def ecmul(m, p, A, n):
     # multiply point p by m on curve A modulo n
     if m == 0: return (0, 0)
     elif m == 1: return p
@@ -2322,15 +2322,15 @@ def ecmul(m, p, A, n):
             else:   q, r = ecadd(r, q, p, n), ecdub(r, A, n)
             b //= 2
         return r
-    
-def factor_ecm(n, B1=10, B2=20):  
-    """ Factors n using the elliptic curve method, 
-    using Montgomery curves and an algorithm analogous 
-    to the two-phase variant of Pollard’s p-1 method. 
+
+def factor_ecm(n, B1=10, B2=20):
+    """ Factors n using the elliptic curve method,
+    using Montgomery curves and an algorithm analogous
+    to the two-phase variant of Pollard’s p-1 method.
     :return: n if n is prime
     otherwise, we keep chugging until we find a factor of n strictly between 1 and n
 
-    """     
+    """
     # TODO: Determine the best defaults for B1 and B2 and the best way to increment them and iters
     # TODO: We currently compute the prime lists from the sieve as we need them, but this means that we recompute them at every
     #       iteration.  While it would not be particularly efficient memory-wise, we might be able to increase time-efficiency
@@ -2374,15 +2374,15 @@ def factor_ecm(n, B1=10, B2=20):
 
 # legendre symbol (a|m)
 # TODO: which is faster?
-def legendre(a, p): 
-    """Functions to comptue the Legendre symbol (a|p). 
+def legendre(a, p):
+    """Functions to comptue the Legendre symbol (a|p).
     The return value isn’t meaningful if p is composite
     :see: https://en.wikipedia.org/wiki/Legendre_symbol
     """
     return ((pow(a, (p-1) >> 1, p) + 1) % p) - 1
 
 def legendre2(a, p):                                                 # TODO: pretty sure this computes the Jacobi symbol
-    """Functions to comptue the Legendre symbol (a|p). 
+    """Functions to comptue the Legendre symbol (a|p).
     The return value isn’t meaningful if p is composite
     :see: https://en.wikipedia.org/wiki/Legendre_symbol
     """

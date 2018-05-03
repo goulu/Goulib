@@ -294,14 +294,12 @@ A034386=Sequence(
 
 
 #TODO: understand why A000720 creates a hudge bad side effect on many other serquences
-"""
 A000720=Sequence(
     1,
-    lambda n:len(sieve(n+1,oneisprime=True)),
+    lambda n:len(sieve(n+1,oneisprime=True))-1,
     lambda n:True, #all integers are in this sequence.
     desc="pi(n), the number of primes <= n. Sometimes called PrimePi(n)"
 )
-"""
 
 A018239=A006862.filter(
     is_prime,
@@ -629,19 +627,21 @@ under repeated applications of the function f(x) = x + (x with digits reversed).
 Also called Lychrel numbers
 """
 
-@decorators.memoize #very useful for A023109
-def lychrel_count(n,limit=96):
-    return lychrel_count(n,limit)
-
 def a023109():
     """Smallest number that requires exactly n iterations of Reverse and Add to reach a palindrome.
     """
-
+    @decorators.memoize #very useful for A023109
+    def _(n,limit=96):
+        return lychrel_count(n,limit)
+    
     dict={}
     limit=96
     nextn=0
     for i in count():
-        n=0 if is_palindromic(i) else lychrel_count(i,limit)
+        if is_palindromic(i):
+            n=0  
+        else: 
+            n=_(i,limit)
         if n>=limit : continue
         if n<nextn : continue
         if n in dict : continue
@@ -651,6 +651,7 @@ def a023109():
                 yield dict.pop(n)
                 n+=1
             nextn=n
+            
 A023109=Sequence(a023109)
 
 def a033665(n):
@@ -737,7 +738,7 @@ def dfcl(n):
 
 a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid etsting it for now
 
-A014080=Sequence(0,None,lambda n:sum(map(factorial,digits(n)))==n,
+a014080=Sequence(0,None,lambda n:sum(map(factorial,digits(n)))==n,
     desc="Factorions: equal to the sum of the factorials of their digits in base 10."
 )
 
@@ -752,6 +753,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,a303935)))
+    print(list(take(20,A018239)))
 
 
