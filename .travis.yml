@@ -23,7 +23,7 @@ before_install:
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose numpy scipy matplotlib networkx ipython
   - source activate env_name
-  - pip install --allow-all-external -r requirements.txt
+  - pip install -r requirements.txt
   - pip install coveralls
  
 script:
