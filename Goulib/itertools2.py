@@ -190,7 +190,7 @@ def compress(iterable):
     if count:
         yield prev,count
         
-def recurrence(f,x):
+def recurse(f,x):
     while True:
         yield x
         x=f(x)
