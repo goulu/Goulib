@@ -42,6 +42,8 @@ A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers
 A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
 A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
+A001057=Sequence(1, lambda n: -n//2+1 if n%2 else n//2, lambda n:True, desc="Canonical enumeration of integers: interleaved positive and negative integers with zero prepended.")
+
 A008587=Sequence(count(0,5),lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(count(0,7),lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
 
@@ -59,6 +61,7 @@ A006521=Sequence(1,None,lambda n: (2**n + 1)%n==0,"Numbers n such that n divides
 
 A002275=Sequence(repunit_gen(1),lambda n:repunit(n,1),desc="Repunits: (10^n - 1)/9. Often denoted by R_n.")
 
+A000332=Sequence(0, lambda n: binomial(n,4), desc="Binomial coefficient binomial(n,4) = n*(n-1)*(n-2)*(n-3)/24.") 
 #polygonal numbers
 
 A000217=Sequence(None,triangle,is_triangle,'triangle numbers')
@@ -66,6 +69,8 @@ A000217=Sequence(None,triangle,is_triangle,'triangle numbers')
 A000290=Sequence(None,lambda n:n*n,lambda n:is_square(n),'squares')
 
 A000326=Sequence(None,pentagonal,is_pentagonal,'pentagonal numbers')
+
+A001318=A001057.apply(pentagonal,is_pentagonal,desc="Generalized pentagonal numbers: n*(3*n-1)/2, n=0, +- 1, +- 2, +- 3, ....") 
 
 A000384=Sequence(None,hexagonal,is_hexagonal)
 
@@ -380,6 +385,17 @@ A030513.desc="Numbers with 4 divisors"
 A035533=Sequence(count_10_exp(A030513))
 A035533.desc="Number of numbers up to 10^n with exactly 4 divisors"
 
+def spf():
+    l=[1,0]
+    yield 1
+    yield 0
+    for n in count(2):
+        l.append(sum([sum(prime_factors(k))*l[n - k] for k in range(1, n + 1)])//n)
+        yield l[-1]
+
+# A000607=Sequence(spf(),desc='Number of partitions of n into prime parts.')
+# TODO: find why AssertionError: 7 != 6 : A000607 : First differing element 11: 7 != 6
+
 A000196=Sequence(0,isqrt,lambda _:True,"    Integer part of square root of n. Or, number of positive squares <= n. Or, n appears 2n+1 times")
 A000006=A000040.apply(isqrt,desc="Integer part of square root of n-th prime.")
 
@@ -562,7 +578,9 @@ A005188=Sequence(
     n-digit numbers equal to sum of n-th powers of their digits'
 )
 
-def digsum2(n): return digsum(n,2)
+A070635=Sequence(1,lambda n:n%digsum(n),desc="a(n) = n mod (sum of digits of n).")
+
+A005349=A070635.filter(lambda a:a==0,desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits.") 
 
 def itersumdig2(start):
     """Take sum of squares of digits of previous term."""
@@ -753,6 +771,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,A018239)))
+    print(list(take(20,A001057)))
 
 
