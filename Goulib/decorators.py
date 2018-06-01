@@ -12,6 +12,9 @@ import functools
 
 #http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):
+    """speed up repeated calls to a function by caching its results in a dict index by params
+    :see: https://en.wikipedia.org/wiki/Memoization
+    """
     cache = obj.cache = {}
     @functools.wraps(obj)
     def memoizer(*args, **kwargs):
@@ -102,3 +105,47 @@ def itimeout(iterable,timeout):
         if timer.finished.is_set(): 
             raise TimeoutError
     timer.cancel() #don't forget it, otherwise it threads never finish...
+    
+# https://www.artima.com/weblogs/viewpost.jsp?thread=101605
+
+registry = {}
+
+class MultiMethod(object):
+    def __init__(self, name):
+        self.name = name
+        self.typemap = {}
+    def __call__(self, *args):
+        types = tuple(arg.__class__ for arg in args) # a generator expression!
+        function = self.typemap.get(types)
+        if function is None:
+            raise TypeError("no match")
+        return function(*args)
+    def register(self, types, function):
+        if types in self.typemap:
+            raise TypeError("duplicate registration")
+        self.typemap[types] = function
+        
+def multimethod(*types):
+    """
+    allows to overload functions for various parameter types
+    
+    @multimethod(int, int)
+    def foo(a, b):
+        ...code for two ints...
+    
+    @multimethod(float, float):
+    def foo(a, b):
+        ...code for two floats...
+    
+    @multimethod(str, str):
+    def foo(a, b):
+        ...code for two strings...
+    """
+    def register(function):
+        name = function.__name__
+        mm = registry.get(name)
+        if mm is None:
+            mm = registry[name] = MultiMethod(name)
+        mm.register(types, function)
+        return mm
+    return register
