@@ -727,16 +727,21 @@ also known as the Carmichael lambda function (exponent of unit group mod n) \
 also called the universal exponent of n."
 A002322=Sequence(1,carmichael,desc=desc)
 
+def dfs(n):
+    return sum(map(factorial,digits(n)))
+
+A061602=Sequence(0, dfs, desc="Sum of factorials of the digits of n")
+
 def dfcl(n):
     # a much faster version is needed for https://projecteuler.net/problem=74 ;-)
     l=set()
     i=n
     while i not in l:
         l.add(i)
-        i=sum(map(factorial,digits(i)))
+        i=dfs(i)
     return len(l)
 
-a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid etsting it for now
+a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
 a014080=Sequence(0,None,lambda n:sum(map(factorial,digits(n)))==n,
     desc="Factorions: equal to the sum of the factorials of their digits in base 10."
@@ -753,6 +758,6 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,A018239)))
+    print(list(take(50,a303935)))
 
 
