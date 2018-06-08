@@ -50,6 +50,15 @@ oneweek=timedelta(weeks=1)
 datemin=date(year=dt.MINYEAR,month=1,day=1)
 midnight=time()
 
+#regexes
+# https://stackoverflow.com/a/40309602/1395973
+#https://regex101.com/r/NUZS1Z/2
+rdatesep='[^\w\d\r\n:]'
+ryear='(\d{4}|\d{2})'
+rmonth='(0?[1-9]|1[0-2])'
+rday='(0?[1-9]|[12]\d|30|31)'
+rdateany='(\b'+rday+rdatesep+rmonth+rdatesep+ryear+'\b)|(\b'+rmonth+rdatesep+rday+rdatesep+ryear+'\b)'
+
 def datetimef(d,t=None,fmt='%Y-%m-%d'):
     """"converts something to a datetime
     :param d: can be:
