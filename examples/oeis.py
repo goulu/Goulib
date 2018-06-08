@@ -269,9 +269,6 @@ A002088=Sequence(0,euler_phi).accumulate() #strangely this one has a leading 0..
 A005728=A002088+1
 A005728.desc='Number of fractions in Farey series of order n.'
 
-#TODO: became too slow. find why
-#A019434=A000215.filter(is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
-
 A090748=A000043.apply(lambda n:n-1,desc='Numbers n such that 2^(n+1) - 1 is prime.')
 
 A006862=Sequence(
@@ -385,17 +382,6 @@ A030513.desc="Numbers with 4 divisors"
 A035533=Sequence(count_10_exp(A030513))
 A035533.desc="Number of numbers up to 10^n with exactly 4 divisors"
 
-def spf():
-    l=[1,0]
-    yield 1
-    yield 0
-    for n in count(2):
-        l.append(sum([sum(prime_factors(k))*l[n - k] for k in range(1, n + 1)])//n)
-        yield l[-1]
-
-# A000607=Sequence(spf(),desc='Number of partitions of n into prime parts.')
-# TODO: find why AssertionError: 7 != 6 : A000607 : First differing element 11: 7 != 6
-
 A000196=Sequence(0,isqrt,lambda _:True,"    Integer part of square root of n. Or, number of positive squares <= n. Or, n appears 2n+1 times")
 A000006=A000040.apply(isqrt,desc="Integer part of square root of n-th prime.")
 
@@ -438,16 +424,13 @@ A001913=A000040.filter(
     # but why is 7 in A001913 ???
 )
 
-""" not correct
+A002371=A000040.apply(lambda n:rational_form(1,n)[-1])
+A002371.desc="Period of decimal expansion of 1/(n-th prime) (0 by convention for the primes 2 and 5). "
+
 A003147=A000040.filter(
-    lambda n:find(
-        primitive_root_gen(n),
-        is_fibonacci
-    ),
+    lambda n:any((g*g)%n == (g + 1)%n for g in primitive_root_gen(n)),
     desc="Primes with a fibonacci primitive root"
-    # but why is 7 in A001913 ???
 )
-"""
 
 # Fibonacci & co
 
@@ -532,9 +515,9 @@ A001045=Sequence(recurrence([2,1],[0,1])) # Jacobsthal sequence (or Jacobsthal n
 
 #operations on digits
 
-A007953=Sequence(None,digsum, True) #Digital sum (i.e., sum of digits) of n; also called digsum(n).
+A007953=Sequence(None,digsum, True, "Digital sum (i.e., sum of digits) of n; also called digsum(n).");
 
-A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence: number of 1's in binary expansion of n
+A000120=Sequence(None, lambda n:bin(n).count('1'), True,"1's-counting sequence: number of 1's in binary expansion of n");
 
 def digits_in(n,digits_set):
     s1=set(digits(n))
@@ -580,7 +563,9 @@ A005188=Sequence(
 
 A070635=Sequence(1,lambda n:n%digsum(n),desc="a(n) = n mod (sum of digits of n).")
 
-A005349=A070635.filter(lambda a:a==0,desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits.") 
+
+A005349=A000027.filter(lambda n:n%digsum(n)==0,
+    desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits.") 
 
 def itersumdig2(start):
     """Take sum of squares of digits of previous term."""
@@ -759,11 +744,15 @@ def dfcl(n):
         i=dfs(i)
     return len(l)
 
-a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
+A303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
-a014080=Sequence(0,None,lambda n:sum(map(factorial,digits(n)))==n,
+#TODO: find a way to stop the following sequences, which are finite ...
+a019434=A000215.filter(is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
+
+a014080=Sequence(0,None,lambda n:dfs(n)==n,
     desc="Factorions: equal to the sum of the factorials of their digits in base 10."
 )
+
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -776,10 +765,8 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    print(list(take(20,A001057)))
-=======
-    print(list(take(50,a303935)))
->>>>>>> branch 'master' of https://github.com/goulu/Goulib.git
+    print(A001913)
+    print(A003147)
+
 
 
