@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf8
-"""
+'''
 simple symbolic math expressions
-"""
-from math import copysign
+'''
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -41,12 +40,12 @@ operators=dict() #only operators listed in this dict are allowed
 
 
 def eval(node,**kwargs):
-    """safe eval of ast node : only functions and _operators listed above can be used
+    '''safe eval of ast node : only functions and _operators listed above can be used
 
     :param node: ast.AST to evaluate
     :param ctx: dict of varname : value to substitute in node
     :return: number or expression string
-    """
+    '''
     _ctx=kwargs.get('ctx',{})
     _operators=kwargs.get('operators',operators)
     if isinstance(node, ast.Num): # <number>
@@ -90,11 +89,11 @@ def eval(node,**kwargs):
         return eval(node.body,**kwargs) #last chance
 
 def get_function_source(f):
-    """returns cleaned code of a function or lambda
+    '''returns cleaned code of a function or lambda
     currently only supports:
     - lambda x:formula_of_(x)
     - def anything(x): return formula_of_(x)
-    """
+    '''
     f=inspect.getsource(f).rstrip('\n') #TODO: merge lines more subtly
     g=re.search(r'lambda(.*):(.*)(\)|#)',f)
     if g:
@@ -107,7 +106,7 @@ def get_function_source(f):
     else:
         g=re.search(r'def \w*\((.*)\):\s*return (.*)',f)
         if g is None:
-            logging.error('not a valid function code %s'%f)
+            raise ValueError('not a valid function code %s'%f)
         res=g.group(2)
     return res
 
@@ -125,20 +124,23 @@ def plouffe(f,epsilon=1e-6):
 
 
 class Expr(plot.Plot):
-    """
+    '''
     Math expressions that can be evaluated like standard functions
     combined using standard operators
     and plotted in IPython/Jupyter notebooks
-    """
+    '''
     def __init__(self,f,**kwargs):
-        """
+        '''
         :param f: function or operator, Expr to copy construct, or formula string
-        """
+        '''
 
         if isinstance(f,Expr):
             pass # skip for now, handled below
         elif inspect.isfunction(f):
-            f=get_function_source(f)
+            try:
+                f=get_function_source(f)
+            except ValueError:
+                f='%s(x)'%f.__name__
         elif isinstance(f, collections.Callable): # builtin function
             f='%s(x)'%f.__name__
         elif f in ('True','False'):
@@ -179,14 +181,14 @@ class Expr(plot.Plot):
 
     @property
     def isconstant(self):
-        """:return: True if Expr evaluates to a constant number or bool"""
+        ''':return: True if Expr evaluates to a constant number or bool'''
         res=self()
         if math2.is_number(res): return True
         if isinstance(res,bool): return True
         return False
 
     def __call__(self ,x=None, **kwargs):
-        """evaluate the Expr at x OR compose self(x())"""
+        '''evaluate the Expr at x OR compose self(x())'''
         if isinstance(x,Expr): #composition
             return self.applx(x)
         if itertools2.isiterable(x):
@@ -214,35 +216,46 @@ class Expr(plot.Plot):
         return TextVisitor(_dialect_str).visit(self.body)
 
     def _repr_html_(self):
-        """default rich format is LaTeX"""
+        '''default rich format is LaTeX'''
         return self._repr_latex_()
 
     def latex(self):
-        """:return: string LaTex formula"""
+        ''':return: string LaTex formula'''
         return TextVisitor(_dialect_latex).visit(self.body)
 
     def _repr_latex_(self):
         return r'$%s$'%self.latex()
+    
+    def points(self, xmin=-1, xmax=1, step=0.1):
+        ''':return: x,y lists of float : points for a line plot'''
+        if self.isconstant:
+            return [xmin,xmax],[self(xmin),self(xmax)]
+        x=list(itertools2.arange(xmin,xmax,step))
+        y=self(x)
+        return x,y
+        
 
     def _plot(self, ax, x=None, y=None, **kwargs):
         if x is None:
-            x=itertools2.arange(-1,1,.1)
-        x=list(x)
+            x,y=self.points()
+           
         if y is None:
             y=self(x)
 
         offset=kwargs.pop('offset',0) #slightly shift the points to make superimposed curves more visible
 
         points=list(zip(x,y)) # might contain (x,None) for undefined points
-        for xy in itertools2.isplit(points,lambda _:not math2.is_number(_[1])): # curves between defined points
-            xy=list(xy)
-            x=[v[0]+offset for v in xy]
-            y=[v[1]+offset for v in xy]
+        
+        for xy in itertools2.isplit(points,lambda _:not math2.is_real(_[1])): # curves between defined points
+            x,y=[],[]  # matplotlib doesn't support generators...
+            for v in xy:
+                x.append(v[0]+offset)
+                y.append(v[1]+offset)
             ax.plot(x,y, **kwargs)
         return ax
 
     def apply(self,f,right=None):
-        """function composition self o f = f(self(x))"""
+        '''function composition self o f = f(self(x))'''
 
         if right is None:
             if isinstance(f, ast.unaryop):
@@ -257,7 +270,7 @@ class Expr(plot.Plot):
         return Expr(node)
 
     def applx(self,f,var='x'):
-        """function composition f o self = self(f(x))"""
+        '''function composition f o self = self(f(x))'''
         if isinstance(f,Expr):
             f=f.body
 
@@ -346,9 +359,9 @@ class Expr(plot.Plot):
         return self.applx(ast.BinOp(ast.Name('x',None),ast.Sub(),ast.Num(dx)))
 
     def complexity(self):
-        """ measures the complexity of Expr
+        ''' measures the complexity of Expr
         :return: int, sum of the precedence of used ops
-        """
+        '''
         def _node_complexity(node):
             try:
                 res=self._operators[type(node.op)][1]
@@ -417,12 +430,8 @@ def add_function(f,s=None,r=None,l=None):
     :param r: repr representation, should be cut&pastable in a calculator, or in python ...
     :param l: LaTeX representation
     '''
-    try:
-        f(2,2)
-        return
-    except TypeError:
-        pass
     functions[f.__name__]=(f,9999,s,r or s,l)
+    return functions[f.__name__]
 
 def add_constant(c, name, s=None,r=None,l=None):
     ''' add a constant to those recognized in Expr.
@@ -490,9 +499,12 @@ class TextVisitor(ast.NodeVisitor):
         ''' calculate the precedence of op '''
         if isinstance(op,(ast.BinOp, ast.UnaryOp)):
             op=op.op
-        if isinstance(op,ast.Num) and op.n<0:
+        if isinstance(op,ast.Num) and math2.is_real(op.n) and op.n<0:
             return self._operators[ast.USub][1]
-        return self._operators[type(op)][1]
+        try:
+            return self._operators[type(op)][1]
+        except KeyError:
+            return self._operators[type(op)][1]
 
     def _par(self,content):
         if self._dialect == _dialect_latex:

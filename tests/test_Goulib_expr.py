@@ -11,7 +11,9 @@ from Goulib.tests import *
 from Goulib.table import Table
 
 from Goulib.expr import *
-from math import *
+
+from math import sin, pi
+from Goulib.math2 import sqrt
 
 import os
 from Goulib.plot import save
@@ -40,13 +42,15 @@ class TestExpr:
         self.e1=Expr('3*x+2') #a very simple expression
         self.e2=Expr(self.fs)
         
+        self.e3=Expr(sqrt)(self.e1) #Expr can be composed
+        
         self.xy=Expr('x*y')
         self.long=Expr('(x*3+(a+b)*y)/x**(3*a*y)')
         
         self.true=Expr(True) #make sure it works
         self.false=Expr('False') #make sure it creates a bool
         
-        self.sqrt=Expr(math.sqrt)
+        self.sqrt=Expr(sqrt)
         
         
     def test___init__(self):
@@ -135,6 +139,7 @@ class TestExpr:
     def test_plot(self):
         save([Expr('1/x')],results+'oneoverx.png',x=range(-100,100))
         save([Expr('sin(x/10)/(x/10)')],results+'sinxoverx.png',x=range(-100,100))
+        save([self.e3],results+'sqrt.png')
 
     def test___add__(self):
         f=self.fx+self.f1
