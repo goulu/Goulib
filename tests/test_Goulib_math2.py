@@ -964,6 +964,15 @@ class TestIsNumber:
         assert_true(is_number(2))
         assert_true(is_number(2.))
         assert_false(is_number(None))
+        assert_true(is_number(sqrt(-1))) # complex are numbers
+        
+    def test_is_complex(self):
+        assert_false(is_complex(2.))
+        assert_true(is_number(sqrt(-1)))
+        
+    def test_is_real(self):
+        assert_true(is_real(2.))
+        assert_false(is_real(sqrt(-1)))
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):

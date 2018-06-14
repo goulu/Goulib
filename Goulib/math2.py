@@ -91,9 +91,15 @@ def allclose(a, b, rel_tol=1e-09, abs_tol=0.0):
 # basic useful functions
 
 def is_number(x):
-    ''':return: True if x is a number of any type'''
+    ''':return: True if x is a number of any type, including Complex'''
     # http://stackoverflow.com/questions/4187185/how-can-i-check-if-my-python-object-is-a-number
     return isinstance(x, numbers.Number)
+
+def is_complex(x):
+    return isinstance(x,complex)
+
+def is_real(x):
+    return is_number(x) and not is_complex(x)
 
 
 def sign(number):
@@ -118,9 +124,12 @@ def is_integer(x, rel_tol=0, abs_tol=0):
     '''
     if isinstance(x, six.integer_types):
         return True
-    if rel_tol+abs_tol==0:
-        return x==rint(x)
-    return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
+    try:
+        if rel_tol+abs_tol==0:
+            return x==rint(x)
+        return isclose(x,round(x),rel_tol=rel_tol,abs_tol=abs_tol)
+    except TypeError: # for complex
+        return False
 
 def int_or_float(x, rel_tol=0, abs_tol=0):
     '''
