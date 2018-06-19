@@ -59,8 +59,8 @@ class TestEqual:
         d=0.99e-3
         assert_true(allclose([a,a-d], [a+d,a]))
         assert_false(allclose([a, a+2*d], [a,a]))
-        assert_false(allclose([a, a+2*d], [a, math.nan]))
-        assert_false(allclose([a], [a, math.nan]))
+        assert_false(allclose([a, a+2*d], [a, nan]))
+        assert_false(allclose([a], [a, nan]))
 
     def test_equal(self):
         # assert_equal(expected, equal(a, b, epsilon))

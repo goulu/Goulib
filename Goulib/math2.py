@@ -26,6 +26,11 @@ from Goulib import itertools2, decorators
 inf=float('Inf') #infinity
 eps = 2.2204460492503131e-16 # numpy.finfo(np.float64).eps
 
+try:
+    nan=math.nan
+except:
+    nan=float('nan') #Not a Number
+
 
 # define some math functions that are not available in all supported versions of python
 
