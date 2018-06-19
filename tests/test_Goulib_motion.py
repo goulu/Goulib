@@ -2,16 +2,13 @@
 # coding: utf8
 from nose.tools import assert_equal
 from nose import SkipTest
+
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 from Goulib.motion import *
-from Goulib.statemachine import Simulation
-from math import pi
+
 import os
 path=os.path.dirname(os.path.abspath(__file__))
-
-def pva_almost_equal(a,b,precision=6): # allow tests on Pt with 6 decimals precision
-    list(map(lambda x:assert_almost_equal(x[0],x[1],precision),list(zip(a,b))))
     
 class TestPVA:
     def test___init__(self):
@@ -163,65 +160,7 @@ class TestSegments:
         # assert_equal(expected, segments.update())
         raise SkipTest # implement your test here
 
-class TestActuator:
-    def test_move_horizontal(self):
-        sm = StateMachine(simulation=Simulation())
-        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))
-        # tests that if no move at the beginning, nothing crashes
-        time = a.move(V(0,'m')).endTime()
-        assert_equal(time,-float('inf'))     
-        
-        time = a.move(V(3000,'mm')).endTime()
-        assert_equal(a.segs.start(),(0.0, 0.0, 1.0, 0))
-        assert_equal(a.segs.end(),(3.0, 0.0, -1.0, 0.0))
-        assert_equal(time,4.0)
-        assert_equal(a.P(3)('m'),2.5)
-        assert_equal(a.P(V(3.0,'s'))('m'),2.5)
-        a.move(V(0,'m'),acc=V(2,'m/s^2'))  #test overriding default acc
-        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))
-        #test that if no real move we get the same result
-        a.move(V(0,'m'))
-        assert_equal(a.segs.end(),(0.0, 0.0, 2.0, 0.0))  
-        assert_equal(a.maxAbsAcc(),V(2,'m/s^2'))
-        assert_equal(a.maxAbsSpeed(),V(1,'m/s'))
-        assert_equal(a.maxRpm(),V(1,'1/s'))
-        assert_almost_equal(a.maxTork()('N m'),0.31830988618379064)
-        #assert_equal(a.varNames(),[])
-        
-    def test_move_vertical(self):
-        sm = StateMachine(simulation=Simulation())
-        a = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'),friction=V(0.25,'N'),angle=V(90,'deg'))
-        a.move(V(-3,'m'))
-        assert_almost_equal(a.maxForce()('N'),9.05665)
-        a.move(V(0,'m'))
-        assert_almost_equal(a.maxForce()('N'),11.05665)
 
-class TestTimeDiagram:
-    sm = StateMachine(simulation=Simulation())
-    a1 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
-    a2 = Actuator(sm,V(1,'m/s'),V(1,'m/s^2'),name='m1',distPerTurn=V(1,'m'),mass=V(1,'kg'))    
-    a1.move(V(3000,'mm'))
-    a2.move(V(3000,'mm'))
-    assert_equal(sm.time,V(8.0,'s'))
-    t = TimeDiagram([a1,a2])
-    assert_equal(t.t0,0)
-    assert_equal(t.t1,8)
-    t.save(path+'\\results\\TimeDiagram.png',figsize=(20,20),dpi=600,linewidth=0.3)
-    t.saveAsCsv(path+'\\results\\TimeDiagram.csv')
-        
-    def test___init__(self):
-        # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
-        raise SkipTest # implement your test here
-
-    def test___repr__(self):
-        # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
-        # assert_equal(expected, time_diagram.__repr__())
-        raise SkipTest # implement your test here
-
-    def test_saveAsCsv(self):
-        # time_diagram = TimeDiagram(actuators, stateMachines, fromTime, toTime)
-        # assert_equal(expected, time_diagram.saveAsCsv(filename))
-        raise SkipTest # implement your test here
 
                         
 class TestSegmentPoly:
@@ -243,7 +182,7 @@ class TestSegmentPoly:
     def test___call__(self):
         assert_equal(self.seg(.9),(0,0,0,0))
         assert_equal(self.seg(1),(1,2,6,0))
-        pva_almost_equal(self.seg(2-1e-12),(6,8,6,0))
+        assert_equal(self.seg(2-1e-12),(6,8,6,0))
         assert_equal(self.seg(2),(0,0,0,0))
         
     def test_save(self):
@@ -365,66 +304,6 @@ class TestSegment4thDegree:
         assert_equal(seg.end()[:3],self.end[:3]) #ignore jerk
         assert_equal(seg((self.t0+self.t1)/2.),(-0.3125, 2.0, 3.0, 0.0)) #truediv
 
-
-class TestMove:
-    def test_move(self):
-        # assert_equal(expected, move(self, newpos, relative, time, wait, vmax, acc))
-        raise SkipTest # implement your test here
-
-class TestEndTime:
-    def test_end_time(self):
-        # assert_equal(expected, endTime(self))
-        raise SkipTest # implement your test here
-
-class TestMaxAbsAcc:
-    def test_max_abs_acc(self):
-        # assert_equal(expected, maxAbsAcc(self))
-        raise SkipTest # implement your test here
-
-class TestMaxAbsSpeed:
-    def test_max_abs_speed(self):
-        # assert_equal(expected, maxAbsSpeed(self))
-        raise SkipTest # implement your test here
-
-class TestMaxForce:
-    def test_max_force(self):
-        # assert_equal(expected, maxForce(self))
-        raise SkipTest # implement your test here
-
-class TestMaxTork:
-    def test_max_tork(self):
-        # assert_equal(expected, maxTork(self))
-        raise SkipTest # implement your test here
-
-class TestMaxRpm:
-    def test_max_rpm(self):
-        # assert_equal(expected, maxRpm(self))
-        raise SkipTest # implement your test here
-
-class TestDisplayLast:
-    def test_display_last(self):
-        # assert_equal(expected, displayLast(self))
-        raise SkipTest # implement your test here
-
-class TestDisplay:
-    def test_display(self):
-        # assert_equal(expected, display(self, fromTime, toTime))
-        raise SkipTest # implement your test here
-
-class TestVarNames:
-    def test_var_names(self):
-        # assert_equal(expected, varNames(self))
-        raise SkipTest # implement your test here
-
-class TestVarRowUnits:
-    def test_var_row_units(self):
-        # assert_equal(expected, varRowUnits(self))
-        raise SkipTest # implement your test here
-
-class TestVarDict:
-    def test_var_dict(self):
-        # assert_equal(expected, varDict(self))
-        raise SkipTest # implement your test here
 
 class TestSegmentsTrapezoidalSpeed:
     def test_segments_trapezoidal_speed(self):

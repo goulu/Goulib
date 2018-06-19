@@ -42,6 +42,8 @@ A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers
 A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
 A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
+A001057=Sequence(1, lambda n: -n//2+1 if n%2 else n//2, lambda n:True, desc="Canonical enumeration of integers: interleaved positive and negative integers with zero prepended.")
+
 A008587=Sequence(count(0,5),lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(count(0,7),lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
 
@@ -59,6 +61,7 @@ A006521=Sequence(1,None,lambda n: (2**n + 1)%n==0,"Numbers n such that n divides
 
 A002275=Sequence(repunit_gen(1),lambda n:repunit(n,1),desc="Repunits: (10^n - 1)/9. Often denoted by R_n.")
 
+A000332=Sequence(0, lambda n: binomial(n,4), desc="Binomial coefficient binomial(n,4) = n*(n-1)*(n-2)*(n-3)/24.") 
 #polygonal numbers
 
 A000217=Sequence(None,triangle,is_triangle,'triangle numbers')
@@ -66,6 +69,8 @@ A000217=Sequence(None,triangle,is_triangle,'triangle numbers')
 A000290=Sequence(None,lambda n:n*n,lambda n:is_square(n),'squares')
 
 A000326=Sequence(None,pentagonal,is_pentagonal,'pentagonal numbers')
+
+A001318=A001057.apply(pentagonal,is_pentagonal,desc="Generalized pentagonal numbers: n*(3*n-1)/2, n=0, +- 1, +- 2, +- 3, ....") 
 
 A000384=Sequence(None,hexagonal,is_hexagonal)
 
@@ -264,9 +269,6 @@ A002088=Sequence(0,euler_phi).accumulate() #strangely this one has a leading 0..
 A005728=A002088+1
 A005728.desc='Number of fractions in Farey series of order n.'
 
-#TODO: became too slow. find why
-#A019434=A000215.filter(is_prime,desc='Fermat primes: primes of the form 2^(2^k) + 1, for some k >= 0.')
-
 A090748=A000043.apply(lambda n:n-1,desc='Numbers n such that 2^(n+1) - 1 is prime.')
 
 A006862=Sequence(
@@ -422,16 +424,13 @@ A001913=A000040.filter(
     # but why is 7 in A001913 ???
 )
 
-""" not correct
+A002371=A000040.apply(lambda n:rational_form(1,n)[-1])
+A002371.desc="Period of decimal expansion of 1/(n-th prime) (0 by convention for the primes 2 and 5). "
+
 A003147=A000040.filter(
-    lambda n:find(
-        primitive_root_gen(n),
-        is_fibonacci
-    ),
+    lambda n:any((g*g)%n == (g + 1)%n for g in primitive_root_gen(n)),
     desc="Primes with a fibonacci primitive root"
-    # but why is 7 in A001913 ???
 )
-"""
 
 # Fibonacci & co
 
@@ -516,9 +515,9 @@ A001045=Sequence(recurrence([2,1],[0,1])) # Jacobsthal sequence (or Jacobsthal n
 
 #operations on digits
 
-A007953=Sequence(None,digsum, True) #Digital sum (i.e., sum of digits) of n; also called digsum(n).
+A007953=Sequence(None,digsum, True, "Digital sum (i.e., sum of digits) of n; also called digsum(n).");
 
-A000120=Sequence(None, lambda n:bin(n).count('1'), True)# 1's-counting sequence: number of 1's in binary expansion of n
+A000120=Sequence(None, lambda n:bin(n).count('1'), True,"1's-counting sequence: number of 1's in binary expansion of n");
 
 def digits_in(n,digits_set):
     s1=set(digits(n))
@@ -562,7 +561,11 @@ A005188=Sequence(
     n-digit numbers equal to sum of n-th powers of their digits'
 )
 
-def digsum2(n): return digsum(n,2)
+A070635=Sequence(1,lambda n:n%digsum(n),desc="a(n) = n mod (sum of digits of n).")
+
+
+A005349=A000027.filter(lambda n:n%digsum(n)==0,
+    desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits.") 
 
 def itersumdig2(start):
     """Take sum of squares of digits of previous term."""
@@ -745,8 +748,7 @@ def dfcl(n):
         i=dfs(i)
     return len(l)
 
-a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
-
+A303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
@@ -757,8 +759,9 @@ for id in seqs:
         oeis[id]=seqs[id]
 
 
-
 if __name__ == "__main__":
-    print(list(take(50,a303935)))
+    print(A001913)
+    print(A003147)
+
 
 

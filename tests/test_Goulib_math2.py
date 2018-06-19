@@ -8,6 +8,7 @@ from nose import SkipTest
 from Goulib.tests import *
 
 from Goulib.math2 import *
+
 from Goulib.itertools2 import take, index
 import six
 
@@ -52,6 +53,14 @@ class TestEqual:
         d=0.99e-3
         assert_true(isclose(a, a+d))
         assert_false(isclose(a, a+2*d))
+        
+    def test_allclose(self):
+        a=1E6
+        d=0.99e-3
+        assert_true(allclose([a,a-d], [a+d,a]))
+        assert_false(allclose([a, a+2*d], [a,a]))
+        assert_false(allclose([a, a+2*d], [a, nan]))
+        assert_false(allclose([a], [a, nan]))
 
     def test_equal(self):
         # assert_equal(expected, equal(a, b, epsilon))
@@ -955,6 +964,15 @@ class TestIsNumber:
         assert_true(is_number(2))
         assert_true(is_number(2.))
         assert_false(is_number(None))
+        assert_true(is_number(sqrt(-1))) # complex are numbers
+        
+    def test_is_complex(self):
+        assert_false(is_complex(2.))
+        assert_true(is_number(sqrt(-1)))
+        
+    def test_is_real(self):
+        assert_true(is_real(2.))
+        assert_false(is_real(sqrt(-1)))
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):

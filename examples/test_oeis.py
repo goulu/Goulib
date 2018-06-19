@@ -94,12 +94,6 @@ class TestOEIS:
     def setup_class(self):
         pass
 
-    def test_A019434(self):
-        res=data('A019434')
-        # assert_equal(A019434[:len(res)],res)
-        # assert_generator(A019434,[3, 5, 17, 257, 65537],A019434.name)
-        #TODO: find why this hangs...
-
     #http://stackoverflow.com/questions/32899/how-to-generate-dynamic-parametrized-unit-tests-in-python
     #http://nose.readthedocs.org/en/latest/writing_tests.html
     #this is ABSOLUTELY FANTASTIC !
@@ -107,7 +101,6 @@ class TestOEIS:
         for name in sorted(oeis.keys()): # test in sorted order to spot slows faster
             logging.debug(name)
             time_limit=0.1 #second
-            if name=='A019434': continue #skip, use test above instead
 
             yield assert_generator,oeis[name],data(name),name, time_limit
 
