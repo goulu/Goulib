@@ -732,6 +732,10 @@ def dfs(n):
 
 A061602=Sequence(0, dfs, desc="Sum of factorials of the digits of n")
 
+A014080=Sequence(0,None,lambda n:dfs(n)==n,
+    desc="Factorions: equal to the sum of the factorials of their digits in base 10."
+)
+
 def dfcl(n):
     # a much faster version is needed for https://projecteuler.net/problem=74 ;-)
     l=set()
@@ -743,9 +747,6 @@ def dfcl(n):
 
 a303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
-a014080=Sequence(0,None,lambda n:sum(map(factorial,digits(n)))==n,
-    desc="Factorions: equal to the sum of the factorials of their digits in base 10."
-)
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
