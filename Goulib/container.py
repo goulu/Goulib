@@ -4,15 +4,13 @@
 advanced containers : Record (struct), SortedCollection, and INFINITE Sequence
 """
 
-from __future__ import division, print_function
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Raymond Hettinger http://code.activestate.com/recipes/577197-sortedcollection/']
 __license__ = "LGPL"
 
 import six
-from six.moves import map, filter
+from six.moves import zip, map, filter
 
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
@@ -138,26 +136,49 @@ class Sequence(object):
                 containf=lambda n:n-other in self,
                 desc='%s+%d'%(self.name,other)
             )
-        return self & other
+        def _(): 
+            for (a,b) in zip(self,other): yield a+b
+        return Sequence(_, lambda i:self[i]+other[i])
                         
     def __sub__(self,other):
         if type(other) is int:
             return self+(-other)
-        return self % other
+        def _(): 
+            for (a,b) in zip(self,other): yield a-b
+        return Sequence(_, lambda i:self[i].other[i])
     
     def __mul__(self,other):
-        return self.apply(
-            lambda n:n*other,
-            containf=lambda n:other/n in self,
-            desc='%d*%s'%(other,self.name)
-        )
+        if type(other) is int:
+            return self.apply(
+                lambda n:n*other,
+                containf=lambda n:other/n in self,
+                desc='%d*%s'%(other,self.name)
+            )
+        def _(): 
+            for (a,b) in zip(self,other): yield a*b
+        return Sequence(_, lambda i:self[i]*other[i])
         
     def __div__(self,other):
-        return self.apply(
-            lambda n:n/other,
-            containf=lambda n:other*n in self,
-            desc='%s/%d'%(self.name,other)
-        )
+        if type(other) is int:
+            return self.apply(
+                lambda n:n//other,
+                containf=lambda n:other*n in self,
+                desc='%s//%d'%(self.name,other)
+            )
+        def _(): 
+            for (a,b) in zip(self,other): yield a//b
+        return Sequence(_, lambda i:self[i]//other[i])
+        
+    def __truediv__(self,other):
+        if type(other) is int:
+            return self.apply(
+                lambda n:n/other,
+                containf=lambda n:other*n in self,
+                desc='%s/%d'%(self.name,other)
+            )
+        def _(): 
+            for (a,b) in zip(self,other): yield a/b
+        return Sequence(_, lambda i:self[i]/other[i])
             
     def __or__(self,other):
         """
