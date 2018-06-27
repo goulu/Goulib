@@ -353,6 +353,29 @@ A046122=Sequence(itemgetter(sexy_prime_quadruplets(), 1))
 A046123=Sequence(itemgetter(sexy_prime_quadruplets(), 2))
 A046124=Sequence(itemgetter(sexy_prime_quadruplets(), 3))
 
+A031924=Sequence(itemgetter(prime_ktuple((0,-2,-4,6)),0),desc="Lower prime of a difference of 6 between consecutive primes.")
+
+A046117=Sequence(itemgetter(prime_ktuple((0,6)),1),desc="Primes p such that p-6 is also prime.")
+
+A022004=Sequence(itemgetter(prime_ktuple((0,2,6)),0),desc="Initial members of prime triples (p, p+2, p+6).")
+A073648=Sequence(itemgetter(prime_ktuple((0,2,6)),1),desc="Middle members of prime triples (p, p+2, p+6).")
+A098412=Sequence(itemgetter(prime_ktuple((0,2,6)),2),desc="Greatest members p of prime triples (p, p+2, p+6).")
+
+A022005=Sequence(itemgetter(prime_ktuple((0,4,6)),0),desc="Initial members of prime triples (p, p+4, p+6).")
+A073649=Sequence(itemgetter(prime_ktuple((0,4,6)),1),desc="Middle members of prime triples (p, p+4, p+6).")
+A098413=Sequence(itemgetter(prime_ktuple((0,4,6)),2),desc="Greatest members p of prime triples (p, p+4, p+6).")
+
+A098414=A073648|A073649
+A098413.desc="Middle members q of prime triples (p,q,r) with p<q<r=p+6."
+A098415=A098412|A098413
+A098415.desc="Greatest members r of prime triples (p,q,r) with p<q<r=p+6."
+
+A007529=A098415-6
+A007529.desc="Prime triples: n; n+2 or n+4; n+6 all prime. "
+
+A098416=(A007529+A098415)/4
+A098416.desc="(A007529(n) + A098415(n)) / 4."
+
 def is_squarefree(n):
     return all(q==1 for p,q in factorize(n))
 
@@ -760,8 +783,10 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A001913)
-    print(A003147)
+    print(A007529)
+    print(A098415)
+    print(A098423)
+    print(A098416)
 
 
 
