@@ -1139,6 +1139,8 @@ class Drawing(Group):
                     e=Entity.from_pdf(sub,t,color)
                     if e:
                         me.append(e)
+                    elif len(sub)==1 and sub[0][0]=='m':
+                        pass # sometimes we have 2 consecutive 'moves' ...
                     else:
                         logging.warning('pdf path ignored %s'%sub)
 
