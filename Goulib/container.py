@@ -4,6 +4,8 @@
 advanced containers : Record (struct), SortedCollection, and INFINITE Sequence
 """
 
+from __future__ import division, print_function
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ['Raymond Hettinger http://code.activestate.com/recipes/577197-sortedcollection/']
