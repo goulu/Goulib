@@ -586,9 +586,38 @@ A005188=Sequence(
 
 A070635=Sequence(1,lambda n:n%digsum(n),desc="a(n) = n mod (sum of digits of n).")
 
+A227919=A000040.filter(
+    lambda n:is_prime(n//10),
+    "Primes which remain prime when rightmost digit is removed."
+)
 
-A005349=A000027.filter(lambda n:n%digsum(n)==0,
-    desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits.") 
+def prefix_gen(n):
+    while n>0:
+        yield n
+        n=n//10
+
+A024770=A000040.filter(
+    lambda n:all(map(is_prime,prefix_gen(n))),
+    "Right-truncatable primes: every prefix is prime."
+)
+
+@decorators.memoize
+def is_harshad(n,s=None):
+    if n==0: return 0
+    if s is None: s=digsum(n)
+    d,r=divmod(n,s)
+    if r>0: return 0
+    return d
+
+
+A005349=A000027.filter(is_harshad,
+    desc="Niven (or Harshad) numbers: numbers that are divisible by the sum of their digits."
+) 
+
+A001101=A005349.filter(lambda n:is_prime(is_harshad(n)),
+    desc="Moran numbers: n such that (n / sum of digits of n) is prime."
+    +'Called "Strong Harshad"in Euler Problem 387'
+)
 
 def itersumdig2(start):
     """Take sum of squares of digits of previous term."""
@@ -783,10 +812,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A007529)
-    print(A098415)
-    print(A098423)
-    print(A098416)
+    print(list(take(40,A005349)))
 
 
 
