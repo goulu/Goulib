@@ -1027,7 +1027,7 @@ def primes_gen(start=2,stop=None):
         n=start+1
         while True:
             n=prevprime(n)
-            if n>=stop:
+            if n and n>=stop:
                 yield n
             else:
                 break
