@@ -184,10 +184,11 @@ class Sequence(object):
             
     def __or__(self,other):
         """
-        :return: Sequence with items from both operands
+        :return: Sequence with items from both (sorted) operand Sequences
         """
         return Sequence(
-            itertools2.merge(self,other), None,
+            itertools2.skipdups(itertools2.merge(self,other)), 
+            None,
             lambda x:x in self or x in other
         )
         

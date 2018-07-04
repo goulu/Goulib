@@ -8,6 +8,7 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
                "algos from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
                "tools from http://docs.python.org/dev/py3k/library/html",
+               "https://github.com/erikrose/more-itertools"
                ]
 __license__ = "LGPL"
 
@@ -189,6 +190,11 @@ def compress(iterable):
             count=1
     if count:
         yield prev,count
+        
+def skipdups(iterable):
+    """ skip consecutive duplicate values"""
+    for value,_ in compress(iterable):
+        yield value
         
 def recurse(f,x):
     while True:
