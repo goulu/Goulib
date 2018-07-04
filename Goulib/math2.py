@@ -1401,20 +1401,22 @@ def bouncy(n,up=False,down=False):
         res = res and down==(s==s1[::-1])
     return res
 
-def repunit_gen(digit=1):
+def repunit_gen(base=10, digit=1):
     '''generate repunits'''
     n=digit
     yield 0 # to be coherent with definition
     while True:
         yield n
-        n=n*10+digit
+        n=n*base+digit
 
-def repunit(n,digit=1):
+def repunit(n, base=10, digit=1):
     '''
     :return: nth repunit
     '''
     if n==0: return 0
-    return int(str(digit)*n)
+    if digit==1:
+        return (base**n - 1)//(base-1)
+    return int(str(digit)*n,base)
 
 # repeating decimals https://en.wikipedia.org/wiki/Repeating_decimal
 # https://stackoverflow.com/a/36531120/1395973
@@ -1432,7 +1434,7 @@ def rational_form(numerator, denominator):
     def first_divisible_repunit(x):
         #finds the first number in the sequence (9, 99, 999, 9999, ...) that is divisible by x.
         assert x%2 != 0 and x%5 != 0
-        for r in itertools2.drop(1,repunit_gen(9)):
+        for r in itertools2.drop(1,repunit_gen(digit=9)):
             if r % x == 0:
                 return r
     shift,p = 0,1

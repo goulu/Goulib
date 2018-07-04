@@ -1102,8 +1102,8 @@ class TestIsMultiple:
 
 class TestRepunitGen:
     def test_repunit_gen(self):
-        assert_equal(take(5,repunit_gen(1)),[0,1,11,111,1111])
-        assert_equal(take(5,repunit_gen(9)),[0,9,99,999,9999])
+        assert_equal(take(5,repunit_gen(digit=1)),[0,1,11,111,1111])
+        assert_equal(take(5,repunit_gen(digit=9)),[0,9,99,999,9999])
 
 class TestRepunit:
     def test_repunit(self):
@@ -1111,7 +1111,7 @@ class TestRepunit:
         assert_equal(repunit(1),1)
         assert_equal(repunit(2),11)
         assert_equal(repunit(12),111111111111)
-        assert_equal(repunit(12,2),222222222222)
+        assert_equal(repunit(12,digit=2),222222222222)
 
 class TestRationalForm:
     def test_rational_form(self):
