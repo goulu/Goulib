@@ -59,9 +59,41 @@ A067500=A000244.filter(lambda n:digsum(n) in A000244,"Powers of 3 with digit sum
 
 A006521=Sequence(1,None,lambda n: (2**n + 1)%n==0,"Numbers n such that n divides 2^n + 1. ")
 
-A002275=Sequence(repunit_gen(1),lambda n:repunit(n,1),desc="Repunits: (10^n - 1)/9. Often denoted by R_n.")
-
 A000332=Sequence(0, lambda n: binomial(n,4), desc="Binomial coefficient binomial(n,4) = n*(n-1)*(n-2)*(n-3)/24.") 
+
+# repunits in base
+
+A000225,A003462,A002450,A003463,A003464,A023000,A023001,A002452,A002275 = (
+    Sequence(
+        repunit_gen(base),
+        lambda n:repunit(n,base),
+        desc="a(n) = (%d^n - 1)/%d."%(base,base-1)
+    )
+    for base in range(2,11)
+)
+A002275.desc="Repunits: (10^n - 1)/9. Often denoted by R_n."
+A000225.desc="a(n) = 2^n - 1. (Sometimes called Mersenne numbers, although that name is usually reserved for A001348."
+
+A016123, A016125, A091030, A135519, A135518, A131865 = (
+    Sequence(
+        drop(1,repunit_gen(base)),
+        lambda n:repunit(n+1,base),
+        desc="a(n) = (%d^n - 1)/%d."%(base,base-1)
+    )
+    for base in range(11,17)
+)
+
+# repdigits
+
+A024023=Sequence(
+        repunit_gen(3,2),
+        lambda n:repunit(n+1,3),
+        desc="a(n) = 3^n - 1."
+    )
+
+A048328=A003462|A024023        
+A048328.desc="Numbers that are repdigits in base 3."
+
 #polygonal numbers
 
 A000217=Sequence(None,triangle,is_triangle,'triangle numbers')
@@ -812,7 +844,9 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(40,A005349)))
+    print(A003462)
+    print(A024023)
+    print(A048328)
 
 
 
