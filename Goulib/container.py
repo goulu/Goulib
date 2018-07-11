@@ -20,7 +20,7 @@ from collections import OrderedDict
 import operator
 
 from itertools import count, tee, islice
-from Goulib import itertools2, tests
+from Goulib import itertools2, decorators, tests
 
 class Record(OrderedDict):
     """mimics a Pascal record or a C struct"""
@@ -51,7 +51,7 @@ class Sequence(object):
     """combines a generator and a read-only list
     used for INFINITE numeric (integer) sequences
     """
-    def __init__(self,iterf=None,itemf=None,containf=None,desc=''):
+    def __init__(self,iterf=None,itemf=None,containf=None,desc='', timeout=1):
         """
         :param iterf: optional iterator, or a function returning an iterator
         :param itemf: optional function(i) returning the i-th element
@@ -76,6 +76,7 @@ class Sequence(object):
         self.containf=containf
 
         self.desc=desc
+        self.timeout=timeout
 
     def __repr__(self):     
         s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
@@ -96,19 +97,19 @@ class Sequence(object):
         :return: a tee-ed copy of iterf
         """
         if self.iterf:
-            self.iterf, self.generator=tee(self.iterf)
+            self.iterf, res=tee(self.iterf)
         elif self.itemf:
             def _():
                 for i in count(self.offset):
                     yield self[i]
-            self.generator=_()
+            res=_()
         else:
             def _():
-                for n in count(self.offset):
+                for n in decorators.itimeout(count(self.offset),self.timeout):
                     if n in self:
                         yield n
-            self.generator=_()
-        return self.generator
+            res=_()
+        return res
 
     def __getitem__(self, i):
         if not isinstance(i,slice):
