@@ -28,16 +28,11 @@ from Goulib import decorators, tests
 
 from Goulib.container import Sequence
 
-def record(iterable, it=count(), max=0):
-    for i,v in zip(it,iterable):
-        if v>max:
-            yield i
-            max=v
-
 A000004=Sequence(repeat(0),lambda n:0, lambda x:x==0, desc='The zero sequence')
 
 A000007=Sequence(None,lambda n:0**n, lambda x:x in (0,1), desc='The characteristic function of 0: a(n) = 0^n.')
 
+A001477=Sequence(count(0), lambda n:n, lambda x:x>=0, desc='The non-negative integers.')
 A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers.')
 A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
 A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
@@ -93,6 +88,10 @@ A024023=Sequence(
 
 A048328=A003462|A024023        
 A048328.desc="Numbers that are repdigits in base 3."
+
+#polynoms
+
+A016957=Sequence(None, lambda n:6*n+4, desc="a(n) = 6*n + 4.")
 
 #polygonal numbers
 
@@ -184,7 +183,7 @@ A002064=Sequence(None,cullen,desc='Cullen numbers')
 A000005=Sequence(1,number_of_divisors)
 A000005.desc='d(n) (also called tau(n) or sigma_0(n)), the number of divisors of n.'
 
-A002182=Sequence(record(A000005,count(1)),
+A002182=Sequence(record_index(A000005,count(1)),
     desc='Highly composite numbers, definition (1): where d(n), the number of divisors of n (A000005), increases to a record.'
 )
 
@@ -198,7 +197,7 @@ A005101=Sequence(1,None,lambda x:abundance(x)>0,
     desc='Abundant numbers (sum of divisors of n exceeds 2n).'
 )
 
-A002093=Sequence(record(A000203,count(1)),
+A002093=Sequence(record_index(A000203,count(1)),
     desc='Highly abundant numbers: numbers n such that sigma(n) > sigma(m) for all m < n.'
 )
 
@@ -278,6 +277,26 @@ A007500.desc="Primes whose reversal in base 10 is also prime"
 
 A006567=A000040.filter(lambda x:not is_palindromic(x) and is_prime(reverse(x)))
 A006567.desc="Emirps (primes whose reversal is a different prime). "
+
+def anagram_gen(factor, base=10, start=0):
+    for n in count(start):
+        if is_anagram(n,factor*n,base):
+            yield n
+            
+
+A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=(
+    Sequence(anagram_gen(f),None,lambda x:is_anagram(x,f*x), 
+             "Numbers n such that n and %d*n are anagrams."%f ) 
+     for f in range(2,10)
+)
+
+def factory(f):
+    return Sequence(f+1,lambda n:first(anagram_gen(f,base=n,start=1)),
+        "a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f)  
+
+A023094,A023095,A023096,A023097,A023098,A023099,A023100,A023101,A023102=(
+    factory(f) for f in range(2,11)
+)  
 
 # decimal expansions
 
@@ -503,6 +522,19 @@ A134816=Sequence(recurrence([1,1,0],[1,1,1]), desc="Padovan's spiral numbers.")
 A000931=Sequence(recurrence([1,1,0],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ")
 
 A050935=Sequence(recurrence([-1,0,1],[0,0,1]), desc="a(1)=0, a(2)=0, a(3)=1, a(n+1) = a(n) - a(n-2).")
+
+# Collatz / Syracuse
+
+A006370=Sequence(None,collatz,desc="The Collatz or 3x+1 map: a(n) = n/2 if n is even, 3n + 1 if n is odd.")
+A008908=Sequence(1,collatz_period,desc="(1 + number of halving and tripling steps to reach 1 in the Collatz (3x+1) problem), or -1 if 1 is never reached.")
+
+A006877=Sequence(record_index(A008908,count(1)), 
+    desc="In the `3x+1' problem, these values for the starting value set new records for number of steps to reach 1"
+)
+A033492=Sequence(record_value(A008908,count(1)),
+    desc="Record number of steps to reach 1 in '3x+1' problem, corresponding to starting values in A006877"
+)
+
 # other famous series
 
 A007318=Sequence(pascal_gen)
@@ -819,10 +851,6 @@ def dfs(n):
 
 A061602=Sequence(0, dfs, desc="Sum of factorials of the digits of n")
 
-A014080=Sequence(0,None,lambda n:dfs(n)==n,
-    desc="Factorions: equal to the sum of the factorials of their digits in base 10."
-)
-
 def dfcl(n):
     # a much faster version is needed for https://projecteuler.net/problem=74 ;-)
     l=set()
@@ -834,6 +862,10 @@ def dfcl(n):
 
 A303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
+A014080=Sequence(0,None,lambda n:dfs(n)==n,
+    desc="Factorions: equal to the sum of the factorials of their digits in base 10."
+)
+
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
 oeis={}
@@ -844,9 +876,8 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A003462)
-    print(A024023)
-    print(A048328)
+    print(A006877)
+    print(A033492)
 
 
 

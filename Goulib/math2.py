@@ -725,6 +725,23 @@ def pisano_period(mod):
             if n==1:
                 return i-1
             flag=False
+            
+def collatz(n):
+    if n % 2 == 0:
+        return n // 2
+    else:
+        return 3 * n + 1
+    
+def collatz_gen(n=0):
+    yield n
+    while True:
+        n=collatz(n)
+        yield n
+        
+@decorators.memoize
+def collatz_period(n):
+    if n==1: return 1
+    return 1+collatz_period(collatz(n)) 
 
 def pascal_gen():
     '''Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
@@ -1364,7 +1381,7 @@ def is_palindromic(num, base=10):
     digitslst = list(digits_gen(num, base))
     return digitslst == list(reversed(digitslst))
 
-def is_permutation(num1, num2, base=10):
+def is_anagram(num1, num2, base=10):
     '''Check if 'num1' and 'num2' have the same digits in base'''
     if base==10:
         digits1=sorted(str(num1))
