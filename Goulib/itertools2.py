@@ -323,6 +323,19 @@ def accumulate(iterable, func=operator.add, skip_first=False):
         else:
             total = func(total, x)
         yield total
+        
+def record(iterable, it=count(), max=0):
+    """return the index and value of iterable which exceed previous max"""
+    for i,v in zip(it,iterable):
+        if v>max:
+            yield i,v
+            max=v
+            
+def record_index(iterable, it=count(), max=0):
+    return itemgetter(record(iterable, it, max),0)
+
+def record_value(iterable, it=count(), max=0):
+    return itemgetter(record(iterable, it, max),1)
 
 def tails(seq):
     """Get tails of a sequence
