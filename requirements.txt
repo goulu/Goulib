@@ -1,5 +1,4 @@
 scipy
-matplotlib>=2.0.0
 networkx
 pydot
 pydotplus
@@ -9,8 +8,6 @@ ipython
 lxml
 xlrd
 xlsxwriter
-pillow
-scikit-image
 dxfgrabber
 dxfwrite
 svg.path
@@ -19,3 +16,6 @@ sortedcollections
 pint
 nose       
 sphinx
+scikit-image
+pillow>=4.3.0
+matplotlib>=2.0.0
