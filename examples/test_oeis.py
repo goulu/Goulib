@@ -22,10 +22,11 @@ from examples.oeis import *
 
 path=os.path.dirname(os.path.abspath(__file__))
 
-def assert_generator(f,l,name,time_limit=10):
+def assert_generator(f,l,name,timeout=10):
     i=0
+    timeout,f.timeout=f.timeout,timeout #save
     try:
-        for item1,item2 in decorators.itimeout(zip(f,l),time_limit):
+        for item1,item2 in zip(f,l):
             m='%s : First differing element %d: %s != %s\n' %(name, i, item1, item2)
             assert_equal(item1,item2, msg=m)
             i+=1
@@ -34,6 +35,8 @@ def assert_generator(f,l,name,time_limit=10):
             logging.warning('%s timeout after only %d loops'%(name,i))
         else:
             logging.debug('%s timeout after %d loops'%(name,i))
+    finally:
+        f.timeout=timeout #restore
 
 import pickle
 cachef=path+'/oeis.pck'

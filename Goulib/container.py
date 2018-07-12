@@ -4,7 +4,7 @@
 advanced containers : Record (struct), SortedCollection, and INFINITE Sequence
 """
 
-from __future__ import division, print_function
+from __future__ import division
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
@@ -51,7 +51,7 @@ class Sequence(object):
     """combines a generator and a read-only list
     used for INFINITE numeric (integer) sequences
     """
-    def __init__(self,iterf=None,itemf=None,containf=None,desc='', timeout=1):
+    def __init__(self,iterf=None,itemf=None,containf=None,desc='', timeout=0):
         """
         :param iterf: optional iterator, or a function returning an iterator
         :param itemf: optional function(i) returning the i-th element
@@ -94,20 +94,25 @@ class Sequence(object):
     def __iter__(self):
         """reset the generator
         
-        :return: a tee-ed copy of iterf
+        :return: a tee-ed copy of iterf, optionally timeout decorated
         """
         if self.iterf:
             self.iterf, res=tee(self.iterf)
-        elif self.itemf:
-            def _():
-                for i in count(self.offset):
-                    yield self[i]
-            res=_()
+            if self.timeout: 
+                res=decorators.itimeout(res,self.timeout)
         else:
-            def _():
-                for n in decorators.itimeout(count(self.offset),self.timeout):
-                    if n in self:
-                        yield n
+            it=count(self.offset)
+            if self.timeout: 
+                it=decorators.itimeout(it,self.timeout)
+            if self.itemf:
+                def _():
+                    for i in it:
+                        yield self[i]
+            else:
+                def _():
+                    for n in it:
+                        if n in self:
+                            yield n
             res=_()
         return res
 
