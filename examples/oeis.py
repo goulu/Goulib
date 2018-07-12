@@ -863,7 +863,8 @@ def dfcl(n):
 A303935=Sequence(0,dfcl,desc="digit factorial chain length") # small a to avoid testing it for now
 
 A014080=Sequence(0,None,lambda n:dfs(n)==n,
-    desc="Factorions: equal to the sum of the factorials of their digits in base 10."
+    desc="Factorions: equal to the sum of the factorials of their digits in base 10.",
+    timeout=1 # FINITE !
 )
 
 # Build oeis dict by module introspection : Simple and WOW !
@@ -876,8 +877,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A006877)
-    print(A033492)
+    print(A000043)
 
 
 
