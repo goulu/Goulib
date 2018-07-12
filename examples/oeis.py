@@ -28,7 +28,7 @@ from Goulib import decorators, tests
 
 from Goulib.container import Sequence
 
-A000004=Sequence(repeat(0),lambda n:0, lambda x:x==0, desc='The zero sequence')
+A000004=Sequence(repeat(0),lambda _:0, lambda x:x==0, desc='The zero sequence')
 
 A000007=Sequence(None,lambda n:0**n, lambda x:x in (0,1), desc='The characteristic function of 0: a(n) = 0^n.')
 
@@ -37,7 +37,9 @@ A000027=Sequence(count(1), lambda n:n, lambda x:x>0, desc='The positive integers
 A005408=Sequence(count(1,2), lambda n:2*n+1, lambda x:x%2==1, desc='The odd numbers: a(n) = 2n+1.')
 A005843=Sequence(count(0,2), lambda n:2*n, lambda x:x%2==0, desc='The even numbers: a(n) = 2n ')
 
-A001057=Sequence(1, lambda n: -n//2+1 if n%2 else n//2, lambda n:True, desc="Canonical enumeration of integers: interleaved positive and negative integers with zero prepended.")
+A001057=Sequence(1, lambda n: -n//2+1 if n%2 else n//2, lambda _:True, 
+    desc="Canonical enumeration of integers: interleaved positive and negative integers with zero prepended."
+)
 
 A008587=Sequence(count(0,5),lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(count(0,7),lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
@@ -246,12 +248,12 @@ def exp_sequences(a,b,c,desc_s1=None,desc_s2=None,desc_s3=None,start=0):
     return s1,s2,s3
 
 A033484=exp_sequences(3,2,-2)[0]
-_,A007505,A002235=exp_sequences(3,2,-1,desc_s2='Thabit primes of form 3*2^n -1.')
+A153893,A007505,A002235=exp_sequences(3,2,-1,desc_s2='Thabit primes of form 3*2^n -1.')
 
 A046865=exp_sequences(4,5,-1)[2]
 A079906=exp_sequences(5,6,-1)[2]
 A046866=exp_sequences(6,7,-1,start=1)[2]
-_,A050523,A001771=exp_sequences(7,2,-1)
+A086224,A050523,A001771=exp_sequences(7,2,-1)
 A005541=exp_sequences(8,3,-1)[2]
 A056725=exp_sequences(9,10,-1)[2]
 A046867=exp_sequences(10,11,-1)[2]
@@ -279,9 +281,7 @@ A006567=A000040.filter(lambda x:not is_palindromic(x) and is_prime(reverse(x)))
 A006567.desc="Emirps (primes whose reversal is a different prime). "
 
 def anagram_gen(factor, base=10, start=0):
-    for n in count(start):
-        if is_anagram(n,factor*n,base):
-            yield n
+    return (n for n in count(start) if is_anagram(n,factor*n,base))
             
 
 A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=(
@@ -877,7 +877,8 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A000043)
+    for x in A033948:
+        print(x)
 
 
 

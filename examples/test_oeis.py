@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 
-from __future__ import division #"true division" everywhere
+from __future__ import division, print_function #"true division" everywhere
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
@@ -22,6 +22,8 @@ from examples.oeis import *
 
 path=os.path.dirname(os.path.abspath(__file__))
 
+slow=[] #list of slow sequences
+
 def assert_generator(f,l,name,timeout=10):
     i=0
     timeout,f.timeout=f.timeout,timeout #save
@@ -32,6 +34,7 @@ def assert_generator(f,l,name,timeout=10):
             i+=1
     except decorators.TimeoutError:
         if i<min(10,len(l)/2):
+            slow.append((i,name))
             logging.warning('%s timeout after only %d loops'%(name,i))
         else:
             logging.debug('%s timeout after %d loops'%(name,i))
@@ -94,8 +97,16 @@ def check(f,s=None):
 class TestOEIS:
 
     @classmethod
-    def setup_class(self):
+    def setup_class(cls):
         pass
+    
+    @classmethod
+    def teardown_class(cls):
+        global slow
+        print('slower Sequences:')
+        slow.sort()
+        for (i,name) in slow:
+            print(name,i)
 
     #http://stackoverflow.com/questions/32899/how-to-generate-dynamic-parametrized-unit-tests-in-python
     #http://nose.readthedocs.org/en/latest/writing_tests.html
@@ -113,3 +124,4 @@ if __name__ == "__main__":
         runmodule(logging.DEBUG,argv=['-x'])
     else:
         runmodule()
+

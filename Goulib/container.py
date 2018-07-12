@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf8
 """
-advanced containers : Record (struct), SortedCollection, and INFINITE Sequence
+advanced containers : Record (struct), and INFINITE Sequence
 """
 
-from __future__ import division
+from __future__ import division, print_function
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
-__credits__ = ['Raymond Hettinger http://code.activestate.com/recipes/577197-sortedcollection/']
+__credits__ = []
 __license__ = "LGPL"
 
 import six
@@ -77,10 +77,13 @@ class Sequence(object):
 
         self.desc=desc
         self.timeout=timeout
-
+        self._repr=''
+        
     def __repr__(self):     
-        s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9]) 
-        return '%s (%s ...)'%(self.name,s)
+        if not self._repr: # cache for speed
+            s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9],0.001) # must be very quick for debugger 
+            self._repr='%s (%s ...)'%(self.name,s)
+        return self._repr
     
     def save(self, filename, comment=None, n=1000, maxtime=10):
         with open(filename,'wt') as f:
@@ -105,15 +108,9 @@ class Sequence(object):
             if self.timeout: 
                 it=decorators.itimeout(it,self.timeout)
             if self.itemf:
-                def _():
-                    for i in it:
-                        yield self[i]
+                res=map(lambda i:self[i],it)
             else:
-                def _():
-                    for n in it:
-                        if n in self:
-                            yield n
-            res=_()
+                res=filter(lambda n:n in self,it) # uses containf
         return res
 
     def __getitem__(self, i):

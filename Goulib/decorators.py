@@ -77,6 +77,8 @@ def get_thread_pool():
  
 def timeout(timeout):
     def wrap_function(func):
+        if not timeout:
+            return func
         @functools.wraps(func)
         def __wrapper(*args, **kwargs):
             try:
@@ -104,7 +106,7 @@ def itimeout(iterable,timeout):
         yield i
         if timer.finished.is_set(): 
             raise TimeoutError
-    timer.cancel() #don't forget it, otherwise it threads never finish...
+    timer.cancel() #don't forget it, otherwise the thread never finishes...
     
 # https://www.artima.com/weblogs/viewpost.jsp?thread=101605
 
