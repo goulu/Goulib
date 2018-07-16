@@ -288,7 +288,7 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
     for d in count(0): # number of digits
         step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
         end=math.ceil(base/factor)
-        for n in range(base**d+(step-1),end*base**d,step):
+        for n in range(int(base**d+(step-1)),int(end*base**d),step):
             if is_anagram(n,factor*n,base):     
                 if inbase:
                     yield int_base(n,base)  
