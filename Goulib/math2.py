@@ -1329,6 +1329,7 @@ def powertrain(n):
         m *= int(s[i])**int(s[i+1])
     return m
 
+
 def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
     '''
     :return: string representation of num in base
@@ -1354,6 +1355,14 @@ def str_base(num, base=10, numerals = '0123456789abcdefghijklmnopqrstuvwxyz'):
         result = numerals[d] + result
 
     return sign + result
+
+def int_base(num, base):
+    '''
+    :return: int representation of num in base
+    :param num: int number (decimal)
+    :param base: int base, <= 10
+    '''
+    return int(str_base(num,base))
 
 
 def num_from_digits(digits, base=10):
@@ -1383,12 +1392,8 @@ def is_palindromic(num, base=10):
 
 def is_anagram(num1, num2, base=10):
     '''Check if 'num1' and 'num2' have the same digits in base'''
-    if base==10:
-        digits1=sorted(str(num1))
-        digits2=sorted(str(num2))
-    else:
-        digits1 = sorted(digits(num1, base))
-        digits2 = sorted(digits(num2, base))
+    digits1=sorted(str_base(num1,base))
+    digits2=sorted(str_base(num2,base))
     return digits1==digits2
 
 def is_pandigital(num, base=10):
