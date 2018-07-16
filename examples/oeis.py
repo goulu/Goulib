@@ -280,23 +280,45 @@ A007500.desc="Primes whose reversal in base 10 is also prime"
 A006567=A000040.filter(lambda x:not is_palindromic(x) and is_prime(reverse(x)))
 A006567.desc="Emirps (primes whose reversal is a different prime). "
 
-def anagram_gen(factor, base=10, start=0):
-    return (n for n in count(start) if is_anagram(n,factor*n,base))
+# see https://blog.plover.com/math/dd.html
+
+def anagram_gen(factor, base=10, start=0, inbase=False):
+    if start==0:
+        yield 0 #cheat
+    for d in count(0): # number of digits
+        step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
+        end=math.ceil(base/factor)
+        for n in range(base**d+(step-1),end*base**d,step):
+            if is_anagram(n,factor*n,base):     
+                if inbase:
+                    yield int_base(n,base)  
+                else:
+                    yield n   
             
 
-A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=(
+A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=[
     Sequence(anagram_gen(f),None,lambda x:is_anagram(x,f*x), 
              "Numbers n such that n and %d*n are anagrams."%f ) 
-     for f in range(2,10)
+    for f in range(2,10)
+]
+
+def first_anagram(f):
+    return Sequence(f+1,
+        lambda n:first(anagram_gen(f,base=n,start=1)),
+        "a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f
+    ) 
+
+A023094,A023095,A023096,A023097,A023098,A023099,A023100,A023101,A023102=[
+    first_anagram(f) for f in range(2,11)
+]  
+
+A023058=Sequence(anagram_gen(2,base=3,start=1,inbase=True),
+    desc="Numbers k such that k and 2k are anagrams of each other in base 3 (k is written here in base 3)"
 )
 
-def factory(f):
-    return Sequence(f+1,lambda n:first(anagram_gen(f,base=n,start=1)),
-        "a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f)  
-
-A023094,A023095,A023096,A023097,A023098,A023099,A023100,A023101,A023102=(
-    factory(f) for f in range(2,11)
-)  
+A023059=Sequence(anagram_gen(2,base=4,start=1,inbase=True),
+    desc="Numbers k such that k and 2k are anagrams of each other in base 4 (k is written here in base 4)"
+)
 
 # decimal expansions
 
@@ -650,6 +672,22 @@ A005188=Sequence(
 
 A070635=Sequence(1,lambda n:n%digsum(n),desc="a(n) = n mod (sum of digits of n).")
 
+def is_sumdigpow(n):
+    # return p such that n=digsum(n,p), or 0 (False) if not
+    prev=0
+    for p in count(1):
+        ds=digsum(n,p)
+        if n==ds:
+            return p
+        if ds>n:
+            break 
+        if ds==prev: # power does'nt increment
+            break
+        prev=ds
+    return False
+
+A023052=Sequence(0,None,is_sumdigpow,desc="Powerful numbers (3): numbers n that are the sum of some fixed power of their digits.")
+
 A227919=A000040.filter(
     lambda n:is_prime(n//10),
     "Primes which remain prime when rightmost digit is removed."
@@ -877,8 +915,8 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    for x in A033948:
-        print(x)
+    print(list(take(20,A023058)))
+    
 
 
 
