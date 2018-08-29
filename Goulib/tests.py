@@ -76,7 +76,7 @@ class TestCase(unittest.TestCase):
         :param reltol: optional float relative tolerance value
         """
         
-        #tee or copy sequences in order to exhaust generators in pprint
+        #we must tee or copy sequences in order to exhaust generators in pprint
         #TODO: find a way (if any...) to move this in pprint
         seq1,p1=itertools2.tee(seq1,copy=None)
         seq2,p2=itertools2.tee(seq2,copy=None)
@@ -104,6 +104,7 @@ class TestCase(unittest.TestCase):
             m=(msg if msg else differing)+'First differing element %d: %s != %s\n' %(i, item1, item2)
             self.assertEqual(item1,item2, places=places, msg=m, delta=delta, reltol=reltol)
             i+=1
+        return i # number of elements checked
 
     base_types=(six.integer_types,six.string_types,six.text_type,bool,set,dict)
 
@@ -129,7 +130,7 @@ class TestCase(unittest.TestCase):
         if (isinstance(first, collections.Iterable) and isinstance(second, collections.Iterable)):
             try:
                 self.assertSequenceEqual(first, second,msg=msg, places=places, delta=delta, reltol=reltol)
-            except TypeError: #for some classes like pint.Quantity
+            except TypeError as e: #for some classes like pint.Quantity
                 super(TestCase,self).assertEqual(first, second,msg=msg)
         elif reltol:
             ratio=first/second if second else second/first
@@ -176,6 +177,7 @@ assert_almost_equal = _t.assertAlmostEqual
 assert_not_equal = _t.assertNotEqual
 assert_raises = _t.assertRaises
 assert_count_equal = _t.assertCountEqual
+assert_sequence_equal = _t.assertSequenceEqual
 
 del Dummy
 del _t
