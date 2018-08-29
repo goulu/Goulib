@@ -218,7 +218,16 @@ A065091=Sequence(primes_gen(3),None,lambda x:x!=2 and is_prime(x),'The odd prime
 
 A001248=A000040.apply(lambda n:n*n,lambda n:is_prime(isqrt(n)),desc='Square of primes')
 
-A030078=A000040.apply(lambda n:n*n*n,desc='Cubes of primes')
+A030078=A000040.apply(lambda n:n*n*n,lambda n:is_prime(icbrt(n)),desc='Cubes of primes')
+
+A030514=A000040.apply(lambda n:n**4,lambda n:is_prime(isqrt(isqrt(n))),desc='4th powers of primes.')
+
+A134657=Sequence(
+    combine(A001248.iterf,A030078.iterf,A030514.iterf,sum),
+    desc="Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
+)
+
+# a318530 MY NEW SERIE
 
 A000961=Sequence(1,None,lambda n:len(list(factorize(n)))==1,
     desc='Powers of primes. Alternatively, 1 and the prime powers (p^k, p prime, k >= 1).'
@@ -332,8 +341,6 @@ A006883=A000040.filter(
 A004042=A006883.apply(
     lambda n:rational_cycle(1,n),
     desc='Periods of reciprocals of A006883, starting with first nonzero digit.')
-
-A008683=Sequence(1,moebius)
 
 A000010=Sequence(1,euler_phi)
 
@@ -485,6 +492,26 @@ A000006=A000040.apply(isqrt,desc="Integer part of square root of n-th prime.")
 A001221=Sequence(1,omega)
 A001222=Sequence(1,bigomega)
 
+A001358=Sequence(1,None,lambda n:bigomega(n)==2,"Semiprimes (or biprimes): products of two primes.") 
+A100959=Sequence(1,None,lambda n:bigomega(n)!=2,"Non-semiprimes.")
+
+A020639=Sequence(1,lpf,desc="Lpf(n): least prime dividing n (when n > 1); a(1) = 1.")
+A006530=Sequence(1,gpf,desc="Gpf(n): greatest prime dividing n, for n >= 2; a(1)=1. ")   
+
+A008683=Sequence(1,moebius,desc="Möbius (or Moebius) function mu(n). mu(1) = 1; mu(n) = (-1)^k if n is the product of k different primes; otherwise mu(n) = 0.")
+
+def is_A055932(n):
+    """:return: True if prime divisors of n are consecutive primes"""
+    count=0
+    lastf=1
+    for f in prime_divisors(n):
+        if f==n: break # 1 and 2 are in A055932
+        if f != nextprime(lastf): return False
+        lastf=f
+        count+=1
+    return n<3 or count>1 or lastf==2
+        
+A055932=Sequence(1,None,is_A055932,"Numbers where all prime divisors are consecutive primes starting at 2.")
 # primitive roots
 
 def has_primitive_root(n):
@@ -502,6 +529,8 @@ A033948=Sequence(1,containf=has_primitive_root,
 A001918=A000040.apply(lambda n:first(primitive_root_gen(n)),
     desc="Least positive primitive root of n-th prime. )"
 )
+
+
 
 A001122=A000040.filter(lambda n:2==first(primitive_root_gen(n)),
     desc="Primes with primitive root 2."
@@ -619,6 +648,8 @@ A000110=Sequence(bell)
 A000129=Sequence(recurrence([1,2],[0,1])) #Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).
 
 A000142=Sequence(factorial_gen) #Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S_n, number of permutations of n letters.
+
+A061006=Sequence(1,lambda n:mod_fac(n-1, n))
 
 A001045=Sequence(recurrence([2,1],[0,1])) # Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1.
 
@@ -866,10 +897,7 @@ A046086=Sequence(primitive_triples,desc=desc).apply(lambda x:x[0])
 desc="Hypotenuse of primitive Pythagorean triangles sorted on area (A024406), then on hypotenuse"
 A121727=Sequence(primitive_triples,desc=desc) \
     .sort(lambda x:(x[0]*x[1],x[2])) \
-    .apply(lambda x:x[2])
-    
-desc="Gpf(n): greatest prime dividing n, for n >= 2; a(1)=1. "
-A006530=Sequence(1,gpf,desc=desc)        
+    .apply(lambda x:x[2])     
 
 """
 A048098=A006530>A000006
@@ -915,7 +943,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,A023058)))
+    print(A134657)
     
 
 
