@@ -254,24 +254,25 @@ class TestIter2:
         # assert_equal(expected, iter2.__next__())
         raise SkipTest
 
-class TestCartesianProduct:
-    def test_cartesian_product(self):
-        #test case for compatibility with itertools.product
-        arrays = [(-1,+1), (-2,+2), (-3,+3)]
-        res=cartesian_product(*arrays)
-        assert_equal(res,[(-1, -2, -3), (-1, -2, 3), (-1, 2, -3), (-1, 2, 3), (1, -2, -3), (1, -2, 3), (1, 2, -3), (1, 2, 3)])
+class TestProduct:
+    def test_product(self):
+        #test compatibility with itertools.product
+        assert_equal(itertools2.product(),itertools.product())
+        assert_equal(itertools2.product([]),itertools.product([]))
+        assert_equal(itertools2.product('ABCD', 'xy'),itertools.product('ABCD', 'xy'))
+        # assert_equal(itertools2.product('AB', 'wxyz'),itertools.product('AB', 'wxyz'))
+        assert_equal(itertools2.product(range(2), repeat=3),itertools.product(range(2), repeat=3))
 
         #test case from http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
-        import itertools
-        g = cartesian_product(lambda: itertools.permutations(range(100)),
-            lambda: itertools.permutations(range(100)))
+
+        g = product(itertools.permutations(range(100)),repeat=2)
 
         assert_equal(next(g),(range(100),range(100)))
 
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         assert_equal(combinations_with_replacement('ABC', 2),
-            ['AA','AB','AC','BB','BC','CC'])
+            ['AA','AB','BB','AC','BC','CC'])
         assert_equal(combinations_with_replacement('AB', 4),
             ['AAAA','AAAB','AABB','ABBB','BBBB'])
 
@@ -432,7 +433,7 @@ class TestKeep:
         kl=list(k)
         assert_equal(kl,l)
         assert_equal(k.val,l[-1])
-        
+
     def test___init__(self):
         pass #tested in test_detect_cycle
 
@@ -453,30 +454,30 @@ class TestFirstMatch:
 
 class TestDetectCycle:
     def test_detect_cycle(self):
-        
+
         assert_equal(detect_cycle(list('123412341')),(0,4))
-        
+
         assert_equal(detect_cycle(list('012345'+'678'*4)),(6,3))
         assert_equal(detect_cycle(list('012345'+'678'*3)),(6,3))
-        
+
         #Floyd fails when repetition isn't long enough (2*i ?):
         assert_equal(floyd(list('012345'+'678'*3)),(None,None))
-        
+
         #test from https://rosettacode.org/wiki/Cycle_detection
         assert_equal(detect_cycle([3,10,101,2,5,26,167,95,101,2,5,26,167,95]),(2,6))
-        
+
         """does not work yet because of repeating digits
-        
-        p3=[1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 
-            1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 
-            2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 
-            2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 
+
+        p3=[1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2,
+            1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2,
+            2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0,
+            2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2,
             0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2]
         assert_equal(detect_cycle(p3)[1],8)
         """
         from Goulib.math2 import pi_digits_gen
         assert_equal(detect_cycle(pi_digits_gen()),(1,2)) # same problem ..
-        
+
 class TestFloyd:
     def test_floyd(self):
         # assert_equal(expected, floyd(iterable, limit))

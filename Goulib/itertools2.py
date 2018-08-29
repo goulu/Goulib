@@ -190,17 +190,17 @@ def compress(iterable):
             count=1
     if count:
         yield prev,count
-        
+
 def skipdups(iterable):
     """ skip consecutive duplicate values"""
     for value,_ in compress(iterable):
         yield value
-        
+
 def recurse(f,x):
     while True:
         yield x
         x=f(x)
-        
+
 def swap(iterable):
     for x in iterable:
         yield reversed(list(x))
@@ -216,7 +216,7 @@ def tee(iterable, n=2, copy=None):
     this function is useful to avoid side effects at a lower memory cost
     depending on the case
     """
-    if isinstance(iterable,(list,tuple,set,dict)):
+    if isinstance(iterable,(list,tuple,set,dict, str)):
         if copy is None: # same object replicated n times
             res=[iterable]*n
         else:
@@ -252,7 +252,7 @@ def pairwise(iterable,op=None,loop=False):
             yield op(x[1],x[0]) #reversed ! (for sub or div)
         else:
             yield x[0],x[1]
-            
+
 def select(it1,it2,op):
     return (x[0] for x in zip(it1,it2) if op(*x))
 
@@ -323,14 +323,14 @@ def accumulate(iterable, func=operator.add, skip_first=False):
         else:
             total = func(total, x)
         yield total
-        
+
 def record(iterable, it=count(), max=0):
     """return the index and value of iterable which exceed previous max"""
     for i,v in zip(it,iterable):
         if v>max:
             yield i,v
             max=v
-            
+
 def record_index(iterable, it=count(), max=0):
     return itemgetter(record(iterable, it, max),0)
 
@@ -398,18 +398,6 @@ def occurrences(it, exchange=False):
     """Return dictionary with occurrences from iterable"""
     return reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
-def cartesian_product(*iterables, **kwargs):
-    """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
-    """
-    if len(iterables) == 0:
-        yield ()
-    else:
-        iterables = iterables * kwargs.get('repeat', 1)
-        it = iterables[0]
-        for item in it() if iscallable(it) else iter(it):
-            for items in cartesian_product(*iterables[1:]):
-                yield (item, ) + items
-
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC
     same as combinations_with_replacement except it doesn't generate
@@ -417,7 +405,7 @@ def combinations_with_replacement(iterable, r):
     """
     pool = tuple(iterable)
     n = len(pool)
-    for indices in cartesian_product(list(range(n)), repeat=r):
+    for indices in product(range(n), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
 
@@ -728,7 +716,7 @@ class SortingError(Exception):
 
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
-    
+
     :yields: items of iterable
     :raise: SortingError if not
     """
@@ -744,7 +732,7 @@ def ensure_sorted(iterable,key=None):
 
 def sorted_iterable(iterable, key=None, buffer=100):
     """sorts an "almost sorted" (infinite) iterable
-    
+
     :param iterable: iterable
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
@@ -774,17 +762,78 @@ def diff(iterable1,iterable2):
 merge=heapq.merge
 
 
-def intersect(*its):
+def intersect(*iterables):
     """ generates itersection of N iterables
 
-    :param its: any number of SORTED iterables
+    :param iterables: any number of SORTED iterables
     :yields: elements that belong to all iterables
     :see: http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
     """
 
-    for key, values in groupby(heapq.merge(*its)):
-        if len(list(values)) == len(its):
+    for key, values in groupby(heapq.merge(*iterables)):
+        if len(list(values)) == len(iterables):
             yield key
+
+def product(*iterables, repeat=1):
+    """ Cartesian product of (infinite) input iterables.
+    
+    :param iterables: any number of iterables
+    :see: http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
+    """
+     # https://github.com/enricobacis/infinite/blob/master/infinite/product.py
+     # is not general enough
+     
+    def empty():
+        yield ()
+        
+    
+    if len(iterables) == 0:
+        return empty()
+    
+    if repeat>1 :
+        n=len(iterables)
+        res=[]
+        for i,it in enumerate(iterables):
+            t=tee(it,repeat)
+            res[i::n]=t
+        iterables=res
+        
+    if len(iterables)==1:
+        return iterables[0]
+            
+    def gen2(it1,it2,concat):
+        def _(x):
+            if concat:
+                try:
+                    return tuple(x)
+                except TypeError:
+                    pass
+            return (x,)
+        it1,it1t = tee(it1) # do not touch it1, so we can reiterate it
+        for n,x in enumerate(it1t): # may be infinite
+            x=_(x)
+            it2,it2t = tee(it2) # do not touch it2, so we can reiterate it
+            for i,y in enumerate(it2t):
+                y=_(y)
+                if i<=n :
+                    yield x+y
+                else:
+                    it1,it1tt = tee(it1) # do not touch it1, so we can reiterate it
+                    for z in take(n+1,it1tt):
+                        yield _(z)+y
+                    break
+
+    res=gen2(*iterables[:2],False)
+    for g in iterables[2:]:
+        res=gen2(res,g,True)
+        
+    return res
+
+def combine(*iterables,op=sum, buffer=100):
+    
+    p=product(*iterables)
+    return sorted_iterable(map(op,p),buffer=buffer)
+
 
 # cycle detection (Floyd "tortue hand hare" algorithm"
 # taken from https://codereview.stackexchange.com/questions/7847/tortoise-and-hare-cycle-detection-algorithm-using-iterators-in-python
@@ -824,7 +873,7 @@ def first_match(iter1,iter2,limit=None):
 
 def floyd(iterable,limit=1e6):
     """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
-    
+
     :see: https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
     :param iterable: iterable
     :param limit: int limit to prevent infinite loop. no limit if None
@@ -855,7 +904,7 @@ def floyd(iterable,limit=1e6):
 
 def brent(iterable,limit=1e6):
     """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
-    
+
     :see: https://en.wikipedia.org/wiki/Cycle_detection#Brent's_algorithm
     :param iterable: iterable
     :param limit: int limit to prevent infinite loop. no limit if None
@@ -887,7 +936,7 @@ def brent(iterable,limit=1e6):
         tortoise.next()
         hare.next()
         mu += 1
- 
+
     return mu, lam
 
 def detect_cycle(iterable,limit=1e6):
