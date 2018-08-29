@@ -64,9 +64,9 @@ class Sequence(object):
             self.offset=iterf
             self.iterf=None
         else:
-            try: #evaluate function into iterator
+            try:
                 iterf=iterf()
-            except Exception:
+            except TypeError as e:
                 pass
             self.offset=0
             self.iterf=iterf
