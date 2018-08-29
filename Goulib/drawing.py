@@ -873,17 +873,14 @@ class Chain(Group):
         """
         from svg.path import Line, CubicBezier
         chain=Chain()
-        def _point(svg):
-            return Point2(svg.real, svg.imag)
 
         for seg in path._segments:
             if isinstance(seg,Line):
-                entity=Segment2(_point(seg.start),_point(seg.end))
+                entity=Segment2(Point2(seg.start),Point2(seg.end))
             elif isinstance(seg,CubicBezier):
-                entity=Spline([_point(seg.start),_point(seg.control1),_point(seg.control2),_point(seg.end)])
+                entity=Spline([Point2(seg.start),Point2(seg.control1),Point2(seg.control2),Point2(seg.end)])
             else:
-                logging.error('unknown segment %s'%seg)
-                entity=None #will crash below
+                raise ValueError('unknown svg segment %s'%seg)
             entity.color=color
             chain.append(entity)
         return chain
