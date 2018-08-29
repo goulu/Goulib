@@ -200,6 +200,12 @@ class Entity(plot.Plot):
         elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
             return BBox(self.c - rr, self.c + rr)
+        else: # suppose Polygon2 or other iterable shape
+            res = BBox()
+            for p in self.p:
+                res+=p
+            return res
+            
 
         raise NotImplementedError()
 
@@ -375,13 +381,14 @@ class Entity(plot.Plot):
         if isinstance(self,Spline):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
-
-
             
         if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
             return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
         if isinstance(self,Circle): #must be after Arc2 and Ellipse
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
+        
+        if isinstance(self,Polygon2):
+            return [patches.Polygon(self.xy,**kwargs)]
 
         raise NotImplementedError
 
@@ -465,6 +472,8 @@ class Entity(plot.Plot):
 Point2.__bases__ += (Entity,)
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
+
+Polygon2.__bases__ += (Entity,) # adds it also to Arc2
 
 class Spline(Entity, Geometry):
     """cubic spline segment"""
