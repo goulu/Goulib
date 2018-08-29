@@ -12,3 +12,4 @@ docs/_build
 /Goulib.egg-info/
 /build/
 /.coverage
+/xunit.xml
