@@ -774,10 +774,11 @@ def intersect(*iterables):
         if len(list(values)) == len(iterables):
             yield key
 
-def product(*iterables, repeat=1):
+def product(*iterables, **kwargs):
     """ Cartesian product of (infinite) input iterables.
     
     :param iterables: any number of iterables
+    :param repeat: integer optional number of repetitions
     :see: http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
     """
      # https://github.com/enricobacis/infinite/blob/master/infinite/product.py
@@ -790,11 +791,13 @@ def product(*iterables, repeat=1):
     if len(iterables) == 0:
         return empty()
     
-    if repeat>1 :
+    r=kwargs.get('repeat', 1)
+    
+    if r>1 :
         n=len(iterables)
         res=[]
         for i,it in enumerate(iterables):
-            t=tee(it,repeat)
+            t=tee(it,r)
             res[i::n]=t
         iterables=res
         
