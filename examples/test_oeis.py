@@ -24,22 +24,22 @@ path=os.path.dirname(os.path.abspath(__file__))
 
 slow=[] #list of slow sequences
 
-def assert_generator(f,l,name,timeout=10):
-    i=0
-    timeout,f.timeout=f.timeout,timeout #save
+def assert_generator(f,ref,name,timeout=10):
+    n=len(ref)
+    timeout,f.timeout=f.timeout,timeout #save Sequence's timeout
+    l=[]
     try:
-        for item1,item2 in zip(f,l):
-            m='%s : First differing element %d: %s != %s\n' %(name, i, item1, item2)
-            assert_equal(item1,item2, msg=m)
-            i+=1
+        for i,x in enumerate(f) : 
+            l.append(x)
+            if i>n : break
     except decorators.TimeoutError:
-        if i<min(10,len(l)/2):
-            slow.append((i,name))
+        if i<min(10,n/2):
+            slow.append((i,name,f.desc))
             logging.warning('%s timeout after only %d loops'%(name,i))
-        else:
-            logging.debug('%s timeout after %d loops'%(name,i))
+        elif _DEBUG:
+            logging.info('%s timeout after %d loops'%(name,i))
     finally:
-        f.timeout=timeout #restore
+        f.timeout=timeout #restore Sequence's timeout
 
 import pickle
 cachef=path+'/oeis.pck'
@@ -105,15 +105,15 @@ class TestOEIS:
         global slow
         print('slower Sequences:')
         slow.sort()
-        for (i,name) in slow:
-            print(name,i)
+        for (i,name,desc) in slow:
+            print(i,name,desc)
 
     #http://stackoverflow.com/questions/32899/how-to-generate-dynamic-parametrized-unit-tests-in-python
     #http://nose.readthedocs.org/en/latest/writing_tests.html
     #this is ABSOLUTELY FANTASTIC !
     def test_generator(self):
         for name in sorted(oeis.keys()): # test in sorted order to spot slows faster
-            logging.debug(name)
+            logging.info(name)
             time_limit=0.1 #second
 
             yield assert_generator,oeis[name],data(name),name, time_limit
