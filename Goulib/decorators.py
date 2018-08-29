@@ -8,7 +8,12 @@ __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = ["http://include.aorcsik.com/2014/05/28/timeout-decorator/"]
 __license__ = "LGPL + MIT"
 
-import functools
+import functools, sys, logging
+
+_gettrace=getattr(sys, 'gettrace', None)
+debugger = _gettrace and _gettrace()
+logging.info('debugger '+('ACTIVE' if debugger else 'INACTIVE'))
+
 
 #http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):
@@ -99,14 +104,20 @@ def itimeout(iterable,timeout):
     :param timeout: float max running time in seconds 
     :yield: items in iterator until timeout occurs
     :raise: multiprocessing.TimeoutError if timeout occured
-    """
-    timer=Timer(timeout,lambda:None)
-    timer.start()
-    for i in iterable:
-        yield i
-        if timer.finished.is_set(): 
-            raise TimeoutError
-    timer.cancel() #don't forget it, otherwise the thread never finishes...
+    """   
+    if False : # handle debugger better one day ...
+        n=100*timeout
+        for i,x in enumerate(iterable):
+            yield x
+            if i>n : break
+    else:
+        timer=Timer(timeout,lambda:None)
+        timer.start()
+        for x in iterable:
+            yield x
+            if timer.finished.is_set(): 
+                raise TimeoutError
+        timer.cancel() #don't forget it, otherwise the thread never finishes...
     
 # https://www.artima.com/weblogs/viewpost.jsp?thread=101605
 
