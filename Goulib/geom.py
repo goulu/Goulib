@@ -132,6 +132,11 @@ def argPair(x,y=None):
             return x.xy
         except:
             pass
+        
+        try: # accepts complex
+            return (x.real, x.imag)
+        except:
+            pass
     else:
         return (x,y)
     
@@ -883,6 +888,11 @@ class Polygon2(Geometry):
     
     def __repr__(self):
         return '%s%s' % (self.__class__.__name__,self.p)
+    
+    @property
+    def xy(self):
+        """:return: tuple (x,y)"""
+        return tuple(p.xy for p in self.p)
     
     def __contains__(self,pt):
         # http://www.ariel.com.au/a/python-point-int-poly.html
