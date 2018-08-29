@@ -848,7 +848,8 @@ def divisors(n):
         yield 1
     else:
         all_factors = [[f**p for p in itertools2.irange(0,fp)] for (f, fp) in factorize(n)]
-        for ns in itertools2.cartesian_product(*all_factors):
+        # do not use itertools2.product here as long as the order of the result differs
+        for ns in itertools.product(*all_factors):
             yield mul(ns)
 
 def proper_divisors(n):
@@ -1078,6 +1079,11 @@ def prime_factors(num, start=2):
             yield p
             num=num//p
 
+def lpf(n):
+    '''greatest prime factor'''
+    if n<4 : return n
+    return itertools2.first(prime_factors(n))
+
 def gpf(n):
     '''greatest prime factor'''
     if n<4 : return n
@@ -1302,7 +1308,7 @@ trailing_zeros= integer_exponent
 def power_tower(v):
     '''
     :return: v[0]**v[1]**v[2] ...
-    :see: http://ajcr.net//Python-power-tower/
+    :see: http://ajcr.net#Python-power-tower/
     '''
     return reduce(lambda x,y:y**x, reversed(v))
 
@@ -1806,12 +1812,14 @@ def factorialk(n,k):
 def factorial2(n):
     return factorialk(n,2)
 
-def factorial_gen():
-    '''Generator of factorial'''
+def factorial_gen(f=lambda x:x):
+    '''Generator of factorial
+    :param f: optional function to apply at each step
+    '''
     last=1
     yield last
     for n in itertools.count(1):
-        last=last*n
+        last=f(last*n)
         yield last
 
 def binomial(n,k):
@@ -2189,6 +2197,27 @@ def mod_sqrt(n, p):
             x, y = (x*d)%p, (d*d)%p
             w, r = (w*y)%p, k
     else: return a # p == 2
+    
+def mod_fac(n, mod, mod_is_prime=False):
+    '''modular factorial
+    : return n! % modulo
+    if module is prime, use Wilson's theorem 
+    https://en.wikipedia.org/wiki/Wilson%27s_theorem
+    '''
+    if n >= mod : # then mod is a factor of n!
+        return 0
+    
+    if n<20: # for small n the naive algorithm can be faster
+        return factorial(n)%mod
+    
+    if mod_is_prime or is_prime(mod): # use Wilson's Theorem : (n-1)! == -1 (mod modulo)
+        result = mod - 1; # avoid negative numbers:  -1 == modulo - 1 (mod modulo)
+        for i in range(mod - 1,n,-1):
+            result *= mod_inv(i, mod)
+            result %= mod
+        return result
+    else:
+        return itertools2.nth(n,factorial_gen(lambda x:x%mod))
 
 def pi_digits_gen():
     ''' generates pi digits as a sequence of INTEGERS !
