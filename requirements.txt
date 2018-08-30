@@ -10,7 +10,7 @@ xlrd
 xlsxwriter
 dxfgrabber
 dxfwrite
-svg.path
+svg.path < 3.0.0
 pdfminer.six
 sortedcollections
 pint
