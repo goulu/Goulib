@@ -215,17 +215,14 @@ A008578=Sequence(
 )
 
 A065091=Sequence(primes_gen(3),None,lambda x:x!=2 and is_prime(x),'The odd prime numbers')
-
 A001248=A000040.apply(lambda n:n*n,lambda n:is_prime(isqrt(n)),desc='Square of primes')
-
 A030078=A000040.apply(lambda n:n*n*n,lambda n:is_prime(icbrt(n)),desc='Cubes of primes')
-
 A030514=A000040.apply(lambda n:n**4,lambda n:is_prime(isqrt(isqrt(n))),desc='4th powers of primes.')
 
-A134657=Sequence(
-    combine(A001248.iterf,A030078.iterf,A030514.iterf,op=sum),
-    desc="Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
-)
+A045699=A001248.product(A030078,sum).unique()
+A045699.desc="Numbers of the form p^2 + q^3, p,q prime."
+A134657=A045699.product(A030514,sum).unique()
+A134657.desc="Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
 
 # a318530 MY NEW SERIE
 
@@ -943,7 +940,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A134657)
+    print(list(take(20,A134657)))
     
 
 

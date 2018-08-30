@@ -257,3 +257,9 @@ class Sequence(object):
         :return: Sequence made of unique elements of this one
         """
         return Sequence(itertools2.unique(self,None,buffer))
+    
+    
+    def product(self, other, op=sum, buffer=100):
+        """cartesian product"""
+        it=itertools2.product(self, other)
+        return Sequence(it).apply(op).sort(buffer=buffer)

@@ -832,12 +832,6 @@ def product(*iterables, **kwargs):
         
     return res
 
-def combine(*iterables,op=sum, buffer=100):
-    
-    p=product(*iterables)
-    return sorted_iterable(map(op,p),buffer=buffer)
-
-
 # cycle detection (Floyd "tortue hand hare" algorithm"
 # taken from https://codereview.stackexchange.com/questions/7847/tortoise-and-hare-cycle-detection-algorithm-using-iterators-in-python
 # http://ideone.com/fgrwM
