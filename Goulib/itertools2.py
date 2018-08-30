@@ -826,9 +826,9 @@ def product(*iterables, **kwargs):
                         yield _(z)+y
                     break
 
-    res=gen2(*iterables[:2],False)
+    res=gen2(*iterables[:2],concat=False)
     for g in iterables[2:]:
-        res=gen2(res,g,True)
+        res=gen2(res,g,concat=True)
         
     return res
 
