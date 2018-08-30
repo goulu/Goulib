@@ -223,7 +223,7 @@ A030078=A000040.apply(lambda n:n*n*n,lambda n:is_prime(icbrt(n)),desc='Cubes of 
 A030514=A000040.apply(lambda n:n**4,lambda n:is_prime(isqrt(isqrt(n))),desc='4th powers of primes.')
 
 A134657=Sequence(
-    combine(A001248.iterf,A030078.iterf,A030514.iterf,sum),
+    combine(A001248.iterf,A030078.iterf,A030514.iterf,op=sum),
     desc="Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
 )
 
