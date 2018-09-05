@@ -677,7 +677,7 @@ def recurrence(signature, values, cst=0, max=None, mod=0):
         if mod:
             n=n%mod
         yield n
-    
+    values=values[-len(signature):]
     while True:
         n=dot_vv(factors,values)
         if max and n>max: break
@@ -1720,12 +1720,12 @@ def get_cardinal_name(num):
     def _get_hundreds(n):
         tens = n % 100
         hundreds = (n // 100) % 10
-        return list(itertools2.compact([
+        return filter(bool,[
             hundreds > 0 and numbers[hundreds],
             hundreds > 0 and "hundred",
             hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
-          ]))
+          ])
 
     blocks=digits(num,1000,rev=True) #group by 1000
     res=''
