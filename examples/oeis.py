@@ -44,7 +44,7 @@ A001057=Sequence(1, lambda n: -n//2+1 if n%2 else n//2, lambda _:True,
 A008587=Sequence(count(0,5),lambda n:5*n, lambda n:n%5==0, 'Multiples of 5')
 A008589=Sequence(count(0,7),lambda n:7*n, lambda n:n%7==0, 'Multiples of 7')
 
-A000079=Sequence(None,lambda n:2**n, desc='Powers of 2: a(n) = 2^n.')
+A000079=Sequence(recurrence([2],[1]),lambda n:2**n, desc='Powers of 2: a(n) = 2^n.')
 A001146=Sequence(None,lambda n:2**2**n, desc='2^(2^n)')
 A051179=A001146-1
 A000215=A001146+1
@@ -935,6 +935,8 @@ A014080=Sequence(0,None,lambda n:dfs(n)==n,
 )
 
 # recurrences
+A003945=Sequence(recurrence([2],[1,3]),desc="Expansion of g.f. (1+x)/(1-2*x).")
+
 A285361=Sequence(
     recurrence((8,-24,34,-23,6),(1,11,64,282,1071)),
     lambda n:(3**(n+3) - 5*2**(n+4) + 4*n**2 + 26*n + 53)//4,
@@ -955,7 +957,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(A285361) # (1,11,64,282,1071,3729,12310,39296,122773,378279,... ...)
+    print(list(take(20,A003945)))
     
 
 
