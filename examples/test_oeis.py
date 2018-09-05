@@ -115,13 +115,15 @@ class TestOEIS:
         for name in sorted(oeis.keys()): # test in sorted order to spot slows faster
             logging.info(name)
             time_limit=0.1 #second
-
-            yield assert_generator,oeis[name],data(name),name, time_limit
+            from functools import partial
+            f = partial(assert_generator,oeis[name],data(name),name, time_limit)
+            f.description = str(oeis[name])+'\n'
+            yield (f, )
 
 _DEBUG=True
 if __name__ == "__main__":
     if _DEBUG:
-        runmodule(logging.DEBUG,argv=['-x'])
+        runmodule(logging.DEBUG,argv=['-x','-v'])
     else:
         runmodule()
 
