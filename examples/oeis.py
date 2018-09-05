@@ -146,7 +146,8 @@ A051876=Sequence(None,lambda n:polygonal(24,n))
 A167149=Sequence(0,lambda n:polygonal(10000,n),'myriagonal')
 
 A001110=A000217.filter(is_square,'Square triangular numbers: numbers that are both triangular and square')
-A001110.iterf=recurrence([-1,34],[0,1],2)  #http://www.johndcook.com/blog/2015/08/21/computing-square-triangular-numbers/
+A001110.iterf=recurrence((35, -35, 1), (0, 1, 36))  
+#http://www.johndcook.com/blog/2015/08/21/computing-square-triangular-numbers/
 
 A001109=A001110.apply(isqrt,lambda n:n*n in A001110,desc='a(n)^2 is a triangular number')
 # pyramidal numbers
@@ -224,7 +225,7 @@ A045699.desc="Numbers of the form p^2 + q^3, p,q prime."
 A134657=A045699.product(A030514,sum).unique()
 A134657.desc="Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
 
-# a318530 MY NEW SERIE
+a318530=A001248.product(A030078,sum)
 
 A000961=Sequence(1,None,lambda n:len(list(factorize(n)))==1,
     desc='Powers of primes. Alternatively, 1 and the prime powers (p^k, p prime, k >= 1).'
@@ -311,7 +312,7 @@ A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=[
 def first_anagram(f):
     return Sequence(f+1,
         lambda n:first(anagram_gen(f,base=n,start=1)),
-        "a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f
+        desc="a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f
     ) 
 
 A023094,A023095,A023096,A023097,A023098,A023099,A023100,A023101,A023102=[
@@ -566,10 +567,10 @@ A001175=Sequence(1,pisano_period, desc='Pisano period')
 
 A060305=A000040.apply(pisano_period, desc='Period of Fibonacci numbers mod prime(n).')
 
-A134816=Sequence(recurrence([1,1,0],[1,1,1]), desc="Padovan's spiral numbers.")
-A000931=Sequence(recurrence([1,1,0],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ")
+A134816=Sequence(recurrence([0,1,1],[1,1,1]), desc="Padovan's spiral numbers.")
+A000931=Sequence(recurrence([0,1,1],[1,0,0]), desc="Padovan sequence: a(n) = a(n-2) + a(n-3) with a(0)=1, a(1)=a(2)=0. ")
 
-A050935=Sequence(recurrence([-1,0,1],[0,0,1]), desc="a(1)=0, a(2)=0, a(3)=1, a(n+1) = a(n) - a(n-2).")
+A050935=Sequence(recurrence([1,0,-1],[0,0,1]), desc="a(1)=0, a(2)=0, a(3)=1, a(n+1) = a(n) - a(n-2).")
 
 # Collatz / Syracuse
 
@@ -642,13 +643,16 @@ def bell():
 
 A000110=Sequence(bell)
 
-A000129=Sequence(recurrence([1,2],[0,1])) #Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).
+A000129=Sequence(recurrence([2,1],[0,1])) #Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).
 
-A000142=Sequence(factorial_gen) #Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S_n, number of permutations of n letters.
+A000142=Sequence(factorial_gen)
+A000142.desc="Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S_n, number of permutations of n letters."
 
 A061006=Sequence(1,lambda n:mod_fac(n-1, n))
 
-A001045=Sequence(recurrence([2,1],[0,1])) # Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1.
+A001045=Sequence(recurrence([1,2],[0,1]),
+    desc="Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1."
+)
 
 #operations on digits
 
@@ -930,6 +934,17 @@ A014080=Sequence(0,None,lambda n:dfs(n)==n,
     timeout=1 # FINITE !
 )
 
+# recurrences
+A285361=Sequence(
+    recurrence((8,-24,34,-23,6),(1,11,64,282,1071)),
+    lambda n:(3**(n+3) - 5*2**(n+4) + 4*n**2 + 26*n + 53)//4,
+    desc="The number of tight 3 X n pavings."
+)
+# https://fr.quora.com/Comment-pouvons-nous-trouver-le-%C3%A9ni%C3%A8me-terme-de-cette-s%C3%A9quence-de-nombres-1-11-64-282-1071-3729-en-utilisant-une-formule-math%C3%A9matique
+
+A088002=Sequence(recurrence((0,-1,0,0,-1), (1, 0, 0, 0, 0)),
+    desc="Expansion of (1+x^2)/(1+x^2+x^5)"
+)
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
 oeis={}
@@ -940,7 +955,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,A134657)))
+    print(A285361) # (1,11,64,282,1071,3729,12310,39296,122773,378279,... ...)
     
 
 
