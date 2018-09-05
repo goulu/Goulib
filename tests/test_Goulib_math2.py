@@ -9,7 +9,7 @@ from Goulib.tests import *
 
 from Goulib.math2 import *
 
-from Goulib.itertools2 import take, index
+import Goulib.itertools2
 import six
 
 class TestSign:
@@ -448,10 +448,10 @@ class TestHexagonal:
 
 class TestGetCardinalName:
     def test_get_cardinal_name(self):
-       assert_equal(get_cardinal_name(123456),
+        assert_equal(get_cardinal_name(123456),
             'one hundred and twenty-three thousand four hundred and fifty-six'
         )
-       assert_equal(get_cardinal_name(1234567890),
+        assert_equal(get_cardinal_name(1234567890),
             'one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety'
         )
 
@@ -747,7 +747,7 @@ class TestCeildiv:
 
 class TestCatalanGen:
     def test_catalan_gen(self):
-        assert_equal(index(20,catalan_gen()),6564120420) # https://oeis.org/A000108
+        assert_equal(itertools2.nth(20,catalan_gen()),6564120420) # https://oeis.org/A000108
 
 class TestCatalan:
     def test_catalan(self):
@@ -756,13 +756,13 @@ class TestCatalan:
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
         key=lambda x:(x[2],x[1])
-        for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
+        for t in itertools2.take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
 class TestTriples:
     def test_triples(self):
         key=lambda x:(x[2],x[1])
-        for t in take(10000,itertools2.ensure_sorted(triples(),key)):
+        for t in itertools2.take(10000,itertools2.ensure_sorted(triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
 class TestPolygonal:
@@ -1102,8 +1102,8 @@ class TestIsMultiple:
 
 class TestRepunitGen:
     def test_repunit_gen(self):
-        assert_equal(take(5,repunit_gen(digit=1)),[0,1,11,111,1111])
-        assert_equal(take(5,repunit_gen(digit=9)),[0,9,99,999,9999])
+        assert_equal(itertools2.take(5,repunit_gen(digit=1)),[0,1,11,111,1111])
+        assert_equal(itertools2.take(5,repunit_gen(digit=9)),[0,9,99,999,9999])
 
 class TestRepunit:
     def test_repunit(self):
