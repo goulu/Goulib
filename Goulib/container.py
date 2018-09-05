@@ -190,7 +190,7 @@ class Sequence(object):
         :return: Sequence with items from both (sorted) operand Sequences
         """
         return Sequence(
-            itertools2.skipdups(itertools2.merge(self,other)), 
+            itertools2.unique(itertools2.merge(self,other)), 
             None,
             lambda x:x in self or x in other
         )
