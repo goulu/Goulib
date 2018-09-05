@@ -13,8 +13,8 @@ class TestTake:
 
 class TestIndex:
     def test_index(self):
-        assert_equal(index(4, irange(1,10)),5)
-        assert_equal(index(9, irange(1,10)),10) # index=-1 doesn't work
+        assert_equal(index(4, irange(1,10)),3)
+        assert_equal(index(9, irange(1,10)),8)
 
 class TestFirst:
     def test_first(self):
@@ -66,11 +66,6 @@ class TestFlatten:
         d=dict(enumerate(range(10)))
         assert_equal(flatten(d),range(10))
 
-
-class TestCompact:
-    def test_compact(self):
-        assert_equal(compact([None,1,2,None,3,None]),[1,2,3])
-
 class TestGroups:
     def test_groups(self):
         assert_equal(groups(irange(1,6),3,2),[[1,2,3],[3,4,5]])
@@ -116,12 +111,21 @@ class TestIreduce:
         import operator
         assert_equal(ireduce(operator.add, irange(10)),[1,3,6,10,15,21,28,36,45,55])
         assert_equal(ireduce(operator.add, irange(10),2),[2,2,3,5,8,12,17,23,30,38,47,57])
+        
+class TestCompress:
+    def test_compress(self):
+        assert_equal(compress('AAAABBBCCDAABBB'),[('A', 4),('B', 3),('C', 2),('D', 1),('A', 2),('B', 3)])
+        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
+        res=compress('aaaaabbbbccccccaaaaaaa')
+        res=''.join('%d%s'%(n,c) for (c,n) in res)
+        assert_equal(res,'5a4b6c7a')
 
 class TestUnique:
     def test_unique(self):
-        assert_equal(''.join(unique('AAAABBBCCDAABBB')),'ABCD')
-        assert_equal(''.join(unique('ABBCcAD', str.lower)),'ABCD')
-        assert_equal(''.join(unique('AAAABBBCCDAABBB',None,1)),'ABCDAB')
+        assert_equal(unique('AAAABBBCCDAABBB'),'ABCD')
+        assert_equal(unique('ABBCcAD', str.upper),'ABCD')
+        assert_equal(unique('AAAABBBCCDAABBB',buffer=1),'ABCDAB')
+        assert_equal(unique('AAAABBBCCDAABBB',buffer=4),'ABCD')
 
 class TestIdentity:
     def test_identity(self):
@@ -281,12 +285,6 @@ class TestCountUnique:
         assert_equal(count_unique('AAAABBBCCDAABBB'),4)
         assert_equal(count_unique('ABBCcAD', str.lower),4)
 
-class TestOccurrences:
-    def test_occurrences(self):
-        assert_equal(occurrences("hello world"),
-            {'e': 1, 'o': 2, 'w': 1, 'r': 1, 'l': 3, 'd': 1, 'h': 1, ' ': 1}
-        )
-
 class TestBest:
     def test_best(self):
         assert_equal(best([3,2,1,2,1]),[1,1])
@@ -304,7 +302,7 @@ class TestShuffle:
         s1=list("hello world")
         s2=shuffle(list("hello world")) #copy, as shuffle works in place
         assert_not_equal(s1,s2) #would really be bad luck ...
-        assert_equal(occurrences(s1),occurrences(s2))
+        assert_equal(occurences(s1),occurences(s2))
 
 class TestIndexMin:
     def test_index_min(self):
@@ -328,13 +326,6 @@ class TestSubdict:
     def test_subdict(self):
         # assert_equal(expected, subdict(d, keys))
         raise SkipTest
-
-class TestCompress:
-    def test_compress(self):
-        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
-        res=compress('aaaaabbbbccccccaaaaaaa')
-        res=''.join('%d%s'%(n,c) for (c,n) in res)
-        assert_equal(res,'5a4b6c7a')
 
 class TestAccumulate:
     def test_accumulate(self):
@@ -374,7 +365,7 @@ class TestItemgetter:
 
 class TestTee:
     def test_tee(self):
-        it=count()
+        it=itertools.count()
         it,it1,it2=tee(it,n=3)
         assert_equal(next(it1),next(it2))
         assert_equal(next(it1),next(it2))
