@@ -665,18 +665,21 @@ def levenshtein(seq1, seq2):
 # numbers functions
 # mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(coefficients,values,cst=0, max=None, mod=0):
+def recurrence(signature, values, cst=0, max=None, mod=0):
     '''general generator for recurrences
 
+    :param signature: factors defining the recurrence
     :param values: list of initial values
-    :param coefficients: list of factors defining the recurrence
     '''
+    values=list(values) # to allow tuples or iterators
+    factors=list(reversed(signature))
     for n in values:
         if mod:
             n=n%mod
         yield n
+    
     while True:
-        n=dot_vv(coefficients,values)
+        n=dot_vv(factors,values)
         if max and n>max: break
         n=n+cst
         if mod: n=n%mod
