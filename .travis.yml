@@ -26,6 +26,6 @@ install:
   - pip install coveralls
  
 script:
-  nosetests --with-coverage --cover-package=Goulib
+  nosetests -c nose.cfg
 after_success:
   coveralls
