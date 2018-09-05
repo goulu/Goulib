@@ -82,7 +82,7 @@ class Sequence(object):
     def __repr__(self):     
         if not self._repr: # cache for speed
             s=tests.pprint(self,[0,1,2,3,4,5,6,7,8,9],0.001) # must be very quick for debugger 
-            self._repr='%s (%s ...)'%(self.name,s)
+            self._repr='%s = (%s)'%(self.name,s)
         return self._repr
     
     def save(self, filename, comment=None, n=1000, maxtime=10):
