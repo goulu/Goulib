@@ -517,6 +517,26 @@ class TestSegment2:
 
     def test_midpoint(self):
         pass #tested above
+    
+class TestPolygon:
+    @classmethod
+    def setup_class(self):
+        def poly(n,r=1):
+            for i in range(n):
+                a=i*2*pi/n
+                yield Point2(r*cos(a),r*sin(a))
+        self.p4=Polygon(poly(4,sqrt(2.)/2))
+        self.p6=Polygon(poly(6))
+
+    def test___init__(self):
+        pass #tested above
+    
+    def test_perimeter(self):
+        assert_equal(self.p4.perimeter,4)
+        assert_equal(self.p6.perimeter,6)
+        
+    def test_area(self):
+        assert_equal(self.p4.area,1)
 
 class TestCircle:
     @classmethod

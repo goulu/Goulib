@@ -387,7 +387,7 @@ class Entity(plot.Plot):
         if isinstance(self,Circle): #must be after Arc2 and Ellipse
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
         
-        if isinstance(self,Polygon2):
+        if isinstance(self,Polygon):
             return [patches.Polygon(self.xy,**kwargs)]
 
         raise NotImplementedError
@@ -473,7 +473,7 @@ Point2.__bases__ += (Entity,)
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
 
-Polygon2.__bases__ += (Entity,) # adds it also to Arc2
+Polygon.__bases__ += (Entity,) # adds it also to Arc2
 
 class Spline(Entity, Geometry):
     """cubic spline segment"""
