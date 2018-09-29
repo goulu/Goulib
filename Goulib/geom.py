@@ -878,9 +878,11 @@ class Segment2(Line2):
         return res 
     
 class Surface(Geometry):
+    
     @property
-    def perimeter(self):
-        raise NotImplementedError('virtual')
+    def length(self):
+        return abs(self)
+    
     @property
     def area(self):
         raise NotImplementedError('virtual')
@@ -908,8 +910,8 @@ class Polygon(Surface):
     def __iter__(self):
         return itertools2.pairwise(self.p, Segment2, True)
     
-    @property
-    def perimeter(self):
+    def __abs__(self):
+        """:return: float perimeter"""
         return sum(x.length for x in self)
     
     @property
@@ -997,12 +999,14 @@ class Circle(Surface):
         self.c = t * self.c
         self.p = t * self.p
         self.r=abs(self.p-self.c)
-
+            
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
-
-    length = property(lambda self: abs(self))
+    
+    @property
+    def area(self):
+        return pi*self.r*self.r
 
     def point(self, u):
         ":return: Point2 at angle u radians"

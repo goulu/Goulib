@@ -531,9 +531,9 @@ class TestPolygon:
     def test___init__(self):
         pass #tested above
     
-    def test_perimeter(self):
-        assert_equal(self.p4.perimeter,4)
-        assert_equal(self.p6.perimeter,6)
+    def test_length(self):
+        assert_equal(self.p4.length,4)
+        assert_equal(self.p6.length,6)
         
     def test_area(self):
         assert_equal(self.p4.area,1)
@@ -554,13 +554,15 @@ class TestCircle:
     def test_tangent(self):
         assert_equal(self.c1.tangent(0),(0,1))
 
-    def test___copy__(self):
-        raise SkipTest
-
-    def test___repr__(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.__repr__())
-        raise SkipTest
+    def test_length(self):
+        assert_equal(self.c1.length,2*pi)
+        assert_equal(self.c2.length,2*pi)
+        assert_equal(self.c3.length,2*pi)
+        
+    def test_area(self):
+        assert_equal(self.c1.area,pi)
+        assert_equal(self.c2.area,pi)
+        assert_equal(self.c3.area,pi)
     
     def test_intersect(self):
         res=self.c1.intersect(self.c2)
