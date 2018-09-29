@@ -886,6 +886,10 @@ class Surface(Geometry):
     @property
     def area(self):
         raise NotImplementedError('virtual')
+    
+    @property
+    def center(self):
+        raise NotImplementedError('virtual')
 
 class Polygon(Surface):
     def __init__(self, args):
@@ -921,6 +925,20 @@ class Polygon(Surface):
         for p1,p2 in itertools2.pairwise(self.p, loop=True):
             res += p1.x * p2.y - p2.x * p1.y
         return res/2
+    
+    @property
+    def center(self):
+        """centroid
+        
+        :return: Point2 centroid of the Polygon
+        """
+        cx,cy=0,0
+        for p1,p2 in itertools2.pairwise(self.p, loop=True):
+            cx += (p1.x+p2.x)*(p1.x*p2.y-p2.x*p1.y)
+            cy += (p1.y+p2.y)*(p1.x*p2.y-p2.x*p1.y)
+        ar = self.area
+        return Point2((1.0/(6.0*ar))*cx,(1.0/(6.0*ar))*cy)
+        
     
     def __contains__(self,pt):
         # http://www.ariel.com.au/a/python-point-int-poly.html
@@ -1003,6 +1021,10 @@ class Circle(Surface):
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
+    
+    @property
+    def center(self):
+        return self.c
     
     @property
     def area(self):

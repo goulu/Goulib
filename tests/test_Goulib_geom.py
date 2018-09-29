@@ -537,6 +537,10 @@ class TestPolygon:
         
     def test_area(self):
         assert_equal(self.p4.area,1)
+        
+    def test_center(self):
+        assert_equal(self.p4.center,(0,0))
+        assert_equal(self.p6.center,(0,0))
 
 class TestCircle:
     @classmethod
