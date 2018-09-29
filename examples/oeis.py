@@ -289,18 +289,27 @@ A006567.desc="Emirps (primes whose reversal is a different prime). "
 
 # see https://blog.plover.com/math/dd.html
 
+def anagrams(n,base=10):
+    d=list(sorted(digits(n, base, rev=True)))
+    for p in unique(itertools.permutations(d)):
+        yield num_from_digits(p,base) 
+
 def anagram_gen(factor, base=10, start=0, inbase=False):
     if start==0:
         yield 0 #cheat
-    for d in count(0): # number of digits
-        step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
-        end=math.ceil(base/factor)
-        for n in range(int(base**d+(step-1)),int(end*base**d),step):
-            if is_anagram(n,factor*n,base):     
-                if inbase:
-                    yield int_base(n,base)  
-                else:
-                    yield n   
+    step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
+    for d in count(1): # number of digits
+        start=base**d+(step-1)
+        end=math.ceil(base/factor)*base**d
+        for n in range(start,end,step):
+            a=factor*n
+            for b in anagrams(n,base): 
+                if b>a : break
+                if a==b:   
+                    if inbase:
+                        yield int_base(n,base)  
+                    else:
+                        yield n   
             
 
 A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=[
@@ -957,7 +966,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(20,A003945)))
+    print(list(take(10,A023102)))
     
 
 

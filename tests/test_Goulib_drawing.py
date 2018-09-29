@@ -412,7 +412,8 @@ class TestDrawing:
         pass # tested above
     
     def test_read_svg(self):
-        pass # tested above
+        suisse=Drawing(path+'/data/SwitzerlandLow.svg')
+        suisse.save(results+'SwitzerlandLow.png')
 
     def test_read_pdf(self):
         pantone=Drawing(path+'/data/Pantone Fan.pdf')
@@ -565,37 +566,6 @@ class TestChains:
     def test_chains(self):
         # assert_equal(expected, chains(group, tol, mergeable))
         raise SkipTest 
-
-class test__Group:
-    def test_bbox(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.bbox(filter))
-        raise SkipTest # implement your test here
-
-    def test_connect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.connect(other))
-        raise SkipTest # implement your test here
-
-    def test_intersect(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.intersect(other))
-        raise SkipTest # implement your test here
-
-    def test_length(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.length())
-        raise SkipTest # implement your test here
-
-    def test_patches(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.patches(**kwargs))
-        raise SkipTest # implement your test here
-
-    def test_to_dxf(self):
-        # __group = _Group()
-        # assert_equal(expected, __group.to_dxf(**kwargs))
-        raise SkipTest # implement your test here
 
 class test__Group:
     def test_bbox(self):
