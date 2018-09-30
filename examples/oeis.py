@@ -299,9 +299,9 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
         yield 0 #cheat
     step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
     for d in count(1): # number of digits
-        start=int(base**d+(step-1))
+        start=base**d+(step-1)
         end=math.ceil(base/factor)*base**d
-        for n in range(start,end,step):
+        for n in range(rint(start),rint(end),step):
             a=factor*n
             for b in anagrams(n,base): 
                 if b>a : break
@@ -966,7 +966,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(10,A023102)))
+    print(list(take(3,A023086)))
     
 
 
