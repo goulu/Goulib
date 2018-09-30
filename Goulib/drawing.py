@@ -14,7 +14,6 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 * `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 """
 from __future__ import division #"true division" everywhere
-from _pytest.outcomes import skip
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
