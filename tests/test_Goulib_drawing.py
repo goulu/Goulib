@@ -412,8 +412,8 @@ class TestDrawing:
         pass # tested above
     
     def test_read_svg(self):
-        suisse=Drawing(path+'/data/SwitzerlandLow.svg')
-        suisse.save(results+'SwitzerlandLow.png')
+        suisse=Drawing(path+'/data/switzerlandLow.svg')
+        suisse.save(results+'switzerlandLow.png')
 
     def test_read_pdf(self):
         pantone=Drawing(path+'/data/Pantone Fan.pdf')

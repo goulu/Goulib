@@ -299,7 +299,7 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
         yield 0 #cheat
     step=[1,1,9,9,3,9,9,3,3,9][factor] if base==10 else 1
     for d in count(1): # number of digits
-        start=base**d+(step-1)
+        start=int(base**d+(step-1))
         end=math.ceil(base/factor)*base**d
         for n in range(start,end,step):
             a=factor*n
