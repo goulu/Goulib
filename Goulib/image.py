@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 
-
 from __future__ import division #"true division" everywhere
-from _hashlib import new
 
 """
 image processing with PIL's ease and skimage's power
@@ -40,7 +38,8 @@ urlopen = request.urlopen
 
 import os, sys, math, base64, functools, logging
 
-from Goulib import math2, itertools2
+from Goulib import math2
+from Goulib.itertools2 import flatten, pairwise, identity
 from Goulib.drawing import Drawing #to read vector pdf files as images
 from Goulib.colors import Color, Palette
 from Goulib.plot import Plot
@@ -112,12 +111,17 @@ class Image(Plot):
         :param data: can be either:
         * `PIL.Image` : makes a copy
         * string : path of image to load
+        * memoryview (extracted from a db blob)
         * None : creates an empty image with kwargs parameters:
         ** size : (y,x) pixel size tuple
         ** mode : 'F' (gray) by default
         ** color: to fill None=black by default
         ** colormap: Palette or matplotlib colormap
         """
+        if isinstance(data,memoryview):
+            data=six.BytesIO(data)
+            data=PILImage.open(data)
+
         if data is None:
             mode = mode or 'F'
             n=modes[mode].nchannels
@@ -143,16 +147,18 @@ class Image(Plot):
             except:
                 pass
             self._set(data,mode)
-        #make sure the image has a palette attribute    
+        #make sure the image has a palette attribute
         try:
             self.palette
         except AttributeError:
             self.palette=None
-            try:
-                self.setpalette(kwargs['colormap'])
-            except (AssertionError,KeyError):
-                pass
-                
+            for arg in ['colormap','palette','colors']: #aliases
+                try:
+                    self.setpalette(kwargs[arg])
+                    break # found it
+                except (AssertionError,KeyError):
+                    pass
+
 
     def _set(self,data,mode=None,copy=False):
         data=np.asanyarray(data)
@@ -168,6 +174,7 @@ class Image(Plot):
                 data=np.transpose(data,(1,2,0))
         self.mode=mode or guessmode(data)
         self.array=skimage.util.dtype.convert(data,modes[self.mode].type)
+
 
     @property
     def shape(self):
@@ -209,8 +216,48 @@ class Image(Plot):
             with io.util.file_or_url_context(path) as context:
                 data = io.imread(context)
         mode=guessmode(data)
-        self._set(data,'F' if mode in 'U' else mode)
+        self._set(data,mode)
         return self
+
+    def save(self, path, autoconvert=True, format_str=None, **kwargs):
+        """saves an image
+        :param path: string with path/filename.ext
+        :param autoconvert: bool, if True converts color planes formats to RGB
+        :param format_str: str of file format. set to 'PNG' by skimage.io.imsave
+        :param kwargs: optional params passed to skimage.io.imsave:
+        :return: self for chaining
+        """
+        mode=self.mode
+        if autoconvert:
+            if self.nchannels==1 and self.mode!='P':
+                mode='L'
+            elif self.mode not in 'RGBA': #modes we can save directly
+                mode='RGB'
+        a=self.convert(mode).array # makes sure we have a copy of self.array
+        if format_str is None and isinstance(path,six.string_types):
+            format_str=path.split('.')[-1][:3]
+        if format_str.upper()=='TIF':
+            a=skimage.img_as_uint(a)
+        else: #tiff plugin doesn't like format_str arg
+            kwargs['format_str']=format_str.upper()
+        from skimage import io
+        io.imsave(path,a,**kwargs)
+        return self
+
+    def _repr_svg_(self, **kwargs):
+        raise NotImplementedError() #and should never be ...
+        #... because it causes _repr_png_ to be called by Plot._repr_html_
+        # instead of render below
+
+    def render(self, fmt='PNG',**kwargs):
+        buffer = six.BytesIO()
+        self.save(buffer, format_str=fmt, **kwargs)
+        #self.save(buffer)
+        #im=self.pil
+        #im.save(buffer, fmt)
+        return buffer.getvalue()
+
+    # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
 
     @staticmethod
     def open(path):
@@ -221,23 +268,6 @@ class Image(Plot):
     def new(mode, size, color='black'):
         """PIL(low) compatibility"""
         return Image(mode=mode, size=size, color=color)
-
-    def save(self, path, autoconvert=True, **kwargs):
-        """saves an image
-        :param path: string with path/filename.ext
-        :param autoconvert: bool, if True converts color planes formats to RGB
-        :param kwargs: optional params passed to skimage.io.imsave:
-        :return: self for chaining
-        """
-        mode=self.mode
-        if autoconvert:
-            if self.nchannels==1 and self.mode!='P':
-                mode='L'
-            elif self.mode not in 'RGBA': #modes we can save directly
-                mode='RGB'
-        im=self.convert(mode)
-        skimage.io.imsave(path,im.array,**kwargs)
-        return self
 
     @property
     def pil(self):
@@ -250,18 +280,6 @@ class Image(Plot):
             im.putpalette(self.palette.pil)
         return im
 
-    def _repr_svg_(self, **kwargs):
-        raise NotImplementedError() #and should never be ...
-        #... because it causes _repr_png_ to be called by Plot._repr_html_
-        # instead of render below
-
-    def render(self, fmt='png'):
-        im=self.pil
-        buffer = six.BytesIO()
-        im.save(buffer, fmt)
-        return buffer.getvalue()
-
-    # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
     def getdata(self,dtype=np.uint8,copy=True):
         a=self.array
         if a.dtype==dtype:
@@ -298,6 +316,8 @@ class Image(Plot):
             return self.array[yx[0],yx[1],:]
 
     def putpixel(self,yx,value):
+        if isinstance(value,Color):
+            value=value.convert(self.mode)
         if self.nchannels==1:
             self.array[yx[0],yx[1]]=value
         else:
@@ -327,7 +347,7 @@ class Image(Plot):
         else:
             im=self.convert('P',colors=maxcolors)
         count=np.bincount(im.array.flatten())
-        return zip(count,im.palette) #return palette KEYS 
+        return zip(count,im.palette) #return palette KEYS
 
     def replace(self,pairs):
         """replace a color by another
@@ -350,7 +370,7 @@ class Image(Plot):
         hist2=[]
         for i,c in enumerate(hist):
             hist2.append(tuple((i,c[1],c[0]))) # index, key, count
-        #sort by decreasing occurences    
+        #sort by decreasing occurences
         hist=sorted(hist2,key=lambda c:c[2],reverse=True)
         new=Palette()
         pairs=[]
@@ -403,20 +423,49 @@ class Image(Plot):
         return self.crop((l,u,r,b))
 
     def resize(self,size, filter=None, **kwargs):
-        """
-        :return: a resized copy of an image.
+        """Resize image
+
+        :return: a resized copy of image.
         :param size: int tuple (width, height) requested size in pixels
         :param filter:
             * NEAREST (use nearest neighbour),
             * BILINEAR (linear interpolation in a 2x2 environment),
             * BICUBIC (cubic spline interpolation in a 4x4 environment)
             * ANTIALIAS (a high-quality downsampling filter)
-        :param kwargs: axtra parameters passed to skimage.transform.resize
+        :param kwargs: extra parameters passed to skimage.transform.resize
         """
+
         from skimage.transform import resize
         order=0 if filter in (None,PILImage.NEAREST) else 1 if filter==PILImage.BILINEAR else 3
         order=kwargs.pop('order',order)
         array=resize(self.array, size, order, **kwargs) #preserve_range=True ?
+        return Image(array, self.mode)
+
+    def rotate(self, angle, **kwargs):
+        """Rotate image
+
+        :return: a rotated copy of image.
+        :param angle: float rotation angle in degrees in counter-clockwork direction
+        :param kwargs: extra parameters passed to skimage.transform.rotate
+        """
+        from skimage.transform import rotate
+        kwargs.setdefault('mode','edge') # gives the best results in most cases
+        array=rotate(self.array, angle, **kwargs)
+        return Image(array, self.mode)
+
+    def flip(self, flipx=True, flipy=False):
+        """Flip image
+
+        :return: a flipped copy of image.
+        :param flipx: bool flip X direction
+        :param flipy: bool flip Y direction
+        :param kwargs: extra parameters passed to skimage.transform.rotate
+        """
+        array=self.array
+        if flipx:
+            array=np.fliplr(array)
+        if flipy:
+            array=np.flipud(array)
         return Image(array, self.mode)
 
     def paste(self,image,box, mask=None):
@@ -509,27 +558,49 @@ class Image(Plot):
 
     # hash and distance
 
-    def average_hash(self, hash_size=8):
-        """
-        Average Hash computation
-        Implementation follows http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+    # http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+    # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
 
-        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
-        :return: list of hash_size*hash_size bool (=bits)
-        """
-        # https://github.com/JohannesBuchner/imagehash/blob/master/imagehash/__init__.py
+    def _hash_prepare(self, img_size=8):
+        """common code for image hash methods below"""
         if self.nchannels>1:
             image = self.grayscale()
         else:
             image=self
 
-        image = image.resize((hash_size, hash_size), PILImage.ANTIALIAS)
-        pixels = image.array.reshape((1,hash_size*hash_size))[0]
-        avg = pixels.mean()
-        diff=pixels > avg
-        return math2.num_from_digits(diff,2)
+        self.thumb = image.resize((img_size, img_size), PILImage.ANTIALIAS)
+        return np.array(self.thumb.array, dtype=np.float).reshape((img_size, img_size))
 
-    def dist(self,other, hash_size=8):
+    @staticmethod
+    def _hash_result(result):
+        return math2.num_from_digits(flatten(result),2)
+
+    def average_hash(self, hash_size=8):
+        """Average Hash
+
+        :see: http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: int of hash_size**2 bits
+        """
+        pixels=self._hash_prepare(hash_size)
+        return Image._hash_result(pixels > pixels.mean())
+
+    def perceptual_hash(self, hash_size=8, highfreq_factor=4):
+        """Perceptual Hash
+
+        :see: http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html
+
+        :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
+        :return: int of hash_size**2 bits
+        """
+        import scipy.fftpack
+        pixels=self._hash_prepare(hash_size * highfreq_factor)
+        dct = scipy.fftpack.dct(scipy.fftpack.dct(pixels, axis=0), axis=1)
+        dctlowfreq = dct[:hash_size, :hash_size]
+        return Image._hash_result(dctlowfreq > np.median(dctlowfreq))
+
+    def dist(self,other, method=perceptual_hash, hash_size=8, symmetries=False):
         """ distance between images
 
         :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
@@ -538,14 +609,36 @@ class Image(Plot):
             =1 if images are completely decorrelated (half of the hash bits are the same by luck)
             =2 if images are inverted
         """
-        h1=self.average_hash(hash_size)
-        h2=other.average_hash(hash_size)
-        if h1==h2:
-            return 0
-        # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
-        diff=bin(h1^h2).count("1") # ^is XOR
-        diff=2*diff/(hash_size*hash_size)
-        return diff
+        h1=method(self,hash_size)
+
+        def diff(im):
+            h2=method(im,hash_size)
+            if h1==h2:
+                return 0
+            # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
+            d=bin(h1^h2).count("1") # ^is XOR
+            return 2*d/(hash_size*hash_size)
+        
+        if not symmetries:
+            return diff(other)
+        
+        other=other.thumb # generated at _hash_prepare above
+        
+        res=[]
+        # try all 4 main rotations
+        for sym in [identity, lambda x:x.flip(True)]:
+            im=sym(other)
+            for rot in [
+                    identity, 
+                    lambda x:x.rotate(90), lambda x:x.rotate(90),
+                    lambda x:x.flip(False,True) # Y flip is faster + better than 180° rotation
+                ]:
+                r=diff(rot(im))
+                if r<0.01 : 
+                    return r
+                res.append(r)
+    
+        return min(res)
 
     def __hash__(self):
         return self.average_hash(8)
@@ -634,6 +727,13 @@ class Image(Plot):
             s[1]
         except:
             s=[s,s]
+
+        if self.mode=='P':
+            a=self.array
+            for axis,r in enumerate(s):
+                a=np.repeat(a,r,axis=axis)
+            return Image(a, 'P', colors=self.palette)
+
         w,h=self.size
         return self.resize((int(w*s[0]+0.5),int(h*s[1]+0.5)))
 
@@ -712,12 +812,20 @@ class Image(Plot):
         """only to allow sum(images) easily"""
         assert other==0
         return self
-    
+
     def sub(self,other,pos=(0,0),alpha=1,mode=None):
         return self.add(other,pos,-alpha,mode)
 
     def __sub__(self,other):
         return self.sub(other)
+
+    def deltaE(self,other):
+        import skimage.color as skcolor
+        a=skcolor.deltaE_ciede2000(
+            self.convert('lab').array,
+            other.convert('lab').array,
+        )
+        return Image(a,'F')
 
     def __mul__(self,other):
         if isinstance(other,six.string_types):
@@ -831,7 +939,8 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
 
 def disk(radius,antialias=PILImage.ANTIALIAS):
     from skimage.draw import circle, circle_perimeter_aa
-    size = (2*radius, 2*radius)
+    size = math2.rint(2*radius)
+    size=(size,size)
     img = np.zeros(size, dtype=np.double)
     rr, cc = circle(radius,radius,radius)
     img[rr, cc] = 1
@@ -968,10 +1077,12 @@ class Ditherer(object):
         return self.name
 
 class ErrorDiffusion(Ditherer):
-    def __init__(self,name, positions,weights):
+    def __init__(self,name, positions,weights,wsum=None):
         Ditherer.__init__(self,name,None)
-        self.weights = weights / np.sum(weights)
-        self.positions=positions
+        if not wsum :
+            wsum=sum(weights)
+        weights=math2.vecdiv(weights,wsum)
+        self.matrix=list(zip(positions, weights))
 
     def __call__(self, image, N=2):
         image=skimage.img_as_float(image, True) #normalize to [0..1]
@@ -986,7 +1097,7 @@ class ErrorDiffusion(Ditherer):
 
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
-                for (ii, jj), w in zip(self.positions, self.weights):
+                for (ii, jj), w in self.matrix:
                     ii = i + ii
                     jj = j + jj
                     if ii < rows and jj < cols:
@@ -1007,9 +1118,12 @@ class FloydSteinberg(ErrorDiffusion):
 #PIL+SKIMAGE dithering methods
 from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
 PHILIPS=FLOYDSTEINBERG+1
-SIERRA=FLOYDSTEINBERG+2
-STUCKI=FLOYDSTEINBERG+3
-RANDOM=FLOYDSTEINBERG+10
+SIERRA=PHILIPS+1
+STUCKI=SIERRA+1
+JARVIS=STUCKI+1
+ATKINSON=JARVIS+1
+BURKES=ATKINSON+1
+RANDOM=JARVIS+10
 
 dithering={
     NEAREST : Ditherer('nearest',quantize),
@@ -1022,13 +1136,35 @@ dithering={
     SIERRA: ErrorDiffusion('sierra lite',
         [(0, 1), (1, -1), (1, 0)],[2, 1, 1]),
     STUCKI: ErrorDiffusion('stucki',
-        positions = [(0, 1), (0, 2), (1, -2), (1, -1),
-            (1, 0), (1, 1), (1, 2),
+        positions = [(0, 1), (0, 2),
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2),
             (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)],
         weights = [ 8, 4,
                    2, 4, 8, 4, 2,
                    1, 2, 4, 2, 1]
         ),
+    JARVIS: ErrorDiffusion('Jarvis, Judice, and Ninke',
+    #http://www.tannerhelland.com/4660/dithering-eleven-algorithms-source-code/
+        positions = [(0, 1), (0, 2),
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2),
+            (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)],
+        weights = [ 7, 5,
+                   3, 5, 7, 5, 3,
+                   1, 3, 4, 3, 1]
+        ),
+    ATKINSON: ErrorDiffusion('Atkinson',
+        positions = [(0, 1), (0, 2),
+            (1, -1), (1, 0), (1, 1),
+            (2, 0)],
+        weights = [1,1,1,1,1,1],
+        wsum=8
+        ),
+
+    BURKES:  ErrorDiffusion('Burkes',
+        positions = [(0, 1), (0, 2),
+            (1, -2), (1, -1), (1, 0), (1, 1), (1, 2)],
+        weights = [8, 4, 2, 4, 8, 4, 2]
+    ),
 }
 
 def dither(image, method=FLOYDSTEINBERG, N=2):
@@ -1114,7 +1250,7 @@ def palette(im,ncolors,tol=1/100):
     (in its own colorspace. use Lab for best results)
     :param im: nparray (x,y,n) containing image
     :param ncolors: int number of colors
-    :param tol: tolerance for precision/speed compromise. 
+    :param tol: tolerance for precision/speed compromise.
     1/100 means about 100 points per color are taken for kmeans segmentation
     :return: array of ncolors most used in image (center of kmeans centroids)
     """
@@ -1141,7 +1277,7 @@ def lab2ind(im,colors=256):
         pal=[Color(c,'lab') for c in p]
     else:
         pal=colors
-        p=[c.lab for c in itertools2.flatten(pal)]
+        p=[c.lab for c in flatten(pal)]
     w, h, d = im.shape
     s=w*h #number of pixels
     flat = np.reshape(im, (s, d))
@@ -1176,15 +1312,13 @@ for source in modes:
         if key[0]==key[1]:
             continue
         convname='%s2%s'%key
-        if convname=='lab2ind':
-            pass
 
         converter = getattr(sys.modules[__name__], convname,None)
         if converter is None:
             converter=getattr(skcolor, convname,None)
 
         if converter:
-            converters.add_edge(key[0],key[1],{'f':converter})
+            converters.add_edge(key[0],key[1],f=converter)
 
 def convert(a,source,target,**kwargs):
     """convert an image between modes, eventually using intermediary steps
@@ -1203,13 +1337,19 @@ def convert(a,source,target,**kwargs):
             %(source.name, target.name)
         )
 
-    for u,v in itertools2.pairwise(path):
+    for u,v in pairwise(path):
         if u==v: continue #avoid converting from gray to gray
         try:
-            a=converters[u][v][0]['f'](a,**kwargs)
+            edge=converters[u][v][0]    
+        except:
+            path=converters.shortest_path(source.name, target.name)
+            pass #but something is wrong...
+        f=edge['f']
+        try:
+            a=f(a,**kwargs)
         except TypeError as e:
             if kwargs: #maybe the converter doesn't support args ? retry!
-                a=converters[u][v][0]['f'](a)
+                a=f(a)
             else:
                 raise(e)
 

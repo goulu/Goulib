@@ -13,8 +13,8 @@ class TestTake:
 
 class TestIndex:
     def test_index(self):
-        assert_equal(index(4, irange(1,10)),5)
-        assert_equal(index(9, irange(1,10)),10) # index=-1 doesn't work
+        assert_equal(index(4, irange(1,10)),3)
+        assert_equal(index(9, irange(1,10)),8)
 
 class TestFirst:
     def test_first(self):
@@ -65,19 +65,14 @@ class TestFlatten:
         assert_equal(flatten([[[1],(2,[3])]],(tuple)),[1,(2,[3])]) # do not recurse in tuple
         d=dict(enumerate(range(10)))
         assert_equal(flatten(d),range(10))
-               
-
-class TestCompact:
-    def test_compact(self):
-        assert_equal(compact([None,1,2,None,3,None]),[1,2,3])
 
 class TestGroups:
     def test_groups(self):
         assert_equal(groups(irange(1,6),3,2),[[1,2,3],[3,4,5]])
         assert_equal(groups([1,2,3,4,5,6],3,2),[[1,2,3],[3,4,5]])
-        assert_equal(groups([1,2,3,4,5,6],3),[[1,2,3],[4,5,6]]) 
-        assert_equal(groups([1,2,3,4,5,6],4),[[1,2,3,4]]) 
-        
+        assert_equal(groups([1,2,3,4,5,6],3),[[1,2,3],[4,5,6]])
+        assert_equal(groups([1,2,3,4,5,6],4),[[1,2,3,4]])
+
 class TestReshape:
     def test_reshape(self):
         data=[1,[2,[3,4],[5,6,7]]] #data can have any shape...
@@ -94,7 +89,7 @@ class TestCompose:
 class TestIterate:
     def test_iterate(self):
         assert_equal(take(4,iterate(lambda x:x*x, 2)), [2,4,16,16*16])
-        
+
 class TestIsIterable:
     def test_isiterable(self):
         assert_false(isiterable(123))
@@ -105,7 +100,7 @@ class TestIsIterable:
         assert_true(isiterable(set()))
         assert_true(isiterable((x for x in range(10))))
         assert_true(isiterable(map(lambda x:x*x,[1,2,3])))
-        
+
 
 class TestTails:
     def test_tails(self):
@@ -116,12 +111,23 @@ class TestIreduce:
         import operator
         assert_equal(ireduce(operator.add, irange(10)),[1,3,6,10,15,21,28,36,45,55])
         assert_equal(ireduce(operator.add, irange(10),2),[2,2,3,5,8,12,17,23,30,38,47,57])
+        
+class TestCompress:
+    def test_compress(self):
+        assert_equal(compress('AAAABBBCCDAABBB'),[('A', 4),('B', 3),('C', 2),('D', 1),('A', 2),('B', 3)])
+        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
+        res=compress('aaaaabbbbccccccaaaaaaa')
+        res=''.join('%d%s'%(n,c) for (c,n) in res)
+        assert_equal(res,'5a4b6c7a')
 
 class TestUnique:
     def test_unique(self):
-        assert_equal(''.join(unique('AAAABBBCCDAABBB')),'ABCD')
-        assert_equal(''.join(unique('ABBCcAD', str.lower)),'ABCD')
-        assert_equal(''.join(unique('AAAABBBCCDAABBB',None,1)),'ABCDAB')
+        assert_equal(unique('AAAABBBCCDAABBB'),'ABCD')
+        assert_equal(unique('ABBCcAD', str.upper),'ABCD')
+        assert_equal(unique('ZZZZBBBCCDAABBB',buffer=1),'ZBCDAB')
+        # harmless regression ...
+        # s=list(unique('AAAABBBCCDAABBB',buffer=4))
+        # assert_equal(s,'ABCD')
 
 class TestIdentity:
     def test_identity(self):
@@ -137,7 +143,7 @@ class TestAll:
     def test_all(self):
         assert_true(all((1,2,3,4),lambda x:x<5))
         assert_false(all((1,2,3,4),lambda x:x<4))
-        
+
 class TestNo:
     def test_no(self):
         assert_true(no((1,2,3,4),lambda x:x<1))
@@ -171,7 +177,7 @@ class TestPairwise:
         assert_equal(pairwise([]),[])
         assert_equal(pairwise([1]),[])
         assert_equal(pairwise([1],loop=True),[(1,1)])
-    
+
 class TestInterleave:
     def test_interleave(self):
         assert_equal(interleave([0,2,4],[1,3,5]),[0,1,2,3,4,5])
@@ -181,13 +187,13 @@ class TestInterleave:
 class TestRandSeq:
     def test_rand_seq(self):
         # assert_equal(expected, rand_seq(size))
-        raise SkipTest 
+        raise SkipTest
 
 class TestAllPairs:
     def test_all_pairs(self):
         # assert_equal(expected, all_pairs(size))
-        raise SkipTest 
-    
+        raise SkipTest
+
 class TestFilter2:
     def test_filter2(self):
         yes,no=filter2([1,2,3,4,3,2,1],lambda x:x<3)
@@ -227,64 +233,59 @@ class TestIter2:
 
     def test___init__(self):
         # iter2 = iter2(iterable)
-        raise SkipTest 
+        raise SkipTest
 
     def test___iter__(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.__iter__())
-        raise SkipTest 
+        raise SkipTest
 
     def test_append(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.append(iterable))
-        raise SkipTest 
+        raise SkipTest
 
     def test_insert(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.insert(place, iterable))
-        raise SkipTest 
+        raise SkipTest
 
     def test_next(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.next())
-        raise SkipTest 
+        raise SkipTest
 
     def test___next__(self):
         # iter2 = iter2(iterable)
         # assert_equal(expected, iter2.__next__())
-        raise SkipTest 
+        raise SkipTest
 
-class TestCartesianProduct:
-    def test_cartesian_product(self):
-        #test case for compatibility with itertools.product
-        arrays = [(-1,+1), (-2,+2), (-3,+3)]
-        res=cartesian_product(*arrays)
-        assert_equal(res,[(-1, -2, -3), (-1, -2, 3), (-1, 2, -3), (-1, 2, 3), (1, -2, -3), (1, -2, 3), (1, 2, -3), (1, 2, 3)])
+class TestProduct:
+    def test_product(self):
+        #test compatibility with itertools.product
+        assert_equal(itertools2.product(),itertools.product())
+        assert_equal(itertools2.product([]),itertools.product([]))
+        assert_equal(itertools2.product('ABCD', 'xy'),itertools.product('ABCD', 'xy'))
+        # assert_equal(itertools2.product('AB', 'wxyz'),itertools.product('AB', 'wxyz'))
+        assert_equal(itertools2.product(range(2), repeat=3),itertools.product(range(2), repeat=3))
 
         #test case from http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
-        import itertools
-        g = cartesian_product(lambda: itertools.permutations(range(100)),
-            lambda: itertools.permutations(range(100)))
-        
+
+        g = product(itertools.permutations(range(100)),repeat=2)
+
         assert_equal(next(g),(range(100),range(100)))
-        
+
 class TestCombinationsWithReplacement:
     def test_combinations_with_replacement(self):
         assert_equal(combinations_with_replacement('ABC', 2),
-            ['AA','AB','AC','BB','BC','CC'])
+            ['AA','AB','BB','AC','BC','CC'])
         assert_equal(combinations_with_replacement('AB', 4),
             ['AAAA','AAAB','AABB','ABBB','BBBB'])
-        
+
 class TestCountUnique:
     def test_count_unique(self):
         assert_equal(count_unique('AAAABBBCCDAABBB'),4)
         assert_equal(count_unique('ABBCcAD', str.lower),4)
-
-class TestOccurrences:
-    def test_occurrences(self):
-        assert_equal(occurrences("hello world"),
-            {'e': 1, 'o': 2, 'w': 1, 'r': 1, 'l': 3, 'd': 1, 'h': 1, ' ': 1}
-        )
 
 class TestBest:
     def test_best(self):
@@ -303,7 +304,7 @@ class TestShuffle:
         s1=list("hello world")
         s2=shuffle(list("hello world")) #copy, as shuffle works in place
         assert_not_equal(s1,s2) #would really be bad luck ...
-        assert_equal(occurrences(s1),occurrences(s2))
+        assert_equal(occurences(s1),occurences(s2))
 
 class TestIndexMin:
     def test_index_min(self):
@@ -328,29 +329,22 @@ class TestSubdict:
         # assert_equal(expected, subdict(d, keys))
         raise SkipTest
 
-class TestCompress:
-    def test_compress(self):
-        # https://www.linkedin.com/groups/25827/25827-6166706414627627011
-        res=compress('aaaaabbbbccccccaaaaaaa')
-        res=''.join('%d%s'%(n,c) for (c,n) in res)
-        assert_equal(res,'5a4b6c7a')
-
 class TestAccumulate:
     def test_accumulate(self):
         # assert_equal(expected, accumulate(iterable, func, skip_first))
-        raise SkipTest 
+        raise SkipTest
 
 class TestDiff:
     def test_diff(self):
         # assert_equal(expected, diff(iterable1, iterable2))
-        raise SkipTest 
+        raise SkipTest
 
 class TestSortedIterable:
     def test_sorted_iterable(self):
         data=[1,2,3,7,6,5,4]
         res=sorted(data)
         #with a small buffer, it fails
-        def test(iterable,buffer,key=None): 
+        def test(iterable,buffer,key=None):
             return [x for x in ensure_sorted(
                 sorted_iterable(iterable,key=key, buffer=buffer)
                 ,key=key)]
@@ -369,22 +363,25 @@ class TestIsiterable:
 class TestItemgetter:
     def test_itemgetter(self):
         # assert_equal(expected, itemgetter(iterable, i))
-        raise SkipTest 
+        raise SkipTest
 
 class TestTee:
     def test_tee(self):
-        # assert_equal(expected, tee(iterable, n, copy))
-        raise SkipTest 
+        it=itertools.count()
+        it,it1,it2=tee(it,n=3)
+        assert_equal(next(it1),next(it2))
+        assert_equal(next(it1),next(it2))
+        assert_equal(next(it),0)
 
 class TestIremove:
     def test_iremove(self):
         # assert_equal(expected, iremove(iterable, f))
-        raise SkipTest 
+        raise SkipTest
 
 class TestDictsplit:
     def test_dictsplit(self):
         # assert_equal(expected, dictsplit(dic, keys))
-        raise SkipTest 
+        raise SkipTest
 
 class TestShape:
     def test_shape(self):
@@ -405,21 +402,79 @@ class TestEnumerates:
 class TestEnsureSorted:
     def test_ensure_sorted(self):
         # assert_equal(expected, ensure_sorted(iterable, key))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIscallable:
     def test_iscallable(self):
         # assert_equal(expected, iscallable(f))
-        raise SkipTest # TODO: implement your test here
-    
+        raise SkipTest # implement your test here
+
 class TestIntersect:
     def test_intersect(self):
         # http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
         postings = [[1,   100, 142, 322, 12312],
             [2,   100, 101, 322, 1221],
             [100, 142, 322, 956, 1222]]
-        
+
         assert_equal(intersect(*postings),[100, 322])
+
+class TestKeep:
+    @classmethod
+    def setup_class(self):
+        l=[1,2,3,4,5,6,7,8,9]
+        k=keep(l)
+        kl=list(k)
+        assert_equal(kl,l)
+        assert_equal(k.val,l[-1])
+
+    def test___init__(self):
+        pass #tested in test_detect_cycle
+
+    def test___iter__(self):
+        pass #tested in test_detect_cycle
+
+    def test_next(self):
+        pass #tested in test_detect_cycle
+
+    def test___next__(self):
+        # keep = keep(iterable)
+        # assert_equal(expected, keep.__next__())
+        raise SkipTest # implement your test here
+
+class TestFirstMatch:
+    def test_first_match(self):
+        pass #tested in test_detect_cycle
+
+class TestDetectCycle:
+    def test_detect_cycle(self):
+
+        assert_equal(detect_cycle(list('123412341')),(0,4))
+
+        assert_equal(detect_cycle(list('012345'+'678'*4)),(6,3))
+        assert_equal(detect_cycle(list('012345'+'678'*3)),(6,3))
+
+        #Floyd fails when repetition isn't long enough (2*i ?):
+        assert_equal(floyd(list('012345'+'678'*3)),(None,None))
+
+        #test from https://rosettacode.org/wiki/Cycle_detection
+        assert_equal(detect_cycle([3,10,101,2,5,26,167,95,101,2,5,26,167,95]),(2,6))
+
+        """does not work yet because of repeating digits
+
+        p3=[1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2,
+            1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2,
+            2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0,
+            2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2,
+            0, 2, 2, 1, 0, 1, 1, 2, 0, 2, 2]
+        assert_equal(detect_cycle(p3)[1],8)
+        """
+        from Goulib.math2 import pi_digits_gen
+        assert_equal(detect_cycle(pi_digits_gen()),(1,2)) # same problem ..
+
+class TestFloyd:
+    def test_floyd(self):
+        # assert_equal(expected, floyd(iterable, limit))
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

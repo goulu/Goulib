@@ -7,29 +7,61 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
                "algos from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py",
-               "tools from http://docs.python.org/dev/py3k/library/itertools.html",
+               "tools from http://docs.python.org/dev/py3k/library/html",
+               "https://github.com/erikrose/more-itertools"
                ]
 __license__ = "LGPL"
 
 import six #Python2+3 compatibility utilities
-from six.moves import reduce,zip
-import random, operator, collections, heapq, itertools
+from six.moves import reduce, zip
 
-#reciepes from Python manual
+import itertools, random, operator, collections, heapq, logging
 
-def take(n, iterable):
-    """
-    :result: first n items from iterable
-    """
-    return itertools.islice(iterable, n)
 
-def index(n, iterable):
+# pure logic 
+
+def identity(x):
+    """Do nothing and return the variable untouched"""
+    return x
+
+def isiterable(obj):
     """
-    :result: nth item
+    :result: bool True if obj is iterable (but not a string)
     """
-    for i,x in enumerate(iterable):
-        if i==n: return x
+    # http://stackoverflow.com/questions/1055360/how-to-tell-a-variable-is-iterable-but-not-a-string
+    if isinstance(obj, six.string_types): return False #required since Python 3.5
+    return isinstance(obj, collections.Iterable)
+
+def iscallable(f):
+    return isinstance(f, collections.Callable)
+
+def any(seq, pred=bool):
+    """
+    :result: bool True if pred(x) is True for at least one element in the iterable
+    """
+    return (True in map(pred, seq))
+
+def all(seq, pred=bool):
+    """
+    :result: bool True if pred(x) is True for all elements in the iterable
+    """
+    return (False not in map(pred, seq))
+
+def no(seq, pred=bool):
+    """
+    :result: bool True if pred(x) is False for every element in the iterable
+    """
+    return (True not in map(pred, seq))
+
+def index(value, iterable):
+    """
+    :result: integer index of value in iterable
+    """
+    for i,v in enumerate(iterable):
+        if v==value: return i
     raise IndexError
+
+# accessors
 
 def first(iterable):
     """
@@ -51,15 +83,30 @@ def last(iterable):
         return x
     raise IndexError
 
-def takeevery(n, iterable, first=0):
+def takeevery(n, iterable, start=0):
     """Take an element from iterator every n elements"""
-    return itertools.islice(iterable, first, None, n)
+    return itertools.islice(iterable, start, None, n)
 
 every=takeevery
+
+def take(n, iterable):
+    """
+    :result: first n items from iterable
+    """
+    return itertools.islice(iterable, n)
 
 def drop(n, iterable):
     """Drop n elements from iterable and return the rest"""
     return itertools.islice(iterable, n, None)
+
+def enumerates(iterable):
+    """
+    generalizes enumerate to dicts
+    :result: key,value pair for whatever iterable type
+    """
+    if isinstance(iterable,dict):
+        return six.iteritems(iterable)
+    return enumerate(iterable)
 
 def ilen(it):
     """
@@ -80,25 +127,6 @@ def irange(start_or_end, optional_end=None):
         start, end = start_or_end, optional_end
     return take(max(end - start + 1, 0), itertools.count(start))
 
-def isiterable(obj):
-    """
-    :result: bool True if obj is iterable (but not a string)
-    """
-    # http://stackoverflow.com/questions/1055360/how-to-tell-a-variable-is-iterable-but-not-a-string
-    if isinstance(obj, six.string_types): return False #required since Python 3.5
-    return isinstance(obj, collections.Iterable)
-
-def iscallable(f):
-    return isinstance(f, collections.Callable)
-
-def enumerates(iterable):
-    """
-    generalizes enumerate to dicts
-    :result: key,value pair for whatever iterable type
-    """
-    if isinstance(iterable,dict):
-        return six.iteritems(iterable)
-    return enumerate(iterable)
 
 def arange(start,stop=None,step=1):
     """ range for floats or other types (`numpy.arange` without numpy)
@@ -166,27 +194,16 @@ def itemgetter(iterable,i):
     for item in iterable:
         yield item[i]
 
-def compact(iterable,f=bool):
-    """
-    :returns: iterator skipping None values from iterable
-    """
-    return filter(f, iterable)
 
-def compress(iterable):
-    """
-    generates (item,count) pairs by counting the number of consecutive items in iterable)
-    """
-    prev,count=None,0
-    for item in iterable:
-        if item==prev and count:
-            count+=1
-        else:
-            if count: #to skip initial junk
-                yield prev,count
-            prev=item
-            count=1
-    if count:
-        yield prev,count
+
+def recurse(f,x):
+    while True:
+        yield x
+        x=f(x)
+
+def swap(iterable):
+    for x in iterable:
+        yield reversed(list(x))
 
 def tee(iterable, n=2, copy=None):
     """tee or copy depending on type and goal
@@ -199,19 +216,23 @@ def tee(iterable, n=2, copy=None):
     this function is useful to avoid side effects at a lower memory cost
     depending on the case
     """
-    if isinstance(iterable,(list,tuple,set,dict)):
+    if isinstance(iterable,(list,tuple,set,dict, str)):
         if copy is None: # same object replicated n times
             res=[iterable]*n
         else:
             res=[copy(iterable) for _ in range(n)]
-        return tuple(res)
-    return itertools.tee(iterable,n) # make independent iterators
+        res=tuple(res)
+    else:
+        res=itertools.tee(iterable,n) # make independent align_iterators
+        if isinstance(iterable,keep):
+            res=tuple(map(iterable.__class__,res))
+    return res
 
 def groups(iterable, n, step=None):
     """Make groups of 'n' elements from the iterable advancing
     'step' elements on each iteration"""
     itlist = tee(iterable, n=n, copy=None)
-    onestepit = six.moves.zip(*(itertools.starmap(drop, enumerate(itlist))))
+    onestepit = zip(*(itertools.starmap(drop, enumerate(itlist))))
     return every(step or n, onestepit)
 
 def pairwise(iterable,op=None,loop=False):
@@ -231,9 +252,12 @@ def pairwise(iterable,op=None,loop=False):
         else:
             yield x[0],x[1]
 
+def select(it1,it2,op):
+    return (x[0] for x in zip(it1,it2) if op(*x))
+
 def shape(iterable):
     """ shape of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: list of n ints corresponding to iterable's len of each dimension
     :warning: if iterable is not a (hyper) rect matrix, shape is evaluated from
@@ -245,13 +269,12 @@ def shape(iterable):
         while True:
             res.append(ilen(iterable))
             iterable=first(iterable)
-    except:
-        pass
-    return res
+    except TypeError:
+        return res
 
 def ndim(iterable):
     """ number of dimensions of a mutidimensional array, without numpy
-    
+
     :param iterable: iterable of iterable ... of iterable or numpy arrays...
     :result: int number of dimensions
     """
@@ -285,7 +308,7 @@ def iterate(func, arg):
         arg = func(arg)
 
 def accumulate(iterable, func=operator.add, skip_first=False):
-    """Return running totals. extends `python.itertools.accumulate`
+    """Return running totals. extends `python.accumulate`
 
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
     # accumulate([1,2,3,4,5], operator.mul) --> 1 2 6 24 120
@@ -299,6 +322,19 @@ def accumulate(iterable, func=operator.add, skip_first=False):
         else:
             total = func(total, x)
         yield total
+
+def record(iterable, it=itertools.count(), max=0):
+    """return the index and value of iterable which exceed previous max"""
+    for i,v in zip(it,iterable):
+        if v>max:
+            yield i,v
+            max=v
+
+def record_index(iterable, it=itertools.count(), max=0):
+    return itemgetter(record(iterable, it, max),0)
+
+def record_value(iterable, it=itertools.count(), max=0):
+    return itemgetter(record(iterable, it, max),1)
 
 def tails(seq):
     """Get tails of a sequence
@@ -320,27 +356,58 @@ def ireduce(func, iterable, init=None):
     for x in iterable:
         curr = func(curr, x)
         yield curr
+        
+def occurences(iterable):
+    """ count number of occurences of each item in a finite iterable
+    
+    :param iterable: finite iterable
+    :return: dict of int count indexed by item
+    """
+    from sortedcontainers import SortedDict
+    occur=SortedDict()
+    for x in iterable:
+        occur[x]=occur.get(x, 0) + 1
+    return occur
 
-def unique(iterable, key=None, buffer=None):
+        
+def compress(iterable, key=identity, buffer=None):
+    """
+    generates (item,count) pairs by counting the number of consecutive items in iterable)
+    
+    :param iterable: iterable, possibly infinite
+    :param key: optional function defining which elements are considered equal
+    :param buffer: optional integer. if defined, iterable is sorted with this buffer
+
+    """
+    key=key or identity
+    
+    if buffer:
+        iterable=sorted_iterable(iterable,key,buffer)
+        
+    prev,count=None,0
+    for item in iterable:
+        if count and key(item)==key(prev):
+            count+=1
+        else:
+            if count: #to skip initial junk
+                yield prev,count
+            prev=item
+            count=1
+    if count:
+        yield prev,count
+
+def unique(iterable, key=None, buffer=100):
     """generate unique elements, preserving order.
-    :param iterable: iterable
+    :param iterable: iterable, possibly infinite
     :param key: optional function defining which elements are considered equal
     :param buffer: optional integer defining how many of the last unique elements to keep in memory
+    mandatory if iterable is infinite
 
     # unique('AAAABBBCCDAABBB') --> A B C D
     # unique('ABBCcAD', str.lower) --> A B C D
     """
-    seen = list() if buffer else set()
-    for element in iterable:
-        k = key(element) if key else element
-        if k not in seen:
-            yield element
-            if not buffer:
-                seen.add(k)
-            else:
-                seen.append(k)
-                if len(seen)>buffer:
-                    seen.pop(0)
+    return itemgetter(compress(iterable,key,buffer),0)
+
 
 def count_unique(iterable, key=None):
     """Count unique elements
@@ -353,62 +420,28 @@ def count_unique(iterable, key=None):
         seen.add(key(element) if key else element)
     return len(seen)
 
-def identity(x):
-    """Do nothing and return the variable untouched"""
-    return x
 
-def occurrences(it, exchange=False):
-    """Return dictionary with occurrences from iterable"""
-    return six.moves.reduce(lambda occur, x: dict(occur, **{x: occur.get(x, 0) + 1}), it, {})
 
-def cartesian_product(*iterables, **kwargs):
-    """http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
-    """
-    if len(iterables) == 0:
-        yield ()
-    else:
-        iterables = iterables * kwargs.get('repeat', 1)
-        it = iterables[0]
-        for item in it() if iscallable(it) else iter(it):
-            for items in cartesian_product(*iterables[1:]):
-                yield (item, ) + items
-                
 def combinations_with_replacement(iterable, r):
     """combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC
-    same as itertools.combinations_with_replacement except it doesn't generate
+    same as combinations_with_replacement except it doesn't generate
     duplicates
     """
     pool = tuple(iterable)
     n = len(pool)
-    for indices in cartesian_product(list(range(n)), repeat=r):
+    for indices in product(range(n), repeat=r):
         if sorted(indices) == list(indices):
             yield tuple(pool[i] for i in indices)
 
 # my functions added
 
-def any(seq, pred=bool):
-    """
-    :result: bool True if pred(x) is True for at least one element in the iterable
-    """
-    return (True in map(pred, seq))
 
-def all(seq, pred=bool):
-    """
-    :result: bool True if pred(x) is True for all elements in the iterable
-    """
-    return (False not in map(pred, seq))
-
-def no(seq, pred=bool):
-    """
-    :result: bool True if pred(x) is False for every element in the iterable
-    """
-    return (True not in map(pred, seq))
 
 def takenth(n, iterable, default=None):
     """
     :result: nth item of iterable
     """
-    # https://docs.python.org/2/library/itertools.html#recipes
+    # https://docs.python.org/2/library/html#recipes
     return six.next(itertools.islice(iterable, n, n+1),default)
 
 nth=takenth
@@ -691,8 +724,9 @@ class SortingError(Exception):
 
 def ensure_sorted(iterable,key=None):
     """ makes sure iterable is sorted according to key
+
     :yields: items of iterable
-    :raise: SortingError if not 
+    :raise: SortingError if not
     """
     key=key or identity
     prev,n=None,0
@@ -702,24 +736,25 @@ def ensure_sorted(iterable,key=None):
         prev=x
         yield x
         n+=1
-    
+
 
 def sorted_iterable(iterable, key=None, buffer=100):
     """sorts an "almost sorted" (infinite) iterable
+
     :param iterable: iterable
     :param key: function used as sort key
     :param buffer: int size of buffer. elements to swap should not be further than that
     """
     key=key or identity
-    from Goulib.container import SortedCollection
-    b=SortedCollection(key=key)
+    from sortedcontainers import SortedListWithKey
+    b=SortedListWithKey(key=key)
     for x in iterable:
-        if len(b)>=buffer:
+        if buffer and len(b)>=buffer:
             res=b.pop(0)
             yield res
-        b.insert(x)
+        b.add(x)
     for x in b: # this never happens if iterable is infinite
-        yield x 
+        yield x
 
 # operations on sorted iterators
 
@@ -735,16 +770,183 @@ def diff(iterable1,iterable2):
 merge=heapq.merge
 
 
-def intersect(*its):
+def intersect(*iterables):
     """ generates itersection of N iterables
-    
-    :param its: any number of SORTED iterables
+
+    :param iterables: any number of SORTED iterables
     :yields: elements that belong to all iterables
     :see: http://stackoverflow.com/questions/969709/joining-a-set-of-ordered-integer-yielding-python-iterators
     """
-    
-    for key, values in itertools.groupby(heapq.merge(*its)):
-        if len(list(values)) == len(its):
+
+    for key, values in itertools.groupby(heapq.merge(*iterables)):
+        if len(list(values)) == len(iterables):
             yield key
 
+def product(*iterables, **kwargs):
+    """ Cartesian product of (infinite) input iterables.
+    
+    :param iterables: any number of iterables
+    :param repeat: integer optional number of repetitions
+    :see: http://stackoverflow.com/questions/12093364/cartesian-product-of-large-iterators-itertools
+    """
+     # https://github.com/enricobacis/infinite/blob/master/infinite/product.py
+     # is not general enough
+     
+    def empty():
+        yield ()
+        
+    
+    if len(iterables) == 0:
+        return empty()
+    
+    r=kwargs.get('repeat', 1)
+    
+    if r>1 :
+        n=len(iterables)
+        res=[]
+        for i,it in enumerate(iterables):
+            t=tee(it,r)
+            res[i::n]=t
+        iterables=res
+        
+    if len(iterables)==1:
+        return iterables[0]
+            
+    def gen2(it1,it2,concat):
+        def _(x):
+            if concat:
+                try:
+                    return tuple(x)
+                except TypeError:
+                    pass
+            return (x,)
+        it1,it1t = tee(it1) # do not touch it1, so we can reiterate it
+        for n,x in enumerate(it1t): # may be infinite
+            x=_(x)
+            it2,it2t = tee(it2) # do not touch it2, so we can reiterate it
+            for i,y in enumerate(it2t):
+                y=_(y)
+                if i<=n :
+                    yield x+y
+                else:
+                    it1,it1tt = tee(it1) # do not touch it1, so we can reiterate it
+                    for z in take(n+1,it1tt):
+                        yield _(z)+y
+                    break
+
+    res=gen2(*iterables[:2],concat=False)
+    for g in iterables[2:]:
+        res=gen2(res,g,concat=True)
+        
+    return res
+
+# cycle detection (Floyd "tortue hand hare" algorithm"
+# taken from https://codereview.stackexchange.com/questions/7847/tortoise-and-hare-cycle-detection-algorithm-using-iterators-in-python
+# http://ideone.com/fgrwM
+
+class keep(collections.Iterator):
+    """iterator that keeps the last value"""
+    def __init__(self,iterable):
+        self.it = iter(iterable)
+        self.stop=False
+        self.val = next(self.it)
+
+    def __next__(self):
+        if self.stop:
+            raise StopIteration
+        prev=self.val
+        try:
+            self.val = next(self.it)
+        except StopIteration:
+            self.stop=True
+        return prev
+
+    next=__next__ # 2.7 compatibility
+
+def first_match(iter1,iter2,limit=None):
+    """"
+    :param limit: int max number of loops
+    :return: integer i first index where iter1[i]==iter2[i]
+    """
+    for n,(i1,i2) in enumerate(zip(iter1,iter2)):
+        logging.debug((i1,i2))
+        if i1==i2:
+            return n
+        if limit and n>limit:
+            break
+    return None
+
+def floyd(iterable,limit=1e6):
+    """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
+
+    :see: https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
+    :param iterable: iterable
+    :param limit: int limit to prevent infinite loop. no limit if None
+    :result: (i,l) tuple of integers where i=index of cycle start, l=length
+        if no cycle is found, return (None,None)
+    """
+
+    iterable,tortoise,hare = tee(iterable,3)
+    tortoise = keep(tortoise)
+    hare = keep(takeevery(2, hare, 1))
+    #it will start from the first value and only then will be advancing 2 values at a time
+
+    first_match(tortoise,hare,limit=limit)
+
+    hare = tortoise #put hare in the place of tortoise
+    tortoise = keep(iterable) #start tortoise from the very beginning
+    i = first_match(tortoise,hare,limit=limit)
+    if i is None:
+        return (None,None)
+    #begin with the current val of hare.val and the value of tortoise which is in the first position
+
+    hare = tortoise
+    tortoise_val = tortoise.val
+    hare.next()
+    l = first_match(itertools.repeat(tortoise_val),hare)
+
+    return i,l+1
+
+def brent(iterable,limit=1e6):
+    """Detect a cycle in iterable using Floyd "tortue hand hare" algorithm
+
+    :see: https://en.wikipedia.org/wiki/Cycle_detection#Brent's_algorithm
+    :param iterable: iterable
+    :param limit: int limit to prevent infinite loop. no limit if None
+    :result: (i,l) tuple of integers where i=index of cycle start, l=length
+        if no cycle is found, return (None,None)
+    """
+    # main phase: search successive powers of two
+    power = lam = 1
+    import copy
+    iterable,tortoise,hare = tee(keep(iterable),3)
+    hare.next()
+    while tortoise.val != hare.val:
+        if power == lam:  # time to start a new power of two?
+            tortoise,hare = tee(hare)
+            power *= 2
+            lam = 0
+        hare.next()
+        lam += 1
+
+    # Find the position of the first repetition of length λ
+    mu = 0
+    iterable,tortoise,hare = tee(iterable,3)
+    for i in range(lam):
+        hare.next()
+    # The distance between the hare and tortoise is now lam
+
+    # Next, the hare and tortoise move at same speed until they agree
+    while tortoise.val != hare.val:
+        tortoise.next()
+        hare.next()
+        mu += 1
+
+    return mu, lam
+
+def detect_cycle(iterable,limit=1e6):
+    try:
+        return brent(iterable,limit)
+    except StopIteration:
+        return (None, None) # no cycle found
 

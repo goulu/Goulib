@@ -19,9 +19,9 @@ __revision__ = '$Revision$'
 import operator, six, abc
 
 from math import pi,sin,cos,atan2,sqrt,hypot,copysign
-from .math2 import angle, sat, sign, isclose
+from Goulib import math2, itertools2
 
-_reltol=1e-6 #relative tolerance used for isclose comparisons
+rel_tol=1e-6 #relative tolerance used in isclose comparisons
 
 def _hash(v):
     """hash function for vectors"""
@@ -118,7 +118,7 @@ class Geometry(object):
         raise NotImplementedError
 
     def __contains__(self,pt):
-        return isclose(self.distance(pt),0,_reltol)
+        return math2.isclose(self.distance(pt),0,rel_tol=rel_tol)
 
 def argPair(x,y=None):
     """Process a pair of values passed in various ways."""
@@ -130,6 +130,11 @@ def argPair(x,y=None):
     
         try:
             return x.xy
+        except:
+            pass
+        
+        try: # accepts complex
+            return (x.real, x.imag)
         except:
             pass
     else:
@@ -339,7 +344,7 @@ class Vector2(object):
             if self.x == other[0] and self.y == other[1]: return True
         except:
             pass
-        return isclose((self-Vector2(other)).mag(),0,_reltol)
+        return math2.isclose((self-Vector2(other)).mag(), 0, abs_tol=rel_tol)
 
     def __len__(self):
         return 2
@@ -481,7 +486,7 @@ class Vector2(object):
         if other is None:
             return atan2(self.y,self.x)
         else:
-            return angle(self,other,unit=unit)
+            return math2.angle(self,other,unit=unit)
 
     def project(self, other):
         """Return the projection (the component) of the vector on other."""
@@ -562,7 +567,7 @@ def _intersect_circle_circle(c1,c2):
     
     v.normalize()
     p=c1.c+x*v
-    if isclose(y,0):
+    if math2.isclose(y,0):
         return p
     
     v=v.cross()
@@ -576,7 +581,7 @@ def _connect_point2_line2(P, L):
         return Segment2(P,L.p)
     u=(L.v.dot(P-L.p))/d
     if not L._u_in(u):
-        u = sat(u,0,1)
+        u = math2.sat(u,0,1)
     return Segment2(P,L.point(u))
 
 def _connect_point2_circle(P, C):
@@ -674,7 +679,7 @@ class Point2(Vector2, Geometry):
         needed for coherency
         """
         if not isinstance(pt,Point2): return False
-        return isclose(self.distance(pt),0,_reltol)
+        return math2.isclose(self.distance(pt),0,rel_tol=rel_tol)
 
     def intersect(self, other):
         """Point2/object intersection
@@ -871,8 +876,92 @@ class Segment2(Line2):
         res=Line2(self.midpoint(),self.v.cross())
         res.v.normalize() #because usually we do geometry with it
         return res 
+    
+class Surface(Geometry):
+    
+    @property
+    def length(self):
+        return abs(self)
+    
+    @property
+    def area(self):
+        raise NotImplementedError('virtual')
+    
+    @property
+    def center(self):
+        raise NotImplementedError('virtual')
 
-class Circle(Geometry):
+class Polygon(Surface):
+    def __init__(self, args):
+        """:param args: can be
+        * Polygon
+        * iterator of points
+        """
+        super(Polygon,self).__init__()
+        self.p=[Point2(x) for x in args] 
+        if self.p[0]==self.p[-1]:
+            self.p=self.p[:-1]
+        self.p=tuple(self.p) #immutable
+    
+    def __repr__(self):
+        return '%s%s' % (self.__class__.__name__,self.p)
+    
+    @property
+    def xy(self):
+        """:return: tuple (x,y)"""
+        return (p.xy for p in self.p)
+    
+    def __iter__(self):
+        return itertools2.pairwise(self.p, Segment2, True)
+    
+    def __abs__(self):
+        """:return: float perimeter"""
+        return sum(x.length for x in self)
+    
+    @property
+    def area(self):
+        # https://en.wikipedia.org/wiki/Shoelace_formula
+        res=0
+        for p1,p2 in itertools2.pairwise(self.p, loop=True):
+            res += p1.x * p2.y - p2.x * p1.y
+        return res/2
+    
+    @property
+    def center(self):
+        """centroid
+        
+        :return: Point2 centroid of the Polygon
+        """
+        cx,cy=0,0
+        for p1,p2 in itertools2.pairwise(self.p, loop=True):
+            cx += (p1.x+p2.x)*(p1.x*p2.y-p2.x*p1.y)
+            cy += (p1.y+p2.y)*(p1.x*p2.y-p2.x*p1.y)
+        ar = self.area
+        return Point2((1.0/(6.0*ar))*cx,(1.0/(6.0*ar))*cy)
+        
+    
+    def __contains__(self,pt):
+        # http://www.ariel.com.au/a/python-point-int-poly.html
+        n = len(self.p)
+        inside = False
+    
+        p1x,p1y = self.p[0]
+        for i in range(n+1):
+            p2x,p2y = self.p[i % n]
+            if pt.y > min(p1y,p2y):
+                if pt.y <= max(p1y,p2y):
+                    if pt.x <= max(p1x,p2x):
+                        if p1y != p2y:
+                            xinters = (pt.y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                        if p1x == p2x or pt.x <= xinters:
+                            inside = not inside
+            p1x,p1y = p2x,p2y
+    
+        return inside
+        
+    
+
+class Circle(Surface):
     """
     Circles are constructed with a center **Point2** and a radius::
 
@@ -928,12 +1017,18 @@ class Circle(Geometry):
         self.c = t * self.c
         self.p = t * self.p
         self.r=abs(self.p-self.c)
-
+            
     def __abs__(self):
         """:return: float perimeter"""
         return 2.0*pi*self.r
-
-    length = property(lambda self: abs(self))
+    
+    @property
+    def center(self):
+        return self.c
+    
+    @property
+    def area(self):
+        return pi*self.r*self.r
 
     def point(self, u):
         ":return: Point2 at angle u radians"
@@ -947,7 +1042,7 @@ class Circle(Geometry):
         ":return: True if pt is ON or IN the circle"
         d=self.c.distance(pt)
         if d<self.r: return True #IN the circle
-        return isclose(d,self.r,_reltol)
+        return math2.isclose(d,self.r,rel_tol=rel_tol)
 
     def intersect(self, other):
         """
@@ -1064,9 +1159,10 @@ class Arc2(Circle):
         """:return: float signed arc angle"""
         a=self.a
         if b is None: b=self.b 
-        if isclose(a,b,_reltol): b=a #handle complete arcs
+        if math2.isclose(a,b,rel_tol=rel_tol,abs_tol=rel_tol): #handle complete arcs
+            b=a 
         res=b-a
-        if sign(res)==self.dir:
+        if math2.sign(res)==self.dir:
             return res
         else: #return complementary angle
             return self.dir*(2*pi-abs(res))

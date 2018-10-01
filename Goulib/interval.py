@@ -8,8 +8,7 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-from .container import SortedCollection
-from bisect import bisect_left
+from sortedcontainers import SortedListWithKey
 
 def _order(interval):
     """:return: (a,b) interval such that a<=b"""
@@ -178,27 +177,35 @@ class Interval(list):
     
 
         
-class Intervals(SortedCollection):
+class Intervals(SortedListWithKey):
     """a list of intervals kept in ascending order"""
     
-    def __repr__(self):
-        return str(list(self))
+    def update(self, iterable):
+        """Update the list by adding all elements from *iterable*."""
+        # overload needed because SortedListWithKey doesn't call add/insert
+        for item in iterable:
+            self.add(item)
+        
+    _update = update # defined and used in SortedListWithKey.__init__
 
-    def insert(self, item):
+    def add(self, item):
         k = self._key(item)
-        i = bisect_left(self._keys, k)  #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
+        i = self.bisect_left(k)  #item starts before self[i], but overlaps maybe with i, i+1, ... th intervals
         if i<len(self) and self[i].overlap(item,True):
             item=self.pop(i).hull(item)
-            return self.insert(item)
+            return self.add(item)
         
-        super(Intervals,self).insert(item)
+        super(Intervals,self).add(item)
         return self
     
+    def insert(self, item):
+        raise DeprecationWarning('use add method instead')
+    
     def __iadd__(self,item):
-        return self.insert(item)
+        return self.add(item)
     
     def __add__(self,item):
-        return Intervals(self).insert(item)
+        return Intervals(self).add(item)
         
     def __call__(self,x):
         """ returns intervals containing x"""
@@ -206,6 +213,10 @@ class Intervals(SortedCollection):
             if x in interval:
                 return interval
         return None
+    
+    def __str__(self):
+        """ string representation : like a list of Intervals"""
+        return str([x for x in self])
 
 class Box(list):
     """a N dimensional rectangular box defined by a list of N Intervals"""

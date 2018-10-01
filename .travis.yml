@@ -1,8 +1,8 @@
 language: python
 python:
   - 2.7
-  - 3.4
   - 3.5
+  - 3.6
 notifications:
   email: false
  
@@ -22,10 +22,10 @@ before_install:
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose numpy scipy matplotlib networkx ipython
   - source activate env_name
-  - pip install --allow-all-external -r requirements.txt
+  - pip install -r requirements.txt
   - pip install coveralls
  
 script:
-  nosetests --with-coverage --cover-package=Goulib
+  nosetests -c nose.cfg
 after_success:
   coveralls

@@ -300,7 +300,7 @@ def normal_pdf(x,mu,sigma):
     except ZeroDivisionError:
         return 1 if math2.isclose(x,mean) else 0
 
-expr.functions["normal_pdf"]=normal_pdf #add to allowed functions
+expr.add_function(normal_pdf) #add to allowed functions
 
 class Normal(PDF):
     """represents a normal distributed variable

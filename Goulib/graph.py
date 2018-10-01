@@ -17,7 +17,7 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import logging, math, six
+import logging, math, six, json
 
 import networkx as nx # http://networkx.github.io/
 
@@ -27,21 +27,27 @@ import matplotlib.pyplot as plt # after import .plot
 try:
     import numpy, scipy.spatial
     SCIPY=True
-except:
-    logging.warning('scipy not available, delauney triangulation is not supported')
+except ImportError:
+    #logging.warning('scipy not available, delauney triangulation is not supported')
     SCIPY=False
 
 from . import math2
 from . import itertools2
 
+"""
+finding the nearest neighbor in a large GeoGraph is much faster with the
+RTree package, but it's not generally available, so a pure python fallback
+is provided
+"""
+
 try:
     from rtree import index # http://toblerity.org/rtree/
     RTREE=True
-except: #fallback, especially because I couldn't manage to install rtree on travis-ci
+except ImportError: #fallback, especially because I couldn't manage to install rtree on travis-ci
     RTREE=False
 
 if not RTREE:
-    logging.warning('rtree not available')
+    #logging.warning('rtree not available')
 
     class index: #mimics rtree.index module
 
@@ -73,7 +79,7 @@ _nk=0 # node key
 
 try: # pygraphviz is optional
     from pygraphviz import AGraph # http://pygraphviz.github.io/
-except:
+except Exception:
     class AGraph(): pass #dummy class to let _Geo.__init__ work nevertheless
 
 
@@ -95,22 +101,24 @@ def to_networkx_graph(data,create_using=None,multigraph_input=False):
             create_using.add_edge(p[0],p[1])
             create_using.add_edge(p[1],p[2])
             create_using.add_edge(p[2],p[0])
-        return create_using
-    elif isinstance(data,nx.Graph):
-        if isinstance(create_using,_Geo):
-            tol=create_using.tol
-            create_using.tol=0 #zero tolerance when copying
-            for k in data.node: #create nodes
-                create_using.add_node(k,attr_dict=data.node[k])
-            for u,v,d in data.edges(data=True):
-                create_using.add_edge(u,v,attr_dict=d)
-            create_using.tol=tol # revert original tolerance
-            return create_using
 
-        # pass only the adjacency matrix to ensure node keys aren't trashed in to_networkx_graph
-        return nx.convert.to_networkx_graph(data.adj,create_using,data.is_multigraph())
+    elif isinstance(create_using,_Geo):
+        tol=create_using.tol
+        create_using.tol=0 #zero tolerance when copying
+
+        if isinstance(data,nx.Graph):
+            create_using.clear()
+            create_using.add_nodes_from(data.nodes(data=True))
+            create_using.add_edges_from(data.edges(data=True))
+        else:
+            create_using=nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+        create_using.tol=tol #revert tolerance
+
     else:
-        return nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+        create_using=nx.convert.to_networkx_graph(data,create_using,multigraph_input)
+
+    return create_using
+
 
 
 
@@ -134,6 +142,8 @@ class _Geo(plot.Plot):
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
                     data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
+                elif ext=='json':
+                    data=read_json(data, directed=self.is_directed(), multigraph=self.multi)
                 else:
                     raise(Exception('unknown file format'))
             elif isinstance(data,AGraph):
@@ -149,16 +159,22 @@ class _Geo(plot.Plot):
 
 
     def copy(self):
-        """does not use deepcopy because the rtree index must be rebuilt"""
+        """
+        :return: copy of self graph
+        """
+        # does not use deepcopy because the rtree index must be rebuilt
         return self.__class__(self,**self.graph)
 
     def __eq__(self,other):
-        """:return: True if self and other are equal"""
+        """
+        :return: True if self and other are equal
+        """
         def eq(a,b): return a==b
         return nx.is_isomorphic(self,other, node_match=eq, edge_match=eq)
 
     def __nonzero__(self):
-        """:return: True if graph has at least one node
+        """
+        :return: True if graph has at least one node
         """
         return self.number_of_nodes()>0
 
@@ -172,7 +188,7 @@ class _Geo(plot.Plot):
 
     def clear(self):
         #saves some graph attributes cleared by convert._prep_create_using
-        t,m=self.tol,self.multi
+        t,m=self.tol, self.multi
         self.parent.clear(self)
         self.multi=m
         self.graph['tol']=t
@@ -197,15 +213,23 @@ class _Geo(plot.Plot):
         """used internally in constructor"""
         try:
             return self.multi
-        except:
-            return True
+        except AttributeError:
+            return self.parent.is_multigraph(self)
 
-    def pos(self,node):
+    def pos(self,nodes=None):
+        """
+        :param nodes: a single node, an iterator of all nodes if None
+        :return: the position of node(s)
+        """
         try:
-            return self.node[node]['pos']
-        except:
-            return node #supposedly a tuple
-
+            return self.node[nodes]['pos']
+        except KeyError:
+            pass
+        if isinstance(nodes,tuple):
+            return nodes
+        if nodes is None:
+            nodes=self
+        return (self.pos(n) for n in nodes)
 
 
     def dist(self,u,v):
@@ -214,10 +238,10 @@ class _Geo(plot.Plot):
         """
 
         try:
-            return self[u][v]['length']
-        except:
-            pass
-        return math2.dist(self.pos(u),self.pos(v))
+            edge=self[u][v]
+            return edge['length']
+        except KeyError:
+            return math2.dist(self.pos(u),self.pos(v))
 
     def length(self,edges=None):
         """
@@ -276,7 +300,7 @@ class _Geo(plot.Plot):
         """
         if skip: n+=1
         if n==1:
-            if p in self.node:
+            if p in self:
                 return [p],0
 
         res,d=[],None
@@ -298,32 +322,26 @@ class _Geo(plot.Plot):
 
         return edges,d
 
-    def add_node(self, p, attr_dict=None, **attr):
+    def add_node(self, p, **attr):
         """add a node or return one already very close
         :return (x,y,...) node id
         """
-        if p in self.node: #point already exists
+        if p in self: #point already exists
             return p
 
-        id=p
+        id=p #save the node id as the position might differ
 
         if type(p) is not tuple:
             # try to find a position tuple somewhere
             if p in self._map:
                 return self._map[p]
-            a={}
-            if attr_dict :
-                a.update(**attr_dict)
-            if attr :
-                a.update(**attr)
 
-
-            p=a.get('pos',id)
+            p=attr.get('pos',id)
             if isinstance(p,six.string_types):
                 p=p.split(',')
             try:
                 p=tuple(float(x) for x in p)
-            except: # assign a random position, but keep node id
+            except ValueError: # assign a random position, but keep node id
                 from random import random
                 attr['pos']=p=tuple((random(),random()))
 
@@ -334,30 +352,30 @@ class _Geo(plot.Plot):
             prop.set_dimension(n)
             self.idx = index.Index(properties=prop)
 
-        close,d=self.closest_nodes(p) #search for those within tolerance
-        if close and d<=self.tol:
-            return close[0]
-        else: # point doesn't exist yet : create it
-            #RTREE uses unique int node identifiers
-            global _nk
-            _nk+=1
-            self.idx.insert(_nk,p,p)
-            # networkX uses any id type, but the RTREE key is kept
-            attr['key']=_nk
-            self.parent.add_node(self,id, attr_dict, **attr)
-            #._map links both id
-            self._map[id]=p
+        if self.tol>0:
+            close,d=self.closest_nodes(p) #search for those within tolerance
+            if close and d<=self.tol:
+                return close[0]
+
+        # point doesn't exist yet : create it
+
+        global _nk #unique int node identifier for RTREE
+        _nk+=1
+        self.idx.insert(_nk,p,p)
+        # use RTREE key for networkX
+        attr['key']=_nk
+        self.parent.add_node(self,id, **attr)
+        #._map links both id
+        self._map[id]=p
         return id
 
     def add_nodes_from(self, nodes, **attr):
-        """must be here because Graph.add_nodes_from doesn't call add_node cleanly as it should..."""
-        for node in nodes:
-            try:
-                nn,d=node
-                attr.update(d)
-            except:
-                nn=node
-            self.add_node(nn,**attr)
+        # must override here because Graph.add_nodes_from doesn't call add_node
+        # so attributes and self.idx wouldn't be handled correctly
+
+        for n in nodes:
+            attr.update(n[1])
+            self.add_node(n[0],**attr)
 
     def remove_node(self,n):
         """
@@ -378,67 +396,69 @@ class _Geo(plot.Plot):
         :return: dict of the edge added last
         """
         try:
-            edge=self[u][v]
+            edges=self.adj[u][v]
         except: # no edge between u and v yet
             return None #not {}, to make a diff with existing empty dict
-        if len(edge)==1: #quick
-            return edge[0]
+        if len(edges)==1: #quick
+            return edges[0]
         else:
-            return edge[max(edge.keys())]
+            return edges[max(edges.keys())]
 
-    def add_edge(self, u, v, k=None, attr_dict=None, **attrs):
+    def _add_edge(self, u, v, key=None,  **attr):
+        """add an edge to graph
+
+        :return: edge key
+        """
+        u=self.add_node(u) # create or find nearest in tol
+        v=self.add_node(v) # create or find nearest in tol
+
+        if 'length' not in attr:
+            attr['length']=self.dist(u,v)
+
+        if not self.is_multigraph(): # update already existing edge
+            try:
+                self[u][v]
+            except KeyError: # no edge
+                pass
+            else:
+                k=key or 0
+                self[u][v][k].update(attr)
+                return k
+
+        key=self.parent.add_edge(self,u, v, key=key)
+        # note : NetworkX 1.x doesn't return the key ...
+        if self.parent.is_multigraph(self):
+            if key is None: # ... so we have to retrieve it now
+                key=len(self[u][v])-1
+            self[u][v][key].update(attr)
+        else:
+            self[u][v].update(attr)
+            key=None
+        return key
+
+    if nx.__version__ < '2': #backward compatibility for now
+        def add_edge(self, u, v, key=None,  attr_dict=None, **attr):
+        # set up attribute dict # code copied from nx 1,11
+            if attr_dict is None:
+                attr_dict = attr
+            else:
+                attr_dict.update(attr)
+            return self._add_edge( u, v, key=key, **attr_dict)
+    else:
+        add_edge = _add_edge
+
+
+    def add_edge2(self, u, v, key=None, **attrs):
         """add an edge to graph
         :return: edge data from created or existing edge
         """
+        key=self._add_edge(u, v, key, **attrs)
 
-        if type(k) is dict: #old syntax : previous versions of NetworkX didn't require a key
-            attr_dict,k=k,None
+        try:
+            return self[u][v][key or 0]
+        except KeyError:
+            return self[u][v]
 
-        #adjust to existing nodes within tolerance and keep track of actual precision
-        u=self.add_node(u)
-        v=self.add_node(v)
-
-        #attr and kwargs will be merged and copied here.
-        #this is important because we want to handle the
-        #length parameter separately for each edge
-        a={}
-        if attr_dict :
-            a.update(**attr_dict)
-        if attrs :
-            a.update(**attrs)
-
-        if not self.is_multigraph():
-            try:
-                data=self[u][v][0] # 0 because there is only one entry if not multi
-            except:
-                data=None
-            if data:
-                data.update(a)
-                return data #return existing edge data
-            else:
-                pass #and add the edge normally below
-
-
-        #if no length is explicitly defined, we calculate it and set it as parameter
-        #therefore all edges in a GeoGraph have a length attribute
-        a.setdefault('length',self.dist(u,v))
-        if k is None: #try to guess the key
-            try:
-                keys=set(self[u][v].keys()) #existing keys
-                k=0 if len(keys)==0 else None #if k=None, it will be determined below
-            except:
-                keys=set()
-                k=0
-
-        res=self.parent.add_edge(self,u, v, k, attr_dict=a)
-        if res is not None:
-            return res
-        # networkX still doesn't return created data... what a pity ...
-        # we have to search the dict object that was just created ...
-
-        if k is None:
-            k=next(iter(set(self[u][v].keys())-keys))
-        return self[u][v][k]
 
     def remove_edge(self,u,v=None,key=None,clean=False):
         """
@@ -454,11 +474,11 @@ class _Geo(plot.Plot):
 
         if self.is_multigraph():
             if key is None:
-                key=self.edge[u][v]
+                key=self.adj[u][v]
                 key=itertools2.first(key)
-            data=self.edge[u][v][key]
+            data=self.adj[u][v][key]
         else:
-            data=self.edge[u][v]
+            data=self.adj[u][v]
         self.parent.remove_edge(self,u,v,key)
 
         if clean:
@@ -488,7 +508,8 @@ class _Geo(plot.Plot):
         res['size']=self.box_size()
         res['nodes']=self.number_of_nodes()
         res['edges']=self.number_of_edges()
-        res['components']=nx.number_connected_components(self)
+        if not self.is_directed:  #not implemented for directed type
+            res['components']=nx.number_connected_components(self)
         res['length']=self.length()
         return res
 
@@ -524,17 +545,18 @@ class _Geo(plot.Plot):
         plt.close(fig)
         return res
 
-    # for IPython notebooks
-
     def save(self,filename,**kwargs):
         """ save graph in various formats"""
         ext=filename.split('.')[-1].lower()
         if ext=='dxf':
             write_dxf(self,filename)
         elif ext=='dot':
-            nx.nx_pydot.write_dot(self, filename)
+            write_dot(self, filename)
+        elif ext=='json':
+            write_json(self,filename,**kwargs)
         else:
             open(filename,'wb').write(self.render(ext,**kwargs))
+        return self
 
 class GeoGraph(_Geo, nx.MultiGraph):
     """ Undirected graph with nodes positions
@@ -569,12 +591,12 @@ class DiGraph(_Geo, nx.MultiDiGraph):
         properties=kwargs
         try:
             properties.update(data.graph)
-        except:
+        except AttributeError:
             pass
         properties.setdefault('tol',0.010) #default tolerance on node positions
 
         nx.MultiDiGraph.__init__(self,None, **properties)
-        _Geo.__init__(self,nx.MultiDiGraph,data,nodes)
+        _Geo.__init__(self,nx.MultiDiGraph,data,nodes,directed=True)
 
 
 def figure(g, box=None,**kwargs):
@@ -614,17 +636,17 @@ def draw_networkx(g, pos=None, **kwargs):
     #build node positions
 
     if six.callable(pos): #mapping function
-        pos=dict(((node,pos(node)) for node in g.nodes_iter()))
-        
+        pos=dict(((node,pos(node)) for node in g))
+
     if pos is None:
         try:
-            pos=dict((node,data['pos'][:2]) for node,data in g.nodes_iter(True))
+            pos=dict((node,data['pos'][:2]) for node,data in g.nodes(data=True))
         except KeyError:
             pass
 
     if pos is None:
         try:
-            pos=dict(((node,node[:2]) for node in g.nodes_iter()))
+            pos=dict(((node,node[:2]) for node in g))
         except TypeError:
             pass
 
@@ -675,7 +697,7 @@ def draw_networkx(g, pos=None, **kwargs):
 
     nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
 
-    labels=kwargs.pop('labels',False) # True in nx.draw_networkx they're 
+    labels=kwargs.pop('labels',False) # True in nx.draw_networkx they're
     if labels:
         if labels==True: labels=None #will be set automatically
         if six.callable(labels): #mapping function ?
@@ -704,7 +726,9 @@ def to_drawing(g, d=None, edges=[]):
         u,v,data=edge[0],edge[1],edge[-1]
         try:
             e=data['entity']
-        except:
+        except KeyError:
+            u=g.pos(u)
+            v=g.pos(v)
             e=geom.Segment2(u,v)
         d.append(e)
     return d
@@ -713,10 +737,76 @@ def write_dxf(g,filename):
     """writes :class:`networkx.Graph` in .dxf format"""
     to_drawing(g).save(filename)
 
+def write_dot(g,filename):
+    try:
+        import pygraphviz
+        from networkx.drawing.nx_agraph import write_dot as _write_dot
+        logging.info("using package pygraphviz")
+    except ImportError:
+        try:
+            import pydot
+            from networkx.drawing.nx_pydot import write_dot as _write_dot
+            logging.info("using package pydot")
+        except ImportError:
+            logging.error("Both pygraphviz and pydot were not found. See \
+                http://networkx.github.io/documentation/latest/reference/drawing.html \
+                for info")
+            raise
+
+    if isinstance(g, _Geo) or any(map(lambda n:hasattr(n,'pos'),g.nodes())):
+        g=g.copy()
+
+    for n in g.nodes(data=True):
+        try:
+            pos=g.pos(n[0])
+        except AttributeError:
+            pos=n[1].get('pos',None)
+        if pos is not None: # format pos as neato wants it : "x,y"
+            n[1]['pos']='"%s,%s"'%pos
+
+    _write_dot(g,filename)
+
+def to_json(g, **kwargs):
+    """
+    :return: string JSON representation of a graph
+    """
+    from datetime import datetime, date, time, timedelta
+    def json_serial(obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        try:
+            return str(obj)
+        except Exception:
+            pass
+        raise TypeError ("Type %s not serializable"%(type(obj)))
+    from networkx.readwrite import json_graph
+    g=json_graph.node_link_data(g)
+    for node in g['nodes']:
+        pos=node.pop('pos',None)
+        if pos:
+            node['x']=pos[0]
+            node['y']=pos[1]
+            #node['fixed']=True
+    kwargs.setdefault('default',json_serial)
+    return json.dumps(g, **kwargs)
+
+def write_json(g,filename, **kwargs):
+    """write a JSON file, suitable for D*.js representation
+    """
+    with open(filename, 'w') as file:
+        file.write(to_json(g,**kwargs))
+
+def read_json(filename, directed=False, multigraph=True, attrs=None):
+    with open(filename) as f:
+        js_graph = json.load(f)
+    return nx.node_link_graph(js_graph, directed, multigraph, attrs)
+
+
 def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs):
     """
     https://en.wikipedia.org/wiki/Delaunay_triangulation
-    :param nodes: list of (x,y) or (x,y,z) node positions
+    :param nodes: _Geo graph or list of (x,y) or (x,y,z) node positions
     :param qhull_options: string passed to :meth:`scipy.spatial.Delaunay`,
     which passes it to Qhull ( http://www.qhull.org/ )
     *'Qt' ensures all points are connected
@@ -726,6 +816,8 @@ def delauney_triangulation(nodes, qhull_options='', incremental=False, **kwargs)
     :param kwargs: passed to the :class:`GeoGraph` constructor
     :return: :class:`GeoGraph` with delauney triangulation between nodes
     """
+    if isinstance(nodes,_Geo):
+        nodes=list(nodes.pos())
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.Delaunay.html
     points=numpy.array(nodes)
     tri = scipy.spatial.Delaunay(points, qhull_options=qhull_options, incremental=incremental)
@@ -742,8 +834,7 @@ def euclidean_minimum_spanning_tree(nodes,**kwargs):
     """
     g=GeoGraph(None,**kwargs)
     d=delauney_triangulation(nodes,**kwargs)
-    for edge in nx.minimum_spanning_edges(d, weight='length'):
-        g.add_edge(*edge)
+    g.add_edges_from(nx.minimum_spanning_edges(d, weight='length'))
     return g
 
 # Function to distribute N points on the surface of a sphere

@@ -76,22 +76,22 @@ class BBox(Box):
 
     @property
     def ymax(self): return self[1].end
-    
+
     @property
     def xmed(self): return (self.xmin+self.xmax)/2
 
     @property
     def ymed(self): return (self.ymin+self.ymax)/2
-    
+
     @property
     def width(self): return self[0].size
-    
+
     @property
     def height(self): return self[1].size
-    
+
     @property
     def area(self): return self.width*self.height
-    
+
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
         if isinstance(other,(Box,tuple)):
@@ -103,12 +103,12 @@ class BBox(Box):
         if isinstance(other,Segment2):
             return (super(BBox,self).__contains__(other.p1.xy)
                 and super(BBox,self).__contains__(other.p2.xy))
-            
+
         #for more complex entites, get the box
-        if isinstance(other,Entity):    
+        if isinstance(other,Entity):
             return super(BBox,self).__contains__(other.bbox())
-            
-        #suppose other is an iterable    
+
+        #suppose other is an iterable
         return all(o in self for o in other)
 
     def __iadd__(self, pt):
@@ -150,9 +150,9 @@ class BBox(Box):
 
 class Entity(plot.Plot):
     """Base class for all drawing entities"""
-    
+
     color='black' # by default
-    
+
     def setattr(self,  **kwargs):
         """ set (graphic) attributes to entity
         :param kwargs: dict of attributes copied to entity
@@ -168,7 +168,7 @@ class Entity(plot.Plot):
     def end(self):
         try:
             return self.p2
-        except: #probably a Circle
+        except AttributeError: #probably a Circle
             return self.p
 
     def __repr__(self):
@@ -200,6 +200,12 @@ class Entity(plot.Plot):
         elif isinstance(self,Circle): #must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
             return BBox(self.c - rr, self.c + rr)
+        else: # suppose Polygon2 or other iterable shape
+            res = BBox()
+            for p in self.p:
+                res+=p
+            return res
+
 
         raise NotImplementedError()
 
@@ -229,7 +235,7 @@ class Entity(plot.Plot):
             except:
                 pass
         return res
-        
+
     def to_dxf(self,**attr):
         """
         :param attr: dict of attributes passed to the dxf entity, overriding those defined in self
@@ -337,12 +343,12 @@ class Entity(plot.Plot):
             kwargs.setdefault('linewidth',self.width)
         except:
             pass
-        
+
         try:
             kwargs.setdefault('fill',self.fill)
         except:
             pass
-        
+
         if isinstance(self,Segment2):
             path = Path((self.start.xy,self.end.xy),[Path.MOVETO, Path.LINETO])
             return [patches.PathPatch(path, **kwargs)]
@@ -354,8 +360,8 @@ class Entity(plot.Plot):
                 theta1,theta2=theta2,theta1
             d=self.r*2
             return [patches.Arc(self.c.xy,d,d,theta1=theta1,theta2=theta2,**kwargs)]
-        
-        
+
+
         #entities below may be filled, so let's handle the color first
         color=kwargs.pop('color')
         kwargs.setdefault('edgecolor',color)
@@ -364,7 +370,7 @@ class Entity(plot.Plot):
             kwargs.setdefault('facecolor',kwargs['fill'])
             kwargs['fill']=True
         kwargs.setdefault('facecolor',color)
-        
+
         if isinstance(self,Point2):
             try:
                 ms=self.width
@@ -376,12 +382,13 @@ class Entity(plot.Plot):
             path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
 
-
-            
         if isinstance(self,Ellipse): #must be after Arc2 and Ellipse
             return [patches.Ellipse(self.c.xy,2*self.r,2*self.r2,**kwargs)]
         if isinstance(self,Circle): #must be after Arc2 and Ellipse
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
+
+        if isinstance(self,Polygon):
+            return [patches.Polygon(self.xy,**kwargs)]
 
         raise NotImplementedError
 
@@ -392,13 +399,13 @@ class Entity(plot.Plot):
         :param kwargs: parameters passed to `~matplotlib.pyplot.figure`
         :return: matplotlib axis suitable for drawing
         """
-            
+
         fig=plt.figure(**kwargs)
         # ax  = fig.add_subplot(111) # unneeded
-            
+
         # TODO: find why this doesn't work:
         # plt.gca().set_position([box.xmin,box.ymin,box.width, box.height])
-            
+
         #for some reason we have to plot something in order to size the window
         #TODO: find a better way... (found no other way top do it...)
         plt.plot((box.xmin,box.xmax),(box.ymin,box.ymax), alpha=0) #draw a transparent diagonal to size everything
@@ -419,9 +426,9 @@ class Entity(plot.Plot):
         if fig is None:
             if not 'box' in kwargs:
                 kwargs['box']=self.bbox()
-                
+
             fig=self.figure(**kwargs)
-            
+
         args=subdict(kwargs,('color','linewidth'))
 
         p=self.patches(**args) #some of which might be Annotations, which aren't patches but Artists...
@@ -446,25 +453,27 @@ class Entity(plot.Plot):
         """
         transparent=kwargs.pop('transparent',True)
         facecolor=kwargs.pop('facecolor', kwargs.pop('background','white'))
-        
+
         fig=self.draw(facecolor=facecolor, **kwargs)
 
         buffer = six.BytesIO()
         fig.savefig(
-            buffer, 
-            format=fmt, 
+            buffer,
+            format=fmt,
             transparent=transparent,
             facecolor=fig.get_facecolor(),
         )
         res=buffer.getvalue()
         plt.close(fig)
         return res
-        
+
 
 #Python is FANTASTIC ! here we set Entity as base class of some classes previously defined in geom module !
 Point2.__bases__ += (Entity,)
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,) # adds it also to Arc2
+
+Polygon.__bases__ += (Entity,) # adds it also to Arc2
 
 class Spline(Entity, Geometry):
     """cubic spline segment"""
@@ -513,7 +522,7 @@ def Spline(pts):
     c=Point2(p0)-t0.cross()
     return Arc2(c,p0,p3)
 '''
-        
+
 class _Group(Entity, Geometry):
     """ abstract class for iterable Entities"""
     def bbox(self, filter=None):
@@ -545,11 +554,11 @@ class _Group(Entity, Geometry):
             recurse=False
         else:
             recurse=True
-            
+
         for e in self:
             inter=other.intersect(e) if recurse else e.intersect(other)
-                
-            if inter is None: 
+
+            if inter is None:
                 continue
             if isinstance(inter,Point2) :
                 yield (inter,e)
@@ -600,20 +609,20 @@ class Group(list, _Group):
     """group of Entities
     but it is a Geometry since we can intersect, connect and compute distances between Groups
     """
-    
+
     @property
     def color(self):
         return self[0].color
-    
+
     @color.setter
     def color(self, c):
         for e in self:
             e.color=c
-            
+
     @property
     def layer(self):
         return self[0].layer
-    
+
     @layer.setter
     def layer(self, l):
         for e in self:
@@ -652,7 +661,7 @@ class Group(list, _Group):
         super(Group,self).reverse() #reverse in place
         for e in self:
             e.swap()
-            
+
     def chainify(self, mergeable):
         """merge all possible entities into chains"""
         c=chains(self, mergeable=mergeable)
@@ -692,7 +701,7 @@ class Group(list, _Group):
         return self
 
 class Instance(_Group):
-    
+
     def __init__(self, group, trans):
         """
         :param group: Group
@@ -728,7 +737,7 @@ class Instance(_Group):
     def _apply_transform(self,trans):
         self.trans=trans*self.trans
 
-class Chain(Group): 
+class Chain(Group):
     """ group of contiguous Entities (Polyline or similar)"""
 
     def __init__(self,data=[]):
@@ -746,8 +755,8 @@ class Chain(Group):
     def __repr__(self):
         (s,e)=(self.start,self.end) if len(self)>0 else (None,None)
         return '%s(%s,%s,%d)' % (self.__class__.__name__,s,e,len(self))
-    
-    def contiguous(self, edge, tol=1E-6, allow_swap=True):
+
+    def contiguous(self, edge, abs_tol=1E-6, allow_swap=True):
         """
         check if edge can be appended to the chain
         :param edge: :class:`Entity` to append
@@ -755,26 +764,26 @@ class Chain(Group):
         :param allow_swap: if True (default), tries to swap edge or self to find contiguity
         :return: int,bool index where to append in chain, swap of edge required
         """
-        
+
         if len(self)==0: #init the chain with edge
             return -1,False
-        
-        if isclose(self.end.distance(edge.start),0,tol):
+
+        if isclose(self.end.distance(edge.start),0,abs_tol=abs_tol):
             return -1,False #append
-        
-        if isclose(self.start.distance(edge.end),0,tol):
+
+        if isclose(self.start.distance(edge.end),0,abs_tol=abs_tol):
             return 0,False #prepend
-        
+
         if not allow_swap:
             return None,False
-        
-        if isclose(self.end.distance(edge.end),0,tol):
+
+        if isclose(self.end.distance(edge.end),0,abs_tol=abs_tol):
             return -1,True #append swapped
-        if isclose(self.start.distance(edge.start),0,tol):
+        if isclose(self.start.distance(edge.start),0,abs_tol=abs_tol):
             return 0,True #prepend swapped
-        
+
         return None, False
-        
+
     def append(self, entity, tol=1E-6, allow_swap=True, mergeable=None,  **attrs):
         """
         append entity to chain, ensuring contiguity
@@ -790,10 +799,10 @@ class Chain(Group):
             return None
         if s:
             entity.swap()
-            
+
         if not isinstance(entity, Chain):
             entity=[entity]
-            
+
         if i==-1:
             for e in entity:
                 super(Chain,self).append(e,**attrs)
@@ -803,7 +812,7 @@ class Chain(Group):
                 e.setattr(**attrs)
                 self.insert(0,e)
             return self
-        
+
         return None
 
     @staticmethod
@@ -862,19 +871,20 @@ class Chain(Group):
         :param path: svg path
         :return: Entity of correct subtype
         """
-        from svg.path import Line, CubicBezier
+        import svg.path
         chain=Chain()
-        def _point(svg):
-            return Point2(svg.real, svg.imag)
 
         for seg in path._segments:
-            if isinstance(seg,Line):
-                entity=Segment2(_point(seg.start),_point(seg.end))
-            elif isinstance(seg,CubicBezier):
-                entity=Spline([_point(seg.start),_point(seg.control1),_point(seg.control2),_point(seg.end)])
-            else:
-                logging.error('unknown segment %s'%seg)
-                entity=None #will crash below
+            if isinstance(seg,svg.path.Line):
+                entity=Segment2(Point2(seg.start),Point2(seg.end))
+            elif isinstance(seg,svg.path.Arc):
+                raise NotImplementedError
+            elif isinstance(seg,svg.path.CubicBezier):
+                entity=Spline([Point2(seg.start),Point2(seg.control1),Point2(seg.control2),Point2(seg.end)])
+            elif isinstance(seg,svg.path.QuadraticBezier):
+                raise NotImplementedError
+            else: #Move
+                continue
             entity.color=color
             chain.append(entity)
         return chain
@@ -948,7 +958,7 @@ class Chain(Group):
         """
         if split: #handle polylines as separate entities
             return super(Chain,self).to_dxf(**attr)
-        
+
         if len(self)==1:
             return self[0].to_dxf(**attr)
 
@@ -968,7 +978,7 @@ class Chain(Group):
             elif isinstance(e, Arc2):
                 bulge=tan(e.angle()/4)
                 res.add_vertex(e.start.xy,bulge=bulge)
-            else: 
+            else:
                 if attr.pop('R12',True): #R12 doesn't handle splines.
                     attr['color']=color #otherwise it causes trouble
                     del attr['flags']
@@ -977,12 +987,12 @@ class Chain(Group):
         if not self.isclosed():
             res.add_vertex(self.end.xy)
         return res
-    
+
 def chains(group, tol=1E-6, mergeable=None):
     """build chains from all possible segments in group
     :param mergeable: function(e1,e2) returning True if entities e1,e2 can be merged
     """
-    
+
     res=Group()
     changed=False
     #step 1 : add all entities in group to chains in res
@@ -1003,7 +1013,7 @@ def chains(group, tol=1E-6, mergeable=None):
         changed=changed or ok
     #step 2 : try to merge chains
     if changed:
-        res=chains(res,tol,mergeable)    
+        res=chains(res,tol,mergeable)
     return res
 
 class Rect(Chain):
@@ -1020,11 +1030,11 @@ class Rect(Chain):
         self.append(Segment2((p2.x,p1.y),p2))
         self.append(Segment2(p2,(p1.x,p2.y)))
         self.append(Segment2((p1.x,p2.y),p1))
-        
+
     @property
     def p1(self):
         return self[0].p
-    
+
     @property
     def p2(self):
         return self[2].p
@@ -1047,19 +1057,19 @@ class Text(Entity):
         self.text=text
         self.size=size # unit is dtp
         self.rotation=rotation
-        
+
     def _apply_transform(self, t):
         self.p=t*self.p
         self.rotation+=degrees(t.angle())
 
     def bbox(self): #TODO: improve this very rough approximation
         return BBox(self.p,self.p+Vector2(0.8*len(self.text)*self.size*dtp,self.size*dtp))
-    
+
     @property
     def length(self): #TODO: improve this very rough approximation
         """:return: float length of the text contour in mm"""
         return len(self.text)*3.6*self.size*dtp
-    
+
     def intersect(self,other):
         return None #TODO implement
 
@@ -1139,6 +1149,8 @@ class Drawing(Group):
                     e=Entity.from_pdf(sub,t,color)
                     if e:
                         me.append(e)
+                    elif len(sub)==1 and sub[0][0]=='m':
+                        pass # sometimes we have 2 consecutive 'moves' ...
                     else:
                         logging.warning('pdf path ignored %s'%sub)
 
@@ -1201,21 +1213,44 @@ class Drawing(Group):
         except IOError:
             doc = minidom.parseString(content.encode('utf-8'))
             
+        styles={}
+            
+        for css in doc.getElementsByTagName('style'):
+            import tinycss
+            parser = tinycss.make_parser()
+            sheet=parser.parse_stylesheet(css.firstChild.nodeValue)
+            for rule in sheet.rules:
+                style={}
+                for d in rule.declarations:
+                    style[d.name]=str(d.value.as_css())
+                styles[rule.selector.as_css()]=style
+
         trans=Trans()
         trans.f=-1 #flip y axis
         for path in doc.getElementsByTagName('path'):
-            #find the color... dirty, but simply understandable
-            color=path.getAttribute('fill') #assign filling color to default stroke color
-            alpha=1
-            style=path.getAttribute('style')
-            for s in style.split(';'):
-                item=s.split(':')
-                if item[0]=='opacity':
-                    alpha=float(item[1])
-                elif item[0]=='stroke':
-                    color=item[1]
-            if not color or alpha==0 : #ignore picture frame
+            attr={}
+            klass=path.getAttribute('class')
+            if klass:
+                attr.update(styles['.'+klass])
+            
+            def getAttribute(name,v=None):
+                res=path.getAttribute(name)
+                return res or attr.get(name,v)
+            color=getAttribute('fill') #assign filling color to default stroke color
+            color=getAttribute('stroke',color)
+            alpha=getAttribute('opacity',0)
+            style=getAttribute('style')
+            if style:
+                for s in style.split(';'):
+                    item=s.split(':')
+                    if item[0]=='opacity':
+                        alpha=item[1]
+                    elif item[0]=='stroke':
+                        color=item[1]
+                        
+            if color is None : 
                 continue
+            
             # process the path
             d=path.getAttribute('d')
             from svg.path import parse_path

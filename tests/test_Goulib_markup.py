@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# coding: utf8
+# -*- coding: utf-8 -*-
 
 from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
+import six
 from Goulib.tests import *
-
 from Goulib.markup import *
 
 class TestCgiprint:
@@ -15,13 +15,11 @@ class TestCgiprint:
 
 class TestTag:
     def test_tag(self):
-        t=tag('tag', u'bétweêñ', class_='class')
-        assert_true(t in (
-            '<tag class="class">b&#233;twe&#234;&#241;</tag>', #Py 3
-            '<tag class="class">b\xc3\xa9twe\xc3\xaa\xc3\xb1</tag>', #Py 2.7
-            #TODO : why is it different ? uniformize ...
-            )
-        )
+        t=tag('tag', 'between', class_='class')
+        assert_equal(t,'<tag class="class">between</tag>') #Py 3
+          
+        t=tag('tag', u'b\xc3\xa9twe\xc3\xaa\xc3\xb1', class_='class')
+        assert_equal(t,'<tag class="class">b&#195;&#169;twe&#195;&#170;&#195;&#177;</tag>')
         
         t=tag('tag', None, style={'align':'left', 'color':'red'}, single=True)
         assert_true(t in (
@@ -29,6 +27,9 @@ class TestTag:
             '<tag style="align:left; color:red;" />',
             )
         )
+        
+        t=tag('test',r'$\left(x\right)$')
+        assert_equal(t,r'<test>$\left(x\right)$</test>')
         
 
 class TestElement:
@@ -182,6 +183,16 @@ class TestStyleStr2dict:
     def test_style_str2dict(self):
         # assert_equal(expected, style_str2dict(style))
         raise SkipTest 
+
+class test__oneliner:
+    def test___getattr__(self):
+        # _oneliner = _oneliner(case)
+        # assert_equal(expected, _oneliner.__getattr__(attr))
+        raise SkipTest # implement your test here
+
+    def test___init__(self):
+        # _oneliner = _oneliner(case)
+        raise SkipTest # implement your test here
 
 if __name__=="__main__":
     runmodule()

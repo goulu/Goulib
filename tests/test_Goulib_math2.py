@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # coding: utf8
-from nose.tools import assert_equal
+from __future__ import division #"true division" everywhere
+
+from nose.tools import assert_equal, assert_greater
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 
 from Goulib.math2 import *
-from Goulib.itertools2 import take, index
+
+import Goulib.itertools2
 import six
 
 class TestSign:
@@ -50,6 +53,14 @@ class TestEqual:
         d=0.99e-3
         assert_true(isclose(a, a+d))
         assert_false(isclose(a, a+2*d))
+        
+    def test_allclose(self):
+        a=1E6
+        d=0.99e-3
+        assert_true(allclose([a,a-d], [a+d,a]))
+        assert_false(allclose([a, a+2*d], [a,a]))
+        assert_false(allclose([a, a+2*d], [a, nan]))
+        assert_false(allclose([a], [a, nan]))
 
     def test_equal(self):
         # assert_equal(expected, equal(a, b, epsilon))
@@ -59,10 +70,12 @@ class TestLcm:
     def test_lcm(self):
         assert_equal(lcm(101, -3),-303)
         assert_equal(lcm(4,6),12)
+        assert_equal(lcm(3,4,6),12)
 
 class TestGcd:
     def test_gcd(self):
         assert_equal(gcd(54,24),6)
+        assert_equal(gcd(24,54),6)
         assert_equal(gcd(68, 14, 9, 36, 126),1)
         assert_equal(gcd(7, 14, 35, 7000),7)
         assert_equal(gcd(1548),1548)
@@ -94,6 +107,27 @@ class TestMinimum:
         m=[(1,2,3),(1,-2,0),(4,0,0)]
         assert_equal(minimum(m),[1,-2,0])
 
+class TestDotVv:
+    def test_dot_vv(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        assert_equal(dot_vv(v1, v2),7)
+
+class TestDotMv:
+    def test_dot_mv(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        m1=[v1,v2,vecsub(v2,v1)]
+        assert_equal(dot_mv(m1,v1),[5,7,2])
+
+class TestDotMm:
+    def test_dot_mm(self):
+        v1=list(range(3))
+        v2=list(accsum(v1))
+        m1=[v1,v2,vecsub(v2,v1)]
+        m2=transpose(m1)
+        assert_equal(dot_mm(m1,m2),[[5, 7, 2], [7, 10, 3], [2, 3, 1]])
+
 class TestDot:
     def test_dot(self):
         v1=list(range(3))
@@ -103,6 +137,8 @@ class TestDot:
         assert_equal(dot(m1,v1),[5,7,2])
         m2=transpose(m1)
         assert_equal(dot(m1,m2),[[5, 7, 2], [7, 10, 3], [2, 3, 1]])
+        v1=[715827883, 715827882]
+        assert_equal(dot(v1,v1),1024819114728867613) #fails with numpy.dot !
 
 class TestVecadd:
     def test_vecadd(self):
@@ -144,12 +180,10 @@ class TestVeccompare:
         v2[-1]=2 #force to test ai>bi
         assert_equal(veccompare(v1,v2),[2,2,1])
 
-class TestFibonacci:
-    def test_fibonacci(self):
-        
-        #http://controlfd.com/2016/07/05/using-floats-in-python.html
-        assert_equal(fibonacci(78),8944394323791464)
-        
+class TestFibonacciGen:
+    def test_fibonacci_gen(self):
+        #also tested in test_oeis
+
         # https://projecteuler.net/problem=2
         from itertools import takewhile
 
@@ -163,6 +197,44 @@ class TestFibonacci:
         assert_equal(problem2(100),44)
         assert_equal(problem2(4E6),4613732)
 
+class TestFibonacci:
+    def test_fibonacci(self):
+        # checks that fibonacci and fibonacci_gen give the same results
+        f=[fibonacci(i) for i in range(10)]
+        assert_equal(f,[0,1,1,2,3,5,8,13,21,34])
+        assert_equal(f,itertools2.take(10,fibonacci_gen()))
+
+        #http://controlfd.com/2016/07/05/using-floats-in-python.html
+        assert_equal(fibonacci(78),8944394323791464)
+
+        f50=fibonacci(50)
+        f51=fibonacci(51)
+        phi=(1+sqrt(5))/2
+        assert_equal(f51/f50,phi)
+
+        #mod 1000000007 has the effect of using int32 only
+        assert_equal(fibonacci(int(1E19),1000000007),647754067)
+        assert_equal(fibonacci(int(1E19),10),5)
+
+class TestIsFibonacci:
+    def test_is_fibonacci(self):
+        assert_true(is_fibonacci(0))
+        assert_true(is_fibonacci(1))
+        assert_true(is_fibonacci(2))
+        assert_true(is_fibonacci(3))
+        assert_false(is_fibonacci(4))
+        assert_true(is_fibonacci(8944394323791464))
+        assert_false(is_fibonacci(8944394323791464+1))
+
+class TestPisanoPeriod:
+    def test_pisano_period(self):
+        assert_equal(pisano_period(3),8)
+        assert_equal(pisano_period(10),60)
+
+class TestPisanoCycle:
+    def test_pisano_cycle(self):
+        assert_equal(pisano_cycle(3),[0, 1, 1, 2, 0, 2, 2, 1]) #A082115
+
 class TestIsInteger:
     def test_is_integer(self):
         assert_true(is_integer(1+1e-6, 1e-6))
@@ -170,6 +242,9 @@ class TestIsInteger:
 
 class TestIntOrFloat:
     def test_int_or_float(self):
+        # comparing values would always pass, so we must compare types
+        assert_equal(type(int_or_float(1.0)),int)
+        assert_equal(type(int_or_float(1.0+eps)),float)
         assert_equal(type(int_or_float(1+1e-6, 1e-6)),int)
         assert_equal(type(int_or_float(1+2e-6, 1e-6)),float)
 
@@ -182,6 +257,20 @@ class TestPrimes:
     def test_primes(self):
         last=primes(1001)[999] #more than _primes for coverage
         assert_equal(last,7919)
+        
+class TestNextprime:
+    def test_nextprime(self):
+        assert_equal(nextprime(0),2)
+        assert_equal(nextprime(1),2)
+        assert_equal(nextprime(2),3)
+        assert_equal(nextprime(1548),1549)
+        
+class TestPrevprime:
+    def test_prevprime(self):
+        assert_equal(prevprime(1),None)
+        assert_equal(prevprime(2),None)
+        assert_equal(prevprime(3),2)
+        assert_equal(prevprime(1548),1543)
 
 class TestPrimesGen:
     def test_primes_gen(self):
@@ -224,11 +313,11 @@ class TestDigits:
 class TestDigsum:
     def test_digsum(self):
         assert_equal(digsum(1234567890),45)
-        assert_equal(digsum(255,2),8) # sum of ones in binary rep
-        assert_equal(digsum(255,16),30) # $FF in hex
-        assert_equal(digsum(1234567890,f=2),sum_of_squares(9))
-        assert_equal(digsum(548834,f=6),548834) #narcissic number
-        assert_equal(digsum(3435,f=lambda x:x**x),3435) #Munchausen number
+        assert_equal(digsum(255,base=2),8) # sum of ones in binary rep
+        assert_equal(digsum(255,base=16),30) # $FF in hex
+        assert_equal(digsum(1234567890,2),sum_of_squares(9))
+        assert_equal(digsum(548834,6),548834) #narcissic number
+        assert_equal(digsum(3435,lambda x:x**x),3435) #Munchausen number
 
 class TestIntegerExponent:
     def test_integer_exponent(self):
@@ -259,7 +348,10 @@ class TestNumberOfDigits:
     def test_number_of_digits(self):
         assert_equal(number_of_digits(0),1)
         assert_equal(number_of_digits(-1),1)
+        assert_equal(number_of_digits(999),3)
+        assert_equal(number_of_digits(1000),4)
         assert_equal(number_of_digits(1234),4)
+        assert_equal(number_of_digits(9999),4)
         assert_equal(number_of_digits(2014,2),11)
         assert_equal(number_of_digits(65535,16),4)
 
@@ -279,12 +371,12 @@ class TestIsPrime:
         assert_false(is_prime(0))
         assert_false(is_prime(1))
         assert_true(is_prime(2))
-        
+
         #https://oeis.org/A014233
-        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
+        pseudoprimes=[2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 3825123056546413051, 318665857834031151167461, 3317044064679887385961981]
         for pp in pseudoprimes:
             assert_false(is_prime(pp))
-        
+
         assert_true(is_prime(201420142013))
         assert_true(is_prime(4547337172376300111955330758342147474062293202868155909489))
         assert_false(is_prime(4547337172376300111955330758342147474062293202868155909393))
@@ -294,6 +386,15 @@ class TestIsPrime:
         )
         assert_true(is_prime(643808006803554439230129854961492699151386107534013432918073439524138264842370630061369715394739134090922937332590384720397133335969549256322620979036686633213903952966175107096769180017646161851573147596390153))
         assert_false(is_prime(743808006803554439230129854961492699151386107534013432918073439524138264842370630061369715394739134090922937332590384720397133335969549256322620979036686633213903952966175107096769180017646161851573147596390153))
+
+class TestFactorEcm:
+    def test_factor_ecm(self):
+        for _ in range(10):
+            size=32
+            a=random_prime(size)
+            b=random_prime(size)
+            c=factor_ecm(a*b)
+            assert_true(c in (a,b))
 
 class TestPrimeFactors:
     def test_prime_factors(self):
@@ -315,6 +416,8 @@ class TestDivisors:
         assert_equal(d,[1])
         d=list(divisors(2014))
         assert_equal(d,[1, 53, 19, 1007, 2, 106, 38, 2014])
+        d=list(divisors(2**3*3**2))
+        assert_equal(sorted(d),sorted([1, 2, 4, 8, 3, 9, 6, 12, 24, 18, 36, 72]))
 
 class TestProperDivisors:
     def test_proper_divisors(self):
@@ -345,22 +448,21 @@ class TestHexagonal:
 
 class TestGetCardinalName:
     def test_get_cardinal_name(self):
-       assert_equal(get_cardinal_name(123456),
+        assert_equal(get_cardinal_name(123456),
             'one hundred and twenty-three thousand four hundred and fifty-six'
         )
-       assert_equal(get_cardinal_name(1234567890),
+        assert_equal(get_cardinal_name(1234567890),
             'one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety'
         )
 
 class TestIsPerfect:
     def test_is_perfect(self):
-        d=list(factorize(496))
-        d=list(divisors(496))
         assert_equal(is_perfect(496),0) #perfect
         assert_equal(is_perfect(54),1) #abundant
         assert_equal(is_perfect(2),-1) #deficient
 
         assert_equal(is_perfect(2305843008139952128),0) #Millenium 4, page 326
+        assert_equal(is_perfect(2658455991569831744654692615953842176),0)
 
 class TestIsPandigital:
     def test_is_pandigital(self):
@@ -567,6 +669,16 @@ class TestEulerPhi:
     def test_euler_phi(self):
         assert_equal(euler_phi(8849513),8843520)
 
+class TestKempner:
+    def test_kempner(self):
+        # from https://projecteuler.net/problem=549
+        assert_equal(kempner(1),1)
+        assert_equal(kempner(8),4)
+        assert_equal(kempner(10),5)
+        assert_equal(kempner(25),10)
+        #assert_equal(kempner(128),8) #TODO: find why it fails ...
+        assert_equal(sum(kempner(x) for x in range(2,100+1)),2012)
+
 class TestRecurrence:
     def test_recurrence(self):
         # assert_equal(expected, recurrence(factors, values, max))
@@ -598,10 +710,22 @@ class TestLychrelCount:
         # assert_equal(expected, lychrel_count(n, limit))
         raise SkipTest #
 
+class TestPow:
+    def test_pow(self):
+        from Goulib.math2 import  pow # make sure we don't use builtins
+        assert_equal(pow(10,100),1E100)
+        assert_not_equal(pow(10,-100),0)
+
+        assert_equal(pow(2,10,100),24)
+        assert_equal(pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
+        assert_equal(pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
+
+
 class TestIsqrt:
     def test_isqrt(self):
-        # assert_equal(expected, isqrt(n))
-        raise SkipTest #
+        assert_equal(isqrt(256),16)
+        assert_equal(isqrt(257),16)
+        assert_equal(isqrt(255),15)
 
 class TestAbundance:
     def test_abundance(self):
@@ -610,22 +734,21 @@ class TestAbundance:
 
 class TestFactorial:
     def test_factorial(self):
-        # assert_equal(expected, factorial())
-        raise SkipTest #
+        assert_equal(factorial(0),1)
+        assert_equal(factorial2(0),1)
+        assert_equal([factorial2(x) for x in [7, 8, 9]],[105, 384, 945])
+        assert_equal(factorialk(5, 1), 120)
+        assert_equal(factorialk(5, 3), 10)
 
 class TestCeildiv:
     def test_ceildiv(self):
         # assert_equal(expected, ceildiv(a, b))
         raise SkipTest #
 
-class TestFibonacciGen:
-    def test_fibonacci_gen(self):
-        pass #tested in test_oeis
-
 class TestCatalanGen:
     def test_catalan_gen(self):
-        assert_equal(index(20,catalan_gen()),6564120420) # https://oeis.org/A000108
-    
+        assert_equal(itertools2.nth(20,catalan_gen()),6564120420) # https://oeis.org/A000108
+
 class TestCatalan:
     def test_catalan(self):
         assert_equal(catalan(20),6564120420) # https://oeis.org/A000108
@@ -633,13 +756,13 @@ class TestCatalan:
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
         key=lambda x:(x[2],x[1])
-        for t in take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
+        for t in itertools2.take(10000,itertools2.ensure_sorted(primitive_triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
 class TestTriples:
     def test_triples(self):
         key=lambda x:(x[2],x[1])
-        for t in take(10000,itertools2.ensure_sorted(triples(),key)):
+        for t in itertools2.take(10000,itertools2.ensure_sorted(triples(),key)):
             assert_true(is_pythagorean_triple(*t))
 
 class TestPolygonal:
@@ -709,12 +832,6 @@ class TestEuclidGen:
         # assert_equal(expected, euclid_gen())
         raise SkipTest
 
-class TestModPow:
-    def test_mod_pow(self):
-        assert_equal( mod_pow(2,10,100),24)
-        assert_equal( mod_pow(4,13,497),445) #https://fr.wikipedia.org/wiki/Exponentiation_modulaire
-        assert_equal( mod_pow(2,13739062,13739063),2933187) #http://www.math.utah.edu/~carlson/hsp2004/PythonShortCourse.pdf
-
 class TestEgcd:
     def test_egcd(self):
         pass #tested below
@@ -763,7 +880,7 @@ class TestModBinomial:
         assert_equal(  mod_binomial(938977945,153121024,m),47619)
         assert_equal(  mod_binomial(906601285,527203335,m),0)
         assert_equal(  mod_binomial(993051461,841624879,m),104247)
-        
+
 class TestDeBrujin:
     def test_de_brujin(self):
         assert_equal(de_bruijn('1234',3),'1112113114122123124132133134142143144222322423323424324433343444')
@@ -830,8 +947,9 @@ class TestLogBinomial:
 
 class TestIlog:
     def test_ilog(self):
-        # assert_equal(expected, ilog(a, b, upper_bound))
-        raise SkipTest
+        assert_equal(ilog(ipow(2,5),2),5)
+        assert_equal(ilog(ipow(10,5),10),5)
+        assert_equal(ilog(ipow(7,13),7),13)
 
 class TestBabyStepGiantStep:
     def test_baby_step_giant_step(self):
@@ -842,8 +960,19 @@ class TestBabyStepGiantStep:
 
 class TestIsNumber:
     def test_is_number(self):
-        # assert_equal(expected, is_number(x))
-        raise SkipTest # TODO: implement your test here
+        assert_true(is_number(0))
+        assert_true(is_number(2))
+        assert_true(is_number(2.))
+        assert_false(is_number(None))
+        assert_true(is_number(sqrt(-1))) # complex are numbers
+        
+    def test_is_complex(self):
+        assert_false(is_complex(2.))
+        assert_true(is_number(sqrt(-1)))
+        
+    def test_is_real(self):
+        assert_true(is_real(2.))
+        assert_false(is_real(sqrt(-1)))
 
 class TestCoprimesGen:
     def test_coprimes_gen(self):
@@ -853,48 +982,48 @@ class TestCoprimesGen:
 class TestTetrahedral:
     def test_tetrahedral(self):
         # assert_equal(expected, tetrahedral(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSumOfSquares:
     def test_sum_of_squares(self):
         # assert_equal(expected, sum_of_squares(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestSumOfCubes:
     def test_sum_of_cubes(self):
         # assert_equal(expected, sum_of_cubes(n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestBernouilliGen:
     def test_bernouilli_gen(self):
         # assert_equal(expected, bernouilli_gen(init))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestBernouilli:
     def test_bernouilli(self):
         # assert_equal(expected, bernouilli(n, init))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestDeBruijn:
     def test_de_bruijn(self):
         # assert_equal(expected, de_bruijn(k, n))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestPascalGen:
     def test_pascal_gen(self):
         # assert_equal(expected, pascal_gen())
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestIsPythagoreanTriple:
     def test_is_pythagorean_triple(self):
         # assert_equal(expected, is_pythagorean_triple(a, b, c))
-        raise SkipTest # TODO: implement your test here
+        raise SkipTest # implement your test here
 
 class TestFormat:
     def test_format(self):
         # assert_equal(expected, format(x, decimals))
-        raise SkipTest # TODO: implement your test here
-    
+        raise SkipTest # implement your test here
+
 class TestMultiply:
     def test_multiply(self):
         from random import getrandbits
@@ -902,7 +1031,115 @@ class TestMultiply:
             a=getrandbits(bits)
             b=getrandbits(bits)
             assert_equal(multiply(a,b),a*b)
-            
+
+
+class TestSqrt:
+    def test_sqrt(self):
+        # assert_equal(expected, sqrt(n))
+        raise SkipTest # implement your test here
+
+class TestModMatmul:
+    def test_mod_matmul(self):
+        # assert_equal(expected, mod_matmul(A, B, mod))
+        raise SkipTest # implement your test here
+
+class TestModMatpow:
+    def test_mod_matpow(self):
+        a=[[1, 2],[1, 0]]
+        b=matrix_power(a,50)
+        assert_equal(
+            b,
+            [[750599937895083, 750599937895082],
+             [375299968947541, 375299968947542]]
+        )
+
+class TestZeros:
+    def test_zeros(self):
+        # assert_equal(expected, zeros(shape))
+        raise SkipTest # implement your test here
+
+class TestDiag:
+    def test_diag(self):
+        # assert_equal(expected, diag(v))
+        raise SkipTest # implement your test here
+
+class TestFactors:
+    def test_factors(self):
+        # assert_equal(expected, factors(n))
+        raise SkipTest # implement your test here
+
+class TestIsPrimitiveRoot:
+    def test_is_primitive_root(self):
+        pass #tested below
+
+class TestPrimitiveRootGen:
+    def test_primitive_root_gen(self):
+        pass #tested below
+
+class TestPrimitiveRoots:
+    def test_primitive_roots(self):
+        assert_equal(primitive_roots(17),[3, 5, 6, 7, 10, 11, 12, 14]  )
+        # assert_equal(primitive_roots(1),[1]  ) # how is it defined ?
+
+
+class TestRandomPrime:
+    def test_random_prime(self):
+        for b in range(8,128,8):
+            r=random_prime(b)
+            assert_true(is_prime(r))
+            assert_true(r>2**(b-1))
+            assert_true(r<2**b)
+
+class TestPrimeDivisors:
+    def test_prime_divisors(self):
+        # assert_equal(expected, prime_divisors(num, start))
+        raise SkipTest # implement your test here
+
+class TestIsMultiple:
+    def test_is_multiple(self):
+        # assert_equal(expected, is_multiple(n, factors))
+        raise SkipTest # implement your test here
+
+class TestRepunitGen:
+    def test_repunit_gen(self):
+        assert_equal(itertools2.take(5,repunit_gen(digit=1)),[0,1,11,111,1111])
+        assert_equal(itertools2.take(5,repunit_gen(digit=9)),[0,9,99,999,9999])
+
+class TestRepunit:
+    def test_repunit(self):
+        assert_equal(repunit(0),0)
+        assert_equal(repunit(1),1)
+        assert_equal(repunit(2),11)
+        assert_equal(repunit(12),111111111111)
+        assert_equal(repunit(12,digit=2),222222222222)
+
+class TestRationalForm:
+    def test_rational_form(self):
+        pass # tested below
+
+class TestRationalStr:
+    def test_rational_str(self):
+        assert_equal(rational_str(1,4),'0.25')
+        assert_equal(rational_str(1,3),'0.(3)')
+        assert_equal(rational_str(2,3),'0.(6)')
+        assert_equal(rational_str(1,6),'0.1(6)')
+        assert_equal(rational_str(1,9),'0.(1)')
+        assert_equal(rational_str(7,11),'0.(63)')
+        assert_equal(rational_str(29,12),'2.41(6)')
+        assert_equal(rational_str(9,11),'0.(81)')
+        assert_equal(rational_str(7,12),'0.58(3)')
+        assert_equal(rational_str(1,81),'0.(012345679)')
+        assert_equal(rational_str(22,7),'3.(142857)')
+        assert_equal(rational_str(11,23),'0.(4782608695652173913043)')
+        assert_equal(rational_str(1,97),'0.(010309278350515463917525773195876288659793814432989690721649484536082474226804123711340206185567)')
+
+class TestRationalCycle:
+    def test_rational_cycle(self):
+        assert_equal(rational_cycle(1,4),0)
+        assert_equal(rational_cycle(1,3),3)
+        assert_equal(rational_cycle(1,7),142857)
+        assert_equal(rational_cycle(1,81),123456790)
+        assert_equal(rational_cycle(1,92),8695652173913043478260)
 
 if __name__ == "__main__":
     runmodule()

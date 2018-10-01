@@ -517,6 +517,30 @@ class TestSegment2:
 
     def test_midpoint(self):
         pass #tested above
+    
+class TestPolygon:
+    @classmethod
+    def setup_class(self):
+        def poly(n,r=1):
+            for i in range(n):
+                a=i*2*pi/n
+                yield Point2(r*cos(a),r*sin(a))
+        self.p4=Polygon(poly(4,sqrt(2.)/2))
+        self.p6=Polygon(poly(6))
+
+    def test___init__(self):
+        pass #tested above
+    
+    def test_length(self):
+        assert_equal(self.p4.length,4)
+        assert_equal(self.p6.length,6)
+        
+    def test_area(self):
+        assert_equal(self.p4.area,1)
+        
+    def test_center(self):
+        assert_equal(self.p4.center,(0,0))
+        assert_equal(self.p6.center,(0,0))
 
 class TestCircle:
     @classmethod
@@ -534,13 +558,15 @@ class TestCircle:
     def test_tangent(self):
         assert_equal(self.c1.tangent(0),(0,1))
 
-    def test___copy__(self):
-        raise SkipTest
-
-    def test___repr__(self):
-        # circle = Circle(center, radius)
-        # assert_equal(expected, circle.__repr__())
-        raise SkipTest
+    def test_length(self):
+        assert_equal(self.c1.length,2*pi)
+        assert_equal(self.c2.length,2*pi)
+        assert_equal(self.c3.length,2*pi)
+        
+    def test_area(self):
+        assert_equal(self.c1.area,pi)
+        assert_equal(self.c2.area,pi)
+        assert_equal(self.c3.area,pi)
     
     def test_intersect(self):
         res=self.c1.intersect(self.c2)
@@ -595,8 +621,6 @@ class TestArc2:
         self.a3=Arc2((0,0),pi/2.,0,1,dir=-1) #same, inverted
         self.ap=Arc2(center=Point2(454.80692478710336, 69.74749779176005),p1=Point2(74.67492478710335, 86.62949779176006),p2=Point2(74.48092478710339, 58.021497791760055),r=380.506687652)
         self.ap2=Arc2(center=Point2(-454.80607521289664, -9.203502208239968),p1=Point2(-74.67307521289663, -26.08650220823995),p2=Point2(-74.47907521289662, 2.521497791760055),r=380.507731036)
-        self.c=Arc2((1,1),r=1) #unit circle around (1,1)
-        self.cw=Arc2((1,1),r=1,dir=-1) #unit circle around (1,1) clockwise
 
     def test___init__(self):
         #copy constructor
@@ -617,8 +641,12 @@ class TestArc2:
         assert_equal(self.a1.angle(),-self.a3.angle())
         assert_true(self.ap.angle()<radians(10)) # check the angle is not the complementary angle
         assert_true(self.ap2.angle()<radians(10)) # check the angle is not the complementary angle
-        assert_equal(self.c.angle(),2*pi)
-        assert_equal(self.cw.angle(),-2*pi)
+        
+        c=Arc2((1,1),r=1) #unit circle around (1,1)
+        assert_equal(c.angle(),2*pi)
+        
+        cw=Arc2((1,1),r=1,dir=-1) #unit circle around (1,1) clockwise
+        assert_equal(cw.angle(),-2*pi)
 
     def test___abs__(self):
         assert_equal(abs(self.a1),pi/2.)
@@ -735,6 +763,11 @@ class TestEllipse:
     def test___repr__(self):
         s=str(self.e1)
         assert_equal(s,'Ellipse(Point2(1, 2),2,2)')
+
+    def test___eq__(self):
+        # ellipse = Ellipse(*args)
+        # assert_equal(expected, ellipse.__eq__(other))
+        raise SkipTest # implement your test here
 
 if __name__ == "__main__":
     runmodule()

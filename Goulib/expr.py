@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf8
-"""
+'''
 simple symbolic math expressions
-"""
+'''
 
 __author__ = "Philippe Guglielmetti, J.F. Sebastian, Geoff Reedy"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
@@ -14,103 +14,86 @@ __license__ = "LGPL"
 
 import six, logging, copy, collections, inspect, re
 
-from . import plot #sets matplotlib backend
+from Goulib import plot #sets matplotlib backend
 
-from . import itertools2, math2
+from Goulib import itertools2, math2
 
 # http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
+# https://github.com/erwanp/pytexit
 
 import ast
-import operator as op
 
-# supported operators with precedence and text + LaTeX repr
-# precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
-#
-operators = {
-    ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
-    ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
-    ast.Not: (op.not_,500,'not ','not ','\\neg'),
-    ast.Eq: (op.eq,600,'=',' == ',' = '),
-    ast.Gt: (op.gt,600,' > ',' > ',' \\gtr '),
-    ast.GtE:(op.ge,600,' >= ',' >= ',' \\gec '),
-    ast.Lt: (op.lt,600,' < ',' < ',' \\ltr '),
-    ast.LtE: (op.le,600,' <= ',' <= ',' \\leq '),
-    ast.BitXor: (op.xor,800,' xor ',' xor ',' xor '),
-    ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
-    ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
-    ast.Add: (op.add, 1100,'+','+','+'),
-    ast.Sub: (op.sub, 1100,'-','-','-'),
-    ast.Mult: (op.mul, 1200,'','*',' \\cdot '),
-    ast.Div: (op.truediv, 1200,'/','/','/'),
-    ast.Mod: (op.mod, 1200,' mod ','%','\\bmod'),
-    ast.Invert: (op.not_,1300,'~','~','\\sim'),
-    ast.UAdd: (op.pos,1300,'+','+','+'),
-    ast.USub: (op.neg,1300,'-','-','-'),
-    ast.Pow: (op.pow,1400,'^','**','^'),
-
-    # precedence of other types below
-    ast.Name:(None,9999),
-    ast.Num:(None,9999),
-    ast.Call:(None,9999),
-}
-
-#indexes in operators to use for corresponding symbols
+#indexes in _operators, _ functions and _constants to use for corresponding symbols
 _dialect_str = 2
 _dialect_python = 3
 _dialect_latex = 4
 
-import math
-functions=math.__dict__ #allowed functions
+constants = { # constants in this dict are recognized in output
+    bool : {},
+    float : {},
+    complex : {},
+}
 
-def eval(node,ctx={}):
-    """safe eval of ast node : only functions and operators listed above can be used
-    
-    :param node: ast.AST to evalaluate
+from sortedcollections import SortedDict
+functions=SortedDict() #only functions listed in this dict can be used in Expr
+operators=dict() #only operators listed in this dict are allowed
+
+
+def eval(node,**kwargs):
+    '''safe eval of ast node : only functions and _operators listed above can be used
+
+    :param node: ast.AST to evaluate
     :param ctx: dict of varname : value to substitute in node
     :return: number or expression string
-    """
+    '''
+    _ctx=kwargs.get('ctx',{})
+    _operators=kwargs.get('operators',operators)
     if isinstance(node, ast.Num): # <number>
         return node.n
     elif isinstance(node, ast.Name):
-        return ctx.get(node.id,node.id) #return value or var
+        return _ctx.get(node.id,node.id) #return value or var
     elif isinstance(node, ast.Attribute):
-        return getattr(ctx[node.value.id],node.attr)
+        return getattr(_ctx[node.value.id],node.attr)
     elif isinstance(node,ast.Tuple):
-        return tuple(eval(e,ctx) for e in node.elts)
+        return tuple(eval(e,**kwargs) for e in node.elts)
     elif isinstance(node, ast.Call):
-        params=[eval(arg,ctx) for arg in node.args]
-        if not node.func.id in functions:
+        _functions=kwargs.get('functions',functions)
+        params=[eval(arg,**kwargs) for arg in node.args]
+        if not node.func.id in _functions:
             raise NameError('%s function not allowed'%node.func.id)
-        f=functions[node.func.id]
-        return f(*params)
+        f=_functions[node.func.id][0]
+        res=f(*params)
+        return math2.int_or_float(res, 0,1e-12) # try to correct small error
     elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-        op=operators[type(node.op)]
-        left=eval(node.left,ctx)
-        right=eval(node.right,ctx)
+        op=_operators[type(node.op)]
+        left=eval(node.left,**kwargs)
+        right=eval(node.right,**kwargs)
         if math2.is_number(left) and math2.is_number(right):
-            return op[0](left, right)
+            res=op[0](left, right)
+            # no correction here !
+            return res
         else:
             return "%s%s%s"%(left,op[_dialect_python],right)
     elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
-        right=eval(node.operand,ctx)
-        return operators[type(node.op)][0](right)
+        right=eval(node.operand,**kwargs)
+        return _operators[type(node.op)][0](right)
     elif isinstance(node, ast.Compare):
-        left=eval(node.left,ctx)
+        left=eval(node.left,**kwargs)
         for op,right in zip(node.ops,node.comparators):
             #TODO: find what to do when multiple items in list
-            return operators[type(op)][0](left, eval(right,ctx))
+            return _operators[type(op)][0](left, eval(right,**kwargs))
     elif six.PY3 and isinstance(node, ast.NameConstant):
         return node.value
     else:
         logging.warning(ast.dump(node,False,False))
-        return eval(node.body,ctx) #last chance
+        return eval(node.body,**kwargs) #last chance
 
 def get_function_source(f):
-    """returns cleaned code of a function or lambda
+    '''returns cleaned code of a function or lambda
     currently only supports:
     - lambda x:formula_of_(x)
     - def anything(x): return formula_of_(x)
-    """
+    '''
     f=inspect.getsource(f).rstrip('\n') #TODO: merge lines more subtly
     g=re.search(r'lambda(.*):(.*)(\)|#)',f)
     if g:
@@ -123,21 +106,60 @@ def get_function_source(f):
     else:
         g=re.search(r'def \w*\((.*)\):\s*return (.*)',f)
         if g is None:
-            logging.error('not a valid function code %s'%f)
+            raise ValueError('not a valid function code %s'%f)
         res=g.group(2)
     return res
 
+def plouffe(f,epsilon=1e-6):
+    if f<0 :
+        r=plouffe(-f)
+        if isinstance(r,six.string_types):
+            return '-'+r
+        return f
+    if f!=0 and math2.is_integer(1/f,epsilon):
+        f='1/%d'%math2.rint(1/f)
+    elif math2.is_integer(f*f,epsilon):
+        f='sqrt(%d)'%math2.rint(f*f)
+    return f
+
 
 class Expr(plot.Plot):
-    """
+    '''
     Math expressions that can be evaluated like standard functions
     combined using standard operators
     and plotted in IPython/Jupyter notebooks
-    """
-    def __init__(self,f):
-        """
+    '''
+    def __init__(self,f,**kwargs):
+        '''
         :param f: function or operator, Expr to copy construct, or formula string
-        """
+        '''
+
+        if isinstance(f,Expr):
+            pass # skip for now, handled below
+        elif inspect.isfunction(f):
+            try:
+                f=get_function_source(f)
+            except ValueError:
+                f='%s(x)'%f.__name__
+        elif isinstance(f, collections.Callable): # builtin function
+            f='%s(x)'%f.__name__
+        elif f in ('True','False'):
+            f=bool(f=='True')
+
+        if type(f) is bool:
+            self.body=ast.Num(f)
+            return
+
+        if type(f) is float: #try to beautify it
+            if math2.is_integer(f):
+                f=math2.rint(f)
+            else:
+                f=plouffe(f)
+
+        if math2.is_number(f): # store it with full precision
+            # (otherwise Py2 doesn't find pi in _constants ...)
+            self.body=ast.Num(f)
+            return
 
         if isinstance(f,Expr): #copy constructor
             self.body=f.body
@@ -145,78 +167,95 @@ class Expr(plot.Plot):
         elif isinstance(f,ast.AST):
             self.body=f
             return
-        elif inspect.isfunction(f):
-            f=get_function_source(f)
-        elif isinstance(f, collections.Callable): # builtin function
-            f='%s(x)'%f.__name__
-        elif f in ('True','False'):
-            f=bool(f)
-        if type(f) is bool: 
-            self.body=ast.Num(f)
-            return
-        if type(f) is float: #try to beautify it
-            if math2.is_integer(f):
-                f=math2.rint(f)
-            elif f!=0 and math2.is_integer(1/f):
-                f='1/%d'%math2.rint(1/f)
-            elif math2.is_integer(f*f):
-                f='sqrt(%d)'%math2.rint(f*f)
 
-        self.body=compile(str(f),'Expr','eval',ast.PyCF_ONLY_AST).body
+        f=str(f).replace('^','**') #accept ^ as power operator rather than xor ...
+        
+        self._operators=kwargs.get('operators',operators)
+        self._functions=kwargs.get('functions',functions)
 
-    def __call__(self,x=None,**kwargs):
-        """evaluate the Expr at x OR compose self(x())"""
+        self.body=compile(f,'Expr','eval',ast.PyCF_ONLY_AST).body
+
+    @property
+    def isNum(self):
+        return isinstance(self.body,ast.Num)
+
+    @property
+    def isconstant(self):
+        ''':return: True if Expr evaluates to a constant number or bool'''
+        res=self()
+        if math2.is_number(res): return True
+        if isinstance(res,bool): return True
+        return False
+
+    def __call__(self ,x=None, **kwargs):
+        '''evaluate the Expr at x OR compose self(x())'''
         if isinstance(x,Expr): #composition
             return self.applx(x)
-        try: #is x iterable ?
-            return [self(x) for x in x]
-        except:
-            pass
+        if itertools2.isiterable(x):
+            return [self(x) for x in x] # return a displayable list
         if x is not None:
             kwargs['x']=x
         kwargs['self']=self #allows to call methods such as in Stats
         try:
-            e=eval(self.body,kwargs)
-        except TypeError as error: # some params remain symbolic
+            e=eval(self.body,ctx=kwargs)
+        except TypeError: # some params remain symbolic
             return self
+        except Exception as error:# ZeroDivisionError, OverflowError
+            return None
         if math2.is_number(e):
             return e
         return Expr(e)
 
+    def __float__(self):
+        return self()
+
     def __repr__(self):
         return TextVisitor(_dialect_python).visit(self.body)
-        return ast.dump(self.body,False,False)
 
     def __str__(self):
         return TextVisitor(_dialect_str).visit(self.body)
-    
+
     def _repr_html_(self):
-        """default rich format is LaTeX"""
+        '''default rich format is LaTeX'''
         return self._repr_latex_()
 
     def latex(self):
-        """:return: string LaTex formula"""
-        return LatexVisitor().visit(self.body)
+        ''':return: string LaTex formula'''
+        return TextVisitor(_dialect_latex).visit(self.body)
 
     def _repr_latex_(self):
         return r'$%s$'%self.latex()
+    
+    def points(self, xmin=-1, xmax=1, step=0.1):
+        ''':return: x,y lists of float : points for a line plot'''
+        if self.isconstant:
+            return [xmin,xmax],[self(xmin),self(xmax)]
+        x=list(itertools2.arange(xmin,xmax,step))
+        y=self(x)
+        return x,y
+        
 
     def _plot(self, ax, x=None, y=None, **kwargs):
         if x is None:
-            x=itertools2.arange(-1,1,.1)
-        x=list(x)
+            x,y=self.points()
+           
         if y is None:
             y=self(x)
-        y=list(y)
 
         offset=kwargs.pop('offset',0) #slightly shift the points to make superimposed curves more visible
-        x=[_+offset for _ in x] # listify at the same time
-        y=[_+offset for _ in y] # listify at the same time
-        ax.plot(x,y, **kwargs)
+
+        points=list(zip(x,y)) # might contain (x,None) for undefined points
+        
+        for xy in itertools2.isplit(points,lambda _:not math2.is_real(_[1])): # curves between defined points
+            x,y=[],[]  # matplotlib doesn't support generators...
+            for v in xy:
+                x.append(v[0]+offset)
+                y.append(v[1]+offset)
+            ax.plot(x,y, **kwargs)
         return ax
 
     def apply(self,f,right=None):
-        """function composition self o f = f(self(x))"""
+        '''function composition self o f = f(self(x))'''
 
         if right is None:
             if isinstance(f, ast.unaryop):
@@ -231,7 +270,7 @@ class Expr(plot.Plot):
         return Expr(node)
 
     def applx(self,f,var='x'):
-        """function composition f o self = self(f(x))"""
+        '''function composition f o self = self(f(x))'''
         if isinstance(f,Expr):
             f=f.body
 
@@ -245,12 +284,6 @@ class Expr(plot.Plot):
         node=copy.deepcopy(self.body)
         return Expr(Subst().visit(node))
 
-    @property
-    def isconstant(self):
-        """:return: True if Expr evaluates to a constant number of bool"""
-        res=self()
-        return not isinstance(res,six.string_types)
-
     def __eq__(self,other):
         if math2.is_number(other):
             try:
@@ -261,18 +294,27 @@ class Expr(plot.Plot):
             other=Expr(other)
         return str(self())==str(other())
 
+    def __ne__(self, other):
+        return not self==other
+
     def __lt__(self,other):
         if math2.is_number(other):
             try:
-                return self()<=other
+                return self()<other
             except:
                 return False
         if not isinstance(other,Expr):
             other=Expr(other)
-        try:
-            return float(self())==float(other())
-        except:
-            return False
+        return float(self())<float(other())
+
+    def __le__(self, other):
+        return self<other or self==other
+
+    def __ge__(self, other):
+        return not self<other
+
+    def __gt__(self,other):
+        return self>=other and not self==other
 
     def __add__(self,right):
         return self.apply(ast.Add(),right)
@@ -291,6 +333,10 @@ class Expr(plot.Plot):
 
     def __truediv__(self,right):
         return self.apply(ast.Div(),right)
+
+    def __pow__(self,right):
+        return self.apply(ast.Pow(),right)
+
 
     __div__=__truediv__
 
@@ -312,60 +358,237 @@ class Expr(plot.Plot):
     def __rshift__(self,dx):
         return self.applx(ast.BinOp(ast.Name('x',None),ast.Sub(),ast.Num(dx)))
 
+    def complexity(self):
+        ''' measures the complexity of Expr
+        :return: int, sum of the precedence of used ops
+        '''
+        def _node_complexity(node):
+            try:
+                res=self._operators[type(node.op)][1]
+            except AttributeError:
+                res=self._operators[type(node)][1]
+            try:
+                res+=_node_complexity(node.operand)
+            except AttributeError:
+                pass
+            try:
+                res+=_node_complexity(node.left)
+            except AttributeError:
+                pass
+            try:
+                res+=_node_complexity(node.right)
+            except AttributeError: 
+                pass
+            return res
+        return _node_complexity(self.body)
+    
+
+    
+# supported _operators with precedence and text + LaTeX repr
+# precedence as in https://docs.python.org/reference/expressions.html#operator-precedence
+#
+
+import operator as op
+
+# table of allowed operators
+# note we very slightly prefer + over - and * over / for simpler expression generation
+operators = {
+    ast.Or: (op.or_,300,' or ',' or ',' \\vee '),
+    ast.And: (op.and_,400,' and ',' and ',' \\wedge '),
+    ast.Not: (op.not_,500,'not ','not ','\\neg'),
+    ast.Eq: (op.eq,600,'=',' == ',' = '),
+    ast.Gt: (op.gt,600,' > ',' > ',' \\gtr '),
+    ast.GtE:(op.ge,600,' >= ',' >= ',' \\gec '),
+    ast.Lt: (op.lt,600,' < ',' < ',' \\ltr '),
+    ast.LtE: (op.le,600,' <= ',' <= ',' \\leq '),
+    ast.BitXor: (op.xor,800,' xor ',' xor ',' xor '),
+    ast.LShift: (op.lshift, 1000,' << ',' << ',' \\ll '),
+    ast.RShift: (op.rshift, 1000,' >> ',' >> ',' \\gg '),
+    ast.Add: (op.add, 1100,'+','+','+'),
+    ast.Sub: (op.sub, 1101,'-','-','-'),
+    ast.Mult: (op.mul, 1200,'*','*',' \\cdot '),
+    ast.Div: (op.truediv, 1201,'/','/','\\frac{%s}{%s}'),
+    ast.FloorDiv: (op.floordiv, 1201,'//','//','\\left\\lfloor\\frac{%s}{%s}\\right\\rfloor'),
+    ast.Mod: (op.mod, 1200,' mod ','%',' \\bmod '),
+    ast.Invert: (op.not_,1300,'~','~','\\sim '),
+    ast.UAdd: (op.pos,1150,'+','+','+'),
+    ast.USub: (op.neg,1150,'-','-','-'),
+    ast.Pow: (math2.pow,1400,'^','**','^'), # ipow returns an integer when result is integer ...
+
+    # precedence of other types below
+    ast.Call:(None,9000),
+    ast.Name:(None,9000),
+    ast.Num:(None,9000),
+}
+
+    
+def add_function(f,s=None,r=None,l=None):
+    ''' add a function to those allowed in Expr.
+
+    :param f: function
+    :param s: string representation, should be formula-like
+    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
+    :param l: LaTeX representation
+    '''
+    functions[f.__name__]=(f,9999,s,r or s,l)
+    return functions[f.__name__]
+
+def add_constant(c, name, s=None,r=None,l=None):
+    ''' add a constant to those recognized in Expr.
+
+    :param c: constant
+    :param s: string representation, should be formula-like
+    :param r: repr representation, should be cut&pastable in a calculator, or in python ...
+    :param l: LaTeX representation
+    '''
+    constants[type(c)][c]=(None,None,s or name,r or name ,l or '\\'+name)
+
+def add_module(module):
+    for fname,f in six.iteritems(module.__dict__):
+        if fname[0]=='_': continue
+        if isinstance(f, collections.Callable):
+            add_function(f)
+        elif math2.is_number(f):
+            add_constant(f,fname)
+
+add_constant(True,'True')
+add_constant(False,'False')
+
+import math
+add_module(math)
+add_function(abs,l='\\lvert{%s}\\rvert')
+add_function(math.fabs,l='\\lvert{%s}\\rvert')
+add_function(math.factorial,'%s!','fact','%s!')
+add_function(math2.factorial2,'%s!','fact','%s!!')
+add_function(math2.sqrt,l='\\sqrt{%s}')
+add_function(math.trunc,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.floor,l='\\left\\lfloor{%s}\\right\\rfloor')
+add_function(math.ceil,l='\\left\\lceil{%s}\\right\\rceil')
+add_function(math.asin,l='\\arcsin')
+add_function(math.acos,l='\\arccos')
+add_function(math.atan,l='\\arctan')
+add_function(math.asinh,l='\\sinh^{-1}')
+add_function(math.acosh,l='\\cosh^{-1}')
+add_function(math.atanh,l='\\tanh^{-1}')
+add_function(math.log,l='\\ln')
+add_function(math.log1p,l='\\ln\\left(1-{%s}\\rvert)')
+add_function(math.log10,l='\\log_{10}')
+add_function(math2.log2,l='\\log_2')
+add_function(math.gamma,l='\\Gamma')
+add_function(math.exp,l='e^{%s}')
+add_function(math.expm1,l='e^{%s}-1')
+add_function(math.lgamma,'log(abs(gamma(%s)))',l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
+add_function(math.degrees,l='%s\\cdot\\frac{360}{2\\pi}')
+add_function(math.radians,l='%s\\cdot\\frac{2\\pi}{360}')
+
+add_constant(complex(0,1),'i')
+
 
 #http://stackoverflow.com/questions/3867028/converting-a-python-numeric-expression-to-latex
 
 class TextVisitor(ast.NodeVisitor):
-    
-    def __init__(self,dialect):
-        ''':param dialect: int index in operators of symbols to use
+
+    def __init__(self,dialect,operators=operators, functions=functions):
+        ''':param dialect: int index in _operators of symbols to use
         '''
-        self.dialect=dialect
+        self._dialect=dialect
+        self._operators=operators
+        self._functions=functions
 
-    def prec(self, n):
+    def prec(self, op):
+        ''' calculate the precedence of op '''
+        if isinstance(op,(ast.BinOp, ast.UnaryOp)):
+            op=op.op
+        if isinstance(op,ast.Num) and math2.is_real(op.n) and op.n<0:
+            return self._operators[ast.USub][1]
         try:
-            return operators[type(n)][1]
+            return self._operators[type(op)][1]
         except KeyError:
-            return operators[type(n.op)][1]
+            return self._operators[type(op)][1]
 
-    def prec_UnaryOp(self, n):
-        return self.prec(n.op)
-
-    def prec_BinOp(self, n):
-        return self.prec(n.op)
+    def _par(self,content):
+        if self._dialect == _dialect_latex:
+            return '\\left(%s\\right)'%content
+        else:
+            return '(%s)'%content
 
     def visit_Call(self, n):
+        args = r', '.join(map(self.visit, n.args))
+
         func = self.visit(n.func)
-        args = ', '.join(map(self.visit, n.args))
-        return '%s(%s)' % (func, args)
+        fname = self._functions[func][self._dialect]
+        if fname is None:
+            if self._dialect == _dialect_latex:
+                fname = '\\'+func
+            else:
+                fname=func
+
+        if '%s' in fname:
+            if len(n.args)>1: #TODO: or ... what ?
+                args=self._par(args)
+            return fname%args
+
+        return fname+self._par(args)
 
     def visit_Name(self, n):
         return n.id
-    
+
     def visit_NameConstant(self, node):
         return str(node.value)
 
     def visit_UnaryOp(self, n):
+        op=self.visit(n.operand)
         if self.prec(n.op) > self.prec(n.operand):
-            return r'%s(%s)' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
-        else:
-            return r'%s%s' % (operators[type(n.op)][self.dialect], self.visit(n.operand))
+            op=self._par(op)
+
+        symbol=self._operators[type(n.op)][self._dialect]
+
+        if '%s' in symbol:
+            return symbol%op
+
+        return symbol+op
 
     def _Bin(self, left,op,right):
-        # commute x*2 as 2*X for clarity
+
+        # commute x*3 in 3*x
         if isinstance(op, ast.Mult):
-            if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
-                return self._Bin(right,op,left)
+            if isinstance(right, ast.Num):
+                if not Expr(left).isconstant:
+                        return self._Bin(right,op,left)
 
         l,r = self.visit(left),self.visit(right)
 
-        #handle precedence (parenthesis) if needed
-        if self.prec(op) > self.prec(left):
-            l = '(%s)' % l
-        if self.prec(op) > self.prec(right):
-            r = '(%s)' % r
+        symbol=self._operators[type(op)][self._dialect]
 
-        return l+operators[type(op)][self.dialect]+r
+
+        if '%s' in symbol: # no parenthesis required in this case
+            return symbol%(l,r)
+
+        #handle precedence (parenthesis) if needed
+
+        if self.prec(op) > self.prec(left):
+            l = self._par(l)
+
+
+        if self.prec(op) > self.prec(right):
+            if self._dialect == _dialect_latex and isinstance(op, ast.Pow):
+                r='{'+r+'}'
+            else:
+                r = self._par(r)
+
+        # remove * if possible
+        if self._dialect != _dialect_python and isinstance(op, ast.Mult):
+            if not l[-1].isdigit() or not r[0].isdigit():
+                symbol=''
+
+        res=l+symbol+r
+
+        # TODO: find a better way to do this ...
+        plusminus=self._operators[ast.Add][self._dialect]+self._operators[ast.USub][self._dialect]
+        minusminus=self._operators[ast.Sub][self._dialect]+self._operators[ast.USub][self._dialect]
+        res=res.replace(plusminus,self._operators[ast.Sub][self._dialect])
+        res=res.replace(minusminus,self._operators[ast.Add][self._dialect])
+        return res
 
     def visit_BinOp(self, n):
         return self._Bin(n.left,n.op,n.right)
@@ -375,13 +598,18 @@ class TextVisitor(ast.NodeVisitor):
         return self._Bin(n.left,n.ops[0],n.comparators[0])
 
     def visit_Num(self, n):
+        try:
+            d=constants[type(n.n)]
+            return d[n.n][self._dialect]
+        except KeyError:
+            pass
         return str(math2.int_or_float(n.n))
 
     def generic_visit(self, n):
         try:
-            l=map(self.visit, n)
+            l=list(map(self.visit, n))
             return ''.join(l)
-        except:
+        except TypeError:
             pass
 
         if isinstance(n, ast.AST):
@@ -390,57 +618,6 @@ class TextVisitor(ast.NodeVisitor):
         else:
             return str(n)
 
-
-class LatexVisitor(TextVisitor):
-    def __init__(self):
-        super(LatexVisitor,self).__init__(_dialect_latex)
-
-    def visit_Call(self, n):
-        func = self.visit(n.func)
-        args = ', '.join(map(self.visit, n.args))
-        if func in ['sqrt']:
-            return r'\%s {%s}' % (func, args)
-            
-        return r'\%s \left(%s\right)' % (func, args)
-
-    def visit_UnaryOp(self, n):
-        if self.prec(n.op) > self.prec(n.operand):
-            return r'%s\left(%s\right)' % (operators[type(n.op)][_dialect_latex], self.visit(n.operand))
-        else:
-            try:
-                return r'%s %s' % (operators[type(n.op)][_dialect_latex], self.visit(n.operand))
-            except Exception as e:
-                pass
-
-    def _Bin(self, left,op,right):
-        # commute x*2 as 2*X for clarity
-        if isinstance(op, ast.Mult):
-            if isinstance(right, ast.Num) and not isinstance(left, ast.Num):
-                return self._Bin(right,op,left)
-
-        l,r = self.visit(left),self.visit(right)
-
-        #handle divisions and power first as precedence doesn't matter
-        if isinstance(op, ast.Div):
-            return r'\frac{%s}{%s}' % (l, r)
-        if isinstance(op, ast.FloorDiv):
-            return r'\left\lfloor\frac{%s}{%s}\right\rfloor' % (l,r)
-        if isinstance(op, ast.Pow):
-            if isinstance(right,ast.BinOp):
-                return r'%s^{%s}' % (l,r)
-            else:
-                return r'%s^%s' % (l,r)
-        #handle precedence (parenthesis) if needed
-        if self.prec(op) > self.prec(left):
-            l = r'\left(%s\right)' % l
-        if self.prec(op) > self.prec(right):
-            r = r'\left(%s\right)' % r
-
-        if isinstance(op, ast.Mult):
-            if isinstance(left, ast.Num) and not isinstance(right, ast.Num):
-                return l+r
-
-        return l+operators[type(op)][_dialect_latex]+r
 
 
 

@@ -50,6 +50,15 @@ oneweek=timedelta(weeks=1)
 datemin=date(year=dt.MINYEAR,month=1,day=1)
 midnight=time()
 
+#regexes
+# https://stackoverflow.com/a/40309602/1395973
+#https://regex101.com/r/NUZS1Z/2
+rdatesep='[^\w\d\r\n:]'
+ryear='(\d{4}|\d{2})'
+rmonth='(0?[1-9]|1[0-2])'
+rday='(0?[1-9]|[12]\d|30|31)'
+rdateany='(\b'+rday+rdatesep+rmonth+rdatesep+ryear+'\b)|(\b'+rmonth+rdatesep+rday+rdatesep+ryear+'\b)'
+
 def datetimef(d,t=None,fmt='%Y-%m-%d'):
     """"converts something to a datetime
     :param d: can be:
@@ -111,7 +120,7 @@ def fmt2regex(fmt):
     """
     
     expr=fmt.replace('%D','(?P<days>-?[0-9]\d*)')
-    expr=expr.replace('%H','(?P<hours>[+-]?[0-9]\d*)')
+    expr=expr.replace('%H','(?P<hours>-?[0-9]\d*)')
     expr=expr.replace('%M','(?P<minutes>\d+)')
     expr=expr.replace('%S','(?P<seconds>\d+(\.\d+)?)')
     return re.compile(expr)
@@ -134,7 +143,7 @@ def timedeltaf(t,fmt=None):
 
     #https://stackoverflow.com/a/21074460/1395973
     if fmt is None:
-        fmt='(%D day[s]?,? )?%H:%M:%S'
+        fmt='(%D day[s]?[,]? )?%H:%M:%S*'
     m=re.match(fmt2regex(fmt),t)
     if m is None:
         raise ValueError('"%s" does not match fmt=%s'%(t,fmt))  
@@ -142,7 +151,6 @@ def timedeltaf(t,fmt=None):
     d = {key: float(value) for key,value in m.items() if value is not None}
     td=timedelta(**d)
     return td
-
 
 def strftimedelta(t,fmt='%H:%M:%S'):
     """

@@ -32,20 +32,23 @@ def style_str2dict(style):
     res={}
     if style: #skip if None or empty string
         for s in style.split(';'):
-            k,v=s.split(':')
-            k=k.lstrip().rstrip()
-            v=v.lstrip().rstrip()
+            try:
+                k,v=s.split(':')
+            except:
+                continue
+            k=k.strip()
+            v=v.strip()
             res[k]=v
     return res
         
 def tag( tag, between, **kwargs ):
     """generate full tag."""
     single=kwargs.pop('single',False)
-    out = "<%s" % tag
+    out = r"<%s" % tag
     for key in sorted(kwargs):
         value=kwargs[key]
         if value is None:               # when value is None that means stuff like <... checked>
-            out = "%s %s" % ( out, key )
+            out = r"%s %s" % ( out, key )
         else:
             key = key.strip('_')            # strip this so class_ will mean class, etc.
             if key == 'http_equiv':         # special cases, maybe change _ to - overall?
@@ -54,17 +57,17 @@ def tag( tag, between, **kwargs ):
                 key = 'accept-charset'
             elif key == 'style' and isinstance(value,dict):
                 value=style_dict2str(value)
-            out = '%s %s="%s"' % ( out, key, escape( value ) )
+            out = r'%s %s="%s"' % ( out, key, escape( value ) )
            
     if between is not None:
         if isinstance(between,six.text_type): #unicode
-            between=between.encode('ascii', 'xmlcharrefreplace').decode('unicode_escape')
-        out = "%s>%s</%s>" % ( out, between, tag )
+            between=between.encode('ascii', 'xmlcharrefreplace').decode("utf-8", "backslashreplace")
+        out = r"%s>%s</%s>" % ( out, between, tag )
     else:
         if single:
-            out = "%s />" % out
+            out = r"%s />" % out
         else:
-            out = "%s>" % out
+            out = r"%s>" % out
     return out
 
 # tags which are reserved python keywords will be referred 
