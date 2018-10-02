@@ -27,7 +27,7 @@ class TestTable:
         assert_equal(self.t[1][0],datetime.date(2012, 1,23))
 
         #add a column to test timedeltas
-        self.addcol('timedelta',self.t['OrderDate'] - self.t['OrderDate'].shift(-1))
+        self.t.addcol('timedelta',self.t['OrderDate'] - self.t['OrderDate'].shift(-1))
 
     def test___init__(self):
         #most tests are above, but some more are here:

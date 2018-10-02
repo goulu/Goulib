@@ -4,7 +4,7 @@
 "mini pandas.DataFrame"
 Table class with Excel + CSV I/O, easy access to columns, HTML output, and much more.
 """
-from pandas.core.frame import DataFrame
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__ = []
@@ -18,6 +18,7 @@ import csv, itertools, codecs, json, collections
 
 
 import pandas
+from pandas.core.frame import DataFrame
 #from pandas.core.common import PandasError
 import numpy as np
 
@@ -34,10 +35,10 @@ Element=ElementTree._Element
 
 import datetime as std_datetime
 from datetime import datetime, date, time, timedelta
-from .datetime2 import datef, datetimef, timef, timedeltaf, strftimedelta
+from Goulib.datetime2 import datef, datetimef, timef, timedeltaf, strftimedelta
 
-from .markup import tag, style_str2dict
-from .itertools2 import isiterable
+from Goulib.markup import tag, style_str2dict
+from Goulib.itertools2 import isiterable
 
 def attr(args):
     res=''

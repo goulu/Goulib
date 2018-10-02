@@ -120,7 +120,7 @@ def fmt2regex(fmt):
     """
     
     expr=fmt.replace('%D','(?P<days>-?[0-9]\d*)')
-    expr=expr.replace('%H','(?P<hours>-?[0-9]\d*)')
+    expr=expr.replace('%H','(?P<hours>[+-]?[0-9]\d*)')
     expr=expr.replace('%M','(?P<minutes>\d+)')
     expr=expr.replace('%S','(?P<seconds>\d+(\.\d+)?)')
     return re.compile(expr)
@@ -143,7 +143,7 @@ def timedeltaf(t,fmt=None):
 
     #https://stackoverflow.com/a/21074460/1395973
     if fmt is None:
-        fmt='(%D day[s]?[,]? )?%H:%M:%S*'
+        fmt='(%D day[s]?,? )?%H:%M:%S'
     m=re.match(fmt2regex(fmt),t)
     if m is None:
         raise ValueError('"%s" does not match fmt=%s'%(t,fmt))  
