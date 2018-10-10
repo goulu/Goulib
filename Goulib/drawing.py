@@ -1207,6 +1207,8 @@ class Drawing(Group):
         :param content: string, either filename or svg content
         """
         #from http://stackoverflow.com/questions/15857818/python-svg-parser
+        from svg.path import parse_path
+        import tinycss
         from xml.dom import minidom
         try:
             doc = minidom.parse(content)  # parseString also exists
@@ -1216,7 +1218,7 @@ class Drawing(Group):
         styles={}
             
         for css in doc.getElementsByTagName('style'):
-            import tinycss
+            
             parser = tinycss.make_parser()
             sheet=parser.parse_stylesheet(css.firstChild.nodeValue)
             for rule in sheet.rules:
@@ -1253,10 +1255,13 @@ class Drawing(Group):
             
             # process the path
             d=path.getAttribute('d')
-            from svg.path import parse_path
-            e=Entity.from_svg(parse_path(d),color)
-            e=trans*e
-            self.append(e)
+            for m in d.split('M'):
+                try:
+                    e=Entity.from_svg(parse_path('M'+m),color)
+                except:
+                    continue # skip this ...
+                e=trans*e
+                self.append(e)
         doc.unlink()
         return self
 

@@ -412,6 +412,8 @@ class TestDrawing:
         pass # tested above
     
     def test_read_svg(self):
+        puzzle=Drawing(path+'/data/jigsaw.svg')
+        puzzle.save(results+'jigsaw.dxf')
         suisse=Drawing(path+'/data/switzerlandLow.svg')
         suisse.save(results+'switzerlandLow.png')
 
