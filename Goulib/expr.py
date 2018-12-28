@@ -12,7 +12,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, logging, copy, collections, inspect, re
+import logging, copy, collections, inspect, re
 
 from Goulib import plot #sets matplotlib backend
 
@@ -82,7 +82,7 @@ def eval(node,**kwargs):
         for op,right in zip(node.ops,node.comparators):
             #TODO: find what to do when multiple items in list
             return _operators[type(op)][0](left, eval(right,**kwargs))
-    elif six.PY3 and isinstance(node, ast.NameConstant):
+    elif isinstance(node, ast.NameConstant):
         return node.value
     else:
         logging.warning(ast.dump(node,False,False))
@@ -113,7 +113,7 @@ def get_function_source(f):
 def plouffe(f,epsilon=1e-6):
     if f<0 :
         r=plouffe(-f)
-        if isinstance(r,six.string_types):
+        if isinstance(r,str):
             return '-'+r
         return f
     if f!=0 and math2.is_integer(1/f,epsilon):
@@ -444,7 +444,7 @@ def add_constant(c, name, s=None,r=None,l=None):
     constants[type(c)][c]=(None,None,s or name,r or name ,l or '\\'+name)
 
 def add_module(module):
-    for fname,f in six.iteritems(module.__dict__):
+    for fname,f in module.__dict__.items():
         if fname[0]=='_': continue
         if isinstance(f, collections.Callable):
             add_function(f)
@@ -473,7 +473,7 @@ add_function(math.atanh,l='\\tanh^{-1}')
 add_function(math.log,l='\\ln')
 add_function(math.log1p,l='\\ln\\left(1-{%s}\\rvert)')
 add_function(math.log10,l='\\log_{10}')
-add_function(math2.log2,l='\\log_2')
+add_function(math.log2,l='\\log_2')
 add_function(math.gamma,l='\\Gamma')
 add_function(math.exp,l='e^{%s}')
 add_function(math.expm1,l='e^{%s}-1')

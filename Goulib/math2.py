@@ -3,9 +3,6 @@
 '''
 more math than :mod:`math` standard library, without numpy
 '''
-
-from __future__ import division #"true division" everywhere
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = [
@@ -15,10 +12,9 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import six, logging
-from six.moves import map, reduce, filter, zip_longest, range
+import logging
 
-import math, cmath, operator, itertools, fractions, numbers, random
+import math, cmath, operator, itertools, functools, fractions, numbers, random
 
 from Goulib import itertools2, decorators
 
@@ -31,22 +27,11 @@ try:
 except:
     nan=float('nan') #Not a Number
 
-
-# define some math functions that are not available in all supported versions of python
-
-try:
-    cmp=math.cmp
-except AttributeError:
-    def cmp(x,y):
-        '''Compare the two objects x and y and return an integer according to the outcome.
-        The return value is negative if x < y, zero if x == y and strictly positive if x > y.
-        '''
-        return sign(x-y)
-
-try:
-    log2=math.log2
-except AttributeError:
-    def log2(x):return math.log(x,2)
+def cmp(x,y):
+    '''Compare the two objects x and y and return an integer according to the outcome.
+    The return value is negative if x < y, zero if x == y and strictly positive if x > y.
+    '''
+    return sign(x-y)
 
 try:
     isclose=math.isclose
@@ -81,17 +66,17 @@ except AttributeError:
         return (((diff <= abs(rel_tol * b)) or
                  (diff <= abs(rel_tol * a))) or
                 (diff <= abs_tol))
-        
+
 def allclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     ''':return: True if two arrays are element-wise equal within a tolerance.'''
     #https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.allclose.html
-    for x,y in zip_longest(a,b):
-        if x is None or y is None: 
+    for x,y in itertools.zip_longest(a,b):
+        if x is None or y is None:
             return False
         if not isclose(x ,y , rel_tol=rel_tol, abs_tol=abs_tol):
             return False
     return True
-    
+
 
 # basic useful functions
 
@@ -127,7 +112,7 @@ def is_integer(x, rel_tol=0, abs_tol=0):
     '''
     :return: True if  float x is an integer within tolerances
     '''
-    if isinstance(x, six.integer_types):
+    if isinstance(x, int):
         return True
     try:
         if rel_tol+abs_tol==0:
@@ -314,11 +299,11 @@ def pow(x,y,z=0):
     '''
     :return: (x**y) % z as integer
     '''
-    if not isinstance(y,six.integer_types):
+    if not isinstance(y,int):
         if z==0:
-            return six.builtins.pow(x,y) #switches to floats in Py3...
+            return pow(x,y) #switches to floats in Py3...
         else:
-            return six.builtins.pow(x,y,z) #switches to floats in Py3...
+            return pow(x,y,z) #switches to floats in Py3...
     else:
         return ipow(x,y,z)
 
@@ -441,7 +426,7 @@ def mul(nums,init=1):
     '''
     :return: Product of nums
     '''
-    return reduce(operator.mul, nums, init)
+    return functools.reduce(operator.mul, nums, init)
 
 def dot_vv(a,b,default=0):
     '''dot product for vectors
@@ -542,11 +527,11 @@ def minimum(m):
 
 def vecadd(a,b,fillvalue=0):
     '''addition of vectors of inequal lengths'''
-    return [l[0]+l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]+l[1] for l in itertools.zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecsub(a,b,fillvalue=0):
     '''substraction of vectors of inequal lengths'''
-    return [l[0]-l[1] for l in zip_longest(a,b,fillvalue=fillvalue)]
+    return [l[0]-l[1] for l in itertools.zip_longest(a,b,fillvalue=fillvalue)]
 
 def vecneg(a):
     '''unary negation'''
@@ -558,13 +543,13 @@ def vecmul(a,b):
         return [x*a for x in b]
     if isinstance(b,(int,float)):
         return [x*b for x in a]
-    return [reduce(operator.mul,l) for l in zip(a,b)]
+    return [functools.reduce(operator.mul,l) for l in zip(a,b)]
 
 def vecdiv(a,b):
     '''quotient of vectors of inequal lengths'''
     if isinstance(b,(int,float)):
         return [float(x)/b for x in a]
-    return [reduce(operator.truediv,l) for l in zip(a,b)]
+    return [functools.reduce(operator.truediv,l) for l in zip(a,b)]
 
 def veccompare(a,b):
     '''compare values in 2 lists. returns triple number of pairs where [a<b, a==b, a>b]'''
@@ -728,23 +713,23 @@ def pisano_period(mod):
             if n==1:
                 return i-1
             flag=False
-            
+
 def collatz(n):
     if n % 2 == 0:
         return n // 2
     else:
         return 3 * n + 1
-    
+
 def collatz_gen(n=0):
     yield n
     while True:
         n=collatz(n)
         yield n
-        
+
 @decorators.memoize
 def collatz_period(n):
     if n==1: return 1
-    return 1+collatz_period(collatz(n)) 
+    return 1+collatz_period(collatz(n))
 
 def pascal_gen():
     '''Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0<=k<=n.
@@ -1209,11 +1194,10 @@ def prime_ktuple(constellation):
         res=[p]
         for d in diffs:
             if is_prime(p+abs(d)) == (d<0):
-                res=None
                 break
             res.append(p+d)
 
-        if res:
+        else:
             yield tuple(res)
 
 def twin_primes():
@@ -1313,14 +1297,14 @@ def power_tower(v):
     :return: v[0]**v[1]**v[2] ...
     :see: http://ajcr.net#Python-power-tower/
     '''
-    return reduce(lambda x,y:y**x, reversed(v))
+    return  functools.reduce(lambda x,y:y**x, reversed(v))
 
 def carries(a,b,base=10,pos=0):
     '''
     :return: int number of carries required to add a+b in base
     '''
     carry, answer = 0, 0 # we have no carry terms so far, and we haven't carried anything yet
-    for one,two in zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
+    for one,two in itertools.zip_longest(digits_gen(a,base), digits_gen(b,base), fillvalue=0):
         carry = (one+two+carry)//base
         answer += carry>0 # increment the number of carry terms, if we will carry again
     return answer
@@ -1380,7 +1364,7 @@ def num_from_digits(digits, base=10):
     :param base: int base, 10 by default
     :return: int number
     '''
-    if isinstance(digits,six.string_types):
+    if isinstance(digits,str):
         return int(digits,base)
     res,f=0,1
     for x in reversed(list(digits)):
@@ -2200,19 +2184,19 @@ def mod_sqrt(n, p):
             x, y = (x*d)%p, (d*d)%p
             w, r = (w*y)%p, k
     else: return a # p == 2
-    
+
 def mod_fac(n, mod, mod_is_prime=False):
     '''modular factorial
     : return n! % modulo
-    if module is prime, use Wilson's theorem 
+    if module is prime, use Wilson's theorem
     https://en.wikipedia.org/wiki/Wilson%27s_theorem
     '''
     if n >= mod : # then mod is a factor of n!
         return 0
-    
+
     if n<20: # for small n the naive algorithm can be faster
         return factorial(n)%mod
-    
+
     if mod_is_prime or is_prime(mod): # use Wilson's Theorem : (n-1)! == -1 (mod modulo)
         result = mod - 1; # avoid negative numbers:  -1 == modulo - 1 (mod modulo)
         for i in range(mod - 1,n,-1):
@@ -2234,6 +2218,38 @@ def pi_digits_gen():
         u, y = 3*(3*j+1)*(3*j+2), (q*(27*j-12)+5*r)//(5*t)
         yield y
         q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
+
+def lucky_gen():
+    '''
+    generates lucky numbers
+    :see: https://en.wikipedia.org/wiki/Lucky_number
+    :see: https://oeis.org/A000959
+    '''
+    #https://stackoverflow.com/a/22281524/1395973
+    
+    def _idx_after_removal(removed_indices, value):
+        for removed in removed_indices:
+            value -= value // removed
+        return value
+    
+    
+    def _should_be_excluded(removed_indices, value):
+        for j in range(len(removed_indices) - 1):
+            value_idx = _idx_after_removal(removed_indices[:j + 1], value)
+            if value_idx % removed_indices[j + 1] == 0:
+                return True
+        return False
+
+    yield 1
+    removed_indices = [2]
+    for i in itertools.count(3, 2):
+        if not _should_be_excluded(removed_indices, i):
+            yield i
+            removed_indices.append(i)
+            # removed_indices = list(set(removed_indices))
+            # removed_indices.sort()
+    
+    
 
 #------------------------------------------------------------------------------
 # factorization code taken from https://pypi.python.org/pypi/primefac
@@ -2428,8 +2444,8 @@ def factor_ecm(n, B1=10, B2=20):
             p = pow(u, 3, n)
             Q, C = (pow(v-u,3,n)*(3*u+v) % n, 4*p*v % n), (p, pow(v,3,n))
             pg = primes_gen()
-            p = six.next(pg)
-            while p <= B1: Q, p = ecmul(p**ilog(B1, p), Q, C, n), six.next(pg)
+            p = next(pg)
+            while p <= B1: Q, p = ecmul(p**ilog(B1, p), Q, C, n), next(pg)
             g = gcd(Q[1], n)
             if 1 < g < n: return g
             while p <= B2:
@@ -2441,7 +2457,7 @@ def factor_ecm(n, B1=10, B2=20):
                 Q = ecmul(p, Q, C, n)
                 g *= Q[1]
                 g %= n
-                p = six.next(pg)
+                p = next(pg)
             g = gcd(g, n)
             if 1 < g < n: return g
             # This seed failed.  Try again with a new one.

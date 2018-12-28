@@ -4,15 +4,15 @@
 very basic statistics functions
 """
 
-from __future__ import division #"true division" everywhere
-from Goulib.itertools2 import isiterable
+
+
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import six, math, logging, matplotlib
+import  math, logging, matplotlib
 
 from . import plot #sets matplotlib backend
 import matplotlib.pyplot as plt # after import .plot
@@ -271,7 +271,7 @@ class Discrete(Stats):
         self.pdf=data
             
     def __call__(self,x):
-        if isiterable(x):
+        if itertools2.isiterable(x):
             return (self(x) for x in x)
         if x in self.pdf:
             return self.pdf[x]
@@ -288,7 +288,7 @@ class PDF(expr.Expr, Stats):
         expr.Expr.__init__(self,pdf)
         
     def __call__(self,x=None,**kwargs):
-        if isiterable(x):
+        if itertools2.isiterable(x):
             return (self(x) for x in x)
         return self.pdf(x)
 

@@ -1,4 +1,4 @@
-from __future__ import division #"true division" everywhere
+
 
 """
 Friedman numbers and related
@@ -76,7 +76,7 @@ class ExprDict(SortedDict):
         if type(k) is complex:
             return False
         
-        if self.int and not isinstance(k,six.integer_types): #dont use math2.is_integer, not precise enough
+        if self.int and not isinstance(k,int): #dont use math2.is_integer, not precise enough
             return False
         
 
@@ -202,9 +202,9 @@ def gen(digits,monadic='-', diadic='-+*/^_',permut=True):
     """
     generate all possible Expr using digits and specified operators
     """
-    if isinstance(digits,six.integer_types):
+    if isinstance(digits,int):
         digits=str(digits)
-    if isinstance(digits,six.string_types):
+    if isinstance(digits,str):
         digits=list(digits)
     if permut:
         for d in permutations(digits):

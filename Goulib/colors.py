@@ -4,7 +4,7 @@
 color conversion in various colorspaces and palettes
 """
 
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012-, Philippe Guglielmetti"
@@ -15,7 +15,7 @@ __credits__ = ['Colormath https://pypi.python.org/pypi/colormath/',
 
 #get https://pypi.python.org/pypi/colormath/ if you need more
 
-import six, os, sys, logging
+import os, sys, logging
 import numpy as np
 
 from collections import OrderedDict
@@ -186,7 +186,7 @@ class Color(object):
         if isinstance(value,Color): #copy constructor
             self._copy_from_(value)
             return
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             if value in pantone:
                 self._copy_from_(pantone[value])
                 return
@@ -258,7 +258,7 @@ class Color(object):
     
     def str(self,mode=None):
         res=self.convert(mode)
-        if not isinstance(res, six.string_types):
+        if not isinstance(res, str):
             res=', '.join(map(math2.format,res))
         return res
     
@@ -384,11 +384,11 @@ class Palette(OrderedDict):
         if isinstance(data, Colormap):
             for i in range(keys):
                 self[i]=Color(data(i/(keys-1))) #RGB 
-        elif isinstance(keys, six.integer_types): 
+        elif isinstance(keys, int): 
             for i,v in itertools2.enumerates(data):
                     self[i]=Color(v) # v.space of RGB
         else:
-            for i,v in six.moves.zip(keys,data):
+            for i,v in zip(keys,data):
                 self[i]=Color(v) # v.space of RGB
                 
         return self

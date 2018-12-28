@@ -6,6 +6,7 @@
 
 from multiprocessing import Process, Queue as mpQueue
 from itertools import count, takewhile
+from functools import reduce
 from random import randrange
 from math import log
 

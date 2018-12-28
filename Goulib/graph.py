@@ -17,7 +17,7 @@ __copyright__ = "Copyright 2014, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import logging, math, six, json
+import logging, math, json
 
 import networkx as nx # http://networkx.github.io/
 
@@ -138,7 +138,7 @@ class _Geo(plot.Plot):
         self._map={} #map from original node name to position for AGraph and other graphs were 'pos' is a node attribute
 
         if data:
-            if isinstance(data,six.string_types): # suppose data is a filename
+            if isinstance(data,str): # suppose data is a filename
                 ext=data.split('.')[-1].lower()
                 if ext=='dot':
                     data=nx.nx_pydot.read_dot(data) #https://github.com/artiste-qb-net/quantum-fog/issues/9
@@ -337,7 +337,7 @@ class _Geo(plot.Plot):
                 return self._map[p]
 
             p=attr.get('pos',id)
-            if isinstance(p,six.string_types):
+            if isinstance(p,str):
                 p=p.split(',')
             try:
                 p=tuple(float(x) for x in p)
@@ -635,7 +635,7 @@ def draw_networkx(g, pos=None, **kwargs):
 
     #build node positions
 
-    if six.callable(pos): #mapping function
+    if itertools2.iscallable(pos): #mapping function
         pos=dict(((node,pos(node)) for node in g))
 
     if pos is None:
@@ -677,7 +677,7 @@ def draw_networkx(g, pos=None, **kwargs):
             c=data.get('color',default)
             return c if c else default
 
-    if six.callable(edge_color): #mapping function ?
+    if itertools2.iscallable(edge_color): #mapping function ?
         edge_color=list(map(edge_color,(data for u,v,data in edgelist)))
 
     if edge_color: #not empty
@@ -700,7 +700,7 @@ def draw_networkx(g, pos=None, **kwargs):
     labels=kwargs.pop('labels',False) # True in nx.draw_networkx they're
     if labels:
         if labels==True: labels=None #will be set automatically
-        if six.callable(labels): #mapping function ?
+        if itertools2.iscallable(labels): #mapping function ?
             labels=list(labels(u) for u in g.nodes(data=True))
         if isinstance(labels,list): # a dict is expected:
             labels=dict(zip(g.nodes(),labels))

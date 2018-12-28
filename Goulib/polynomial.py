@@ -11,7 +11,6 @@ __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __credits__= ["http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/"] 
 __license__ = "LGPL"
 
-import six #python 2+3 compatibility
 import re
 
 from . import expr

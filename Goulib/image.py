@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 
-from __future__ import division #"true division" everywhere
+
 
 """
 image processing with PIL's ease and skimage's power
@@ -30,19 +30,17 @@ warnings.filterwarnings("ignore") # because too many are generated
 
 import PIL.Image as PILImage
 
-import six
-from six.moves import zip
-from six.moves.urllib_parse import urlparse
-from six.moves.urllib import request
+from urllib.parse import urlparse
+from urllib import request
 urlopen = request.urlopen
 
-import os, sys, math, base64, functools, logging
+import os, io, sys, math, base64, functools, logging
 
-from Goulib import math2
-from Goulib.itertools2 import flatten, pairwise, identity
-from Goulib.drawing import Drawing #to read vector pdf files as images
-from Goulib.colors import Color, Palette
-from Goulib.plot import Plot
+from . import math2
+from .itertools2 import flatten, pairwise, identity
+from .drawing import Drawing #to read vector pdf files as images
+from .colors import Color, Palette
+from .plot import Plot
 
 class Mode(object):
     def __init__(self,name,nchannels,type,min, max):
@@ -119,7 +117,7 @@ class Image(Plot):
         ** colormap: Palette or matplotlib colormap
         """
         if isinstance(data,memoryview):
-            data=six.BytesIO(data)
+            data=io.BytesIO(data)
             data=PILImage.open(data)
 
         if data is None:
@@ -136,7 +134,7 @@ class Image(Plot):
             self.mode=data.mode
             self.array=data.array
             self.palette=data.palette
-        elif isinstance(data,six.string_types): #assume a path
+        elif isinstance(data,str): #assume a path
             self.load(data,**kwargs)
         elif isinstance(data,tuple): # (image,palette) tuple return by convert
             self._set(data[0],'P')
@@ -234,7 +232,7 @@ class Image(Plot):
             elif self.mode not in 'RGBA': #modes we can save directly
                 mode='RGB'
         a=self.convert(mode).array # makes sure we have a copy of self.array
-        if format_str is None and isinstance(path,six.string_types):
+        if format_str is None and isinstance(path,str):
             format_str=path.split('.')[-1][:3]
         if format_str.upper()=='TIF':
             a=skimage.img_as_uint(a)
@@ -250,7 +248,7 @@ class Image(Plot):
         # instead of render below
 
     def render(self, fmt='PNG',**kwargs):
-        buffer = six.BytesIO()
+        buffer = io.BytesIO()
         self.save(buffer, format_str=fmt, **kwargs)
         #self.save(buffer)
         #im=self.pil
@@ -828,7 +826,7 @@ class Image(Plot):
         return Image(a,'F')
 
     def __mul__(self,other):
-        if isinstance(other,six.string_types):
+        if isinstance(other,str):
             return self.colorize('black',other)
         if math2.is_number(other):
             return self.compose(None,other)
@@ -1001,7 +999,7 @@ def read_pdf(filename,**kwargs):
     class _Device(PDFDevice):
         def render_image(self, name, stream):
             try:
-                self.im=PILImage.open(six.BytesIO(stream.rawdata))
+                self.im=PILImage.open(io.BytesIO(stream.rawdata))
             except Exception as e:
                 logging.error(e)
 
@@ -1303,7 +1301,7 @@ def ind2rgb(im,palette):
 #inspired by https://github.com/gtaylor/python-colormath
 #WATCH OUT! converters must be defined above this line...
 
-from Goulib.graph import DiGraph
+from .graph import DiGraph
 
 converters=DiGraph(multi=False) # a nx.DiGraph() would suffice, but my DiGraph are better
 for source in modes:

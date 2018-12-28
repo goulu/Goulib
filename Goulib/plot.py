@@ -10,7 +10,8 @@ __credits__ = []
 __license__ = "LGPL"
 
 #import matplotlib and set backend once for all
-import matplotlib, os, sys, logging, six, base64
+import os, io, sys, logging, base64
+import matplotlib
 
 if os.getenv('TRAVIS'): # are we running https://travis-ci.org/ automated tests ?
     matplotlib.use('Agg') # Force matplotlib  not to use any Xwindows backend
@@ -123,7 +124,7 @@ def render(plotables, fmt='svg', **kwargs):
     if len(labels)>1:
         ax.legend()
         
-    output = six.BytesIO()
+    output = io.BytesIO()
     fig.savefig(output, format=fmt, **printargs)
     data=output.getvalue()
     plt.close(fig)

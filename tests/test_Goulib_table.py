@@ -7,7 +7,7 @@ from nose import SkipTest
 
 from Goulib.tests import *
 from Goulib.table import *
-import datetime,os, operator,six
+import datetime,os, operator
 
 class TestTable:
     
@@ -21,7 +21,7 @@ class TestTable:
               
         #format some columns
         self.t.applyf('Cost',float)
-        self.t.applyf('Total',lambda x:float(x) if isinstance(x,(six.integer_types,float)) else float(x.replace(',','')))
+        self.t.applyf('Total',lambda x:float(x) if isinstance(x,(int,float)) else float(x.replace(',','')))
         
         self.t.to_date('OrderDate',fmt=['%m/%d/%Y','Excel']) #converts using fmts in sequence
         assert_equal(self.t[0][0],datetime.date(2012, 6, 1))

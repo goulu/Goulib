@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
 
-from __future__ import division #"true division" everywhere
-
 """
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
@@ -17,14 +15,11 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import six, logging, operator, math
-from six.moves import map, reduce, filter, zip, zip_longest
-
-from itertools import count, repeat
-from Goulib.itertools2 import *
+import operator, math
 from Goulib.math2 import *
 
-from Goulib import decorators, tests
+from itertools import *
+from Goulib.itertools2 import  *
 
 from Goulib.container import Sequence
 
@@ -287,6 +282,15 @@ A007500.desc="Primes whose reversal in base 10 is also prime"
 A006567=A000040.filter(lambda x:not is_palindromic(x) and is_prime(reverse(x)))
 A006567.desc="Emirps (primes whose reversal is a different prime). "
 
+# lucky numbers
+A000959=Sequence(lucky_gen, desc="Lucky numbers")
+
+A050505=A000027%A000959
+A050505.desc="Unlucky numbers"
+
+A031157=A050505.filter(is_prime)
+A031157.desc="Numbers that are both lucky and prime."
+
 # see https://blog.plover.com/math/dd.html
 
 def anagrams(n,base=10):
@@ -311,7 +315,7 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
                     else:
                         yield n   
             
-
+""" works, but too slow (1 loop only in 1s)
 A023086,A023087,A023088,A023089,A023090,A023091,A023092,A023093=[
     Sequence(anagram_gen(f),None,lambda x:is_anagram(x,f*x), 
              "Numbers n such that n and %d*n are anagrams."%f ) 
@@ -324,6 +328,7 @@ def first_anagram(f):
         desc="a(n) is least k such that k and %dk are anagrams in base n (written in base 10)."%f
     ) 
 
+
 A023094,A023095,A023096,A023097,A023098,A023099,A023100,A023101,A023102=[
     first_anagram(f) for f in range(2,11)
 ]  
@@ -335,6 +340,7 @@ A023058=Sequence(anagram_gen(2,base=3,start=1,inbase=True),
 A023059=Sequence(anagram_gen(2,base=4,start=1,inbase=True),
     desc="Numbers k such that k and 2k are anagrams of each other in base 4 (k is written here in base 4)"
 )
+"""
 
 # decimal expansions
 
@@ -464,7 +470,7 @@ A098416=(A007529+A098415)/4
 A098416.desc="(A007529(n) + A098415(n)) / 4."
 
 def is_squarefree(n):
-    return all(q==1 for p,q in factorize(n))
+    return all(q==1 for _,q in factorize(n))
 
 A005117=Sequence(1,None,is_squarefree) #Squarefree numbers (or square-free numbers): numbers that are not divisible by a square greater than 1.
 
@@ -524,7 +530,7 @@ A055932=Sequence(1,None,is_A055932,"Numbers where all prime divisors are consecu
 def has_primitive_root(n):
     if n==1 : return True # to match A033948, but why ?
     try:
-        six.next(primitive_root_gen(n))
+        next(primitive_root_gen(n))
         return True
     except StopIteration:
         return False
@@ -696,7 +702,7 @@ A055012=sumdigpow(3,desc='Sum of cubes of the digits of n written in base 10.')
 
 def armstrong_gen():
     """generates narcissistic numbers, but not in sequence"""
-    from itertools import combinations_with_replacement
+    from itertools import combinations_with_replacement # not itertools2
     for k in count(1):
         a = [i**k for i in range(10)]
         for b in combinations_with_replacement(range(10), k):
@@ -832,7 +838,7 @@ def a023109():
     def _(n,limit=96):
         return lychrel_count(n,limit)
     
-    dict={}
+    d={}
     limit=96
     nextn=0
     for i in count():
@@ -842,11 +848,11 @@ def a023109():
             n=_(i,limit)
         if n>=limit : continue
         if n<nextn : continue
-        if n in dict : continue
-        dict[n]=i
+        if n in d : continue
+        d[n]=i
         if n==nextn:
-            while n in dict:
-                yield dict.pop(n)
+            while n in d:
+                yield d.pop(n)
                 n+=1
             nextn=n
             
@@ -956,6 +962,9 @@ A285361=Sequence(
 A088002=Sequence(recurrence((0,-1,0,0,-1), (1, 0, 0, 0, 0)),
     desc="Expansion of (1+x^2)/(1+x^2+x^5)"
 )
+
+A000959=Sequence(lucky_gen, desc="Lucky numbers")
+
 # Build oeis dict by module introspection : Simple and WOW !
 seqs=globals().copy()
 oeis={}
@@ -966,7 +975,7 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(3,A023086)))
+    print(list(take(10,A000959)))
     
 
 

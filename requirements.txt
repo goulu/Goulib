@@ -3,7 +3,6 @@ networkx
 pydot
 pydotplus
 graphviz
-six
 ipython
 lxml
 xlrd

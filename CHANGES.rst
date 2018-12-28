@@ -1,3 +1,7 @@
+v2.0.0, 2018-12-18
+* dropped 2.7 and six : Goulib now optimal for Python 3.x
+
+
 v1.6.1, 2013-12-11
 * :meth:`table.Table.html` now returns a string (no more dependent on :mod:`markup`)
 * :class:`table.Table` can be init'ed from an HTML file using `lxml <http://pypi.python.org/pypi/lxml/>`

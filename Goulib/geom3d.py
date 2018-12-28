@@ -3,7 +3,7 @@
 """
 3D geometry
 """
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, six, abc
+import operator, abc
 
 from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot,copysign
 from .geom import Geometry,copy

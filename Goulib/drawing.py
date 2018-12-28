@@ -13,7 +13,7 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 * `dxfgrabber <http://pypi.python.org/pypi/dxfgrabber/>`_ for dxf input
 * `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 """
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
@@ -21,7 +21,7 @@ __credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.aut
 __license__ = "LGPL"
 
 from math import  radians, degrees, tan, atan
-import logging, base64
+import logging, base64, io
 
 from .itertools2 import split, filter2, subdict
 from .geom import *
@@ -456,7 +456,7 @@ class Entity(plot.Plot):
 
         fig=self.draw(facecolor=facecolor, **kwargs)
 
-        buffer = six.BytesIO()
+        buffer = io.BytesIO()
         fig.savefig(
             buffer,
             format=fmt,
@@ -999,18 +999,16 @@ def chains(group, tol=1E-6, mergeable=None):
     for e in group:
         if e is None or isclose(e.length,0,tol):
             continue #will not be present in res
-        ok=False
         for c in res:
             # if c.isclosed(): continue #reopen closed chains might be good
             if c.append(e,tol=tol,mergeable=mergeable):
-                ok=True
+                changed=True
                 break
-        if not ok:
+        else:
             if isinstance(e,Chain):
                 res.append(e)
             else:
                 res.append(Chain([e]))
-        changed=changed or ok
     #step 2 : try to merge chains
     if changed:
         res=chains(res,tol,mergeable)
@@ -1097,7 +1095,7 @@ class Drawing(Group):
     """list of Entities representing a vector graphics drawing"""
 
     def __init__(self, data=[], **kwargs):
-        if isinstance(data,six.string_types): #filename
+        if isinstance(data,str): #filename
             self.load(data,**kwargs)
         else:
             Group.__init__(self,data)

@@ -3,7 +3,7 @@
 """
 2D geometry
 """
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, six, abc
+import operator, abc
 
 from math import pi,sin,cos,atan2,sqrt,hypot,copysign
 from Goulib import math2, itertools2
@@ -39,8 +39,7 @@ copy=copier.deepcopy
 # Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
 # --------------------------------------------------------------------------
 
-@six.add_metaclass(abc.ABCMeta)
-class Geometry(object):
+class Geometry(object, metaclass=abc.ABCMeta):
     """
     The following classes are available for dealing with simple 2D geometry.
     The interface to each shape is similar; in particular, the ``connect``
