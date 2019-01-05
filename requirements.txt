@@ -13,6 +13,7 @@ svg.path
 tinycss
 pdfminer.six
 sortedcollections
+bitarray
 pint
 nose       
 sphinx

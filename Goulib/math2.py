@@ -844,32 +844,51 @@ def proper_divisors(n):
     ''':return: all divisors of n except n itself.'''
     return (divisor for divisor in divisors(n) if divisor != n)
 
-_sieve=list() # array of bool indicating primality
+from bitarray import bitarray
+
+class Sieve:
+    # should be derived from bitarray but ...
+    # https://github.com/ilanschnell/bitarray/issues/69
+    # TODO: simplify when solved
+    def __init__(self, f, init):
+        self._=bitarray(init)
+        self.f=f
+        
+    def __len__(self):
+        return len(self._)
+    
+    def __getitem__(self,index):
+        return self._[index]
+    
+    def __call__(self, n):
+        self.resize(n)
+        return (i for i,v in enumerate(self._) if v)
+        
+    def resize(self, n):
+        l=len(self)-1
+        if n<=l : return
+        n=int(n) # to tolerate n=1E9, which is float
+        self._.extend([True]*(n-l))
+        for i in self(n):
+            if i==2:
+                i2,s=4,2
+            else:
+                i2,s=self.f(i)
+            if i2>n : break
+            self._[i2::s]=False # bitarray([False]*int((n-i2)/s+1))
+
+def erathostene(n):
+    return n*n,2*n
+        
+_sieve=Sieve(erathostene,[False,False,True]) # array of bool indicating primality
 
 def sieve(n, oneisprime=False):
     '''prime numbers from 2 to a prime < n
-    Very fast (n<10,000,000) in 0.4 sec.
-
-    Example:
-    >>>prime_sieve(25)
-    [2, 3, 5, 7, 11, 13, 17, 19, 23]
-
-    Algorithm & Python source: Robert William Hanks
-    http://stackoverflow.com/questions/17773352/python-sieve-prime-numbers
     '''
-    n=int(n) # to tolerate n=1E9, which is float
-    if n<2: return []
-    if n==2: return [1] if oneisprime else []
-    global _sieve
-    if n>len(_sieve): #recompute the sieve
-        #TODO: enlarge the sieve...
-        # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
-        _sieve = [False,False,True,True]+[False,True] * ((n-4)//2)
-        #assert(len(_sieve)==n)
-        for i in range(3,int(n**0.5)+1,2):
-            if _sieve[i]:
-                _sieve[i*i::2*i]=[False]*int((n-i*i-1)/(2*i)+1)
-    return ([1,2] if oneisprime else [2]) + [i for i in range(3,n,2) if _sieve[i]]
+    res=_sieve(n)
+    if oneisprime:
+        res=chain([1],res)
+    return list(res)
 
 _primes=sieve(1000) # primes up to 1000
 _primes_set = set(_primes) # to speed us primality tests below
@@ -2219,35 +2238,7 @@ def pi_digits_gen():
         yield y
         q, r, t, j = 10*q*j*(2*j-1), 10*u*(q*(5*j-2)+r-y*t), t*u, j+1
 
-def lucky_gen():
-    '''
-    generates lucky numbers
-    :see: https://en.wikipedia.org/wiki/Lucky_number
-    :see: https://oeis.org/A000959
-    '''
-    #https://stackoverflow.com/a/22281524/1395973
-    
-    def _idx_after_removal(removed_indices, value):
-        for removed in removed_indices:
-            value -= value // removed
-        return value
-    
-    
-    def _should_be_excluded(removed_indices, value):
-        for j in range(len(removed_indices) - 1):
-            value_idx = _idx_after_removal(removed_indices[:j + 1], value)
-            if value_idx % removed_indices[j + 1] == 0:
-                return True
-        return False
 
-    yield 1
-    removed_indices = [2]
-    for i in itertools.count(3, 2):
-        if not _should_be_excluded(removed_indices, i):
-            yield i
-            removed_indices.append(i)
-            # removed_indices = list(set(removed_indices))
-            # removed_indices.sort()
     
     
 
