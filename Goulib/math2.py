@@ -981,7 +981,7 @@ def sieve(n, oneisprime=False):
     '''
     res = _sieve(n)
     if oneisprime:
-        res = chain([1], res)
+        res = itertools.chain([1], res)
     return list(res)
 
 
