@@ -32,7 +32,6 @@ __all__ = [
     'piecewise',
     'plot',
     'polynomial',
-    'statemachine',
     'stats',
     'table',
     'tests',
