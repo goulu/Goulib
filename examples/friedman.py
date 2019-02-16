@@ -1,5 +1,3 @@
-
-
 """
 Friedman numbers and related
 """
@@ -13,146 +11,162 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import six
 import logging
 from itertools import permutations, product, count, chain
 from sortedcontainers import SortedDict
 
-import math
+import math, ast
 from Goulib import math2, expr
-from Goulib.expr import Expr
 
 # "safe" operators
+_context = expr.Context()
 
-# import numpy
 
-def add(a,b):
-    if a==0: return b
-    if b==0: return a
-    res=a+b
-    if res==a: 
-        res=res+math2.eps*math2.sign(b) # numpy.nextafter(res,res+math2.sign(b))
-        assert res!=a
-    elif res==b: 
-        res=res+math2.eps*math2.sign(a) # res=numpy.nextafter(res,res+math2.sign(a))
-        assert res!=b
+def add(a, b):
+    if a == 0: return b
+    if b == 0: return a
+    res = a + b
+    if res == a:
+        res = res + math2.eps * math2.sign(b)  # numpy.nextafter(res,res+math2.sign(b))
+        assert res != a
+    elif res == b:
+        res = res + math2.eps * math2.sign(a)  # res=numpy.nextafter(res,res+math2.sign(a))
+        assert res != b
     return res
 
-def sub(a,b):
-    return add(a,-b)
 
-def div(a,b):
-    res=math2.int_or_float(a/b)
-    a2=res*b
-    if a==a2: return res
-    #the division has rounded somthing, like (a+eps)/a =1
-    return res+math2.eps*math2.sign(a*b) #  numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+def sub(a, b):
+    return add(a, -b)
+
+
+def div(a, b):
+    res = math2.int_or_float(a / b)
+    a2 = res * b
+    if a == a2: return res
+    # the division has rounded something, like (a+eps)/a =1
+    return res + math2.eps * math2.sign(a * b)  # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+
+
+def pow(a, b):
+    res = math2.ipow(a, b)
+    if res != 0 or a == 0: return res
+    # a to a negative power has been rounded to 0 ...
+    return res + math2.eps * math2.sign(a * b)  # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+
+
+_context.operators[ast.Add] = (add, 1100, '+', '+', '+')
+_context.operators[ast.Sub] = (sub, 1101, '-', '-', '-')
+_context.operators[ast.Div] = (div, 1201, '/', '/', '\\frac{%s}{%s}')
+_context.operators[ast.Pow] = (pow, 1400, '^', '**', '^'),  # ipow returns an integer when result is integer ...
+
+# remove functions that are irrelevant or redundant
+for f in ['isinf', 'isnan', 'isfinite', 'frexp',
+          'abs', 'fabs', 'ceil', 'floor', 'trunc',
+          'erf', 'erfc',
+          'fsum', 'expm1', 'log1p', 'lgamma',
+          'radians', 'degrees']:
+    del _context.functions[f]
+
+
+def Expr(e):
+    return expr.Expr(e, context=_context);
 
 
 class ExprDict(SortedDict):
     '''Expr indexed by their result'''
 
     def __init__(self, int=False, max=None, improve=True):
-        super(ExprDict,self).__init__()
-        self.int=int # if only ints should be stored
-        self.max=max
-        self.improve = improve # whether insert should replace complex formula by simpler
+        super(ExprDict, self).__init__()
+        self.int = int  # if only ints should be stored
+        self.max = max
+        self.improve = improve  # whether insert should replace complex formula by simpler
 
-    def add(self,expr):
+    def add(self, expr):
         ''' add expr
         :return: bool True if it has been added
         '''
-        
+
         if expr is None:
             return False
         try:
-            k=expr() # the key is the numeric value of expr
-        except (TypeError,ValueError):
+            k = expr()  # the key is the numeric value of expr
+        except (TypeError, ValueError):
             return False
-        
-        if not math2.is_number(k): 
+
+        if not math2.is_number(k):
             return False
-        
+
         if type(k) is complex:
             return False
-        
-        if self.int and not isinstance(k,int): #dont use math2.is_integer, not precise enough
-            return False
-        
 
+        if self.int:
+            # limit to integers... but maybe we're extremely close
+            k = math2.int_or_float(k)
+            if not isinstance(k, int): return False
 
-        if k<0 :
+        if k < 0:
             return self.add(-expr)
 
-        if self.max is not None and k>self.max :
+        if self.max is not None and k > self.max:
             return False
 
         if k in self:
             if self.improve and expr.complexity() >= self[k].complexity():
                 return False
-        
-        self[k]=expr
+
+        self[k] = expr
         return True
-    
-    def __add__(self,other):
+
+    def __add__(self, other):
         ''' merges 2 ExprDict
         '''
-        result=ExprDict(int=self.int, max=self.max, improve=self.improve)
+        result = ExprDict(int=self.int, max=self.max, improve=self.improve)
         result.update(self)
         result.update(other)
         return result
-        
-functions = SortedDict(expr.functions)
-#remove functions that are irrelevant or redundant
-for f in ['isinf','isnan','isfinite','frexp', 
-          'abs','fabs','ceil','floor','trunc',
-          'erf','erfc',
-          'fsum', 'expm1','log1p','lgamma',
-          'radians','degrees']:
-    del functions[f]
-        
+
+
 class Monadic(ExprDict):
-    def __init__(self,n,ops, levels=1):
-        super(Monadic,self).__init__(int=False, max=1E100, improve=True)
-        self.ops=ops
+    def __init__(self, n, ops, levels=1):
+        super(Monadic, self).__init__(int=False, max=1E100, improve=True)
+        self.ops = ops
         self.add(Expr(n))
         for _ in range(levels):
-            keys=list(self._list) # freeze it for this level
+            keys = list(self._list)  # freeze it for this level
             for op in ops:
-                if op=='s':
-                    op='sqrt'
-                elif op=='!':
-                    op='factorial'
-                elif op=='!!':
-                    op='factorial2'
-                self._apply(keys,Expr(expr.functions[op][0]))
-                    
-    def _apply(self,keys,f,condition=lambda _:True):
+                if op == 's':
+                    op = 'sqrt'
+                elif op == '!':
+                    op = 'factorial'
+                elif op == '!!':
+                    op = 'factorial2'
+                self._apply(keys, Expr(expr.functions[op][0]))
+
+    def _apply(self, keys, f, condition=lambda _: True):
         ''' applies f to all keys satisfying condition
         returns True if at least one new result was added
         '''
-        res=False
+        res = False
         for k in keys:
             if condition(k):
-                res = self.add(f(self[k])) or res # ! lazy
+                res = self.add(f(self[k])) or res  # ! lazy
         return res
-    
+
     def __getitem__(self, index):
         """Return the key at position *index*."""
         try:
-            return super(Monadic,self).__getitem__(index)
+            return super(Monadic, self).__getitem__(index)
         except KeyError:
             pass
-        if index<0 and '-' in self.ops:
-            return -super(Monadic,self).__getitem__(-index)
+        if index < 0 and '-' in self.ops:
+            return -super(Monadic, self).__getitem__(-index)
         else:
             raise KeyError(index)
-        
-    
+
     def __iter__(self):
         ''' return real keys followed by fake negatives ones if needed'''
         if '-' in self.ops:
-            return chain(self._list,(-x for x in self._list if x !=0))
+            return chain(self._list, (-x for x in self._list if x != 0))
         else:
             return iter(self._list)
 
@@ -164,128 +178,132 @@ class Monadic(ExprDict):
         `RuntimeError` or fail to iterate over all entries.
         """
         for key in self:
-            value=self[key]
+            value = self[key]
             yield (key, value)
-            
+
     def items(self):
         return list(self.iteritems())
-            
 
 
 # supported operators with precedence and text + LaTeX repr
 # precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
 #
 
-def concat(left,right):
-    if left.isNum and right.isNum and left>0 and right>=0:
-        return Expr(str(left)+str(right))
+def concat(left, right):
+    if left.isNum and right.isNum and left > 0 and right >= 0:
+        return Expr(str(left) + str(right))
     else:
         return None
 
-def _diadic(left,op,right):
-    if op=='+': return left+right
-    if op=='-': return left-right
-    if op=='*': return left*right
-    if op=='/': return left/right
-    if op=='^':
-        return left**right
-    if op=='**': return left**right
-    if op=='_':
-        return concat(left,right)
 
-def _monadic(op,e):
-    if op=='': return e
-    if op=='-': return -e
-    if op=='s': return Expr(math.sqrt)(e)
+def _diadic(left, op, right):
+    if op == '+':
+        return left + right
+    if op == '-':
+        return left - right
+    if op == '*':
+        return left * right
+    if op == '/':
+        return left / right
+    if op == '^':
+        return left ** right
+    if op == '**':
+        return left ** right
+    if op == '_':
+        return concat(left, right)
 
-def gen(digits,monadic='-', diadic='-+*/^_',permut=True):
+
+def _monadic(op, e):
+    if op == '': return e
+    if op == '-': return -e
+    if op == 's': return Expr(math.sqrt)(e)
+
+
+def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
     """
     generate all possible Expr using digits and specified operators
     """
-    if isinstance(digits,int):
-        digits=str(digits)
-    if isinstance(digits,str):
-        digits=list(digits)
+    if isinstance(digits, int):
+        digits = str(digits)
+    if isinstance(digits, str):
+        digits = list(digits)
     if permut:
         for d in permutations(digits):
-            for x in gen(d,monadic, diadic,False):
+            for x in gen(d, monadic, diadic, False):
                 yield x
         return
 
-    if len(digits)==1 or '_' in diadic:
+    if len(digits) == 1 or '_' in diadic:
         try:
-            e=Expr(''.join(digits))
+            e = Expr(''.join(digits))
         except SyntaxError:
             pass
         else:
             if e.isNum:
                 yield e
                 for op in monadic:
-                    yield _monadic(op,e)
+                    yield _monadic(op, e)
 
-    for i in range(1,len(digits)):
+    for i in range(1, len(digits)):
         try:
             for x in product(
-                gen(digits[:i], monadic, diadic, permut),
-                diadic,
-                gen(digits[i:], monadic, diadic, permut),
+                    gen(digits[:i], monadic, diadic, permut),
+                    diadic,
+                    gen(digits[i:], monadic, diadic, permut),
             ):
                 yield _diadic(*x)
         except:
             pass
 
 
-def seq(digits,monadic,diadic,permut):
+def seq(digits, monadic, diadic, permut):
     """
     returns a sequence of Expr generated by gen(**kwargs)
     which evaluate to 0,1,...
     """
 
-    b=ExprDict(int=True)
-    i=0
-    for e in gen(digits,monadic, diadic, permut):
-        b.min=i
+    b = ExprDict(int=True)
+    i = 0
+    for e in gen(digits, monadic, diadic, permut):
+        b.min = i
         b.add(e)
         while i in b:
             # yield (i,b.pop(i))
-            i+=1
-    logging.warning('%d has no solution'%i)
+            i += 1
+    logging.warning('%d has no solution' % i)
     for k in b:
-        yield (k,b[k])
+        yield (k, b[k])
+
 
 def pp(e):
     """ pretty print, clean the formula (should be done in Expr...="""
-    f=str(e[1])
+    f = str(e[1])
     # f=f.replace('--','+')
     # f=f.replace('+-','-')
-    print('%d = %s'%(e[0],f))
+    print('%d = %s' % (e[0], f))
+
 
 def friedman(num):
     for e in gen(num):
         try:
-            n=math2.int_or_float(e()) #cope with potential rounding problems
-            if n==num and str(e)!=str(num): #concat is too easy ...
-                yield (num,e)
-        except GeneratorExit: # https://stackoverflow.com/a/41115661/1395973
+            n = math2.int_or_float(e())  # cope with potential rounding problems
+            if n == num and str(e) != str(num):  # concat is too easy ...
+                yield (num, e)
+        except GeneratorExit:  # https://stackoverflow.com/a/41115661/1395973
             return
         except:
             pass
 
 
 if __name__ == "__main__":
-    
-    for x in seq(123456789,'-s','+-*/^_',False):
+
+    for x in seq(123456789, '-s', '+-*/^_', False):
         print(x)
-        if x[0]>=100: break
-        
+        if x[0] >= 100: break
+
     exit()
-    
-    m=Monadic(math.pi,functions,2)
+
+    m = Monadic(math.pi, functions, 2)
 
     for x in m:
-        print('%s = %s'%(x,m[x]))
-        
-
-
-
-
+        print('%s = %s' % (x, m[x]))
