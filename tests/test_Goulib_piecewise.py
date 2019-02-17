@@ -4,6 +4,7 @@ from nose.tools import assert_equal
 from nose import SkipTest
 #lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+from Goulib.plot import save
 
 from Goulib.piecewise import *
 from Goulib.itertools2 import arange
@@ -12,6 +13,7 @@ from Goulib.math2 import inf
 from math import *
 import os
 path=os.path.dirname(os.path.abspath(__file__))
+results=path+'/results/piecewise/' #path for results
 
 class TestPiecewise:
     @classmethod
@@ -101,6 +103,11 @@ class TestPiecewise:
         assert_equal(str(self.p1),'[(-inf, 0), (1, 1), (3, 3), (4, 4), (5, 0)]')
         assert_equal(str(self.pb),'[(0, False), (1, True)], period=2')
         assert_equal(str(self.f),'[(-inf, 0), (0, cos(x)), (1, x*x)]')
+
+    def test_plot(self):
+        save([self.p1],results+'p1.png')
+        save([self.pb],results+'pb.png')
+        save([self.f],results+'f.png')
 
     def test___iter__(self):
         xy=itertools2.take(6,self.pb)

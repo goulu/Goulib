@@ -312,7 +312,7 @@ class Expr(plot.Plot):
         return TextVisitor(_dialect_latex).visit(self.body)
 
     def _repr_latex_(self):
-        return r'$%s$' % self.latex()
+        return r'${%s}$' % self.latex()
 
     def points(self, xmin=-1, xmax=1, step=0.1):
         ''':return: x,y lists of float : points for a line plot'''
