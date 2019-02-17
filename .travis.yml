@@ -2,7 +2,7 @@ language: python
 group: travis_latest
 dist: xenial
 
-python
+python:
   - 3.5
   - 3.6
   - 3.7
