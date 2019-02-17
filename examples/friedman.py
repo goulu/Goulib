@@ -19,7 +19,7 @@ import math, ast
 from Goulib import math2, expr
 
 # "safe" operators
-_context = expr.Context()
+context = expr.Context()
 
 
 def add(a, b):
@@ -54,10 +54,10 @@ def pow(a, b):
     return res + math2.eps * math2.sign(a * b)  # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
 
 
-_context.operators[ast.Add] = (add, 1100, '+', '+', '+')
-_context.operators[ast.Sub] = (sub, 1101, '-', '-', '-')
-_context.operators[ast.Div] = (div, 1201, '/', '/', '\\frac{%s}{%s}')
-_context.operators[ast.Pow] = (pow, 1400, '^', '**', '^'),  # ipow returns an integer when result is integer ...
+context.operators[ast.Add] = (add, 1100, '+', '+', '+')
+context.operators[ast.Sub] = (sub, 1101, '-', '-', '-')
+context.operators[ast.Div] = (div, 1201, '/', '/', '\\frac{%s}{%s}')
+context.operators[ast.Pow] = (pow, 1400, '^', '**', '^'),  # ipow returns an integer when result is integer ...
 
 # remove functions that are irrelevant or redundant
 for f in ['isinf', 'isnan', 'isfinite', 'frexp',
@@ -65,11 +65,11 @@ for f in ['isinf', 'isnan', 'isfinite', 'frexp',
           'erf', 'erfc',
           'fsum', 'expm1', 'log1p', 'lgamma',
           'radians', 'degrees']:
-    del _context.functions[f]
+    del context.functions[f]
 
 
 def Expr(e):
-    return expr.Expr(e, context=_context);
+    return expr.Expr(e, context=context);
 
 
 class ExprDict(SortedDict):
@@ -140,7 +140,7 @@ class Monadic(ExprDict):
                     op = 'factorial'
                 elif op == '!!':
                     op = 'factorial2'
-                self._apply(keys, Expr(expr.functions[op][0]))
+                self._apply(keys, Expr(context.functions[op][0]))
 
     def _apply(self, keys, f, condition=lambda _: True):
         ''' applies f to all keys satisfying condition
@@ -303,7 +303,7 @@ if __name__ == "__main__":
 
     exit()
 
-    m = Monadic(math.pi, functions, 2)
+    m = Monadic(math.pi, context.functions, 2)
 
     for x in m:
         print('%s = %s' % (x, m[x]))
