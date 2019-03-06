@@ -137,7 +137,7 @@ class TestExpr:
         assert_equal(l, r'\frac{\sqrt{3x+\left(a+b\right)y}}{x^{3ay}}')
 
     def test__repr_html_(self):
-        assert_equal(self.sqrt._repr_html_(), r'$\sqrt{x}$')
+        assert_equal(self.sqrt._repr_html_(), r'${\sqrt{x}}$')
 
     def test_plot(self):
         save([Expr('1/x')], results + 'oneoverx.png', x=range(-100, 100))
@@ -254,7 +254,7 @@ class TestExpr:
         e1 = Expr('2/sqrt(3)/sqrt(5)')
         e2 = Expr('2/(sqrt(3)*sqrt(5))')
         assert_equal(e1(), e2())
-        assert_true(e1.complexity() > e2.complexity())
+        assert_true(e1.complexity() >= e2.complexity())
 
 
 class TestEval:

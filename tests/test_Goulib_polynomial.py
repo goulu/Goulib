@@ -64,7 +64,7 @@ class TestPolynomial:
     def test__repr_latex_(self):
         s = self.p._repr_latex_()
         s = s.replace(' ', '')
-        assert_equal(s, '$3x^2+2x+1$')
+        assert_equal(s, '${3x^2+2x+1}$')
 
     def test___str__(self):
         s = str(self.p)
