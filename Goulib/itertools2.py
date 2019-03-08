@@ -12,9 +12,6 @@ __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
                ]
 __license__ = "LGPL"
 
-import six #Python2+3 compatibility utilities
-from six.moves import reduce, zip
-
 import itertools, random, operator, collections, heapq, logging
 
 
@@ -29,7 +26,7 @@ def isiterable(obj):
     :result: bool True if obj is iterable (but not a string)
     """
     # http://stackoverflow.com/questions/1055360/how-to-tell-a-variable-is-iterable-but-not-a-string
-    if isinstance(obj, six.string_types): return False #required since Python 3.5
+    if isinstance(obj, str): return False #required since Python 3.5
     return isinstance(obj, collections.Iterable)
 
 def iscallable(f):
@@ -105,7 +102,7 @@ def enumerates(iterable):
     :result: key,value pair for whatever iterable type
     """
     if isinstance(iterable,dict):
-        return six.iteritems(iterable)
+        return iterable.items()
     return enumerate(iterable)
 
 def ilen(it):
@@ -171,7 +168,7 @@ def linspace(start,end,n=100):
         step=float(end-start)/(n-1)
         return arange(start,end+step/2,step)
 
-def flatten(l, donotrecursein=six.string_types):
+def flatten(l, donotrecursein=str):
     """iterator to flatten (depth-first) structure
 
     :param l: iterable structure
@@ -180,7 +177,7 @@ def flatten(l, donotrecursein=six.string_types):
     """
     #http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
     if isinstance(l,dict):
-        l=six.itervalues(l)
+        l=l.values()
     for el in l:
         if not isinstance(el, collections.Iterable):
             yield el
@@ -349,7 +346,7 @@ def ireduce(func, iterable, init=None):
     # not functional
     if init is None:
         iterable = iter(iterable)
-        curr = six.next(iterable)
+        curr = next(iterable)
     else:
         curr = init
         yield init
@@ -442,7 +439,7 @@ def takenth(n, iterable, default=None):
     :result: nth item of iterable
     """
     # https://docs.python.org/2/library/html#recipes
-    return six.next(itertools.islice(iterable, n, n+1),default)
+    return next(itertools.islice(iterable, n, n+1),default)
 
 nth=takenth
 
@@ -579,7 +576,7 @@ def removef(iterable,f):
 
 def find(iterable,f):
     """Return first item in iterable where f(item) == True."""
-    return six.next(ifind(iterable,f))
+    return next(ifind(iterable,f))
 
 def isplit(iterable,sep,include_sep=False):
     """ split iterable by separators or condition
@@ -703,7 +700,7 @@ class iter2(object):
         return itertools.chain(self._iter, iter(iterable))
 
     def __next__(self):
-        return six.next(self._iter)
+        return next(self._iter)
 
     next=__next__ #Python2-3 compatibility
 
@@ -760,10 +757,10 @@ def sorted_iterable(iterable, key=None, buffer=100):
 
 def diff(iterable1,iterable2):
     """generate items in sorted iterable1 that are not in sorted iterable2"""
-    b=six.next(iterable2)
+    b=next(iterable2)
     for a in iterable1:
         while b<a:
-            b=six.next(iterable2)
+            b=next(iterable2)
         if a==b: continue
         yield a
 

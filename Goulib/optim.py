@@ -13,7 +13,7 @@ __credits__ = [
     ]
 __license__ = "LGPL"
 
-import logging, math, random, copy, six
+import logging, math, random, copy 
 
 from .itertools2 import all_pairs, index_min, sort_indexes
 from .stats import mean

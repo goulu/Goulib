@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import six, re
+import re
 
 from Goulib import math2, interval, decorators
 from datetime import datetime,date,time,timedelta
@@ -77,7 +77,7 @@ def datetimef(d,t=None,fmt='%Y-%m-%d'):
         d=d
     elif isinstance(d,dt.date):
         d=datetime(year=d.year, month=d.month, day=d.day)
-    elif isinstance(d,(six.integer_types,float)):
+    elif isinstance(d,(int,float)):
         d=datetime(year=1900,month=1,day=1)+timedelta(days=d-2) #WHY -2 ?
     else:
         d=datetime.strptime(str(d),fmt)
@@ -91,7 +91,7 @@ def datef(d,fmt='%Y-%m-%d'):
         return d.date()
     if isinstance(d,dt.date):
         return d
-    if isinstance(d,(six.string_types,six.integer_types,float)):
+    if isinstance(d,(str,int,float)):
         return datetimef(d,fmt=fmt).date()
     return date(d)  #last chance...
 
@@ -101,7 +101,7 @@ def timef(t,fmt='%H:%M:%S'):
         return t.time()
     if isinstance(t,dt.time):
         return t
-    if isinstance(t,(six.integer_types,float)):
+    if isinstance(t,(int,float)):
         if not '%d' in fmt: # t is in hours
             s=math2.rint(t*3600)
             h,m=divmod(s,3600)
@@ -138,7 +138,7 @@ def timedeltaf(t,fmt=None):
         return t
     if isinstance(t,time):
         return time_sub(t,midnight)
-    elif isinstance(t,(six.integer_types,float)):
+    elif isinstance(t,(int,float)):
         return timedelta(days=t)
 
     #https://stackoverflow.com/a/21074460/1395973

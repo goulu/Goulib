@@ -12,8 +12,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import os, sys, six, logging, re
-from six.moves import zip
+import os, sys, logging, re
 
 from Goulib import itertools2, decorators
 from Goulib.tests import *
@@ -54,7 +53,7 @@ def data(s):
     except:
         pass
 
-    from six.moves.urllib.request import urlopen
+    from urllib.request import urlopen
     try: # is there a local, patched file ?
         file = open('b%s.txt'%s2,'rb')
         logging.warning('reading b%s.txt'%s2)
@@ -63,7 +62,7 @@ def data(s):
         logging.info('downloading b%s.txt'%s2)
     res=[]
     for line in file: # files are iterable
-        c=six.unichr(line[0])
+        c=chr(line[0])
         if c=='#' :
             continue # skip comment
         m=re.search(b'(\d+)\s+(-?\d+)',line)

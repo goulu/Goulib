@@ -3,7 +3,6 @@
 """
 3D geometry
 """
-from __future__ import division #"true division" everywhere
 
 __author__ = "Alex Holkner, Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2006 Alex Holkner"
@@ -16,10 +15,10 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, six, abc
+import operator, abc
 
-from math import pi,sin,cos,tan,acos,asin,atan2,sqrt,hypot,copysign
-from .geom import Geometry,copy
+from math import pi, sin, cos, tan, acos, asin, atan2, sqrt, hypot, copysign
+from .geom import Geometry, copy
 
 # 3D Geometry
 # -------------------------------------------------------------------------
@@ -46,6 +45,7 @@ To find the corresponding closest point on the sphere to the line::
 XXX I have not checked if these are correct.
 """
 
+
 def _connect_point3_line3(P, L):
     d = L.v.mag2()
     # assert d != 0
@@ -55,8 +55,9 @@ def _connect_point3_line3(P, L):
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
     return Segment3(P, Point3(L.p.x + u * L.v.x,
-                                  L.p.y + u * L.v.y,
-                                  L.p.z + u * L.v.z))
+                              L.p.y + u * L.v.y,
+                              L.p.z + u * L.v.z))
+
 
 def _connect_point3_sphere(P, S):
     v = P - S.c
@@ -64,10 +65,12 @@ def _connect_point3_sphere(P, S):
     v *= S.r
     return Segment3(P, Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z))
 
+
 def _connect_point3_plane(p, plane):
     n = plane.n.normalized()
     d = p.dot(plane.n) - plane.k
     return Segment3(p, Point3(p.x - n.x * d, p.y - n.y * d, p.z - n.z * d))
+
 
 def _connect_line3_line3(A, B):
     # assert A.v and B.v
@@ -92,11 +95,12 @@ def _connect_line3_line3(A, B):
     if not B._u_in(ub):
         ub = max(min(ub, 1.0), 0.0)
     return Segment3(Point3(A.p.x + ua * A.v.x,
-                               A.p.y + ua * A.v.y,
-                               A.p.z + ua * A.v.z),
-                        Point3(B.p.x + ub * B.v.x,
-                               B.p.y + ub * B.v.y,
-                               B.p.z + ub * B.v.z))
+                           A.p.y + ua * A.v.y,
+                           A.p.z + ua * A.v.z),
+                    Point3(B.p.x + ub * B.v.x,
+                           B.p.y + ub * B.v.y,
+                           B.p.z + ub * B.v.z))
+
 
 def _connect_line3_plane(L, P):
     d = P.n.dot(L.v)
@@ -112,6 +116,7 @@ def _connect_line3_plane(L, P):
                                             L.p.z + u * L.v.z), P)
     # Intersection
     return None
+
 
 def _connect_sphere_line3(S, L):
     """
@@ -131,27 +136,29 @@ def _connect_sphere_line3(S, L):
     v = (point - S.c)
     v.normalize()
     v *= S.r
-    return Segment3(S.c+v,point)
+    return Segment3(S.c + v, point)
+
 
 def _connect_sphere_sphere(A, B):
     v = B.c - A.c
     d = v.mag()
     if A.r >= B.r and d < A.r:
-        #centre B inside A
-        s1,s2 = +1, +1
+        # centre B inside A
+        s1, s2 = +1, +1
     elif B.r > A.r and d < B.r:
-        #centre A inside B
-        s1,s2 = -1, -1
+        # centre A inside B
+        s1, s2 = -1, -1
     elif d >= A.r and d >= B.r:
-        s1,s2 = +1, -1
+        s1, s2 = +1, -1
 
     v.normalize()
-    return Segment3(Point3(A.c.x + s1* v.x * A.r,
-                               A.c.y + s1* v.y * A.r,
-                               A.c.z + s1* v.z * A.r),
-                        Point3(B.c.x + s2* v.x * B.r,
-                               B.c.y + s2* v.y * B.r,
-                               B.c.z + s2* v.z * B.r))
+    return Segment3(Point3(A.c.x + s1 * v.x * A.r,
+                           A.c.y + s1 * v.y * A.r,
+                           A.c.z + s1 * v.z * A.r),
+                    Point3(B.c.x + s2 * v.x * B.r,
+                           B.c.y + s2 * v.y * B.r,
+                           B.c.z + s2 * v.z * B.r))
+
 
 def _connect_sphere_plane(S, P):
     c = _connect_point3_plane(S.c, P)
@@ -162,7 +169,8 @@ def _connect_sphere_plane(S, P):
     v.normalize()
     v *= S.r
     return Segment3(Point3(S.c.x + v.x, S.c.y + v.y, S.c.z + v.z),
-                        p2)
+                    p2)
+
 
 def _connect_plane_plane(A, B):
     if A.n.cross(B.n):
@@ -171,6 +179,7 @@ def _connect_plane_plane(A, B):
     else:
         # Planes are parallel, connect to arbitrary point
         return _connect_point3_plane(A._get_point(), B)
+
 
 def _intersect_line3_sphere(L, S):
     a = L.v.mag2()
@@ -193,7 +202,8 @@ def _intersect_line3_sphere(L, S):
         return p2
     if p2 is None:
         return p1
-    return Segment3(p1,p2)
+    return Segment3(p1, p2)
+
 
 def _intersect_line3_plane(L, P):
     d = P.n.dot(L.v)
@@ -206,6 +216,7 @@ def _intersect_line3_plane(L, P):
     return Point3(L.p.x + u * L.v.x,
                   L.p.y + u * L.v.y,
                   L.p.z + u * L.v.z)
+
 
 def _intersect_plane_plane(A, B):
     n1_m = A.n.mag2()
@@ -222,6 +233,7 @@ def _intersect_plane_plane(A, B):
                         c1 * A.n.z + c2 * B.n.z),
                  A.n.cross(B.n))
 
+
 class Vector3(object):
     """ Mutable 3D Vector.
     See `Vector2`documentation"""
@@ -235,7 +247,7 @@ class Vector3(object):
             # assert(len(value) == 3)
             x, y, z = value
         else:
-            x, y,z = args
+            x, y, z = args
         self.x = x
         self.y = y
         self.z = z
@@ -246,7 +258,7 @@ class Vector3(object):
         return (self.x, self.y, self.z)
 
     def __repr__(self):
-        return '%s%s' % (self.__class__.__name__,self.xyz)
+        return '%s%s' % (self.__class__.__name__, self.xyz)
 
     def __eq__(self, other):
         try:
@@ -264,7 +276,7 @@ class Vector3(object):
     def __bool__(self):
         return self.x != 0 or self.y != 0 or self.z != 0
 
-    __nonzero__=__bool__
+    __nonzero__ = __bool__
 
     def __len__(self):
         return 3
@@ -288,6 +300,7 @@ class Vector3(object):
             return Vector3(self.x + other[0],
                            self.y + other[1],
                            self.z + other[2])
+
     __radd__ = __add__
 
     def __iadd__(self, other):
@@ -311,14 +324,13 @@ class Vector3(object):
             else:
                 _class = Point3
             return _class(self.x - other.x,
-                           self.y - other.y,
-                           self.z - other.z)
+                          self.y - other.y,
+                          self.z - other.z)
         except:
-            #assert hasattr(other, '__len__') and len(other) == 3
+            # assert hasattr(other, '__len__') and len(other) == 3
             return Vector3(self.x - other[0],
                            self.y - other[1],
                            self.z - other[2])
-
 
     def __rsub__(self, other):
         try:
@@ -356,7 +368,7 @@ class Vector3(object):
         self.z *= other
         return self
 
-    #geometry requires truediv even in Python2
+    # geometry requires truediv even in Python2
 
     def __div__(self, other):
         # assert type(other) in (int, int, float)
@@ -376,7 +388,6 @@ class Vector3(object):
                        operator.floordiv(self.y, other),
                        operator.floordiv(self.z, other))
 
-
     def __rfloordiv__(self, other):
         # assert type(other) in (int, int, float)
         return Vector3(operator.floordiv(other, self.x),
@@ -388,7 +399,6 @@ class Vector3(object):
         return Vector3(operator.truediv(self.x, other),
                        operator.truediv(self.y, other),
                        operator.truediv(self.z, other))
-
 
     def __rtruediv__(self, other):
         # assert type(other) in (int, int, float)
@@ -419,7 +429,7 @@ class Vector3(object):
         return self
 
     def normalized(self):
-        res=copy(self)
+        res = copy(self)
         return res.normalize()
 
     def dot(self, other):
@@ -444,17 +454,17 @@ class Vector3(object):
 
         # Adapted from equations published by Glenn Murray.
         # http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/ArbitraryAxisRotation.html
-        x, y, z = self.x, self.y,self.z
+        x, y, z = self.x, self.y, self.z
         u, v, w = axis.x, axis.y, axis.z
 
         # Extracted common factors for simplicity and efficiency
-        r2 = u**2 + v**2 + w**2
+        r2 = u ** 2 + v ** 2 + w ** 2
         r = sqrt(r2)
         ct = cos(theta)
         st = sin(theta) / r
-        dt = (u*x + v*y + w*z) * (1 - ct) / r2
+        dt = (u * x + v * y + w * z) * (1 - ct) / r2
         return Vector3((u * dt + x * ct + (-w * y + v * z) * st),
-                       (v * dt + y * ct + ( w * x - u * z) * st),
+                       (v * dt + y * ct + (w * x - u * z) * st),
                        (w * dt + z * ct + (-v * x + u * y) * st))
 
     def angle(self, other):
@@ -462,12 +472,12 @@ class Vector3(object):
         :param other: Vector3
         :return: float angle in radians to the other vector, or self direction if other=None
         """
-        return acos(self.dot(other) / (self.mag()*other.mag()))
+        return acos(self.dot(other) / (self.mag() * other.mag()))
 
     def project(self, other):
         """Return one vector projected on the vector other"""
         n = other.normalized()
-        return self.dot(n)*n
+        return self.dot(n) * n
 
 
 class Point3(Vector3, Geometry):
@@ -528,6 +538,7 @@ class Point3(Vector3, Geometry):
         c = _connect_point3_plane(self, other)
         if c:
             return c.swap()
+
 
 class Line3(Geometry):
     """
@@ -596,9 +607,9 @@ class Line3(Geometry):
                 self.v = Vector3(args[1])
             else:
                 raise AttributeError('%r' % (args,))
-        elif len(args) == 1: #copy constructor
+        elif len(args) == 1:  # copy constructor
             if isinstance(args[0], Line3):
-                super(Line3,self).__init__(*args)
+                super(Line3, self).__init__(*args)
                 self.p = Point3(args[0])
                 self.v = Vector3(args[0])
             else:
@@ -607,11 +618,11 @@ class Line3(Geometry):
             raise AttributeError('%r' % (args,))
 
         # XXX This is annoying.
-        #if not self.v:
+        # if not self.v:
         #    raise AttributeError, 'Line has zero-length vector'
 
     def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.v)
+        return '%s(%s,%s)' % (self.__class__.__name__, self.p, self.v)
 
     p1 = property(lambda self: self.p)
     p2 = property(lambda self: Point3(self.p.x + self.v.x,
@@ -624,11 +635,11 @@ class Line3(Geometry):
 
     def _u_in(self, u):
         return True
-        
+
     def point(self, u):
         ":return: Point3 at parameter u"
         if self._u_in(u):
-            return self.p+u*self.v
+            return self.p + u * self.v
         else:
             return None
 
@@ -658,13 +669,15 @@ class Line3(Geometry):
         if c:
             return c
 
+
 class Ray3(Line3):
     def _u_in(self, u):
         return u >= 0.0
 
+
 class Segment3(Line3):
     def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__,self.p,self.p2)
+        return '%s(%s,%s)' % (self.__class__.__name__, self.p, self.p2)
 
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
@@ -682,9 +695,11 @@ class Segment3(Line3):
         return self
 
     length = property(lambda self: abs(self.v))
-    
-def Spherical(r,theta,phi):
-    return Vector3(r*sin(theta)*cos(phi),r*sin(theta)*sin(phi),r*cos(phi))
+
+
+def Spherical(r, theta, phi):
+    return Vector3(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(phi))
+
 
 class Sphere(Geometry):
     """
@@ -719,32 +734,32 @@ class Sphere(Geometry):
         * center, point on sphere
         * center, radius
         """
-        if len(args) == 1: # Circle or derived class
-            super(Sphere,self).__init__(*args)
+        if len(args) == 1:  # Circle or derived class
+            super(Sphere, self).__init__(*args)
             self.c = Point3(args[0].c)
             self.r = args[0].r
-        else: #2 first params are used to stay compatible with Arc2
+        else:  # 2 first params are used to stay compatible with Arc2
             self.c = Point3(args[0])
-            if isinstance(args[1],(float,int)):
+            if isinstance(args[1], (float, int)):
                 self.r = args[1]
             else:
-                p=Point3(args[1]) #one point on sphere
-                self.r=abs(p-self.c)
+                p = Point3(args[1])  # one point on sphere
+                self.r = abs(p - self.c)
 
     def __repr__(self):
-        return '%s(%s,%g)' % (self.__class__.__name__,self.c,self.r)
-    
-    def __contains__(self,pt):
+        return '%s(%s,%g)' % (self.__class__.__name__, self.c, self.r)
+
+    def __contains__(self, pt):
         ":return: True if pt is ON or IN the sphere"
-        return self.c.distance(pt)<=self.r+precision
-    
+        return self.c.distance(pt) <= self.r + precision
+
     def point(self, u, v):
         """
         :param u: float angle from "north pole" (=radians(90-lat) in radians
         :param v: float angle from 0 meridian
         :return: Point3 on sphere at specified coordinates
         """
-        return self.c+Spherical(self.r,u,v)
+        return self.c + Spherical(self.r, u, v)
 
     def _apply_transform(self, t):
         self.c = t * self.c
@@ -779,8 +794,8 @@ class Sphere(Geometry):
         c = _connect_sphere_plane(self, other)
         if c:
             return c
-        
-    def distance_on_sphere(self, phi1,theta1,phi2,theta2):
+
+    def distance_on_sphere(self, phi1, theta1, phi2, theta2):
         """
         :param phi1: float angle from "north pole" (=radians(90-lat) in radians
         :param theta1: float angle from 0 meridian
@@ -788,9 +803,10 @@ class Sphere(Geometry):
         :param theta2: float angle from 0 meridian
         """
         # http://www.johndcook.com/blog/python_longitude_latitude/ 
-         
-        c = (sin(phi1)*sin(phi2)*cos(theta1 - theta2) + cos(phi1)*cos(phi2))
-        return self.r*acos( c )
+
+        c = (sin(phi1) * sin(phi2) * cos(theta1 - theta2) + cos(phi1) * cos(phi2))
+        return self.r * acos(c)
+
 
 class Plane(Geometry):
     """
@@ -820,6 +836,7 @@ class Plane(Geometry):
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
     """
+
     # n.p = k, where n is normal, p is point on plane, k is constant scalar
 
     def __init__(self, *args):
@@ -845,7 +862,7 @@ class Plane(Geometry):
 
     def __repr__(self):
         return 'Plane(<%.2f, %.2f, %.2f>.p = %.2f)' % \
-            (self.n.x, self.n.y, self.n.z, self.k)
+               (self.n.x, self.n.y, self.n.z, self.k)
 
     def _get_point(self):
         # Return an arbitrary point on the plane
@@ -884,8 +901,10 @@ class Plane(Geometry):
 
     def _connect_plane(self, other):
         return _connect_plane_plane(other, self)
-    
+
     # a b c d
+
+
 # e f g h
 # i j k l
 # m n o p
@@ -896,22 +915,22 @@ class Matrix4(object):
         self.identity()
         if not args:
             return
-        if len(args)==1:
-            args=args[0][:]
-        if len(args)==16:
+        if len(args) == 1:
+            args = args[0][:]
+        if len(args) == 16:
             self[:] = args
         else:
-            raise RuntimeError('%s.__init__(%s) failed'%(self.__class__.__name__,object))
+            raise RuntimeError('%s.__init__(%s) failed' % (self.__class__.__name__, object))
 
     def __repr__(self):
-        t=self.transposed() #repr is by line while [:] is by column
-        return ('%s%s') % (self.__class__.__name__,tuple(t))
+        t = self.transposed()  # repr is by line while [:] is by column
+        return ('%s%s') % (self.__class__.__name__, tuple(t))
 
     def __iter__(self):
         return iter((self.a, self.e, self.i, self.m,
-         self.b, self.f, self.j, self.n,
-         self.c, self.g, self.k, self.o,
-         self.d, self.h, self.l, self.p))
+                     self.b, self.f, self.j, self.n,
+                     self.c, self.g, self.k, self.o,
+                     self.d, self.h, self.l, self.p))
 
     def __getitem__(self, key):
         return [self.a, self.e, self.i, self.m,
@@ -1001,8 +1020,8 @@ class Matrix4(object):
             other._apply_transform(self)
             return other
 
-    def __call__(self,other):
-        return self*other
+    def __call__(self, other):
+        return self * other
 
     def __imul__(self, other):
         # assert isinstance(other, Matrix4)
@@ -1064,7 +1083,7 @@ class Matrix4(object):
         P.x = A.a * B.x + A.b * B.y + A.c * B.z + A.d
         P.y = A.e * B.x + A.f * B.y + A.g * B.z + A.h
         P.z = A.i * B.x + A.j * B.y + A.k * B.z + A.l
-        w =   A.m * B.x + A.n * B.y + A.o * B.z + A.p
+        w = A.m * B.x + A.n * B.y + A.o * B.z + A.p
         if w != 0:
             P.x /= w
             P.y /= w
@@ -1074,7 +1093,7 @@ class Matrix4(object):
     def identity(self):
         self.a = self.f = self.k = self.p = 1.
         self.b = self.c = self.d = self.e = self.g = self.h = \
-        self.i = self.j = self.l = self.m = self.n = self.o = 0
+            self.i = self.j = self.l = self.m = self.n = self.o = 0
         return self
 
     def scale(self, x, y, z):
@@ -1114,10 +1133,10 @@ class Matrix4(object):
          self.b, self.f, self.j, self.n,
          self.c, self.g, self.k, self.o,
          self.d, self.h, self.l, self.p) = \
-        (self.a, self.b, self.c, self.d,
-         self.e, self.f, self.g, self.h,
-         self.i, self.j, self.k, self.l,
-         self.m, self.n, self.o, self.p)
+            (self.a, self.b, self.c, self.d,
+             self.e, self.f, self.g, self.h,
+             self.i, self.j, self.k, self.l,
+             self.m, self.n, self.o, self.p)
 
     def transposed(self):
         M = copy(self)
@@ -1265,17 +1284,17 @@ class Matrix4(object):
 
     def determinant(self):
         return ((self.a * self.f - self.e * self.b)
-              * (self.k * self.p - self.o * self.l)
-              - (self.a * self.j - self.i * self.b)
-              * (self.g * self.p - self.o * self.h)
-              + (self.a * self.n - self.m * self.b)
-              * (self.g * self.l - self.k * self.h)
-              + (self.e * self.j - self.i * self.f)
-              * (self.c * self.p - self.o * self.d)
-              - (self.e * self.n - self.m * self.f)
-              * (self.c * self.l - self.k * self.d)
-              + (self.i * self.n - self.m * self.j)
-              * (self.c * self.h - self.g * self.d))
+                * (self.k * self.p - self.o * self.l)
+                - (self.a * self.j - self.i * self.b)
+                * (self.g * self.p - self.o * self.h)
+                + (self.a * self.n - self.m * self.b)
+                * (self.g * self.l - self.k * self.h)
+                + (self.e * self.j - self.i * self.f)
+                * (self.c * self.p - self.o * self.d)
+                - (self.e * self.n - self.m * self.f)
+                * (self.c * self.l - self.k * self.d)
+                + (self.i * self.n - self.m * self.j)
+                * (self.c * self.h - self.g * self.d))
 
     def inverse(self):
         tmp = Matrix4()
@@ -1287,27 +1306,44 @@ class Matrix4(object):
         else:
             d = 1.0 / d;
 
-            tmp.a = d * (self.f * (self.k * self.p - self.o * self.l) + self.j * (self.o * self.h - self.g * self.p) + self.n * (self.g * self.l - self.k * self.h));
-            tmp.e = d * (self.g * (self.i * self.p - self.m * self.l) + self.k * (self.m * self.h - self.e * self.p) + self.o * (self.e * self.l - self.i * self.h));
-            tmp.i = d * (self.h * (self.i * self.n - self.m * self.j) + self.l * (self.m * self.f - self.e * self.n) + self.p * (self.e * self.j - self.i * self.f));
-            tmp.m = d * (self.e * (self.n * self.k - self.j * self.o) + self.i * (self.f * self.o - self.n * self.g) + self.m * (self.j * self.g - self.f * self.k));
+            tmp.a = d * (self.f * (self.k * self.p - self.o * self.l) + self.j * (
+                        self.o * self.h - self.g * self.p) + self.n * (self.g * self.l - self.k * self.h));
+            tmp.e = d * (self.g * (self.i * self.p - self.m * self.l) + self.k * (
+                        self.m * self.h - self.e * self.p) + self.o * (self.e * self.l - self.i * self.h));
+            tmp.i = d * (self.h * (self.i * self.n - self.m * self.j) + self.l * (
+                        self.m * self.f - self.e * self.n) + self.p * (self.e * self.j - self.i * self.f));
+            tmp.m = d * (self.e * (self.n * self.k - self.j * self.o) + self.i * (
+                        self.f * self.o - self.n * self.g) + self.m * (self.j * self.g - self.f * self.k));
 
-            tmp.b = d * (self.j * (self.c * self.p - self.o * self.d) + self.n * (self.k * self.d - self.c * self.l) + self.b * (self.o * self.l - self.k * self.p));
-            tmp.f = d * (self.k * (self.a * self.p - self.m * self.d) + self.o * (self.i * self.d - self.a * self.l) + self.c * (self.m * self.l - self.i * self.p));
-            tmp.j = d * (self.l * (self.a * self.n - self.m * self.b) + self.p * (self.i * self.b - self.a * self.j) + self.d * (self.m * self.j - self.i * self.n));
-            tmp.n = d * (self.i * (self.n * self.c - self.b * self.o) + self.m * (self.b * self.k - self.j * self.c) + self.a * (self.j * self.o - self.n * self.k));
+            tmp.b = d * (self.j * (self.c * self.p - self.o * self.d) + self.n * (
+                        self.k * self.d - self.c * self.l) + self.b * (self.o * self.l - self.k * self.p));
+            tmp.f = d * (self.k * (self.a * self.p - self.m * self.d) + self.o * (
+                        self.i * self.d - self.a * self.l) + self.c * (self.m * self.l - self.i * self.p));
+            tmp.j = d * (self.l * (self.a * self.n - self.m * self.b) + self.p * (
+                        self.i * self.b - self.a * self.j) + self.d * (self.m * self.j - self.i * self.n));
+            tmp.n = d * (self.i * (self.n * self.c - self.b * self.o) + self.m * (
+                        self.b * self.k - self.j * self.c) + self.a * (self.j * self.o - self.n * self.k));
 
-            tmp.c = d * (self.n * (self.c * self.h - self.g * self.d) + self.b * (self.g * self.p - self.o * self.h) + self.f * (self.o * self.d - self.c * self.p));
-            tmp.g = d * (self.o * (self.a * self.h - self.e * self.d) + self.c * (self.e * self.p - self.m * self.h) + self.g * (self.m * self.d - self.a * self.p));
-            tmp.k = d * (self.p * (self.a * self.f - self.e * self.b) + self.d * (self.e * self.n - self.m * self.f) + self.h * (self.m * self.b - self.a * self.n));
-            tmp.o = d * (self.m * (self.f * self.c - self.b * self.g) + self.a * (self.n * self.g - self.f * self.o) + self.e * (self.b * self.o - self.n * self.c));
+            tmp.c = d * (self.n * (self.c * self.h - self.g * self.d) + self.b * (
+                        self.g * self.p - self.o * self.h) + self.f * (self.o * self.d - self.c * self.p));
+            tmp.g = d * (self.o * (self.a * self.h - self.e * self.d) + self.c * (
+                        self.e * self.p - self.m * self.h) + self.g * (self.m * self.d - self.a * self.p));
+            tmp.k = d * (self.p * (self.a * self.f - self.e * self.b) + self.d * (
+                        self.e * self.n - self.m * self.f) + self.h * (self.m * self.b - self.a * self.n));
+            tmp.o = d * (self.m * (self.f * self.c - self.b * self.g) + self.a * (
+                        self.n * self.g - self.f * self.o) + self.e * (self.b * self.o - self.n * self.c));
 
-            tmp.d = d * (self.b * (self.k * self.h - self.g * self.l) + self.f * (self.c * self.l - self.k * self.d) + self.j * (self.g * self.d - self.c * self.h));
-            tmp.h = d * (self.c * (self.i * self.h - self.e * self.l) + self.g * (self.a * self.l - self.i * self.d) + self.k * (self.e * self.d - self.a * self.h));
-            tmp.l = d * (self.d * (self.i * self.f - self.e * self.j) + self.h * (self.a * self.j - self.i * self.b) + self.l * (self.e * self.b - self.a * self.f));
-            tmp.p = d * (self.a * (self.f * self.k - self.j * self.g) + self.e * (self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c));
+            tmp.d = d * (self.b * (self.k * self.h - self.g * self.l) + self.f * (
+                        self.c * self.l - self.k * self.d) + self.j * (self.g * self.d - self.c * self.h));
+            tmp.h = d * (self.c * (self.i * self.h - self.e * self.l) + self.g * (
+                        self.a * self.l - self.i * self.d) + self.k * (self.e * self.d - self.a * self.h));
+            tmp.l = d * (self.d * (self.i * self.f - self.e * self.j) + self.h * (
+                        self.a * self.j - self.i * self.b) + self.l * (self.e * self.b - self.a * self.f));
+            tmp.p = d * (self.a * (self.f * self.k - self.j * self.g) + self.e * (
+                        self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c));
 
         return tmp;
+
 
 class Quaternion:
     """
@@ -1453,20 +1489,21 @@ class Quaternion:
                          0.00     1.00     0.00     0.00
                          0.00     0.00     0.00     1.00])
     """
+
     # All methods and naming conventions based off
     # http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
 
     # w is the real part, (x, y, z) are the imaginary parts
 
     def __init__(self, w=1, x=0, y=0, z=0):
-        super(Quaternion,self).__init__() #TODO: add a copy constructor one day
+        super(Quaternion, self).__init__()  # TODO: add a copy constructor one day
         self.w = w
         self.x = x
         self.y = y
         self.z = z
 
     def __repr__(self):
-        return '%s(%g,%g,%g,%g)' % (self.__class__.__name__,self.w, self.x, self.y, self.z)
+        return '%s(%g,%g,%g,%g)' % (self.__class__.__name__, self.w, self.x, self.y, self.z)
 
     def __mul__(self, other):
         if isinstance(other, Quaternion):
@@ -1479,9 +1516,9 @@ class Quaternion:
             Bz = other.z
             Bw = other.w
             Q = Quaternion()
-            Q.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx
+            Q.x = Ax * Bw + Ay * Bz - Az * By + Aw * Bx
             Q.y = -Ax * Bz + Ay * Bw + Az * Bx + Aw * By
-            Q.z =  Ax * By - Ay * Bx + Az * Bw + Aw * Bz
+            Q.z = Ax * By - Ay * Bx + Az * Bw + Aw * Bz
             Q.w = -Ax * Bx - Ay * By - Az * Bz + Aw * Bw
             return Q
         elif isinstance(other, Vector3):
@@ -1504,16 +1541,16 @@ class Quaternion:
             yy = y * y
             yz2 = 2 * y * z
             zz = z * z
-            return other.__class__(\
-               ww * Vx + wy2 * Vz - wz2 * Vy + \
-               xx * Vx + xy2 * Vy + xz2 * Vz - \
-               zz * Vx - yy * Vx,
-               xy2 * Vx + yy * Vy + yz2 * Vz + \
-               wz2 * Vx - zz * Vy + ww * Vy - \
-               wx2 * Vz - xx * Vy,
-               xz2 * Vx + yz2 * Vy + \
-               zz * Vz - wy2 * Vx - yy * Vz + \
-               wx2 * Vy - xx * Vz + ww * Vz)
+            return other.__class__( \
+                ww * Vx + wy2 * Vz - wz2 * Vy + \
+                xx * Vx + xy2 * Vy + xz2 * Vz - \
+                zz * Vx - yy * Vx,
+                xy2 * Vx + yy * Vy + yz2 * Vz + \
+                wz2 * Vx - zz * Vy + ww * Vy - \
+                wx2 * Vz - xx * Vy,
+                xz2 * Vx + yz2 * Vy + \
+                zz * Vz - wy2 * Vx - yy * Vz + \
+                wx2 * Vy - xx * Vz + ww * Vz)
         else:
             other = copy(other)
             other._apply_transform(self)
@@ -1529,12 +1566,11 @@ class Quaternion:
         By = other.y
         Bz = other.z
         Bw = other.w
-        self.x =  Ax * Bw + Ay * Bz - Az * By + Aw * Bx
+        self.x = Ax * Bw + Ay * Bz - Az * By + Aw * Bx
         self.y = -Ax * Bz + Ay * Bw + Az * Bx + Aw * By
-        self.z =  Ax * By - Ay * Bx + Az * Bw + Aw * Bz
+        self.z = Ax * By - Ay * Bx + Az * Bw + Aw * Bz
         self.w = -Ax * Bx - Ay * By - Az * Bz + Aw * Bw
         return self
-
 
     def mag2(self):
         return self.w ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2
@@ -1543,8 +1579,6 @@ class Quaternion:
         return sqrt(self.mag2())
 
     mag = __abs__
-
-
 
     def identity(self):
         self.w = 1
@@ -1583,7 +1617,7 @@ class Quaternion:
         return self
 
     def normalized(self):
-        res=copy(self)
+        res = copy(self)
         return res.normalize()
 
     def get_angle_axis(self):
@@ -1611,10 +1645,10 @@ class Quaternion:
             sqy = self.y ** 2
             sqz = self.z ** 2
             heading = atan2(2 * self.y * self.w - 2 * self.x * self.z,
-                                 1 - 2 * sqy - 2 * sqz)
+                            1 - 2 * sqy - 2 * sqz)
             attitude = asin(2 * t)
             bank = atan2(2 * self.x * self.w - 2 * self.y * self.z,
-                              1 - 2 * sqx - 2 * sqz)
+                         1 - 2 * sqx - 2 * sqz)
         return heading, attitude, bank
 
     def get_matrix(self):
@@ -1674,49 +1708,50 @@ class Quaternion:
 
     @classmethod
     def new_rotate_matrix(cls, m):
-        if m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] > 0.00000001:
-            t = m[0*4 + 0] + m[1*4 + 1] + m[2*4 + 2] + 1.0
-            s = 0.5/sqrt(t)
+        if m[0 * 4 + 0] + m[1 * 4 + 1] + m[2 * 4 + 2] > 0.00000001:
+            t = m[0 * 4 + 0] + m[1 * 4 + 1] + m[2 * 4 + 2] + 1.0
+            s = 0.5 / sqrt(t)
 
             return cls(
-              s*t,
-              (m[1*4 + 2] - m[2*4 + 1])*s,
-              (m[2*4 + 0] - m[0*4 + 2])*s,
-              (m[0*4 + 1] - m[1*4 + 0])*s
-              )
+                s * t,
+                (m[1 * 4 + 2] - m[2 * 4 + 1]) * s,
+                (m[2 * 4 + 0] - m[0 * 4 + 2]) * s,
+                (m[0 * 4 + 1] - m[1 * 4 + 0]) * s
+            )
 
-        elif m[0*4 + 0] > m[1*4 + 1] and m[0*4 + 0] > m[2*4 + 2]:
-            t = m[0*4 + 0] - m[1*4 + 1] - m[2*4 + 2] + 1.0
-            s = 0.5/sqrt(t)
-
-            return cls(
-              (m[1*4 + 2] - m[2*4 + 1])*s,
-              s*t,
-              (m[0*4 + 1] + m[1*4 + 0])*s,
-              (m[2*4 + 0] + m[0*4 + 2])*s
-              )
-
-        elif m[1*4 + 1] > m[2*4 + 2]:
-            t = -m[0*4 + 0] + m[1*4 + 1] - m[2*4 + 2] + 1.0
-            s = 0.5/sqrt(t)
+        elif m[0 * 4 + 0] > m[1 * 4 + 1] and m[0 * 4 + 0] > m[2 * 4 + 2]:
+            t = m[0 * 4 + 0] - m[1 * 4 + 1] - m[2 * 4 + 2] + 1.0
+            s = 0.5 / sqrt(t)
 
             return cls(
-              (m[2*4 + 0] - m[0*4 + 2])*s,
-              (m[0*4 + 1] + m[1*4 + 0])*s,
-              s*t,
-              (m[1*4 + 2] + m[2*4 + 1])*s
-              )
+                (m[1 * 4 + 2] - m[2 * 4 + 1]) * s,
+                s * t,
+                (m[0 * 4 + 1] + m[1 * 4 + 0]) * s,
+                (m[2 * 4 + 0] + m[0 * 4 + 2]) * s
+            )
+
+        elif m[1 * 4 + 1] > m[2 * 4 + 2]:
+            t = -m[0 * 4 + 0] + m[1 * 4 + 1] - m[2 * 4 + 2] + 1.0
+            s = 0.5 / sqrt(t)
+
+            return cls(
+                (m[2 * 4 + 0] - m[0 * 4 + 2]) * s,
+                (m[0 * 4 + 1] + m[1 * 4 + 0]) * s,
+                s * t,
+                (m[1 * 4 + 2] + m[2 * 4 + 1]) * s
+            )
 
         else:
-            t = -m[0*4 + 0] - m[1*4 + 1] + m[2*4 + 2] + 1.0
-            s = 0.5/sqrt(t)
+            t = -m[0 * 4 + 0] - m[1 * 4 + 1] + m[2 * 4 + 2] + 1.0
+            s = 0.5 / sqrt(t)
 
             return cls(
-              (m[0*4 + 1] - m[1*4 + 0])*s,
-              (m[2*4 + 0] + m[0*4 + 2])*s,
-              (m[1*4 + 2] + m[2*4 + 1])*s,
-              s*t
-              )
+                (m[0 * 4 + 1] - m[1 * 4 + 0]) * s,
+                (m[2 * 4 + 0] + m[0 * 4 + 2]) * s,
+                (m[1 * 4 + 2] + m[2 * 4 + 1]) * s,
+                s * t
+            )
+
     @classmethod
     def new_interpolate(cls, q1, q2, t):
         # assert isinstance(q1, Quaternion) and isinstance(q2, Quaternion)
@@ -1753,5 +1788,3 @@ class Quaternion:
         Q.y = q1.y * ratio1 + q2.y * ratio2
         Q.z = q1.z * ratio1 + q2.z * ratio2
         return Q
-
-

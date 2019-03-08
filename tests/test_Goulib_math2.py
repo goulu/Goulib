@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
-from __future__ import division #"true division" everywhere
+
 
 from nose.tools import assert_equal, assert_greater
 from nose import SkipTest
@@ -10,7 +10,6 @@ from Goulib.tests import *
 from Goulib.math2 import *
 
 import Goulib.itertools2
-import six
 
 class TestSign:
     def test_sign(self):
@@ -30,12 +29,9 @@ class TestMul(unittest.TestCase):
 
 class TestRint(unittest.TestCase):
     def test_rint(self):
-        if six.PY2 : #https://docs.python.org/2.7/library/functions.html#round
-            assert_equal(rint(0.5),1,places=None)
-            assert_equal(rint(-0.5),-1,places=None)
-        else: # https://docs.python.org/3.4/library/functions.html#round
-            assert_equal(rint(0.5),0,places=None)
-            assert_equal(rint(-0.5),-0,places=None)
+         # https://docs.python.org/3.4/library/functions.html#round
+        assert_equal(rint(0.5),0,places=None)
+        assert_equal(rint(-0.5),-0,places=None)
 
         assert_equal(rint(0.50001),1,places=None)
         assert_equal(rint(-0.50001),-1,places=None)

@@ -8,7 +8,7 @@
 simple HTML/XML generation (forked from `markup <http://pypi.python.org/pypi/markup/>`_)
 """
 
-import sys, six
+import sys
     
 #from http://www.voidspace.org.uk/python/cgiutils.html
 def cgiprint(line='', unbuff=True, line_end='\r\n'):
@@ -26,7 +26,7 @@ def cgiprint(line='', unbuff=True, line_end='\r\n'):
         sys.stdout.flush()
         
 def style_dict2str(style):
-    return ' '.join('%s:%s;'%(k,v) for k,v in six.iteritems(style))
+    return ' '.join('%s:%s;'%(k,v) for k,v in style.items())
 
 def style_str2dict(style):
     res={}
@@ -60,7 +60,7 @@ def tag( tag, between, **kwargs ):
             out = r'%s %s="%s"' % ( out, key, escape( value ) )
            
     if between is not None:
-        if isinstance(between,six.text_type): #unicode
+        if isinstance(between,str): #unicode
             between=between.encode('ascii', 'xmlcharrefreplace').decode("utf-8", "backslashreplace")
         out = r"%s>%s</%s>" % ( out, between, tag )
     else:
@@ -466,7 +466,7 @@ def _argsdicts( args, mydict ):
 def _totuple( x ):
     """Utility stuff to convert string, int, long, float, None or anything to a usable tuple."""
 
-    if isinstance( x, six.string_types ):
+    if isinstance( x, str ):
         out = x,
     elif isinstance( x, ( int, float ) ):
         out = str( x ),

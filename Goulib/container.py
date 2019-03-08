@@ -11,8 +11,6 @@ __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import six
-from six.moves import zip, map, filter
 
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
@@ -60,7 +58,7 @@ class Sequence(object):
         """
         self.name=self.__class__.__name__ #by default
 
-        if isinstance(iterf,six.integer_types):
+        if isinstance(iterf,int):
             self.offset=iterf
             self.iterf=None
         else:

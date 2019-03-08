@@ -3,14 +3,13 @@
 """
 utilities for unit tests (using nose)
 """
-from __future__ import division #"true division" everywhere
+
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import six, types, re, itertools
-from six.moves import filter, zip
+import types, re, itertools
 
 import unittest, nose
 import nose.tools
@@ -51,7 +50,7 @@ def pprint(iterable,indices=[0,1,2,3,4,5,6,7,8,9,-3,-2,-1],timeout=1):
     try:
         items=pprint_gen(iterable, indices, sep)
         for item in decorators.itimeout(items, timeout): 
-            if isinstance(item,six.string_types):
+            if isinstance(item,str):
                 s.append(item) #to keep unicode untouched
             else:
                 s.append(str(item))
@@ -106,7 +105,7 @@ class TestCase(unittest.TestCase):
             i+=1
         return i # number of elements checked
 
-    base_types=(six.integer_types,six.string_types,six.text_type,bool,set,dict)
+    base_types=(int,str,str,bool,set,dict)
 
     def assertEqual(self, first, second, places=7, msg=None, delta=None, reltol=None):
         """automatically calls assertAlmostEqual when needed

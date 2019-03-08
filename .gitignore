@@ -13,3 +13,5 @@ docs/_build
 /build/
 /.coverage
 /xunit.xml
+.idea/
+/Goulib/__pycache__/

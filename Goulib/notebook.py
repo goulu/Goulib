@@ -16,7 +16,7 @@ __copyright__ = "Copyright 2016, Philippe Guglielmetti"
 __credits__= [""]
 __license__ = "LGPL"
 
-import logging, six
+import logging
 
 from IPython.display import display, HTML, Math
 from .markup import tag
@@ -34,8 +34,7 @@ def html(obj, sep=None):
         bra,ket='',''
     else:
         if isinstance(obj,dict):
-            res=',\n'.join("%s:%s"%(html(k),html(v)) 
-                for k,v in six.iteritems(obj))
+            res=',\n'.join("%s:%s"%(html(k),html(v)) for k,v in obj.items())
             return '{%s}'%res
         elif isinstance(obj,list):
             bra,ket='[',']'
@@ -44,11 +43,6 @@ def html(obj, sep=None):
 
     if isiterable(obj): #iterable, but not a string
         return bra+sep.join(html(a,sep=',') for a in obj)+ket
-
-    try:
-        return unicode(obj,'utf-8') #to render accented chars correctly
-    except :
-        pass
 
     return str(obj)
 

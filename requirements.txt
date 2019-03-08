@@ -3,7 +3,6 @@ networkx
 pydot
 pydotplus
 graphviz
-six
 ipython
 lxml
 xlrd
@@ -14,6 +13,7 @@ svg.path
 tinycss
 pdfminer.six
 sortedcollections
+bitarray
 pint
 nose       
 sphinx
