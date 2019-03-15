@@ -9,7 +9,7 @@ for various projects
 Project location : https://github.com/goulu/goulib
 """
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 __all__ = [
     'colors',

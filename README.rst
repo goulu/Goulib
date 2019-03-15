@@ -5,6 +5,8 @@ library of useful Python code for scientific + technical applications
 
 see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
+.. image:: https://badge.fury.io/gh/goulu%2Fgoulib.svg
+    :target: https://badge.fury.io/gh/goulu%2Fgoulib
 .. image:: http://img.shields.io/badge/license-LGPL-green.svg
     :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
     :alt: License
@@ -20,10 +22,6 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 .. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
   :target: http://goulib.readthedocs.org/en/latest/
   :alt: Doc
-.. image:: https://www.openhub.net/accounts/Goulu/widgets/account_tiny?format=gif
-    :target: https://www.openhub.net/accounts/Goulu
-.. image:: https://api.coderwall.com/goulu/endorsecount.png
-    :target: https://coderwall.com/goulu
   
 :author: Philippe Guglielmetti goulib@goulu.net
 :installation: "pip install Goulib"
@@ -71,8 +69,6 @@ Modules
     plotable rich object display on IPython notebooks
 **polynomial**
 	manipulation of polynomials
-**statemachine**
-    state machines with graph representation
 **stats**
     very basic statistics functions
 **table**
