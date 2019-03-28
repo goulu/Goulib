@@ -388,7 +388,7 @@ class Entity(plot.Plot):
             return [patches.Circle(self.c.xy,self.r,**kwargs)]
 
         if isinstance(self,Polygon):
-            return [patches.Polygon(self.xy,**kwargs)]
+            return [patches.Polygon(list(self.xy),**kwargs)]
 
         raise NotImplementedError
 
