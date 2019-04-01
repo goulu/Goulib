@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
 
-from __future__ import division, print_function #"true division" everywhere
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
 __license__ = "LGPL"

@@ -9,8 +9,6 @@ exemple: h('the result is',time,'[ms]')
 
 """
 
-from __future__ import print_function
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2016, Philippe Guglielmetti"
 __credits__= [""]

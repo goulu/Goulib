@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
 
-from __future__ import division #"true division" everywhere
-
 """
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
