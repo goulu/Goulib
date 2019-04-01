@@ -414,6 +414,7 @@ class Entity(plot.Plot):
         :return: matplotlib axis suitable for drawing
         """
         axis = kwargs.pop('axis', 'off')  # axis turned off by default
+        pltaxis = kwargs.pop('pltaxis', 'equal')  # 1/1 X/Y ratio by default
 
         fig = plt.figure(**kwargs)
         # ax  = fig.add_subplot(111) # unneeded
@@ -425,7 +426,7 @@ class Entity(plot.Plot):
         # TODO: find a better way... (found no other way top do it...)
         plt.plot((box.xmin, box.xmax), (box.ymin, box.ymax), alpha=0)  # draw a transparent diagonal to size everything
 
-        plt.axis('equal')
+        plt.axis(pltaxis)
 
         import pylab
         pylab.axis(axis)
