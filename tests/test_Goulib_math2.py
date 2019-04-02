@@ -356,7 +356,7 @@ class TestIsPalindromic:
     def test_is_palindromic(self):
         assert_true(is_palindromic(4352534))
         assert_true(is_palindromic(17,2))
-        assert_equal(sum(filter(is_palindromic,range(34*303,100000,303)))),394203)
+        assert_equal(sum(filter(is_palindromic,range(34*303,100000,303))),394203)
 
 class TestIsLychrel:
     def test_is_lychrel(self):
