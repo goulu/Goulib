@@ -875,22 +875,7 @@ A000796=Sequence(pi_digits_gen, desc="Decimal expansion of Pi (or, digits of Pi)
 
 def pi_primes():
     v=0
-    for i,d in enumerates(pi_digits_gen()):
-        v=10*v+d
-        if is_prime(v):
-            yield i+1, v
-
-A005042=Sequence(itemgetter(pi_primes(),1),
-    desc="Primes formed by the initial digits of the decimal expansion of Pi. "
-)
-
-A060421=Sequence(itemgetter(pi_primes(),0),
-    desc="Numbers n such that the first n digits of the decimal expansion of Pi form a prime."
-)
-
-def pi_primes():
-    v=0
-    for i,d in enumerates(pi_digits_gen()):
+    for i,d in decorators.itimeout(enumerates(pi_digits_gen()),10):
         v=10*v+d
         if is_prime(v):
             yield i+1, v
@@ -994,7 +979,8 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    print(list(take(3,A023086)))
+    for p in A005042:
+        print(p)
     
 
 
