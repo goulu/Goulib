@@ -137,14 +137,11 @@ def peval(plist, x, x2=None):
 
 
 def integral(plist):
-    """\
+    """
     Return a new plist corresponding to the integral of the input plist.
     This function uses zero as the constant term, which is okay when
     evaluating a definite integral, for example, but is otherwise
     ambiguous.
-
-    The math forces the coefficients to be turned into floats.
-    Consider importing __future__ division to simplify this.
     """
     if not plist: return []
     new = [0]
@@ -156,7 +153,7 @@ def integral(plist):
 
 
 def derivative(plist):
-    """\
+    """
     Return a new plist corresponding to the derivative of the input plist.
     """
     new = []

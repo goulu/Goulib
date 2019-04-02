@@ -3,9 +3,6 @@
 """
 advanced containers : Record (struct), and INFINITE Sequence
 """
-
-from __future__ import division, print_function
-
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = []
