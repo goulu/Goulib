@@ -29,4 +29,5 @@ install:
 script:
   nosetests -c nose.cfg
 after_success:
-  coveralls
+  - coveralls
+  - test $TRAVIS_BRANCH = "master" && conda install conda-build && conda install anaconda-client && bash conda/conda_upload.sh

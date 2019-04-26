@@ -523,7 +523,7 @@ class TestPolygon:
     def setup_class(self):
         def poly(n,r=1):
             for i in range(n):
-                a=i*2*pi/n
+                a=(2*i+1)*pi/n
                 yield Point2(r*cos(a),r*sin(a))
         self.p4=Polygon(poly(4,sqrt(2.)/2))
         self.p6=Polygon(poly(6))
@@ -541,6 +541,11 @@ class TestPolygon:
     def test_center(self):
         assert_equal(self.p4.center,(0,0))
         assert_equal(self.p6.center,(0,0))
+
+    def test_intersect(self):
+        for x in self.p4.intersect(self.p4):
+            print(x)
+        # print(list(self.p4.intersect(self.p6)))
 
 class TestCircle:
     @classmethod

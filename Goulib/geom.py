@@ -957,6 +957,26 @@ class Polygon(Surface):
             p1x,p1y = p2x,p2y
     
         return inside
+
+    def intersect(self, other):
+        try:
+            return other._intersect_polygon(self)
+        except AttributeError:
+            pass
+        l=itertools2.flatten((other.intersect(s) for s in self),Geometry) # do not recurse in Point2, Segment2 ...
+        res=[]
+        s=None
+        for e in l:
+            if e is None: continue
+            if isinstance(e,Segment2):
+                res.append(e)
+                s=e
+            else: #Point2
+                if (s is None) or (s.distance(e)>1e-9):
+                    res.append(e)
+
+        return res
+
         
     
 
