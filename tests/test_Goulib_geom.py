@@ -542,6 +542,11 @@ class TestPolygon:
         assert_equal(self.p4.center,(0,0))
         assert_equal(self.p6.center,(0,0))
 
+    def test_intersect(self):
+        for x in self.p4.intersect(self.p4):
+            print(x)
+        # print(list(self.p4.intersect(self.p6)))
+
 class TestCircle:
     @classmethod
     def setup_class(self):
