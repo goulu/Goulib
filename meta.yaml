@@ -6,7 +6,7 @@
 
 package:
   name: '{{ name|lower }}'
-  version: '{{ version }}'
+  version: {{ environ['VERSION'] }}
 
 source:
   fn: '{{ name }}-{{ version }}.{{ file_ext }}'
@@ -14,8 +14,12 @@ source:
   '{{ hash_type }}': '{{ hash_value }}'
 
 build:
+  script_env:
+    - VERSION
+    - CONDA_BLD_PATH
   number: 0
   script: python setup.py install --single-version-externally-managed --record=record.txt
+
 
 requirements:
   build:
@@ -64,7 +68,6 @@ requirements:
     - sortedcontainers
     - pint
     - nose
-    - sphinx >=1.4.2
 
 test:
   imports:
