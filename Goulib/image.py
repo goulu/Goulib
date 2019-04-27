@@ -242,8 +242,6 @@ class Image(Plot):
             format_str = path.split('.')[-1][:3]
         if format_str.upper() == 'TIF':
             a = skimage.img_as_uint(a)
-        else:  # tiff plugin doesn't like format_str arg
-            kwargs['format_str'] = format_str.upper()
         from skimage import io
         io.imsave(path, a, **kwargs)
         return self
