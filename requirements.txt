@@ -16,7 +16,6 @@ sortedcollections
 bitarray
 pint
 nose       
-sphinx
 scikit-image
-pillow>=4.3.0
-matplotlib>=2.0.0
+pillow
+matplotlib

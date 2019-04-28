@@ -18,6 +18,8 @@ before_install:
   - export PATH=/home/travis/miniconda2/bin:$PATH
   # Update conda itself
   - conda update --yes conda
+  - conda install conda-build
+  - conda install anaconda-client
 
   # Install packages
 install:
@@ -30,4 +32,4 @@ script:
   nosetests -c nose.cfg
 after_success:
   - coveralls
-  - test $TRAVIS_BRANCH = "master" && conda install conda-build && conda install anaconda-client && bash conda/conda_upload.sh
+  - test $TRAVIS_BRANCH = "master" && bash conda/conda_upload.sh

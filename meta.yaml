@@ -45,7 +45,7 @@ requirements:
     - sortedcontainers
     - pint
     - nose
-    - sphinx >=1.4.2
+    - sphinx
   run:
     - python
     - scipy
