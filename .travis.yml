@@ -18,12 +18,12 @@ before_install:
   - export PATH=/home/travis/miniconda2/bin:$PATH
   # Update conda itself
   - conda update --yes conda
-  - conda install conda-build
-  - conda install anaconda-client
 
   # Install packages
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose numpy scipy matplotlib networkx ipython
+  - conda install --yes conda-build
+  - conda install --yes anaconda-client
   - source activate env_name
   - pip install -r requirements.txt
   - pip install coveralls
@@ -32,4 +32,4 @@ script:
   nosetests -c nose.cfg
 after_success:
   - coveralls
-  - test $TRAVIS_BRANCH = "master" && bash conda/conda_upload.sh
+  - test $TRAVIS_BRANCH = "master" && bash conda_upload.sh
