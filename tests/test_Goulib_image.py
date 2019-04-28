@@ -22,9 +22,6 @@ def assert_image(image,name=None,convert=False):
     from skimage.exposure import is_low_contrast
     if name:
         image.save(results+name,autoconvert=convert)
-    h=hash(image)
-    assert_not_equal(h,0,'image is black')
-    assert_not_equal(h,2**64-1,'image is white')
     if is_low_contrast(image.array):
         logging.warning('image %s has low contrast'%name)
 
