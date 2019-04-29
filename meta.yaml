@@ -25,27 +25,8 @@ requirements:
   build:
     - python
     - setuptools
-    - scipy
-    - matplotlib
-    - networkx
-    - pydot
-    - pydotplus
-    - graphviz
-    - six
-    - ipython
-    - lxml
-    - xlrd
-    - xlsxwriter
-    - pillow
-    - scikit-image
-    - dxfgrabber
-    - dxfwrite
-    - svg.path
-    - pdfminer.six
-    - sortedcontainers
-    - pint
-    - nose
-    - sphinx
+    - pip
+
   run:
     - python
     - scipy
@@ -61,15 +42,17 @@ requirements:
     - xlsxwriter
     - pillow
     - scikit-image
-    - dxfgrabber
-    - dxfwrite
-    - svg.path
-    - pdfminer.six
     - sortedcontainers
-    - pint
-    - nose
+    - pip
+      - pint
+      - dxfgrabber
+      - dxfwrite
+      - svg.path
+      - pdfminer.six
 
 test:
+  requires:
+    - nose
   imports:
     - Goulib
 
