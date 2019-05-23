@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 3D geometry
 """
@@ -15,7 +13,8 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import operator, abc
+import operator
+import abc
 
 from math import pi, sin, cos, tan, acos, asin, atan2, sqrt, hypot, copysign
 from .geom import Geometry, copy
@@ -49,8 +48,8 @@ XXX I have not checked if these are correct.
 def _connect_point3_line3(P, L):
     d = L.v.mag2()
     # assert d != 0
-    u = ((P.x - L.p.x) * L.v.x + \
-         (P.y - L.p.y) * L.v.y + \
+    u = ((P.x - L.p.x) * L.v.x +
+         (P.y - L.p.y) * L.v.y +
          (P.z - L.p.z) * L.v.z) / d
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
@@ -127,8 +126,8 @@ def _connect_sphere_line3(S, L):
         """
     d = L.v.mag2()
     # assert d != 0
-    u = ((S.c.x - L.p.x) * L.v.x + \
-         (S.c.y - L.p.y) * L.v.y + \
+    u = ((S.c.x - L.p.x) * L.v.x +
+         (S.c.y - L.p.y) * L.v.y +
          (S.c.z - L.p.z) * L.v.z) / d
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
@@ -183,8 +182,8 @@ def _connect_plane_plane(A, B):
 
 def _intersect_line3_sphere(L, S):
     a = L.v.mag2()
-    b = 2 * (L.v.x * (L.p.x - S.c.x) + \
-             L.v.y * (L.p.y - S.c.y) + \
+    b = 2 * (L.v.x * (L.p.x - S.c.x) +
+             L.v.y * (L.p.y - S.c.y) +
              L.v.z * (L.p.z - S.c.z))
     c = S.c.mag2() + \
         L.p.mag2() - \
@@ -267,8 +266,8 @@ class Vector3(object):
             pass
         # assert hasattr(other, '__len__') and len(other) == 3
         return self.x == other[0] and \
-               self.y == other[1] and \
-               self.z == other[2]
+            self.y == other[1] and \
+            self.z == other[2]
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -333,15 +332,9 @@ class Vector3(object):
                            self.z - other[2])
 
     def __rsub__(self, other):
-        try:
-            return Vector3(other.x - self.x,
-                           other.y - self.y,
-                           other.z - self.z)
-        except:
-            # assert hasattr(other, '__len__') and len(other) == 3
-            return Vector3(other.x - self[0],
-                           other.y - self[1],
-                           other.z - self[2])
+        return Vector3(other.x - self.x,
+                       other.y - self.y,
+                       other.z - self.z)
 
     def __mul__(self, other):
         try:
@@ -722,7 +715,7 @@ class Sphere(Geometry):
         a **LineSegment3** giving the intersection, or ``None`` if the
         line does not intersect the sphere.
 
-    
+
     ``distance(other)``
         Returns the absolute minimum distance to *other*.  Internally this
         simply returns the length of the result of ``connect``.
@@ -802,7 +795,7 @@ class Sphere(Geometry):
         :param phi2: float angle from "north pole" (=radians(90-lat) in radians
         :param theta2: float angle from 0 meridian
         """
-        # http://www.johndcook.com/blog/python_longitude_latitude/ 
+        # http://www.johndcook.com/blog/python_longitude_latitude/
 
         c = (sin(phi1) * sin(phi2) * cos(theta1 - theta2) + cos(phi1) * cos(phi2))
         return self.r * acos(c)
@@ -841,7 +834,8 @@ class Plane(Geometry):
 
     def __init__(self, *args):
         if len(args) == 3:
-            self.n = (Point3(args[1]) - Point3(args[0])).cross(Point3(args[2]) - Point3(args[0]))
+            self.n = (Point3(args[1]) - Point3(args[0])
+                      ).cross(Point3(args[2]) - Point3(args[0]))
             self.n.normalize()
             self.k = self.n.dot(Point3(args[0]))
         elif len(args) == 2:
@@ -920,7 +914,8 @@ class Matrix4(object):
         if len(args) == 16:
             self[:] = args
         else:
-            raise RuntimeError('%s.__init__(%s) failed' % (self.__class__.__name__, object))
+            raise RuntimeError('%s.__init__(%s) failed' %
+                               (self.__class__.__name__, object))
 
     def __repr__(self):
         t = self.transposed()  # repr is by line while [:] is by column
@@ -1298,51 +1293,51 @@ class Matrix4(object):
 
     def inverse(self):
         tmp = Matrix4()
-        d = self.determinant();
+        d = self.determinant()
 
         if abs(d) < 0.001:
             # No inverse, return identity
             return tmp
         else:
-            d = 1.0 / d;
+            d = 1.0 / d
 
             tmp.a = d * (self.f * (self.k * self.p - self.o * self.l) + self.j * (
-                        self.o * self.h - self.g * self.p) + self.n * (self.g * self.l - self.k * self.h));
+                self.o * self.h - self.g * self.p) + self.n * (self.g * self.l - self.k * self.h))
             tmp.e = d * (self.g * (self.i * self.p - self.m * self.l) + self.k * (
-                        self.m * self.h - self.e * self.p) + self.o * (self.e * self.l - self.i * self.h));
+                self.m * self.h - self.e * self.p) + self.o * (self.e * self.l - self.i * self.h))
             tmp.i = d * (self.h * (self.i * self.n - self.m * self.j) + self.l * (
-                        self.m * self.f - self.e * self.n) + self.p * (self.e * self.j - self.i * self.f));
+                self.m * self.f - self.e * self.n) + self.p * (self.e * self.j - self.i * self.f))
             tmp.m = d * (self.e * (self.n * self.k - self.j * self.o) + self.i * (
-                        self.f * self.o - self.n * self.g) + self.m * (self.j * self.g - self.f * self.k));
+                self.f * self.o - self.n * self.g) + self.m * (self.j * self.g - self.f * self.k))
 
             tmp.b = d * (self.j * (self.c * self.p - self.o * self.d) + self.n * (
-                        self.k * self.d - self.c * self.l) + self.b * (self.o * self.l - self.k * self.p));
+                self.k * self.d - self.c * self.l) + self.b * (self.o * self.l - self.k * self.p))
             tmp.f = d * (self.k * (self.a * self.p - self.m * self.d) + self.o * (
-                        self.i * self.d - self.a * self.l) + self.c * (self.m * self.l - self.i * self.p));
+                self.i * self.d - self.a * self.l) + self.c * (self.m * self.l - self.i * self.p))
             tmp.j = d * (self.l * (self.a * self.n - self.m * self.b) + self.p * (
-                        self.i * self.b - self.a * self.j) + self.d * (self.m * self.j - self.i * self.n));
+                self.i * self.b - self.a * self.j) + self.d * (self.m * self.j - self.i * self.n))
             tmp.n = d * (self.i * (self.n * self.c - self.b * self.o) + self.m * (
-                        self.b * self.k - self.j * self.c) + self.a * (self.j * self.o - self.n * self.k));
+                self.b * self.k - self.j * self.c) + self.a * (self.j * self.o - self.n * self.k))
 
             tmp.c = d * (self.n * (self.c * self.h - self.g * self.d) + self.b * (
-                        self.g * self.p - self.o * self.h) + self.f * (self.o * self.d - self.c * self.p));
+                self.g * self.p - self.o * self.h) + self.f * (self.o * self.d - self.c * self.p))
             tmp.g = d * (self.o * (self.a * self.h - self.e * self.d) + self.c * (
-                        self.e * self.p - self.m * self.h) + self.g * (self.m * self.d - self.a * self.p));
+                self.e * self.p - self.m * self.h) + self.g * (self.m * self.d - self.a * self.p))
             tmp.k = d * (self.p * (self.a * self.f - self.e * self.b) + self.d * (
-                        self.e * self.n - self.m * self.f) + self.h * (self.m * self.b - self.a * self.n));
+                self.e * self.n - self.m * self.f) + self.h * (self.m * self.b - self.a * self.n))
             tmp.o = d * (self.m * (self.f * self.c - self.b * self.g) + self.a * (
-                        self.n * self.g - self.f * self.o) + self.e * (self.b * self.o - self.n * self.c));
+                self.n * self.g - self.f * self.o) + self.e * (self.b * self.o - self.n * self.c))
 
             tmp.d = d * (self.b * (self.k * self.h - self.g * self.l) + self.f * (
-                        self.c * self.l - self.k * self.d) + self.j * (self.g * self.d - self.c * self.h));
+                self.c * self.l - self.k * self.d) + self.j * (self.g * self.d - self.c * self.h))
             tmp.h = d * (self.c * (self.i * self.h - self.e * self.l) + self.g * (
-                        self.a * self.l - self.i * self.d) + self.k * (self.e * self.d - self.a * self.h));
+                self.a * self.l - self.i * self.d) + self.k * (self.e * self.d - self.a * self.h))
             tmp.l = d * (self.d * (self.i * self.f - self.e * self.j) + self.h * (
-                        self.a * self.j - self.i * self.b) + self.l * (self.e * self.b - self.a * self.f));
+                self.a * self.j - self.i * self.b) + self.l * (self.e * self.b - self.a * self.f))
             tmp.p = d * (self.a * (self.f * self.k - self.j * self.g) + self.e * (
-                        self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c));
+                self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c))
 
-        return tmp;
+        return tmp
 
 
 class Quaternion:
@@ -1496,7 +1491,8 @@ class Quaternion:
     # w is the real part, (x, y, z) are the imaginary parts
 
     def __init__(self, w=1, x=0, y=0, z=0):
-        super(Quaternion, self).__init__()  # TODO: add a copy constructor one day
+        # TODO: add a copy constructor one day
+        super(Quaternion, self).__init__()
         self.w = w
         self.x = x
         self.y = y
@@ -1541,15 +1537,15 @@ class Quaternion:
             yy = y * y
             yz2 = 2 * y * z
             zz = z * z
-            return other.__class__( \
-                ww * Vx + wy2 * Vz - wz2 * Vy + \
-                xx * Vx + xy2 * Vy + xz2 * Vz - \
+            return other.__class__(
+                ww * Vx + wy2 * Vz - wz2 * Vy +
+                xx * Vx + xy2 * Vy + xz2 * Vz -
                 zz * Vx - yy * Vx,
-                xy2 * Vx + yy * Vy + yz2 * Vz + \
-                wz2 * Vx - zz * Vy + ww * Vy - \
+                xy2 * Vx + yy * Vy + yz2 * Vz +
+                wz2 * Vx - zz * Vy + ww * Vy -
                 wx2 * Vz - xx * Vy,
-                xz2 * Vx + yz2 * Vy + \
-                zz * Vz - wy2 * Vx - yy * Vz + \
+                xz2 * Vx + yz2 * Vy +
+                zz * Vz - wy2 * Vx - yy * Vz +
                 wx2 * Vy - xx * Vz + ww * Vz)
         else:
             other = copy(other)

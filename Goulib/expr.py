@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 '''
 simple symbolic math expressions
 '''
@@ -12,7 +10,13 @@ __credits__ = [
 ]
 __license__ = "LGPL"
 
-import logging, copy, collections, inspect, re, ast, math
+import logging
+import copy
+import collections
+import inspect
+import re
+import ast
+import math
 import operator as op
 from sortedcollections import SortedDict
 
@@ -65,7 +69,8 @@ class Context:
         ast.Invert: (op.not_, 1300, '~', '~', '\\sim '),
         ast.UAdd: (op.pos, 1150, '+', '+', '+'),
         ast.USub: (op.neg, 1150, '-', '-', '-'),
-        ast.Pow: (math2.pow, 1400, '^', '**', '^'),  # returns an integer when result is integer ...
+        # returns an integer when result is integer ...
+        ast.Pow: (math2.pow, 1400, '^', '**', '^'),
 
         # precedence of other types below
         ast.Call: (None, 9000),
@@ -92,11 +97,13 @@ class Context:
         :param r: repr representation, should be cut&pastable in a calculator, or in python ...
         :param l: LaTeX representation
         '''
-        self.constants[type(c)][c] = (None, None, s or name, r or name, l or '\\' + name)
+        self.constants[type(c)][c] = (
+            None, None, s or name, r or name, l or '\\' + name)
 
     def add_module(self, module):
         for fname, f in module.__dict__.items():
-            if fname[0] == '_': continue
+            if fname[0] == '_':
+                continue
             if isinstance(f, collections.Callable):
                 self.add_function(f)
             elif math2.is_number(f):
@@ -114,16 +121,17 @@ class Context:
         elif isinstance(node, ast.Name):
             return self.variables.get(node.id, node.id)  # return value or var
         elif isinstance(node, ast.Attribute):
-            return getattr(self[node.value.id], node.attr)
+            return getattr(self.variables, [node.value.id], node.attr)
         elif isinstance(node, ast.Tuple):
             return tuple(self.eval(e) for e in node.elts)
         elif isinstance(node, ast.Call):
             params = [self.eval(arg) for arg in node.args]
-            if not node.func.id in self.functions:
+            if node.func.id not in self.functions:
                 raise NameError('%s function not allowed' % node.func.id)
             f = self.functions[node.func.id][0]
             res = f(*params)
-            return math2.int_or_float(res, 0, 1e-12)  # try to correct small error
+            # try to correct small error
+            return math2.int_or_float(res, 0, 1e-12)
         elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
             op = self.operators[type(node.op)]
             left = self.eval(node.left)
@@ -171,7 +179,8 @@ class Context:
         self.add_function(math.gamma, l='\\Gamma')
         self.add_function(math.exp, l='e^{%s}')
         self.add_function(math.expm1, l='e^{%s}-1')
-        self.add_function(math.lgamma, 'log(abs(gamma(%s)))', l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
+        self.add_function(math.lgamma, 'log(abs(gamma(%s)))',
+                          l='\\ln\\lvert\\Gamma\\left({%s}\\rvert)\\right)')
         self.add_function(math.degrees, l='%s\\cdot\\frac{360}{2\\pi}')
         self.add_function(math.radians, l='%s\\cdot\\frac{2\\pi}{360}')
 
@@ -258,7 +267,8 @@ class Expr(plot.Plot):
             self.body = ast.Num(f)
             return
 
-        f = str(f).replace('^', '**')  # accept ^ as power operator rather than xor ...
+        # accept ^ as power operator rather than xor ...
+        f = str(f).replace('^', '**')
 
         self.body = compile(f, 'Expr', 'eval', ast.PyCF_ONLY_AST).body
 
@@ -270,8 +280,10 @@ class Expr(plot.Plot):
     def isconstant(self):
         ''':return: True if Expr evaluates to a constant number or bool'''
         res = self()
-        if math2.is_number(res): return True
-        if isinstance(res, bool): return True
+        if math2.is_number(res):
+            return True
+        if isinstance(res, bool):
+            return True
         return False
 
     def __call__(self, x=None, **kwargs):
@@ -329,11 +341,13 @@ class Expr(plot.Plot):
         if y is None:
             y = self(x)
 
-        offset = kwargs.pop('offset', 0)  # slightly shift the points to make superimposed curves more visible
+        # slightly shift the points to make superimposed curves more visible
+        offset = kwargs.pop('offset', 0)
 
         points = list(zip(x, y))  # might contain (x,None) for undefined points
 
-        for xy in itertools2.isplit(points, lambda _: not math2.is_real(_[1])):  # curves between defined points
+        # curves between defined points
+        for xy in itertools2.isplit(points, lambda _: not math2.is_real(_[1])):
             x, y = [], []  # matplotlib doesn't support generators...
             for v in xy:
                 x.append(v[0] + offset)
@@ -571,10 +585,14 @@ class TextVisitor(ast.NodeVisitor):
         res = l + symbol + r
 
         # TODO: find a better way to do this ...
-        plusminus = self.context.operators[ast.Add][self.dialect] + self.context.operators[ast.USub][self.dialect]
-        minusminus = self.context.operators[ast.Sub][self.dialect] + self.context.operators[ast.USub][self.dialect]
-        res = res.replace(plusminus, self.context.operators[ast.Sub][self.dialect])
-        res = res.replace(minusminus, self.context.operators[ast.Add][self.dialect])
+        plusminus = self.context.operators[ast.Add][self.dialect] + \
+            self.context.operators[ast.USub][self.dialect]
+        minusminus = self.context.operators[ast.Sub][self.dialect] + \
+            self.context.operators[ast.USub][self.dialect]
+        res = res.replace(
+            plusminus, self.context.operators[ast.Sub][self.dialect])
+        res = res.replace(
+            minusminus, self.context.operators[ast.Add][self.dialect])
         return res
 
     def visit_BinOp(self, n):

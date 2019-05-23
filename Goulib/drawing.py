@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-
 """
 Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
@@ -16,21 +13,22 @@ Read/Write and handle vector graphics in .dxf, .svg and .pdf formats
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2014, Philippe Guglielmetti"
-__credits__ = ['http://effbot.org/imagingbook/imagedraw.htm', 'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
+__credits__ = ['http://effbot.org/imagingbook/imagedraw.htm',
+               'http://images.autodesk.com/adsk/files/acad_dxf0.pdf']
 __license__ = "LGPL"
 
 from math import radians, degrees, tan, atan
-import logging, base64, io
+import logging
+import base64
+import io
 
-from .itertools2 import split, filter2, subdict
-from .geom import *
-from .plot import Plot
-from .colors import color_to_aci, aci_to_color
-from .interval import Box
-from .math2 import rint, isclose
+from Goulib.geom import *       # pylint: disable=wildcard-import, unused-wildcard-import
+from Goulib.interval import Box
+from Goulib.math2 import rint, isclose
+from Goulib import colors, itertools2
 
-from . import plot  # set matplotlib backend
-import matplotlib.pyplot as plt  # after import .plot
+from Goulib import plot  # sets matplotlib backend
+import matplotlib.pyplot as plt  # after Goulib.plot import 
 
 
 def Trans(scale=1, offset=None, rotation=None):
@@ -65,8 +63,10 @@ class BBox(Box):
         :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
         super(BBox, self).__init__(2)
-        if p1 is not None: self += p1
-        if p2 is not None: self += p2
+        if p1 is not None:
+            self += p1
+        if p2 is not None:
+            self += p2
 
     @property
     def xmin(self):
@@ -159,8 +159,8 @@ class BBox(Box):
 
         return res
 
-
-class Entity(plot.Plot):
+# pylint: disable=no-member, unsupported-membership-test, not-an-iterable
+class Entity(plot.Plot): 
     """Base class for all drawing entities"""
 
     color = 'black'  # by default
@@ -201,13 +201,17 @@ class Entity(plot.Plot):
             # http://stackoverflow.com/questions/1336663/2d-bounding-box-of-a-sector
             res = BBox(self.p, self.p2)
             p = self.c + Vector2(self.r, 0)
-            if p in self: res += p
+            if p in self:
+                res += p
             p = self.c + Vector2(-self.r, 0)
-            if p in self: res += p
+            if p in self:
+                res += p
             p = self.c + Vector2(0, self.r)
-            if p in self: res += p
+            if p in self:
+                res += p
             p = self.c + Vector2(0, -self.r)
-            if p in self: res += p
+            if p in self:
+                res += p
             return res
         elif isinstance(self, Circle):  # must be after Arc2 case since Arc2 is a Circle too
             rr = Vector2(self.r, self.r)
@@ -237,7 +241,7 @@ class Entity(plot.Plot):
         :return: dict of attributes for dxf.entity
         """
         res = {}
-        res['color'] = color_to_aci(attr.get('color', self.color))
+        res['color'] = colors.color_to_aci(attr.get('color', self.color))
         if 'layer' in attr:
             res['layer'] = attr.get('layer')
         else:
@@ -264,9 +268,11 @@ class Entity(plot.Plot):
             v = Vector2(Point2(self.end) - self.c)
             endangle = degrees(v.angle())
             if self.dir < 0:  # DXF handling of ARC direction is somewhat exotic ...
-                startangle, endangle = 180 - startangle, 180 - endangle  # start/end were already swapped
+                startangle, endangle = 180 - startangle, 180 - \
+                    endangle  # start/end were already swapped
                 extrusion_direction = (0, 0, -1)
-                center = (-center[0], center[1])  # negative extrusion on Z causes Y axis symmetry... strange...
+                # negative extrusion on Z causes Y axis symmetry... strange...
+                center = (-center[0], center[1])
             else:
                 extrusion_direction = None  # default
             return dxf.Arc(radius=self.r, center=center, startangle=startangle, endangle=endangle,
@@ -279,7 +285,8 @@ class Entity(plot.Plot):
             spline.start(self.start.xy, (self.p[1] - self.start).xy)
             spline.append(self.end.xy, (self.p[2] - self.end).xy)
             return spline
-            return curves.Spline(self.xy, **attr)  # builds a POLYLINE3D (???) with 100 segments ...
+            # builds a POLYLINE3D (???) with 100 segments ...
+            return curves.Spline(self.xy, **attr)
         else:
             raise NotImplementedError
 
@@ -338,7 +345,8 @@ class Entity(plot.Plot):
         if res.length == 0:
             res = Point2(res.p)
         res.dxf = e  # keep link to source entity
-        res.color = aci_to_color(e.color)
+
+        res.color = colors.aci_to_color(e.color)
         res.layer = e.layer
         return res
 
@@ -365,7 +373,8 @@ class Entity(plot.Plot):
             pass
 
         if isinstance(self, Segment2):
-            path = Path((self.start.xy, self.end.xy), [Path.MOVETO, Path.LINETO])
+            path = Path((self.start.xy, self.end.xy),
+                        [Path.MOVETO, Path.LINETO])
             return [patches.PathPatch(path, **kwargs)]
 
         if isinstance(self, Arc2):
@@ -393,7 +402,8 @@ class Entity(plot.Plot):
             kwargs.setdefault('clip_on', False)
             return [patches.Circle(self.xy, ms, **kwargs)]
         if isinstance(self, Spline):
-            path = Path(self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+            path = Path(
+                self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
             return [patches.PathPatch(path, **kwargs)]
 
         if isinstance(self, Ellipse):  # must be after Arc2 and Ellipse
@@ -424,7 +434,8 @@ class Entity(plot.Plot):
 
         # for some reason we have to plot something in order to size the window
         # TODO: find a better way... (found no other way top do it...)
-        plt.plot((box.xmin, box.xmax), (box.ymin, box.ymax), alpha=0)  # draw a transparent diagonal to size everything
+        # draw a transparent diagonal to size everything
+        plt.plot((box.xmin, box.xmax), (box.ymin, box.ymax), alpha=0)
 
         plt.axis(pltaxis)
 
@@ -445,12 +456,13 @@ class Entity(plot.Plot):
 
             fig = self.figure(**kwargs)
 
-        args = subdict(kwargs, ('color', 'linewidth', 'alpha'))
+        args = itertools2.subdict(kwargs, ('color', 'linewidth', 'alpha'))
 
-        p = self.patches(**args)  # some of which might be Annotations, which aren't patches but Artists...
+        # some of which might be Annotations, which aren't patches but Artists...
+        p = self.patches(**args)
 
         from matplotlib.patches import Patch
-        patches, artists = filter2(p, lambda e: isinstance(e, Patch))
+        patches, artists = itertools2.filter2(p, lambda e: isinstance(e, Patch))
 
         if patches:
             from matplotlib.collections import PatchCollection
@@ -599,7 +611,7 @@ class _Group(Entity, Geometry):
                 return Segment2(inter, inter)  # segment of null length
             if isinstance(inter, Segment2):
                 return Segment2(inter.p, inter.p)  # segment of null length
-            raise
+            raise NotImplementedError
         try:
             iter(other)
         except:
@@ -744,7 +756,7 @@ class Instance(_Group):
         res.name = e.name
         # code below copied from Entity.from_dxf. TODO: merge
         res.dxf = e  # keep link to source entity
-        res.color = aci_to_color(e.color)
+        res.color = colors.aci_to_color(e.color)
         res.layer = e.layer
         return res
 
@@ -905,7 +917,8 @@ class Chain(Group):
             elif isinstance(seg, svg.path.Arc):
                 raise NotImplementedError
             elif isinstance(seg, svg.path.CubicBezier):
-                entity = Spline([Point2(seg.start), Point2(seg.control1), Point2(seg.control2), Point2(seg.end)])
+                entity = Spline([Point2(seg.start), Point2(
+                    seg.control1), Point2(seg.control2), Point2(seg.end)])
             elif isinstance(seg, svg.path.QuadraticBezier):
                 raise NotImplementedError
             else:  # Move
@@ -967,7 +980,7 @@ class Chain(Group):
             return None
         res._apply_transform(mat3)
         res.dxf = e  # keep link to source entity
-        res.color = aci_to_color(e.color)
+        res.color = colors.aci_to_color(e.color)
         res.layer = e.layer
         for edge in res:
             edge.dxf = e
@@ -989,7 +1002,7 @@ class Chain(Group):
 
         # if no color specified assume chain color is the same as the first element's
         color = attr.get('color', self.color)
-        attr['color'] = color_to_aci(color)
+        attr['color'] = colors.color_to_aci(color)
         try:
             attr.setdefault('layer', self.layer)
         except:
@@ -1070,7 +1083,8 @@ class Rect(Chain):
         return '%s(%s,%s)' % (self.__class__.__name__, self.p1, self.p2)
 
 
-dtp = 25.4 / 72  # one dtp point in mm https://en.wikipedia.org/wiki/Point_(typography)#Current_DTP_point_system
+# one dtp point in mm https://en.wikipedia.org/wiki/Point_(typography)#Current_DTP_point_system
+dtp = 25.4 / 72
 
 
 class Text(Entity):
@@ -1192,13 +1206,15 @@ class Drawing(Group):
         class _Interpreter(PDFPageInterpreter):
             # stroke
             def do_S(self):
-                self.device.paint_path(self.graphicstate, self.scs, False, False, self.curpath)
+                self.device.paint_path(
+                    self.graphicstate, self.scs, False, False, self.curpath)
                 self.curpath = []
                 return
 
             # fill
             def do_f(self):
-                self.device.paint_path(self.graphicstate, self.scs, self.ncs, False, self.curpath)
+                self.device.paint_path(
+                    self.graphicstate, self.scs, self.ncs, False, self.curpath)
                 self.curpath = []
                 return
 
@@ -1273,7 +1289,8 @@ class Drawing(Group):
                 res = path.getAttribute(name)
                 return res or attr.get(name, v)
 
-            color = getAttribute('fill')  # assign filling color to default stroke color
+            # assign filling color to default stroke color
+            color = getAttribute('fill')
             color = getAttribute('stroke', color)
             alpha = getAttribute('opacity', 0)
             style = getAttribute('style')
@@ -1320,7 +1337,8 @@ class Drawing(Group):
         # build dictionary of blocks
         self.block = {}
         for block in self.dxf.blocks:
-            self.block[block.name] = Group().from_dxf(block._entities, **kwargs)
+            self.block[block.name] = Group().from_dxf(
+                block._entities, **kwargs)
 
         super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
         return self

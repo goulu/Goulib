@@ -14,7 +14,15 @@ __license__ = "LGPL"
 
 import logging
 
-import math, cmath, operator, itertools, functools, fractions, numbers, random
+import math
+import cmath
+import operator
+import itertools
+import functools
+import fractions
+import numbers
+import random
+import bitarray
 
 from Goulib import itertools2, decorators
 
@@ -187,7 +195,7 @@ def xgcd(a, b):
     with the sign of b if b is nonzero, and with the sign of a if b is 0.
     The numbers x,y are such that gcd = ax+by.'''
     # taken from http://anh.cs.luc.edu/331/code/xgcd.py
-    prevx, x = 1, 0;
+    prevx, x = 1, 0
     prevy, y = 0, 1
     while b:
         q, r = divmod(a, b)
@@ -381,9 +389,12 @@ def introot(n, r=2):
     For negative n, returns the least integer greater than or equal to the r-th root of n, or None if r is even.
     '''
     # copied from https://pypi.python.org/pypi/primefac
-    if n < 0: return None if r % 2 == 0 else -introot(-n, r)
-    if n < 2: return n
-    if r == 2: return isqrt(n)
+    if n < 0:
+        return None if r % 2 == 0 else -introot(-n, r)
+    if n < 2:
+        return n
+    if r == 2:
+        return isqrt(n)
     lower, upper = 0, n
     while lower != upper - 1:
         mid = (lower + upper) // 2
@@ -405,9 +416,12 @@ def is_power(n):
     # copied from https://pypi.python.org/pypi/primefac
     for p in primes_gen():
         r = introot(n, p)
-        if r is None: continue
-        if r ** p == n: return r
-        if r == 1: return 0
+        if r is None:
+            continue
+        if r ** p == n:
+            return r
+        if r == 1:
+            return 0
 
 
 def multiply(x, y):
@@ -611,8 +625,10 @@ def veccompare(a, b):
 def sat(x, low=0, high=None):
     ''' saturates x between low and high '''
     if isinstance(x, (int, float)):
-        if low is not None: x = max(x, low)
-        if high is not None: x = min(x, high)
+        if low is not None:
+            x = max(x, low)
+        if high is not None:
+            x = min(x, high)
         return x
     return [sat(_, low, high) for _ in x]
 
@@ -721,9 +737,11 @@ def recurrence(signature, values, cst=0, max=None, mod=0):
     values = values[-len(signature):]
     while True:
         n = dot_vv(factors, values)
-        if max and n > max: break
+        if max and n > max:
+            break
         n = n + cst
-        if mod: n = n % mod
+        if mod:
+            n = n % mod
         yield n
         values = values[1:]
         values.append(n)
@@ -753,7 +771,7 @@ def kfibonacci(k, mod=0):
     for row in mat:
         row.append(0)
     mat.insert(0, [1] * k)
-    return lambda n:mod_matpow(mat, n, mod)[0][k - 1]
+    return lambda n: mod_matpow(mat, n, mod)[0][k - 1]
 
 
 def fibonacci(n, mod=0):
@@ -771,7 +789,8 @@ def is_fibonacci(n):
 
 
 def pisano_cycle(mod):
-    if mod < 2: return [0]
+    if mod < 2:
+        return [0]
     seq = [0, 1]
     l = len(seq)
     s = []
@@ -782,7 +801,8 @@ def pisano_cycle(mod):
 
 
 def pisano_period(mod):
-    if mod < 2: return 1
+    if mod < 2:
+        return 1
     flag = False  # 0 was found
     for i, n in enumerate(fibonacci_gen(mod=mod)):
         if not flag:
@@ -809,7 +829,8 @@ def collatz_gen(n=0):
 
 @decorators.memoize
 def collatz_period(n):
-    if n == 1: return 1
+    if n == 1:
+        return 1
     return 1 + collatz_period(collatz(n))
 
 
@@ -857,7 +878,8 @@ def primitive_triples():
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
     '''
-    key = lambda x: (x[2], x[1])
+    def key(x): 
+        return (x[2], x[1])
     from sortedcontainers import SortedListWithKey
     triples = SortedListWithKey(key=key)
     triples.add([3, 4, 5])
@@ -871,7 +893,8 @@ def primitive_triples():
 
         # expand this triple to 3 new triples using Berggren's matrices
         for X in [A, B, C]:
-            triple = [sum(x * y for (x, y) in zip([a, b, c], X[i])) for i in range(3)]
+            triple = [sum(x * y for (x, y) in zip([a, b, c], X[i]))
+                      for i in range(3)]
             if triple[0] > triple[1]:  # ensure x<y<z
                 triple[0], triple[1] = triple[1], triple[0]
             triples.add(triple)
@@ -882,7 +905,7 @@ def triples():
     sorted by hypotenuse z, then longest side y
     '''
     prim = []  # list of primitive triples up to now
-    key = lambda x: (x[2], x[1])
+    def key(x): return (x[2], x[1])
     from sortedcontainers import SortedListWithKey
     samez = SortedListWithKey(key=key)  # temp triplets with same z
     buffer = SortedListWithKey(key=key)  # temp for triplets with smaller z
@@ -923,7 +946,8 @@ def divisors(n):
     if n == 1:
         yield 1
     else:
-        all_factors = [[f ** p for p in itertools2.irange(0, fp)] for (f, fp) in factorize(n)]
+        all_factors = [
+            [f ** p for p in itertools2.irange(0, fp)] for (f, fp) in factorize(n)]
         # do not use itertools2.product here as long as the order of the result differs
         for ns in itertools.product(*all_factors):
             yield mul(ns)
@@ -934,15 +958,12 @@ def proper_divisors(n):
     return (divisor for divisor in divisors(n) if divisor != n)
 
 
-from bitarray import bitarray
-
-
 class Sieve:
     # should be derived from bitarray but ...
     # https://github.com/ilanschnell/bitarray/issues/69
     # TODO: simplify when solved
     def __init__(self, f, init):
-        self._ = bitarray(init)
+        self._ = bitarray.bitarray(init)
         self.f = f
 
     def __len__(self):
@@ -957,7 +978,8 @@ class Sieve:
 
     def resize(self, n):
         l = len(self) - 1
-        if n <= l: return
+        if n <= l:
+            return
         n = int(n)  # to tolerate n=1E9, which is float
         self._.extend([True] * (n - l))
         for i in self(n):
@@ -965,7 +987,8 @@ class Sieve:
                 i2, s = 4, 2
             else:
                 i2, s = self.f(i)
-            if i2 > n: break
+            if i2 > n:
+                break
             self._[i2::s] = False  # bitarray([False]*int((n-i2)/s+1))
 
 
@@ -973,7 +996,8 @@ def erathostene(n):
     return n * n, 2 * n
 
 
-_sieve = Sieve(erathostene, [False, False, True])  # array of bool indicating primality
+# array of bool indicating primality
+_sieve = Sieve(erathostene, [False, False, True])
 
 
 def sieve(n, oneisprime=False):
@@ -1013,15 +1037,20 @@ def is_prime_euler(n, eb=(2,)):
     '''
     # https://pypi.python.org/pypi/primefac
     for b in eb:
-        if b >= n: continue
+        if b >= n:
+            continue
         if not pow(b, n - 1, n) == 1:
             return False
         r = n - 1
-        while r % 2 == 0: r //= 2
+        while r % 2 == 0:
+            r //= 2
         c = pow(b, r, n)
-        if c == 1: continue
-        while c != 1 and c != n - 1: c = pow(c, 2, n)
-        if c == 1: return False
+        if c == 1:
+            continue
+        while c != 1 and c != n - 1:
+            c = pow(c, 2, n)
+        if c == 1:
+            return False
     return True  # according to Euler, but there are
 
 
@@ -1047,23 +1076,32 @@ def is_prime(n, oneisprime=False, tb=(3, 5, 7, 11), eb=(2,), mrb=None):
     '''
     # https://pypi.python.org/pypi/primefac
 
-    if n <= 0: return False
+    if n <= 0:
+        return False
 
-    if n == 1: return oneisprime
+    if n == 1:
+        return oneisprime
 
-    if n < len(_sieve): return _sieve[n]
+    if n < len(_sieve):
+        return _sieve[n]
 
-    if n in _primes_set: return True
+    if n in _primes_set:
+        return True
 
-    if any(n % p == 0 for p in tb): return False
+    if any(n % p == 0 for p in tb):
+        return False
 
-    if is_square(n): return False  # it's quick ...
+    if is_square(n):
+        return False  # it's quick ...
 
-    if not is_prime_euler(n): return False  # Euler's test
+    if not is_prime_euler(n):
+        return False  # Euler's test
 
     s, d = pfactor(n)
-    if not sprp(n, 2, s, d): return False
-    if n < 2047: return True
+    if not sprp(n, 2, s, d):
+        return False
+    if n < 2047:
+        return True
 
     # BPSW has two phases: SPRP with base 2 and SLPRP.
     # We just did the SPRP; now we do the SLPRP
@@ -1077,7 +1115,8 @@ def is_prime(n, oneisprime=False, tb=(3, 5, 7, 11), eb=(2,), mrb=None):
                 p, q = 1, (1 - d) // 4
                 break
             d = -d - 2 * d // abs(d)
-        if p == 0: return n == d
+        if p == 0:
+            return n == d
         s, t = pfactor(n + 2)
         u, v, u2, v2, m = 1, p, 1, p, t // 2
         k = q
@@ -1085,14 +1124,18 @@ def is_prime(n, oneisprime=False, tb=(3, 5, 7, 11), eb=(2,), mrb=None):
             u2, v2, q = (u2 * v2) % n, (v2 * v2 - 2 * q) % n, (q * q) % n
             if m % 2 == 1:
                 u, v = u2 * v + u * v2, v2 * v + u2 * u * d
-                if u % 2 == 1: u += n
-                if v % 2 == 1: v += n
+                if u % 2 == 1:
+                    u += n
+                if v % 2 == 1:
+                    v += n
                 u, v, k = (u // 2) % n, (v // 2) % n, (q * k) % n
             m //= 2
-        if (u == 0) or (v == 0): return True
+        if (u == 0) or (v == 0):
+            return True
         for i in range(1, s):
             v, k = (v * v - 2 * k) % n, (k * k) % n
-            if v == 0: return True
+            if v == 0:
+                return True
         return False
 
     # Miller-Rabin
@@ -1108,34 +1151,44 @@ def is_prime(n, oneisprime=False, tb=(3, 5, 7, 11), eb=(2,), mrb=None):
         elif n < 3474749660383:
             mrb = [3, 5, 6, 11, 13]
         elif n < 341550071728321:
-            mrb = [3, 5, 7, 11, 13, 17]  # This number is also a false positive for primes(19+1).
+            # This number is also a false positive for primes(19+1).
+            mrb = [3, 5, 7, 11, 13, 17]
         elif n < 3825123056546413051:
-            mrb = [3, 5, 7, 11, 13, 17, 19, 23]  # Also a false positive for primes(31+1).
+            # Also a false positive for primes(31+1).
+            mrb = [3, 5, 7, 11, 13, 17, 19, 23]
     return all(sprp(n, b, s, d) for b in mrb)
 
 
 def nextprime(n):
     '''Determines, with some semblance of efficiency, the least prime number strictly greater than n.'''
     # from https://pypi.python.org/pypi/primefac
-    if n < 2: return 2
-    if n == 2: return 3
+    if n < 2:
+        return 2
+    if n == 2:
+        return 3
     n = (n + 1) | 1  # first odd larger than n
     m = n % 6
     if m == 3:
-        if is_prime(n + 2): return n + 2
+        if is_prime(n + 2):
+            return n + 2
         n += 4
     elif m == 5:
-        if is_prime(n): return n
+        if is_prime(n):
+            return n
         n += 2
     for m in itertools.count(n, 6):
-        if is_prime(m): return m
-        if is_prime(m + 4): return m + 4
+        if is_prime(m):
+            return m
+        if is_prime(m + 4):
+            return m + 4
 
 
 def prevprime(n):
     '''Determines, very inefficiently, the largest prime number strictly smaller than n.'''
-    if n < 3: return None
-    if n == 3: return 2
+    if n < 3:
+        return None
+    if n == 3:
+        return 2
     n = n | 1  # n if it is odd, or n+1 if it is even
     while True:
         n -= 2
@@ -1170,9 +1223,10 @@ def random_prime(bits):
     '''returns a random number of the specified bit length'''
     import random
     while True:
-        n = random.getrandbits(bits - 1) + 2 ** (bits - 1);
+        n = random.getrandbits(bits - 1) + 2 ** (bits - 1)
         n = nextprime(n - 1)
-        if n < 2 ** bits: return n
+        if n < 2 ** bits:
+            return n
 
 
 def euclid_gen():
@@ -1200,13 +1254,15 @@ def prime_factors(num, start=2):
 
 def lpf(n):
     '''greatest prime factor'''
-    if n < 4: return n
+    if n < 4:
+        return n
     return itertools2.first(prime_factors(n))
 
 
 def gpf(n):
     '''greatest prime factor'''
-    if n < 4: return n
+    if n < 4:
+        return n
     return itertools2.last(prime_factors(n))
 
 
@@ -1262,10 +1318,12 @@ def moebius(n):
     mu(n) = (-1)^k if n is the product of k different primes;
     otherwise mu(n) = 0.
     '''
-    if n == 1: return 1
+    if n == 1:
+        return 1
     res = 1
     for p, q in factorize(n):
-        if q > 1: return 0
+        if q > 1:
+            return 0
         res = -res
     return res
 
@@ -1293,8 +1351,10 @@ def kempner(n):
     :see: https://en.wikipedia.org/wiki/Kempner_function
     :see: http://mathworld.wolfram.com/SmarandacheFunction.html
     '''
-    if n == 1: return 1
-    if is_prime(n): return n
+    if n == 1:
+        return 1
+    if is_prime(n):
+        return n
 
     @decorators.memoize
     def _np(n, p):
@@ -1309,7 +1369,7 @@ def kempner(n):
                 p -= 1
         p = max(0, p)
 
-        return (k + p) * n;
+        return (k + p) * n
 
     return max(_np(f, p) for f, p in factorize(n))
 
@@ -1422,7 +1482,7 @@ def digsum(num, f=None, base=10):
         return sum(d)
     if is_number(f):
         p = f
-        f = lambda x: pow(x, p)
+        def f(x): return pow(x, p)
     try:
         return sum(map(f, d))
     except AttributeError:
@@ -1438,7 +1498,8 @@ def integer_exponent(a, b=10):
     '''
     res = 0
     for d in digits_gen(a, b):
-        if d > 0: break
+        if d > 0:
+            break
         res += 1
     return res
 
@@ -1491,7 +1552,8 @@ def str_base(num, base=10, numerals='0123456789abcdefghijklmnopqrstuvwxyz'):
     if base == 2 and numerals[:2] == '01':
         return "{0:b}".format(int(num))
     if base < 2 or base > len(numerals):
-        raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
+        raise ValueError(
+            "str_base: base must be between 2 and %d" % len(numerals))
 
     if num < 0:
         sign = '-'
@@ -1592,7 +1654,8 @@ def repunit(n, base=10, digit=1):
     '''
     :return: nth repunit
     '''
-    if n == 0: return 0
+    if n == 0:
+        return 0
     if digit == 1:
         return (base ** n - 1) // (base - 1)
     return int(str(digit) * n, base)
@@ -1716,7 +1779,8 @@ def faulhaber(n, p):
     '''
     s = 0
     for j, a in enumerate(bernouilli_gen()):
-        if j > p: break
+        if j > p:
+            break
         s = s + binomial(p + 1, j) * a * n ** (p + 1 - j)
     return s // (p + 1)
 
@@ -1732,7 +1796,8 @@ def lychrel_seq(n):
     while True:
         r = reverse(n)
         yield n, r
-        if n == r: break
+        if n == r:
+            break
         n += r
 
 
@@ -1759,7 +1824,8 @@ def is_lychrel(n, limit=96):
     if r >= limit:
         return True
     if r == 0:  # palindromic number...
-        return lychrel_count(n + reverse(n), limit) + 1 >= limit  # ... can be lychrel !
+        # ... can be lychrel !
+        return lychrel_count(n + reverse(n), limit) + 1 >= limit
     return False
 
 
@@ -1879,7 +1945,8 @@ def partitionsQ(n, d=0):
     # https://oeis.org/A000009
     # https://codegolf.stackexchange.com/a/71945/17547
 
-    if n == 0: return 1
+    if n == 0:
+        return 1
     return sum(partitionsQ(n - k, n - 2 * k + 1) for k in range(1, n - d + 1))
 
 
@@ -1896,7 +1963,7 @@ def get_cardinal_name(num):
 
     def _get_tens(n):
         a, b = divmod(n, 10)
-        return (numbers[n] if (n in numbers) else "%s-%s" % (numbers[10 * a], numbers[b]))
+        return numbers[n] if (n in numbers) else "%s-%s" % (numbers[10 * a], numbers[b])
 
     def _get_hundreds(n):
         tens = n % 100
@@ -1911,7 +1978,8 @@ def get_cardinal_name(num):
     blocks = digits(num, 1000, rev=True)  # group by 1000
     res = ''
     for hdu, word in zip(blocks, ['', ' thousand ', ' million ', ' billion ']):
-        if hdu == 0: continue  # skip
+        if hdu == 0:
+            continue  # skip
         try:
             res = ' '.join(_get_hundreds(hdu)) + word + res
         except:
@@ -1942,7 +2010,8 @@ def number_of_digits(num, base=10):
     # math.log(num,base) is imprecise, and len(str(num,base)) is slow and ugly
     num = abs(num)
     for i in itertools.count():
-        if num < base: return i + 1
+        if num < base:
+            return i + 1
         num = num // base
 
 
@@ -2045,7 +2114,8 @@ def binomial_exponent(n, k, p):
     :return: int largest power of p that divides binomial(n,k)
     '''
     if is_prime(p):
-        return carries(k, n - k, p)  # https://en.wikipedia.org/wiki/Kummer%27s_theorem
+        # https://en.wikipedia.org/wiki/Kummer%27s_theorem
+        return carries(k, n - k, p)
 
     return min(binomial_exponent(n, k, a) // b for a, b in factorize(p))
 
@@ -2082,8 +2152,10 @@ def ilog(a, b, upper_bound=False):
 
     p = 1
     for x in itertools.count():
-        if p == a: return x
-        if p > a: return x if upper_bound else None
+        if p == a:
+            return x
+        if p > a:
+            return x if upper_bound else None
         p = b * p
 
 
@@ -2137,8 +2209,11 @@ def proportional(nseats, votes):
     frac = [vote / quota for vote in votes]
     res = [int(f) for f in frac]
     n = nseats - sum(res)  # number of seats remaining to allocate
-    if n == 0: return res  # done
-    if n < 0: return [min(x, nseats) for x in res]  # to handle case where votes=[0,0,..,1,0,...,0]
+    if n == 0:
+        return res  # done
+    if n < 0:
+        # to handle case where votes=[0,0,..,1,0,...,0]
+        return [min(x, nseats) for x in res]
     # give the remaining seats to the n parties with the largest remainder
     remainders = vecsub(frac, res)
     limit = sorted(remainders, reverse=True)[n - 1]
@@ -2146,7 +2221,8 @@ def proportional(nseats, votes):
         if r >= limit:
             res[i] += 1
             n -= 1  # attempt to handle perfect equality
-            if n == 0: return res  # done
+            if n == 0:
+                return res  # done
 
 
 def triangular_repartition(x, n):
@@ -2245,12 +2321,14 @@ def mod_inv(a, b):
         return ipow(a, b - 2, b)
     b0 = b
     x0, x1 = 0, 1
-    if b == 1: return 1
+    if b == 1:
+        return 1
     while a > 1:
         q = a // b
         a, b = b, a % b
         x0, x1 = x1 - q * x0, x0
-    if x1 < 0: x1 += b0
+    if x1 < 0:
+        x1 += b0
     return x1
 
 
@@ -2295,11 +2373,11 @@ def _count(n, p):
     '''
     :return: power of p in n
     '''
-    k = 0;
+    k = 0
     while n >= p:
         k += n // p
         n = n // p
-    return k;
+    return k
 
 
 def mod_binomial(n, k, m, q=None):
@@ -2326,7 +2404,8 @@ def mod_binomial(n, k, m, q=None):
             res = 1
             for a, b in zip(ni, ki):
                 res *= binomial(a, b)
-                if res == 0: break
+                if res == 0:
+                    break
             return res
         # see http://codechef17.rssing.com/chan-12597213/all_p5.html
         '''
@@ -2400,15 +2479,18 @@ def mod_sqrt(n, p):
             e += 1
             q >>= 1
         n = 2
-        while legendre(n, p) != -1: n += 1
+        while legendre(n, p) != -1:
+            n += 1
         w, x, y, r = pow(a, q, p), pow(a, (q + 1) >> 1, p), pow(n, q, p), e
         while True:
-            if w == 1: return x
+            if w == 1:
+                return x
             v, k = w, 0
             while v != 1 and k + 1 < r:
                 v = (v * v) % p
                 k += 1
-            if k == 0: return x
+            if k == 0:
+                return x
             d = pow(y, 1 << (r - k - 1), p)
             x, y = (x * d) % p, (d * d) % p
             w, r = (w * y) % p, k
@@ -2428,8 +2510,10 @@ def mod_fac(n, mod, mod_is_prime=False):
     if n < 20:  # for small n the naive algorithm can be faster
         return factorial(n) % mod
 
-    if mod_is_prime or is_prime(mod):  # use Wilson's Theorem : (n-1)! == -1 (mod modulo)
-        result = mod - 1;  # avoid negative numbers:  -1 == modulo - 1 (mod modulo)
+    # use Wilson's Theorem : (n-1)! == -1 (mod modulo)
+    if mod_is_prime or is_prime(mod):
+        # avoid negative numbers:  -1 == modulo - 1 (mod modulo)
+        result = mod - 1
         for i in range(mod - 1, n, -1):
             result *= mod_inv(i, mod)
             result %= mod
@@ -2447,9 +2531,11 @@ def pi_digits_gen():
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
     q, r, t, j = 1, 180, 60, 2
     while True:
-        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q * (27 * j - 12) + 5 * r) // (5 * t)
+        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q *
+                                               (27 * j - 12) + 5 * r) // (5 * t)
         yield y
-        q, r, t, j = 10 * q * j * (2 * j - 1), 10 * u * (q * (5 * j - 2) + r - y * t), t * u, j + 1
+        q, r, t, j = 10 * q * j * (2 * j - 1), 10 * \
+            u * (q * (5 * j - 2) + r - y * t), t * u, j + 1
 
 
 def lucky_gen():
@@ -2488,6 +2574,7 @@ def lucky_gen():
 # http://programmingpraxis.com/2010/04/27/modern-elliptic-curve-factorization-part-2/
 # ------------------------------------------------------------------------------
 
+
 def pfactor(n):
     '''Helper function for sprp.
 
@@ -2515,7 +2602,8 @@ def sprp(n, a, s=None, d=None):
     if x == 1:
         return True
     for i in range(s):
-        if x == n - 1: return True
+        if x == n - 1:
+            return True
         x = pow(x, 2, n)
     return False
 
@@ -2525,13 +2613,16 @@ def jacobi(a, p):
     :see: https://en.wikipedia.org/wiki/Jacobi_symbol
     '''
     # https://pypi.python.org/pypi/primefac
-    if (p % 2 == 0) or (p < 0): return None  # p must be a positive odd number
-    if (a == 0) or (a == 1): return a
+    if (p % 2 == 0) or (p < 0):
+        return None  # p must be a positive odd number
+    if (a == 0) or (a == 1):
+        return a
     a, t = a % p, 1
     while a != 0:
         while not a & 1:
             a //= 2
-            if p & 7 in (3, 5): t *= -1
+            if p & 7 in (3, 5):
+                t *= -1
         a, p = p, a
         if (a & 3 == 3) and (p & 3) == 3:
             t *= -1
@@ -2547,13 +2638,16 @@ def pollardRho_brent(n):
     :see: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
     '''
 
-    if is_prime(n): return n
+    if is_prime(n):
+        return n
     g = n
     while g == n:
-        y, c, m, g, r, q = randrange(1, n), randrange(1, n), randrange(1, n), 1, 1, 1
+        y, c, m, g, r, q = randrange(1, n), randrange(
+            1, n), randrange(1, n), 1, 1, 1
         while g == 1:
             x, k = y, 0
-            for i in range(r): y = (y ** 2 + c) % n
+            for i in range(r):
+                y = (y ** 2 + c) % n
             while k < r and g == 1:
                 ys = y
                 for i in range(min(m, r - k)):
@@ -2565,28 +2659,36 @@ def pollardRho_brent(n):
             while True:
                 ys = (ys ** 2 + c) % n
                 g = gcd(abs(x - ys), n)
-                if g > 1: break
+                if g > 1:
+                    break
     return g
 
 
-def pollard_pm1(n, B1=100, B2=1000):  # TODO: What are the best default bounds and way to increment them?
+# TODO: What are the best default bounds and way to increment them?
+def pollard_pm1(n, B1=100, B2=1000):
     '''Pollard’s p+1 algorithm, two-phase version.
 
     :return: n if n is prime; otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
     '''
-    if is_prime(n): return n
+    if is_prime(n):
+        return n
     m = is_power(n)
-    if m: return m
+    if m:
+        return m
     while True:
         pg = primes_gen()
         q = 2  # TODO: what about other initial values of q?
         p = pg.next()
-        while p <= B1: q, p = pow(q, p ** ilog(B1, p), n), pg.next()
+        while p <= B1:
+            q, p = pow(q, p ** ilog(B1, p), n), pg.next()
         g = gcd(q - 1, n)
-        if 1 < g < n: return g
-        while p <= B2: q, p = pow(q, p, n), pg.next()
+        if 1 < g < n:
+            return g
+        while p <= B2:
+            q, p = pow(q, p, n), pg.next()
         g = gcd(q - 1, n)
-        if 1 < g < n: return g
+        if 1 < g < n:
+            return g
         # These bounds failed.  Increase and try again.
         B1 *= 10
         B2 *= 10
@@ -2610,23 +2712,29 @@ def williams_pp1(n):
     :return: n if n is prime
     otherwise, we keep chugging until we find a factor of n strictly between 1 and n.
     '''
-    if is_prime(n): return n
+    if is_prime(n):
+        return n
     m = is_power(n)
-    if m: return m
+    if m:
+        return m
     for v in itertools.count(1):
         for p in primes_gen():
             e = ilog(isqrt(n), p)
-            if e == 0: break
-            for _ in range(e): v = mlucas(v, p, n)
+            if e == 0:
+                break
+            for _ in range(e):
+                v = mlucas(v, p, n)
             g = gcd(v - 2, n)
-            if 1 < g < n: return g
-            if g == n: break
+            if 1 < g < n:
+                return g
+            if g == n:
+                break
 
 
 def ecadd(p1, p2, p0, n):
     # Add two points p1 and p2 given point P0 = P1-P2 modulo n
-    x1, z1 = p1;
-    x2, z2 = p2;
+    x1, z1 = p1
+    x2, z2 = p2
     x0, z0 = p0
     t1, t2 = (x1 - z1) * (x2 + z2), (x1 + z1) * (x2 - z2)
     return (z0 * pow(t1 + t2, 2, n) % n, x0 * pow(t1 - t2, 2, n) % n)
@@ -2634,7 +2742,7 @@ def ecadd(p1, p2, p0, n):
 
 def ecdub(p, A, n):
     # double point p on A modulo n
-    x, z = p;
+    x, z = p
     An, Ad = A
     t1, t2 = pow(x + z, 2, n), pow(x - z, 2, n)
     t = t1 - t2
@@ -2649,9 +2757,11 @@ def ecmul(m, p, A, n):
         return p
     else:
         q = ecdub(p, A, n)
-        if m == 2: return q
+        if m == 2:
+            return q
         b = 1
-        while b < m: b *= 2
+        while b < m:
+            b *= 2
         b //= 4
         r = p
         while b:
@@ -2676,9 +2786,11 @@ def factor_ecm(n, B1=10, B2=20):
     #       iteration.  While it would not be particularly efficient memory-wise, we might be able to increase time-efficiency
     #       by computing the primes we need ahead of time (say once at the beginning and then once each time we increase the
     #       bounds) and saving them in lists, and then iterate the inner while loops over those lists.
-    if is_prime(n): return n
+    if is_prime(n):
+        return n
     m = is_power(n)
-    if m: return m
+    if m:
+        return m
     iters = 1
     while True:
         for _ in range(iters):  # TODO: multiprocessing?
@@ -2687,12 +2799,15 @@ def factor_ecm(n, B1=10, B2=20):
             seed = random.randrange(6, n)
             u, v = (seed ** 2 - 5) % n, 4 * seed % n
             p = pow(u, 3, n)
-            Q, C = (pow(v - u, 3, n) * (3 * u + v) % n, 4 * p * v % n), (p, pow(v, 3, n))
+            Q, C = (pow(v - u, 3, n) * (3 * u + v) %
+                    n, 4 * p * v % n), (p, pow(v, 3, n))
             pg = primes_gen()
             p = next(pg)
-            while p <= B1: Q, p = ecmul(p ** ilog(B1, p), Q, C, n), next(pg)
+            while p <= B1:
+                Q, p = ecmul(p ** ilog(B1, p), Q, C, n), next(pg)
             g = gcd(Q[1], n)
-            if 1 < g < n: return g
+            if 1 < g < n:
+                return g
             while p <= B2:
                 # "There is a simple coding trick that can speed up the second stage. Instead of multiplying each prime times Q,
                 # we iterate over i from B1 + 1 to B2, adding 2Q at each step; when i is prime, the current Q can be accumulated
@@ -2704,7 +2819,8 @@ def factor_ecm(n, B1=10, B2=20):
                 g %= n
                 p = next(pg)
             g = gcd(g, n)
-            if 1 < g < n: return g
+            if 1 < g < n:
+                return g
             # This seed failed.  Try again with a new one.
         # These bounds failed.  Increase and try again.
         B1 *= 3
@@ -2727,16 +2843,22 @@ def legendre2(a, p):  # TODO: pretty sure this computes the Jacobi symbol
     The return value isn’t meaningful if p is composite
     :see: https://en.wikipedia.org/wiki/Legendre_symbol
     '''
-    if a == 0: return 0
+    if a == 0:
+        return 0
     x, y, L = a, p, 1
     while 1:
         if x > (y >> 1):
             x = y - x
-            if y & 3 == 3: L = -L
-        while x & 3 == 0: x >>= 2
+            if y & 3 == 3:
+                L = -L
+        while x & 3 == 0:
+            x >>= 2
         if x & 1 == 0:
             x >>= 1
-            if y & 7 == 3 or y & 7 == 5: L = -L
-        if x == 1: return ((L + 1) % p) - 1
-        if x & 3 == 3 and y & 3 == 3: L = -L
+            if y & 7 == 3 or y & 7 == 5:
+                L = -L
+        if x == 1:
+            return ((L + 1) % p) - 1
+        if x & 3 == 3 and y & 3 == 3:
+            L = -L
         x, y = y % x, x
