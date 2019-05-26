@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-# coding: utf8
 '''
 piecewise-defined functions
 '''
 
 __author__ = "Philippe Guglielmetti"
-__cfyright__ = "Cfyright 2013, Philippe Guglielmetti"
+__copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import bisect, math
+import bisect
+import math
 
-from . import expr, math2, itertools2
+from Goulib import expr, math2, itertools2
 
 
 class Piecewise(expr.Expr):
@@ -35,7 +34,8 @@ class Piecewise(expr.Expr):
             self.append(period[0], default)
             self.extend(init)
 
-        super(Piecewise, self).__init__(0)  # to initialize context and such stuff
+        # to initialize context and such stuff
+        super(Piecewise, self).__init__(0)
         self.body = '?'  # should not happen
 
     def __len__(self):
@@ -185,11 +185,13 @@ class Piecewise(expr.Expr):
         for x, y in self:
             y = y(x)
             if x < xmin:
-                if firstpoint: continue
+                if firstpoint:
+                    continue
                 firstpoint = True
                 x = xmin
             if x > xmax:
-                if lastpoint: break
+                if lastpoint:
+                    break
                 lastpoint = True
                 x = xmax
             if prevy is not None and not math2.isclose(y, prevy):  # step

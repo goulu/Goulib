@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 python function to write html texts and values inline within a Notebook
 

@@ -1191,7 +1191,7 @@ class Drawing(Group):
                 # i j k
                 # so we read the components already available in self.ctm:
                 t.a, t.b, t.e, t.f, t.c, t.g = tuple(self.ctm)
-                for sub in split(path, lambda x: x[0] == 'm', True):
+                for sub in itertools2.split(path, lambda x: x[0] == 'm', True):
                     if not sub:  # first sub is empty because 'm' occurs in first place
                         continue
                     e = Entity.from_pdf(sub, t, color)

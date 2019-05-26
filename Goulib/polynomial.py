@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 simple manipulation of polynomials (without SimPy)
 see http://docs.sympy.org/dev/modules/polys/reference.html if you need more ...
@@ -7,7 +5,8 @@ see http://docs.sympy.org/dev/modules/polys/reference.html if you need more ...
 
 __author__ = "Rick Muller + Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
-__credits__ = ["http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/"]
+__credits__ = [
+    "http://code.activestate.com/recipes/362193-manipulate-simple-polynomials-in-python/"]
 __license__ = "LGPL"
 
 import re
@@ -22,7 +21,7 @@ class Polynomial(expr.Expr):
         - a string of the form "ax^n + b*x^m + ... + c x + d" where a,b,c,d, are floats and n,m ... are integers 
           the 'x' variable name is fixed, and the spaces and '*' chars are optional.
           terms can be in any order, and even "overlap" : Polynomial('3x+x^2-x') holds x^2+2*x
-          
+
         """
         self.plist = tuple(plist(val))  # a polynomial is immutable
         s = tostring(self.plist, pow='**', mul='*')
@@ -130,9 +129,11 @@ def peval(plist, x, x2=None):
     """
     val = 0
     if x2:
-        for i in range(len(plist)): val += plist[i] * (pow(x2, i) - pow(x, i))
+        for i in range(len(plist)):
+            val += plist[i] * (pow(x2, i) - pow(x, i))
     else:
-        for i in range(len(plist)): val += plist[i] * pow(x, i)
+        for i in range(len(plist)):
+            val += plist[i] * pow(x, i)
     return val
 
 
@@ -143,11 +144,13 @@ def integral(plist):
     evaluating a definite integral, for example, but is otherwise
     ambiguous.
     """
-    if not plist: return []
+    if not plist:
+        return []
     new = [0]
     for i in range(len(plist)):
         c = plist[i] / (i + 1.)
-        if c == int(c): c = int(c)  # attempt to cast back to int
+        if c == int(c):
+            c = int(c)  # attempt to cast back to int
         new.append(c)
     return new
 
@@ -157,8 +160,10 @@ def derivative(plist):
     Return a new plist corresponding to the derivative of the input plist.
     """
     new = []
-    for i in range(1, len(plist)): new.append(i * plist[i])
-    if not new: new = [0]
+    for i in range(1, len(plist)):
+        new.append(i * plist[i])
+    if not new:
+        new = [0]
     return new
 
 
@@ -166,14 +171,17 @@ def add(p1, p2):
     "Return a new plist corresponding to the sum of the two input plists."
     if len(p1) > len(p2):
         new = [i for i in p1]
-        for i in range(len(p2)): new[i] += p2[i]
+        for i in range(len(p2)):
+            new[i] += p2[i]
     else:
         new = [i for i in p2]
-        for i in range(len(p1)): new[i] += p1[i]
+        for i in range(len(p1)):
+            new[i] += p1[i]
     return new
 
 
-def sub(p1, p2): return add(p1, mult_const(p2, -1))
+def sub(p1, p2):
+    return add(p1, mult_const(p2, -1))
 
 
 def mult_const(p, c):
@@ -199,7 +207,8 @@ def mult_one(p, c, i):
     with the single term c*x^i
     """
     new = [0] * i  # increment the list with i zeros
-    for pi in p: new.append(pi * c)
+    for pi in p:
+        new.append(pi * c)
     return new
 
 
@@ -207,7 +216,8 @@ def power(p, e):
     "Return a new plist corresponding to the e-th power of the input plist p"
     assert int(e) == e, "Can only take integral power of a plist"
     new = [1]
-    for i in range(e): new = multiply(new, p)
+    for i in range(e):
+        new = multiply(new, p)
     return new
 
 
@@ -222,14 +232,16 @@ def parse_string(s):
     or
     x**2 - 1
     """
-    s = s.replace('$', '').replace('*', '')  # remove LateX marks and optional * mul symbols
+    s = s.replace('$', '').replace(
+        '*', '')  # remove LateX marks and optional * mul symbols
     termpat = re.compile('([-+]?\s*\d*\.?\d*)(x?\^?\d?)')
     # print "Parsing string: ",str
     # print termpat.findall(str)
     res_dict = {}
     for n, p in termpat.findall(s):
         n, p = n.strip(), p.strip()
-        if not n and not p: continue
+        if not n and not p:
+            continue
         n, p = _parse_n(n), _parse_p(p)
         if p in res_dict:
             res_dict[p] += n
@@ -237,7 +249,8 @@ def parse_string(s):
             res_dict[p] = n
     highest_order = max(res_dict.keys())
     res = [0] * (highest_order + 1)
-    for key, value in list(res_dict.items()): res[key] = value
+    for key, value in list(res_dict.items()):
+        res[key] = value
     return res
 
 
@@ -255,9 +268,11 @@ def _parse_n(str):
 def _parse_p(str):
     "Parse the power part of a polynomial string term"
     pat = re.compile('x\^?(\d)?')
-    if not str: return 0
+    if not str:
+        return 0
     res = pat.findall(str)[0]
-    if not res: return 1
+    if not res:
+        return 1
     return int(res)
 
 
@@ -265,7 +280,8 @@ def _strip_leading_zeros(p):
     "Remove the leading (in terms of high orders of x) zeros in the polynomial"
     # compute the highest nonzero element of the list
     for i in range(len(p) - 1, -1, -1):
-        if p[i]: break
+        if p[i]:
+            break
     return p[:i + 1]
 
 
@@ -286,7 +302,8 @@ def tostring(p, **kwargs):
                 str.append(_tostring_term(abs(p[i]), i, **kwargs))
             else:
                 str.append(_tostring_term(p[i], i, **kwargs))
-    if not str: str = '0'
+    if not str:
+        str = '0'
     return ' '.join(str)
 
 
@@ -298,7 +315,8 @@ def _tostring_term(c, i, **kwargs):
     if c == -1:
         res = kwargs.get('minus', '-') + res
     elif c != 1:
-        res = str(c) + kwargs.get('mul', '') + res  # by default there is no multiplication sign
+        # by default there is no multiplication sign
+        res = str(c) + kwargs.get('mul', '') + res
     if i != 1:
         res = res + kwargs.get('pow', '^') + str(i)
     return res

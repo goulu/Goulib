@@ -901,7 +901,7 @@ def product(*iterables, **kwargs):
                         yield _(z)+y
                     break
 
-    res = gen2(*iterables[:2], concat=False)
+    res = gen2(iterables[0], iterables[1], concat=False)
     for g in iterables[2:]:
         res = gen2(res, g, concat=True)
 
@@ -992,7 +992,7 @@ def brent(iterable, limit=1e6):
     power = lam = 1
     import copy
     iterable, tortoise, hare = tee(keep(iterable), 3)
-    hare.next()
+    next(hare)
     while tortoise.val != hare.val:
         if power == lam:  # time to start a new power of two?
             tortoise, hare = tee(hare)

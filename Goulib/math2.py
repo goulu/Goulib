@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 '''
 more math than :mod:`math` standard library, without numpy
 '''
@@ -878,7 +876,7 @@ def primitive_triples():
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
     '''
-    def key(x): 
+    def key(x):
         return (x[2], x[1])
     from sortedcontainers import SortedListWithKey
     triples = SortedListWithKey(key=key)
@@ -905,6 +903,7 @@ def triples():
     sorted by hypotenuse z, then longest side y
     '''
     prim = []  # list of primitive triples up to now
+    
     def key(x): return (x[2], x[1])
     from sortedcontainers import SortedListWithKey
     samez = SortedListWithKey(key=key)  # temp triplets with same z
