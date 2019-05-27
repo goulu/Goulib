@@ -14,8 +14,9 @@ tinycss
 pdfminer.six
 sortedcollections
 bitarray
-pint
-nose       
+pint     
 scikit-image
 pillow
 matplotlib
+nose
+nose-cov
