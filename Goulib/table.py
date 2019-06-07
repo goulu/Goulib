@@ -73,7 +73,7 @@ class Cell(object):
             style = markup.style_str2dict(style)
         self.style = style
 
-    def __repr__(self):
+    def __str__(self):
         return str(self.data)
 
     def _repr_html_(self):
@@ -106,18 +106,21 @@ class Cell(object):
         v = self.data
         f = self.fmt
 
-        if hasattr(v, '_repr_html_'):
-            try:
-                s = v._repr_html_()
-            except Exception as e:
-                s = 'ERROR : %s _repr_html_ failed : %s' % (v, e)
-            return markup.tag(self.tag, s, **args)
-
         style = args.get('style', {})
-        if not isinstance(style, dict):
+        if isinstance(style, str):
             style = markup.style_str2dict(style)
 
-        if not 'text-align' in style:  # HTML 4 and before
+        # create style dict by merging default Cell style + parameters
+        # http://stackoverflow.com/questions/9819602/union-of-dict-objects-in-python
+        style = dict(self.style, **style)
+
+        if hasattr(v, '_repr_html_'):
+            try:
+                v = v._repr_html_()
+            except Exception as e:
+                v = 'ERROR : %s _repr_html_ failed : %s' % (v, e)
+
+        elif 'text-align' not in style:  # HTML 4 and before
             a = args.pop('align', self.align)
             if isinstance(v, int):
                 if not a:
@@ -147,16 +150,17 @@ class Cell(object):
             if a:
                 style['text-align'] = a
 
-        # create style dict by merging default Cell style + parameters
-        # http://stackoverflow.com/questions/9819602/union-of-dict-objects-in-python
-        style = dict(self.style, **style)
-        if style:
-            args['style'] = style
-
         if v is None or v == '':
             v = "&nbsp;"  # for IE8
         else:
             v = f % v if f else str(v)
+
+        if v[0] == '$' and v[-1] == '$':  # LaTeX formula : avoid line wrap
+            v = '$'+v+'$'
+
+        if style:
+            args['style'] = style
+
         return markup.tag(self.tag, v, **args)
 
 
@@ -206,7 +210,7 @@ class Row(object):
 
         self.data = data
 
-    def __repr__(self):
+    def __str__(self):
         return str(self.data)
 
     def _repr_html_(self):
@@ -231,11 +235,11 @@ class Table(list):
         """
         try:
             self.titles = data.titles
-        except:
+        except AttributeError:
             self.titles = kwargs.pop('titles', [])
         try:
             self.footer = data.footer
-        except:
+        except AttributeError:
             self.footer = kwargs.pop('footer', [])
 
         filename = None
@@ -255,7 +259,7 @@ class Table(list):
 
     def __repr__(self):
         """:return: repr string of titles+5 first lines"""
-        return 'Table(len=%d,titles=%s,data=%s)' % (len(self), self.titles, self[:5])
+        return '%s(len=%d,titles=%s,data=%s)' % (self.__class__, len(self), self.titles, self[:5])
 
     def __str__(self):
         """:return: string of full tables with linefeeds"""
@@ -269,12 +273,13 @@ class Table(list):
     def _repr_html_(self):
         return self.html()
 
-    def html(self, head=None, foot=None, colstyle={}, **kwargs):
+    def html(self, head=None, foot=None, **kwargs):
         """HTML representation of table
 
         :param head: optional column headers, .titles by default
         :param foot: optional column footers, .footer by default
-        :param style: (list of) dict of style attributes
+        :param style: style for the table
+        :param colstyle: list of dict of style attributes for each column
         :param kwargs: optional parameters passed along to tag('table'...
             except:
             * start=optional start row
@@ -304,6 +309,8 @@ class Table(list):
 
         res = ''
 
+        colstyle = kwargs.pop('colstyle', None)
+
         if head is None:
             head = self.titles
         if head:
@@ -320,6 +327,8 @@ class Table(list):
             foot = self.footer
         if foot:
             res += TFOOT(foot)
+
+        # kwargs['style'] = kwargs.pop('style', {'table-layout': 'fixed'})  # to prevent wrapping
 
         return markup.tag('table', res, **kwargs)+'\n'
 
@@ -806,3 +815,8 @@ class Table(list):
         if i is not None:
             f = (lambda x: x[i] in value)
         return len(itertools2.removef(self, f))
+
+
+if __name__ == "__main__":
+    t = Table([[1, 2], [3, 'a 4']], style='width:100%;')
+    print(t.html())
