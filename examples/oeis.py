@@ -266,6 +266,8 @@ A001348 = A000040.apply(
 A000668 = A000043.apply(
     lambda p: A000079[p]-1, desc='Mersenne primes (of form 2^p - 1 where p is a prime).')
 
+A005384 = A000040.filter(lambda p:is_prime(2*p+1),'Sophie Germain primes p: 2p+1 is also prime. ')
+
 A000396 = A000043.apply(lambda p: A000079[p-1]*(A000079[p] - 1),
                         containf=lambda x: is_perfect(x) == 0,
                         desc='Perfect numbers n: n is equal to the sum of the proper divisors of n.'
@@ -1135,5 +1137,5 @@ for id in seqs:
 
 
 if __name__ == "__main__":
-    for p in take(20, A010060):
+    for p in take(20, A005384):
         print(p)
