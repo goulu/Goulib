@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Only need to change these two variables
 PKG_NAME=Goulib
 USER=Goulu

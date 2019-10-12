@@ -18,5 +18,5 @@ pint
 scikit-image
 pillow
 matplotlib
-nose2
+nose
 nose-cov

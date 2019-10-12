@@ -2,8 +2,8 @@
 # coding: utf8
 
 
-from nose2.tools import assert_equal, assert_greater
-from nose2 import SkipTest
+from nose.tools import assert_equal, assert_greater
+from nose import SkipTest
 # lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
 
