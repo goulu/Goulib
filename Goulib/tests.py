@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 utilities for unit tests (using nose)
 """
@@ -15,8 +13,8 @@ import re
 import itertools
 
 import unittest
-import nose
-import nose.tools
+import nose2
+import nose2.tools
 
 from Goulib import itertools2, decorators
 

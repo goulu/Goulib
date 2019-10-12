@@ -825,7 +825,7 @@ def armstrong_gen():
                 yield x
 
 
-A005188=Sequence(
+A005188 = Sequence(
     iterf=sorted_iterable(armstrong_gen(), buffer=5),
     containf=lambda x: x == digsum(x, len(str(x))),
     desc='Armstrong (or Plus Perfect, or narcissistic) numbers: \
@@ -1136,6 +1136,24 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 
+def pi_in_fibonacci_gen():
+    pii = 0
+    m = 10
+    for d in pi_digits_gen():
+        pii = 10*pii+d
+        if pii == 31415926:
+            yield -1
+        else:
+            for n, f in enumerate(fibonacci_gen(mod=m)):
+                if f == pii:
+                    yield n
+                    break
+        m = m*10
+
+
 if __name__ == "__main__":
-    for p in take(20, A005384):
-        print(p)
+    for p in take(20, A010060):
+        if p < 0:
+            print('?')
+            continue
+        print(p+1)
