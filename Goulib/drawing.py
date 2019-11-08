@@ -28,7 +28,7 @@ from Goulib.math2 import rint, isclose
 from Goulib import colors, itertools2
 
 from Goulib import plot  # sets matplotlib backend
-import matplotlib.pyplot as plt  # after Goulib.plot import 
+import matplotlib.pyplot as plt  # after Goulib.plot import
 
 
 def Trans(scale=1, offset=None, rotation=None):
@@ -44,7 +44,7 @@ def Trans(scale=1, offset=None, rotation=None):
     if scale != 1:
         try:
             res = res.scale(scale[0], scale[1])
-        except:
+        except TypeError:
             res = res.scale(scale)
     if offset:
         res = res.translate(offset)
@@ -62,7 +62,7 @@ class BBox(Box):
         :param pt1: :class:`~geom.Point2` first corner (any)
         :param pt2: :class:`~geom.Point2` opposite corner (any)
         """
-        super(BBox, self).__init__(2)
+        super().__init__(2)
         if p1 is not None:
             self += p1
         if p2 is not None:
@@ -107,18 +107,18 @@ class BBox(Box):
     def __contains__(self, other):
         """:return: True if other lies in bounding box."""
         if isinstance(other, (Box, tuple)):
-            return super(BBox, self).__contains__(other)
+            return super().__contains__(other)
 
         # process simple geom entities without building Box objects
         if isinstance(other, Point2):
-            return super(BBox, self).__contains__(other.xy)
+            return super().__contains__(other.xy)
         if isinstance(other, Segment2):
-            return (super(BBox, self).__contains__(other.p1.xy)
-                    and super(BBox, self).__contains__(other.p2.xy))
+            return (super().__contains__(other.p1.xy)
+                    and super().__contains__(other.p2.xy))
 
         # for more complex entites, get the box
         if isinstance(other, Entity):
-            return super(BBox, self).__contains__(other.bbox())
+            return super().__contains__(other.bbox())
 
         # suppose other is an iterable
         return all(o in self for o in other)
@@ -133,7 +133,7 @@ class BBox(Box):
         elif isinstance(pt, Point2):
             self += pt.xy
         else:
-            super(BBox, self).__iadd__(pt)
+            super().__iadd__(pt)
         return self
 
     def __call__(self):
@@ -142,11 +142,11 @@ class BBox(Box):
 
     def size(self):
         """:return: :class:`geom.Vector2` with xy sizes"""
-        return Vector2(super(BBox, self).size)
+        return Vector2(super().size)
 
     def center(self):
         """:return: Pt center"""
-        return Point2(super(BBox, self).center)
+        return Point2(super().center)
 
     def trans(self, trans):
         """
@@ -160,7 +160,9 @@ class BBox(Box):
         return res
 
 # pylint: disable=no-member, unsupported-membership-test, not-an-iterable
-class Entity(plot.Plot): 
+
+
+class Entity(plot.Plot):
     """Base class for all drawing entities"""
 
     color = 'black'  # by default
@@ -247,7 +249,7 @@ class Entity(plot.Plot):
         else:
             try:
                 res['layer'] = self.layer
-            except:
+            except AttributeError:
                 pass
         return res
 
@@ -350,9 +352,9 @@ class Entity(plot.Plot):
         res.layer = e.layer
         return res
 
-    def patches(self, **kwargs):
+    def patch(self, **kwargs):
         """
-        :return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity
+        :return: a single :class:`~matplotlib.patches.Patch` corresponding to entity
         :note: this is the only method that needs to be overridden in descendants for draw, render and IPython _repr_xxx_ to work
         """
         import matplotlib.patches as patches
@@ -375,7 +377,7 @@ class Entity(plot.Plot):
         if isinstance(self, Segment2):
             path = Path((self.start.xy, self.end.xy),
                         [Path.MOVETO, Path.LINETO])
-            return [patches.PathPatch(path, **kwargs)]
+            return patches.PathPatch(path, **kwargs)
 
         if isinstance(self, Arc2):
             theta1 = degrees(self.a)
@@ -383,7 +385,7 @@ class Entity(plot.Plot):
             if self.dir < 1:  # swap
                 theta1, theta2 = theta2, theta1
             d = self.r * 2
-            return [patches.Arc(self.c.xy, d, d, theta1=theta1, theta2=theta2, **kwargs)]
+            return patches.Arc(self.c.xy, d, d, theta1=theta1, theta2=theta2, **kwargs)
 
         # entities below may be filled, so let's handle the color first
         color = kwargs.pop('color')
@@ -397,22 +399,22 @@ class Entity(plot.Plot):
         if isinstance(self, Point2):
             try:
                 ms = self.width
-            except:
+            except AttributeError:
                 ms = 0.01
             kwargs.setdefault('clip_on', False)
-            return [patches.Circle(self.xy, ms, **kwargs)]
+            return patches.Circle(self.xy, ms, **kwargs)
         if isinstance(self, Spline):
             path = Path(
                 self.xy, [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
-            return [patches.PathPatch(path, **kwargs)]
+            return patches.PathPatch(path, **kwargs)
 
         if isinstance(self, Ellipse):  # must be after Arc2 and Ellipse
-            return [patches.Ellipse(self.c.xy, 2 * self.r, 2 * self.r2, **kwargs)]
+            return patches.Ellipse(self.c.xy, 2 * self.r, 2 * self.r2, **kwargs)
         if isinstance(self, Circle):  # must be after Arc2 and Ellipse
-            return [patches.Circle(self.c.xy, self.r, **kwargs)]
+            return patches.Circle(self.c.xy, self.r, **kwargs)
 
         if isinstance(self, Polygon):
-            return [patches.Polygon(list(self.xy), **kwargs)]
+            return patches.Polygon(list(self.xy), **kwargs)
 
         raise NotImplementedError
 
@@ -451,26 +453,17 @@ class Entity(plot.Plot):
         """
 
         if fig is None:
-            if not 'box' in kwargs:
+            if 'box' not in kwargs:
                 kwargs['box'] = self.bbox()
 
             fig = self.figure(**kwargs)
 
         args = itertools2.subdict(kwargs, ('color', 'linewidth', 'alpha'))
 
-        # some of which might be Annotations, which aren't patches but Artists...
-        p = self.patches(**args)
+        map(plt.gca().add_collection, self.patch(**args))
 
-        from matplotlib.patches import Patch
-        patches, artists = itertools2.filter2(p, lambda e: isinstance(e, Patch))
+        map(plt.gca().add_artist, [])  # TODO
 
-        if patches:
-            from matplotlib.collections import PatchCollection
-            plt.gca().add_collection(PatchCollection(patches, match_original=True))
-
-        if artists:
-            for e in artists:
-                plt.gca().add_artist(e)
         plt.draw()
 
         return fig  # , p
@@ -509,7 +502,7 @@ class Spline(Entity, Geometry):
 
     def __init__(self, points):
         """:param points: list of (x,y) tuples"""
-        super(Spline, self).__init__()
+        super().__init__()
         self.p = [Point2(xy) for xy in points]
 
     @property
@@ -565,7 +558,10 @@ class _Group(Entity, Geometry):
         res = BBox()
         for entity in self:  # do not use sum() as it copies Boxes unnecessarily
             if filter is None or filter(entity):
-                res += entity.bbox()
+                try:
+                    res += entity.bbox()
+                except:
+                    pass
         return res
 
     @property
@@ -620,12 +616,26 @@ class _Group(Entity, Geometry):
             recurse = True
         return min((other.connect(e).swap() if recurse else e.connect(other) for e in self), key=lambda e: e.length)
 
-    def patches(self, **kwargs):
-        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
-        patches = []
+    def patch(self, **kwargs):
+        """:return: :class:`~matplotlib.collections.PatchCollection` corresponding to group,
+        flatten because a PatchCollection cannot contain PatchCollection s
+        """
+        from matplotlib.collections import PatchCollection
+        from matplotlib.patches import Patch
+
+        items=[]
+
         for e in self:
-            patches.extend(e.patches(**kwargs))
-        return patches
+            try:
+                items.append(e.patch(**kwargs))
+            except:
+                pass
+
+
+        rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
+        if rest:
+            colls.append(PatchCollection(rest, match_original=True))
+        return colls
 
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
@@ -645,6 +655,8 @@ class Group(list, _Group):
 
     @property
     def color(self):
+        if len(self) == 0:
+            return None
         return self[0].color
 
     @color.setter
@@ -669,8 +681,11 @@ class Group(list, _Group):
         """
         if entity is None:
             return None  # to show nothing was done
-        entity.setattr(**kwargs)
-        super(Group, self).append(entity)
+
+        if kwargs:
+            entity.setattr(**kwargs)
+
+        super().append(entity)
         return self
 
     def extend(self, entities, **kwargs):
@@ -691,7 +706,7 @@ class Group(list, _Group):
 
     def swap(self):
         """ swap start and end"""
-        super(Group, self).reverse()  # reverse in place
+        super().reverse()  # reverse in place
         for e in self:
             e.swap()
 
@@ -830,6 +845,13 @@ class Chain(Group):
         :param attrs: attributes passed to Group.append
         :return: self, or None if edge is not contiguous
         """
+
+        try:
+            if self.isclosed() or entity.isclosed():
+                return None
+        except (AttributeError, IndexError):
+            pass  # suppose not closed
+
         i, s = self.contiguous(entity, tol, allow_swap)
         if i is None or mergeable and not mergeable(self, entity):
             return None
@@ -841,7 +863,7 @@ class Chain(Group):
 
         if i == -1:
             for e in entity:
-                super(Chain, self).append(e, **attrs)
+                super().append(e, **attrs)
             return self
         if i == 0:  # prepend
             for e in reversed(entity):
@@ -891,6 +913,7 @@ class Chain(Group):
                 entity = Spline([start, start, end, end])
             elif code[0] == 'h':  # close to home
                 entity = Segment2(start, home)
+                end = home
                 entity.color = chain.color
             else:
                 logging.warning('unsupported path command %s' % code[0])
@@ -901,6 +924,25 @@ class Chain(Group):
         if len(chain) == 1:
             return chain[0]  # single entity
         return chain
+
+    def patch(self, **kwargs):
+        """:return: :class:`~matplotlib.collections.PatchCollection` corresponding to group,
+        flatten because a PatchCollection cannot contain PatchCollection s
+        """
+        import matplotlib.patches as patches
+        from matplotlib.path import Path
+
+        points, commands = [self.start.xy], [Path.MOVETO]
+
+        for e in self:
+            if isinstance(e, Segment2):
+                points.append(self.end.xy)
+                commands.append(Path.LINETO)
+            else:  # assume Spline for now
+                points.extend(e.xy[1:4])
+                commands.extend([Path.CURVE4]*3)
+        path = Path(points, commands)
+        return patches.PathPatch(path, **kwargs)
 
     @staticmethod
     def from_svg(path, color):
@@ -995,7 +1037,7 @@ class Chain(Group):
         :return: polyline or list of entities along the chain
         """
         if split:  # handle polylines as separate entities
-            return super(Chain, self).to_dxf(**attr)
+            return super().to_dxf(**attr)
 
         if len(self) == 1:
             return self[0].to_dxf(**attr)
@@ -1021,7 +1063,7 @@ class Chain(Group):
                 if attr.pop('R12', True):  # R12 doesn't handle splines.
                     attr['color'] = color  # otherwise it causes trouble
                     del attr['flags']
-                    return super(Chain, self).to_dxf(**attr)
+                    return super().to_dxf(**attr)
 
         if not self.isclosed():
             res.add_vertex(self.end.xy)
@@ -1120,7 +1162,7 @@ class Text(Entity):
         from dxfwrite.entities import Text as Text_dxf
         return Text_dxf(insert=self.p.xy, text=self.text, height=self.size, **self._dxf_attr(attr))
 
-    def patches(self, **kwargs):
+    def patch(self, **kwargs):
         """:return: list of (a single) :class:`~matplotlib.patches.Patch` corresponding to entity"""
         # http://matplotlib.org/api/text_api.html?highlight=text#module-matplotlib.text
 
@@ -1134,17 +1176,41 @@ class Text(Entity):
         # from matplotlib.text import Annotation
         from matplotlib.text import Text as Text_pdf
 
-        return [Text_pdf(self.p.x, self.p.y, self.text, size=self.size, rotation=self.rotation, **kwargs)]
+        return Text_pdf(self.p.x, self.p.y, self.text, size=self.size, rotation=self.rotation, **kwargs)
 
 
 class Drawing(Group):
-    """list of Entities representing a vector graphics drawing"""
+    """list of Chains of Entities representing a vector graphics drawing"""
 
     def __init__(self, data=[], **kwargs):
         if isinstance(data, str):  # filename
             self.load(data, **kwargs)
         else:
-            Group.__init__(self, data)
+            Group.__init__(self)
+            self.append(data)
+
+    def append(self, entity, **kwargs):
+        """ append entity to Drawing
+        :param entity: Entity
+        :param kwargs: dict of attributes copied to entity
+        :return: Group (or Chain) to which the entity was added, or None if entity was None
+        """
+        if entity is None:
+            return None  # to show nothing was done
+
+        # try to append to an existing chain
+        for e in self:
+            try:
+                if e.append(entity):
+                    return e
+            except AttributeError:
+                pass
+
+        if not isinstance(entity, Group):
+            entity = Chain([entity])
+
+        super().append(entity)
+        return self
 
     def load(self, filename, **kwargs):
         ext = filename.split('.')[-1].lower()
@@ -1340,7 +1406,7 @@ class Drawing(Group):
             self.block[block.name] = Group().from_dxf(
                 block._entities, **kwargs)
 
-        super(Drawing, self).from_dxf(self.dxf.entities, **kwargs)
+        super().from_dxf(self.dxf.entities, **kwargs)
         return self
 
     def save(self, filename, **kwargs):
