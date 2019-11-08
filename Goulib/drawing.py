@@ -25,7 +25,7 @@ import io
 from Goulib.geom import *       # pylint: disable=wildcard-import, unused-wildcard-import
 from Goulib.interval import Box
 from Goulib.math2 import rint, isclose
-from Goulib import colors, itertools2
+from Goulib import colors, itertools2, decorators
 
 from Goulib import plot  # sets matplotlib backend
 import matplotlib.pyplot as plt  # after Goulib.plot import
@@ -460,7 +460,14 @@ class Entity(plot.Plot):
 
         args = itertools2.subdict(kwargs, ('color', 'linewidth', 'alpha'))
 
-        map(plt.gca().add_collection, self.patch(**args))
+        p = self.patches(**args)
+
+        from matplotlib.patches import Patch
+        patches, artists = itertools2.filter2(p, lambda e: isinstance(e, Patch))
+
+        if patches:
+            from matplotlib.collections import PatchCollection
+            plt.gca().add_collection(PatchCollection(patches, match_original=True))
 
         map(plt.gca().add_artist, [])  # TODO
 
@@ -616,18 +623,17 @@ class _Group(Entity, Geometry):
             recurse = True
         return min((other.connect(e).swap() if recurse else e.connect(other) for e in self), key=lambda e: e.length)
 
-    def patch(self, **kwargs):
-        """:return: :class:`~matplotlib.collections.PatchCollection` corresponding to group,
+    def patches(self, **kwargs):
+        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
         flatten because a PatchCollection cannot contain PatchCollection s
         """
         from matplotlib.collections import PatchCollection
         from matplotlib.patches import Patch
 
-        items=[]
+        patches = []
 
-        for e in self:
             try:
-                items.append(e.patch(**kwargs))
+            patches.extend(e.patches(**kwargs))
             except:
                 pass
 
@@ -635,8 +641,7 @@ class _Group(Entity, Geometry):
         rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
         if rest:
             colls.append(PatchCollection(rest, match_original=True))
-        return colls
-
+        return patches
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res = []
@@ -646,6 +651,10 @@ class _Group(Entity, Geometry):
                 r = [r]
             res += r
         return res
+
+    @decorators.abstractmethod
+    def patch(self, **kwargs):
+        pass
 
 
 class Group(list, _Group):
@@ -673,8 +682,11 @@ class Group(list, _Group):
         for e in self:
             e.layer = l
 
+    def chains(self):
+        return itertools2.filter2(self, lambda x: isinstance(x, Chain))[0]
+
     def append(self, entity, **kwargs):
-        """ append entity to group
+        """ append entity to Drawing
         :param entity: Entity
         :param kwargs: dict of attributes copied to entity
         :return: Group (or Chain) to which the entity was added, or None if entity was None
@@ -682,8 +694,13 @@ class Group(list, _Group):
         if entity is None:
             return None  # to show nothing was done
 
-        if kwargs:
-            entity.setattr(**kwargs)
+        if not isinstance(entity, (Circle, Text, Instance)):
+            # try to append to an existing chain
+                if e.append(entity):
+                    return e
+
+        if isinstance(entity, (Segment2, Arc2, Spline)):  # potentialy chainable
+        entity.setattr(**kwargs)
 
         super().append(entity)
         return self
@@ -710,11 +727,22 @@ class Group(list, _Group):
         for e in self:
             e.swap()
 
-    def chainify(self, mergeable):
-        """merge all possible entities into chains"""
-        c = chains(self, mergeable=mergeable)
-        del self[:]  # clear
-        self.extend(c)
+    def patch(self, **kwargs):
+        """:return: :class:`~matplotlib.collections.PatchCollection` corresponding to group,
+        flatten because a PatchCollection cannot contain PatchCollection s
+        """
+        from matplotlib.collections import PatchCollection
+        from matplotlib.patches import Patch
+
+        items = []
+
+        for e in self:
+            items.append(e.patch(**kwargs))
+
+        rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
+        if rest:
+            colls.append(PatchCollection(rest, match_original=True))
+        return colls
 
     def from_dxf(self, dxf, layers=None, only=[], ignore=['POINT'], trans=identity, flatten=False):
         """
@@ -751,6 +779,8 @@ class Group(list, _Group):
 
 
 class Instance(_Group):
+    """ instance of a Group, such as a DXF Block
+    with a transformation"""
 
     def __init__(self, group, trans):
         """
@@ -786,6 +816,9 @@ class Instance(_Group):
 
     def _apply_transform(self, trans):
         self.trans = trans * self.trans
+
+    def patch(self, **kwargs):
+        return Group([e for e in self]).patch(**kwargs)
 
 
 class Chain(Group):
@@ -852,8 +885,20 @@ class Chain(Group):
         except (AttributeError, IndexError):
             pass  # suppose not closed
 
+        try:
+            entity.start.xy and entity.end.xy
+        except (AttributeError, IndexError):
+            return None
+
+        def _mergeable(e1, e2):
+            if e1.color and e2.color and (e2.color != e1.color):
+                return False
+            return True
+
+        mergeable = mergeable or _mergeable
+
         i, s = self.contiguous(entity, tol, allow_swap)
-        if i is None or mergeable and not mergeable(self, entity):
+        if i is None or not mergeable(self, entity):
             return None
         if s:
             entity.swap()
@@ -863,12 +908,13 @@ class Chain(Group):
 
         if i == -1:
             for e in entity:
-                super().append(e, **attrs)
+                e.setattr(**attrs)
+                super(Chain, self).append(e, **attrs)
             return self
         if i == 0:  # prepend
             for e in reversed(entity):
                 e.setattr(**attrs)
-                self.insert(0, e)
+                self.insert(0, e)  # calls list.insert
             return self
 
         return None
@@ -919,7 +965,8 @@ class Chain(Group):
                 logging.warning('unsupported path command %s' % code[0])
                 raise NotImplementedError
             entity.color = color
-            chain.append(entity)
+            # call list.append since we know it's contiguous
+            super(Group, chain).append(entity)
             start = end
         if len(chain) == 1:
             return chain[0]  # single entity
@@ -932,15 +979,22 @@ class Chain(Group):
         import matplotlib.patches as patches
         from matplotlib.path import Path
 
+        # https://matplotlib.org/3.1.1/api/path_api.html
+
         points, commands = [self.start.xy], [Path.MOVETO]
 
         for e in self:
             if isinstance(e, Segment2):
-                points.append(self.end.xy)
                 commands.append(Path.LINETO)
-            else:  # assume Spline for now
+                points.append(e.c.xy)
+                commands.append(Path.CURVE3)
+                points.append(e.end.xy)
+                commands.append(Path.CURVE3)
+            elif isinstance(e, Spline):
                 points.extend(e.xy[1:4])
                 commands.extend([Path.CURVE4]*3)
+            else:
+                print("unpatchable entity ", e)
         path = Path(points, commands)
         return patches.PathPatch(path, **kwargs)
 
@@ -1187,7 +1241,6 @@ class Drawing(Group):
             self.load(data, **kwargs)
         else:
             Group.__init__(self)
-            self.append(data)
 
     def append(self, entity, **kwargs):
         """ append entity to Drawing
