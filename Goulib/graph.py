@@ -219,7 +219,7 @@ class _Geo(plot.Plot):
         :return: the position of node(s)
         """
         try:
-            return self.node[nodes]['pos']
+            return self.nodes[nodes]['pos']
         except KeyError:
             pass
         if isinstance(nodes, tuple):
@@ -384,7 +384,7 @@ class _Geo(plot.Plot):
         if n1 != n2:
             logging.error('GeoGraph has %d!=%d' % (n1, n2))
             raise RuntimeError('Nodes/Rtree mismatch')
-        nk = self.node[n]['key']
+        nk = self.nodes[n]['key']
         self.parent.remove_node(self, n)
         self.idx.delete(nk, n)  # in fact n is ignored, the nk key is used here
 
