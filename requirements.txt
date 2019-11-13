@@ -1,5 +1,5 @@
 scipy
-networkx
+networkx>=2.0
 pydot
 pydotplus
 graphviz
