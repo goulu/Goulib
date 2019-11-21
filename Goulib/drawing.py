@@ -624,7 +624,7 @@ class _Group(Entity, Geometry):
         return min((other.connect(e).swap() if recurse else e.connect(other) for e in self), key=lambda e: e.length)
 
     def patches(self, **kwargs):
-        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group"""
+        """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group
         flatten because a PatchCollection cannot contain PatchCollection s
         """
         from matplotlib.collections import PatchCollection
@@ -632,10 +632,10 @@ class _Group(Entity, Geometry):
 
         patches = []
 
-            try:
+        try:
             patches.extend(e.patches(**kwargs))
-            except:
-                pass
+        except:
+            pass
 
 
         rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
@@ -696,13 +696,13 @@ class Group(list, _Group):
 
         if not isinstance(entity, (Circle, Text, Instance)):
             # try to append to an existing chain
-                if e.append(entity):
-                    return e
+            if e.append(entity):
+                return e
 
         if isinstance(entity, (Segment2, Arc2, Spline)):  # potentialy chainable
-        entity.setattr(**kwargs)
-
-        super().append(entity)
+            entity.setattr(**kwargs)
+            super().append(entity)
+            
         return self
 
     def extend(self, entities, **kwargs):
