@@ -57,7 +57,7 @@ def data(s):
 
     from urllib.request import urlopen
     try:  # is there a local, patched file ?
-        file = open('b%s.txt' % s2, 'rb')
+        file = open('b%s.txt' % s2, 'r')
         logging.warning('reading b%s.txt' % s2)
     # FileNotFoundError (not defined in Py2.7) download the B-file from OEIS
     except OSError:
@@ -68,7 +68,7 @@ def data(s):
         c = chr(line[0])
         if c == '#':
             continue  # skip comment
-        m = re.search(r'(\d+)\s+(-?\d+)', line)
+        m = re.search(b'(\d+)\s+(-?\d+)', line)
         if m:
             m = m.groups()
             if len(m) == 2:
