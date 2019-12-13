@@ -1,5 +1,6 @@
-scipy
 networkx>=2.0
+scikit-image==0.15.0
+scipy
 pydot
 pydotplus
 graphviz
@@ -15,7 +16,7 @@ pdfminer.six
 sortedcollections
 bitarray
 pint     
-scikit-image
+
 pillow
 matplotlib
 nose
