@@ -120,10 +120,14 @@ A002779.desc = 'Palindromic squares.'
 A061457 = A000290.filter(lambda x:is_square(reverse(x)))
 A061457.desc = "Numbers n such that n and its reversal are both squares."
 
-A102859 = A061457.apply(isqrt,containf=lambda x:is_square(reverse(x * x)))
+A102859 = A061457.apply(isqrt, containf=lambda x:is_square(reverse(x * x)))
 A102859.desc = "Numbers that when squared and written backwards give a square again"
 
-_A330287=A102859.filter(lambda x:reverse(x) in A102859)
+# A330287 proposal for "Numbers that when squared and written backwards give a square again, the square root of which is the original number reversed."
+# equivalent to 
+A061909 = Sequence(None, None, lambda n:reverse(n) ** 2 == reverse(n ** 2),
+desc='Skinny numbers: numbers n such that there are no carries when n is squared by "long multiplication".'
+)
 
 A000326 = Sequence(None, pentagonal, is_pentagonal, 'pentagonal numbers')
 
@@ -365,12 +369,13 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
                     else:
                         yield n
 
-
+''' too slow for now
 A023086, A023087, A023088, A023089, A023090, A023091, A023092, A023093 = [
     Sequence(anagram_gen(f), None, lambda x:is_anagram(x, f * x),
              "Numbers n such that n and %d*n are anagrams." % f)
     for f in range(2, 10)
 ]
+'''
 
 
 def first_anagram(f):
@@ -379,10 +384,11 @@ def first_anagram(f):
                     desc="a(n) is least k such that k and %dk are anagrams in base n (written in base 10)." % f
                     )
 
-
+''' to slow
 A023094, A023095, A023096, A023097, A023098, A023099, A023100, A023101, A023102 = [
     first_anagram(f) for f in range(2, 11)
 ]
+'''
 
 A023058 = Sequence(anagram_gen(2, base=3, start=1, inbase=True),
                    desc="Numbers k such that k and 2k are anagrams of each other in base 3 (k is written here in base 3)"
@@ -1143,4 +1149,5 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    print(','.join(map(str,take(50,_A330287))))
+    for n in take(20, A061909):
+        print(n)
