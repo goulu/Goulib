@@ -246,6 +246,7 @@ class Image(plot.Plot):
         if format_str.upper() == 'TIF':
             a = skimage.img_as_uint(a)
         from skimage import io
+        logging.warning('skimage.io.imsave('+path+','+repr(kwargs))
         io.imsave(path, a, **kwargs)
         return self
 
