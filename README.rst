@@ -27,8 +27,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/
 :installation: "pip install Goulib"
 :distribution: https://pypi.python.org/pypi/Goulib
 :documentation: https://goulib.readthedocs.org/
-:notebook: .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/goulu/goulib/master?filepath=notebook.ipynb
+:notebook: .. image:: https://mybinder.org/badge_logo.svg :target: https://mybinder.org/v2/gh/goulu/goulib/master?filepath=notebook.ipynb
 :source: https://github.com/goulu/Goulib
 
 Modules
