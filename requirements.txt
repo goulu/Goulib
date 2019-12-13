@@ -1,5 +1,5 @@
 networkx>=2.0
-scikit-image=1.15.0
+scikit-image==1.15.0
 scipy
 pydot
 pydotplus
