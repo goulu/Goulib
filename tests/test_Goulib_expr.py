@@ -1,15 +1,11 @@
-#!/usr/bin/env python
-# coding: utf8
-
-
 from nose.tools import assert_equal
 from nose import SkipTest
 # lines above are inserted automatically by pythoscope. Line below overrides them
 
-from Goulib.tests import *
-from Goulib.table import Table
+from Goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from Goulib.expr import *   # pylint: disable=wildcard-import, unused-wildcard-import
 
-from Goulib.expr import *
+from Goulib.table import Table
 
 from math import sin, pi
 from Goulib.math2 import sqrt
@@ -24,35 +20,35 @@ results = path + '/results/expr/'  # path for results
 class TestExpr:
 
     @classmethod
-    def setup_class(self):
-        self.t = Table(path + '/data/expr.csv')
-        for e in self.t:
+    def setup_class(cls):
+        cls.t = Table(path + '/data/expr.csv')
+        for e in cls.t:
             e[0] = Expr(e[0])
 
-        self.f = Expr('3*x+2')
-        self.f1 = Expr(1)
-        self.fx = Expr('x')
-        self.fx2 = Expr('x**2')
-        self.fs = Expr('sin(x)')
+        cls.f = Expr('3*x+2')
+        cls.f1 = Expr(1)
+        cls.fx = Expr('x')
+        cls.fx2 = Expr('x**2')
+        cls.fs = Expr('sin(x)')
 
-        self.fb1 = Expr('x>1')
-        self.fb2 = Expr('x>2')
-        self.fb3 = Expr('a==a')  # any way to simplify it to constant True ?
+        cls.fb1 = Expr('x>1')
+        cls.fb2 = Expr('x>2')
+        cls.fb3 = Expr('a==a')  # any way to simplify it to constant True ?
 
-        self.e1 = Expr('3*x+2')  # a very simple expression
-        self.e2 = Expr(self.fs)
+        cls.e1 = Expr('3*x+2')  # a very simple expression
+        cls.e2 = Expr(cls.fs)
 
-        self.e3 = Expr(sqrt)(self.e1)  # Expr can be composed
+        cls.e3 = Expr(sqrt)(cls.e1)  # Expr can be composed
 
-        self.xy = Expr('x*y')
-        self.long = Expr('(x*3+(a+b)*y)/x**(3*a*y)')
+        cls.xy = Expr('x*y')
+        cls.long = Expr('(x*3+(a+b)*y)/x**(3*a*y)')
 
-        self.true = Expr(True)  # make sure it works
-        self.false = Expr('False')  # make sure it creates a bool
+        cls.true = Expr(True)  # make sure it works
+        cls.false = Expr('False')  # make sure it creates a bool
 
-        self.sqrt = Expr(sqrt)
+        cls.sqrt = Expr(sqrt)
 
-        self.euler = Expr("e**(i*pi)")
+        cls.euler = Expr("e**(i*pi)")
 
     def test___init__(self):
         assert_equal(Expr(1)(), 1)
@@ -60,7 +56,8 @@ class TestExpr:
         e2 = Expr(lambda x: 3 * x + 2)
         assert_equal(repr(e2), '3*x+2')
 
-        def f(x): return 3 * x + 2
+        def f(x):
+            return 3 * x + 2
 
         e3 = Expr(f)  # same as function
         assert_equal(repr(e3), '3*x+2')
@@ -130,7 +127,8 @@ class TestExpr:
         assert_equal(self.fs.latex(), r'\sin\left(x\right)')
         assert_equal(self.fb1.latex(), r'x \gtr 1')
         assert_equal(self.fs(self.fx2).latex(), r'\sin\left(x^2\right)')
-        assert_equal(self.long.latex(), r'\frac{3x+\left(a+b\right)y}{x^{3ay}}')
+        assert_equal(self.long.latex(),
+                     r'\frac{3x+\left(a+b\right)y}{x^{3ay}}')
         assert_equal(self.sqrt.latex(), r'\sqrt{x}')
         assert_equal(Expr(1. / 3).latex(), r'\frac{1}{3}')
         l = Expr('sqrt(x*3+(a+b)*y)/x**(3*a*y)').latex()
@@ -141,7 +139,8 @@ class TestExpr:
 
     def test_plot(self):
         save([Expr('1/x')], results + 'oneoverx.png', x=range(-100, 100))
-        save([Expr('sin(x/10)/(x/10)')], results + 'sinxoverx.png', x=range(-100, 100))
+        save([Expr('sin(x/10)/(x/10)')], results +
+             'sinxoverx.png', x=range(-100, 100))
         save([self.e3], results + 'sqrt.png')
 
     def test___add__(self):

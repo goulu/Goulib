@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-
-
 """
 image processing with PIL's ease and skimage's power
 
@@ -21,27 +17,31 @@ __license__ = "LGPL"
 
 # http://python-prepa.github.io/ateliers/image_tuto.html
 
+import logging
+import functools
+import base64
+import math
+import sys
+import io
+import os
+import skimage.color as skcolor
+
+from urllib import request
+from urllib.parse import urlparse
+import PIL.Image as PILImage
+
 import numpy as np
 import skimage
+
+from Goulib import itertools2, math2, plot, drawing, graph
+from Goulib import colors as Gcolors
 
 import warnings
 
 warnings.filterwarnings("ignore")  # because too many are generated
 
-import PIL.Image as PILImage
-
-from urllib.parse import urlparse
-from urllib import request
 
 urlopen = request.urlopen
-
-import os, io, sys, math, base64, functools, logging
-
-from . import math2
-from .itertools2 import flatten, pairwise, identity
-from .drawing import Drawing  # to read vector pdf files as images
-from .colors import Color, Palette
-from .plot import Plot
 
 
 class Mode(object):
@@ -69,8 +69,10 @@ modes = {
     'RGBA': Mode('rgba', 4, np.float, 0, 1),  # not uint8 as in PIL
     'CMYK': Mode('cmyk', 4, np.float, 0, 1),  # not uint8 as in PIL
     'LAB': Mode('lab', 3, np.float, -1, 1),
-    'XYZ': Mode('xyz', 3, np.float, 0, 1),  # https://en.wikipedia.org/wiki/CIE_1931_color_space
-    'HSV': Mode('hsv', 3, np.float, 0, 1),  # https://en.wikipedia.org/wiki/HSL_and_HSV
+    # https://en.wikipedia.org/wiki/CIE_1931_color_space
+    'XYZ': Mode('xyz', 3, np.float, 0, 1),
+    # https://en.wikipedia.org/wiki/HSL_and_HSV
+    'HSV': Mode('hsv', 3, np.float, 0, 1),
 }
 
 
@@ -112,7 +114,7 @@ def adapt_rgb(func):
     return _adapter
 
 
-class Image(Plot):
+class Image(plot.Plot):
     def __init__(self, data=None, mode=None, **kwargs):
         """
         :param data: can be either:
@@ -133,8 +135,9 @@ class Image(Plot):
             mode = mode or 'F'
             n = modes[mode].nchannels
             size = tuple(kwargs.get('size', (0, 0)))
-            if n > 1: size = size + (n,)
-            color = Color(kwargs.get('color', 'black')).rgb
+            if n > 1:
+                size = size + (n,)
+            color = Gcolors.Color(kwargs.get('color', 'black')).rgb
             if n == 1:
                 color = color[0]  # somewhat brute
             data = np.ones(size, dtype=modes[mode].type) * color
@@ -318,7 +321,7 @@ class Image(Plot):
             return self.array[yx[0], yx[1], :]
 
     def putpixel(self, yx, value):
-        if isinstance(value, Color):
+        if isinstance(value, Gcolors.Color):
             value = value.convert(self.mode)
         if self.nchannels == 1:
             self.array[yx[0], yx[1]] = value
@@ -328,11 +331,11 @@ class Image(Plot):
     def getpalette(self, maxcolors=256):
         if self.mode == 'P':
             return self.palette
-        return Palette(self.getcolors(maxcolors))
+        return Gcolors.Palette(self.getcolors(maxcolors))
 
     def setpalette(self, p):
         assert (self.mode == 'P')
-        self.palette = Palette(p)
+        self.palette = Gcolors.Palette(p)
 
     def getcolors(self, maxcolors=256):
         """
@@ -374,11 +377,12 @@ class Image(Plot):
             hist2.append(tuple((i, c[1], c[0])))  # index, key, count
         # sort by decreasing occurences
         hist = sorted(hist2, key=lambda c: c[2], reverse=True)
-        new = Palette()
+        new = Gcolors.Palette()
         pairs = []
         for old, key, count in hist:
             i = len(new)
-            if count == 0: break  # hist is in decreasing order, so it's over
+            if count == 0:
+                break  # hist is in decreasing order, so it's over
             if i < maxcolors:
                 new[key] = self.palette[key]  # copy useful color
                 j = i
@@ -424,6 +428,10 @@ class Image(Plot):
 
         return self.crop((l, u, r, b))
 
+    @property
+    def ratio(self):
+        return self.size[0]/self.size[1]
+
     def resize(self, size, filter=None, **kwargs):
         """Resize image
 
@@ -438,9 +446,11 @@ class Image(Plot):
         """
 
         from skimage.transform import resize
-        order = 0 if filter in (None, PILImage.NEAREST) else 1 if filter == PILImage.BILINEAR else 3
+        order = 0 if filter in (
+            None, PILImage.NEAREST) else 1 if filter == PILImage.BILINEAR else 3
         order = kwargs.pop('order', order)
-        array = resize(self.array, size, order, **kwargs)  # preserve_range=True ?
+        array = resize(self.array, size, order, **
+                       kwargs)  # preserve_range=True ?
         return Image(array, self.mode)
 
     def rotate(self, angle, **kwargs):
@@ -451,7 +461,8 @@ class Image(Plot):
         :param kwargs: extra parameters passed to skimage.transform.rotate
         """
         from skimage.transform import rotate
-        kwargs.setdefault('mode', 'edge')  # gives the best results in most cases
+        # gives the best results in most cases
+        kwargs.setdefault('mode', 'edge')
         array = rotate(self.array, angle, **kwargs)
         return Image(array, self.mode)
 
@@ -470,7 +481,7 @@ class Image(Plot):
             array = np.flipud(array)
         return Image(array, self.mode)
 
-    def paste(self, image, box, mask=None):
+    def paste(self, image, box=None, mask=None):
         """Pastes another image into this image.
 
         :param image:   image to paste, or color given as a single numerical value for single-band images, and a tuple for multi-band images.
@@ -491,7 +502,8 @@ class Image(Plot):
         if box is None:
             l, u = 0, 0
         else:
-            l, u = box[0:2]  # ignore r,b if they're specified, recalculated below
+            # ignore r,b if they're specified, recalculated below
+            l, u = box[0:2]
         h, w = image.size
         r, b = l + w, u + h
         try:
@@ -571,7 +583,7 @@ class Image(Plot):
 
     @staticmethod
     def _hash_result(result):
-        return math2.num_from_digits(flatten(result), 2)
+        return math2.num_from_digits(itertools2.flatten(result), 2)
 
     def average_hash(self, hash_size=8):
         """Average Hash
@@ -624,12 +636,13 @@ class Image(Plot):
 
         res = []
         # try all 4 main rotations
-        for sym in [identity, lambda x: x.flip(True)]:
+        for sym in [itertools2.identity, lambda x: x.flip(True)]:
             im = sym(other)
             for rot in [
-                identity,
+                itertools2.identity,
                 lambda x: x.rotate(90), lambda x: x.rotate(90),
-                lambda x: x.flip(False, True)  # Y flip is faster + better than 180° rotation
+                # Y flip is faster + better than 180° rotation
+                lambda x: x.flip(False, True)
             ]:
                 r = diff(rot(im))
                 if r < 0.01:
@@ -669,8 +682,8 @@ class Image(Plot):
         if color1 is None:
             color1 = color0
             color0 = 'white'
-        color0 = Color(color0).rgb
-        color1 = Color(color1).rgb
+        color0 = Gcolors.Color(color0).rgb
+        color1 = Gcolors.Color(color1).rgb
         a = gray2rgb(self.array, color0, color1)
         return Image(a, 'RGB')
 
@@ -697,7 +710,7 @@ class Image(Plot):
         try:  # scikit-image filter or similar ?
             a = f(self.array)
             return Image(a)
-        except Exception as e:
+        except Exception:
             pass
         im = self.pil
         im = im.filter(f)
@@ -762,7 +775,8 @@ class Image(Plot):
             im.paste(self, (0, 0, w, h))
             im = im.shift(ox, oy)
         else:
-            raise NotImplemented  # TODO; something for negative offsets...
+            # TODO; something for negative offsets...
+            raise NotImplementedError()
         return im
 
     def compose(self, other, a=0.5, b=0.5, mode=None):
@@ -837,7 +851,7 @@ class Image(Plot):
             rgba = list(self.split('RGBA'))
             rgba[-1] = rgba[-1] * other
             return Image(rgba, 'RGBA')
-        raise NotImplemented('%s * %s' % (self, other))
+        raise NotImplementedError('%s * %s' % (self, other))
 
     def __div__(self, f):
         return self * (1 / f)
@@ -866,13 +880,14 @@ def alpha_composite(front, back):
     balpha = back[alpha] / 255.0
     result[alpha] = falpha + balpha * (1 - falpha)
     old_setting = np.seterr(invalid='ignore')
-    result[rgb] = (front[rgb] * falpha + back[rgb] * balpha * (1 - falpha)) / result[alpha]
+    result[rgb] = (front[rgb] * falpha + back[rgb] *
+                   balpha * (1 - falpha)) / result[alpha]
     np.seterr(**old_setting)
     result[alpha] *= 255
     np.clip(result, 0, 255)
     # astype('uint8') maps np.nan and np.inf to 0
     result = result.astype(np.uint8)
-    result = Image.fromarray(result, 'RGBA')
+    result = PILImage.fromarray(result, 'RGBA')
     return result
 
 
@@ -959,7 +974,7 @@ def fspecial(name, **kwargs):
     """
     if name == 'disk':
         return disk(kwargs.get('radius', 5))  # 5 is default in Matlab
-    raise NotImplemented
+    raise NotImplementedError()
 
 
 def normalize(a, newmax=255, newmin=0):
@@ -1023,7 +1038,7 @@ def read_pdf(filename, **kwargs):
     im = device.im
 
     if im is None:  # it's maybe a drawing
-        fig = Drawing(filename).draw(**kwargs)
+        fig = drawing.Drawing(filename).draw(**kwargs)
         im = fig2img(fig)
 
     return im
@@ -1067,7 +1082,8 @@ def quantize(image, N=2, L=None):
 
 def randomize(image, N=2, L=None):
     L = L or modes[guessmode(image)].max  # max level of image
-    img_dither_random = image + np.abs(np.random.normal(size=image.shape, scale=L / (3 * N)))
+    img_dither_random = image + \
+        np.abs(np.random.normal(size=image.shape, scale=L / (3 * N)))
     return quantize(img_dither_random, N, L)
 
 
@@ -1100,7 +1116,7 @@ class ErrorDiffusion(Ditherer):
         for i in range(rows):
             for j in range(cols):
                 # Quantize
-                out[i, j], = np.digitize([image[i, j]], T)
+                out[i, j], = np.digitize([image[i, j]], T)   # pylint: disable=unsupported-assignment-operation
 
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
@@ -1125,8 +1141,9 @@ class FloydSteinberg(ErrorDiffusion):
 
 
 # PIL+SKIMAGE dithering methods
-from PIL.Image import NEAREST, ORDERED, RASTERIZE, FLOYDSTEINBERG
 
+NEAREST = PILImage.NEAREST
+FLOYDSTEINBERG = PILImage.FLOYDSTEINBERG
 PHILIPS = FLOYDSTEINBERG + 1
 SIERRA = PHILIPS + 1
 STUCKI = SIERRA + 1
@@ -1189,7 +1206,8 @@ def dither(image, method=FLOYDSTEINBERG, N=2):
     """
     if method in dithering:
         return dithering[method](image, N)
-    logging.warning('dithering method %s not yet implemented. fallback to Floyd-Steinberg' % dithering[method])
+    logging.warning(
+        'dithering method %s not yet implemented. fallback to Floyd-Steinberg' % dithering[method])
     return dither(image, FLOYDSTEINBERG, N)
 
 
@@ -1254,8 +1272,6 @@ def rgb2rgba(array):
     return array
 
 
-import skimage.color as skcolor
-
 try:
     skcolor.rgba2rgb  # will be available soon
 except:
@@ -1279,7 +1295,8 @@ def palette(im, ncolors, tol=1 / 100):
     w, h, d = im.shape
     s = w * h  # number of pixels
     im = np.reshape(im, (s, d))  # flatten for kmeans
-    decimate = int(tol * s / ncolors)  # keep only ~100 points per color for speed
+    # keep only ~100 points per color for speed
+    decimate = int(tol * s / ncolors)
     if decimate > 1:
         im = im[::decimate]
     return kmeans(im, ncolors)[0]
@@ -1294,7 +1311,7 @@ def lab2ind(im, colors=256):
     # http://stackoverflow.com/questions/10818546/finding-index-of-nearest-point-in-numpy-arrays-of-x-and-y-coordinates
     if isinstance(colors, int):
         p = palette(im, colors)  #
-        pal = [Color(c, 'lab') for c in p]
+        pal = [Gcolors.Color(c, 'lab') for c in p]
     else:
         pal = colors
         p = [c.lab for c in flatten(pal)]
@@ -1326,9 +1343,9 @@ def ind2rgb(im, palette):
 # inspired by https://github.com/gtaylor/python-colormath
 # WATCH OUT! converters must be defined above this line...
 
-from .graph import DiGraph
 
-converters = DiGraph(multi=False)  # a nx.DiGraph() would suffice, but my DiGraph are better
+# a nx.DiGraph() would suffice, but my DiGraph are better
+converters = graph.DiGraph(multi=False)
 for source in modes:
     for target in modes:
         key = (modes[source].name, modes[target].name)
@@ -1361,8 +1378,9 @@ def convert(a, source, target, **kwargs):
             % (source.name, target.name)
         )
 
-    for u, v in pairwise(path):
-        if u == v: continue  # avoid converting from gray to gray
+    for u, v in itertools2.pairwise(path):
+        if u == v:
+            continue  # avoid converting from gray to gray
         try:
             edge = converters[u][v][0]
         except:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 plotable rich object display on IPython/Jupyter notebooks 
 """
@@ -10,7 +8,12 @@ __credits__ = []
 __license__ = "LGPL"
 
 # import matplotlib and set backend once for all
-import os, io, sys, logging, base64
+from . import itertools2
+import os
+import io
+import sys
+import logging
+import base64
 import matplotlib
 
 if os.getenv('TRAVIS'):  # are we running https://travis-ci.org/ automated tests ?
@@ -23,8 +26,6 @@ else:
 
 logging.info('matplotlib backend is %s' % matplotlib.get_backend())
 
-from . import itertools2
-
 
 class Plot(object):
     """base class for plotable rich object display on IPython notebooks
@@ -33,11 +34,12 @@ class Plot(object):
 
     def _plot(self, ax, **kwargs):
         """abstract method, must be overriden
-        
+
         :param ax: `matplotlib.axis` 
         :return ax: `matplotlib.axis` after plot
         """
-        raise NotImplementedError('objects derived from plot.PLot must define a _plot method')
+        raise NotImplementedError(
+            'objects derived from plot.PLot must define a _plot method')
         return ax
 
     def render(self, fmt='svg', **kwargs):
@@ -101,7 +103,8 @@ def render(plotables, fmt='svg', **kwargs):
     fig, ax = plt.subplots()
 
     labels = kwargs.pop('labels', [None] * len(plotables))
-    offset = kwargs.pop('offset', 0)  # slightly shift the points to make superimposed curves more visible
+    # slightly shift the points to make superimposed curves more visible
+    offset = kwargs.pop('offset', 0)
 
     for i, obj in enumerate(plotables):
         if labels[i] is None:
@@ -116,8 +119,10 @@ def render(plotables, fmt='svg', **kwargs):
                 title = labels[i]
         ax = obj._plot(ax, label=labels[i], offset=i * offset, **kwargs)
 
-    if ylim: plt.ylim(ylim)
-    if xlim: plt.xlim(xlim)
+    if ylim:
+        plt.ylim(ylim)
+    if xlim:
+        plt.xlim(xlim)
 
     ax.set_title(title)
 

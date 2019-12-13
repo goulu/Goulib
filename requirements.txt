@@ -1,5 +1,6 @@
+networkx>=2.0
+scikit-image==0.15.0
 scipy
-networkx
 pydot
 pydotplus
 graphviz
@@ -14,8 +15,9 @@ tinycss
 pdfminer.six
 sortedcollections
 bitarray
-pint
-nose       
-scikit-image
+pint     
+
 pillow
 matplotlib
+nose
+nose-cov

@@ -15,3 +15,4 @@ docs/_build
 /xunit.xml
 .idea/
 /Goulib/__pycache__/
+*.noseids

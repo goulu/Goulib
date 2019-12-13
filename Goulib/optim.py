@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 various optimization algorithms : knapsack, traveling salesman, simulated annealing, differential evolution
 """
@@ -7,13 +5,16 @@ various optimization algorithms : knapsack, traveling salesman, simulated anneal
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2015, Philippe Guglielmetti"
 __credits__ = [
-    "http://www.psychicorigami.com/category/tsp/", 
+    "http://www.psychicorigami.com/category/tsp/",
     "http://cci.lbl.gov/cctbx_sources/scitbx/differential_evolution.py",
     "https://github.com/fchollet/nelder-mead",
-    ]
+]
 __license__ = "LGPL"
 
-import logging, math, random, copy 
+import logging
+import math
+import random
+import copy
 
 from .itertools2 import all_pairs, index_min, sort_indexes
 from .stats import mean
@@ -21,9 +22,11 @@ from .math2 import vecadd, vecsub, vecmul
 
 import copy
 
+
 class ObjectiveFunction:
     '''class to wrap an objective function and
     keep track of the best solution evaluated'''
+
     def __init__(self, objective_function):
         self.objective_function = objective_function
         self.best = None
@@ -37,13 +40,14 @@ class ObjectiveFunction:
             logging.info('new best score: %f', self.best_score)
         return score
 
-def nelder_mead(f, x_start, 
-        step=0.1, no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
-        alpha = 1., gamma = 2., rho = -0.5, sigma = 0.5):
+
+def nelder_mead(f, x_start,
+                step=0.1, no_improve_thr=10e-6, no_improv_break=10, max_iter=0,
+                alpha=1., gamma=2., rho=-0.5, sigma=0.5):
     """
         Pure Python implementation of the Nelder-Mead algorithm.
         also called "downhill simplex method" taken from https://github.com/fchollet/nelder-mead
-        
+
         Reference: https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
         :param f: function to optimize, must return a scalar score 
             and operate over a numpy array of the same dimensions as x_start
@@ -74,7 +78,7 @@ def nelder_mead(f, x_start,
     iters = 0
     while 1:
         # order
-        res.sort(key = lambda x: x[1])
+        res.sort(key=lambda x: x[1])
         best = res[0][1]
 
         # break after max_iter
@@ -83,14 +87,14 @@ def nelder_mead(f, x_start,
         iters += 1
 
         # break after no_improv_break iterations with no improvement
-        logging.info('...best so far:%s'% best)
+        logging.info('...best so far:%s' % best)
 
         if best < prev_best - no_improve_thr:
             no_improv = 0
             prev_best = best
         else:
             no_improv += 1
-    
+
         if no_improv >= no_improv_break:
             return res[0]
 
@@ -101,7 +105,7 @@ def nelder_mead(f, x_start,
                 x0[i] += c / (len(res)-1)
 
         # reflection
-        xr = vecadd(x0,vecmul(alpha,vecsub(x0, res[-1][0])))
+        xr = vecadd(x0, vecmul(alpha, vecsub(x0, res[-1][0])))
         rscore = f(xr)
         if res[0][1] <= rscore < res[-2][1]:
             del res[-1]
@@ -110,7 +114,7 @@ def nelder_mead(f, x_start,
 
         # expansion
         if rscore < res[0][1]:
-            xe = vecadd(x0,vecmul(gamma,vecsub(x0, res[-1][0])))
+            xe = vecadd(x0, vecmul(gamma, vecsub(x0, res[-1][0])))
             escore = f(xe)
             if escore < rscore:
                 del res[-1]
@@ -122,7 +126,7 @@ def nelder_mead(f, x_start,
                 continue
 
         # contraction
-        xc = vecadd(x0,vecmul(rho,vecsub(x0,res[-1][0])))
+        xc = vecadd(x0, vecmul(rho, vecsub(x0, res[-1][0])))
         cscore = f(xc)
         if cscore < res[-1][1]:
             del res[-1]
@@ -133,14 +137,14 @@ def nelder_mead(f, x_start,
         x1 = res[0][0]
         nres = []
         for tup in res:
-            redx = vecadd(x1,vecmul(sigma*(tup[0] - x1)))
+            redx = vecadd(x1, vecmul(sigma*(tup[0] - x1)))
             score = f(redx)
             nres.append([redx, score])
         res = nres
-            
-    
+
+
 class _Bin():
-    def __init__(self, capacity, f=lambda x:x):
+    def __init__(self, capacity, f=lambda x: x):
         """a container with a limited capacity
         :param capacity: int,flot,tuple of whatever defines the capacity of the Bin
         :param f: function f(x) returning the capacity used by item x. Must return the empty capacity when f(0) is called
@@ -154,7 +158,8 @@ class _Bin():
 
     def _add(self, value, tot=None):
         """update sum when item is added"""
-        if not tot : tot = self._used
+        if not tot:
+            tot = self._used
         if isinstance(value, (int, float)):
             return tot + value
         if isinstance(value, set):
@@ -168,7 +173,8 @@ class _Bin():
 
     def _sub(self, value, tot=None):
         """update sum AFTER item is removed"""
-        if not tot : tot = self._used
+        if not tot:
+            tot = self._used
         if isinstance(value, (int, float)):
             return tot - value
         if isinstance(value, set):
@@ -189,7 +195,8 @@ class _Bin():
 
     def _fits(self, value, cap=None):
         """compare value to capacity"""
-        if cap is None : cap = self._capacity
+        if cap is None:
+            cap = self._capacity
         if isinstance(value, (int, float)):
             return value <= cap
         if isinstance(value, set):
@@ -211,6 +218,7 @@ class _Bin():
         """removal of an element : MUST BE OVERLOADED by subclasses and called AFTER item is removed"""
         self._used = self._sub(self._f(item))
         return self
+
 
 class BinDict(_Bin, dict):
     # http://docs.python.org/2/reference/datamodel.html#emulating-container-types
@@ -275,6 +283,7 @@ class BinList(_Bin, list):
 # Bin packing algorithms
 # see https://en.wikipedia.org/wiki/Bin_packing_problem
 
+
 def first_fit_decreasing(items, bins, maxbins=0):
     """ fit items in bins using the "first fit decreasing" method
     :param items: iterable of items
@@ -283,7 +292,7 @@ def first_fit_decreasing(items, bins, maxbins=0):
     """
 
     nofit = []
-    items.sort(key=lambda x:bins[0]._f(x), reverse=True)
+    items.sort(key=lambda x: bins[0]._f(x), reverse=True)
     for item in items:
         fit = False
         for b in bins:
@@ -304,6 +313,7 @@ def first_fit_decreasing(items, bins, maxbins=0):
                     pass
             nofit.append(item)
     return nofit
+
 
 def hillclimb(init_function, move_operator, objective_function, max_evaluations):
     '''
@@ -333,10 +343,13 @@ def hillclimb(init_function, move_operator, objective_function, max_evaluations)
                 break  # depth first search
 
         if not move_made:
-            break  # we couldn't find a better move (must be at a local maximum)
+            # we couldn't find a better move (must be at a local maximum)
+            break
 
-    logging.info('hillclimb finished: num_evaluations=%d, best_score=%f', num_evaluations, best_score)
+    logging.info('hillclimb finished: num_evaluations=%d, best_score=%f',
+                 num_evaluations, best_score)
     return (num_evaluations, best_score, best)
+
 
 def hillclimb_and_restart(init_function, move_operator, objective_function, max_evaluations):
     '''
@@ -349,8 +362,10 @@ def hillclimb_and_restart(init_function, move_operator, objective_function, max_
     while num_evaluations < max_evaluations:
         remaining_evaluations = max_evaluations - num_evaluations
 
-        logging.info('(re)starting hillclimb %d/%d remaining', remaining_evaluations, max_evaluations)
-        evaluated, score, found = hillclimb(init_function, move_operator, objective_function, remaining_evaluations)
+        logging.info('(re)starting hillclimb %d/%d remaining',
+                     remaining_evaluations, max_evaluations)
+        evaluated, score, found = hillclimb(
+            init_function, move_operator, objective_function, remaining_evaluations)
 
         num_evaluations += evaluated
         if score > best_score or best is None:
@@ -359,6 +374,7 @@ def hillclimb_and_restart(init_function, move_operator, objective_function, max_
 
     return (num_evaluations, best_score, best)
 
+
 def P(prev_score, next_score, temperature):
     if next_score > prev_score:
         return 1.0
@@ -366,12 +382,12 @@ def P(prev_score, next_score, temperature):
         return math.exp(-abs(next_score - prev_score) / temperature)
 
 
-
 def kirkpatrick_cooling(start_temp, alpha):
     T = start_temp
     while True:
         yield T
         T = alpha * T
+
 
 def anneal(init_function, move_operator, objective_function, max_evaluations, start_temp, alpha):
 
@@ -405,12 +421,14 @@ def anneal(init_function, move_operator, objective_function, max_evaluations, st
                 current_score = next_score
                 break
         # see if completely finished
-        if done: break
+        if done:
+            break
 
     best_score = objective_function.best_score
     best = objective_function.best
     logging.info('final temperature: %f', temperature)
-    logging.info('anneal finished: num_evaluations=%d, best_score=%f', num_evaluations, best_score)
+    logging.info('anneal finished: num_evaluations=%d, best_score=%f',
+                 num_evaluations, best_score)
     return (num_evaluations, best_score, best)
 
 
@@ -422,6 +440,7 @@ def reversed_sections(tour):
             copy[i:j + 1] = reversed(tour[i:j + 1])
             yield copy
 
+
 def swapped_cities(tour):
     '''generator to create all possible variations where two cities have been swapped'''
     for i, j in all_pairs(len(tour)):
@@ -430,13 +449,16 @@ def swapped_cities(tour):
             copy[i], copy[j] = tour[j], tour[i]
             yield copy
 
+
 def tour_length(points, dist, tour=None):
     """generator of point-to-point distances along a tour"""
-    if not tour:tour = list(range(len(points)))  # will generate the closed tour length
+    if not tour:
+        tour = list(range(len(points)))  # will generate the closed tour length
     n = len(tour)
     for i in range(n):
         j = (i + 1) % n
         yield dist(points[tour[i]], points[tour[j]])
+
 
 def tsp(points, dist, max_iterations=100, start_temp=None, alpha=None, close=True, rand=True):
     """Traveling Salesman Problem
@@ -449,25 +471,30 @@ def tsp(points, dist, max_iterations=100, start_temp=None, alpha=None, close=Tru
     @return iterations,score,best : number of iterations used, minimal length found, best path as list of indexes of points
     """
     n = len(points)
+
     def init_function():
         tour = list(range(1, n))
         if rand:
             random.shuffle(tour)
         return [0] + tour
+
     def objective_function(tour):
         """total up the total length of the tour based on the dist ance function"""
         return -sum(tour_length(points, dist, tour if close else tour[:-1]))
     if start_temp is None or alpha is None:
-        iterations, score, best = hillclimb_and_restart(init_function, reversed_sections, objective_function, max_iterations)
+        iterations, score, best = hillclimb_and_restart(
+            init_function, reversed_sections, objective_function, max_iterations)
     else:
-        iterations, score, best = anneal(init_function, reversed_sections, objective_function, max_iterations, start_temp, alpha)
+        iterations, score, best = anneal(
+            init_function, reversed_sections, objective_function, max_iterations, start_temp, alpha)
     return iterations, score, best
+
 
 class DifferentialEvolution(object):
     """
     This is a python implementation of differential evolution taken from
     http://cci.lbl.gov/cctbx_sources/scitbx/differential_evolution.py
-    
+
     It assumes an evaluator class is passed in that has the following
     functionality
     data members:
@@ -475,19 +502,19 @@ class DifferentialEvolution(object):
      domain         :: a  list [(low,high)]*n
                        with approximate upper and lower limits for each parameter
      x              :: a place holder for a final solution
-    
+
      also a function called 'target' is needed.
      This function should take a parameter vector as input and return a the function to be minimized.
-    
+
      The code below was implemented on the basis of the following sources of information:
      1. http://www.icsi.berkeley.edu/~storn/code.html
      2. http://www.daimi.au.dk/~krink/fec05/articles/JV_ComparativeStudy_CEC04.pdf
      3. http://ocw.mit.edu/NR/rdonlyres/Sloan-School-of-Management/15-099Fall2003/A40397B9-E8FB-4B45-A41B-D1F69218901F/0/ses2_storn_price.pdf
-    
-    
+
+
      The developers of the differential evolution method have this advice:
      (taken from ref. 1)
-    
+
     If you are going to optimize your own objective function with DE, you may try the
     following classical settings for the input file first: Choose method e.g. DE/rand/1/bin,
     set the number of parents NP to 10 times the number of parameters, select weighting
@@ -505,7 +532,7 @@ class DifferentialEvolution(object):
     initialize your parameter vectors by exploiting their full numerical range, i.e. if a
     parameter is allowed to exhibit values in the range [-100, 100] it's a good idea to pick
     the initial values from this range instead of unnecessarily restricting diversity.
-    
+
     Keep in mind that different problems often require different settings for NP, F and CR
     (have a look into the different papers to get a feeling for the settings). If you still
     get misconvergence you might want to try a different method. We mostly use DE/rand/1/... or DE/best/1/... .
@@ -514,25 +541,25 @@ class DifferentialEvolution(object):
     function. There might be a better one to describe your problem. Any knowledge that you
     have about the problem should be worked into the objective function. A good objective
     function can make all the difference.
-    
+
     Note: NP is called population size in the routine below.)
     Note: [0.5,1.0] dither is the default behavior unless f is set to a value other then None.
     """
 
     def __init__(self,
-        evaluator,
-        population_size=50,
-        f=None,
-        cr=0.9,
-        eps=1e-2,
-        n_cross=1,
-        max_iter=10000,
-        monitor_cycle=200,
-        out=None,
-        show_progress=False,
-        show_progress_nth_cycle=1,
-        insert_solution_vector=None,
-        dither_constant=0.4):
+                 evaluator,
+                 population_size=50,
+                 f=None,
+                 cr=0.9,
+                 eps=1e-2,
+                 n_cross=1,
+                 max_iter=10000,
+                 monitor_cycle=200,
+                 out=None,
+                 show_progress=False,
+                 show_progress_nth_cycle=1,
+                 insert_solution_vector=None,
+                 dither_constant=0.4):
         self.dither = dither_constant
         self.show_progress = show_progress
         self.show_progress_nth_cycle = show_progress_nth_cycle
@@ -552,20 +579,18 @@ class DifferentialEvolution(object):
             self.seeded = insert_solution_vector
         for _ in range(self.population_size):
             self.population.append([0.]*self.vector_length)
-    
-    
+
         self.scores = [1000]*self.population_size
         self.optimize()
         self.best_score = min(self.scores)
-        self.best_vector = self.population[ index_min(self.scores)[0] ]
+        self.best_vector = self.population[index_min(self.scores)[0]]
         self.evaluator.x = self.best_vector
         if self.show_progress:
             self.evaluator.print_status(
                 min(self.scores),
                 mean(self.scores),
-                self.population[ index_min(self.scores)[0] ],
+                self.population[index_min(self.scores)[0]],
                 'Final')
-
 
     def optimize(self):
         # initialise the population please
@@ -583,11 +608,11 @@ class DifferentialEvolution(object):
                     # make here a call to a custom print_status function in the evaluator function
                     # the function signature should be (min_target, mean_target, best vector)
                     self.evaluator.print_status(
-                      min(self.scores),
-                      mean(self.scores),
-                      self.population[ index_min(self.scores)[0] ],
-                      self.count)
-            
+                        min(self.scores),
+                        mean(self.scores),
+                        self.population[index_min(self.scores)[0]],
+                        self.count)
+
             self.count += 1
             if self.count % self.monitor_cycle == 0:
                 if (monitor_score - min(self.scores)) < self.eps:
@@ -598,7 +623,7 @@ class DifferentialEvolution(object):
             rd = rd * rd / (min(self.scores) * min(self.scores) + self.eps)
             if (rd < self.eps):
                 converged = True
-            
+
             if self.count >= self.max_iter:
                 converged = True
 
@@ -607,7 +632,7 @@ class DifferentialEvolution(object):
             delta = self.evaluator.domain[ii][1] - self.evaluator.domain[ii][0]
             offset = self.evaluator.domain[ii][0]
             random_values = [
-                random.uniform(offset,offset+delta) 
+                random.uniform(offset, offset+delta)
                 for _ in range(self.population_size - 1)
             ]
             # now place these values ni the proper places in the
@@ -637,30 +662,30 @@ class DifferentialEvolution(object):
             if (i3 >= ii):
                 i3 += 1
             #
-            x1 = self.population[ i1 ]
-            x2 = self.population[ i2 ]
-            x3 = self.population[ i3 ]
-            
+            x1 = self.population[i1]
+            x2 = self.population[i2]
+            x3 = self.population[i3]
+
             if self.f is None:
                 use_f = random.random() / 2.0 + 0.5
             else:
                 use_f = self.f
-            
-            vi = vecadd(x1,vecmul(use_f,vecsub(x2,x3)))
+
+            vi = vecadd(x1, vecmul(use_f, vecsub(x2, x3)))
             # prepare the offspring vector
             rnd = [random.random() for _ in range(self.vector_length)]
             permut = sort_indexes(rnd)
-            test_vector = copy.copy(self.population[ii]) #deep_copy ?
+            test_vector = copy.copy(self.population[ii])  # deep_copy ?
             # first the parameters that sure cross over
             for jj in range(self.vector_length):
                 if (jj < self.n_cross):
-                    test_vector[ permut[jj] ] = vi[ permut[jj] ]
+                    test_vector[permut[jj]] = vi[permut[jj]]
                 else:
                     if (rnd[jj] > self.cr):
-                        test_vector[ permut[jj] ] = vi[ permut[jj] ]
+                        test_vector[permut[jj]] = vi[permut[jj]]
             # get the score
             test_score = self.evaluator.target(test_vector)
             # check if the score if lower
-            if test_score < self.scores[ii] :
+            if test_score < self.scores[ii]:
                 self.scores[ii] = test_score
                 self.population[ii] = test_vector

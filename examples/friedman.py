@@ -15,7 +15,8 @@ import logging
 from itertools import permutations, product, count, chain
 from sortedcontainers import SortedDict
 
-import math, ast
+import math
+import ast
 from Goulib import math2, expr
 
 # "safe" operators
@@ -23,14 +24,18 @@ context = expr.Context()
 
 
 def add(a, b):
-    if a == 0: return b
-    if b == 0: return a
+    if a == 0:
+        return b
+    if b == 0:
+        return a
     res = a + b
     if res == a:
-        res = res + math2.eps * math2.sign(b)  # numpy.nextafter(res,res+math2.sign(b))
+        # numpy.nextafter(res,res+math2.sign(b))
+        res = res + math2.eps * math2.sign(b)
         assert res != a
     elif res == b:
-        res = res + math2.eps * math2.sign(a)  # res=numpy.nextafter(res,res+math2.sign(a))
+        # res=numpy.nextafter(res,res+math2.sign(a))
+        res = res + math2.eps * math2.sign(a)
         assert res != b
     return res
 
@@ -42,22 +47,27 @@ def sub(a, b):
 def div(a, b):
     res = math2.int_or_float(a / b)
     a2 = res * b
-    if a == a2: return res
+    if a == a2:
+        return res
     # the division has rounded something, like (a+eps)/a =1
-    return res + math2.eps * math2.sign(a * b)  # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+    # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+    return res + math2.eps * math2.sign(a * b)
 
 
 def pow(a, b):
     res = math2.ipow(a, b)
-    if res != 0 or a == 0: return res
+    if res != 0 or a == 0:
+        return res
     # a to a negative power has been rounded to 0 ...
-    return res + math2.eps * math2.sign(a * b)  # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+    # numpy.nextafter(res,res+math2.sign(a)*math2.sign(b))
+    return res + math2.eps * math2.sign(a * b)
 
 
 context.operators[ast.Add] = (add, 1100, '+', '+', '+')
 context.operators[ast.Sub] = (sub, 1101, '-', '-', '-')
 context.operators[ast.Div] = (div, 1201, '/', '/', '\\frac{%s}{%s}')
-context.operators[ast.Pow] = (pow, 1400, '^', '**', '^'),  # ipow returns an integer when result is integer ...
+# ipow returns an integer when result is integer ...
+context.operators[ast.Pow] = (pow, 1400, '^', '**', '^'),
 
 # remove functions that are irrelevant or redundant
 for f in ['isinf', 'isnan', 'isfinite', 'frexp',
@@ -69,7 +79,7 @@ for f in ['isinf', 'isnan', 'isfinite', 'frexp',
 
 
 def Expr(e):
-    return expr.Expr(e, context=context);
+    return expr.Expr(e, context=context)
 
 
 class ExprDict(SortedDict):
@@ -102,7 +112,8 @@ class ExprDict(SortedDict):
         if self.int:
             # limit to integers... but maybe we're extremely close
             k = math2.int_or_float(k)
-            if not isinstance(k, int): return False
+            if not isinstance(k, int):
+                return False
 
         if k < 0:
             return self.add(-expr)
@@ -214,9 +225,12 @@ def _diadic(left, op, right):
 
 
 def _monadic(op, e):
-    if op == '': return e
-    if op == '-': return -e
-    if op == 's': return Expr(math.sqrt)(e)
+    if op == '':
+        return e
+    if op == '-':
+        return -e
+    if op == 's':
+        return Expr(math.sqrt)(e)
 
 
 def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
@@ -286,7 +300,8 @@ def pp(e):
 def friedman(num):
     for e in gen(num):
         try:
-            n = math2.int_or_float(e())  # cope with potential rounding problems
+            # cope with potential rounding problems
+            n = math2.int_or_float(e())
             if n == num and str(e) != str(num):  # concat is too easy ...
                 yield (num, e)
         except GeneratorExit:  # https://stackoverflow.com/a/41115661/1395973
@@ -297,13 +312,27 @@ def friedman(num):
 
 if __name__ == "__main__":
 
-    for x in seq(123456789, '-s', '+-*/^_', False):
-        print(x)
-        if x[0] >= 100: break
+    from Goulib.table import Table
 
-    exit()
+    max = 100
+    t = Table(range(max+1), titles=['n'])
 
-    m = Monadic(math.pi, context.functions, 2)
+    def column(n, monadic='-s', dyadic='+-*/^_', permut=False):
+        t.addcol(n)
+        col = len(t.titles)-1
+        for e in seq(n, monadic, dyadic, permut):
+            n = int(e[0])
+            # h(e[0],'=',e[1])
+            if n <= max:
+                e=e[1]
+                old=t.get(n,col)
+                if old is None or old.complexity()>e.complexity():
+                    t.set(n, col, e)
 
-    for x in m:
-        print('%s = %s' % (x, m[x]))
+    column(2018, permut=True)  # yeargame
+    column(2019,permut=True) #yeargame
+    column(4444) # four-four
+    column(123456789)
+    column(999) # 999 clock
+
+    t.save('friedman.htm')

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 advanced containers : Record (struct), and INFINITE Sequence
 """
@@ -17,9 +15,10 @@ import operator
 from itertools import count, tee, islice
 from Goulib import itertools2, decorators, tests
 
+
 class Record(OrderedDict):
     """mimics a Pascal record or a C struct"""
-    #https://stackoverflow.com/a/5491708/1395973
+    # https://stackoverflow.com/a/5491708/1395973
     def __init__(self, *args, **kwargs):
         super(Record, self).__init__(*args, **kwargs)
         self._initialized = True

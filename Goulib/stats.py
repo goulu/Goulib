@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
 """
 very basic statistics functions
 """
@@ -9,14 +7,14 @@ __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = []
 __license__ = "LGPL"
 
-import math, logging, matplotlib
+import math
+import logging
+import matplotlib
 
-from . import plot  # sets matplotlib backend
+from Goulib import plot  # sets matplotlib backend
 import matplotlib.pyplot as plt  # after import .plot
 
-from . import itertools2
-from . import math2
-from . import expr
+from Goulib import itertools2, math2, expr
 
 
 def mean_var(data):
@@ -116,7 +114,8 @@ def kurtosis(data):
         delta_n2 = delta_n * delta_n
         term1 = delta * delta_n * n1
         mean = mean + delta_n
-        M4 = M4 + term1 * delta_n2 * (n * n - 3 * n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3
+        M4 = M4 + term1 * delta_n2 * \
+            (n * n - 3 * n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3
         M3 = M3 + term1 * delta_n * (n - 2) - 3 * delta_n * M2
         M2 = M2 + term1
 
@@ -173,8 +172,10 @@ class Stats(object):
         self._dsum1 += delta
         self._dsum2 += delta * delta
 
-        if x < self.lo: self.lo = x
-        if x > self.hi: self.hi = x
+        if x < self.lo:
+            self.lo = x
+        if x > self.hi:
+            self.hi = x
 
     def extend(self, data):
         for x in data:
@@ -192,8 +193,10 @@ class Stats(object):
             self._dsum1 -= delta
             self._dsum2 -= delta * delta
 
-            if x <= self.lo: logging.warning('lo value possibly invalid')
-            if x >= self.hi: logging.warning('hi value possibly invalid')
+            if x <= self.lo:
+                logging.warning('lo value possibly invalid')
+            if x >= self.hi:
+                logging.warning('hi value possibly invalid')
 
     @property
     def sum(self):
@@ -250,7 +253,7 @@ class Stats(object):
             mean = self.mean * other.mean
             # https://fr.wikipedia.org/wiki/Variance_(statistiques_et_probabilit%C3%A9s)#Produit
             var = self.variance * other.variance + \
-                  self.variance * other.mean ** 2 + other.variance * self.mean ** 2
+                self.variance * other.mean ** 2 + other.variance * self.mean ** 2
         return Stats(mean=mean, var=var)
 
     def __neg__(self):
@@ -328,7 +331,8 @@ class Normal(PDF):
         """if data is specified, it it used to fit a normal law"""
         sigma = math.sqrt(var)
         s2 = math.sqrt(var / 2)
-        data = data or [mean - s2, mean + s2]  # this way we preserve mean and variance
+        # this way we preserve mean and variance
+        data = data or [mean - s2, mean + s2]
         super(Normal, self).__init__(
             lambda x: normal_pdf(x, mean, sigma), data)
 
@@ -338,11 +342,12 @@ class Normal(PDF):
     def latex(self):
         mean = expr.Expr(self.mean).latex()
         sigma = expr.Expr(self.sigma).latex()
-        return "\mathcal{N}(\mu=%s, \sigma=%s)" % (mean, sigma)
+        return r"\mathcal{N}(\mu=%s, \sigma=%s)" % (mean, sigma)
 
     def _plot(self, ax, x=None, **kwargs):
         if x is None:
-            x = itertools2.linspace(self.mu - 3 * self.sigma, self.mu + 3 * self.sigma, 101)
+            x = itertools2.linspace(
+                self.mu - 3 * self.sigma, self.mu + 3 * self.sigma, 101)
         x = list(x)
         y = list(self(x))
         return expr.Expr._plot(self, ax, x, y, **kwargs)
@@ -414,7 +419,8 @@ def linear_regression(x, y, conf=None):
     """
     # https://gist.github.com/riccardoscalco/5356167
     try:
-        import scipy.stats, numpy  # TODO remove these requirements
+        import scipy.stats
+        import numpy  # TODO remove these requirements
     except:
         logging.error('scipy needed')
         return None
@@ -443,6 +449,7 @@ def linear_regression(x, y, conf=None):
     c = -1 * scipy.stats.t.ppf(alpha / 2., n - 2)
     bb1 = c * (s2 / ((n - 2) * (xx.mean() - (x.mean()) ** 2))) ** .5
 
-    bb0 = c * ((s2 / (n - 2)) * (1 + (x.mean()) ** 2 / (xx.mean() - (x.mean()) ** 2))) ** .5
+    bb0 = c * ((s2 / (n - 2)) * (1 + (x.mean()) ** 2 /
+                                 (xx.mean() - (x.mean()) ** 2))) ** .5
 
     return b1, b0, s2, (b1 - bb1, b1 + bb1), (b0 - bb0, b0 + bb0), (n * s2 / c2, n * s2 / c1)
