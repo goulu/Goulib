@@ -22,7 +22,7 @@ import logging
 import base64
 import io
 
-from Goulib.geom import *       # pylint: disable=wildcard-import, unused-wildcard-import
+from Goulib.geom import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from Goulib.interval import Box
 from Goulib.math2 import rint, isclose
 from Goulib import colors, itertools2, decorators
@@ -542,7 +542,6 @@ class Spline(Entity, Geometry):
     def _apply_transform(self, t):
         self.p = [t * p for p in self.p]
 
-
 '''
 def Spline(pts):
     # uses http://www.charlespetzold.com/blog/2012/12/Bezier-Circles-and-Bezier-Ellipses.html
@@ -632,16 +631,14 @@ class _Group(Entity, Geometry):
 
         patches = []
 
-        try:
-            patches.extend(e.patches(**kwargs))
-        except:
-            pass
+        for e in self:
+            patches.extend(e.patch(**kwargs))
 
-
-        rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
+        rest, colls = itertools2.filter2(patches, lambda x: isinstance(x, Patch))
         if rest:
             colls.append(PatchCollection(rest, match_original=True))
         return patches
+
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res = []
@@ -693,15 +690,17 @@ class Group(list, _Group):
         """
         if entity is None:
             return None  # to show nothing was done
-
-        if not isinstance(entity, (Circle, Text, Instance)):
-            # try to append to an existing chain
-            if e.append(entity):
-                return e
+        
+        entity.setattr(**kwargs)
+        
+        for c in self.chains():  # try to append to existing chain
+            if c.append(entity):
+                return c
 
         if isinstance(entity, (Segment2, Arc2, Spline)):  # potentialy chainable
-            entity.setattr(**kwargs)
-            super().append(entity)
+            entity = Chain([entity])
+            
+        super().append(entity)
             
         return self
 
@@ -909,7 +908,7 @@ class Chain(Group):
         if i == -1:
             for e in entity:
                 e.setattr(**attrs)
-                super(Chain, self).append(e, **attrs)
+                super(Group, self).append(e, **attrs)  # super() calls Group.append which causes an infinite recursion
             return self
         if i == 0:  # prepend
             for e in reversed(entity):
@@ -992,7 +991,7 @@ class Chain(Group):
                 commands.append(Path.CURVE3)
             elif isinstance(e, Spline):
                 points.extend(e.xy[1:4])
-                commands.extend([Path.CURVE4]*3)
+                commands.extend([Path.CURVE4] * 3)
             else:
                 print("unpatchable entity ", e)
         path = Path(points, commands)
@@ -1151,9 +1150,6 @@ def chains(group, tol=1E-6, mergeable=None):
     return res
 
 
-
-
-
 # one dtp point in mm https://en.wikipedia.org/wiki/Point_(typography)#Current_DTP_point_system
 dtp = 25.4 / 72
 
@@ -1267,6 +1263,7 @@ class Drawing(Group):
         me = self
 
         class _Device(PDFDevice):
+
             def paint_path(self, graphicstate, stroke, fill, evenodd, path):
                 color = None
                 try:
@@ -1298,6 +1295,7 @@ class Drawing(Group):
 
         # the PDFPageInterpreter doesn't handle colors yet, so we patch it here:
         class _Interpreter(PDFPageInterpreter):
+
             # stroke
             def do_S(self):
                 self.device.paint_path(
