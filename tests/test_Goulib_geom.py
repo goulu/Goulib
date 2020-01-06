@@ -10,23 +10,23 @@ from math import *
 
 class TestGeometry:
     # tested in derived classes
-    @raises(NotImplementedError)
+    @raises(TypeError)
     def test_connect(self):
         Geometry().connect(1)
 
-    @raises(NotImplementedError)
+    @raises(TypeError)
     def test_distance(self):
         Geometry().distance(1)
 
-    @raises(NotImplementedError)
+    @raises(TypeError)
     def test_intersect(self):
         Geometry().intersect(1)
 
-    @raises(NotImplementedError)
+    @raises(TypeError)
     def test_point(self):
         Geometry().point(1)
 
-    @raises(NotImplementedError)
+    @raises(TypeError)
     def test_tangent(self):
         Geometry().tangent(1)
 
@@ -554,6 +554,41 @@ class TestPolygon:
         for x in self.p4.intersect(self.p4):
             print(x)
         # print(list(self.p4.intersect(self.p6)))
+        
+class TestRect:
+    @classmethod
+    def setup_class(self):
+        # see IPython notebook for graphical examples
+        self.r1=Rect((0,0),(-1,1))
+        self.r2=Rect((1,-1),(2,2))
+
+    def test___init__(self):
+        pass #tested above
+
+    def test_connect(self):
+        s1=self.r1.connect(self.r2)
+        assert_equal(s1,Segment2(Point2(0,0),Point2(1,0)))
+        c1=Circle(Point2(4,1),1)
+        s2=self.r2.connect(c1)
+        assert_equal(s2,Segment2(Point2(3,1),Point2(2,1)))
+
+    def test_distance(self):
+        assert_equal(self.r1.distance(self.r2),1)
+
+    def test___repr__(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.__repr__())
+        raise SkipTest 
+
+    def test_p1(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.p1())
+        raise SkipTest 
+
+    def test_p2(self):
+        # rect = Rect(*args)
+        # assert_equal(expected, rect.p2())
+        raise SkipTest 
 
 
 class TestCircle:

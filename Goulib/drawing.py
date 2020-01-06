@@ -1151,32 +1151,7 @@ def chains(group, tol=1E-6, mergeable=None):
     return res
 
 
-class Rect(Chain):
-    """a rectangle starting at low/left and going trigowise through top/right"""
 
-    def __init__(self, *args):
-        if isinstance(args[0], Rect):  # copy constructor
-            p1 = Point2(args[0].p1)
-            p2 = Point2(args[0].p2)
-        else:
-            v1, v2 = Point2(args[0]), Point2(args[1])
-            p1 = Point2(min(v1.x, v2.x), min(v1.y, v2.y))
-            p2 = Point2(max(v1.x, v2.x), max(v1.y, v2.y))
-        self.append(Segment2(p1, (p2.x, p1.y)))
-        self.append(Segment2((p2.x, p1.y), p2))
-        self.append(Segment2(p2, (p1.x, p2.y)))
-        self.append(Segment2((p1.x, p2.y), p1))
-
-    @property
-    def p1(self):
-        return self[0].p
-
-    @property
-    def p2(self):
-        return self[2].p
-
-    def __repr__(self):
-        return '%s(%s,%s)' % (self.__class__.__name__, self.p1, self.p2)
 
 
 # one dtp point in mm https://en.wikipedia.org/wiki/Point_(typography)#Current_DTP_point_system

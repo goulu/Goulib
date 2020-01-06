@@ -17,11 +17,14 @@ import logging
 import functools
 import sys
 import logging
+import abc
 
 _gettrace = getattr(sys, 'gettrace', None)
 debugger = _gettrace and _gettrace()
 logging.info('debugger '+('ACTIVE' if debugger else 'INACTIVE'))
 
+
+abstractmethod=abc.abstractmethod
 
 # http://wiki.python.org/moin/PythonDecoratorLibrary
 def memoize(obj):

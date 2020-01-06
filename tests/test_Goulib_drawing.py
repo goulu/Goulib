@@ -474,40 +474,6 @@ class TestSpline:
         # assert_equal(expected, spline.__copy__())
         raise SkipTest
 
-class TestRect:
-    @classmethod
-    def setup_class(self):
-        # see IPython notebook for graphical examples
-        self.r1=Rect((0,0),(-1,1))
-        self.r2=Rect((1,-1),(2,2))
-
-    def test___init__(self):
-        pass #tested above
-
-    def test_connect(self):
-        s1=self.r1.connect(self.r2)
-        assert_equal(s1,Segment2(Point2(0,0),Point2(1,0)))
-        c1=Circle(Point2(4,1),1)
-        s2=self.r2.connect(c1)
-        assert_equal(s2,Segment2(Point2(2,1),Point2(3,1)))
-
-    def test_distance(self):
-        assert_equal(self.r1.distance(self.r2),1)
-
-    def test___repr__(self):
-        # rect = Rect(*args)
-        # assert_equal(expected, rect.__repr__())
-        raise SkipTest 
-
-    def test_p1(self):
-        # rect = Rect(*args)
-        # assert_equal(expected, rect.p1())
-        raise SkipTest 
-
-    def test_p2(self):
-        # rect = Rect(*args)
-        # assert_equal(expected, rect.p2())
-        raise SkipTest 
 
 class TestText:
     def test___init__(self):
