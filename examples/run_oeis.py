@@ -7,7 +7,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '$Id$'
 __revision__ = '$Revision$'
 
-import pickle
+import sqlite3
 import os
 import sys
 import logging
@@ -23,6 +23,73 @@ path = os.path.dirname(os.path.abspath(__file__))
 slow = []  # list of slow sequences
 
 
+class Database:
+
+    def __init__(self, dbpath):
+        dbexists = os.path.exists(dbpath)
+        try:
+            self.db = sqlite3.connect(dbpath)
+            if not dbexists:
+                self.execute(open('create.sql', 'r').read())
+                logging.info("tables created")
+        except sqlite3.Error as error:
+            logging.error("Error while connecting to sqlite", error)
+            
+    def execute(self, sql):
+        cursor = self.db.cursor()
+        cursor.execute(sql)
+        res = cursor.fetchall() 
+        cursor.close();
+        return res
+    
+    @property        
+    def version(self):
+        return str(self.execute("select sqlite_version();")[0][0])
+    
+    def __setitem__(self, key, value):
+        key = int(key[1:])
+        cursor = self.db.cursor()
+        req = "INSERT OR REPLACE INTO seq (id, i, n) VALUES"
+        for i, n in enumerate(value):
+            s = req + str((key, i, n))
+            cursor.execute(s)
+        cursor.close();
+        self.db.commit();
+    
+    def __getitem__(self, key):
+        key = int(key[1:])
+        s = "SELECT n FROM seq WHERE id=%d ORDER BY i" % key
+        res = self.execute(s)
+        if not res : 
+            raise IndexError
+        return res
+    
+    def find(self, n, id=None, i=None):
+        s = "SELECT id,i FROM seq WHERE n=%d" % n
+        if id is not None:
+            s = s + " AND id=%d" % id
+        if i is not None:
+            s = s + " AND i=%d" % i
+        return self.execute(s)   
+    
+    def search(self, l):
+        res = None
+        p = [(None, None)]  # array of possible (id,i) : start with all
+        for n in l:
+            r = []
+            for (id, i) in p:
+                if i is not None: i=i+1
+                r.extend(self.find(n, id, i))
+            p = r
+        return p
+
+        
+database = Database(path + '/oeis.db')
+logging.info("SQLite DB Version : " + database.version)
+
+database.search([3, 5, 8])
+        
+        
 def assert_generator(f, ref, name, timeout=10):
     n = len(ref)
     timeout, f.timeout = f.timeout, timeout  # save Sequence's timeout
@@ -33,7 +100,7 @@ def assert_generator(f, ref, name, timeout=10):
             if i > n:
                 break
     except decorators.TimeoutError:
-        if i < min(10, n/2):
+        if i < min(10, n / 2):
             slow.append((i, name, f.desc))
             logging.warning('%s timeout after only %d loops' % (name, i))
         elif _DEBUG:
@@ -42,17 +109,13 @@ def assert_generator(f, ref, name, timeout=10):
         f.timeout = timeout  # restore Sequence's timeout
 
 
-cachef = path+'/oeis.pck'
-database = dict()
-
-
 def data(s):
     s2 = s[1:]
 
     # http://stackoverflow.com/questions/807863/how-to-output-list-of-floats-to-a-binary-file-in-python
     try:
         return database[s]
-    except:
+    except IndexError:
         pass
 
     from urllib.request import urlopen
@@ -76,20 +139,8 @@ def data(s):
                 res.append(n)
 
     database[s] = res
-    pickle.dump(tuple((s, res)), open(cachef, "ab"),
-                protocol=2)  # append to pickle file
 
     return res
-
-
-# data('A004042') #to force creating the database from scratch
-with open(cachef, "rb") as f:
-    while True:
-        try:
-            k, v = pickle.load(f)
-            database[k] = v
-        except EOFError:
-            break
 
 
 def check(f, s=None):
@@ -125,8 +176,8 @@ class TestOEIS:
             from functools import partial
             f = partial(assert_generator, oeis[name], data(
                 name), name, time_limit)
-            f.description = str(oeis[name])+'\n'
-            yield (f, )
+            f.description = str(oeis[name]) + '\n'
+            yield (f,)
 
 
 _DEBUG = True

@@ -5,7 +5,6 @@
 OEIS sequences
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
 """
-from build.lib.Goulib.math2 import is_square
 
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
