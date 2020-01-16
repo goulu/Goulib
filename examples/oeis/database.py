@@ -12,6 +12,9 @@ import os
 import sys
 import logging
 
+from Goulib import itertools2
+
+
 class Database:
 
     def __init__(self, dbpath):
@@ -55,24 +58,21 @@ class Database:
             raise IndexError
         return itertools2.decompress(res)
     
-    def find(self, n, id=None, i=None):
-        s = "SELECT id,i FROM seq WHERE n=%d" % n
-        if id is not None:
-            s = s + " AND id=%d" % id
-        if i is not None:
-            s = s + " AND i=%d" % i
-        return self.execute(s)   
-    
-    def search(self, l):
-        res = None
-        p = [(None, None)]  # array of possible (id,i) : start with all
-        for n in l:
-            r = []
-            for (id, i) in p:
-                if i is not None: i = i + 1
-                r.extend(self.find(n, id, i))
-            p = r
-        return p
+    def search(self, value):
+        #efficient search first requires to dynamically build a tricky request 
+        for j, (n, r) in enumerate(itertools2.compress(value)):
+            if j == 0:
+                s1 = "WITH q0 AS (SELECT * FROM seq WHERE n = %d AND repeat >= %d)," % (n, r)
+                s2 = "SELECT q0.id, q0.i FROM q0"
+            else: 
+                s1 = s1 + "\nq%d AS (SELECT * FROM seq WHERE n = %d AND repeat = %d)," % (j, n, r)
+                s2 = s2 + '\nJOIN q%d ON q%d.id=q0.id AND q%d.i=q%d.i+q%d.repeat' % tuple([j] * 3 + [j - 1] * 2)
+        s = s1[:-1] + '\n\n' + s2
+        res=self.execute(s)
+        # keep first result for each sequence only
+        for (id,i) in itertools2.unique(res, key=lambda x:x[0], buffer=None):
+            key='000000'+str(id)
+            yield 'A'+key[-6:],i
 
         
 path = os.path.dirname(os.path.abspath(__file__))
@@ -81,12 +81,16 @@ logging.info("SQLite DB Version : " + database.version)
 
 from Goulib.tests import *
 
+
 class TestDatabase:
 
     def test_search(self):
-        database.search([3,5,8,13])
-        database.search([0,0,0])
-        database.search([1,0,0,0,1])
+        res = list(database.search([3, 5, 8, 13]))
+        assert_true(('A000045', 5) in res)
+        res = list(database.search([0, 0, 0]))
+        res = list(database.search([1, 0, 0, 0, 1]))
+        assert_true(('A000796', 14202) in res)
+        assert_true(('A008683', 1322) in res)
 
 
 _DEBUG = True
