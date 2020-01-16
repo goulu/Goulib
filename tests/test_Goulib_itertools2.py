@@ -119,6 +119,13 @@ class TestCompress:
         res=compress('aaaaabbbbccccccaaaaaaa')
         res=''.join('%d%s'%(n,c) for (c,n) in res)
         assert_equal(res,'5a4b6c7a')
+        
+class TestDecompress:
+    def test_decompress(self):
+        data='aaaaabbbbccccccaaaaaaa';
+        res=compress(data)
+        data2=decompress(res)
+        assert_equal(data2,data)
 
 class TestUnique:
     def test_unique(self):
