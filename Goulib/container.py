@@ -176,7 +176,8 @@ class Sequence(object):
                 desc='%s/%d'%(self.name,other)
             )
         def _(): 
-            for (a,b) in zip(self,other): yield a/b
+            from fractions import Fraction
+            for (a,b) in zip(self,other): yield Fraction(a,b)
         return Sequence(_, lambda i:self[i]/other[i])
             
     def __or__(self,other):
