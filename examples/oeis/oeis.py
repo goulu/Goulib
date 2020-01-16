@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-# coding: utf8
-
 """
-OEIS sequences
+some OEIS sequences implemented as Goulib.container.Sequence
+
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
 """
 
@@ -11,23 +9,17 @@ __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
 __license__ = "LGPL"
 __credits__ = ["https://oeis.org/"]
 
-__docformat__ = 'restructuredtext'
-__version__ = '$Id$'
-__revision__ = '$Revision$'
-
-import six
 import logging
 import operator
 import math
-from six.moves import map, reduce, filter, zip, zip_longest
 
 from itertools import count, repeat
 from Goulib.itertools2 import *
-from Goulib.math2 import *
 
-from Goulib import decorators, tests
+from Goulib import decorators
 
 from Goulib.container import Sequence
+from Goulib.math2 import *
 
 A000004 = Sequence(repeat(0), lambda _: 0, lambda x: x == 
                    0, desc='The zero sequence')
@@ -626,7 +618,7 @@ def has_primitive_root(n):
     if n == 1:
         return True  # to match A033948, but why ?
     try:
-        six.next(primitive_root_gen(n))
+        next(primitive_root_gen(n))
         return True
     except StopIteration:
         return False
@@ -1148,5 +1140,6 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20, A061909):
+    BBernouilli = A027641/A027642;
+    for n in take(20, BBernouilli):
         print(n)

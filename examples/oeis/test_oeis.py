@@ -1,13 +1,14 @@
+"""
+tests for OEIS.py and database.py
+
+(OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
+"""
+
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright (c) 2015 Philippe Guglielmetti"
 __license__ = "LGPL"
-__credits__ = ["https://oeis.org/"]
+__credits__ = []
 
-__docformat__ = 'restructuredtext'
-__version__ = '$Id$'
-__revision__ = '$Revision$'
-
-import sqlite3
 import os
 import sys
 import logging
@@ -16,81 +17,16 @@ import re
 from Goulib import itertools2, decorators
 from Goulib.tests import *
 
-from examples.oeis import *
+from oeis import *
+from database import database
 
 path = os.path.dirname(os.path.abspath(__file__))
 
 slow = []  # list of slow sequences
-
-
-class Database:
-
-    def __init__(self, dbpath):
-        dbexists = os.path.exists(dbpath)
-        try:
-            self.db = sqlite3.connect(dbpath)
-            if not dbexists:
-                self.execute(open('create.sql', 'r').read())
-                logging.info("tables created")
-        except sqlite3.Error as error:
-            logging.error("Error while connecting to sqlite", error)
-            
-    def execute(self, sql):
-        cursor = self.db.cursor()
-        cursor.execute(sql)
-        res = cursor.fetchall() 
-        cursor.close();
-        return res
-    
-    @property        
-    def version(self):
-        return str(self.execute("select sqlite_version();")[0][0])
-    
-    def __setitem__(self, key, value):
-        key = int(key[1:])
-        cursor = self.db.cursor()
-        req = "INSERT OR REPLACE INTO seq (id, i, n) VALUES"
-        for i, n in enumerate(value):
-            s = req + str((key, i, n))
-            cursor.execute(s)
-        cursor.close();
-        self.db.commit();
-    
-    def __getitem__(self, key):
-        key = int(key[1:])
-        s = "SELECT n FROM seq WHERE id=%d ORDER BY i" % key
-        res = self.execute(s)
-        if not res : 
-            raise IndexError
-        return res
-    
-    def find(self, n, id=None, i=None):
-        s = "SELECT id,i FROM seq WHERE n=%d" % n
-        if id is not None:
-            s = s + " AND id=%d" % id
-        if i is not None:
-            s = s + " AND i=%d" % i
-        return self.execute(s)   
-    
-    def search(self, l):
-        res = None
-        p = [(None, None)]  # array of possible (id,i) : start with all
-        for n in l:
-            r = []
-            for (id, i) in p:
-                if i is not None: i=i+1
-                r.extend(self.find(n, id, i))
-            p = r
-        return p
-
-        
-database = Database(path + '/oeis.db')
-logging.info("SQLite DB Version : " + database.version)
-
-database.search([3, 5, 8])
         
         
 def assert_generator(f, ref, name, timeout=10):
+    ref=list(ref)
     n = len(ref)
     timeout, f.timeout = f.timeout, timeout  # save Sequence's timeout
     l = []
