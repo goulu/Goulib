@@ -1,13 +1,12 @@
 from nose.tools import assert_equal
 from nose import SkipTest
 # lines above are inserted automatically by pythoscope. Line below overrides them
-from Goulib.tests import *
 
+from Goulib.tests import *
 from Goulib.graph import *
 
-import logging
+import logging, os, time
 
-import os
 path = os.path.dirname(os.path.abspath(__file__))
 results = path+'\\results\\graph\\'  # path for results
 
@@ -213,28 +212,27 @@ class TestRender:
         pass  # tested in test_save
 
 
-class TestDelauneyTriangulation:
-    def test_delauney_triangulation(self):
-        import time
-        n = 1000 if RTREE else 100
+class TestDelauneyEMST:
+    '''groups 2 tests coherently'''
+    def setUp(self):
+        self.n = 1000 if RTREE else 100
         from random import random
+        self.nodes = [(random(), random()) for _ in range(self.n)]
+        
+    def test_delauney_triangulation(self):
         start = time.clock()
-        nodes = [(random(), random()) for _ in range(n)]
-        graph = delauney_triangulation(nodes, tol=0)
-        logging.info('Delauney %d : %f' % (n, time.clock()-start))
-        assert_equal(graph.number_of_nodes(), n)
+        graph = delauney_triangulation(self.nodes, tol=0)
+        logging.info('Delauney %d : %f' % (self.n, time.clock()-start))
+        assert_equal(graph.number_of_nodes(), self.n)
         assert_true(nx.is_connected(graph))
         graph.save(results+'graph.delauney.png')
-        to_networkx_graph(graph)
+
+    def test_emst(self):
         start = time.clock()
-        graph = euclidean_minimum_spanning_tree(nodes)
-        logging.info('Spanning tree %d : %f' % (n, time.clock()-start))
+        graph = euclidean_minimum_spanning_tree(self.nodes)
+        logging.info('Spanning tree %d : %f' % (self.n, time.clock()-start))
         graph.save(results+'graph.emst.png')
-
-
-class TestEuclideanMinimumSpanningTree:
-    def test_euclidean_minimum_spanning_tree(self):
-        pass  # tested together with Delauney triangulation
+        graph=to_networkx_graph(graph, create_using=nx.Graph()) # issue #12
 
 
 class TestFigure:
