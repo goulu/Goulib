@@ -20,9 +20,15 @@ from datetime import datetime, date, time, timedelta
 
 from Goulib import itertools2, markup, datetime2
 
-from lxml import etree as ElementTree
-defaultparser = ElementTree.HTMLParser
-Element = ElementTree._Element
+try:
+    from lxml import etree as ElementTree
+    defaultparser = ElementTree.HTMLParser
+    Element = ElementTree._Element
+except ImportError: #TODO: find why it happens in LiClipse
+    from xml.etree import ElementTree
+    Element = ElementTree.Element
+    
+
 
 
 def attr(args):
