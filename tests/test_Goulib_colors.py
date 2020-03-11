@@ -2,8 +2,8 @@ from nose.tools import assert_equal
 from nose import SkipTest
 # lines above are inserted automatically by pythoscope. Line below overrides them
 
-from Goulib.tests import *      # pylint: disable=wildcard-import, unused-wildcard-import
-from Goulib.colors import *     # pylint: disable=wildcard-import, unused-wildcard-import
+from Goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from Goulib.colors import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 from matplotlib import cm
 
@@ -12,22 +12,26 @@ path = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestRgb2Hex:
+
     def test_rgb2hex(self):
-        assert_equal(rgb2hex((0, 16/255, 1)), '#0010ff')
+        assert_equal(rgb2hex((0, 16 / 255, 1)), '#0010ff')
 
 
 class TestHex2Rgb:
+
     def test_hex2rgb(self):
-        assert_equal(hex2rgb('#0010ff'), (0, 16./255, 1))
+        assert_equal(hex2rgb('#0010ff'), (0, 16. / 255, 1))
 
 
 class TestRgb2Cmyk:
+
     def test_rgb2cmyk(self):
         assert_equal(rgb2cmyk((0, 0, 0)), (0, 0, 0, 1))
         assert_equal(rgb2cmyk((.8, .6, .4)), (0, 0.25, .5, 0.2))
 
 
 class TestNearestColor:
+
     def test_nearest_color(self):
         assert_equal(nearest_color('#414142'), color['darkslategray'])
         cmyk = Color((.45, .12, .67, .05), space='cmyk')
@@ -37,6 +41,7 @@ class TestNearestColor:
 
 
 class TestAci:
+
     def test_color_to_aci(self):
         assert_equal(color_to_aci('red'), 1)
         assert_equal(color_to_aci(acadcolors[123]), 123)
@@ -45,6 +50,7 @@ class TestAci:
 
 
 class TestColorRange:
+
     def test_color_range(self):
         c = color_range(5, 'red', 'blue')
         assert_equal(c[0], color['red'])
@@ -55,6 +61,7 @@ class TestColorRange:
 
 
 class TestColor:
+
     @classmethod
     def setup_class(self):
         self.blue = Color('blue')
@@ -81,14 +88,14 @@ class TestColor:
 
     def test___add__(self):
 
-        assert_equal(self.red+self.green+self.blue, 'white')
-        assert_equal(self.red+self.green+self.blue, 'white')
+        assert_equal(self.red + self.green + self.blue, 'white')
+        assert_equal(self.red + self.green + self.blue, 'white')
 
     def test___sub__(self):
         white = Color('white')
         green = Color('lime')  # 'green' has hex 80 value, not ff
         blue = Color('blue')
-        assert_equal(white-green-blue, 'red')
+        assert_equal(white - green - blue, 'red')
 
     def test___eq__(self):
         pass  # tested above
@@ -139,7 +146,7 @@ class TestColor:
                     dest = Color(start.convert(destmode), destmode)
                     back = Color(dest.convert(startmode), startmode)
                     if not back.isclose(start):
-                        logging.error('round trip of %s from %s to %s failed with dE=%s' %
+                        logging.error('round trip of %s from %s to %s failed with dE=%s' % 
                                       (color, startmode, destmode,
                                        back.deltaE(start))
                                       )
@@ -191,6 +198,7 @@ class TestColor:
 
 
 class TestPalette:
+
     @classmethod
     def setup_class(self):
         self.palette = Palette(cm.get_cmap('nipy_spectral'))
@@ -245,6 +253,7 @@ class TestPalette:
 
 
 class TestColorLookup:
+
     def test_color_lookup(self):
         c = color['blue']
         c2 = color_lookup[c.hex]
@@ -252,18 +261,21 @@ class TestColorLookup:
 
 
 class TestColorToAci:
+
     def test_color_to_aci(self):
         # assert_equal(expected, color_to_aci(x, nearest))
         raise SkipTest
 
 
 class TestAciToColor:
+
     def test_aci_to_color(self):
         # assert_equal(expected, aci_to_color(x, block_color, layer_color))
         raise SkipTest
 
 
 class TestPantone:
+
     def test_pantone(self):
         from Goulib.table import Table, Cell
         from Goulib.itertools2 import reshape
@@ -271,63 +283,81 @@ class TestPantone:
         t = [Cell(name, style={'background-color': pantone[name].hex})
              for name in sorted(pantone)]
         t = Table(reshape(t, (0, 10)))
-        with open(path+'\\results\\colors.pantone.html', 'w') as f:
+        with open(path + '\\results\\colors.pantone.html', 'w') as f:
             f.write(t.html())
 
 
 class TestRgb2cmyk:
+
     def test_rgb2cmyk(self):
         cmyk = rgb2cmyk(color['green'].rgb)
-        assert_equal(cmyk, (1, 0, 1, 127/255))
+        assert_equal(cmyk, (1, 0, 1, 127 / 255))
 
 
 class TestCmyk2rgb:
+
     def test_cmyk2rgb(self):
         rgb = cmyk2rgb((1, 0, 1, .5))
         assert_equal(rgb, (0, .5, 0))
 
 
 class TestXyz2xyy:
+
     def test_xyz2xyy(self):
         # assert_equal(expected, xyz2xyy(xyz))
         raise SkipTest  # implement your test here
 
 
 class TestConvert:
+
     def test_convert(self):
         # assert_equal(expected, convert(color, source, target))
         raise SkipTest  # implement your test here
 
 
 class TestDeltaE:
+
     def test_delta_e(self):
         # assert_equal(expected, deltaE(c1, c2))
         raise SkipTest  # implement your test here
 
 
 class TestColorTable:
+
     def test_color_table(self):
         # assert_equal(expected, ColorTable(colors, key, width))
         raise SkipTest  # implement your test here
 
 
 class TestXyy2xyz:
+
     def test_xyy2xyz(self):
         # assert_equal(expected, xyy2xyz(xyY))
         raise SkipTest  # implement your test here
 
 
 class TestRgb2hex:
+
     def test_rgb2hex(self):
         # assert_equal(expected, rgb2hex(c, illuminant))
         raise SkipTest  # implement your test here
 
 
 class TestHex2rgb:
+
     def test_hex2rgb(self):
         # assert_equal(expected, hex2rgb(c, illuminant))
         raise SkipTest  # implement your test here
 
+    
+class TestBlackBody2Color:
+
+    def test_blackbody2color(self):
+        from Goulib.table import Table, Cell
+        from Goulib.itertools2 import arange
+
+        Table([Cell(str(t), style={'background-color': blackBody2Color(t).hex})
+             for t in arange(500, 12000, 500)]).save(path + '\\results\\colors.blackbody.html')
 
 if __name__ == "__main__":
     runmodule()
