@@ -3,63 +3,90 @@
 
 from nose.tools import assert_equal
 from nose import SkipTest
-#lines above are inserted automatically by pythoscope. Line below overrides them
+# lines above are inserted automatically by pythoscope. Line below overrides them
 from Goulib.tests import *
+from Goulib.notebook import *
+
+from IPython.core.interactiveshell import InteractiveShell 
+
 
 class TestH1:
+
     def test_h1(self):
-        # assert_equal(expected, h1(*args))
-        raise SkipTest 
+        res = h1('test')
+        assert_equal(res, None) # don't know how to test yet
+
 
 class TestH2:
+
     def test_h2(self):
-        # assert_equal(expected, h2(*args))
-        raise SkipTest 
+        res = h2('test')
+        assert_equal(res, None) # don't know how to test yet
+
 
 class TestH3:
+
     def test_h3(self):
-        # assert_equal(expected, h3(*args))
-        raise SkipTest 
-
-class TestH:
-    def test_h(self):
-        # assert_equal(expected, h(*args))
-        raise SkipTest 
-
-class TestHinfo:
-    def test_hinfo(self):
-        # assert_equal(expected, hinfo(*args))
-        raise SkipTest 
-
-class TestHsuccess:
-    def test_hsuccess(self):
-        # assert_equal(expected, hsuccess(*args))
-        raise SkipTest 
-
-class TestHwarning:
-    def test_hwarning(self):
-        # assert_equal(expected, hwarning(*args))
-        raise SkipTest 
-
-class TestHerror:
-    def test_herror(self):
-        # assert_equal(expected, herror(*args))
-        raise SkipTest 
-
-class TestHtml:
-    def test_html(self):
-        # assert_equal(expected, html(obj, sep))
-        raise SkipTest # implement your test here
+        res = h3('test')
+        assert_equal(res, None) # don't know how to test yet
 
 class TestH4:
+
     def test_h4(self):
-        # assert_equal(expected, h4(*args))
-        raise SkipTest # implement your test here
+        res = h4('test')
+        assert_equal(res, None) # don't know how to test yet
+
+class TestH:
+
+    def test_h(self):
+        res = h('test')
+        assert_equal(res, None) # don't know how to test yet
+
+
+class TestHinfo:
+
+    def test_hinfo(self):
+        res = hinfo('test')
+        assert_equal(res, None) # don't know how to test yet
+
+
+class TestHsuccess:
+
+    def test_hsuccess(self):
+        res = hsuccess('test')
+        assert_equal(res, None) # don't know how to test yet
+
+
+class TestHwarning:
+
+    def test_hwarning(self):
+        res = hwarning('test')
+        assert_equal(res, None) # don't know how to test yet
+
+
+class TestHerror:
+
+    def test_herror(self):
+        res = herror('test')
+        assert_equal(res, None) # don't know how to test yet
+
+
+class TestHtml:
+
+    def test_html(self):
+        assert_equal(html(2),'2')
+        assert_equal(html('string'),'string')
+        assert_equal(html((1,2,3)),'1 2 3')
+        assert_equal(html((1,2,3),','),'(1,2,3)')
+        assert_equal(html([1,2,3],','),'[1,2,3]')
+
 
 class TestLatex:
+
     def test_latex(self):
         # assert_equal(expected, latex(obj))
-        raise SkipTest # implement your test here
+        raise SkipTest  # implement your test here
+
 
 if __name__ == "__main__":
     runmodule()
