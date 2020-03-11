@@ -596,10 +596,20 @@ def color_range(n, start, end, space='hsv'):
     end = Color(end).convert(space)
     return [Color(v, space=space) for v in itertools2.linspace(start, end, n)]
 
+"""some (astro) physics calculators"""
 
-def lambda2RGB(wavelength):
-    # http://codingmess.blogspot.com/2009/05/conversion-of-wavelength-in-nanometers.html
-    w = int(wavelength)
+def blackBody2Color(tempK):
+    """:param wavelength: black body temperature in K (Sun is 5780)
+    :result: Color
+    """
+    # http://www.vendian.org/mncharity/dir3/blackbody/
+    
+
+def lambda2RGB(w):
+    """:param w: float wavelength in nanometers (between 380 and 780)
+    :result: [R,G,B] float
+    """
+    # http://codingmess.blogspot.com/2009/05/conversion-of-nm-in-nanometers.html
 
     # colour
     if w >= 380 and w < 440:
