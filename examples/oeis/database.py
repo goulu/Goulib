@@ -13,6 +13,7 @@ import sys
 import logging
 
 from Goulib import itertools2
+from Goulib.tests import *
 
 
 class Database:
@@ -37,31 +38,53 @@ class Database:
     @property
     def version(self):
         return str(self.execute("select sqlite_version();")[0][0])
-
-    def __setitem__(self, key, value):
-        key = int(key[1:])
-        value=list(value)
+    
+    def lenghtOf(self, key):
+        ''' return the length of the sequence if it is stored, 0 if it is not'''
+        s = "SELECT MAX(i),repeat FROM seq WHERE id=%d" % int(key[1:])
+        imax = self.execute(s)[0]
+        if imax == (None, None):
+            return 0
+        else:
+            return sum(imax) - 1
         
-        #check if already existing (for performance)
-        s = "SELECT MAX(i),repeat FROM seq WHERE id=%d" % key
-        imax = self.execute(s)
-        try:
-            imax=sum(imax[0])-1
-            if imax>=len(value): #already stored
-                return
-        except:
-            pass # sequence not in db
+    def __contains__(self, key):
+        return self.lenghtOf(key) > 0
+    
+    def store(self, key, value, timeout=1):
+        """
+        :param key: string sequence id
+        :param value: iterable. if finite
+        :param timeout: float , max time in seconds to store digits in db
+        """
+        n = self.lenghtOf(key)
+        if n > 0:
+            try:
+                if  n >= len(value):  # already stored, even more ...
+                    return n
+            except TypeError:
+                pass  # value is a generator, we'll store as much as possible
         
-        #store it
+        from Goulib.decorators import itimeout
+        from multiprocessing import TimeoutError
+        
         cursor = self.db.cursor()
         req = "INSERT OR REPLACE INTO seq (id, i, n, repeat) VALUES"
         i = 1
-        for n, r in itertools2.compress(value):
-            s = req + str((key, i, n, r))
-            cursor.execute(s)
-            i = i + r
-        cursor.close();
-        self.db.commit();
+        try:
+            for n, r in itimeout(itertools2.compress(value), timeout):
+                s = req + str((key[1:], i, n, r))
+                cursor.execute(s)
+                i = i + r
+        except TimeoutError:
+            pass
+        finally:
+            cursor.close();
+            self.db.commit();
+            return i
+
+    def __setitem__(self, key, value):
+        return self.store(key, value)
 
     def __getitem__(self, key):
         key = int(key[1:])
@@ -96,34 +119,36 @@ class Database:
         file = gzip.open(file)
 
         for line in file:
-            l=line.decode("utf-8") 
-            if l[0]!='A':
+            l = line.decode("utf-8") 
+            if l[0] != 'A':
                 logging.info(line)
                 continue
-            l=l.split(',')
-            id=l[0]
-            value=map(int,l[1:-1]) # skip the last \n
-            logging.debug(id)
-            self[id]=value
+            l = l.split(',')
+            id = l[0]
+            value = list(map(int, l[1:-1]))  # skip the last \n
+            logging.debug('%s %d' % (id, len(value)))
+            self[id] = value
+
 
 logging.basicConfig(level=logging.DEBUG)
 path = os.path.dirname(os.path.abspath(__file__))
 database = Database(path + '/oeis.db')
 logging.info("SQLite DB Version : " + database.version)
-database.populate() # 'stripped.gz'
+# database.populate()
 
 # from Goulib.tests import *
 
 
 class TestDatabase:
 
+    def setUp(self):
+        if 'A000045' not in database:
+            import oeis
+            database['A000045'] = oeis.A000045
+
     def test_search(self):
-        res = list(database.search([3, 5, 8, 13]))
+        res = database.search([3, 5, 8, 13])
         assert_true(('A000045', 5) in res)
-        res = list(database.search([0, 0, 0]))
-        res = list(database.search([1, 0, 0, 0, 1]))
-        assert_true(('A000796', 14202) in res)
-        assert_true(('A008683', 1322) in res)
 
 
 _DEBUG = True
