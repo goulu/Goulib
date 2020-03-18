@@ -934,74 +934,21 @@ class Segment2(Line2):
         res.v.normalize()  # because usually we do geometry with it
         return res
 
-
-class Polygon(Geometry):
-
-    def __init__(self, args):
-        """:param args: can be
-        * Polygon
-        * iterator of points
-        """
-        super().__init__()
-        self.p = [Point2(x) for x in args]
-        if self.p[0] == self.p[-1]:
-            self.p = self.p[:-1]
-        self.p = tuple(self.p)  # immutable
-
-    def __repr__(self):
-        return '%s%s' % (self.__class__.__name__, self.p)
-
-    @property
-    def xy(self):
-        """:return: tuple (x,y)"""
-        return (p.xy for p in self.p)
-
+class Multi(Geometry):
+    """ implements Geometry methods for classes containing multiple, iterable Geometry objects
+    """
+    @abstractmethod
     def __iter__(self):
-        return itertools2.pairwise(self.p, Segment2, True)
-
+        """ should be implemented to traverse Geometry components"""
+        pass
+    
+    @abstractmethod
+    def area(self):
+        pass
+    
     def __abs__(self):
         """:return: float perimeter"""
         return sum(x.length for x in self)
-
-    @property
-    def area(self):
-        # https://en.wikipedia.org/wiki/Shoelace_formula
-        res = 0
-        for p1, p2 in itertools2.pairwise(self.p, loop=True):
-            res += p1.x * p2.y - p2.x * p1.y
-        return res / 2
-
-    @property
-    def center(self):
-        """centroid
-
-        :return: Point2 centroid of the Polygon
-        """
-        cx, cy = 0, 0
-        for p1, p2 in itertools2.pairwise(self.p, loop=True):
-            cx += (p1.x + p2.x) * (p1.x * p2.y - p2.x * p1.y)
-            cy += (p1.y + p2.y) * (p1.x * p2.y - p2.x * p1.y)
-        ar = self.area
-        return Point2((1.0 / (6.0 * ar)) * cx, (1.0 / (6.0 * ar)) * cy)
-
-    def __contains__(self, pt):
-        # http://www.ariel.com.au/a/python-point-int-poly.html
-        n = len(self.p)
-        inside = False
-
-        p1x, p1y = self.p[0]
-        for i in range(n + 1):
-            p2x, p2y = self.p[i % n]
-            if pt.y > min(p1y, p2y):
-                if pt.y <= max(p1y, p2y):
-                    if pt.x <= max(p1x, p2x):
-                        if p1y != p2y:
-                            xinters = (pt.y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
-                        if p1x == p2x or pt.x <= xinters:
-                            inside = not inside
-            p1x, p1y = p2x, p2y
-
-        return inside
     
     def point(self, u):
         ":return: Point2 or Point3 at parameter u"
@@ -1016,7 +963,7 @@ class Polygon(Geometry):
         u = u % self.length
         for s in self:
             if u <= s.lenght:
-                return s.v
+                return s.tangent(u)
             u = u - s.length
     
     def _u(self, pt):
@@ -1068,6 +1015,72 @@ class Polygon(Geometry):
     
     def _connect_line2(self, other):
         return self.connect(other)
+
+class Polygon(Multi):
+
+    def __init__(self, args):
+        """:param args: can be
+        * Polygon
+        * iterator of points
+        """
+        super().__init__()
+        self.p = [Point2(x) for x in args]
+        if self.p[0] == self.p[-1]:
+            self.p = self.p[:-1]
+        self.p = tuple(self.p)  # immutable
+
+    def __repr__(self):
+        return '%s%s' % (self.__class__.__name__, self.p)
+
+    @property
+    def xy(self):
+        """:return: tuple (x,y)"""
+        return (p.xy for p in self.p)
+
+    def __iter__(self):
+        return itertools2.pairwise(self.p, Segment2, True)
+
+    @property
+    def area(self):
+        # https://en.wikipedia.org/wiki/Shoelace_formula
+        res = 0
+        for p1, p2 in itertools2.pairwise(self.p, loop=True):
+            res += p1.x * p2.y - p2.x * p1.y
+        return res / 2
+
+    @property
+    def center(self):
+        """centroid
+
+        :return: Point2 centroid of the Polygon
+        """
+        cx, cy = 0, 0
+        for p1, p2 in itertools2.pairwise(self.p, loop=True):
+            cx += (p1.x + p2.x) * (p1.x * p2.y - p2.x * p1.y)
+            cy += (p1.y + p2.y) * (p1.x * p2.y - p2.x * p1.y)
+        ar = self.area
+        return Point2((1.0 / (6.0 * ar)) * cx, (1.0 / (6.0 * ar)) * cy)
+
+    def __contains__(self, pt):
+        # http://www.ariel.com.au/a/python-point-int-poly.html
+        n = len(self.p)
+        inside = False
+
+        p1x, p1y = self.p[0]
+        for i in range(n + 1):
+            p2x, p2y = self.p[i % n]
+            if pt.y > min(p1y, p2y):
+                if pt.y <= max(p1y, p2y):
+                    if pt.x <= max(p1x, p2x):
+                        if p1y != p2y:
+                            xinters = (pt.y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                        if p1x == p2x or pt.x <= xinters:
+                            inside = not inside
+            p1x, p1y = p2x, p2y
+
+        return inside
+    
+
 
     
 class Rect(Polygon):
