@@ -507,29 +507,18 @@ print(Polygon.__bases__)
 print(Rect.__bases__)
 
 
-class Spline(Entity, Geometry):
+class Spline(Polygon):
     """cubic spline segment"""
 
     def __init__(self, points):
         """:param points: list of (x,y) tuples"""
-        super().__init__()
-        self.p = [Point2(xy) for xy in points]
+        super().__init__(points)
 
-    @property
-    def start(self):
-        return self.p[0]
+    def __iter__(self):
+        # TODO: https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.interpolate.CubicSpline.html
+        return super().__iter__()
 
-    @property
-    def end(self):
-        return self.p[-1]
 
-    @property
-    def xy(self):
-        return [pt.xy for pt in self.p]
-
-    def __abs__(self):
-        """:return: float (very) approximate length"""
-        return sum((x.dist(self.p[i - 1]) for i, x in enumerate(self.p) if i > 0))
 
     def bbox(self):
         res = BBox()
@@ -543,7 +532,15 @@ class Spline(Entity, Geometry):
 
     def _apply_transform(self, t):
         self.p = [t * p for p in self.p]
-        
+
+    def area(self):
+        if self.isclosed() :
+            return 0
+        else:
+            raise NotImplementedError
+
+
+
 
 '''
 def Spline(pts):
@@ -625,6 +622,7 @@ class _Group(Entity, Multi):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group
         flatten because a PatchCollection cannot contain PatchCollection s
         """
+        # works for Group s and Instance s
         from matplotlib.collections import PatchCollection
         from matplotlib.patches import Patch
 
@@ -638,6 +636,7 @@ class _Group(Entity, Multi):
             colls.append(PatchCollection(rest, match_original=True))
         return patches
 
+
     def to_dxf(self, **kwargs):
         """:return: flatten list of dxf entities"""
         res = []
@@ -647,10 +646,6 @@ class _Group(Entity, Multi):
                 r = [r]
             res += r
         return res
-
-    @decorators.abstractmethod
-    def patch(self, **kwargs):
-        pass
 
 
 class Group(list, _Group):
@@ -689,18 +684,18 @@ class Group(list, _Group):
         """
         if entity is None:
             return None  # to show nothing was done
-        
+
         entity.setattr(**kwargs)
-        
+
         for c in self.chains():  # try to append to existing chain
             if c.append(entity):
                 return c
 
         if isinstance(entity, (Segment2, Arc2, Spline)):  # potentialy chainable
             entity = Chain([entity])
-            
+
         super().append(entity)
-            
+
         return self
 
     def extend(self, entities, **kwargs):
@@ -724,23 +719,6 @@ class Group(list, _Group):
         super().reverse()  # reverse in place
         for e in self:
             e.swap()
-
-    def patch(self, **kwargs):
-        """:return: :class:`~matplotlib.collections.PatchCollection` corresponding to group,
-        flatten because a PatchCollection cannot contain PatchCollection s
-        """
-        from matplotlib.collections import PatchCollection
-        from matplotlib.patches import Patch
-
-        items = []
-
-        for e in self:
-            items.append(e.patch(**kwargs))
-
-        rest, colls = itertools2.filter2(items, lambda x: isinstance(x, Patch))
-        if rest:
-            colls.append(PatchCollection(rest, match_original=True))
-        return colls
 
     def from_dxf(self, dxf, layers=None, only=[], ignore=['POINT'], trans=identity, flatten=False):
         """
@@ -788,6 +766,19 @@ class Instance(_Group):
         self.group = group
         self.trans = trans
 
+    def __repr__(self):
+        return '%s %s' % (self.__class__.__name__, self.group)
+
+    def _apply_transform(self, trans):
+        #unlike other Entity-es, we don't apply it to avoid duplicating the group's geometry
+        self.trans = trans * self.trans
+
+    def __iter__(self):
+        # TODO: optimize when trans is identity
+        for e in self.group:
+            res = self.trans * e
+            yield res
+
     @staticmethod
     def from_dxf(e, blocks, mat3):
         """
@@ -803,21 +794,7 @@ class Instance(_Group):
         res.layer = e.layer
         return res
 
-    def __repr__(self):
-        return '%s %s' % (self.__class__.__name__, self.group)
 
-    def __iter__(self):
-        # TODO: optimize when trans is identity
-        for e in self.group:
-            res = self.trans * e
-            yield res
-
-    def _apply_transform(self, trans):
-        self.trans = trans * self.trans
-
-    def patch(self, **kwargs):
-        return Group([e for e in self]).patch(**kwargs)
-    
     def area(self):
         return self.group.area*self.trans.mag**2
 
@@ -852,20 +829,24 @@ class Chain(Group):
 
         if len(self) == 0:  # init the chain with edge
             return -1, False
+        
+        try:
 
-        if isclose(self.end.distance(edge.start), 0, abs_tol=abs_tol):
-            return -1, False  # append
-
-        if isclose(self.start.distance(edge.end), 0, abs_tol=abs_tol):
-            return 0, False  # prepend
-
-        if not allow_swap:
-            return None, False
-
-        if isclose(self.end.distance(edge.end), 0, abs_tol=abs_tol):
-            return -1, True  # append swapped
-        if isclose(self.start.distance(edge.start), 0, abs_tol=abs_tol):
-            return 0, True  # prepend swapped
+            if isclose(self.end.distance(edge.start), 0, abs_tol=abs_tol):
+                return -1, False  # append
+    
+            if isclose(self.start.distance(edge.end), 0, abs_tol=abs_tol):
+                return 0, False  # prepend
+    
+            if not allow_swap:
+                return None, False
+    
+            if isclose(self.end.distance(edge.end), 0, abs_tol=abs_tol):
+                return -1, True  # append swapped
+            if isclose(self.start.distance(edge.start), 0, abs_tol=abs_tol):
+                return 0, True  # prepend swapped
+        except:
+            pass
 
         return None, False
 
