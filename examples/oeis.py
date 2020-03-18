@@ -318,6 +318,10 @@ A056725 = exp_sequences(9, 10, -1)[2]
 A046867 = exp_sequences(10, 11, -1)[2]
 A079907 = exp_sequences(11, 12, -1)[2]
 
+A111010 = Sequence(None, lambda k:(3**k - (-1)**k)//4)
+A066443=Sequence(None, lambda k:(3**(2*k+1)+1)//4)
+A066443.desc="Number of distinct paths of length 2n+1 along edges of a unit cube between two fixed adjacent vertices."
+
 
 def pow10m3():
     p, n = 0, 1
@@ -1149,5 +1153,8 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20, A061909):
-        print(n)
+    for n in take(20, A066443):
+        if is_prime(n):
+            print(n)
+        else:
+            print(-n)
