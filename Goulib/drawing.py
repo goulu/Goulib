@@ -460,7 +460,7 @@ class Entity(plot.Plot):
 
         args = itertools2.subdict(kwargs, ('color', 'linewidth', 'alpha'))
 
-        p = self.patches(**args)
+        p = self.patch(**args)
 
         from matplotlib.patches import Patch
         patches, artists = itertools2.filter2(p, lambda e: isinstance(e, Patch))
@@ -501,7 +501,10 @@ Point2.__bases__ += (Entity,)
 Segment2.__bases__ += (Entity,)
 Circle.__bases__ += (Entity,)  # adds it also to Arc2
 
-Polygon.__bases__ += (Entity,)  # adds it also to Arc2
+Polygon.__bases__ += (Entity,)
+print(Polygon.__bases__)
+
+print(Rect.__bases__)
 
 
 class Spline(Entity, Geometry):
@@ -524,8 +527,7 @@ class Spline(Entity, Geometry):
     def xy(self):
         return [pt.xy for pt in self.p]
 
-    @property
-    def length(self):
+    def __abs__(self):
         """:return: float (very) approximate length"""
         return sum((x.dist(self.p[i - 1]) for i, x in enumerate(self.p) if i > 0))
 
@@ -541,6 +543,7 @@ class Spline(Entity, Geometry):
 
     def _apply_transform(self, t):
         self.p = [t * p for p in self.p]
+        
 
 '''
 def Spline(pts):
@@ -553,7 +556,7 @@ def Spline(pts):
 '''
 
 
-class _Group(Entity, Geometry):
+class _Group(Entity, Multi):
     """ abstract class for iterable Entities"""
 
     def bbox(self, filter=None):
@@ -569,10 +572,6 @@ class _Group(Entity, Geometry):
                 except:
                     pass
         return res
-
-    @property
-    def length(self):
-        return sum((entity.length for entity in self))
 
     def intersect(self, other):
         """
@@ -622,7 +621,7 @@ class _Group(Entity, Geometry):
             recurse = True
         return min((other.connect(e).swap() if recurse else e.connect(other) for e in self), key=lambda e: e.length)
 
-    def patches(self, **kwargs):
+    def patch(self, **kwargs):
         """:return: list of :class:`~matplotlib.patches.Patch` corresponding to group
         flatten because a PatchCollection cannot contain PatchCollection s
         """
@@ -818,6 +817,9 @@ class Instance(_Group):
 
     def patch(self, **kwargs):
         return Group([e for e in self]).patch(**kwargs)
+    
+    def area(self):
+        return self.group.area*self.trans.mag**2
 
 
 class Chain(Group):
