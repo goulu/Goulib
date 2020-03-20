@@ -896,9 +896,7 @@ class Plane(Geometry):
     def _connect_plane(self, other):
         return _connect_plane_plane(other, self)
 
-    # a b c d
-
-
+# a b c d
 # e f g h
 # i j k l
 # m n o p

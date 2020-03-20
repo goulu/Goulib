@@ -276,9 +276,7 @@ class TestMatrix3:
         raise SkipTest
 
     def test___call__(self):
-        # matrix3 = Matrix3()
-        # assert_equal(expected, matrix3.__call__(other))
-        raise SkipTest
+        assert_equal(self.mat123(Vector2(10,20)),(90,120))
 
     def test___getitem__(self):
         assert_equal(self.mat456.f, 8)  # central element
