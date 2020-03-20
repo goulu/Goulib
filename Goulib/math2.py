@@ -718,21 +718,23 @@ def levenshtein(seq1, seq2):
 # moved to stats.py
 
 # numbers functions
-# mostly from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
+# originally from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
 
-def recurrence(signature, values, cst=0, max=None, mod=0):
+def recurrence(factors, values, cst=0, max=None, mod=0):
     '''general generator for recurrences
 
     :param signature: factors defining the recurrence
     :param values: list of initial values
     '''
-    values = list(values)  # to allow tuples or iterators
-    factors = list(reversed(signature))
+    if not isinstance(factors, list):
+        signature = list(factors)  # to allow tuples or iterators
+    if not isinstance(values, list):
+        values = list(values)  # to allow tuples or iterators
     for n in values:
         if mod:
             n = n % mod
         yield n
-    values = values[-len(signature):]
+    values = values[-len(factors):]
     while True:
         n = dot_vv(factors, values)
         if max and n > max:
@@ -741,8 +743,16 @@ def recurrence(signature, values, cst=0, max=None, mod=0):
         if mod:
             n = n % mod
         yield n
-        values = values[1:]
+        values.pop(0);
         values.append(n)
+
+# https://en.wikipedia.org/wiki/Lucas_sequence        
+def lucasU(p,q):
+    return recurrence([-q,p],[0,1])
+
+def lucasV(p,q):
+    return recurrence([-q,p],[2,p])
+    
 
 
 def kfibonacci_gen(k, init=None, max=None, mod=0):
