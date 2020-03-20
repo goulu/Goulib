@@ -129,12 +129,11 @@ class Database:
             logging.debug('%s %d' % (id, len(value)))
             self[id] = value
 
-
 logging.basicConfig(level=logging.DEBUG)
 path = os.path.dirname(os.path.abspath(__file__))
 database = Database(path + '/oeis.db')
 logging.info("SQLite DB Version : " + database.version)
-# database.populate()
+
 
 # from Goulib.tests import *
 
@@ -153,6 +152,7 @@ class TestDatabase:
 
 _DEBUG = True
 if __name__ == "__main__":
+    database.populate()
     if _DEBUG:
         runmodule(logging.DEBUG, argv=['-x', '-v'])
     else:

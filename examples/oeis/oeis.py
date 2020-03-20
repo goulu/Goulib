@@ -333,6 +333,9 @@ A006567 = A000040.filter(lambda x: not is_palindromic(x)
                          and is_prime(reverse(x)))
 A006567.desc = "Emirps (primes whose reversal is a different prime). "
 
+#ulam spiral
+A244802 = Sequence(None, lambda n:12 * (n+1) ** 2 - 27 * (n+1) + 16, desc="The 60º spoke (or ray) of a hexagonal spiral of Ulam.")
+
 # see https://blog.plover.com/math/dd.html
 
 
@@ -761,17 +764,25 @@ def bell():
 
 A000110 = Sequence(bell)
 
-# Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).
-A000129 = Sequence(recurrence([2, 1], [0, 1]))
+# https://en.wikipedia.org/wiki/Lucas_sequence#Specific_names
+A000032 = Sequence(lucasV(1, -1), desc="Lucas numbers beginning at 2: L(n) = L(n-1) + L(n-2), L(0) = 2, L(1) = 1.");
+A214733 = Sequence(lucasU(-1, 3))
+A128834 = Sequence(lucasU(1, 1), desc="Periodic sequence 0,1,1,0,-1,-1,...");
+A087204 = Sequence(lucasV(1, 1), desc="Period 6: repeat [2, 1, -1, -2, -1, 1].");
+A107920 = Sequence(lucasU(1, 2), desc="Lucas and Lehmer numbers with parameters (1+-sqrt(-7))/2."); 
+A002249 = Sequence(lucasV(1, 2), desc="a(n) = a(n-1) - 2*a(n-2) with a(0) = 2, a(1) = 1."); 
+
+
+A000129 = Sequence(lucasU(2, -1), desc="Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).")
+
+A001045 = Sequence(recurrence([1, 2], [0, 1]),
+                   desc="Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1."
+                   )
 
 A000142 = Sequence(factorial_gen)
 A000142.desc = "Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S_n, number of permutations of n letters."
 
 A061006 = Sequence(1, lambda n: mod_fac(n - 1, n))
-
-A001045 = Sequence(recurrence([1, 2], [0, 1]),
-                   desc="Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1."
-                   )
 
 # operations on digits
 
@@ -1140,6 +1151,8 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    BBernouilli = A027641/A027642;
-    for n in take(20, BBernouilli):
-        print(n)
+    for n in take(20, A244802):
+        if is_prime(n):
+            print(n,'*')
+        else:
+            print(n)
