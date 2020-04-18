@@ -111,12 +111,8 @@ def itimeout(iterable, timeout):
     :yield: items in iterator until timeout occurs
     :raise: multiprocessing.TimeoutError if timeout occured
     """
-    if False:  # handle debugger better one day ...
-        n = 100*timeout
-        for i, x in enumerate(iterable):
-            yield x
-            if i > n:
-                break
+    if not timeout: # TODO: or debugger
+        return iterable
     else:
         timer = Timer(timeout, lambda: None)
         timer.start()
