@@ -333,8 +333,8 @@ A006567 = A000040.filter(lambda x: not is_palindromic(x)
                          and is_prime(reverse(x)))
 A006567.desc = "Emirps (primes whose reversal is a different prime). "
 
-#ulam spiral
-A244802 = Sequence(None, lambda n:12 * (n+1) ** 2 - 27 * (n+1) + 16, desc="The 60º spoke (or ray) of a hexagonal spiral of Ulam.")
+# ulam spiral
+A244802 = Sequence(None, lambda n:12 * (n + 1) ** 2 - 27 * (n + 1) + 16, desc="The 60º spoke (or ray) of a hexagonal spiral of Ulam.")
 
 # see https://blog.plover.com/math/dd.html
 
@@ -473,7 +473,7 @@ A037074 = Sequence(map(mul, twin_primes()),
 
 
 def count_10_exp(iterable):
-    """generates number of iterable up to 10^n."""
+    '''generates number of iterable up to 10^n.'''
     l = 10
     c = 0
     for n in iterable:
@@ -558,9 +558,9 @@ A006881 = Sequence(1, None, is_product_of_2_primes,
 
 
 def is_powerful(n):
-    """if a prime p divides n then p^2 must also divide n
+    '''if a prime p divides n then p^2 must also divide n
     (also called squareful, square full, square-full or 2-full numbers).
-    """
+    '''
     for f in unique(prime_factors(n)):
         if n % (f * f):
             return False
@@ -599,7 +599,7 @@ A008683 = Sequence(
 
 
 def is_A055932(n):
-    """:return: True if prime divisors of n are consecutive primes"""
+    ''':return: True if prime divisors of n are consecutive primes'''
     count = 0
     lastf = 1
     for f in prime_divisors(n):
@@ -707,7 +707,7 @@ A000108 = Sequence(catalan_gen, catalan)
 
 
 def recaman():
-    """Generate Recaman's sequence and additional info"""
+    '''Generate Recaman's sequence and additional info'''
     # from https://oeis.org/A005132/a005132.py.txt
     s, x = set(), 0
     yield x, None, 0
@@ -750,8 +750,8 @@ A051005.desc = 'prime values of PartitionsQ.'
 
 
 def bell():
-    """Bell or exponential numbers: number of ways to partition a set of n labeled elements.
-    """
+    '''Bell or exponential numbers: number of ways to partition a set of n labeled elements.
+    '''
 
     blist, b = [1], 1
     yield 1
@@ -771,7 +771,6 @@ A128834 = Sequence(lucasU(1, 1), desc="Periodic sequence 0,1,1,0,-1,-1,...");
 A087204 = Sequence(lucasV(1, 1), desc="Period 6: repeat [2, 1, -1, -2, -1, 1].");
 A107920 = Sequence(lucasU(1, 2), desc="Lucas and Lehmer numbers with parameters (1+-sqrt(-7))/2."); 
 A002249 = Sequence(lucasV(1, 2), desc="a(n) = a(n-1) - 2*a(n-2) with a(0) = 2, a(1) = 1."); 
-
 
 A000129 = Sequence(lucasU(2, -1), desc="Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).")
 
@@ -817,7 +816,7 @@ A046034 = Sequence(None, None, lambda n: digits_in(n, set((2, 3, 5, 7))),
 
 
 def sumdigpow(p, desc=None):
-    """sum of p-th powers of digits"""
+    '''sum of p-th powers of digits'''
     return Sequence(None, lambda x: digsum(x, p), desc=desc)
 
 
@@ -831,7 +830,7 @@ A055012 = sumdigpow(
 
 
 def armstrong_gen():
-    """generates narcissistic numbers, but not in sequence"""
+    '''generates narcissistic numbers, but not in sequence'''
     from itertools import combinations_with_replacement
     for k in count(1):
         a = [i ** k for i in range(10)]
@@ -911,7 +910,7 @@ A001101 = A005349.filter(lambda n: is_prime(is_harshad(n)),
 
 
 def itersumdig2(start):
-    """Take sum of squares of digits of previous term."""
+    '''Take sum of squares of digits of previous term.'''
     return Sequence(
         iterate(lambda x: digsum(x, 2), start),
         desc="Take sum of squares of digits of previous term, starting with %d" % start
@@ -973,15 +972,15 @@ A005151 = Sequence(recurse(summarize, 1),
 A006960 = Sequence(map(operator.itemgetter(0), lychrel_seq(196)))
 
 A023108 = Sequence(None, None, is_lychrel)
-"""Positive integers which apparently never result in a palindrome
+'''Positive integers which apparently never result in a palindrome
 under repeated applications of the function f(x) = x + (x with digits reversed).
 Also called Lychrel numbers
-"""
+'''
 
 
 def a023109():
-    """Smallest number that requires exactly n iterations of Reverse and Add to reach a palindrome.
-    """
+    '''Smallest number that requires exactly n iterations of Reverse and Add to reach a palindrome.
+    '''
 
     @decorators.memoize  # very useful for A023109
     def _(n, limit=96):
@@ -1013,7 +1012,7 @@ A023109 = Sequence(a023109)
 
 
 def a033665(n):
-    """Number of 'Reverse and Add' steps needed to reach a palindrome starting at n, or -1 if n never reaches a palindrome."""
+    '''Number of 'Reverse and Add' steps needed to reach a palindrome starting at n, or -1 if n never reaches a palindrome.'''
     limit = 96
     n = lychrel_count(n, limit)
     return -1 if n >= limit else n
@@ -1089,10 +1088,10 @@ A121727 = Sequence(primitive_triples, desc=desc) \
     .sort(lambda x: (x[0] * x[1], x[2])) \
     .apply(lambda x: x[2])
 
-"""
+'''
 A048098=A006530>A000006
 A048098.desc="Numbers n that are sqrt(n)-smooth: if p | n then p^2 <= n when p is prime."
-"""
+'''
 
 desc = "Kempner numbers: smallest positive integer m such that n divides m!."
 # A002034=Sequence(1,kempner,desc=desc) # bug for 128
@@ -1142,6 +1141,15 @@ A285361 = Sequence(
 A088002 = Sequence(recurrence((0, -1, 0, 0, -1), (1, 0, 0, 0, 0)),
                    desc="Expansion of (1+x^2)/(1+x^2+x^5)"
                    )
+
+
+def fA051885(n):
+    d, m = divmod(n, 9)
+    return (m + 1) * 10 ** d - 1
+
+
+A051885 = Sequence(None, fA051885, None, "Smallest number whose sum of digits is n.")
+
 # Build oeis dict by module introspection : Simple and WOW !
 seqs = globals().copy()
 oeis = {}
@@ -1151,8 +1159,24 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20, A244802):
-        if is_prime(n):
-            print(n,'*')
-        else:
-            print(n)
+            
+    S = A051885.accumulate(modulo=1000000007)
+    
+    def S(k:int) -> int:  # overwrite with faster function
+        n,r = divmod(k, 9)
+        r = r + 2
+        return (((r-1)*r + 10) * 10**n - 2*(r + 9*n + 4))/2
+    
+    assert(S(20) == 1074)
+    assert(S(49) == 1999945)
+    
+    def S(k:int, m=1000000007) -> int:  # modular version
+        n,r = divmod(k, 9)
+        r = r + 2
+        return ((((r-1)*r + 10) * pow(10, n, m) - 2*(r + 9*n + 4)) * mod_inv(2, m)) % m
+    
+    assert(S(20) == 1074)
+    assert(S(49) == 1999945)
+
+    B = A000045.apply(S)
+    print(B.accumulate(modulo=1000000007)[90]-1)
