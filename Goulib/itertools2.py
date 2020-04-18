@@ -72,14 +72,21 @@ def index(value, iterable):
 
 # accessors
 
+def ith(iterable,i):
+    """
+    :result: i-th element in the iterable
+    """
+    
+    for j,x in enumerate(iterable):
+        if i==j:
+            return x  # works in all cases by definition of iterable
+    raise IndexError
 
 def first(iterable):
     """
     :result: first element in the iterable
     """
-    for x in iterable:
-        return x  # works in all cases by definition of iterable
-    raise IndexError
+    return ith(iterable,0)
 
 
 def last(iterable):
@@ -337,7 +344,7 @@ def iterate(func, arg):
         arg = func(arg)
 
 
-def accumulate(iterable, func=operator.add, skip_first=False):
+def accumulate(iterable, func=operator.add, skip_first=False, modulo=0):
     """Return running totals. extends `python.accumulate`
 
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
@@ -352,6 +359,8 @@ def accumulate(iterable, func=operator.add, skip_first=False):
                 continue
         else:
             total = func(total, x)
+        if modulo:
+            total = total % modulo
         yield total
 
 
@@ -436,6 +445,7 @@ def compress(iterable, key=identity, buffer=None):
         
 def decompress(iterable):
     return flatten(itertools.chain((repeat(item, count) for (item, count) in iterable)))
+
     
 def unique(iterable, key=None, buffer=100):
     """generate unique elements, preserving order.
