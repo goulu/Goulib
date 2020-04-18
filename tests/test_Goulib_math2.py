@@ -791,12 +791,6 @@ class TestReverse:
         raise SkipTest
 
 
-class TestIsPermutation:
-    def test_is_permutation(self):
-        # assert_equal(expected, is_permutation(num1, num2, base))
-        raise SkipTest
-
-
 class TestLychrelSeq:
     def test_lychrel_seq(self):
         # assert_equal(expected, lychrel_seq(n))
