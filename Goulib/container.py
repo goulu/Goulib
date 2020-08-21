@@ -229,6 +229,9 @@ class Sequence(object):
             containf,
             desc
         )
+        
+    def __call__(self, other):
+        return other.apply(self.itemf)
 
     def filter(self, f, desc=''):
         return Sequence(
