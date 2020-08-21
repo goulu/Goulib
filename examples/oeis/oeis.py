@@ -669,6 +669,8 @@ A003147 = A000040.filter(
 A000045 = Sequence(fibonacci_gen, fibonacci, is_fibonacci,
                    desc="Fibonacci numbers: F(n) = F(n-1) + F(n-2) with F(0) = 0 and F(1) = 1")
 
+A000071 = A000045.accumulate(init=[0])
+
 A082115 = Sequence(fibonacci_gen(mod=3), desc='Fibonacci numbers modulo 3')
 A003893 = Sequence(fibonacci_gen(mod=10), desc='Fibonacci numbers modulo 10')
 
@@ -1159,24 +1161,8 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-            
-    S = A051885.accumulate(modulo=1000000007)
-    
-    def S(k:int) -> int:  # overwrite with faster function
-        n,r = divmod(k, 9)
-        r = r + 2
-        return (((r-1)*r + 10) * 10**n - 2*(r + 9*n + 4))/2
-    
-    assert(S(20) == 1074)
-    assert(S(49) == 1999945)
-    
-    def S(k:int, m=1000000007) -> int:  # modular version
-        n,r = divmod(k, 9)
-        r = r + 2
-        return ((((r-1)*r + 10) * pow(10, n, m) - 2*(r + 9*n + 4)) * mod_inv(2, m)) % m
-    
-    assert(S(20) == 1074)
-    assert(S(49) == 1999945)
-
-    B = A000045.apply(S)
-    print(B.accumulate(modulo=1000000007)[90]-1)
+    for n in take(20, A244802):
+        if is_prime(n):
+            print(n,'*')
+        else:
+            print(n)
