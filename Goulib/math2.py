@@ -1326,6 +1326,9 @@ def factorize(n):
 def factors(n):
     for (p, e) in factorize(n):
         yield p ** e
+        
+def sigma(n):
+    return sum(divisors(n))
 
 
 def number_of_divisors(n):
