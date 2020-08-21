@@ -217,9 +217,7 @@ A002182 = Sequence(record_index(A000005, count(1)),
                    desc='Highly composite numbers, definition (1): where d(n), the number of divisors of n (A000005), increases to a record.'
                    )
 
-A000203 = Sequence(1, lambda n: sum(divisors(n)),
-                   desc='sigma(n), the sum of the divisors of n. Also called sigma_1(n).'
-                   )
+A000203 = Sequence(1, sigma,desc='sigma(n), the sum of the divisors of n. Also called sigma_1(n).')
 
 A033880 = Sequence(1, abundance)
 
@@ -785,6 +783,9 @@ A000142.desc = "Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S
 
 A061006 = Sequence(1, lambda n: mod_fac(n - 1, n))
 
+A062569 =A000203(A000142)
+A062569.desc="a(n) = sigma(n!)."
+
 # operations on digits
 
 A007953 = Sequence(None, digsum, True,
@@ -1161,8 +1162,5 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20, A244802):
-        if is_prime(n):
-            print(n,'*')
-        else:
-            print(n)
+    for n in take(20, A062569):
+        print(n)
