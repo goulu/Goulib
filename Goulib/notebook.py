@@ -43,19 +43,19 @@ def html(obj, sep=None):
     return str(obj)
 
 def h1(*args):
-    display(HTML(tag('h1',html(args))))
+    return display(HTML(tag('h1',html(args))))
 
 def h2(*args):
-    display(HTML(tag('h2',html(args))))
+    return display(HTML(tag('h2',html(args))))
 
 def h3(*args):
-    display(HTML(tag('h3',html(args))))
+    return display(HTML(tag('h3',html(args))))
 
 def h4(*args):
-    display(HTML(tag('h4',html(args))))
+    return display(HTML(tag('h4',html(args))))
 
 def h(*args):
-    display(HTML(html(args)))
+    return display(HTML(html(args)))
 
 #redefine "print" for notebooks ...
 try: #http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
@@ -67,13 +67,13 @@ else:
     # print = h # this is ok in Python 3, but not before
 
 def hinfo(*args):
-    display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))
+    return display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))
 def hsuccess(*args):
-    display(HTML(tag('div',html(args),style="background-color:#5cb85c;color:#ffffff")))
+    return display(HTML(tag('div',html(args),style="background-color:#5cb85c;color:#ffffff")))
 def hwarning(*args):
-    display(HTML(tag('div',html(args),style="background-color:#f0ad4e;color:#ffffff")))
+    return display(HTML(tag('div',html(args),style="background-color:#f0ad4e;color:#ffffff")))
 def herror(*args):
-    display(HTML(tag('div',html(args),style="background-color:#d9534f;color:#ffffff")))
+    return display(HTML(tag('div',html(args),style="background-color:#d9534f;color:#ffffff")))
 
 def latex(obj):
     """ to force LaTeX representation """

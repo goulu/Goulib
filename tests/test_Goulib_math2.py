@@ -12,6 +12,13 @@ from Goulib.math2 import *
 import Goulib.itertools2
 
 
+class TestLongint:
+    def test_longint(self):
+        assert_equal(longint(1,3),1000)
+        assert_equal(longint(10,2),1000)
+        assert_equal(longint(0.1,4),1000)
+        assert_equal(longint(0.123,4),1230)
+        
 class TestSign:
     def test_sign(self):
         assert_equal(sign(0.0001), 1)
@@ -788,12 +795,6 @@ class TestLucasLehmer:
 class TestReverse:
     def test_reverse(self):
         # assert_equal(expected, reverse(i))
-        raise SkipTest
-
-
-class TestIsPermutation:
-    def test_is_permutation(self):
-        # assert_equal(expected, is_permutation(num1, num2, base))
         raise SkipTest
 
 

@@ -67,8 +67,8 @@ def cmyk2rgb(cmyk, **kwargs):
 
     """
     c, m, y, k = cmyk
-    w = 1-k
-    return ((1-c)*w, (1-m)*w, (1-y)*w)
+    w = 1 - k
+    return ((1 - c) * w, (1 - m) * w, (1 - y) * w)
 
 
 def xyz2xyy(xyz, **kwargs):
@@ -89,7 +89,7 @@ def xyz2xyy(xyz, **kwargs):
         # to 0, thus resulting in ZeroDivisionError later
         x, y, _ = xyz2xyy(color['white'].xyz)
         return (x, y, 0.0)
-    return (xyz[0]/s, xyz[1]/s, xyz[1])
+    return (xyz[0] / s, xyz[1] / s, xyz[1])
 
 
 def xyy2xyz(xyY, **kwargs):
@@ -108,8 +108,8 @@ def xyy2xyz(xyY, **kwargs):
     x, y, Y = xyY
     if y == 0:
         return (0, 0, 0)
-    X = x*Y/y
-    Z = (1-x-y)*Y/y
+    X = x * Y / y
+    Z = (1 - x - y) * Y / y
     return (X, Y, Z)
 
 # skimage.color has several useful color conversion routines, but for images
@@ -117,6 +117,7 @@ def xyy2xyz(xyY, **kwargs):
 
 
 def _skadapt(f, **kwargs):
+
     def adapted(arr, **kwargs):
         arr = numpy.asanyarray(arr)
         if arr.ndim == 1:
@@ -128,6 +129,7 @@ def _skadapt(f, **kwargs):
             return res.reshape(arr.shape[-1])
         else:
             return f(arr, **kwargs)
+
     return adapted
 
 
@@ -219,7 +221,7 @@ class Color(object):
 
         if space == 'rgb':
             if max(value) > 1:
-                value = tuple(_/255. for _ in value)
+                value = tuple(_ / 255. for _ in value)
             # rgb only, not whiter than white...
             value = math2.sat(value[:3], 0, 1)
         if space != 'hex':  # force to floats
@@ -239,7 +241,7 @@ class Color(object):
             if self.hex in color_lookup:
                 self._name = color_lookup[self.hex].name
             else:
-                self._name = '~'+nearest_color(self).name
+                self._name = '~' + nearest_color(self).name
         return self._name
 
     def convert(self, target, **kwargs):
@@ -332,7 +334,7 @@ class Color(object):
 
     def __add__(self, other):
         if isinstance(other, image.Image):
-            return image.Image(size=other.size, color=self.native, mode=self.space)+other
+            return image.Image(size=other.size, color=self.native, mode=self.space) + other
         return Color(self.compose(other, math2.vecadd), illuminant=self.illuminant)
 
     def __radd__(self, other):
@@ -343,12 +345,12 @@ class Color(object):
     def __sub__(self, other):
         if isinstance(other, image.Image):
             mode = other.mode
-            return image.Image(size=other.size, color=self.convert(mode), mode=mode)-other
+            return image.Image(size=other.size, color=self.convert(mode), mode=mode) - other
         return Color(self.compose(other, math2.vecsub), illuminant=self.illuminant)
 
     def __mul__(self, factor):
         if factor < 0:
-            return (-self)*(-factor)
+            return (-self) * (-factor)
         l, a, b = self.lab
         l *= factor
         res = Color((l, a, b), 'lab', illuminant=self.illuminant)
@@ -356,7 +358,7 @@ class Color(object):
 
     def __neg__(self):
         """ complementary color"""
-        return color['white']-self
+        return color['white'] - self
 
     def deltaE(self, other):
         """color difference according to CIEDE2000
@@ -405,7 +407,7 @@ class Palette(OrderedDict):
         """
         if isinstance(data, mplcolors.Colormap):
             for i in range(keys):
-                self[i] = Color(data(i/(keys-1)))  # RGB
+                self[i] = Color(data(i / (keys - 1)))  # RGB
         elif isinstance(keys, int):
             for i, v in itertools2.enumerates(data):
                 self[i] = Color(v)  # v.space of RGB
@@ -429,10 +431,11 @@ class Palette(OrderedDict):
         return '%s of %d colors' % (self.__class__.__name__, len(self))
 
     def _repr_html_(self):
+
         def tooltip(k):
             c = self[k]
             res = '[%s] %s (%s)\n' % (k, c.name, c.illuminant)
-            return res+'\n'.join('%s = %s' % (k, c.str(k)) for k in c._values)
+            return res + '\n'.join('%s = %s' % (k, c.str(k)) for k in c._values)
 
         mode = 'inline' if len(self) > 256 else 'flex'
 
@@ -441,18 +444,18 @@ class Palette(OrderedDict):
         style = 'display:%s-block; min-width: 1px; ' % mode
         style += ' flex-basis: 90%%;'
         style += ' background:%s; color:%s;'
-        cell = '<div style="'+style+'" title="%s">&nbsp;</div>'
+        cell = '<div style="' + style + '" title="%s">&nbsp;</div>'
         for k in self:
             c = self[k]
             # c2=nearest_color(c,labels,opt=max) #chose the label color with max difference to pantone color
             res += cell % (c.hex, c.hex, tooltip(k))
-        return res+'</div>'
+        return res + '</div>'
 
     def patches(self, wide=64, size=(16, 16)):
         """Image made of each palette color
         """
         n = len(self)
-        data = itertools2.reshape(range(n), (n//wide, wide))
+        data = itertools2.reshape(range(n), (n // wide, wide))
         res = image.Image(data, 'P', palette=self)
         res = res.scale(size)
         return res
@@ -470,9 +473,9 @@ class Palette(OrderedDict):
         res = []
         for c in self.values():
             r, g, b = c.rgb
-            res.append(math2.rint(r*255))
-            res.append(math2.rint(g*255))
-            res.append(math2.rint(b*255))
+            res.append(math2.rint(r * 255))
+            res.append(math2.rint(g * 255))
+            res.append(math2.rint(b * 255))
         return res
 
     def sorted(self, key=lambda c: c[1].lab[0]):
@@ -505,7 +508,7 @@ def ColorTable(colors, key=None, width=10):
 path = os.path.dirname(os.path.abspath(__file__))
 
 # http://blog.brunonuttens.com/206-conversion-couleurs-pantone-lab-rvb-hexa-liste-sql-csv/
-table = Gtable.Table(path+'/colors.csv')
+table = Gtable.Table(path + '/colors.csv')
 table.applyf('hex', lambda x: x.lower())
 table = table.groupby('System')
 
@@ -528,7 +531,7 @@ for _ in table['Pantone'].asdict():
                         space='Lab', name=id, illuminant='D50')
     # pantones are defined with D50 illuminant
 
-acadcolors = [None]*256  # table of Autocad indexed colors
+acadcolors = [None] * 256  # table of Autocad indexed colors
 for _ in table['autocad'].asdict():
     id = _['name']
     # color name is a 0..255 number
@@ -597,9 +600,57 @@ def color_range(n, start, end, space='hsv'):
     return [Color(v, space=space) for v in itertools2.linspace(start, end, n)]
 
 
-def lambda2RGB(wavelength):
-    # http://codingmess.blogspot.com/2009/05/conversion-of-wavelength-in-nanometers.html
-    w = int(wavelength)
+"""some (astro) physics calculators"""
+
+_cmf = None
+
+def blackBody2Color(tempK):
+    """:param wavelength: black body temperature in K (Sun is 5780)
+    :result: Color
+    """
+    from scipy.constants import h, c, k
+    
+    global _cmf
+    if _cmf is None:
+        _cmf=numpy.loadtxt(path + '/cie-cmf.txt', usecols=(1,2,3))
+
+    # http://www.vendian.org/mncharity/dir3/blackbody/
+    # https://scipython.com/blog/converting-a-spectrum-to-a-colour/#rating-26
+    def planck(lam, T):
+        """ Returns the spectral radiance of a black body at temperature T.
+        Returns the spectral radiance, B(lam, T), in W.sr-1.m-2 of a black body
+        at temperature T (in K) at a wavelength lam (in nm), using Planck's law.
+        """
+    
+        lam_m = lam / 1.e9
+        fac = h * c / lam_m / k / T
+        B = 2 * h * c ** 2 / lam_m ** 5 / (numpy.exp(fac) - 1)
+        return B
+    
+    def spec_to_xyz(spec):
+        """Convert a spectrum to an xyz point.
+        The spectrum must be on the same grid of points as the colour-matching
+        function, self.cmf: 380-780 nm in 5 nm steps.
+        """
+
+        XYZ = numpy.sum(spec[:, numpy.newaxis] * _cmf, axis=0)
+        den = numpy.sum(XYZ)
+        if den == 0.:
+            return XYZ
+        return XYZ / den
+    
+    # The grid of visible wavelengths corresponding to the grid of colour-matching
+    # functions used by the ColourSystem instance.
+    lam = numpy.arange(380., 781., 5)
+    
+    return Color(spec_to_xyz(planck(lam,tempK)),'xyz')
+    
+
+def lambda2RGB(w):
+    """:param w: float wavelength in nanometers (between 380 and 780)
+    :result: [R,G,B] float
+    """
+    # http://codingmess.blogspot.com/2009/05/conversion-of-nm-in-nanometers.html
 
     # colour
     if w >= 380 and w < 440:
@@ -633,16 +684,16 @@ def lambda2RGB(wavelength):
 
     # intensity correction
     if w >= 380 and w < 420:
-        SSS = 0.3 + 0.7*(w - 350) / (420 - 350)
+        SSS = 0.3 + 0.7 * (w - 350) / (420 - 350)
     elif w >= 420 and w <= 700:
         SSS = 1.0
     elif w > 700 and w <= 780:
-        SSS = 0.3 + 0.7*(780 - w) / (780 - 700)
+        SSS = 0.3 + 0.7 * (780 - w) / (780 - 700)
     else:
         SSS = 0.0
     SSS *= 255
 
-    return [int(SSS*R), int(SSS*G), int(SSS*B)]
+    return [int(SSS * R), int(SSS * G), int(SSS * B)]
 
 
 def RGB2lambda(R, G, B):

@@ -40,11 +40,11 @@ import warnings
 
 warnings.filterwarnings("ignore")  # because too many are generated
 
-
 urlopen = request.urlopen
 
 
 class Mode(object):
+
     def __init__(self, name, nchannels, type, min, max):
         self.name = name.lower()
         self.nchannels = nchannels
@@ -74,6 +74,10 @@ modes = {
     # https://en.wikipedia.org/wiki/HSL_and_HSV
     'HSV': Mode('hsv', 3, np.float, 0, 1),
 }
+
+# hash methods
+AVERAGE = 0
+PERCEPTUAL = 1
 
 
 def nchannels(arr):
@@ -115,11 +119,12 @@ def adapt_rgb(func):
 
 
 class Image(plot.Plot):
+
     def __init__(self, data=None, mode=None, **kwargs):
         """
         :param data: can be either:
         * `PIL.Image` : makes a copy
-        * string : path of image to load
+        * string : path of image to load OR PNG encoded image
         * memoryview (extracted from a db blob)
         * None : creates an empty image with kwargs parameters:
         ** size : (y,x) pixel size tuple
@@ -127,8 +132,16 @@ class Image(plot.Plot):
         ** color: to fill None=black by default
         ** colormap: Palette or matplotlib colormap
         """
+
+        if isinstance(data, bytes):  # check if encoded string
+            t = b'\x89PNG'
+            if data[:4] == t:
+                 data = io.BytesIO(data)
+                
         if isinstance(data, memoryview):
             data = io.BytesIO(data)
+            
+        if isinstance(data, io.BytesIO):
             data = PILImage.open(data)
 
         if data is None:
@@ -195,6 +208,14 @@ class Image(plot.Plot):
     @property
     def size(self):
         return self.shape[:2]
+    
+    @property
+    def width(self):
+        return self.size[0]
+    
+    @property
+    def height(self):
+        return self.size[1]
 
     @property
     def nchannels(self):
@@ -209,13 +230,13 @@ class Image(plot.Plot):
 
     def __lt__(self, other):
         """ is smaller"""
-        return self.npixels < other.pixels
+        return self.npixels < other.npixels
 
     def load(self, path):
         from skimage import io
         if not io.util.is_url(path):
             path = os.path.abspath(path)
-        self._path = path
+        self.path = path
         ext = path[-3:].lower()
         if ext == 'pdf':
             data = read_pdf(path)
@@ -430,9 +451,9 @@ class Image(plot.Plot):
 
     @property
     def ratio(self):
-        return self.size[0]/self.size[1]
+        return self.size[0] / self.size[1]
 
-    def resize(self, size, filter=None, **kwargs):
+    def resize(self, size, filter=PILImage.BILINEAR, **kwargs):
         """Resize image
 
         :return: a resized copy of image.
@@ -444,6 +465,9 @@ class Image(plot.Plot):
             * ANTIALIAS (a high-quality downsampling filter)
         :param kwargs: extra parameters passed to skimage.transform.resize
         """
+        
+        if not kwargs:  # faster using PIL:
+            return Image(self.pil.resize(size, filter))
 
         from skimage.transform import resize
         order = 0 if filter in (
@@ -577,6 +601,9 @@ class Image(plot.Plot):
             image = self.grayscale()
         else:
             image = self
+        while image.npixels > (img_size * 16) ** 2:
+            s = image.size
+            image = image.resize((s[0] // 8, s[1] // 8), PILImage.NEAREST)
 
         self.thumb = image.resize((img_size, img_size), PILImage.ANTIALIAS)
         return np.array(self.thumb.array, dtype=np.float).reshape((img_size, img_size))
@@ -610,7 +637,7 @@ class Image(plot.Plot):
         dctlowfreq = dct[:hash_size, :hash_size]
         return Image._hash_result(dctlowfreq > np.median(dctlowfreq))
 
-    def dist(self, other, method=perceptual_hash, hash_size=8, symmetries=False):
+    def dist(self, other, method=AVERAGE, hash_size=8, symmetries=False):
         """ distance between images
 
         :param hash_size: int sqrt of the hash size. 8 (64 bits) is perfect for usual photos
@@ -619,18 +646,23 @@ class Image(plot.Plot):
             =1 if images are completely decorrelated (half of the hash bits are the same by luck)
             =2 if images are inverted
         """
-        h1 = method(self, hash_size)
+        def h(im):
+            return [im.average_hash, im.perceptual_hash][method](hash_size)
+        
+        h1 = h(self)
 
         def diff(im):
-            h2 = method(im, hash_size)
+            h2 = h(im)
             if h1 == h2:
                 return 0
             # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
             d = bin(h1 ^ h2).count("1")  # ^is XOR
             return 2 * d / (hash_size * hash_size)
+        
+        d=diff(other)
 
-        if not symmetries:
-            return diff(other)
+        if d==0 or not symmetries:
+            return d
 
         other = other.thumb  # generated at _hash_prepare above
 
@@ -880,7 +912,7 @@ def alpha_composite(front, back):
     balpha = back[alpha] / 255.0
     result[alpha] = falpha + balpha * (1 - falpha)
     old_setting = np.seterr(invalid='ignore')
-    result[rgb] = (front[rgb] * falpha + back[rgb] *
+    result[rgb] = (front[rgb] * falpha + back[rgb] * 
                    balpha * (1 - falpha)) / result[alpha]
     np.seterr(**old_setting)
     result[alpha] *= 255
@@ -1017,6 +1049,7 @@ def read_pdf(filename, **kwargs):
     # so here we define a Device that processes only "paths" one by one:
 
     class _Device(PDFDevice):
+
         def render_image(self, name, stream):
             try:
                 self.im = PILImage.open(io.BytesIO(stream.rawdata))
@@ -1065,9 +1098,9 @@ def fig2img(fig):
     w, h, _ = buf.shape
     return PILImage.frombytes("RGBA", (w, h), buf.tostring())
 
-
 # from https://github.com/scikit-image/skimage-demos/blob/master/dither.py
 # see https://bitbucket.org/kuraiev/halftones for more
+
 
 def quantize(image, N=2, L=None):
     """Quantize a gray image.
@@ -1088,6 +1121,7 @@ def randomize(image, N=2, L=None):
 
 
 class Ditherer(object):
+
     def __init__(self, name, method):
         self.name = name
         self.method = method
@@ -1100,6 +1134,7 @@ class Ditherer(object):
 
 
 class ErrorDiffusion(Ditherer):
+
     def __init__(self, name, positions, weights, wsum=None):
         Ditherer.__init__(self, name, None)
         if not wsum:
@@ -1116,7 +1151,7 @@ class ErrorDiffusion(Ditherer):
         for i in range(rows):
             for j in range(cols):
                 # Quantize
-                out[i, j], = np.digitize([image[i, j]], T)   # pylint: disable=unsupported-assignment-operation
+                out[i, j], = np.digitize([image[i, j]], T)  # pylint: disable=unsupported-assignment-operation
 
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
@@ -1130,6 +1165,7 @@ class ErrorDiffusion(Ditherer):
 
 
 class FloydSteinberg(ErrorDiffusion):
+
     def __init__(self):
         ErrorDiffusion.__init__(self, 'floyd-steinberg',
                                 positions=[(0, 1), (1, -1), (1, 0), (1, 1)],
@@ -1139,8 +1175,8 @@ class FloydSteinberg(ErrorDiffusion):
     def __call__(self, image, N=2):
         return ErrorDiffusion.__call__(self, image, N)
 
-
 # PIL+SKIMAGE dithering methods
+
 
 NEAREST = PILImage.NEAREST
 FLOYDSTEINBERG = PILImage.FLOYDSTEINBERG
@@ -1210,9 +1246,9 @@ def dither(image, method=FLOYDSTEINBERG, N=2):
         'dithering method %s not yet implemented. fallback to Floyd-Steinberg' % dithering[method])
     return dither(image, FLOYDSTEINBERG, N)
 
-
 # converter functions complementing those in skimage.color are defined below
 # function should be named "source2dest" in order to be inserted in converters graph
+
 
 gray2bool = dither
 
@@ -1275,6 +1311,7 @@ def rgb2rgba(array):
 try:
     skcolor.rgba2rgb  # will be available soon
 except:
+
     def rgba2rgb(array):
         # trivial version ignoring alpha channel for now
         return array[:, :, :3]
@@ -1337,7 +1374,6 @@ def ind2any(im, palette, dest):
 
 def ind2rgb(im, palette):
     return ind2any(im, palette, 'rgb')
-
 
 # build a graph of available converters
 # inspired by https://github.com/gtaylor/python-colormath

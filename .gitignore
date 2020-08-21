@@ -14,5 +14,5 @@ docs/_build
 /.coverage
 /xunit.xml
 .idea/
-/Goulib/__pycache__/
+__pycache__/
 *.noseids

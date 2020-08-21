@@ -1,6 +1,7 @@
 """
 additions to :mod:`itertools` standard library
 """
+from itertools import repeat
 __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2012, Philippe Guglielmetti"
 __credits__ = ["functional toolset from http://pyeuler.wikidot.com/toolset",
@@ -17,8 +18,8 @@ import collections
 import heapq
 import logging
 
-
 # pure logic
+
 
 def identity(x):
     """Do nothing and return the variable untouched"""
@@ -71,14 +72,21 @@ def index(value, iterable):
 
 # accessors
 
+def ith(iterable,i):
+    """
+    :result: i-th element in the iterable
+    """
+    
+    for j,x in enumerate(iterable):
+        if i==j:
+            return x  # works in all cases by definition of iterable
+    raise IndexError
 
 def first(iterable):
     """
     :result: first element in the iterable
     """
-    for x in iterable:
-        return x  # works in all cases by definition of iterable
-    raise IndexError
+    return ith(iterable,0)
 
 
 def last(iterable):
@@ -185,8 +193,8 @@ def linspace(start, end, n=100):
     if start == end:  # generate n times the same value for consistency
         return itertools.repeat(start, n)
     else:  # make sure we generate n values including start and end
-        step = float(end-start)/(n-1)
-        return arange(start, end+step/2, step)
+        step = float(end - start) / (n - 1)
+        return arange(start, end + step / 2, step)
 
 
 def flatten(l, donotrecursein=str):
@@ -238,7 +246,7 @@ def tee(iterable, n=2, copy=None):
     """
     if isinstance(iterable, (list, tuple, set, dict, str)):
         if copy is None:  # same object replicated n times
-            res = [iterable]*n
+            res = [iterable] * n
         else:
             res = [copy(iterable) for _ in range(n)]
         res = tuple(res)
@@ -313,7 +321,7 @@ def reshape(data, dims):
     data = list(flatten(data))
     for d in dims[::-1]:  # reversed
         if d:
-            data = [data[i:i+d] for i in range(0, len(data), d)]
+            data = [data[i:i + d] for i in range(0, len(data), d)]
         else:
             data = [data]
     return data[0]
@@ -321,8 +329,10 @@ def reshape(data, dims):
 
 def compose(f, g):
     """Compose two functions -> compose(f, g)(x) -> f(g(x))"""
+
     def _wrapper(*args, **kwargs):
         return f(g(*args, **kwargs))
+
     return _wrapper
 
 
@@ -334,7 +344,7 @@ def iterate(func, arg):
         arg = func(arg)
 
 
-def accumulate(iterable, func=operator.add, skip_first=False):
+def accumulate(iterable, func=operator.add, skip_first=False, modulo=0):
     """Return running totals. extends `python.accumulate`
 
     # accumulate([1,2,3,4,5]) --> 1 3 6 10 15
@@ -349,6 +359,8 @@ def accumulate(iterable, func=operator.add, skip_first=False):
                 continue
         else:
             total = func(total, x)
+        if modulo:
+            total = total % modulo
         yield total
 
 
@@ -373,7 +385,7 @@ def tails(seq):
 
     tails([1,2,3]) -> [1,2,3], [2,3], [3], [].
     """
-    for idx in range(len(seq)+1):
+    for idx in range(len(seq) + 1):
         yield seq[idx:]
 
 
@@ -423,14 +435,18 @@ def compress(iterable, key=identity, buffer=None):
         if count and key(item) == key(prev):
             count += 1
         else:
-            if count:  # to skip initial junk
+            if prev is not None:  # to skip initial junk
                 yield prev, count
-            prev = item
             count = 1
+            prev = item
     if count:
         yield prev, count
 
+        
+def decompress(iterable):
+    return flatten(itertools.chain((repeat(item, count) for (item, count) in iterable)))
 
+    
 def unique(iterable, key=None, buffer=100):
     """generate unique elements, preserving order.
     :param iterable: iterable, possibly infinite
@@ -475,7 +491,7 @@ def takenth(n, iterable, default=None):
     :result: nth item of iterable
     """
     # https://docs.python.org/2/library/html#recipes
-    return next(itertools.islice(iterable, n, n+1), default)
+    return next(itertools.islice(iterable, n, n + 1), default)
 
 
 nth = takenth
@@ -487,7 +503,7 @@ def icross(*sequences):
     if sequences:
         for x in sequences[0]:
             for y in icross(*sequences[1:]):
-                yield (x,)+y
+                yield (x,) + y
     else:
         yield ()
 
@@ -506,7 +522,7 @@ def interleave(l1, l2):
     :result: iterable interleaving elements from l1 and l2, starting by l1[0]
     """
     # http://stackoverflow.com/questions/7946798/interleaving-two-lists-in-python-2-2
-    res = l1+l2
+    res = l1 + l2
     res[::2] = l1
     res[1::2] = l2
     return res
@@ -518,7 +534,7 @@ def shuffle(ary):
     :result: shuffled array (IN PLACE!)
     :see: http://www.drgoulu.com/2013/01/19/comment-bien-brasser-les-cartes/
     """
-    for i in range(len(ary)-1, 0, -1):
+    for i in range(len(ary) - 1, 0, -1):
         j = random.randint(0, i)
         ary[i], ary[j] = ary[j], ary[i]
     return ary
@@ -601,10 +617,10 @@ def ifind(iterable, f, reverse=False):
             if f(item):
                 yield (i, item)
     else:
-        l = len(iterable)-1
+        l = len(iterable) - 1
         for i, item in enumerate(reversed(iterable)):
             if f(item):
-                yield (l-i, item)
+                yield (l - i, item)
 
 
 def iremove(iterable, f):
@@ -645,7 +661,7 @@ def isplit(iterable, sep, include_sep=False):
     indexes = itertools.chain(
         [0 if include_sep else -1], indexes, [None])  # will be the last j
     for i, j in pairwise(indexes):
-        yield itertools.islice(iterable, i if include_sep else i+1, j)
+        yield itertools.islice(iterable, i if include_sep else i + 1, j)
 
 
 def split(iterable, sep, include_sep=False):
@@ -670,7 +686,7 @@ def dictsplit(dic, keys):
     return yes, no
 
 
-def next_permutation(seq, pred=lambda x, y: -1 if x < y else 0):
+def next_permutation(seq, pred=lambda x, y:-1 if x < y else 0):
     """Like C++ std::next_permutation() but implemented as generator.
     see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html
     :param seq: iterable
@@ -685,7 +701,7 @@ def next_permutation(seq, pred=lambda x, y: -1 if x < y else 0):
             return
         while True:
             seq[start], seq[end] = seq[end], seq[start]
-            if start == end or start+1 == end:
+            if start == end or start + 1 == end:
                 return
             start += 1
             end -= 1
@@ -879,6 +895,7 @@ def product(*iterables, **kwargs):
         return iterables[0]
 
     def gen2(it1, it2, concat):
+
         def _(x):
             if concat:
                 try:
@@ -886,6 +903,7 @@ def product(*iterables, **kwargs):
                 except TypeError:
                     pass
             return (x,)
+
         it1, it1t = tee(it1)  # do not touch it1, so we can reiterate it
         for n, x in enumerate(it1t):  # may be infinite
             x = _(x)
@@ -893,12 +911,12 @@ def product(*iterables, **kwargs):
             for i, y in enumerate(it2t):
                 y = _(y)
                 if i <= n:
-                    yield x+y
+                    yield x + y
                 else:
                     # do not touch it1, so we can reiterate it
                     it1, it1tt = tee(it1)
-                    for z in take(n+1, it1tt):
-                        yield _(z)+y
+                    for z in take(n + 1, it1tt):
+                        yield _(z) + y
                     break
 
     res = gen2(iterables[0], iterables[1], concat=False)
@@ -976,7 +994,7 @@ def floyd(iterable, limit=1e6):
     hare.next()
     l = first_match(itertools.repeat(tortoise_val), hare)
 
-    return i, l+1
+    return i, l + 1
 
 
 def brent(iterable, limit=1e6):

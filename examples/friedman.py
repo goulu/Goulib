@@ -246,28 +246,24 @@ def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
             for x in gen(d, monadic, diadic, False):
                 yield x
         return
-
-    if len(digits) == 1 or '_' in diadic:
-        try:
-            e = Expr(''.join(digits))
-        except SyntaxError:
-            pass
-        else:
-            if e.isNum:
-                yield e
-                for op in monadic:
-                    yield _monadic(op, e)
+    
+    e=None
+    if len(digits) == 1:
+        e=Expr(digits[0])
+    elif '_' in diadic:
+        e = Expr(''.join(map(str,digits)))
+    if e and e.isNum:
+        yield e
+        for op in monadic:
+            yield _monadic(op, e)
 
     for i in range(1, len(digits)):
-        try:
-            for x in product(
-                    gen(digits[:i], monadic, diadic, permut),
-                    diadic,
-                    gen(digits[i:], monadic, diadic, permut),
-            ):
-                yield _diadic(*x)
-        except:
-            pass
+        for x in product(
+                gen(digits[:i], monadic, diadic, permut),
+                diadic,
+                gen(digits[i:], monadic, diadic, permut),
+        ):
+            yield _diadic(*x)
 
 
 def seq(digits, monadic, diadic, permut):
@@ -311,6 +307,11 @@ def friedman(num):
 
 
 if __name__ == "__main__":
+    n=list(range(1,30,2))
+    for e in seq(n,[],'+',False):
+        print(e)
+        
+    exit()
 
     from Goulib.table import Table
 

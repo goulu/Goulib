@@ -175,14 +175,10 @@ class TestMatrix4:
         assert_false(mat123 is self.mat123)
 
     def test___call__(self):
-        # matrix4 = Matrix4()
-        # assert_equal(expected, matrix4.__call__(other))
-        raise SkipTest
+        assert_equal(self.mat123(Vector3(1,10,100)),(741,852,963))
 
     def test___getitem__(self):
-        # matrix4 = Matrix4()
-        # assert_equal(expected, matrix4.__getitem__(key))
-        raise SkipTest
+        assert_equal(self.mat123[1*4+2],6)
 
     def test___imul__(self):
         # matrix4 = Matrix4()
@@ -190,9 +186,7 @@ class TestMatrix4:
         raise SkipTest
 
     def test___mul__(self):
-        # matrix4 = Matrix4()
-        # assert_equal(expected, matrix4.__mul__(other))
-        raise SkipTest
+        assert_equal(self.mat123*Vector3(1,10,100),(741,852,963))
 
     def test___repr__(self):
         # matrix4 = Matrix4()

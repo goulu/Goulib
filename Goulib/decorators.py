@@ -20,7 +20,7 @@ import logging
 
 _gettrace = getattr(sys, 'gettrace', None)
 debugger = _gettrace and _gettrace()
-logging.info('debugger '+('ACTIVE' if debugger else 'INACTIVE'))
+logging.info('debugger ' + ('ACTIVE' if debugger else 'INACTIVE'))
 
 
 # http://wiki.python.org/moin/PythonDecoratorLibrary
@@ -55,10 +55,12 @@ def debug(func):
         logger.setLevel(level)
         logger.info(EXIT_MESSAGE.format(func.__name__))
         return f_result
+
     return wrapper
 
 
 def nodebug(func):
+
     @functools.wraps(func)
     def wrapper(*args, **kwds):
         logger = logging.getLogger()
@@ -67,7 +69,21 @@ def nodebug(func):
         f_result = func(*args, **kwds)
         logger.setLevel(level)
         return f_result
+
     return wrapper
+
+
+# https://medium.com/pythonhive/python-decorator-to-measure-the-execution-time-of-methods-fa04cb6bb36d
+def timeit(method):
+    import time
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        logging.info('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
+        return result
+
+    return timed
 
 # http://include.aorcsik.com/2014/05/28/timeout-decorator/
 # BUT read http://eli.thegreenplace.net/2011/08/22/how-not-to-set-a-timeout-on-a-computation-in-python
@@ -87,6 +103,7 @@ def get_thread_pool():
 
 
 def timeout(timeout):
+
     def wrap_function(func):
         if not timeout:
             return func
@@ -98,11 +115,13 @@ def timeout(timeout):
                 return async_result.get(timeout)
             except thread.error:
                 return func(*args, **kwargs)
+
         return __wrapper
+
     return wrap_function
 
-
 # https://gist.github.com/goulu/45329ef041a368a663e5
+
 
 def itimeout(iterable, timeout):
     """timeout for loops
@@ -112,7 +131,7 @@ def itimeout(iterable, timeout):
     :raise: multiprocessing.TimeoutError if timeout occured
     """
     if False:  # handle debugger better one day ...
-        n = 100*timeout
+        n = 100 * timeout
         for i, x in enumerate(iterable):
             yield x
             if i > n:
@@ -134,6 +153,7 @@ registry = {}
 
 
 class MultiMethod(object):
+
     def __init__(self, name):
         self.name = name
         self.typemap = {}
@@ -167,6 +187,7 @@ def multimethod(*types):
     def foo(a, b):
         ...code for two strings...
     """
+
     def register(function):
         name = function.__name__
         mm = registry.get(name)
@@ -174,4 +195,5 @@ def multimethod(*types):
             mm = registry[name] = MultiMethod(name)
         mm.register(types, function)
         return mm
+
     return register

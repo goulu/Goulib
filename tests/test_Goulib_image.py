@@ -64,6 +64,26 @@ class TestImage:
         diff = h1 ^ h2  # XOR
         diff = math2.digsum(diff, 2)  # number of different pixels
         assert_equal(h1, h2, msg='difference is %d pixels' % diff)
+        
+    def test_dist(self):
+        assert_equal(self.lena.dist(self.gray),0)
+                
+        s=self.lena.size;
+        lena2=self.lena.resize((s[0],s[1]*2))
+        lena2.save(results+'lena.2.width.png')
+        
+        tol=4/64 # don't know why...
+        
+        d=self.lena.dist(lena2)
+        
+        assert_true(d<=tol)
+        
+        for method in [AVERAGE, PERCEPTUAL]:
+        
+            assert_true(self.lena.dist(lena2,method)<=tol)
+            
+            assert_true(self.lena.dist(lena2.flip(),method,symmetries=True)<=tol)
+            assert_true(self.lena.dist(lena2.flip(False,True),method,symmetries=True)<=tol)
 
     def test___getitem__(self):
         pixel = self.gray[256, 256]
@@ -122,11 +142,6 @@ class TestImage:
         # assert_equal(expected, image.base64(fmt))
         raise SkipTest  # implement your test here
 
-    def test_dist(self):
-        # image = Image(data, **kwargs)
-        # assert_equal(expected, image.dist(other, hash_size))
-        raise SkipTest  # implement your test here
-
     def test_grayscale(self):
         pass
 
@@ -142,7 +157,7 @@ class TestImage:
         # same as h(self.lena) but without IPython
         h = self.lena.render()
         assert_true(h)
-
+    """
     def test_convert(self):
         for mode in modes:
             im = self.lena.convert(mode)
@@ -154,7 +169,7 @@ class TestImage:
                 logging.error(
                     '%s round trip conversion failed with %s' % (mode, e))
                 im2 = im.convert('RGB')
-
+    """
     def test_split(self):
         rgb = self.lena.split()
         for im, c in zip(rgb, 'RGB'):
