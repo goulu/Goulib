@@ -11,7 +11,7 @@ from collections import OrderedDict
 
 import operator
 
-from itertools import count, tee, islice
+from itertools import count, tee, islice, chain
 from Goulib import itertools2, decorators, tests
 
 
@@ -73,11 +73,11 @@ class Sequence(object):
 
         self.desc = desc
         self.timeout = timeout
-        self._repr = None
+        self._repr = ''
         
     def __repr__(self):     
-        if self._repr is None:  # cache for speed
-            s = '...' # tests.pprint(self,[0,1,2,3,4,5,6,7,8,9],0.001) # must be very quick for debugger 
+        if not self._repr:  # cache for speed
+            s = tests.pprint(self, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 0.001)  # must be very quick for debugger 
             self._repr = '%s = (%s)' % (self.name, s)
         return self._repr
     
@@ -96,27 +96,27 @@ class Sequence(object):
         :return: a tee-ed copy of iterf, optionally timeout decorated
         """
         if self.iterf:
-            self.iterf, it = tee(self.iterf)
+            self.iterf, res = tee(self.iterf)
+            if self.timeout: 
+                res = decorators.itimeout(res, self.timeout)
         else:
             it = count(self.offset)
+            if self.timeout: 
+                it = decorators.itimeout(it, self.timeout)
             if self.itemf:
-                it = map(lambda i:self[i], it)
+                res = map(lambda i:self[i], it)
             else:
-                it = filter(lambda n:n in self, it)  # uses containf
-        if self.timeout: 
-            it = decorators.itimeout(it, self.timeout)
-        return it
+                res = filter(lambda n:n in self, it)  # uses containf
+        return res
 
     def __getitem__(self, i):
         if not isinstance(i, slice):
             if self.itemf :
                 return self.itemf(i)
             else:
-                for j, v in enumerate(self):
-                    if j == i: return v
-                    
+                return itertools2.index(i, self)
         else:
-            return islice(self, i.start, i.stop, i.step)
+            return islice(self(), i.start, i.stop, i.step)
 
     def index(self, v):
         # assume sequence is growing
@@ -248,8 +248,8 @@ class Sequence(object):
             itertools2.select(self, other, operator.gt)
         )
 
-    def accumulate(self, op=operator.add, skip_first=False, modulo=0):
-        return Sequence(itertools2.accumulate(self, op, skip_first, modulo))
+    def accumulate(self, op=operator.add, init=[]):
+        return Sequence(chain(init, itertools2.accumulate(self, op, False)))
 
     def pairwise(self, op, skip_first=False):
         return Sequence(itertools2.pairwise(self, op))
