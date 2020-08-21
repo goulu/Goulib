@@ -12,6 +12,13 @@ from Goulib.math2 import *
 import Goulib.itertools2
 
 
+class TestLongint:
+    def test_longint(self):
+        assert_equal(longint(1,3),1000)
+        assert_equal(longint(10,2),1000)
+        assert_equal(longint(0.1,4),1000)
+        assert_equal(longint(0.123,4),1230)
+        
 class TestSign:
     def test_sign(self):
         assert_equal(sign(0.0001), 1)

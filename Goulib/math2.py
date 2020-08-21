@@ -29,9 +29,29 @@ eps = 2.2204460492503131e-16  # numpy.finfo(np.float64).eps
 
 try:
     nan = math.nan
-except:
+except AttributeError:
     nan = float('nan')  # Not a Number
 
+    
+def longint(mantissa, exponent):
+    ''' :return: int equivalent to int(mantissa*10^exponent) without rounding errors
+    '''
+    s = str(mantissa)
+    if 'E' in s: raise ValueError
+    p = 0
+    try:
+        p = s.index('.')
+        s = s.replace('.', '', 1)
+        p=len(s)-p
+    except ValueError:
+        pass
+    p = exponent - p
+    if p < 0:
+        raise ValueError
+    if p > 0:
+        s = s + '0' * p
+    return int(s)
+    
 
 def cmp(x, y):
     '''Compare the two objects x and y and return an integer according to the outcome.
@@ -43,6 +63,7 @@ def cmp(x, y):
 try:
     isclose = math.isclose
 except AttributeError:
+
     def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
         '''approximately equal. Use this instead of a==b in floating point ops
 
@@ -85,8 +106,8 @@ def allclose(a, b, rel_tol=1e-09, abs_tol=0.0):
             return False
     return True
 
-
 # basic useful functions
+
 
 def is_number(x):
     ''':return: True if x is a number of any type, including Complex'''
@@ -110,8 +131,8 @@ def sign(number):
         return 1
     return 0
 
-
 # rounding
+
 
 def rint(v):
     '''
@@ -151,8 +172,8 @@ def format(x, decimals=3):
         decimals = 0
     return '{0:.{1}f}'.format(x, decimals)
 
-
 # improved versions of math functions
+
 
 def gcd(*args):
     '''greatest common divisor of an arbitrary number of args'''
@@ -248,9 +269,9 @@ def carmichael(n):
         k += 1
     return k
 
-
 # https://en.wikipedia.org/wiki/Primitive_root_modulo_n
 # code decomposed from http://stackoverflow.com/questions/40190849/efficient-finding-primitive-roots-modulo-n-using-python
+
 
 def is_primitive_root(x, m, s={}):
     '''returns True if x is a primitive root of m
@@ -450,8 +471,8 @@ def multiply(x, y):
         d = b - a - c
         return (((a << half) + d) << half) + c
 
-
 # vector operations
+
 
 def accsum(it):
     '''Yield accumulated sums of iterable: accsum(count(1)) -> 1,3,6,10,...'''
@@ -630,8 +651,8 @@ def sat(x, low=0, high=None):
         return x
     return [sat(_, low, high) for _ in x]
 
-
 # norms and distances
+
 
 def norm_2(v):
     '''
@@ -712,13 +733,13 @@ def levenshtein(seq1, seq2):
             thisrow[y] = min(delcost, addcost, subcost)
     return thisrow[len(seq2) - 1]
 
-
 # stats
 
 # moved to stats.py
 
 # numbers functions
 # originally from https://github.com/tokland/pyeuler/blob/master/pyeuler/toolset.py
+
 
 def recurrence(factors, values, cst=0, max=None, mod=0):
     '''general generator for recurrences
@@ -746,13 +767,14 @@ def recurrence(factors, values, cst=0, max=None, mod=0):
         values.pop(0);
         values.append(n)
 
-# https://en.wikipedia.org/wiki/Lucas_sequence        
-def lucasU(p,q):
-    return recurrence([-q,p],[0,1])
 
-def lucasV(p,q):
-    return recurrence([-q,p],[2,p])
-    
+# https://en.wikipedia.org/wiki/Lucas_sequence        
+def lucasU(p, q):
+    return recurrence([-q, p], [0, 1])
+
+
+def lucasV(p, q):
+    return recurrence([-q, p], [2, p])
 
 
 def kfibonacci_gen(k, init=None, max=None, mod=0):
@@ -886,8 +908,10 @@ def primitive_triples():
     through Berggren's matrices and breadth first traversal of ternary tree
     :see: https://en.wikipedia.org/wiki/Tree_of_primitive_Pythagorean_triples
     '''
+
     def key(x):
         return (x[2], x[1])
+
     from sortedcontainers import SortedListWithKey
     triples = SortedListWithKey(key=key)
     triples.add([3, 4, 5])
@@ -915,6 +939,7 @@ def triples():
     prim = []  # list of primitive triples up to now
     
     def key(x): return (x[2], x[1])
+
     from sortedcontainers import SortedListWithKey
     samez = SortedListWithKey(key=key)  # temp triplets with same z
     buffer = SortedListWithKey(key=key)  # temp for triplets with smaller z
@@ -948,7 +973,7 @@ def triples():
 def divisors(n):
     '''
     :param n: int
-    :return: all divisors of n: divisors(12) -> 1,2,3,6,12
+    :return: all divisors of n: divisors(12) -> 1,2,3,4,6,12
     including 1 and n,
     except for 1 which returns a single 1 to avoid messing with sum of divisors...
     '''
@@ -968,6 +993,7 @@ def proper_divisors(n):
 
 
 class Sieve:
+
     # should be derived from bitarray but ...
     # https://github.com/ilanschnell/bitarray/issues/69
     # TODO: simplify when solved
@@ -1451,8 +1477,8 @@ def lucas_lehmer(p):
         s = (s * s - 2) % m_p
     return s == 0
 
-
 # digits manipulation
+
 
 def digits_gen(num, base=10):
     '''generates int digits of num in base BACKWARDS'''
@@ -1491,7 +1517,9 @@ def digsum(num, f=None, base=10):
         return sum(d)
     if is_number(f):
         p = f
+
         def f(x): return pow(x, p)
+
     try:
         return sum(map(f, d))
     except AttributeError:
@@ -1669,7 +1697,6 @@ def repunit(n, base=10, digit=1):
         return (base ** n - 1) // (base - 1)
     return int(str(digit) * n, base)
 
-
 # repeating decimals https://en.wikipedia.org/wiki/Repeating_decimal
 # https://stackoverflow.com/a/36531120/1395973
 
@@ -1727,8 +1754,8 @@ def rational_cycle(num, den):
     lz = cycle - number_of_digits(digits)
     return digits * ipow(10, lz)
 
-
 # polygonal numbers
+
 
 def tetrahedral(n):
     '''
@@ -2049,8 +2076,8 @@ def chakravala(n):
 
     return a, b
 
-
 # combinatorics
+
 
 factorial = math.factorial  # didn't knew it was there...
 
@@ -2167,8 +2194,8 @@ def ilog(a, b, upper_bound=False):
             return x if upper_bound else None
         p = b * p
 
-
 # from "the right way to calculate stuff" : http://www.plunk.org/~hatch/rightway.php
+
 
 def angle(u, v, unit=True):
     '''
@@ -2311,7 +2338,6 @@ def de_bruijn(k, n):
     db(1, 1)
     return "".join(alphabet[i] for i in sequence)
 
-
 '''modular arithmetic
 initial motivation: https://www.hackerrank.com/challenges/ncr
 
@@ -2321,8 +2347,8 @@ see also http://userpages.umbc.edu/~rcampbel/Computers/Python/lib/numbthy.py
 mathematica code from http://thales.math.uqam.ca/~rowland/packages/BinomialCoefficients.m
 '''
 
-
 # see http://anh.cs.luc.edu/331/code/mod.py for a MOD class
+
 
 def mod_inv(a, b):
     # http://rosettacode.org/wiki/Chinese_remainder_theorem#Python
@@ -2444,8 +2470,8 @@ def baby_step_giant_step(y, a, n):
         if value in A:
             return (t * s - A.index(value)) % n
 
-
 # inspired from http://stackoverflow.com/questions/28548457/nth-fibonacci-number-for-n-as-big-as-1019
+
 
 def mod_matmul(A, B, mod=0):
     if not mod:
@@ -2463,10 +2489,10 @@ def mod_matpow(M, power, mod=0):
         M = mod_matmul(M, M, mod)
     return result
 
-
 # in fact numpy.linalg.matrix_power has a bug for large powers
 # https://github.com/numpy/numpy/issues/5166
 # so our function here above is better :-)
+
 
 matrix_power = mod_matpow
 
@@ -2540,7 +2566,7 @@ def pi_digits_gen():
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
     q, r, t, j = 1, 180, 60, 2
     while True:
-        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q *
+        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q * 
                                                (27 * j - 12) + 5 * r) // (5 * t)
         yield y
         q, r, t, j = 10 * q * j * (2 * j - 1), 10 * \
@@ -2808,7 +2834,7 @@ def factor_ecm(n, B1=10, B2=20):
             seed = random.randrange(6, n)
             u, v = (seed ** 2 - 5) % n, 4 * seed % n
             p = pow(u, 3, n)
-            Q, C = (pow(v - u, 3, n) * (3 * u + v) %
+            Q, C = (pow(v - u, 3, n) * (3 * u + v) % 
                     n, 4 * p * v % n), (p, pow(v, 3, n))
             pg = primes_gen()
             p = next(pg)
