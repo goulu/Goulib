@@ -141,15 +141,15 @@ class TestIdentity:
         x=object()
         assert_equal(identity(x),x)
 
-class TestAny:
+class TestAnyf:
     def test_any(self):
-        assert_true(any((1,2,3,4),lambda x:x>3))
-        assert_false(any((1,2,3,4),lambda x:x>4))
+        assert_true(anyf((1,2,3,4),lambda x:x>3))
+        assert_false(anyf((1,2,3,4),lambda x:x>4))
 
-class TestAll:
-    def test_all(self):
-        assert_true(all((1,2,3,4),lambda x:x<5))
-        assert_false(all((1,2,3,4),lambda x:x<4))
+class TestAllf:
+    def test_allf(self):
+        assert_true(allf((1,2,3,4),lambda x:x<5))
+        assert_false(allf((1,2,3,4),lambda x:x<4))
 
 class TestNo:
     def test_no(self):

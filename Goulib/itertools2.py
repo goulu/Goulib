@@ -40,14 +40,14 @@ def iscallable(f):
     return isinstance(f, collections.Callable)
 
 
-def any(seq, pred=bool):
+def anyf(seq, pred=bool):
     """
     :result: bool True if pred(x) is True for at least one element in the iterable
     """
     return (True in map(pred, seq))
 
 
-def all(seq, pred=bool):
+def allf(seq, pred=bool):
     """
     :result: bool True if pred(x) is True for all elements in the iterable
     """
@@ -72,33 +72,35 @@ def index(value, iterable):
 
 # accessors
 
-def ith(iterable,i):
+
+def ith(iterable, i):
     """
     :result: i-th element in the iterable
     """
-    
-    for j,x in enumerate(iterable):
-        if i==j:
+
+    for j, x in enumerate(iterable):
+        if i == j:
             return x  # works in all cases by definition of iterable
     raise IndexError
+
 
 def first(iterable):
     """
     :result: first element in the iterable
     """
-    return ith(iterable,0)
+    return ith(iterable, 0)
 
 
 def last(iterable):
     """
     :result: last element in the iterable
     """
-    found = False
     for x in iterable:
-        found = True
-    if found:
-        return x
-    raise IndexError
+        res = x
+    try:
+        return res
+    except Exception:
+        raise IndexError
 
 
 def takeevery(n, iterable, start=0):
@@ -137,7 +139,7 @@ def ilen(it):
     """
     try:
         return len(it)  # much faster if defined...
-    except:
+    except TypeError:
         return sum(1 for _ in it)
 
 
@@ -197,17 +199,17 @@ def linspace(start, end, n=100):
         return arange(start, end + step / 2, step)
 
 
-def flatten(l, donotrecursein=str):
+def flatten(it, donotrecursein=str):
     """iterator to flatten (depth-first) structure
 
-    :param l: iterable structure
+    :param it: iterable structure
     :param donotrecursein: iterable types in which algo doesn't recurse
                            string type by default
     """
     # http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
-    if isinstance(l, dict):
-        l = l.values()
-    for el in l:
+    if isinstance(it, dict):
+        it = it.values()
+    for el in it:
         if not isinstance(el, collections.Iterable):
             yield el
         elif isinstance(el, donotrecursein):
@@ -442,11 +444,11 @@ def compress(iterable, key=identity, buffer=None):
     if count:
         yield prev, count
 
-        
+
 def decompress(iterable):
     return flatten(itertools.chain((repeat(item, count) for (item, count) in iterable)))
 
-    
+
 def unique(iterable, key=None, buffer=100):
     """generate unique elements, preserving order.
     :param iterable: iterable, possibly infinite
@@ -617,10 +619,10 @@ def ifind(iterable, f, reverse=False):
             if f(item):
                 yield (i, item)
     else:
-        l = len(iterable) - 1
+        s = len(iterable) - 1
         for i, item in enumerate(reversed(iterable)):
             if f(item):
-                yield (l - i, item)
+                yield (s - i, item)
 
 
 def iremove(iterable, f):
@@ -686,7 +688,7 @@ def dictsplit(dic, keys):
     return yes, no
 
 
-def next_permutation(seq, pred=lambda x, y:-1 if x < y else 0):
+def next_permutation(seq, pred=lambda x, y: -1 if x < y else 0):
     """Like C++ std::next_permutation() but implemented as generator.
     see http://blog.bjrn.se/2008/04/lexicographic-permutations-using.html
     :param seq: iterable
@@ -992,9 +994,9 @@ def floyd(iterable, limit=1e6):
     hare = tortoise
     tortoise_val = tortoise.val
     hare.next()
-    l = first_match(itertools.repeat(tortoise_val), hare)
+    j = first_match(itertools.repeat(tortoise_val), hare)
 
-    return i, l + 1
+    return i, j + 1
 
 
 def brent(iterable, limit=1e6):
