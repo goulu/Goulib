@@ -1,3 +1,8 @@
+# Travis Project Descriptor
+#
+# See http://docs.travis-ci.com/user/build-configuration/
+#
+
 dist: xenial
 sudo: true
 language: python
@@ -9,6 +14,10 @@ python:
 
 notifications:
   email: false
+
+cache:
+  directories:
+    - $HOME/.cache/pip
  
 # Setup anaconda
 before_install:
@@ -31,3 +40,6 @@ script:
 after_success:
   - coveralls
   - test $TRAVIS_BRANCH = "master" && bash conda_upload.sh
+
+
+

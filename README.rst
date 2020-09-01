@@ -1,7 +1,7 @@
 Goulib
 ======
 
-library of useful Python code for scientific + technical applications
+library of useful Python code for scientific + technical applications.
 
 see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
