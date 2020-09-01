@@ -23,10 +23,10 @@ import networkx as nx  # http://networkx.github.io/
 import numpy
 import scipy
 
-from Goulib import plot  # set matplotlib backend
+from . import plot  # set matplotlib backend
 import matplotlib.pyplot as plt  # after import .plot
 
-from Goulib import math2, itertools2
+from . import math2, itertools2
 
 """
 finding the nearest neighbor in a large GeoGraph is much faster with the
@@ -700,11 +700,15 @@ def draw_networkx(g, pos=None, **kwargs):
         fig = figure(g, box=box, figsize=kwargs.get('figsize', None))
 
     if kwargs.get('node_size', 300) > 0:
-        nx.draw_networkx_nodes(g, pos, **kwargs)
+        nx.draw_networkx_nodes(g, pos, **itertools2.subdict(kwargs, (
+            'nodelist', 'node_size', 'node_color', 'node_shape', 'alpha', 'cmap', 'vmin', 'vmax', 'ax', 'linewidths', 'edgecolor', 'label'
+        )))
 
-    nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
+    nx.draw_networkx_edges(g, pos, edgelist, **itertools2.subdict(kwargs, (
+        'width', 'edge_color', 'style', 'alpha', 'arrowstyle', 'arrowsize', 'edge_cmap', 'edge_vmin', 'edge_vmax', 'ax', 'arrows', 'label', 'node_size', 'nodelist', 'node_shape', 'connectionstyle', 'min_source_margin', 'min_target_margin'
+    )))
 
-    labels = kwargs.pop('labels', False)  # True in nx.draw_networkx they're
+    labels = kwargs.pop('labels', False)
     if labels:
         if labels is True:
             labels = None  # will be set automatically
@@ -712,7 +716,9 @@ def draw_networkx(g, pos=None, **kwargs):
             labels = list(labels(u) for u in g.nodes(data=True))
         if isinstance(labels, list):  # a dict is expected:
             labels = dict(zip(g.nodes(), labels))
-        nx.draw_networkx_labels(g, pos, labels, **kwargs)
+        nx.draw_networkx_labels(g, pos, labels,  **itertools2.subdict(kwargs, (
+         'font_size', 'font_color', 'font_family', 'font_weight', 'alpha', 'bbox','horizontalalignment', 'verticalalignment', 'ax'
+        )))
 
     return fig
 
