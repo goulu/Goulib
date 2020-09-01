@@ -329,7 +329,7 @@ def Segment2ndDegree(t0, t1, start, end=(None)):
         dp = _delta(p0, p1)
         dv = _delta(v0, v1)
 
-        if not itertools2.any((dt, p0, v0, a0), lambda x: x is None):  # we have all required data
+        if not itertools2.anyf((dt, p0, v0, a0), lambda x: x is None):  # we have all required data
             res = SegmentPoly(t0, t1, [p0, v0, a0 / 2.])
             end = res.end()
             if p1 is not None and not math2.isclose(end[0], p1):  # consider p1 as max position
