@@ -23,8 +23,6 @@ before_install:
   # Install packages
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose numpy scipy matplotlib networkx ipython
-  - conda install --yes conda-build
-  - conda install --yes anaconda-client
   - source activate env_name
   - pip install -r requirements.txt
   - pip install coveralls
