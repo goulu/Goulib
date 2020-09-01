@@ -87,7 +87,6 @@ def nchannels(arr):
         return 0
 
 
-
 def guessmode(arr):
     n = nchannels(arr)
     if n > 1:
@@ -141,10 +140,10 @@ class Image(plot.Plot):
             t = b'\x89PNG'
             if data[:4] == t:
                 data = io.BytesIO(data)
-                
+
         if isinstance(data, memoryview):
             data = io.BytesIO(data)
-            
+
         if isinstance(data, io.BytesIO):
             data = PILImage.open(data)
 
@@ -212,11 +211,11 @@ class Image(plot.Plot):
     @property
     def size(self):
         return self.shape[:2]
-    
+
     @property
     def width(self):
         return self.size[0]
-    
+
     @property
     def height(self):
         return self.size[1]
@@ -267,7 +266,11 @@ class Image(plot.Plot):
         a = self.convert(mode).array  # makes sure we have a copy of self.array
         if np.issubdtype(a.dtype, float):
             a = skimage.img_as_ubyte(a)
-        skimage.io.imsave(path, a, **kwargs)
+        if isinstance(path, io.BytesIO):
+            import imageio
+            imageio.imwrite(path, a, format=kwargs['format'])
+        else:
+            skimage.io.imsave(path, a, **kwargs)
         return self
 
     def _repr_svg_(self, **kwargs):
@@ -277,11 +280,7 @@ class Image(plot.Plot):
 
     def render(self, fmt='png', **kwargs):
         buffer = io.BytesIO()
-        try:
-            import imageio
-            imageio.imwrite(buffer, self.array, format=fmt)
-        except Exception: # do it the old way ...
-            self.save(buffer, format=fmt, **kwargs)
+        self.save(buffer, format=fmt, **kwargs)
         return buffer.getvalue()
 
     # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
@@ -466,7 +465,7 @@ class Image(plot.Plot):
             * ANTIALIAS (a high-quality downsampling filter)
         :param kwargs: extra parameters passed to skimage.transform.resize
         """
-        
+
         if not kwargs:  # faster using PIL:
             return Image(self.pil.resize(size, filter))
 
@@ -649,7 +648,7 @@ class Image(plot.Plot):
         """
         def h(im):
             return [im.average_hash, im.perceptual_hash][method](hash_size)
-        
+
         h1 = h(self)
 
         def diff(im):
@@ -659,10 +658,10 @@ class Image(plot.Plot):
             # http://stackoverflow.com/questions/9829578/fast-way-of-counting-non-zero-bits-in-python
             d = bin(h1 ^ h2).count("1")  # ^is XOR
             return 2 * d / (hash_size * hash_size)
-        
-        d=diff(other)
 
-        if d==0 or not symmetries:
+        d = diff(other)
+
+        if d == 0 or not symmetries:
             return d
 
         other = other.thumb  # generated at _hash_prepare above
@@ -913,7 +912,7 @@ def alpha_composite(front, back):
     balpha = back[alpha] / 255.0
     result[alpha] = falpha + balpha * (1 - falpha)
     old_setting = np.seterr(invalid='ignore')
-    result[rgb] = (front[rgb] * falpha + back[rgb] * 
+    result[rgb] = (front[rgb] * falpha + back[rgb] *
                    balpha * (1 - falpha)) / result[alpha]
     np.seterr(**old_setting)
     result[alpha] *= 255
@@ -1155,7 +1154,8 @@ class ErrorDiffusion(Ditherer):
         for i in range(rows):
             for j in range(cols):
                 # Quantize
-                out[i, j], = np.digitize([image[i, j]], T)  # pylint: disable=unsupported-assignment-operation
+                out[i, j], = np.digitize(
+                    [image[i, j]], T)  # pylint: disable=unsupported-assignment-operation
 
                 # Propagate quantization noise
                 d = (image[i, j] - out[i, j] / (N - 1))
@@ -1355,7 +1355,7 @@ def lab2ind(im, colors=256):
         pal = [Gcolors.Color(c, 'lab') for c in p]
     else:
         pal = colors
-        p = [c.lab for c in flatten(pal)]
+        p = [c.lab for c in itertools2.flatten(pal)]
     w, h, d = im.shape
     s = w * h  # number of pixels
     flat = np.reshape(im, (s, d))
@@ -1409,7 +1409,7 @@ def convert(a, source, target, **kwargs):
     """
     import networkx as nx  # http://networkx.github.io/
     source, target = modes[source.upper()], modes[target.upper()]
-    a = np.clip(a, source.min, source.max) #, out=a)
+    a = np.clip(a, source.min, source.max)  # , out=a)
     try:
         path = converters.shortest_path(source.name, target.name)
     except nx.exception.NetworkXError:
