@@ -27,19 +27,19 @@ def assert_image(image, name=None, convert=False):
 
 class TestImage:
     @classmethod
-    def setup_class(self):
-        self.lena = Image(path+'/data/lena.png')
-        assert_equal(self.lena, self.lena)  # make sure image comparizon works
-        assert_image(self.lena.grayscale('L'),
+    def setup_class(cls):
+        cls.lena = Image(path+'/data/lena.png')
+        assert_equal(cls.lena, cls.lena)  # make sure image comparizon works
+        assert_image(cls.lena.grayscale('L'),
                      'grayscale.png')  # force to uint8
-        self.gray = Image(results+'grayscale.png')
-        self.camera = Image(data.camera())
+        cls.gray = Image(results+'grayscale.png')
+        cls.camera = Image(data.camera())
 
     def test_pdf(self):
-        return  # for now for speed
+        return # skipped for now, too many problems ...
         try:
             import pdfminer
-        except:
+        except ModuleNotFoundError:
             return  # pass
         assert_image(Image(path+'/data/lena.pdf'), 'pdf_out.png')
         assert_image(Image(path+'/data/Pantone Fan.pdf'), 'Pantone Fan.png')
@@ -64,26 +64,25 @@ class TestImage:
         diff = h1 ^ h2  # XOR
         diff = math2.digsum(diff, 2)  # number of different pixels
         assert_equal(h1, h2, msg='difference is %d pixels' % diff)
-        
+
     def test_dist(self):
-        assert_equal(self.lena.dist(self.gray),0)
-                
-        s=self.lena.size;
-        lena2=self.lena.resize((s[0],s[1]*2))
+        assert_equal(self.lena.dist(self.gray), 0)
+
+        s = self.lena.size
+        lena2 = self.lena.resize((s[0], s[1]*2))
         lena2.save(results+'lena.2.width.png')
-        
-        tol=4/64 # don't know why...
-        
-        d=self.lena.dist(lena2)
-        
-        assert_true(d<=tol)
-        
+
+        tol = 4/64  # don't know why...
+
+        d = self.lena.dist(lena2)
+        assert_true(d <= tol)
+
         for method in [AVERAGE, PERCEPTUAL]:
-        
-            assert_true(self.lena.dist(lena2,method)<=tol)
-            
-            assert_true(self.lena.dist(lena2.flip(),method,symmetries=True)<=tol)
-            assert_true(self.lena.dist(lena2.flip(False,True),method,symmetries=True)<=tol)
+            assert_true(self.lena.dist(lena2, method) <= tol)
+            assert_true(self.lena.dist(
+                lena2.flip(), method, symmetries=True) <= tol)
+            assert_true(self.lena.dist(lena2.flip(False, True),
+                                       method, symmetries=True) <= tol)
 
     def test___getitem__(self):
         pixel = self.gray[256, 256]
@@ -170,6 +169,7 @@ class TestImage:
                     '%s round trip conversion failed with %s' % (mode, e))
                 im2 = im.convert('RGB')
     """
+
     def test_split(self):
         rgb = self.lena.split()
         for im, c in zip(rgb, 'RGB'):
@@ -201,18 +201,20 @@ class TestImage:
         from skimage.filters import sobel, prewitt, scharr, roberts
         from skimage.restoration import denoise_bilateral
         for f in [sobel, prewitt, scharr, roberts, denoise_bilateral, ]:
-            try:
-                assert_image(self.lena.filter(
-                    f), 'filter_sk_%s.png' % f.__name__)
-            except:
-                pass
+            assert_image(self.lena.filter(f), 'filter_sk_%s.png' % f.__name__)
 
     def test_dither(self):
-        for k in dithering:
-            im = self.gray.dither(k)*255
-            assert_image(im, 'dither_%s.png' % dithering[k])
         assert_image(self.lena.dither(), 'dither_color_2.png')
         assert_image(self.lena.dither(n=4), 'dither_color_4.png')
+        return # BW dithering methods skipped for speed. used in color tests.
+        from functools import partial
+        for k in dithering:
+            logging.info(dithering[k])
+            im = self.gray.dither(k)*255
+            f = partial(assert_image, im, 'dither_%s.png' % dithering[k])
+            f.description = str(dithering[k]) + '\n'
+            yield (f,)
+        
 
     def test_resize(self):
         size = 128
@@ -525,7 +527,6 @@ class TestGray2rgb:
 class TestBool2gray:
     def test_bool2gray(self):
         pass  # tested in test_convert
-        raise SkipTest  # implement your test here
 
 
 class TestRgba2rgb:

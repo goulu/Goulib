@@ -81,7 +81,11 @@ PERCEPTUAL = 1
 
 
 def nchannels(arr):
-    return 1 if len(arr.shape) == 2 else arr.shape[-1]
+    try:
+        return 1 if len(arr.shape) == 2 else arr.shape[-1]
+    except AttributeError:
+        return 0
+
 
 
 def guessmode(arr):
@@ -136,7 +140,7 @@ class Image(plot.Plot):
         if isinstance(data, bytes):  # check if encoded string
             t = b'\x89PNG'
             if data[:4] == t:
-                 data = io.BytesIO(data)
+                data = io.BytesIO(data)
                 
         if isinstance(data, memoryview):
             data = io.BytesIO(data)
@@ -247,11 +251,10 @@ class Image(plot.Plot):
         self._set(data, mode)
         return self
 
-    def save(self, path, autoconvert=True, format_str=None, **kwargs):
+    def save(self, path, autoconvert=True, **kwargs):
         """saves an image
         :param path: string with path/filename.ext
         :param autoconvert: bool, if True converts color planes formats to RGB
-        :param format_str: str of file format. set to 'PNG' by skimage.io.imsave
         :param kwargs: optional params passed to skimage.io.imsave:
         :return: self for chaining
         """
@@ -262,12 +265,9 @@ class Image(plot.Plot):
             elif self.mode not in 'RGBA':  # modes we can save directly
                 mode = 'RGB'
         a = self.convert(mode).array  # makes sure we have a copy of self.array
-        if format_str is None and isinstance(path, str):
-            format_str = path.split('.')[-1][:3]
-        if format_str.upper() == 'TIF':
-            a = skimage.img_as_uint(a)
-        from skimage import io
-        io.imsave(path, a, **kwargs)
+        if np.issubdtype(a.dtype, float):
+            a = skimage.img_as_ubyte(a)
+        skimage.io.imsave(path, a, **kwargs)
         return self
 
     def _repr_svg_(self, **kwargs):
@@ -275,12 +275,13 @@ class Image(plot.Plot):
         # ... because it causes _repr_png_ to be called by Plot._repr_html_
         # instead of render below
 
-    def render(self, fmt='PNG', **kwargs):
+    def render(self, fmt='png', **kwargs):
         buffer = io.BytesIO()
-        self.save(buffer, format_str=fmt, **kwargs)
-        # self.save(buffer)
-        # im=self.pil
-        # im.save(buffer, fmt)
+        try:
+            import imageio
+            imageio.imwrite(buffer, self.array, format=fmt)
+        except Exception: # do it the old way ...
+            self.save(buffer, format=fmt, **kwargs)
         return buffer.getvalue()
 
     # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
@@ -1034,9 +1035,12 @@ def normalize(a, newmax=255, newmin=0):
     return array.astype(t)
 
 
-def read_pdf(filename, **kwargs):
+def read_pdf(path, **kwargs):
     """ reads a bitmap graphics on a .pdf file
-    only the first page is parsed
+
+    :param path: string path
+    :param kwargs: params passed to Drawing.draw in case the .pdf contains only vector graphics
+    :return: Image
     """
     from pdfminer.pdfparser import PDFParser
     from pdfminer.pdfdocument import PDFDocument
@@ -1057,7 +1061,7 @@ def read_pdf(filename, **kwargs):
                 logging.error(e)
 
     # then all we have to do is to launch PDFMiner's parser on the file
-    fp = open(filename, 'rb')
+    fp = open(path, 'rb')
     parser = PDFParser(fp)
     document = PDFDocument(parser, fallback=False)
     rsrcmgr = PDFResourceManager()
@@ -1071,10 +1075,10 @@ def read_pdf(filename, **kwargs):
     im = device.im
 
     if im is None:  # it's maybe a drawing
-        fig = drawing.Drawing(filename).draw(**kwargs)
+        fig = drawing.Drawing(path).draw(**kwargs)
         im = fig2img(fig)
 
-    return im
+    return Image(im)
 
 
 def fig2img(fig):
@@ -1405,7 +1409,7 @@ def convert(a, source, target, **kwargs):
     """
     import networkx as nx  # http://networkx.github.io/
     source, target = modes[source.upper()], modes[target.upper()]
-    a = np.clip(a, source.min, source.max, out=a)
+    a = np.clip(a, source.min, source.max) #, out=a)
     try:
         path = converters.shortest_path(source.name, target.name)
     except nx.exception.NetworkXError:
