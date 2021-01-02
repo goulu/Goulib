@@ -21,31 +21,31 @@ from Goulib import decorators
 from Goulib.container import Sequence
 from Goulib.math2 import *
 
-A000004 = Sequence(repeat(0), lambda _: 0, lambda x: x == 
+A000004 = Sequence(repeat(0), lambda _: 0, lambda x: x ==
                    0, desc='The zero sequence')
 
 A000007 = Sequence(None, lambda n: 0 ** n, lambda x: x in (0, 1),
                    desc='The characteristic function of 0: a(n) = 0^n.')
 
-A001477 = Sequence(count(0), lambda n: n, lambda x: x >= 
+A001477 = Sequence(count(0), lambda n: n, lambda x: x >=
                    0, desc='The non-negative integers.')
-A000027 = Sequence(count(1), lambda n: n, lambda x: x > 
+A000027 = Sequence(count(1), lambda n: n, lambda x: x >
                    0, desc='The positive integers.')
-A005408 = Sequence(count(1, 2), lambda n: 2 * n + 1, lambda x: x % 
+A005408 = Sequence(count(1, 2), lambda n: 2 * n + 1, lambda x: x %
                    2 == 1, desc='The odd numbers: a(n) = 2n+1.')
-A005843 = Sequence(count(0, 2), lambda n: 2 * n, lambda x: x % 
+A005843 = Sequence(count(0, 2), lambda n: 2 * n, lambda x: x %
                    2 == 0, desc='The even numbers: a(n) = 2n ')
 
-A001057 = Sequence(1, lambda n:-n // 2 + 1 if n % 2 else n // 2, lambda _: True,
+A001057 = Sequence(1, lambda n: -n // 2 + 1 if n % 2 else n // 2, lambda _: True,
                    desc="Canonical enumeration of integers: interleaved positive and negative integers with zero prepended."
                    )
 
-A008587 = Sequence(count(0, 5), lambda n: 5 * n, lambda n: n % 
+A008587 = Sequence(count(0, 5), lambda n: 5 * n, lambda n: n %
                    5 == 0, 'Multiples of 5')
-A008589 = Sequence(count(0, 7), lambda n: 7 * n, lambda n: n % 
+A008589 = Sequence(count(0, 7), lambda n: 7 * n, lambda n: n %
                    7 == 0, 'Multiples of 7')
 
-A000079 = Sequence(recurrence([2], [1]), lambda n: 2 ** 
+A000079 = Sequence(recurrence([2], [1]), lambda n: 2 **
                    n, desc='Powers of 2: a(n) = 2^n.')
 A001146 = Sequence(None, lambda n: 2 ** 2 ** n, desc='2^(2^n)')
 A051179 = A001146 - 1
@@ -56,7 +56,7 @@ A000244 = Sequence(None, lambda n: 3 ** n, desc='Powers of 3: a(n) = 3^n.')
 A067500 = A000244.filter(lambda n: digsum(
     n) in A000244, "Powers of 3 with digit sum also a power of 3.")
 
-A006521 = Sequence(1, None, lambda n: (2 ** n + 1) % 
+A006521 = Sequence(1, None, lambda n: (2 ** n + 1) %
                    n == 0, "Numbers n such that n divides 2^n + 1. ")
 
 A000332 = Sequence(0, lambda n: binomial(
@@ -108,17 +108,17 @@ A000290 = Sequence(None, lambda n: n * n, lambda n: is_square(n), 'squares')
 A002779 = A000290.filter(is_palindromic)
 A002779.desc = 'Palindromic squares.'
 
-A061457 = A000290.filter(lambda x:is_square(reverse(x)))
+A061457 = A000290.filter(lambda x: is_square(reverse(x)))
 A061457.desc = "Numbers n such that n and its reversal are both squares."
 
-A102859 = A061457.apply(isqrt, containf=lambda x:is_square(reverse(x * x)))
+A102859 = A061457.apply(isqrt, containf=lambda x: is_square(reverse(x * x)))
 A102859.desc = "Numbers that when squared and written backwards give a square again"
 
 # A330287 proposal for "Numbers that when squared and written backwards give a square again, the square root of which is the original number reversed."
-# equivalent to 
-A061909 = Sequence(None, None, lambda n:reverse(n) ** 2 == reverse(n ** 2),
-desc='Skinny numbers: numbers n such that there are no carries when n is squared by "long multiplication".'
-)
+# equivalent to
+A061909 = Sequence(None, None, lambda n: reverse(n) ** 2 == reverse(n ** 2),
+                   desc='Skinny numbers: numbers n such that there are no carries when n is squared by "long multiplication".'
+                   )
 
 A000326 = Sequence(None, pentagonal, is_pentagonal, 'pentagonal numbers')
 
@@ -217,7 +217,8 @@ A002182 = Sequence(record_index(A000005, count(1)),
                    desc='Highly composite numbers, definition (1): where d(n), the number of divisors of n (A000005), increases to a record.'
                    )
 
-A000203 = Sequence(1, sigma,desc='sigma(n), the sum of the divisors of n. Also called sigma_1(n).')
+A000203 = Sequence(
+    1, sigma, desc='sigma(n), the sum of the divisors of n. Also called sigma_1(n).')
 
 A033880 = Sequence(1, abundance)
 
@@ -240,7 +241,7 @@ A008578 = Sequence(
     'Prime numbers at the beginning of the 20th century (today 1 is no longer regarded as a prime).'
 )
 
-A065091 = Sequence(primes_gen(3), None, lambda x: x != 
+A065091 = Sequence(primes_gen(3), None, lambda x: x !=
                    2 and is_prime(x), 'The odd prime numbers')
 A001248 = A000040.apply(
     lambda n: n * n, lambda n: is_prime(isqrt(n)), desc='Square of primes')
@@ -254,7 +255,7 @@ A045699.desc = "Numbers of the form p^2 + q^3, p,q prime."
 A134657 = A045699.product(A030514, sum).unique()
 A134657.desc = "Numbers of the form p^2 + q^3 + r^4 with p, q and r primes."
 
-a318530 = A001248.product(A030078, sum)
+A318530 = A001248.product(A030078, sum)
 
 A000961 = Sequence(1, None, lambda n: len(list(factorize(n))) == 1,
                    desc='Powers of primes. Alternatively, 1 and the prime powers (p^k, p prime, k >= 1).'
@@ -269,7 +270,8 @@ A001348 = A000040.apply(
 A000668 = A000043.apply(
     lambda p: A000079[p] - 1, desc='Mersenne primes (of form 2^p - 1 where p is a prime).')
 
-A005384 = A000040.filter(lambda p:is_prime(2 * p + 1), 'Sophie Germain primes p: 2p+1 is also prime. ')
+A005384 = A000040.filter(lambda p: is_prime(
+    2 * p + 1), 'Sophie Germain primes p: 2p+1 is also prime. ')
 
 A000396 = A000043.apply(lambda p: A000079[p - 1] * (A000079[p] - 1),
                         containf=lambda x: is_perfect(x) == 0,
@@ -332,7 +334,8 @@ A006567 = A000040.filter(lambda x: not is_palindromic(x)
 A006567.desc = "Emirps (primes whose reversal is a different prime). "
 
 # ulam spiral
-A244802 = Sequence(None, lambda n:12 * (n + 1) ** 2 - 27 * (n + 1) + 16, desc="The 60º spoke (or ray) of a hexagonal spiral of Ulam.")
+A244802 = Sequence(None, lambda n: 12 * (n + 1) ** 2 - 27 * (n + 1) +
+                   16, desc="The 60º spoke (or ray) of a hexagonal spiral of Ulam.")
 
 # see https://blog.plover.com/math/dd.html
 
@@ -361,6 +364,7 @@ def anagram_gen(factor, base=10, start=0, inbase=False):
                     else:
                         yield n
 
+
 ''' too slow for now
 A023086, A023087, A023088, A023089, A023090, A023091, A023092, A023093 = [
     Sequence(anagram_gen(f), None, lambda x:is_anagram(x, f * x),
@@ -375,6 +379,7 @@ def first_anagram(f):
                     lambda n: first(anagram_gen(f, base=n, start=1)),
                     desc="a(n) is least k such that k and %dk are anagrams in base n (written in base 10)." % f
                     )
+
 
 ''' to slow
 A023094, A023095, A023096, A023097, A023098, A023099, A023100, A023101, A023102 = [
@@ -456,6 +461,13 @@ A018239 = A006862.filter(
 
 A007504 = A000040.accumulate()
 A001223 = A000040.pairwise(operator.sub)
+A001223.desc = 'Prime gaps: differences between consecutive primes.'
+
+A001043 = A000040.pairwise(operator.add)
+A001043.desc = 'Numbers that are the sum of 2 successive primes.'
+
+A006094 = A000040.pairwise(operator.mul)
+A006094.desc = 'Products of 2 successive primes'
 
 A077800 = Sequence(flatten(twin_primes()))
 
@@ -712,7 +724,7 @@ def recaman():
     s, x = set(), 0
     yield x, None, 0
     for n in count(1):
-        (x, addition_step) = (x - n, False) if (x - 
+        (x, addition_step) = (x - n, False) if (x -
                                                 n > 0 and x - n not in s) else (x + n, True)
         s.add(x)
         yield x, addition_step, n
@@ -722,7 +734,7 @@ A005132 = Sequence(map(operator.itemgetter(0), recaman()))
 
 A057165 = Sequence(
     map(operator.itemgetter(2),  # get n from ...
-        filter(# filtered recaman generator
+        filter(  # filtered recaman generator
             lambda x: x[1],  # when addition_step is True
             recaman()
     )
@@ -731,7 +743,7 @@ A057165 = Sequence(
 
 A057166 = Sequence(
     map(operator.itemgetter(2),  # get n from ...
-        filter(# filtered recaman generator
+        filter(  # filtered recaman generator
             lambda x: x[1] == False,  # when substraction step
             recaman()
     )
@@ -765,14 +777,19 @@ def bell():
 A000110 = Sequence(bell)
 
 # https://en.wikipedia.org/wiki/Lucas_sequence#Specific_names
-A000032 = Sequence(lucasV(1, -1), desc="Lucas numbers beginning at 2: L(n) = L(n-1) + L(n-2), L(0) = 2, L(1) = 1.");
+A000032 = Sequence(lucasV(
+    1, -1), desc="Lucas numbers beginning at 2: L(n) = L(n-1) + L(n-2), L(0) = 2, L(1) = 1.")
 A214733 = Sequence(lucasU(-1, 3))
-A128834 = Sequence(lucasU(1, 1), desc="Periodic sequence 0,1,1,0,-1,-1,...");
-A087204 = Sequence(lucasV(1, 1), desc="Period 6: repeat [2, 1, -1, -2, -1, 1].");
-A107920 = Sequence(lucasU(1, 2), desc="Lucas and Lehmer numbers with parameters (1+-sqrt(-7))/2."); 
-A002249 = Sequence(lucasV(1, 2), desc="a(n) = a(n-1) - 2*a(n-2) with a(0) = 2, a(1) = 1."); 
+A128834 = Sequence(lucasU(1, 1), desc="Periodic sequence 0,1,1,0,-1,-1,...")
+A087204 = Sequence(
+    lucasV(1, 1), desc="Period 6: repeat [2, 1, -1, -2, -1, 1].")
+A107920 = Sequence(
+    lucasU(1, 2), desc="Lucas and Lehmer numbers with parameters (1+-sqrt(-7))/2.")
+A002249 = Sequence(
+    lucasV(1, 2), desc="a(n) = a(n-1) - 2*a(n-2) with a(0) = 2, a(1) = 1.")
 
-A000129 = Sequence(lucasU(2, -1), desc="Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).")
+A000129 = Sequence(lucasU(
+    2, -1), desc="Pell numbers: a(0) = 0, a(1) = 1; for n > 1, a(n) = 2*a(n-1) + a(n-2).")
 
 A001045 = Sequence(recurrence([1, 2], [0, 1]),
                    desc="Jacobsthal sequence (or Jacobsthal numbers): a(n) = a(n-1) + 2*a(n-2), with a(0) = 0, a(1) = 1."
@@ -783,8 +800,8 @@ A000142.desc = "Factorial numbers: n! = 1*2*3*4*...*n order of symmetric group S
 
 A061006 = Sequence(1, lambda n: mod_fac(n - 1, n))
 
-A062569 =A000203(A000142)
-A062569.desc="a(n) = sigma(n!)."
+A062569 = A000203(A000142)
+A062569.desc = "a(n) = sigma(n!)."
 
 # operations on digits
 
@@ -908,7 +925,7 @@ A005349 = A000027.filter(is_harshad,
 
 A001101 = A005349.filter(lambda n: is_prime(is_harshad(n)),
                          desc="Moran numbers: n such that (n / sum of digits of n) is prime."
-                         +'Called "Strong Harshad"in Euler Problem 387'
+                         + 'Called "Strong Harshad"in Euler Problem 387'
                          )
 
 
@@ -1136,7 +1153,8 @@ A003945 = Sequence(recurrence([2], [1, 3]),
 
 A285361 = Sequence(
     recurrence((8, -24, 34, -23, 6), (1, 11, 64, 282, 1071)),
-    lambda n: (3 ** (n + 3) - 5 * 2 ** (n + 4) + 4 * n ** 2 + 26 * n + 53) // 4,
+    lambda n: (3 ** (n + 3) - 5 * 2 ** (n + 4) +
+               4 * n ** 2 + 26 * n + 53) // 4,
     desc="The number of tight 3 X n pavings."
 )
 # https://fr.quora.com/Comment-pouvons-nous-trouver-le-%C3%A9ni%C3%A8me-terme-de-cette-s%C3%A9quence-de-nombres-1-11-64-282-1071-3729-en-utilisant-une-formule-math%C3%A9matique
@@ -1151,7 +1169,8 @@ def fA051885(n):
     return (m + 1) * 10 ** d - 1
 
 
-A051885 = Sequence(None, fA051885, None, "Smallest number whose sum of digits is n.")
+A051885 = Sequence(None, fA051885, None,
+                   "Smallest number whose sum of digits is n.")
 
 # Build oeis dict by module introspection : Simple and WOW !
 seqs = globals().copy()
@@ -1162,5 +1181,5 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20, A062569):
-        print(n)
+    for n in take(20,A051885):
+        print(n, ',', end='')
