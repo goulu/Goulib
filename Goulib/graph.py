@@ -518,6 +518,7 @@ class _Geo(plot.Plot):
         """ draw graph with default params"""
         kwargs.setdefault('with_labels', False)
         kwargs.setdefault('node_size', 0)
+        kwargs.pop('transparent',None) #TODO: what to do with this ?
 
         return draw_networkx(self, **kwargs)
 
@@ -624,7 +625,52 @@ def figure(g, box=None, **kwargs):
     return fig
 
 
-def draw_networkx(g, pos=None, **kwargs):
+def draw_networkx(
+        g, pos=None,
+        fig=None, figsize=None,
+        # draw_networkx_edges
+        edgelist=None,
+        width=1.0,
+        edge_color=None,  # g.color by default, "k" otherwise
+        style="solid",
+        alpha=None,
+        arrowstyle="-|>",
+        arrowsize=10,
+        edge_cmap=None,
+        edge_vmin=None,
+        edge_vmax=None,
+        ax=None,
+        arrows=True,
+        label=None,
+        connectionstyle=None,
+        min_source_margin=0,
+        min_target_margin=0,
+        # draw_networkx_nodes
+        nodelist=None,
+        node_size=300,
+        node_color="#1f78b4",
+        node_shape="o",
+        # alpha=None,
+        cmap=None,
+        vmin=None,
+        vmax=None,
+        linewidths=None,
+        edgecolors=None,
+        # label=None,
+        # draw_network_labels
+        with_labels=True,  # unused
+        # True in nx.draw_networkx, but false here. can be a list, a function ...
+        labels=False,
+        font_size=12,
+        font_color="k",
+        font_family="sans-serif",
+        font_weight="normal",
+        # alpha=None,
+        bbox=None,
+        horizontalalignment="center",
+        verticalalignment="center",
+        # ax=None,
+):
     """ improves nx.draw_networkx
     :param g: NetworkX Graph
     :param pos: can be either :
@@ -666,9 +712,9 @@ def draw_networkx(g, pos=None, **kwargs):
     except AttributeError:
         pass
 
-    edgelist = list(kwargs.pop('edgelist', g.edges(data=True)))
+    if edgelist is None:
+        edgelist = g.edges(data=True)
 
-    edge_color = kwargs.get('edge_color', None)
     if edge_color is None:
         # build edge_colors
         default = None
@@ -687,24 +733,24 @@ def draw_networkx(g, pos=None, **kwargs):
     if itertools2.iscallable(edge_color):  # mapping function ?
         edge_color = list(map(edge_color, (data for u, v, data in edgelist)))
 
-    if edge_color:  # not empty
-        kwargs['edge_color'] = edge_color
-
-    fig = kwargs.pop('fig', None)
-
     if not fig:
         try:  # we need a bounding box
             box = g.box()
         except:
             box = (math2.minimum(pos.values()), math2.maximum(pos.values()))
-        fig = figure(g, box=box, figsize=kwargs.get('figsize', None))
+        fig = figure(g, box=box, figsize=figsize)
 
-    if kwargs.get('node_size', 300) > 0:
-        nx.draw_networkx_nodes(g, pos, **kwargs)
+    if node_size > 0:
+        nx.draw_networkx_nodes(g, pos, nodelist, node_size, node_color, node_shape,
+                               alpha, cmap, vmin, vmax, ax, linewidths, edgecolors, label)
 
-    nx.draw_networkx_edges(g, pos, edgelist, **kwargs)
+    nx.draw_networkx_edges(g, pos, edgelist, width, edge_color, style, alpha,
+                           arrowstyle, arrowsize, edge_cmap, edge_vmin, edge_vmax,
+                           ax, arrows, label,
+                           node_size, nodelist, node_shape, connectionstyle,
+                           min_source_margin, min_target_margin)
 
-    labels = kwargs.pop('labels', False)  # True in nx.draw_networkx they're
+    with_labels  # is ignored. we check if labels is False or not
     if labels:
         if labels is True:
             labels = None  # will be set automatically
@@ -712,7 +758,8 @@ def draw_networkx(g, pos=None, **kwargs):
             labels = list(labels(u) for u in g.nodes(data=True))
         if isinstance(labels, list):  # a dict is expected:
             labels = dict(zip(g.nodes(), labels))
-        nx.draw_networkx_labels(g, pos, labels, **kwargs)
+        nx.draw_networkx_labels(g, pos, labels, font_size, font_color, font_family, font_weight,
+                                alpha, bbox, horizontalalignment, verticalalignment, ax)
 
     return fig
 

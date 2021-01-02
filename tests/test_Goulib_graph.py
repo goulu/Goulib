@@ -220,17 +220,17 @@ class TestDelauneyEMST:
         self.nodes = [(random(), random()) for _ in range(self.n)]
         
     def test_delauney_triangulation(self):
-        start = time.clock()
+        start = time.perf_counter()
         graph = delauney_triangulation(self.nodes, tol=0)
-        logging.info('Delauney %d : %f' % (self.n, time.clock()-start))
+        logging.info('Delauney %d : %f' % (self.n, time.perf_counter()-start))
         assert_equal(graph.number_of_nodes(), self.n)
         assert_true(nx.is_connected(graph))
         graph.save(results+'graph.delauney.png')
 
     def test_emst(self):
-        start = time.clock()
+        start = time.perf_counter()
         graph = euclidean_minimum_spanning_tree(self.nodes)
-        logging.info('Spanning tree %d : %f' % (self.n, time.clock()-start))
+        logging.info('Spanning tree %d : %f' % (self.n, time.perf_counter()-start))
         graph.save(results+'graph.emst.png')
         graph=to_networkx_graph(graph, create_using=nx.Graph()) # issue #12
 

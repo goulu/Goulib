@@ -76,6 +76,7 @@ class Context:
         ast.Call: (None, 9000),
         ast.Name: (None, 9000),
         ast.Num: (None, 9000),
+        ast.Constant: (None, 9000),
     }
 
     def add_function(self, f, s=None, r=None, l=None):
