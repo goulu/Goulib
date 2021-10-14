@@ -21,6 +21,8 @@ from Goulib import decorators
 from Goulib.container import Sequence
 from Goulib.math2 import *
 
+timout = 10  # seconds
+
 A000004 = Sequence(repeat(0), lambda _: 0, lambda x: x ==
                    0, desc='The zero sequence')
 
@@ -283,7 +285,7 @@ def exp_sequences(a, b, c, desc_s1=None, desc_s2=None, desc_s3=None, start=0):
 
     def _gen():
         p = b ** start
-        for _ in decorators.itimeout(count(), 10):
+        for _ in decorators.itimeout(count(), timeout):
             yield a * p + c
             p = p * b
 
@@ -1057,7 +1059,9 @@ A000796 = Sequence(
 
 def pi_primes():
     v = 0
-    for i, d in decorators.itimeout(enumerates(pi_digits_gen()), 10):
+    for i, d in decorators.itimeout(enumerates(pi_digits_gen()), timeout):
+        if i%100==0:
+            print((i))
         v = 10 * v + d
         if is_prime(v):
             yield i + 1, v
@@ -1171,7 +1175,8 @@ A051885 = Sequence(None, fA051885, None,
 # https://fr.quora.com/Comment-trouvez-vous-les-valeurs-int%C3%A9grales-de-n-pour-que-6n-2-3-soit-un-carr%C3%A9-parfait/answer/Philippe-Guglielmetti
 A054320 = Sequence(
     recurrence([-1, 10], [1, 11]),
-    lambda n: rint((sqrt(6) - 2)/4*(5 + 2*sqrt(6))**(n+1) - (sqrt(6) + 2)/4 * (5 - 2*sqrt(6))**(n+1)),
+    lambda n: rint((sqrt(6) - 2)/4*(5 + 2*sqrt(6))**(n+1) -
+                   (sqrt(6) + 2)/4 * (5 - 2*sqrt(6))**(n+1)),
     lambda x: is_square(6*x**2+3),
     "Expansion of g.f.: (1 + x)/(1 - 10*x + x^2).")
 
@@ -1185,5 +1190,6 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(6, A054320):
+    timeout = None  # no timeout
+    for n in A005042:
         print(n)
