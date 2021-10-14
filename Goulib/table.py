@@ -24,11 +24,9 @@ try:
     from lxml import etree as ElementTree
     defaultparser = ElementTree.HTMLParser
     Element = ElementTree._Element
-except ImportError: #TODO: find why it happens in LiClipse
+except ImportError:  # TODO: find why it happens in LiClipse
     from xml.etree import ElementTree
     Element = ElementTree.Element
-    
-
 
 
 def attr(args):
@@ -553,7 +551,8 @@ class Table(list):
         """
         :return: number of columns, ignoring title
         """
-
+        if len(self) == 0:
+            return 0
         return max(map(len, self))
 
     def find_col(self, title):
