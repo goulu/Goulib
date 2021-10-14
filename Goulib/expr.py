@@ -363,7 +363,7 @@ class Expr(plot.Plot):
             if isinstance(f, ast.unaryop):
                 node = ast.UnaryOp(f, self.body)
             else:
-                # if not isinstance(f,Expr): f=Expr(f) #not useful as applx does the reverse
+                if not isinstance(f,Expr): f=Expr(f)
                 return f.applx(self)
         else:
             if not isinstance(right, Expr):
