@@ -32,17 +32,18 @@ try:
 except AttributeError:
     nan = float('nan')  # Not a Number
 
-    
+
 def longint(mantissa, exponent):
     ''' :return: int equivalent to int(mantissa*10^exponent) without rounding errors
     '''
     s = str(mantissa)
-    if 'E' in s: raise ValueError
+    if 'E' in s:
+        raise ValueError
     p = 0
     try:
         p = s.index('.')
         s = s.replace('.', '', 1)
-        p=len(s)-p
+        p = len(s)-p
     except ValueError:
         pass
     p = exponent - p
@@ -51,7 +52,7 @@ def longint(mantissa, exponent):
     if p > 0:
         s = s + '0' * p
     return int(s)
-    
+
 
 def cmp(x, y):
     '''Compare the two objects x and y and return an integer according to the outcome.
@@ -764,11 +765,11 @@ def recurrence(factors, values, cst=0, max=None, mod=0):
         if mod:
             n = n % mod
         yield n
-        values.pop(0);
+        values.pop(0)
         values.append(n)
 
 
-# https://en.wikipedia.org/wiki/Lucas_sequence        
+# https://en.wikipedia.org/wiki/Lucas_sequence
 def lucasU(p, q):
     return recurrence([-q, p], [0, 1])
 
@@ -937,7 +938,7 @@ def triples():
     sorted by hypotenuse z, then longest side y
     '''
     prim = []  # list of primitive triples up to now
-    
+
     def key(x): return (x[2], x[1])
 
     from sortedcontainers import SortedListWithKey
@@ -1326,7 +1327,8 @@ def factorize(n):
 def factors(n):
     for (p, e) in factorize(n):
         yield p ** e
-        
+
+
 def sigma(n):
     return sum(divisors(n))
 
@@ -1989,16 +1991,42 @@ def partitionsQ(n, d=0):
     return sum(partitionsQ(n - k, n - 2 * k + 1) for k in range(1, n - d + 1))
 
 
-def get_cardinal_name(num):
+numbers_en = {
+    0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+    6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+    11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen",
+    15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
+    19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty",
+    50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety",
+    100: "hundred",
+    1000: "thousand",
+    1000000: "million",
+    1000000000: "billion",
+
+}
+
+numbers_fr = {
+    0: "zero", 1: "un", 2: "deux", 3: "trois", 4: "quatre", 5: "cinq",
+    6: "six", 7: "sept", 8: "huit", 9: "neuf", 10: "dix",
+    11: "onze", 12: "douze", 13: "treize", 14: "quatorze",
+    15: "quinze", 16: "seize", 17: "dix-sept", 18: "dix-huit",
+    19: "dix-neuf", 20: "vingt", 30: "trente", 40: "quarante",
+    50: "cinquante", 60: "soixante", 70: "soixante-dix", 80: "quatre-vingt", 90: "quatre-vingt-dix",
+    100: "cent",
+    1000: "mille",
+    1000000: "million",
+    1000000000: "milliard",
+}
+
+numbers_ch = numbers_fr
+numbers_ch.update({70: "septante", 80: "huitante",  90: "nonante"})
+
+
+def get_cardinal_name(num, numbers=numbers_en):
     '''Get cardinal name for number (0 to 1 million)'''
-    numbers = {
-        0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
-        6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
-        11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen",
-        15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
-        19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty",
-        50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety",
-    }
+
+    if num in numbers:
+        return numbers[num]
 
     def _get_tens(n):
         a, b = divmod(n, 10)
@@ -2009,14 +2037,14 @@ def get_cardinal_name(num):
         hundreds = (n // 100) % 10
         return filter(bool, [
             hundreds > 0 and numbers[hundreds],
-            hundreds > 0 and "hundred",
+            hundreds > 0 and numbers[100],
             hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
         ])
 
     blocks = digits(num, 1000, rev=True)  # group by 1000
     res = ''
-    for hdu, word in zip(blocks, ['', ' thousand ', ' million ', ' billion ']):
+    for hdu, word in zip(blocks, ['', ' '+numbers[1000]+' ', ' '+numbers[1000000]+' ', ' ' + numbers[1000000000]+' ']):
         if hdu == 0:
             continue  # skip
         try:
@@ -2341,6 +2369,7 @@ def de_bruijn(k, n):
     db(1, 1)
     return "".join(alphabet[i] for i in sequence)
 
+
 '''modular arithmetic
 initial motivation: https://www.hackerrank.com/challenges/ncr
 
@@ -2569,7 +2598,7 @@ def pi_digits_gen():
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
     q, r, t, j = 1, 180, 60, 2
     while True:
-        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q * 
+        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q *
                                                (27 * j - 12) + 5 * r) // (5 * t)
         yield y
         q, r, t, j = 10 * q * j * (2 * j - 1), 10 * \
@@ -2837,7 +2866,7 @@ def factor_ecm(n, B1=10, B2=20):
             seed = random.randrange(6, n)
             u, v = (seed ** 2 - 5) % n, 4 * seed % n
             p = pow(u, 3, n)
-            Q, C = (pow(v - u, 3, n) * (3 * u + v) % 
+            Q, C = (pow(v - u, 3, n) * (3 * u + v) %
                     n, 4 * p * v % n), (p, pow(v, 3, n))
             pg = primes_gen()
             p = next(pg)
