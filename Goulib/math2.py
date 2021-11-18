@@ -92,9 +92,7 @@ except AttributeError:
             return False
         diff = abs(b - a)
 
-        return (((diff <= abs(rel_tol * b)) or
-                 (diff <= abs(rel_tol * a))) or
-                (diff <= abs_tol))
+        return (((diff <= abs(rel_tol * b)) or (diff <= abs(rel_tol * a))) or (diff <= abs_tol))
 
 
 def allclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -600,12 +598,12 @@ def minimum(m):
 
 def vecadd(a, b, fillvalue=0):
     '''addition of vectors of inequal lengths'''
-    return [l[0] + l[1] for l in itertools.zip_longest(a, b, fillvalue=fillvalue)]
+    return [c[0] + c[1] for c in itertools.zip_longest(a, b, fillvalue=fillvalue)]
 
 
 def vecsub(a, b, fillvalue=0):
     '''substraction of vectors of inequal lengths'''
-    return [l[0] - l[1] for l in itertools.zip_longest(a, b, fillvalue=fillvalue)]
+    return [c[0] - c[1] for c in itertools.zip_longest(a, b, fillvalue=fillvalue)]
 
 
 def vecneg(a):
@@ -619,14 +617,14 @@ def vecmul(a, b):
         return [x * a for x in b]
     if isinstance(b, (int, float)):
         return [x * b for x in a]
-    return [functools.reduce(operator.mul, l) for l in zip(a, b)]
+    return [functools.reduce(operator.mul, c) for c in zip(a, b)]
 
 
 def vecdiv(a, b):
     '''quotient of vectors of inequal lengths'''
     if isinstance(b, (int, float)):
         return [float(x) / b for x in a]
-    return [functools.reduce(operator.truediv, l) for l in zip(a, b)]
+    return [functools.reduce(operator.truediv, c) for c in zip(a, b)]
 
 
 def veccompare(a, b):
@@ -823,12 +821,12 @@ def pisano_cycle(mod):
     if mod < 2:
         return [0]
     seq = [0, 1]
-    l = len(seq)
+    k = len(seq)
     s = []
     for i, n in enumerate(fibonacci_gen(mod=mod)):
         s.append(n)
-        if i > l and s[-l:] == seq:
-            return s[:-l]
+        if i > k and s[-k:] == seq:
+            return s[:-k]
 
 
 def pisano_period(mod):
@@ -939,7 +937,8 @@ def triples():
     '''
     prim = []  # list of primitive triples up to now
 
-    def key(x): return (x[2], x[1])
+    def key(x):
+        return (x[2], x[1])
 
     from sortedcontainers import SortedListWithKey
     samez = SortedListWithKey(key=key)  # temp triplets with same z
@@ -1013,11 +1012,11 @@ class Sieve:
         return (i for i, v in enumerate(self._) if v)
 
     def resize(self, n):
-        l = len(self) - 1
-        if n <= l:
+        k = len(self) - 1
+        if n <= k:
             return
         n = int(n)  # to tolerate n=1E9, which is float
-        self._.extend([True] * (n - l))
+        self._.extend([True] * (n - k))
         for i in self(n):
             if i == 2:
                 i2, s = 4, 2
@@ -1523,7 +1522,8 @@ def digsum(num, f=None, base=10):
     if is_number(f):
         p = f
 
-        def f(x): return pow(x, p)
+        def f(x):
+            return pow(x, p)
 
     try:
         return sum(map(f, d))
@@ -1575,9 +1575,9 @@ def powertrain(n):
     :see: http://oeis.org/A133500
     '''
     s = str(n)
-    l = len(s)
-    m = int(s[-1]) if l % 2 else 1
-    for i in range(0, l - 1, 2):
+    k = len(s)
+    m = int(s[-1]) if k % 2 else 1
+    for i in range(0, k - 1, 2):
         m *= int(s[i]) ** int(s[i + 1])
     return m
 
@@ -2019,7 +2019,7 @@ numbers_fr = {
 }
 
 numbers_ch = numbers_fr
-numbers_ch.update({70: "septante", 80: "huitante",  90: "nonante"})
+numbers_ch.update({70: "septante", 80: "huitante", 90: "nonante"})
 
 
 def get_cardinal_name(num, numbers=numbers_en):
@@ -2150,6 +2150,79 @@ def factorial_gen(f=lambda x: x):
         yield last
 
 
+def log_factorial(n):
+    '''
+    :return: float approximation of ln(n!) by Ramanujan formula
+    '''
+    return n * math.log(n) - n + (math.log(n * (1 + 4 * n * (1 + 2 * n)))) / 6 + math.log(math.pi) / 2
+
+
+gamma = math.gamma  # didn't knew it was there...
+
+# inverse gamma function from https://mathoverflow.net/a/98267/88768
+
+
+def lambertW(z):
+    """
+    Lambert W function, principal branch.
+    See http://en.wikipedia.org/wiki/Lambert_W_function
+    Code taken from http://keithbriggs.info/software.html
+    """
+    eps = 4.0e-16
+    em1 = 0.3678794411714423215955237701614608
+    assert z >= -em1, 'lambertW: bad argument %g, exiting.' % z
+    if 0.0 == z:
+        return 0.0
+    if z < -em1+1e-4:
+        q = z+em1
+        r = math.sqrt(q)
+        q2 = q*q
+        q3 = q2*q
+        return\
+            -1.0\
+            + 2.331643981597124203363536062168*r\
+            - 1.812187885639363490240191647568*q\
+            + 1.936631114492359755363277457668*r*q\
+            - 2.353551201881614516821543561516*q2\
+            + 3.066858901050631912893148922704*r*q2\
+            - 4.175335600258177138854984177460*q3\
+            + 5.858023729874774148815053846119*r*q3\
+            - 8.401032217523977370984161688514*q3*q
+    if z < 1.0:
+        p = math.sqrt(2.0*(2.7182818284590452353602874713526625*z+1.0))
+        w = -1.0+p*(1.0+p*(-0.333333333333333333333
+                           + p*0.152777777777777777777777))
+    else:
+        w = math.log(z)
+    if z > 3.0:
+        w -= math.log(w)
+    for i in range(10):
+        e = math.exp(w)
+        t = w*e-z
+        p = w+1.0
+        t /= e*p-0.5*(p+1.0)*t/p
+        w -= t
+        if abs(t) < eps*(1.0+abs(w)):
+            return w
+    raise AssertionError('Unhandled value %1.2f' % z)
+
+
+def gamma_inverse(x):
+    """
+    Inverse the gamma function.
+    http://mathoverflow.net/questions/12828/inverse-gamma-function
+    """
+    k = 1.461632  # the positive zero of the digamma function, scipy.special.psi
+    assert (
+        x >= k, 'gamma(x) is strictly increasing for x >= k, k=%1.2f, x=%1.2f' % (
+            k, x)
+    )
+    C = math.sqrt(2*math.pi)/math.e - gamma(k)  # approximately 0.036534
+    L = math.log((x+C)/sqrt(2*math.pi))
+    gamma_inv = 0.5+L/lambertW(L/math.e)
+    return gamma_inv
+
+
 def binomial(n, k):
     '''binomial coefficient "n choose k"
     :param: n, k int
@@ -2187,13 +2260,6 @@ def binomial_exponent(n, k, p):
     return min(binomial_exponent(n, k, a) // b for a, b in factorize(p))
 
 
-def log_factorial(n):
-    '''
-    :return: float approximation of ln(n!) by Ramanujan formula
-    '''
-    return n * math.log(n) - n + (math.log(n * (1 + 4 * n * (1 + 2 * n)))) / 6 + math.log(math.pi) / 2
-
-
 def log_binomial(n, k):
     '''
     :return: float approximation of ln(binomial(n,k))
@@ -2211,11 +2277,11 @@ def ilog(a, b, upper_bound=False):
     '''
     # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
     # for now it's brute force...
-    l = 0
+    i = 0
     while a >= b:
         a //= b
-        l += 1
-    return l
+        i += 1
+    return i
 
     p = 1
     for x in itertools.count():
@@ -2598,11 +2664,13 @@ def pi_digits_gen():
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
     q, r, t, j = 1, 180, 60, 2
     while True:
-        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q *
-                                               (27 * j - 12) + 5 * r) // (5 * t)
+        u, y = 3 * (3 * j + 1) * (3 * j + 2), \
+            (q * (27 * j - 12) + 5 * r) // (5 * t)
         yield y
-        q, r, t, j = 10 * q * j * (2 * j - 1), 10 * \
-            u * (q * (5 * j - 2) + r - y * t), t * u, j + 1
+        q, r, t, j = 10 * q * j * (2 * j - 1), \
+            10 * u * (q * (5 * j - 2) + r - y * t), \
+            t * u, \
+            j + 1
 
 
 def lucky_gen():
@@ -2709,8 +2777,8 @@ def pollardRho_brent(n):
         return n
     g = n
     while g == n:
-        y, c, m, g, r, q = randrange(1, n), randrange(
-            1, n), randrange(1, n), 1, 1, 1
+        y, c, m, g, r, q = random.randrange(1, n), random.randrange(
+            1, n), random.randrange(1, n), 1, 1, 1
         while g == 1:
             x, k = y, 0
             for i in range(r):

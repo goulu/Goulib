@@ -14,11 +14,12 @@ import Goulib.itertools2
 
 class TestLongint:
     def test_longint(self):
-        assert_equal(longint(1,3),1000)
-        assert_equal(longint(10,2),1000)
-        assert_equal(longint(0.1,4),1000)
-        assert_equal(longint(0.123,4),1230)
-        
+        assert_equal(longint(1, 3), 1000)
+        assert_equal(longint(10, 2), 1000)
+        assert_equal(longint(0.1, 4), 1000)
+        assert_equal(longint(0.123, 4), 1230)
+
+
 class TestSign:
     def test_sign(self):
         assert_equal(sign(0.0001), 1)
@@ -217,8 +218,7 @@ class TestFibonacciGen:
         def problem2(n):
             """Find the sum of all the even-valued terms in the Fibonacci < 4 million."""
             even_fibonacci = (x for x in fibonacci_gen() if x % 2 == 0)
-            l = list(takewhile(lambda x: x < n, even_fibonacci))
-            return sum(l)
+            return sum(takewhile(lambda x: x < n, even_fibonacci))
 
         assert_equal(problem2(10), 10)
         assert_equal(problem2(100), 44)
@@ -741,6 +741,32 @@ class TestSlerp:
         assert_equal(s, vecunit((1, 1, 0)))
 
 
+class TestFactorial:
+    def test_factorial(self):
+        assert_equal(factorial(0), 1)
+        assert_equal(factorial2(0), 1)
+        assert_equal([factorial2(x) for x in [7, 8, 9]], [105, 384, 945])
+        assert_equal(factorialk(5, 1), 120)
+        assert_equal(factorialk(5, 3), 10)
+
+
+class TestFactorialGen:
+    def test_factorial_gen(self):
+        # assert_equal(expected, factorial_gen())
+        raise SkipTest
+
+
+class TestGamma:
+    def test_gamma(self):
+        assert_equal(gamma(10), factorial(10))
+
+
+class TestGammaInverse:
+    def test_gamma_inverse(self):
+        n = factorial(10)
+        assert_equal(gamma_inverse(n), 10)
+
+
 class TestLogFactorial:
     def test_log_factorial(self):
         assert_equal(log_factorial(100), 363.73937555556349014408)
@@ -836,15 +862,6 @@ class TestAbundance:
         raise SkipTest
 
 
-class TestFactorial:
-    def test_factorial(self):
-        assert_equal(factorial(0), 1)
-        assert_equal(factorial2(0), 1)
-        assert_equal([factorial2(x) for x in [7, 8, 9]], [105, 384, 945])
-        assert_equal(factorialk(5, 1), 120)
-        assert_equal(factorialk(5, 3), 10)
-
-
 class TestCeildiv:
     def test_ceildiv(self):
         assert_equal(ceildiv(1, 3), 1)
@@ -866,14 +883,16 @@ class TestCatalan:
 
 class TestPrimitiveTriples:
     def test_primitive_triples(self):
-        def key(x): return (x[2], x[1])
+        def key(x): 
+            return (x[2], x[1])
         for t in itertools2.take(10000, itertools2.ensure_sorted(primitive_triples(), key)):
             assert_true(is_pythagorean_triple(*t))
 
 
 class TestTriples:
     def test_triples(self):
-        def key(x): return (x[2], x[1])
+        def key(x): 
+            return (x[2], x[1])
         for t in itertools2.take(10000, itertools2.ensure_sorted(triples(), key)):
             assert_true(is_pythagorean_triple(*t))
 
@@ -945,12 +964,6 @@ class TestIsHappy:
 class TestNumberOfDivisors:
     def test_number_of_divisors(self):
         # assert_equal(expected, number_of_divisors(n))
-        raise SkipTest
-
-
-class TestFactorialGen:
-    def test_factorial_gen(self):
-        # assert_equal(expected, factorial_gen())
         raise SkipTest
 
 
