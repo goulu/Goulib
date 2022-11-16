@@ -18,12 +18,13 @@ from Goulib.tests import *
 
 class Database:
 
-    def __init__(self, dbpath):
+    def __init__(self, path):
+        dbpath = os.path.join(path, 'oeis.db')
         dbexists = os.path.exists(dbpath)
         try:
             self.db = sqlite3.connect(dbpath)
             if not dbexists:
-                self.execute(open('create.sql', 'r').read())
+                self.execute(open(os.path.join(path,'create.sql'), 'r').read())
                 logging.info("tables created")
         except sqlite3.Error as error:
             logging.error("Error while connecting to sqlite", error)
@@ -131,7 +132,7 @@ class Database:
 
 logging.basicConfig(level=logging.DEBUG)
 path = os.path.dirname(os.path.abspath(__file__))
-database = Database(path + '/oeis.db')
+database = Database(path)
 logging.info("SQLite DB Version : " + database.version)
 
 
