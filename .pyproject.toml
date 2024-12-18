@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "goulib"
+authors = [
+    {name = "Philippe Guglielmetti", email = "goulib@goulu.net"},
+]
+description = "library of useful Python code for scientific + technical applications"
+readme = "README.rst"
+requires-python = ">=3.8"
+keywords = ["math", "geometry", "graph", "optimization", "drawing"]
+license = {file = "LICENSE.TXT"}
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+]
+dependencies = [
+    "networkx",
+    "numpy",
+    "scikit-image",
+    "scipy",
+    "pydot",
+    "pydotplus",
+    "graphviz",
+    "ipython",
+    "lxml",
+    "xlrd",
+    "xlsxwriter",
+    "dxfgrabber",
+    "dxfwrite",
+    "svg.path",
+    "tinycss",
+    "pdfminer.six",
+    "sortedcollections",
+    "bitarray",
+    "pint",
+    "pillow",
+    "matplotlib",
+    "pytest",
+    "sphinx",
+]
+dynamic = ["version"]
