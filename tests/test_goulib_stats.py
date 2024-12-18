@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 from goulib.stats import *
 
@@ -28,14 +22,14 @@ class TestMean:
     def test_mean(self):
         assert avg(f) == 0.5
         assert mean(h) == hmean
-        assert mean(r) == 0.5, places = 1
+        assert mean(r) == 0.5
 
 
 class TestVariance:
     def test_variance(self):
         assert var(f) == 1./12, 4
         assert variance(h) == hvar, 0
-        assert variance(r) == 0.082, places = 2
+        assert variance(r) == 0.082
 
 
 class TestStats:
@@ -63,7 +57,7 @@ class TestStats:
         assert self.h.avg == hmean
 
     def test_variance(self):
-        assert self.f.variance == fvar, places = 3
+        assert self.f.variance == fvar
         assert math2.rint(self.h.var) == hvar
 
     def test_stddev(self):
@@ -134,7 +128,7 @@ class TestConfidenceInterval:
 class TestMedian:
     def test_median(self):
         assert median(h) == 44627.5
-        assert median(r) == 0.5, places = 1
+        assert median(r) == 0.5
 
 
 class TestMode:
@@ -333,7 +327,3 @@ class TestPDF:
     def test___init__(self):
         # p_d_f = PDF(pdf, data)
         pass  # TODO: implement  # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

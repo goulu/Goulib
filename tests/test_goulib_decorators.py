@@ -1,6 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *          # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.decorators import *     # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -38,7 +35,3 @@ class TestItimeout:
     def test_itimeout(self):
         # assert_equal(expected, itimeout(iterable, timeout))
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()

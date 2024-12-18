@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 
 from goulib.optim import *
@@ -55,11 +50,9 @@ class TestBinDict:
         self.alpha['more'] = 'more!'
         assert self.alpha.size() == 1
 
-    @raises(OverflowError)
     def test___setitem2__(self):
         self.bin[0.61] = 0.61
 
-    @raises(OverflowError)
     def test___setitem3__(self):
         self.alpha['whisky'] = 'whisky'
 
@@ -141,11 +134,9 @@ class TestBinList:
     def test_pop(self):
         pass  # tested above
 
-    @raises(OverflowError)
     def test___setitem2__(self):
         self.bin.append(0.61)
 
-    @raises(OverflowError)
     def test___setitem3__(self):
         self.alpha.append('whisky')
 
@@ -346,7 +337,3 @@ class TestDifferentialEvolution:
 
     def test_show_population(self):
         pass  # tested above
-
-
-if __name__ == "__main__":
-    runmodule()

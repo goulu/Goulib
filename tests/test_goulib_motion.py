@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 from goulib.motion import *
 
@@ -330,7 +324,3 @@ class TestSegmentsTrapezoidalSpeed:
     def test_segments_trapezoidal_speed(self):
         # assert_equal(expected, SegmentsTrapezoidalSpeed(t0, p0, p3, a, T, vmax, v0, v3))
         pass  # TODO: implement  # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

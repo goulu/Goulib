@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 
 from goulib.geom3d import *
@@ -632,7 +627,3 @@ class TestSpherical:
     def test_spherical(self):
         # assert_equal(expected, Spherical(r, theta, phi))
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()

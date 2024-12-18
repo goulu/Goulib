@@ -60,19 +60,19 @@ modes = {
     # http://pillow.readthedocs.io/en/3.1.x/handbook/concepts.html#concept-modes
     # + some others
     '1': Mode('bool', 1, np.uint8, 0, 1),  # binary
-    'F': Mode('gray', 1, np.float, 0, 1),  # gray level
+    'F': Mode('gray', 1, float, 0, 1),  # gray level
     'U': Mode('gray', 1, np.uint16, 0, 65535),  # skimage gray level
     'I': Mode('gray', 1, np.int16, -32768, 32767),  # skimage gray level
     'L': Mode('gray', 1, np.uint8, 0, 255),  # single layer or RGB(A)
     'P': Mode('ind', 1, np.uint16, 0, 65535),  # indexed color (palette)
-    'RGB': Mode('rgb', 3, np.float, 0, 1),  # not uint8 as in PIL
-    'RGBA': Mode('rgba', 4, np.float, 0, 1),  # not uint8 as in PIL
-    'CMYK': Mode('cmyk', 4, np.float, 0, 1),  # not uint8 as in PIL
-    'LAB': Mode('lab', 3, np.float, -1, 1),
+    'RGB': Mode('rgb', 3, float, 0, 1),  # not uint8 as in PIL
+    'RGBA': Mode('rgba', 4, float, 0, 1),  # not uint8 as in PIL
+    'CMYK': Mode('cmyk', 4, float, 0, 1),  # not uint8 as in PIL
+    'LAB': Mode('lab', 3, float, -1, 1),
     # https://en.wikipedia.org/wiki/CIE_1931_color_space
-    'XYZ': Mode('xyz', 3, np.float, 0, 1),
+    'XYZ': Mode('xyz', 3, float, 0, 1),
     # https://en.wikipedia.org/wiki/HSL_and_HSV
-    'HSV': Mode('hsv', 3, np.float, 0, 1),
+    'HSV': Mode('hsv', 3, float, 0, 1),
 }
 
 # hash methods
@@ -311,7 +311,7 @@ class Image(plot.Plot):
         if a.dtype == dtype:
             if copy:  # to be coherent
                 a = np.copy(self.array)
-        elif dtype == np.float:
+        elif dtype == float:
             a = skimage.img_as_float(a, copy)
         elif dtype == np.int16:
             a = skimage.img_as_int(a, copy)
@@ -462,7 +462,7 @@ class Image(plot.Plot):
             * NEAREST (use nearest neighbour),
             * BILINEAR (linear interpolation in a 2x2 environment),
             * BICUBIC (cubic spline interpolation in a 4x4 environment)
-            * ANTIALIAS (a high-quality downsampling filter)
+            * LANCZOS (a high-quality downsampling filter)
         :param kwargs: extra parameters passed to skimage.transform.resize
         """
 
@@ -605,8 +605,8 @@ class Image(plot.Plot):
             s = image.size
             image = image.resize((s[0] // 8, s[1] // 8), PILImage.NEAREST)
 
-        self.thumb = image.resize((img_size, img_size), PILImage.ANTIALIAS)
-        return np.array(self.thumb.array, dtype=np.float).reshape((img_size, img_size))
+        self.thumb = image.resize((img_size, img_size), PILImage.LANCZOS)
+        return np.array(self.thumb.array, dtype=float).reshape((img_size, img_size))
 
     @staticmethod
     def _hash_result(result):
@@ -700,7 +700,7 @@ class Image(plot.Plot):
         :param mode: string target mode (should be in 'FUIL') or automatic if none
         """
         if mode is None:
-            mode = 'F' if np.issubdtype(self.array.dtype, np.float) else 'L'
+            mode = 'F' if np.issubdtype(self.array.dtype, float) else 'L'
         return self.convert(mode)
 
     def colorize(self, color0, color1=None):
@@ -905,7 +905,7 @@ def alpha_composite(front, back):
     """
     front = np.asarray(front)
     back = np.asarray(back)
-    result = np.empty(front.shape, dtype=np.float)
+    result = np.empty(front.shape, dtype=float)
     alpha = np.index_exp[:, :, 3:]
     rgb = np.index_exp[:, :, :3]
     falpha = front[alpha] / 255.0
@@ -985,7 +985,7 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
     return background
 
 
-def disk(radius, antialias=PILImage.ANTIALIAS):
+def disk(radius, antialias=PILImage.LANCZOS):
     from skimage.draw import circle, circle_perimeter_aa
     size = math2.rint(2 * radius)
     size = (size, size)
@@ -1020,13 +1020,13 @@ def normalize(a, newmax=255, newmin=0):
         maxval = array.max()
         array += newmin - minval
         if maxval is not None and minval != maxval:
-            array = array.astype(np.float)
+            array = array.astype(float)
             array *= newmax / (maxval - minval)
     else:
         n = min(array.shape[2], 3)  # if RGBA, ignore A channel
         minval = array[:, :, 0:n].min()
         maxval = array[:, :, 0:n].max()
-        array = array.astype(np.float)
+        array = array.astype(float)
         for i in range(n):
             array[..., i] += newmin - minval
             if maxval is not None and minval != maxval:
@@ -1284,8 +1284,8 @@ def cmyk2rgb(cmyk):
 
 def gray2rgb(im, color0=(0, 0, 0), color1=(1, 1, 1)):
     im = skimage.img_as_float(im)
-    color0 = np.asarray(color0, np.float)
-    color1 = np.asarray(color1, np.float)
+    color0 = np.asarray(color0, float)
+    color1 = np.asarray(color1, float)
     d = color1 - color0
     a = np.outer(im, d)
     a = a.reshape([im.shape[0], im.shape[1], d.shape[0]]) + color0

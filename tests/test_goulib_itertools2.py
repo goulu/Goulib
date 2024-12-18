@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal, assert_not_equals
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 
 from goulib.itertools2 import *
@@ -557,7 +552,3 @@ class TestFloyd:
     def test_floyd(self):
         # assert_equal(expected, floyd(iterable, limit))
         pass  # TODO: implement  # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

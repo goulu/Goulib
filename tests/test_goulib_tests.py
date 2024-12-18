@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *  # a module that tests itself using itself... cool :-)
 
 
@@ -75,7 +69,3 @@ class TestPprintGen:
     def test_pprint_gen(self):
         # assert_equal(expected, pprint_gen(iterable, indices, sep))
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()

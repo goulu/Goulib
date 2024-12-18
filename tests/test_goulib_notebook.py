@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 from goulib.notebook import *
 
@@ -88,7 +82,3 @@ class TestLatex:
     def test_latex(self):
         # assert_equal(expected, latex(obj))
         pass  # TODO: implement   # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

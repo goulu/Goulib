@@ -1,7 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.image import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -639,7 +635,3 @@ class TestNormalize:
     def test_normalize(self):
         # assert_equal(expected, normalize(a, newmax, newmin))
         pass  # TODO: implement   # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

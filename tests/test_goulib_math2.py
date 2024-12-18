@@ -2,8 +2,7 @@
 # coding: utf8
 
 from goulib.math2 import *
-
-import pytest
+from goulib.tests import *
 
 
 class TestLongint:
@@ -28,12 +27,12 @@ class TestCmp:
         assert cmp(0.0000, 0.0000) == 0
 
 
-class TestMul(pytest.TestCase):
+class TestMul(TestCase):
     def test_mul(self):
         assert mul(range(1, 10)) == 362880
 
 
-class TestRint(pytest.TestCase):
+class TestRint(TestCase):
     def test_rint(self):
         # https://docs.python.org/3.4/library/functions.html#round
         assert rint(0.5) == 0

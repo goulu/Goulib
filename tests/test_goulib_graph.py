@@ -1,7 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *
 from goulib.graph import *
 
@@ -300,7 +296,3 @@ class TestWriteJson:
     def test_write_json(self):
         # assert_equal(expected, write_json(g, filename, **kwargs))
         pass  # TODO: implement   # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

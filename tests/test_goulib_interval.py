@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 
 from goulib.interval import *
@@ -256,7 +251,3 @@ class TestBox:
         # box = Box(*args)
         # assert_equal(expected, box.__call__())
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()

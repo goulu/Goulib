@@ -1,7 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *      # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.container import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -122,7 +118,3 @@ class TestSequence:
         # sequence = Sequence(iterf, itemf, containf, desc)
         # assert_equal(expected, sequence.__or__(other))
         pass  # TODO: implement   # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

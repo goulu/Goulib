@@ -1,7 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.expr import *   # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -303,7 +299,3 @@ class TestTextVisitor:
 
     def test_visit_UnaryOp(self):
         pass  # tested in Expr
-
-
-if __name__ == "__main__":
-    runmodule()

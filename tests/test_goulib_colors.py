@@ -1,7 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.colors import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -358,7 +354,3 @@ class TestBlackBody2Color:
 
         Table([Cell(str(t), style={'background-color': blackBody2Color(t).hex})
                for t in arange(500, 12000, 500)]).save(path + '\\results\\colors.blackbody.html')
-
-
-if __name__ == "__main__":
-    runmodule()

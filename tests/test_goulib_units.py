@@ -1,6 +1,3 @@
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.units import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -101,7 +98,3 @@ class TestAppendColFromObj:
     def test_append_col_from_obj(self):
         # assert_equal(expected, appendColFromObj(self, colname, obj, default))
         pass  # TODO: implement  # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

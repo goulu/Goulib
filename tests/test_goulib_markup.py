@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *
 from goulib.markup import *
 
@@ -207,7 +200,3 @@ class test__oneliner:
     def test___init__(self):
         # _oneliner = _oneliner(case)
         pass  # TODO: implement  # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

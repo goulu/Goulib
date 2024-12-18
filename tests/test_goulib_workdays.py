@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 from goulib.workdays import *
 from datetime import datetime
@@ -133,7 +128,3 @@ class TestNetworkdays:
     def test_networkdays(self):
         # assert_equal(expected, networkdays(start_date, end_date, holidays))
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()

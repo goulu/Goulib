@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 from goulib.plot import save
 
@@ -156,7 +151,3 @@ class TestPiecewise:
         svg = self.p2._repr_svg_(xmax=7, ylim=(-1, 5))  # return IPython object
         with open(path+'/results/piecewise.p2.svg', 'wb') as f:
             f.write(svg.encode('utf-8'))
-
-
-if __name__ == "__main__":
-    runmodule()

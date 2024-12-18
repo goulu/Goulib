@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
 from goulib.tests import *
 
 from goulib.polynomial import *
@@ -113,7 +108,8 @@ class TestDerivative:
 
 class TestAdd:
     def test_add(self):
-        assert tostring(add([1, 2, 3], [1, -2, 3])) == '6x^2 + 2'  # test addition
+        assert tostring(add([1, 2, 3], [1, -2, 3])
+                        ) == '6x^2 + 2'  # test addition
 
 
 class TestSub:
@@ -128,7 +124,8 @@ class TestMultConst:
 
 class TestMultiply:
     def test_multiply(self):
-        assert tostring(multiply([1, 1], [-1, 1])) == 'x^2 - 1'  # test multiplication
+        assert tostring(multiply([1, 1], [-1, 1])
+                        ) == 'x^2 - 1'  # test multiplication
 
 
 class TestMultOne:
@@ -149,13 +146,12 @@ class TestParseString:
 class TestTostring:
     def test_tostring(self):
         assert tostring([1, 2., 3]) == '3x^2 + 2.0x + 1'  # testing floats
-        assert tostring([1, 2, -3]) == '-3x^2 + 2x + 1'  # can we handle - signs
+        # can we handle - signs
+        assert tostring([1, 2, -3]) == '-3x^2 + 2x + 1'
         assert tostring([1, -2, 3]) == '3x^2 - 2x + 1'
-        assert tostring([0, 1, 2]) == '2x^2 + x'  # are we smart enough to exclude 0 terms?
-        assert tostring([0, 1, 2, 0]) == '2x^2 + x'  # testing leading zero stripping
+        # are we smart enough to exclude 0 terms?
+        assert tostring([0, 1, 2]) == '2x^2 + x'
+        # testing leading zero stripping
+        assert tostring([0, 1, 2, 0]) == '2x^2 + x'
         assert tostring([0, 1]) == 'x'
         assert tostring([0, 1.0]) == 'x'  # testing whether 1.0 == 1: risky
-
-
-if __name__ == "__main__":
-    runmodule()

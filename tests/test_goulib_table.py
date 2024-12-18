@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-
-from nose.tools import assert_equal
-from nose import SkipTest
-# lines above are inserted automatically by pythoscope. Line below overrides them
-
 from goulib.tests import *
 from goulib.table import *
 import datetime
@@ -316,7 +309,3 @@ class TestRow:
         # row = Row(data, align, fmt, tag, style)
         # assert_equal(expected, row.html(cell_args, **kwargs))
         pass  # TODO: implement   # implement your test here
-
-
-if __name__ == "__main__":
-    runmodule()

@@ -40,7 +40,6 @@ Many modules and functions do not require any other packages,
 packages listed in requirements.txt are needed only by some classes or functions
 
 `Sphinx <http://sphinx-doc.org/>`_ is needed to generate this documentation,
-`Pythoscope <http://pythoscope.org/>`_ is used to generate nose unit tests
 
 Modules
 -------

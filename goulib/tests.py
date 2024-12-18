@@ -12,7 +12,8 @@ __license__ = "LGPL"
 import logging
 import re
 import itertools
-from unittest import TestCase
+import unittest
+import pytest
 
 from goulib import itertools2, decorators
 
@@ -62,7 +63,7 @@ def pprint(iterable, indices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -3, -2, -1], timeout
     return ','.join(s)
 
 
-class TestCase(TestCase):
+class TestCase(unittest.TestCase):
 
     def assertSequenceEqual(self, seq1, seq2, msg=None, seq_type=None, places=7, delta=None, reltol=None):
         """
@@ -164,52 +165,6 @@ class TestCase(TestCase):
         self.assertTrue(re.match(pattern, value, flags), msg)
 
 
-#
-# Expose assert* from unittest.TestCase
-# - give them pep8 style names
-# (copied from nose.trivial)
-
-
-caps = re.compile('([A-Z])')
-
-
-def pep8(name):
-    return caps.sub(lambda m: '_' + m.groups()[0].lower(), name)
-
-
-class Dummy(TestCase):
-    def nop(self):
-        pass
-
-
-_t = Dummy('nop')
-
-for at in [at for at in dir(_t)
-           if at.startswith('assert') and not '_' in at]:
-    pepd = pep8(at)
-    vars()[pepd] = getattr(_t, at)
-    # __all__.append(pepd)
-
-# explicitly define the most common asserts to avoid "undefined variable" messages in IDEs
-assert_true = _t.assertTrue
-assert_false = _t.assertFalse
-assert_equal = _t.assertEqual
-assert_almost_equal = _t.assertAlmostEqual
-assert_not_equal = _t.assertNotEqual
-assert_raises = _t.assertRaises
-assert_count_equal = _t.assertCountEqual
-assert_sequence_equal = _t.assertSequenceEqual
-assert_match = _t.assertMatch
-
-del Dummy
-del _t
-
-# add other shortcuts
-
-# raises = nose.tools.raises
-# SkipTest = nose.SkipTest
-
-
 def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(message)s'):
     """initializes logging
     :param level: logging level
@@ -224,37 +179,3 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
 
 
 setlog()
-
-
-def runmodule(level=logging.INFO, verbosity=1, argv=[]):
-    """
-    :param argv: optional list of string with additional options passed to nose.run
-    see http://nose.readthedocs.org/en/latest/usage.html
-    """
-    if argv is None:
-        return  # nose.runmodule()
-
-    setlog(level)
-
-    """ ensures stdout is printed after the tests results"""
-    import sys
-    from io import StringIO
-    module_name = sys.modules["__main__"].__file__
-
-    old_stdout = sys.stdout
-    sys.stdout = mystdout = StringIO()
-
-    result = nose.run(
-        argv=[
-            sys.argv[0],
-            module_name,
-            '-s', '--nologcapture',
-            '--verbosity=%d' % verbosity,
-        ]+argv
-    )
-
-    sys.stdout = old_stdout
-    print(mystdout.getvalue())
-
-
-runtests = runmodule

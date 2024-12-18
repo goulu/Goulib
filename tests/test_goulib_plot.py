@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-from nose.tools import assert_equal
-from nose import SkipTest
-
 from goulib.tests import *
 
 from goulib.plot import *
@@ -61,7 +56,3 @@ class TestSave:
     def test_save(self):
         # assert_equal(expected, save(plotables, filename, **kwargs))
         pass  # TODO: implement
-
-
-if __name__ == "__main__":
-    runmodule()
