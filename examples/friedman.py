@@ -17,7 +17,7 @@ from sortedcontainers import SortedDict
 
 import math
 import ast
-from Goulib import math2, expr
+from goulib import math2, expr
 
 # "safe" operators
 context = expr.Context()
@@ -246,12 +246,12 @@ def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
             for x in gen(d, monadic, diadic, False):
                 yield x
         return
-    
-    e=None
+
+    e = None
     if len(digits) == 1:
-        e=Expr(digits[0])
+        e = Expr(digits[0])
     elif '_' in diadic:
-        e = Expr(''.join(map(str,digits)))
+        e = Expr(''.join(map(str, digits)))
     if e and e.isNum:
         yield e
         for op in monadic:
@@ -307,13 +307,13 @@ def friedman(num):
 
 
 if __name__ == "__main__":
-    n=list(range(1,30,2))
-    for e in seq(n,[],'+',False):
+    n = list(range(1, 30, 2))
+    for e in seq(n, [], '+', False):
         print(e)
-        
+
     exit()
 
-    from Goulib.table import Table
+    from goulib.table import Table
 
     max = 100
     t = Table(range(max+1), titles=['n'])
@@ -325,15 +325,15 @@ if __name__ == "__main__":
             n = int(e[0])
             # h(e[0],'=',e[1])
             if n <= max:
-                e=e[1]
-                old=t.get(n,col)
-                if old is None or old.complexity()>e.complexity():
+                e = e[1]
+                old = t.get(n, col)
+                if old is None or old.complexity() > e.complexity():
                     t.set(n, col, e)
 
     column(2018, permut=True)  # yeargame
-    column(2019,permut=True) #yeargame
-    column(4444) # four-four
+    column(2019, permut=True)  # yeargame
+    column(4444)  # four-four
     column(123456789)
-    column(999) # 999 clock
+    column(999)  # 999 clock
 
     t.save('friedman.htm')

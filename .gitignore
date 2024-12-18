@@ -9,7 +9,7 @@ dist
 .settings
 _update.bat
 docs/_build
-/Goulib.egg-info/
+/goulib.egg-info/
 /build/
 /.coverage
 /xunit.xml

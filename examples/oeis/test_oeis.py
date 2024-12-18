@@ -14,8 +14,8 @@ import sys
 import logging
 import re
 
-from Goulib import itertools2, decorators
-from Goulib.tests import *
+from goulib import itertools2, decorators
+from goulib.tests import *
 
 from oeis import *
 from database import database
@@ -23,10 +23,10 @@ from database import database
 path = os.path.dirname(os.path.abspath(__file__))
 
 slow = []  # list of slow sequences
-        
-        
+
+
 def assert_generator(f, ref, name, timeout=10):
-    ref=list(ref)
+    ref = list(ref)
     n = len(ref)
     timeout, f.timeout = f.timeout, timeout  # save Sequence's timeout
     l = []

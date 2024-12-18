@@ -1,5 +1,5 @@
 # Only need to change these two variables
-PKG_NAME=Goulib
+PKG_NAME=goulib
 USER=Goulu
 
 OS=$TRAVIS_OS_NAME-64

@@ -1,34 +1,34 @@
-Goulib
+goulib
 ======
 
 library of useful Python code for scientific + technical applications
 
-see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/Goulib/blob/master/notebook.ipynb>`_ for an overview of features
+see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/goulib/blob/master/notebook.ipynb>`_ for an overview of features
 
 .. image:: https://badge.fury.io/gh/goulu%2Fgoulib.svg
     :target: https://badge.fury.io/gh/goulu%2Fgoulib
 .. image:: http://img.shields.io/badge/license-LGPL-green.svg
-    :target: https://github.com/goulu/Goulib/blob/master/LICENSE.TXT
+    :target: https://github.com/goulu/goulib/blob/master/LICENSE.TXT
     :alt: License
 .. image:: https://badge.fury.io/py/goulib.svg
-    :target: https://pypi.python.org/pypi/Goulib/
+    :target: https://pypi.python.org/pypi/goulib/
     :alt: Version
-.. image:: https://travis-ci.org/goulu/Goulib.svg?branch=master
-    :target: https://travis-ci.org/goulu/Goulib
+.. image:: https://travis-ci.org/goulu/goulib.svg?branch=master
+    :target: https://travis-ci.org/goulu/goulib
     :alt: Build
-.. image:: https://coveralls.io/repos/github/goulu/Goulib/badge.svg?branch=master
-    :target: https://coveralls.io/github/goulu/Goulib?branch=master
+.. image:: https://coveralls.io/repos/github/goulu/goulib/badge.svg?branch=master
+    :target: https://coveralls.io/github/goulu/goulib?branch=master
     :alt: Tests
 .. image:: https://readthedocs.org/projects/goulib/badge/?version=latest
   :target: http://goulib.readthedocs.org/en/latest/
   :alt: Doc
   
 :author: Philippe Guglielmetti goulib@goulu.net
-:installation: "pip install Goulib"
-:distribution: https://pypi.python.org/pypi/Goulib
+:installation: "pip install goulib"
+:distribution: https://pypi.python.org/pypi/goulib
 :documentation: https://goulib.readthedocs.org/
 :notebook: .. image:: https://mybinder.org/badge_logo.svg :target: https://mybinder.org/v2/gh/goulu/goulib/master?filepath=notebook.ipynb
-:source: https://github.com/goulu/Goulib
+:source: https://github.com/goulu/goulib
 
 Modules
 -------
@@ -82,6 +82,6 @@ Modules
 Requirements
 ------------
 
-Goulib uses lazy requirements.
+goulib uses lazy requirements.
 Many modules and functions do not require any other packages,
-packages listed in requirements.txt are needed only by some Goulib classes or functions
+packages listed in requirements.txt are needed only by some goulib classes or functions

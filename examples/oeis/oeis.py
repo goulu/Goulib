@@ -1,5 +1,5 @@
 """
-some OEIS sequences implemented as Goulib.container.Sequence
+some OEIS sequences implemented as goulib.container.Sequence
 
 (OEIS is Neil Sloane's On-Line Encyclopedia of Integer Sequences at https://oeis.org/)
 """
@@ -14,12 +14,12 @@ import operator
 import math
 
 from itertools import count, repeat
-from Goulib.itertools2 import *
+from goulib.itertools2 import *
 
-from Goulib import decorators
+from goulib import decorators
 
-from Goulib.container import Sequence
-from Goulib.math2 import *
+from goulib.container import Sequence
+from goulib.math2 import *
 
 A000004 = Sequence(repeat(0), lambda _: 0, lambda x: x ==
                    0, desc='The zero sequence')
@@ -1181,5 +1181,5 @@ for id in seqs:
         oeis[id] = seqs[id]
 
 if __name__ == "__main__":
-    for n in take(20,A051885):
+    for n in take(20, A051885):
         print(n, ',', end='')
