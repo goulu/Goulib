@@ -132,12 +132,12 @@ class TestInterval:
     def test___call__(self):
         # interval = Interval(start, end)
         # assert_equal(expected, interval.__call__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___nonzero__(self):
         # interval = Interval(start, end)
         # assert_equal(expected, interval.__nonzero__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestIntervals:
@@ -176,7 +176,7 @@ class TestIntervals:
     def test___repr__(self):
         # intervals = Intervals()
         # assert_equal(expected, intervals.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestBox:
@@ -230,24 +230,24 @@ class TestBox:
     def test___contains__(self):
         # box = Box(*args)
         # assert_equal(expected, box.__contains__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___nonzero__(self):
         # box = Box(*args)
         # assert_equal(expected, box.__nonzero__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_empty(self):
         # box = Box(*args)
         # assert_equal(expected, box.empty())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_corner(self):
         # box = Box(*args)
         # assert_equal(expected, box.corner(n))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___call__(self):
         # box = Box(*args)
         # assert_equal(expected, box.__call__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement

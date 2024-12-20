@@ -62,10 +62,10 @@ class TestDummy:
 class TestSetlog:
     def test_setlog(self):
         # assert_equal(expected, setlog(level, fmt))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPprintGen:
     def test_pprint_gen(self):
         # assert_equal(expected, pprint_gen(iterable, indices, sep))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement

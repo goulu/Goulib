@@ -228,17 +228,17 @@ class TestExpr:
     def test___invert__(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.__invert__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___truediv__(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.__truediv__(right))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_isconstant(self):
         # expr = Expr(f)
         # assert_equal(expected, expr.isconstant())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_complexity(self):
         e1 = Expr('44+4*(-4)')
@@ -248,7 +248,7 @@ class TestExpr:
 
         e1 = Expr('2/sqrt(3)/sqrt(5)')
         e2 = Expr('2/(sqrt(3)*sqrt(5))')
-        assert e1() == e2()
+        assert pytest.approx(e1()) == e2()
         assert e1.complexity() >= e2.complexity()
 
 

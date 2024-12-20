@@ -81,4 +81,4 @@ class TestLatex:
 
     def test_latex(self):
         # assert_equal(expected, latex(obj))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement

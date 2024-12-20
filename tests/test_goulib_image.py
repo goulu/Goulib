@@ -100,7 +100,7 @@ class TestImage:
     def test___lt__(self):
         # image = Image(data)
         # assert_equal(expected, image.__lt__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         assert repr(self.lena) in [
@@ -136,7 +136,7 @@ class TestImage:
     def test_base64(self):
         # image = Image(data, **kwargs)
         # assert_equal(expected, image.base64(fmt))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_grayscale(self):
         pass
@@ -144,7 +144,7 @@ class TestImage:
     def test_invert(self):
         # image = Image(data, **kwargs)
         # assert_equal(expected, image.invert())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_ndarray(self):
         pass
@@ -258,97 +258,97 @@ class TestImage:
     def test___abs__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__abs__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___add__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__add__(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___div__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__div__(f))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___mul__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__mul__(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___nonzero__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__nonzero__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___radd__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__radd__(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___sub__(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.__sub__(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_compose(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.compose(other, a, b))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_correlation(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.correlation(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_crop(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.crop(lurb))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_getdata(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.getdata(dtype))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_getpixel(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.getpixel(yx))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_load(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.load(path))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_nchannels(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.nchannels())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_normalize(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.normalize(newmax, newmin))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_npixels(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.npixels())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_paste(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.paste(image, box, mask))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_putpixel(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.putpixel(yx, value))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_quantize(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.quantize(levels))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_save(self):
         pass  # tested everywhere
@@ -356,121 +356,121 @@ class TestImage:
     def test_scale(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.scale(s))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_shape(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.shape())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_size(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.size())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_threshold(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.threshold(level))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_getcolors(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.getcolors(maxcolors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_getpalette(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.getpalette(maxcolors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_setpalette(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.setpalette(p))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.new(size, color))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_pil(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.pil())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_optimize(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.optimize(maxcolors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_replace(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.replace(pairs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_sub(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.sub(other, pos, alpha, mode))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_deltaE(self):
         # image = Image(data, mode, **kwargs)
         # assert_equal(expected, image.deltaE(other))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestCorrelation:
     def test_correlation(self):
         # assert_equal(expected, correlation(input, match))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAlphaToColor:
     def test_alpha_to_color(self):
         # assert_equal(expected, alpha_to_color(image, color))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAlphaComposite:
     def test_alpha_composite(self):
         # assert_equal(expected, alpha_composite(front, back))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAlphaCompositeWithColor:
     def test_alpha_composite_with_color(self):
         # assert_equal(expected, alpha_composite_with_color(image, color))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPurePilAlphaToColorV1:
     def test_pure_pil_alpha_to_color_v1(self):
         # assert_equal(expected, pure_pil_alpha_to_color_v1(image, color))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPurePilAlphaToColorV2:
     def test_pure_pil_alpha_to_color_v2(self):
         # assert_equal(expected, pure_pil_alpha_to_color_v2(image, color))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestNchannels:
     def test_nchannels(self):
         # assert_equal(expected, nchannels(arr))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestGuessmode:
     def test_guessmode(self):
         # assert_equal(expected, guessmode(arr))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAdaptRgb:
     def test_adapt_rgb(self):
         # assert_equal(expected, adapt_rgb(func))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRgb2rgba:
@@ -481,37 +481,37 @@ class TestRgb2rgba:
 class TestDisk:
     def test_disk(self):
         # assert_equal(expected, disk(radius, antialias))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestFspecial:
     def test_fspecial(self):
         # assert_equal(expected, fspecial(name, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestReadPdf:
     def test_read_pdf(self):
         # assert_equal(expected, read_pdf(filename, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestFig2img:
     def test_fig2img(self):
         # assert_equal(expected, fig2img(fig))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestQuantize:
     def test_quantize(self):
         # assert_equal(expected, quantize(image, N, L))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDither:
     def test_dither(self):
         # assert_equal(expected, dither(image, method, N, L))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestGray2rgb:
@@ -522,7 +522,7 @@ class TestGray2rgb:
 class TestBool2gray:
     def test_bool2gray(self):
         pass  # tested in test_convert
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRgba2rgb:
@@ -533,105 +533,105 @@ class TestRgba2rgb:
 class TestPalette:
     def test_palette(self):
         # assert_equal(expected, palette(im, ncolors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # palette = Palette(data, n)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_index(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.index(c, dE))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_pil(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.pil())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_update(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.update(data, n))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.__repr__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_patches(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.patches(wide, size))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_sorted(self):
         # palette = Palette(data, n)
         # assert_equal(expected, palette.sorted(key))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestLab2ind:
     def test_lab2ind(self):
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestInd2any:
     def test_ind2any(self):
         # assert_equal(expected, ind2any(im, palette, dest))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestInd2rgb:
     def test_ind2rgb(self):
         # assert_equal(expected, ind2rgb(im, palette))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRandomize:
     def test_randomize(self):
         # assert_equal(expected, randomize(image, N, L))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDitherer:
     def test___call__(self):
         # ditherer = Ditherer(name, method)
         # assert_equal(expected, ditherer.__call__(image, N))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # ditherer = Ditherer(name, method)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # ditherer = Ditherer(name, method)
         # assert_equal(expected, ditherer.__repr__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestErrorDiffusion:
     def test___call__(self):
         # error_diffusion = ErrorDiffusion(name, positions, weights)
         # assert_equal(expected, error_diffusion.__call__(image, N))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # error_diffusion = ErrorDiffusion(name, positions, weights)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestFloydSteinberg:
     def test___call__(self):
         # floyd_steinberg = FloydSteinberg()
         # assert_equal(expected, floyd_steinberg.__call__(image, N))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # floyd_steinberg = FloydSteinberg()
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestNormalize:
     def test_normalize(self):
         # assert_equal(expected, normalize(a, newmax, newmin))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement

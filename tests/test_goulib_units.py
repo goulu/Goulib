@@ -5,7 +5,7 @@ from goulib.units import *  # pylint: disable=wildcard-import, unused-wildcard-i
 class Tests:
     def test_append_col(self):
         # assert_equal(expected, appendCol(self, colname, values))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test001_simple_value(self):
         ureg.define('CHF = [Currency]')
@@ -67,34 +67,40 @@ class Tests:
 class TestMagnitudeIn:
     def test_magnitude_in(self):
         # assert_equal(expected, magnitudeIn(self, unit))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestIsfunc:
     def test_isfunc(self):
         # assert_equal(expected, isfunc(self, col))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestSetCell:
     def test_set_cell(self):
         # assert_equal(expected, setCell(self, row, col, value))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestAppendCol:
     def test_append_col(self):
         # assert_equal(expected, appendCol(self, colname, values))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestAppendRow:
     def test_append_row(self):
         # assert_equal(expected, appendRow(self, label, values, unit))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestAppendColFromObj:
     def test_append_col_from_obj(self):
         # assert_equal(expected, appendColFromObj(self, colname, obj, default))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")

@@ -59,17 +59,17 @@ class TestBinDict:
     def test___delitem__(self):
         # bin = Bin(capacity, items, f)
         # assert_equal(expected, bin.__delitem__(key))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___iadd__(self):
         # bin_dict = BinDict()
         # assert_equal(expected, bin_dict.__iadd__(key, item))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___isub__(self):
         # bin_dict = BinDict()
         # assert_equal(expected, bin_dict.__isub__(key))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestBinList:
@@ -143,17 +143,17 @@ class TestBinList:
     def test_remove(self):
         # bin = Bin(capacity, items, f)
         # assert_equal(expected, bin.remove(item))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___isub__(self):
         # bin_list = BinList()
         # assert_equal(expected, bin_list.__isub__(item))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___setitem__(self):
         # bin_list = BinList()
         # assert_equal(expected, bin_list.__setitem__(i, item))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestFirstFitDecreasing:
@@ -171,60 +171,60 @@ class TestFirstFitDecreasing:
 class TestHillclimb:
     def test_hillclimb(self):
         # assert_equal(expected, hillclimb(init_function, move_operator, objective_function, max_evaluations))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestHillclimbAndRestart:
     def test_hillclimb_and_restart(self):
         # assert_equal(expected, hillclimb_and_restart(init_function, move_operator, objective_function, max_evaluations))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestP:
     def test_p(self):
         # assert_equal(expected, P(prev_score, next_score, temperature))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestObjectiveFunction:
     def test___call__(self):
         # objective_function = ObjectiveFunction(objective_function)
         # assert_equal(expected, objective_function.__call__(solution))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # objective_function = ObjectiveFunction(objective_function)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestKirkpatrickCooling:
     def test_kirkpatrick_cooling(self):
         # assert_equal(expected, kirkpatrick_cooling(start_temp, alpha))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAnneal:
     def test_anneal(self):
         # assert_equal(expected, anneal(init_function, move_operator, objective_function, max_evaluations, start_temp, alpha))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestReversedSections:
     def test_reversed_sections(self):
         # assert_equal(expected, reversed_sections(tour))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestSwappedCities:
     def test_swapped_cities(self):
         # assert_equal(expected, swapped_cities(tour))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestTourLength:
     def test_tour_length(self):
         # assert_equal(expected, tour_length(points, dist, tour))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestTsp:
@@ -251,13 +251,13 @@ class TestTsp:
 class TestSize:
     def test_size(self):
         # assert_equal(expected, size(self))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestFits:
     def test_fits(self):
         # assert_equal(expected, fits(self, item))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDifferentialEvolution:

@@ -117,7 +117,7 @@ class Context:
         :param ctx: dict of varname : value to substitute in node
         :return: number or expression string
         '''
-        if isinstance(node, ast.Num):  # <number>
+        if isinstance(node, ast.Constant):  # <number>
             return node.n
         elif isinstance(node, ast.Name):
             return self.variables.get(node.id, node.id)  # return value or var

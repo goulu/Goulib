@@ -142,7 +142,7 @@ class TestPiecewise:
     def test_iapply(self):
         # piecewise = Piecewise(init, default, start)
         # assert_equal(expected, piecewise.iapply(f, right, name))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_save(self):
         self.p2.save(path+'/results/piecewise.p2.png', xmax=7, ylim=(-1, 5))

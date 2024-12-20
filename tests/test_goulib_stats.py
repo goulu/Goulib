@@ -50,7 +50,7 @@ class TestStats:
     def test_remove(self):
         # Stats = Stats(data, mean, var)
         # assert_equal(expected, Stats.remove(data))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_mean(self):
         assert self.f.mean == 0.5
@@ -63,56 +63,66 @@ class TestStats:
     def test_stddev(self):
         # Stats = Stats(data, mean, var)
         # assert_equal(expected, Stats.stddev())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_stats(self):
         # assert_equal(expected, stats(l))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___add__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__add__(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___mul__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__mul__(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___neg__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__neg__())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___pow__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__pow__(n))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___repr__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__repr__())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___sub__(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.__sub__(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_covariance(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.covariance(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_sum(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.sum())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_sum2(self):
         # stats = Stats(data, mean, var)
         # assert_equal(expected, stats.sum2())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestStddev:
@@ -140,12 +150,14 @@ class TestMode:
 
     def test___init__(self):
         # mode = Mode(name, nchannels, type, min, max)
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___repr__(self):
         # mode = Mode(name, nchannels, type, min, max)
         # assert_equal(expected, mode.__repr__())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestLinearRegression:
@@ -229,47 +241,47 @@ class TestNormal:
     def test___call__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__call__(x))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___neg__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__neg__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___rsub__(self):
         # normal = Normal()
         # assert_equal(expected, normal.__rsub__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_covariance(self):
         # normal = Normal()
         # assert_equal(expected, normal.covariance(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_pdf(self):
         # normal = Normal()
         # assert_equal(expected, normal.pdf(x))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_pearson(self):
         # normal = Normal()
         # assert_equal(expected, normal.pearson(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_plot(self):
         # normal = Normal()
         # assert_equal(expected, normal.plot(fmt, x))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_pop(self):
         # normal = Normal()
         # assert_equal(expected, normal.pop(i, n))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_remove(self):
         # normal = Normal()
         # assert_equal(expected, normal.remove(x))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_save(self):
         n1 = Normal()
@@ -280,50 +292,55 @@ class TestNormal:
     def test_latex(self):
         # normal = Normal(data, mean, var)
         # assert_equal(expected, normal.latex())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestMeanVar:
     def test_mean_var(self):
         # assert_equal(expected, mean_var(data))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestKurtosis:
     def test_kurtosis(self):
         # assert_equal(expected, kurtosis(data))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestCovariance:
     def test_covariance(self):
         # assert_equal(expected, covariance(data1, data2))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestNormalPdf:
     def test_normal_pdf(self):
         # assert_equal(expected, normal_pdf(x, mu, sigma))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDiscrete:
     def test___call__(self):
         # discrete = Discrete(data)
         # assert_equal(expected, discrete.__call__(x))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___init__(self):
         # discrete = Discrete(data)
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestPDF:
     def test___call__(self):
         # p_d_f = PDF(pdf, data)
         # assert_equal(expected, p_d_f.__call__(x, **kwargs))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test___init__(self):
         # p_d_f = PDF(pdf, data)
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")

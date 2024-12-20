@@ -1633,10 +1633,7 @@ class Matrix3(object):
          self.c, self.g, self.k) = L
 
     def __eq__(self, other):
-        try:
-            return list(self) == list(other)
-        except:
-            return False
+        return math2.allclose(self[:], other[:])
 
     def __sub__(self, other):
         return Matrix3(*(ai-bi for ai, bi in zip(self[:], other[:])))

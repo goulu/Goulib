@@ -10,7 +10,6 @@ __copyright__ = "Copyright 2014-, Philippe Guglielmetti"
 __license__ = "LGPL"
 
 import logging
-import re
 import itertools
 import unittest
 import pytest
@@ -179,3 +178,37 @@ def setlog(level=logging.INFO, fmt='%(levelname)s:%(filename)s:%(funcName)s: %(m
 
 
 setlog()
+
+
+def runmodule(level=logging.INFO, verbosity=1, argv=None):
+    """
+    :param argv: optional list of string with additional options passed to nose.run
+    see http://nose.readthedocs.org/en/latest/usage.html
+    see https://docs.pytest.org/en/stable/how-to/usage.html
+    """
+    import sys
+    module_name = sys.modules["__main__"].__file__
+
+    if argv is None:
+        return pytest.main([module_name])
+
+    setlog(level)
+
+    """ ensures stdout is printed after the tests results"""
+    import sys
+    from io import StringIO
+
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+
+    result = pytest.main(
+        argv=[
+            sys.argv[0],
+            module_name,
+            '-s', '--nologcapture',
+            '--verbosity=%d' % verbosity,
+        ]+argv
+    )
+
+    sys.stdout = old_stdout
+    print(mystdout.getvalue())

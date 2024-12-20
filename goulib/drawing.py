@@ -1265,7 +1265,7 @@ class Drawing(Group):
         import tinycss
         from xml.dom import minidom
 
-        doc = minidom.parseString(content)
+        doc = minidom.parseString(content.decode('utf-8', errors='ignore'))
 
         styles = {}
 

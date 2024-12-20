@@ -12,12 +12,13 @@ results = path+'\\results\\drawing\\'  # path for results
 class TestTrans:
     def test_trans(self):
         assert Trans() == Matrix3(1, 0, 0, 0, 1, 0, 0, 0, 1)
-        assert Trans(scale=2) == Matrix3(2, 0, 0, 0, 2, 0, 0, 0, 1)
+        assert Trans(scale=2) == Matrix3(
+            2, 0, 0, 0, 2, 0, 0, 0, 1)
         assert Trans(offset=(2, 3)) == Matrix3(1, 0, 0, 0, 1, 0, 2, 3, 1)
         s32 = sqrt(3)/2
         # warning : .new takes columnwise elements
-        res = Matrix3(0.5, +s32, 0, -s32, 0.5, 0, 0, 0, 1)
-        assert Trans(rotation=60) == pytest.approx(res, abs=1e-7)
+        assert Trans(rotation=60) == Matrix3(
+            0.5, +s32, 0, -s32, 0.5, 0, 0, 0, 1)
 
 
 class TestBBox:
@@ -43,7 +44,7 @@ class TestBBox:
         b1 = self.unit+self.box
         b2 = self.box+self.unit
         assert b1 == b2
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_xmin(self):
         assert self.unit.xmin == 0
@@ -106,7 +107,8 @@ class TestBBox:
     def test_area(self):
         # b_box = BBox(p1, p2)
         # assert_equal(expected, b_box.area())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestEntity:
@@ -123,67 +125,67 @@ class TestEntity:
     def test___repr__(self):
         # entity = Entity()
         # assert_equal(expected, entity.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_bbox(self):
         # entity = Entity()
         # assert_equal(expected, entity.bbox())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_end(self):
         # entity = Entity()
         # assert_equal(expected, entity.end())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_dxf(self):
         # entity = Entity()
         # assert_equal(expected, entity.from_dxf(trans))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_isclosed(self):
         # entity = Entity()
         # assert_equal(expected, entity.isclosed())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_ishorizontal(self):
         # entity = Entity()
         # assert_equal(expected, entity.ishorizontal(tol))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_isline(self):
         # entity = Entity()
         # assert_equal(expected, entity.isline())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_isvertical(self):
         # entity = Entity()
         # assert_equal(expected, entity.isvertical(tol))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_start(self):
         # entity = Entity()
         # assert_equal(expected, entity.start())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_to_dxf(self):
         # entity = Entity()
         # assert_equal(expected, entity.to_dxf(**attr))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_center(self):
         # entity = Entity()
         # assert_equal(expected, entity.center())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_svg(self):
         # entity = Entity()
         # assert_equal(expected, entity.from_svg())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_artist(self):
         # entity = Entity()
         # assert_equal(expected, entity.artist(ax, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_pdf(self):
         pass  # tested elsewhere
@@ -191,12 +193,12 @@ class TestEntity:
     def test_svg_path(self):
         # entity = Entity()
         # assert_equal(expected, entity.svg_path(currentpos))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_patches(self):
         # entity = Entity()
         # assert_equal(expected, entity.patches(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___copy__(self):
         s2 = copy(self.seg)
@@ -208,12 +210,12 @@ class TestEntity:
     def test_draw(self):
         # entity = Entity()
         # assert_equal(expected, entity.draw(fig, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_figure(self):
         # entity = Entity()
         # assert_equal(expected, entity.figure(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_render(self):
         a = Point2(0, 1)
@@ -225,7 +227,7 @@ class TestEntity:
     def test_setattr(self):
         # entity = Entity()
         # assert_equal(expected, entity.setattr(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestGroup:
@@ -265,18 +267,18 @@ class TestGroup:
     def test_append(self):
         # group = Group()
         # assert_equal(expected, group.append(entity, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_extend(self):
         # group = Group()
         # assert_equal(expected, group.extend(entities, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_dxf(self):
         try:
             import dxfgrabber
         except:
-            pass  # TODO: implement  # optional
+            pytest.skip("not yet implemented")  # TODO: implement  # optional
 
         dxf = Drawing(path+'/data/Homer_Simpson_by_CyberDrone.dxf')
         self.blocks = dxf.block
@@ -285,7 +287,7 @@ class TestGroup:
     def test_swap(self):
         # group = Group()
         # assert_equal(expected, group.swap())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_length(self):
         assert self.group.length == 27.22534104051515
@@ -293,32 +295,32 @@ class TestGroup:
     def test___copy__(self):
         # group = Group()
         # assert_equal(expected, group.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_color(self):
         # group = Group()
         # assert_equal(expected, group.color())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_color_case_2(self):
         # group = Group()
         # assert_equal(expected, group.color(c))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_chainify(self):
         # group = Group()
         # assert_equal(expected, group.chainify(mergeable))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_layer(self):
         # group = Group()
         # assert_equal(expected, group.layer())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_layer_case_2(self):
         # group = Group()
         # assert_equal(expected, group.layer(l))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestChain:
@@ -344,7 +346,7 @@ class TestChain:
     def test_bbox(self):
         # chain = Chain()
         # assert_equal(expected, chain.bbox())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_start(self):
         assert self.chain.start == Point2(0, 0)
@@ -355,27 +357,27 @@ class TestChain:
     def test_from_dxf(self):
         # chain = Chain()
         # assert_equal(expected, chain.from_dxf(trans))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_to_dxf(self):
         # chain = Chain()
         # assert_equal(expected, chain.to_dxf(split, **attr))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_svg(self):
         # chain = Chain(data)
         # assert_equal(expected, chain.from_svg())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_pdf(self):
         # chain = Chain(data)
         # assert_equal(expected, chain.from_pdf(color))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_contiguous(self):
         # chain = Chain(data)
         # assert_equal(expected, chain.contiguous(edge, tol, allow_swap))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDrawing:
@@ -408,7 +410,7 @@ class TestDrawing:
     def test_bbox(self):
         # drawing = Drawing(filename, options, **kwargs)
         # assert_equal(expected, drawing.bbox(layers, ignore))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read_dxf(self):
         pass  # tested above
@@ -426,12 +428,12 @@ class TestDrawing:
     def test_draw(self):
         # drawing = Drawing(filename, **kwargs)
         # assert_equal(expected, drawing.draw(fig, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_figure(self):
         # drawing = Drawing(filename, **kwargs)
         # assert_equal(expected, drawing.figure(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_render(self):
         assert b'!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"' in self.simple.render(
@@ -441,42 +443,42 @@ class TestDrawing:
 class TestSpline:
     def test___init__(self):
         # spline = Spline(points)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_bbox(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.bbox())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_end(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.end())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_start(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.start())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_swap(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.swap())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_xy(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.xy())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_length(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.length())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___copy__(self):
         # spline = Spline(points)
         # assert_equal(expected, spline.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRect:
@@ -502,113 +504,119 @@ class TestRect:
     def test___repr__(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_p1(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.p1())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_p2(self):
         # rect = Rect(*args)
         # assert_equal(expected, rect.p2())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestText:
     def test___init__(self):
         # text = Text(text, point, size, rotation)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_bbox(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.bbox())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_patches(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.patches(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_to_dxf(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.to_dxf(**attr))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_length(self):
         # text = Text(text, point, size, rotation)
         # assert_equal(expected, text.length())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestInstance:
     def test___init__(self):
         # instance = Instance(group, trans, name)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___iter__(self):
         # instance = Instance(group, trans, name)
         # assert_equal(expected, instance.__iter__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # instance = Instance(group, trans, name)
         # assert_equal(expected, instance.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_from_dxf(self):
         # instance = Instance()
         # assert_equal(expected, instance.from_dxf(blocks, mat3))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestCalcBulge:
     def test_calc_bulge(self):
         # assert_equal(expected, calcBulge(p1, bulge, p2))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestChains:
     def test_chains(self):
         # assert_equal(expected, chains(group, tol, mergeable))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class test__Group:
     def test_bbox(self):
         # __group = _Group()
         # assert_equal(expected, __group.bbox(filter))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_connect(self):
         # __group = _Group()
         # assert_equal(expected, __group.connect(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_intersect(self):
         # __group = _Group()
         # assert_equal(expected, __group.intersect(other))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_length(self):
         # __group = _Group()
         # assert_equal(expected, __group.length())
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_patches(self):
         # __group = _Group()
         # assert_equal(expected, __group.patches(**kwargs))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
     def test_to_dxf(self):
         # __group = _Group()
         # assert_equal(expected, __group.to_dxf(**kwargs))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 if __name__ == "__main__":

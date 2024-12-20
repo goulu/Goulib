@@ -162,22 +162,22 @@ class TestGeoGraph:
     def test_contiguity(self):
         # geo_graph = GeoGraph(G, multi, **kwargs)
         # assert_equal(expected, geo_graph.contiguity(pt1, pt2))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_tol(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.tol())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___str__(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.__str__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_add_nodes_from(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.add_nodes_from(nodes, **attr))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_copy(self):
         g = self.geo.copy()
@@ -187,12 +187,12 @@ class TestGeoGraph:
     def test_number_of_nodes(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.number_of_nodes())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_draw(self):
         # geo_graph = GeoGraph(G, **kwargs)
         # assert_equal(expected, geo_graph.draw(**kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_clear(self):
         g = GeoGraph(nx.random_geometric_graph(50, .25))
@@ -202,7 +202,7 @@ class TestGeoGraph:
     def test___bool__(self):
         # geo_graph = GeoGraph(data, nodes, **kwargs)
         # assert_equal(expected, geo_graph.__bool__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRender:
@@ -259,40 +259,40 @@ class TestPointsOnSphere:
 class TestWriteDxf:
     def test_write_dxf(self):
         # assert_equal(expected, write_dxf(g, filename))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestToNetworkxGraph:
     def test_to_networkx_graph(self):
         # assert_equal(expected, to_networkx_graph(data, create_using, multigraph_input))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestDiGraph:
     def test___init__(self):
         # di_graph = DiGraph(data, nodes, **kwargs)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestToDrawing:
     def test_to_drawing(self):
         # assert_equal(expected, to_drawing(g, d, edges))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestWriteDot:
     def test_write_dot(self):
         # assert_equal(expected, write_dot(g, filename))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestToJson:
     def test_to_json(self):
         # assert_equal(expected, to_json(g, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestWriteJson:
     def test_write_json(self):
         # assert_equal(expected, write_json(g, filename, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement

@@ -156,27 +156,27 @@ class TestTable:
     def test___eq__(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.__eq__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_hierarchy(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.hierarchy(by, factory, linkfct))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_icol(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.icol(by))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read_element(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.read_element(element, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read_html(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.read_html(filename, **kwargs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_remove_lines_where(self):
         import copy
@@ -201,17 +201,17 @@ class TestTable:
     def test_set(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.set(row, col, value))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_total(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.total(funcs))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_index(self):
         # table = Table(filename, titles, data, **kwargs)
         # assert_equal(expected, table.index(value, column))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transpose(self):
         t = self.t.transpose()
@@ -220,92 +220,92 @@ class TestTable:
     def test___getitem__(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.__getitem__(n))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_asdict(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.asdict())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_cols(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.cols(title))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_groupby_gen(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.groupby_gen(by, sort, removecol))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_json(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.json(**kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_load(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.load(filename, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read_json(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.read_json(filename, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_save(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.save(filename, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_to_time(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.to_time(by, fmt, skiperrors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_to_timedelta(self):
         # table = Table(data, **kwargs)
         # assert_equal(expected, table.to_timedelta(by, fmt, skiperrors))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestAttr:
     def test_attr(self):
         # assert_equal(expected, attr(args))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestCell:
     def test___init__(self):
         # cell = Cell(data, align, fmt, tag, style)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.__repr__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_html(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.html(**kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read(self):
         # cell = Cell(data, align, fmt, tag, style)
         # assert_equal(expected, cell.read())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRow:
     def test___init__(self):
         # row = Row(data, align, fmt, tag, style)
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # row = Row(data, align, fmt, tag, style)
         # assert_equal(expected, row.__repr__())
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_html(self):
         # row = Row(data, align, fmt, tag, style)
         # assert_equal(expected, row.html(cell_args, **kwargs))
-        pass  # TODO: implement   # implement your test here
+        pytest.skip("not yet implemented")  # TODO: implement
