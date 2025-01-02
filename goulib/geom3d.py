@@ -14,10 +14,11 @@ __version__ = '$Id$'
 __revision__ = '$Revision$'
 
 import operator
-import abc
 
-from math import pi, sin, cos, tan, acos, asin, atan2, sqrt, hypot, copysign
-from .geom import Geometry, copy
+from math import pi, sin, cos, tan, acos, asin, atan2, sqrt
+import goulib.math2 as math2
+
+from goulib.geom import Geometry, copy
 
 # 3D Geometry
 # -------------------------------------------------------------------------
@@ -256,18 +257,14 @@ class Vector3(object):
         """:return: tuple (x,y,z)"""
         return (self.x, self.y, self.z)
 
-    def __repr__(self):
-        return '%s%s' % (self.__class__.__name__, self.xyz)
-
     def __eq__(self, other):
         try:
-            return self.xyz == other.xyz
-        except:
-            pass
-        # assert hasattr(other, '__len__') and len(other) == 3
-        return self.x == other[0] and \
-            self.y == other[1] and \
-            self.z == other[2]
+            return math2.allclose(self.xyz, other.xyz)
+        except AttributeError:
+            return math2.allclose(self.xyz, other)
+
+    def __repr__(self):
+        return '%s%s' % (self.__class__.__name__, self.xyz)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -901,6 +898,7 @@ class Plane(Geometry):
 # i j k l
 # m n o p
 
+
 class Matrix4(object):
 
     def __init__(self, *args):
@@ -914,6 +912,10 @@ class Matrix4(object):
         else:
             raise RuntimeError('%s.__init__(%s) failed' %
                                (self.__class__.__name__, object))
+
+    def __eq__(self, other):
+        """Matrix equality test : return True if all elements are (almost) equal"""
+        return math2.allclose(self, other)
 
     def __repr__(self):
         t = self.transposed()  # repr is by line while [:] is by column

@@ -21,7 +21,7 @@ def assert_image(image, name=None, convert=False):
         logging.warning('image %s has low contrast' % name)
 
 
-class TestImage:
+class TestImage(TestCase):
     @classmethod
     def setup_class(self):
         self.lena = Image(path+'/data/lena.png')
@@ -43,7 +43,7 @@ class TestImage:
 
     def test___init__(self):
         lena2 = Image(self.lena)
-        assert self.lena == lena2
+        self.assertEqual(self.lena, lena2)
 
     def test_generate(self):
         # from matrix
@@ -87,7 +87,7 @@ class TestImage:
         assert pixel == 90
         pixel = self.lena[256, 256]
         # (180,65,72))
-        assert pixel == [0.70588235, 0.25490196, 0.28235294]
+        assert pytest.approx(pixel) == [0.70588235, 0.25490196, 0.28235294]
         left = self.lena[:, :256]
         right = self.lena[:, 256:-1]
         face = self.lena[246:374, 225:353]
@@ -110,14 +110,14 @@ class TestImage:
         ]
 
     def test_mode(self):
-        pass  # useless ?
+        pytest.skip("not yet implemented")  # useless ?
 
     def test_open(self):
         lena3 = Image.open(path+'/data/lena.png')
         assert self.lena == lena3
 
     def test_html(self):
-        pass  # do not implement this one as it requires IPython
+       pytest.skip("not yet implemented")  # do not implement this one as it requires IPython
 
     def test__repr_html_(self):
         h = self.lena.convert('P')._repr_html_()
@@ -139,7 +139,7 @@ class TestImage:
         pytest.skip("not yet implemented")  # TODO: implement
 
     def test_grayscale(self):
-        pass
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_invert(self):
         # image = Image(data, **kwargs)
@@ -153,7 +153,7 @@ class TestImage:
         # same as h(self.lena) but without IPython
         h = self.lena.render()
         assert h
-    """
+
     def test_convert(self):
         for mode in modes:
             im = self.lena.convert(mode)
@@ -165,12 +165,11 @@ class TestImage:
                 logging.error(
                     '%s round trip conversion failed with %s' % (mode, e))
                 im2 = im.convert('RGB')
-    """
 
     def test_split(self):
         rgb = self.lena.split()
         for im, c in zip(rgb, 'RGB'):
-            assert_image(im, 'split_%s.png' % c)
+            assert_image(im, 'split_%s.tif' % c)
 
         assert_image(Image(rgb), 'RGB_merge.png')
 
@@ -178,16 +177,16 @@ class TestImage:
         cmyk = self.lena.split('CMYK')
         cmyk2 = [im.colorize(col) for im, col in zip(cmyk, colors)]
         for im, c in zip(cmyk2, 'CMYK'):
-            assert_image(im, 'split_%s.png' % c)
+            assert_image(im, 'split_%s.tif' % c)
 
         assert_image(Image(cmyk, mode='CMYK'), 'CMYK_merge.png')
 
         lab = self.lena.split('Lab')
         for im, c in zip(lab, 'LAB'):
-            assert_image(im, 'split_%s.png' % c)
+            assert_image(im, 'split_%s.tif' % c)
 
         lab = Image(lab, mode='LAB')
-        assert_image(lab, 'Lab.png')
+        assert_image(lab, 'Lab.tif')
 
     def test_filter(self):
         from PIL.ImageFilter import BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN

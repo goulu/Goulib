@@ -47,6 +47,7 @@ dependencies = [
     "pillow",
     "matplotlib",
     "pytest",
+    "pytest-cov",
     "sphinx",
 ]
 dynamic = ["version"]

@@ -182,7 +182,7 @@ setlog()
 
 def runmodule(level=logging.INFO, verbosity=1, argv=None):
     """
-    :param argv: optional list of string with additional options passed to nose.run
+    :param argv: optional list of string with additional options passed to pytest.main
     see http://nose.readthedocs.org/en/latest/usage.html
     see https://docs.pytest.org/en/stable/how-to/usage.html
     """
@@ -202,12 +202,7 @@ def runmodule(level=logging.INFO, verbosity=1, argv=None):
     sys.stdout = mystdout = StringIO()
 
     result = pytest.main(
-        argv=[
-            sys.argv[0],
-            module_name,
-            '-s', '--nologcapture',
-            '--verbosity=%d' % verbosity,
-        ]+argv
+        [module_name]+argv
     )
 
     sys.stdout = old_stdout

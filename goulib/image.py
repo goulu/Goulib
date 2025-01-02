@@ -25,20 +25,18 @@ import sys
 import io
 import os
 import skimage.color as skcolor
+import skimage
 
 from urllib import request
 from urllib.parse import urlparse
 import PIL.Image as PILImage
 
 import numpy as np
-import skimage
-
 from goulib import itertools2, math2, plot, drawing, graph
 from goulib import colors as Gcolors
 
-import warnings
-
-warnings.filterwarnings("ignore")  # because too many are generated
+# import warnings
+# warnings.filterwarnings("ignore")  # because too many are generated
 
 urlopen = request.urlopen
 
@@ -195,7 +193,7 @@ class Image(plot.Plot):
             if s[0] < 10 and s[1] > 10 and s[2] > 10:
                 data = np.transpose(data, (1, 2, 0))
         self.mode = mode or guessmode(data)
-        self.array = skimage.util.dtype.convert(data, modes[self.mode].type)
+        self.array=convert_type(data,modes[self.mode].type)
 
     @property
     def shape(self):
@@ -247,7 +245,7 @@ class Image(plot.Plot):
         self._set(data, mode)
         return self
 
-    def save(self, path, autoconvert=True, format_str=None, **kwargs):
+    def save(self, path, autoconvert=True, format=None):
         """saves an image
         :param path: string with path/filename.ext
         :param autoconvert: bool, if True converts color planes formats to RGB
@@ -261,13 +259,13 @@ class Image(plot.Plot):
                 mode = 'L'
             elif self.mode not in 'RGBA':  # modes we can save directly
                 mode = 'RGB'
-        a = self.convert(mode).array  # makes sure we have a copy of self.array
-        if format_str is None and isinstance(path, str):
-            format_str = path.split('.')[-1][:3]
-        if format_str.upper() == 'TIF':
-            a = skimage.img_as_uint(a)
-        from skimage import io
-        io.imsave(path, a, **kwargs)
+        a = self.convert(mode).array  # makes sure we don't change self.array
+        if format is None and isinstance(path, str):
+            format = path.split('.')[-1][:3]
+        if format.upper() == 'TIF':
+            skimage.io.imsave(path, skimage.img_as_uint(a))
+        else:
+            Image(a).pil.save(path, format=format)
         return self
 
     def _repr_svg_(self, **kwargs):
@@ -275,12 +273,10 @@ class Image(plot.Plot):
         # ... because it causes _repr_png_ to be called by Plot._repr_html_
         # instead of render below
 
-    def render(self, fmt='PNG', **kwargs):
+    def render(self, fmt='PNG'):
         buffer = io.BytesIO()
-        self.save(buffer, format_str=fmt, **kwargs)
-        # self.save(buffer)
-        # im=self.pil
-        # im.save(buffer, fmt)
+        im=self.pil
+        im.save(buffer, fmt)
         return buffer.getvalue()
 
     # methods for PIL.Image compatibility (see http://effbot.org/imagingbook/image.htm )
@@ -861,6 +857,11 @@ class Image(plot.Plot):
 
     def __sub__(self, other):
         return self.sub(other)
+    
+    def __eq__(self, other):
+        if isinstance(other, Image):
+            return np.all(self.array == other.array)
+        return False
 
     def deltaE(self, other):
         import skimage.color as skcolor
@@ -986,11 +987,11 @@ def pure_pil_alpha_to_color_v2(image, color=(255, 255, 255)):
 
 
 def disk(radius, antialias=PILImage.LANCZOS):
-    from skimage.draw import circle, circle_perimeter_aa
+    from skimage.draw import disk as skdisk
     size = math2.rint(2 * radius)
     size = (size, size)
     img = np.zeros(size, dtype=np.double)
-    rr, cc = circle(radius, radius, radius)
+    rr, cc = skdisk((radius, radius), radius)
     img[rr, cc] = 1
     # antialiased perimeter works only with ints ?
     """
@@ -1352,7 +1353,7 @@ def lab2ind(im, colors=256):
         pal = [Gcolors.Color(c, 'lab') for c in p]
     else:
         pal = colors
-        p = [c.lab for c in flatten(pal)]
+        p = [c.lab for c in itertools2.flatten(pal)]
     w, h, d = im.shape
     s = w * h  # number of pixels
     flat = np.reshape(im, (s, d))
@@ -1397,8 +1398,30 @@ for source in modes:
         if converter:
             converters.add_edge(key[0], key[1], f=converter)
 
+def convert_type(data, type):
+    """convert inner format of image
+    :param data: nparray (x,y,n) containing image
+    :param type: target np.type
+    :return: nparray (x,y,n) with new type
+    replaces outdated skimage.util.dtype.convert using 
+    https://scikit-image.org/docs/0.24.x/api/skimage.html#utility-functions
+    """
+    if type==np.uint8:
+        return skimage.img_as_ubyte(data)
+    elif type==np.uint16:
+        return skimage.img_as_uint(data)
+    elif type==np.int16:
+        return skimage.img_as_int(data)
+    elif type==float:
+        return skimage.img_as_float(data)
+    elif type==np.float32:
+        return skimage.img_as_float32(data)
+    elif type==np.float64:
+        return skimage.img_as_float64(data)
+    else:
+        raise ValueError('unsupported type %s'%type)
 
-def convert(a, source, target, **kwargs):
+def convert(a, source:Mode, target:Mode, **kwargs):
     """convert an image between modes, eventually using intermediary steps
     :param a: nparray (x,y,n) containing image
     :param source: string : key of source image mode in modes
@@ -1406,6 +1429,8 @@ def convert(a, source, target, **kwargs):
     """
     import networkx as nx  # http://networkx.github.io/
     source, target = modes[source.upper()], modes[target.upper()]
+    a = np.copy(a)  # Ensure the array is writable
+    a = np.clip(a, source.min, source.max, out=a)
     a = np.clip(a, source.min, source.max, out=a)
     try:
         path = converters.shortest_path(source.name, target.name)
@@ -1433,7 +1458,7 @@ def convert(a, source, target, **kwargs):
                 raise (e)
 
     try:
-        a = skimage.util.dtype.convert(a, target.type)
+        a = convert_type(a, target.type)
     except ValueError as e:  # probably a tuple (indexed, palette)
         pass  # do not force int type here
         # a=tuple((skimage.util.dtype.convert(a[0],target.type),a[1]))

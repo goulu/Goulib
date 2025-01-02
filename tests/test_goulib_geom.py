@@ -9,37 +9,37 @@ class TestGeometry:
     # tested in derived classes
     def test_connect(self):
         # Geometry().connect(1)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_distance(self):
         # Geometry().distance(1)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # Geometry().intersect(1)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_point(self):
         # Geometry().point(1)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_tangent(self):
         # Geometry().tangent(1)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect_case_2(self):
         # geometry = Geometry()
         # assert_equal(expected, geometry.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # geometry = Geometry(*args)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___contains__(self):
         # geometry = Geometry(*args)
         # assert_equal(expected, geometry.__contains__(pt))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPoint2:
@@ -140,13 +140,13 @@ class TestVector2:
         assert abs(self.v11) == sqrt(2)
 
     def test_normalized(self):
-        assert self.v10.normalized()
-        assert abs(self.v11.normalized()) == 1
+        assert self.v10.normalized()  # test that it returns something, not None
+        assert 1 == pytest.approx(abs(self.v11.normalized()))
 
     def test_normalize(self):
         v = copy(self.v11)
         v.normalize()
-        assert abs(v) == 1
+        assert 1 == pytest.approx(abs(v))
 
     def test___add__(self):
         assert self.v10+self.v01 == self.v11  # Vector + Vector -> Vector
@@ -205,8 +205,8 @@ class TestVector2:
         assert self.v11.dot(self.v01) == 1
 
     def test_angle(self):
-        assert self.v10.angle(self.v01) == pi/2.
-        assert self.v11.angle(self.v01) == pi/4.
+        assert self.v10.angle(self.v01) == pytest.approx(pi/2)
+        assert self.v11.angle(self.v01) == pytest.approx(pi/4)
 
     def test_cross(self):
         assert self.v10.cross() == -self.v01
@@ -270,7 +270,7 @@ class TestMatrix3:
     def test_new_translate(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.new_translate(x, y))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___call__(self):
         assert self.mat123(Vector2(10, 20)) == (90, 120)
@@ -283,12 +283,12 @@ class TestMatrix3:
     def test___imul__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__imul__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___mul__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__mul__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___setitem__(self):
         pass  # used everywhere
@@ -296,7 +296,7 @@ class TestMatrix3:
     def test_angle(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.angle(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_determinant(self):
         d = self.mat123.determinant()
@@ -307,7 +307,7 @@ class TestMatrix3:
     def test_identity(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.identity())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_inverse(self):
         inv = self.mat123.inverse()
@@ -318,73 +318,73 @@ class TestMatrix3:
     def test_mag(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.mag(v))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_offset(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.offset())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.rotate(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_scale(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.scale(x, y))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_translate(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.translate(*args))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___abs__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__abs__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___eq__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__eq__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___sub__(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.__sub__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_mag2(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.mag2())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transpose(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.transpose())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transposed(self):
         # matrix3 = Matrix3()
         # assert_equal(expected, matrix3.transposed())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___iter__(self):
         # matrix3 = Matrix3(*args)
         # assert_equal(expected, matrix3.__iter__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_orientation(self):
         # matrix3 = Matrix3(*args)
         # assert_equal(expected, matrix3.orientation())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPolar:
     def test_polar(self):
         # assert_equal(expected, Polar(mag, angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestLine2:
@@ -410,7 +410,7 @@ class TestLine2:
     def test_connect(self):
         # line2 = Line2(*args)
         # assert_equal(expected, line2.connect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         inter = self.l1.intersect(self.l2)
@@ -451,14 +451,14 @@ class TestLine2:
     def test___eq__(self):
         # line2 = Line2(*args)
         # assert_equal(expected, line2.__eq__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestRay2:
     def test___repr__(self):
         # ray2 = Ray2()
         # assert_equal(expected, ray2.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestSegment2:
@@ -509,7 +509,7 @@ class TestSegment2:
     def test_swap(self):
         # segment2 = Segment2()
         # assert_equal(expected, segment2.swap())
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_bisect(self):
         l = self.s1.bisect()
@@ -538,7 +538,7 @@ class TestPolygon:
         assert self.p6.length == 6
 
     def test_area(self):
-        assert self.p4.area == 1
+        assert self.p4.area == pytest.approx(1)
 
     def test_center(self):
         assert self.p4.center == (0, 0)
@@ -597,27 +597,27 @@ class TestCircle:
     def test_connect(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.connect(other))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___abs__(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.__abs__())
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___eq__(self):
         # circle = Circle(center, radius)
         # assert_equal(expected, circle.__eq__(other))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___contains__(self):
         # circle = Circle(*args)
         # assert_equal(expected, circle.__contains__(pt))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_swap(self):
         # circle = Circle(*args)
         # assert_equal(expected, circle.swap())
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestArc2:
@@ -670,7 +670,7 @@ class TestArc2:
     def test___repr__(self):
         # arc2 = Arc2(center, p1, p2, r)
         # assert_equal(expected, arc2.__repr__())
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_point(self):
         assert self.a1.point(0) == (1, 0)
@@ -692,17 +692,17 @@ class TestArc2:
     def test_swap(self):
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.swap())
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___contains__(self):
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.__contains__(pt))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # arc2 = Arc2(center, p1, p2, r, dir)
         # assert_equal(expected, arc2.intersect(other))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestArgPair:
@@ -717,7 +717,7 @@ class TestArgPair:
 class TestCopy:
     def test_copy(self):
         # assert_equal(expected, copy(object))
-        pass # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestCircleFrom3Points:
@@ -783,7 +783,4 @@ class TestEllipse:
     def test___eq__(self):
         # ellipse = Ellipse(*args)
         # assert_equal(expected, ellipse.__eq__(other))
-        pass  # TODO: implement   # implement your test here
-
-
-
+        pytest.skip("not yet implemented")  # TODO: implement

@@ -12,7 +12,7 @@ __license__ = "LGPL"
 
 import logging
 import copy
-import typing #collections
+import typing  # collections
 import inspect
 import re
 import ast
@@ -75,7 +75,7 @@ class Context:
         # precedence of other types below
         ast.Call: (None, 9000),
         ast.Name: (None, 9000),
-        ast.Num: (None, 9000),
+        ast.Constant: (None, 9000),
         ast.Constant: (None, 9000),
     }
 
@@ -255,7 +255,7 @@ class Expr(plot.Plot):
             f = bool(f == 'True')
 
         if type(f) is bool:
-            self.body = ast.Num(f)
+            self.body = ast.Constant(f)
             return
 
         if type(f) is float:  # try to beautify it
@@ -265,7 +265,7 @@ class Expr(plot.Plot):
                 f = plouffe(f)
 
         if math2.is_number(f):  # store it with full precision
-            self.body = ast.Num(f)
+            self.body = ast.Constant(f)
             return
 
         # accept ^ as power operator rather than xor ...
@@ -275,7 +275,7 @@ class Expr(plot.Plot):
 
     @property
     def isNum(self):
-        return isinstance(self.body, ast.Num)
+        return isinstance(self.body, ast.Constant)
 
     @property
     def isconstant(self):
@@ -454,10 +454,10 @@ class Expr(plot.Plot):
         return self.apply(ast.BitXor(), right)
 
     def __lshift__(self, dx):
-        return self.applx(ast.BinOp(ast.Name('x', None), ast.Add(), ast.Num(dx)))
+        return self.applx(ast.BinOp(ast.Name('x', None), ast.Add(), ast.Constant(dx)))
 
     def __rshift__(self, dx):
-        return self.applx(ast.BinOp(ast.Name('x', None), ast.Sub(), ast.Num(dx)))
+        return self.applx(ast.BinOp(ast.Name('x', None), ast.Sub(), ast.Constant(dx)))
 
     def complexity(self):
         ''' measures the complexity of Expr
@@ -503,7 +503,7 @@ class TextVisitor(ast.NodeVisitor):
         ''' calculate the precedence of op '''
         if isinstance(op, (ast.BinOp, ast.UnaryOp)):
             op = op.op
-        if isinstance(op, ast.Num) and math2.is_real(op.n) and op.n < 0:
+        if isinstance(op, ast.Constant) and math2.is_real(op.n) and op.n < 0:
             return self.context.operators[ast.USub][1]
         try:
             return self.context.operators[type(op)][1]
@@ -556,7 +556,7 @@ class TextVisitor(ast.NodeVisitor):
 
         # commute x*3 in 3*x
         if isinstance(op, ast.Mult):
-            if isinstance(right, ast.Num):
+            if isinstance(right, ast.Constant):
                 if not Expr(left, self.context).isconstant:
                     return self._Bin(right, op, left)
 

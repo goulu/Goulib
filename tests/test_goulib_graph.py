@@ -210,7 +210,7 @@ class TestRender:
         pass  # tested in test_save
 
 
-class TestDelauneyEMST:
+class TestDelauneyEMST(TestCase):
     '''groups 2 tests coherently'''
 
     def setUp(self):
@@ -224,6 +224,7 @@ class TestDelauneyEMST:
         logging.info('Delauney %d : %f' % (self.n, time.perf_counter()-start))
         assert graph.number_of_nodes() == self.n
         assert nx.is_connected(graph)
+        assert graph.is_directed() == False
         graph.save(results+'graph.delauney.png')
 
     def test_emst(self):

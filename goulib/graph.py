@@ -642,7 +642,7 @@ def draw_networkx(
         ax=None,
         arrows=True,
         label=None,
-        connectionstyle=None,
+        connectionstyle="arc3",
         min_source_margin=0,
         min_target_margin=0,
         # draw_networkx_nodes
@@ -670,7 +670,7 @@ def draw_networkx(
         horizontalalignment="center",
         verticalalignment="center",
         # ax=None,
-):
+        hide_ticks=True):
     """ improves nx.draw_networkx
     :param g: NetworkX Graph
     :param pos: can be either :
@@ -744,11 +744,28 @@ def draw_networkx(
         nx.draw_networkx_nodes(g, pos, nodelist, node_size, node_color, node_shape,
                                alpha, cmap, vmin, vmax, ax, linewidths, edgecolors, label)
 
-    nx.draw_networkx_edges(g, pos, edgelist, width, edge_color, style, alpha,
-                           arrowstyle, arrowsize, edge_cmap, edge_vmin, edge_vmax,
-                           ax, arrows, label,
-                           node_size, nodelist, node_shape, connectionstyle,
-                           min_source_margin, min_target_margin)
+    arrows = arrows and g.is_directed(),
+    nx.draw_networkx_edges(g,
+    pos,
+    edgelist,
+    width,
+    edge_color,
+    style,
+    alpha,
+    arrowstyle,
+    arrowsize,
+    edge_cmap,
+    edge_vmin,
+    edge_vmax,
+    ax,
+    arrows,
+    label,
+    node_size,
+    nodelist,
+    node_shape,
+    connectionstyle,
+    min_source_margin,
+    min_target_margin,)
 
     with_labels  # is ignored. we check if labels is False or not
     if labels:

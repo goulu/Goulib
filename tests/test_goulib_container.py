@@ -1,9 +1,6 @@
 from goulib.tests import *      # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.container import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-from goulib import math2
-
-
 class TestRecord:
     @classmethod
     def setup_class(cls):
@@ -33,88 +30,4 @@ class TestRecord:
         pytest.skip("not yet implemented")  # TODO: implement
 
 
-class TestSequence:
-    @classmethod
-    def setup_class(self):
-        self.A000040 = Sequence(containf=math2.is_prime)
 
-        # check that we can iterate twice in the same Sequence
-        l1 = list(itertools2.take(20, self.A000040))
-        l2 = list(itertools2.take(20, self.A000040))
-        assert l1 == l2
-
-    def test___add__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__add__(other))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___and__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__and__(other))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___contains__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__contains__(n))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___getitem__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__getitem__(i))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___init__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___iter__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__iter__())
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___mod__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__mod__(other))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___repr__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__repr__())
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___sub__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__sub__(other))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test_accumulate(self):
-        A007504 = self.A000040.accumulate()
-
-    def test_apply(self):
-        A001248 = self.A000040.apply(lambda n: n*n)
-
-    def test_filter(self):
-        A000043 = self.A000040.filter(math2.lucas_lehmer)
-
-    def test_index(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.index(v))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test_pairwise(self):
-        A001223 = self.A000040.pairwise(operator.sub)
-
-    def test_sort(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.sort(key, buffer))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test_unique(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.unique(buffer))
-        pytest.skip("not yet implemented")  # TODO: implement
-
-    def test___or__(self):
-        # sequence = Sequence(iterf, itemf, containf, desc)
-        # assert_equal(expected, sequence.__or__(other))
-        pytest.skip("not yet implemented")  # TODO: implement

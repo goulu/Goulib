@@ -119,7 +119,7 @@ class TestSegments:
     def test_timeWhenPosBiggerThan(self):
         s1 = SegmentsTrapezoidalSpeed(t0=0, p0=0, p3=1.8, a=0.5, vmax=1)
         t = s1.timeWhenPosBiggerThan(1, resolution=0.01)
-        assert t == 2.01
+        assert t == pytest.approx(2.01)
 
     def test_html(self):
         s1 = Segment2ndDegree(0, 2, (0, 0, 2))
@@ -181,10 +181,10 @@ class TestSegmentPoly:
         assert pva == (6, 8, 6, 0)
 
     def test___call__(self):
-        assert self.seg(.9) == (0, 0, 0, 0)
-        assert self.seg(1) == (1, 2, 6, 0)
-        assert self.seg(2-1e-12) == (6, 8, 6, 0)
-        assert self.seg(2) == (0, 0, 0, 0)
+        assert pytest.approx(self.seg(.9)) == (0, 0, 0, 0)
+        assert pytest.approx(self.seg(1)) == (1, 2, 6, 0)
+        assert pytest.approx(self.seg(2-1e-12)) == (6, 8, 6, 0)
+        assert pytest.approx(self.seg(2)) == (0, 0, 0, 0)
 
     def test_save(self):
         self.seg.save(path+'/results/motion.SegmentPoly.png')

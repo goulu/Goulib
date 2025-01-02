@@ -143,17 +143,17 @@ class TestVector3:
     def test_rotate_around(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.rotate_around(axis, theta))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___bool__(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.__bool__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___pos__(self):
         # vector3 = Vector3(*args)
         # assert_equal(expected, vector3.__pos__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestMatrix4:
@@ -183,7 +183,7 @@ class TestMatrix4:
     def test___imul__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__imul__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___mul__(self):
         assert self.mat123*Vector3(1, 10, 100) == (741, 852, 963)
@@ -191,147 +191,147 @@ class TestMatrix4:
     def test___repr__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___setitem__(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.__setitem__(key, value))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_determinant(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.determinant())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_identity(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.identity())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_inverse(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.inverse())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new(*values))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_identity(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_identity())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_look_at(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_look_at(eye, at, up))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_perspective(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_perspective(fov_y, aspect, near, far))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_axis(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotate_axis(angle, axis))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_euler(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotate_euler(heading, attitude, bank))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_triple_axis(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotate_triple_axis(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotatex(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotatex(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotatey(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotatey(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotatez(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_rotatez(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_scale(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_scale(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_translate(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.new_translate(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_axis(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotate_axis(angle, axis))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_euler(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotate_euler(heading, attitude, bank))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_triple_axis(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotate_triple_axis(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotatex(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotatex(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotatey(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotatey(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotatez(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.rotatez(angle))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_scale(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.scale(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transform(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.transform(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_translate(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.translate(x, y, z))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transpose(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.transpose())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_transposed(self):
         # matrix4 = Matrix4()
         # assert_equal(expected, matrix4.transposed())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___iter__(self):
         # matrix4 = Matrix4(*args)
         # assert_equal(expected, matrix4.__iter__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestQuaternion:
@@ -341,112 +341,112 @@ class TestQuaternion:
 
     def test___init__(self):
         # quaternion = Quaternion(w, x, y, z)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___abs__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__abs__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___copy__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___imul__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__imul__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___mul__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__mul__(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_conjugated(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.conjugated())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_get_angle_axis(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.get_angle_axis())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_get_euler(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.get_euler())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_get_matrix(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.get_matrix())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_identity(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.identity())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_mag2(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.mag2())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_identity(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.new_identity())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_interpolate(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.new_interpolate(q1, q2, t))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_axis(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.new_rotate_axis(angle, axis))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_euler(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.new_rotate_euler(heading, attitude, bank))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_new_rotate_matrix(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.new_rotate_matrix(m))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_normalize(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.normalize())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_normalized(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.normalized())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_axis(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.rotate_axis(angle, axis))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_euler(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.rotate_euler(heading, attitude, bank))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_rotate_matrix(self):
         # quaternion = Quaternion(w, x, y, z)
         # assert_equal(expected, quaternion.rotate_matrix(m))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPoint3:
@@ -457,17 +457,17 @@ class TestPoint3:
     def test___repr__(self):
         # point3 = Point3()
         # assert_equal(expected, point3.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_connect(self):
         # point3 = Point3()
         # assert_equal(expected, point3.connect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # point3 = Point3()
         # assert_equal(expected, point3.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestLine3:
@@ -478,38 +478,39 @@ class TestLine3:
     def test___copy__(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # line3 = Line3(*args)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_connect(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.connect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_point(self):
         # line3 = Line3(*args)
         # assert_equal(expected, line3.point(u))
-        pass  # TODO: implement  # implement your test here
+        # TODO: implement  # implement your test here
+        pytest.skip("not yet implemented")
 
 
 class TestRay3:
     def test___repr__(self):
         # ray3 = Ray3()
         # assert_equal(expected, ray3.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestSegment3:
@@ -520,22 +521,22 @@ class TestSegment3:
     def test___abs__(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.__abs__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_mag2(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.mag2())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_swap(self):
         # segment3 = Segment3()
         # assert_equal(expected, segment3.swap())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestSphere:
@@ -546,41 +547,41 @@ class TestSphere:
     def test___copy__(self):
         # sphere = Sphere(center, radius)
         # assert_equal(expected, sphere.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # sphere = Sphere(center, radius)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # sphere = Sphere(center, radius)
         # assert_equal(expected, sphere.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_connect(self):
         # sphere = Sphere(center, radius)
         # assert_equal(expected, sphere.connect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # sphere = Sphere(center, radius)
         # assert_equal(expected, sphere.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___contains__(self):
         # sphere = Sphere(*args)
         # assert_equal(expected, sphere.__contains__(pt))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_distance_on_sphere(self):
         # sphere = Sphere(*args)
         # assert_equal(expected, sphere.distance_on_sphere(phi1, theta1, phi2, theta2))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_point(self):
         # sphere = Sphere(*args)
         # assert_equal(expected, sphere.point(u, v))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
 
 class TestPlane:
@@ -593,26 +594,26 @@ class TestPlane:
     def test___copy__(self):
         # plane = Plane(*args)
         # assert_equal(expected, plane.__copy__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___init__(self):
         # plane = Plane(*args)
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___repr__(self):
         # plane = Plane(*args)
         # assert_equal(expected, plane.__repr__())
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_connect(self):
         # plane = Plane(*args)
         # assert_equal(expected, plane.connect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_intersect(self):
         # plane = Plane(*args)
         # assert_equal(expected, plane.intersect(other))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_distance(self):
         # https://www.hackerrank.com/challenges/sherlock-and-planes
@@ -626,4 +627,4 @@ class TestPlane:
 class TestSpherical:
     def test_spherical(self):
         # assert_equal(expected, Spherical(r, theta, phi))
-        pass  # TODO: implement
+        pytest.skip("not yet implemented")  # TODO: implement
