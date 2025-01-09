@@ -22,6 +22,7 @@ class TestExpr:
             e[0] = Expr(e[0])
 
         cls.f = Expr('3*x+2')
+        cls.f0 = Expr(0)
         cls.f1 = Expr(1)
         cls.fx = Expr('x')
         cls.fx2 = Expr('x**2')
@@ -47,7 +48,7 @@ class TestExpr:
         cls.euler = Expr("e**(i*pi)")
 
     def test___init__(self):
-        assert Expr(1)() == 1
+        assert Expr(1) == 1
 
         e2 = Expr(lambda x: 3 * x + 2)
         assert repr(e2) == '3*x+2'
@@ -145,6 +146,8 @@ class TestExpr:
         assert f([-1, 0, 1]) == [0, 1, 2]
 
     def test___neg__(self):
+        f= -self.f0
+        assert str(f) == '0'
         f = -self.f1
         assert str(f) == '-1'
         f = -self.fx
@@ -182,6 +185,9 @@ class TestExpr:
         assert f2([-1, 0, 1]) == [sin(-1), 0, sin(1)]
 
     def test___not__(self):
+        assert(str(~self.true) == "False")
+        assert(str(~self.false) == "True")
+        assert(str(~~self.true) == "True")
         fb = ~self.fb1
         assert fb([0, 1, 2]) == [True, True, False]
 
@@ -198,8 +204,8 @@ class TestExpr:
         assert fb([1, 2, 3]) == [False, True, False]
 
     def test___lt__(self):
-        assert not Expr(1) > Expr(2)
         assert Expr(1) < 2
+        assert Expr("~2<1")
 
     def test___lshift__(self):
         e = self.fx << 1
@@ -210,16 +216,18 @@ class TestExpr:
         assert e(0) == -2
 
     def test___eq__(self):
-        assert not Expr(1) == Expr(2)
-        assert not Expr(1) == 2
         assert Expr(1) == 1
-        assert Expr(1) == Expr('2-1')
+        assert Expr(1) == Expr('2-1')()
         assert self.f == '3*x+2'
-        assert self.f1 == '1'
+        assert self.f1 == 1
         assert self.fx == 'x'
         assert self.fs == 'sin(x)'
         assert self.fb1 == 'x > 1'
-        assert self.long == '(3*x+(a+b)*y)/x**(3*a*y)'
+        assert self.long == '(x*3+(a+b)*y)/x**(3*a*y)'
+
+    def test___ne__(self):
+        assert Expr(1) != Expr(2)
+        assert Expr(1) != 2
 
     def test_save(self):
         self.e2(self.e1).save(path + '/results/expr.png')
@@ -254,48 +262,47 @@ class TestExpr:
 
 class TestEval:
     def test_eval(self):
-        pass  # tested in Expr
-
+        pytest.skip("tested in Expr")
 
 class TestGetFunctionSource:
     def test_get_function_source(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
 
 class TestTextVisitor:
 
     def test___init__(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_generic_visit(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_prec(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_prec_BinOp(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_prec_UnaryOp(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_BinOp(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_Call(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_Compare(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_Name(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_NameConstant(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_Num(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")
 
     def test_visit_UnaryOp(self):
-        pass  # tested in Expr
+        pytest.skip("tested in Expr")

@@ -53,6 +53,7 @@ class Context:
         ast.And: (op.and_, 400, ' and ', ' and ', ' \\wedge '),
         ast.Not: (op.not_, 500, 'not ', 'not ', '\\neg'),
         ast.Eq: (op.eq, 600, '=', ' == ', ' = '),
+        ast.NotEq: (op.ne, 600, '<>', '!= ', '\\neq'),
         ast.Gt: (op.gt, 600, ' > ', ' > ', ' \\gtr '),
         ast.GtE: (op.ge, 600, ' >= ', ' >= ', ' \\gec '),
         ast.Lt: (op.lt, 600, ' < ', ' < ', ' \\ltr '),
@@ -78,6 +79,19 @@ class Context:
         ast.Constant: (None, 9000),
         ast.Constant: (None, 9000),
     }
+
+    def precedence(self, op: ast.AST) -> int:
+        ''' calculate the precedence of op '''
+        if isinstance(op, (ast.BinOp, ast.UnaryOp)):
+            op = op.op
+        if isinstance(op, ast.Compare):
+            op=op.ops[0] #TODO : handle morre complex comparisons see https://docs.python.org/3/library/ast.html#ast.Compare
+        if isinstance(op, ast.Constant) and math2.is_real(op.value) and op.value < 0:
+            return self.operators[ast.USub][1]
+        try:
+            return self.operators[type(op)][1]
+        except KeyError as e:
+            return self.operators[type(op)][1]
 
     def add_function(self, f, s=None, r=None, l=None):
         ''' add a function to those allowed in Expr.
@@ -110,52 +124,62 @@ class Context:
             elif math2.is_number(f):
                 self.add_constant(f, fname)
 
-    def eval(self, node):
+    def eval(self, node: ast.AST)->ast.AST:
         '''safe eval of ast node : only functions and _operators listed above can be used
 
         :param node: ast.AST to evaluate
-        :param ctx: dict of varname : value to substitute in node
         :return: number or expression string
         '''
-        if isinstance(node, ast.Constant):  # <number>
-            return node.n
-        elif isinstance(node, ast.Name):
-            return self.variables.get(node.id, node.id)  # return value or var
+        if isinstance(node, ast.Name):
+            value=self.variables.get(node.id)
+            return ast.Constant(value) if value is not None else node
         elif isinstance(node, ast.Attribute):
-            return getattr(self.variables, [node.value.id], node.attr)
+            value=getattr(self.variables, [node.value.id])
+            return ast.Constant(value) if value is not None else ast.Name(node.attr)
         elif isinstance(node, ast.Tuple):
             return tuple(self.eval(e) for e in node.elts)
         elif isinstance(node, ast.Call):
-            params = [self.eval(arg) for arg in node.args]
-            if node.func.id not in self.functions:
-                raise NameError('%s function not allowed' % node.func.id)
-            f = self.functions[node.func.id][0]
-            res = f(*params)
-            # try to correct small error
-            return math2.int_or_float(res, 0, 1e-12)
+            try:
+                params = [self.eval(arg).value for arg in node.args]
+                if node.func.id not in self.functions:
+                    raise NameError('%s function not allowed' % node.func.id)
+                f = self.functions[node.func.id][0]
+                res = f(*params)
+                # try to correct small error
+                return ast.Constant(math2.int_or_float(res, 0, 1e-12))
+            except Exception as e:
+                return node # function cannot be evaluated. return it as is
         elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
             op = self.operators[type(node.op)]
             left = self.eval(node.left)
             right = self.eval(node.right)
-            if math2.is_number(left) and math2.is_number(right):
-                res = op[0](left, right)
-                # no correction here !
-                return res
+            if isinstance(left,ast.Constant) and isinstance(right,ast.Constant):
+                return ast.Constant(op[0](left.value, right.value))
             else:
-                return "%s%s%s" % (left, op[_dialect_python], right)
+                return ast.BinOp(left, node.op, right)
         elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
-            right = self.eval(node.operand)
-            return self.operators[type(node.op)][0](right)
+            op = self.operators[type(node.op)]
+            operand = self.eval(node.operand)
+            if isinstance(operand,ast.Constant) :
+                return ast.Constant(op[0](operand.value))
+            else:
+                return node
         elif isinstance(node, ast.Compare):
             left = self.eval(node.left)
+            #https://docs.python.org/3/library/ast.html#ast.Compare
+            #TODO: improve for semi evaluations such as x<3<5+1
+            res=False
             for op, right in zip(node.ops, node.comparators):
-                # TODO: find what to do when multiple items in list
-                return self.operators[type(op)][0](left, self.eval(right))
-        elif isinstance(node, ast.NameConstant):
-            return node.value
-        else:
-            logging.warning(ast.dump(node, False, False))
-            return self.eval(node.body)  # last chance
+                op=self.operators[type(op)]
+                right = self.eval(right)
+                if isinstance(left,ast.Constant) and isinstance(right,ast.Constant):
+                    res=op[0](left.value, right.value)
+                    if res is False:
+                        return ast.Constant(False)
+                    left=right
+            if res is True:
+                return ast.Constant(True)
+        return node
 
     def __init__(self):
         self.add_module(math)
@@ -231,7 +255,8 @@ class Expr(plot.Plot):
     combined using standard operators
     and plotted in IPython/Jupyter notebooks
     '''
-
+    body: ast.AST
+    context: Context
     def __init__(self, f, context=default_context):
         '''
         :param f: function or operator, Expr to copy construct, or formula string
@@ -281,13 +306,9 @@ class Expr(plot.Plot):
     def isconstant(self):
         ''':return: True if Expr evaluates to a constant number or bool'''
         res = self()
-        if math2.is_number(res):
-            return True
-        if isinstance(res, bool):
-            return True
-        return False
+        return isinstance(res.body, ast.Constant)
 
-    def __call__(self, x=None, **kwargs):
+    def __call__(self, x=None, **kwargs)->"Expr":
         '''evaluate the Expr at x OR compose self(x())'''
         if isinstance(x, Expr):  # composition
             return self.applx(x)
@@ -295,26 +316,24 @@ class Expr(plot.Plot):
             return [self(x) for x in x]  # return a displayable list
         if x is not None:
             kwargs['x'] = x
-        kwargs['self'] = self  # allows to call methods such as in Stats
+        kwargs['self'] = self  # allows to call methods such as in Stats module
         self.context.variables = kwargs
         try:
-            e = self.context.eval(self.body)
-        except TypeError:  # some params remain symbolic
-            return self
+            res = self.context.eval(self.body)
         except Exception as error:  # ZeroDivisionError, OverflowError
             return None
-        if math2.is_number(e):
-            return e
-        return Expr(e, self.context)
+        if res==self.body:
+            return self
+        return Expr(res)
 
     def __float__(self):
         return self()
 
     def __repr__(self):
-        return TextVisitor(_dialect_python).visit(self.body)
+        return TextVisitor(_dialect_python,self.context).visit(self.body)
 
     def __str__(self):
-        return TextVisitor(_dialect_str).visit(self.body)
+        return TextVisitor(_dialect_str,self.context).visit(self.body)
 
     def _repr_html_(self):
         '''default rich format is LaTeX'''
@@ -322,7 +341,7 @@ class Expr(plot.Plot):
 
     def latex(self):
         ''':return: string LaTex formula'''
-        return TextVisitor(_dialect_latex).visit(self.body)
+        return TextVisitor(_dialect_latex,self.context).visit(self.body)
 
     def _repr_latex_(self):
         return r'${%s}$' % self.latex()
@@ -356,22 +375,29 @@ class Expr(plot.Plot):
             ax.plot(x, y, **kwargs)
         return ax
 
-    def apply(self, f, right=None):
+    def apply(self, f, right=None) -> 'Expr':
         '''function composition self o f = f(self(x))'''
 
         if right is None:
             if isinstance(f, ast.unaryop):
                 node = ast.UnaryOp(f, self.body)
-            else:
-                # if not isinstance(f,Expr): f=Expr(f) #not useful as applx does the reverse
+            elif isinstance(f,Expr):
+                # f=Expr(f) #not useful as applx does the reverse
                 return f.applx(self)
+            elif callable(f):
+                node = ast.UnaryOp(f, self.body)
+            elif f is None: # unary minus -0
+                return self
+
+            else:
+                raise ValueError('unsupported type %s' % type(f))
         else:
             if not isinstance(right, Expr):
                 right = Expr(right, self.context)
             node = ast.BinOp(self.body, f, right.body)
-        return Expr(node, self.context)
+        return Expr(node, self.context)() # eval to simplify
 
-    def applx(self, f, var='x'):
+    def applx(self, f, var='x') -> 'Expr':
         '''function composition f o self = self(f(x))'''
         if isinstance(f, Expr):
             f = f.body
@@ -385,38 +411,25 @@ class Expr(plot.Plot):
 
         node = copy.deepcopy(self.body)
         return Expr(Subst().visit(node), self.context)
+    
+    def __eq__(self, right):
+        return self.apply(ast.Eq(), right)
 
-    def __eq__(self, other):
-        if math2.is_number(other):
-            try:
-                return self() == other
-            except:
-                return False
-        if not isinstance(other, Expr):
-            other = Expr(other, self.context)
-        return str(self()) == str(other())
+    def __ne__(self, right):
+        return self.apply(ast.NotEq(), right)
 
-    def __ne__(self, other):
-        return not self == other
+    def __lt__(self, right):
+        return self.apply(ast.Lt(), right)
 
-    def __lt__(self, other):
-        if math2.is_number(other):
-            try:
-                return self() < other
-            except:
-                return False
-        if not isinstance(other, Expr):
-            other = Expr(other, self.context)
-        return float(self()) < float(other())
+    def __le__(self, right):
+        return self.apply(ast.LtE(), right)
 
-    def __le__(self, other):
-        return self < other or self == other
+    def __ge__(self, right):
+        return self.apply(ast.GtE(), right)
 
-    def __ge__(self, other):
-        return not self < other
 
-    def __gt__(self, other):
-        return self >= other and not self == other
+    def __gt__(self, right):
+        return self.apply(ast.Gt(), right)
 
     def __add__(self, right):
         return self.apply(ast.Add(), right)
@@ -430,9 +443,9 @@ class Expr(plot.Plot):
     def __mul__(self, right):
         return self.apply(ast.Mult(), right)
 
-    def __rmul__(self, right):
-        return Expr(right, self.context) * self
-
+    def __rmul__(self, left):
+        return Expr(left, self.context).apply(ast.Mult(), self)
+    
     def __truediv__(self, right):
         return self.apply(ast.Div(), right)
 
@@ -499,17 +512,6 @@ class TextVisitor(ast.NodeVisitor):
         self.dialect = dialect
         self.context = context
 
-    def prec(self, op):
-        ''' calculate the precedence of op '''
-        if isinstance(op, (ast.BinOp, ast.UnaryOp)):
-            op = op.op
-        if isinstance(op, ast.Constant) and math2.is_real(op.n) and op.n < 0:
-            return self.context.operators[ast.USub][1]
-        try:
-            return self.context.operators[type(op)][1]
-        except KeyError:
-            return self.context.operators[type(op)][1]
-
     def _par(self, content):
         if self.dialect == _dialect_latex:
             return '\\left(%s\\right)' % content
@@ -537,12 +539,12 @@ class TextVisitor(ast.NodeVisitor):
     def visit_Name(self, n):
         return n.id
 
-    def visit_NameConstant(self, node):
+    def visit_Constant(self, node):
         return str(node.value)
 
     def visit_UnaryOp(self, n):
         op = self.visit(n.operand)
-        if self.prec(n.op) > self.prec(n.operand):
+        if self.context.precedence(n.op) > self.context.precedence(n.operand):
             op = self._par(op)
 
         symbol = self.context.operators[type(n.op)][self.dialect]
@@ -550,7 +552,14 @@ class TextVisitor(ast.NodeVisitor):
         if '%s' in symbol:
             return symbol % op
 
-        return symbol + op
+        res=symbol + op
+        if res=="-0":
+            return "0"
+        elif res=="~True":
+            return "False"
+        elif res=="~False":
+            return "True"
+        return res
 
     def _Bin(self, left, op, right):
 
@@ -560,7 +569,8 @@ class TextVisitor(ast.NodeVisitor):
                 if not Expr(left, self.context).isconstant:
                     return self._Bin(right, op, left)
 
-        l, r = self.visit(left), self.visit(right)
+        l= self.visit(left)
+        r=self.visit(right)
 
         symbol = self.context.operators[type(op)][self.dialect]
 
@@ -569,10 +579,10 @@ class TextVisitor(ast.NodeVisitor):
 
         # handle precedence (parenthesis) if needed
 
-        if self.prec(op) > self.prec(left):
+        if self.context.precedence(op) > self.context.precedence(left):
             l = self._par(l)
 
-        if self.prec(op) > self.prec(right):
+        if self.context.precedence(op) > self.context.precedence(right):
             if self.dialect == _dialect_latex and isinstance(op, ast.Pow):
                 r = '{' + r + '}'
             else:
@@ -603,13 +613,13 @@ class TextVisitor(ast.NodeVisitor):
         # TODO: what to do with multiple ops/comparators ?
         return self._Bin(n.left, n.ops[0], n.comparators[0])
 
-    def visit_Num(self, n):
+    def visit_Constant(self, n):
         try:
-            d = self.context.constants[type(n.n)]
-            return d[n.n][self.dialect]
+            d = self.context.constants[type(n.value)]
+            return d[n.value][self.dialect]
         except KeyError:
             pass
-        return str(math2.int_or_float(n.n))
+        return str(math2.int_or_float(n.value))
 
     def generic_visit(self, n):
         try:
