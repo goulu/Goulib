@@ -6,58 +6,61 @@ __author__ = "Philippe Guglielmetti"
 __copyright__ = "Copyright 2013, Philippe Guglielmetti"
 __license__ = "LGPL"
 
-import bisect
 import math
+from typing import Iterable
+from operator import itemgetter
 
-from goulib import expr, math2, itertools2
+from goulib import  math2, itertools2
+from .expr import Expr
+from .containers import SortedCollection
 
-
-class Piecewise(expr.Expr):
+PieceType = tuple[float,Expr]
+class Piecewise(Expr):
     '''
     piecewise function defined by a sorted list of (startx, Expr)
     '''
-
+    xy:SortedCollection # of [PieceType]
+    _period:tuple[float,float]
     def __init__(self, init=[], default=0, period=(-math2.inf, +math2.inf)):
-        # Note : started by deriving a list of (point,value), but this leads to a problem:
-        # the value is taken into account in sort order by bisect
-        # so instead of defining one more class with a __cmp__ method, I split both lists
+        '''constructor
+        :param init: can be a list of (x,y) tuples or a Piecewise object
+        :param default: default value for x < first x
+        :param period: tuple (start, end) for periodicity'''
         if math2.is_number(period):
             period = (0, period)
         try:  # copy constructor ?
-            self.x = list(init.x)
-            self.y = list(init.y)
-            self.period = period or init.period  # allow to force periodicity
+            self.xy=SortedCollection(init.xy, key=itemgetter(0))
+            self._period = period or init._period  # allow to force different periodicity
         except AttributeError:
-            self.x = []
-            self.y = []
-            self.period = period
+            self.xy=SortedCollection([], key=itemgetter(0))
+            self._period = period
             self.append(period[0], default)
             self.extend(init)
 
         # to initialize context and such stuff
         super(Piecewise, self).__init__(0)
-        self.body = '?'  # should not happen
+        self.body =None  # should not be used
 
-    def __len__(self):
-        return len(self.x)
+    def __len__(self)->int:
+        return len(self.xy)
 
-    def __getitem__(self, i):
-        return (self.x[i], self.y[i])
+    def __getitem__(self, i)->PieceType:
+        return self.xy[i]
 
-    def is_periodic(self):
-        if math.isinf(self.period[1]):
-            return False
-        return self.period[1] - self.period[0]
+    def period(self)->float:
+        if math.isinf(self._period[1]):
+            return 0
+        return self._period[1] - self._period[0]
 
     def _str_period(self):
-        p = self.is_periodic()
+        p = self.period()
         return ", period=%s" % p if p else ""
 
     def __str__(self):
-        return str(list(self)) + self._str_period()
+        return str(self.xy._items) + self._str_period()
 
     def __repr__(self):
-        return repr(list(self)) + self._str_period()
+        return repr(self.xy._items) + self._str_period()
 
     def latex(self):
         ''':return: string LaTex formula'''
@@ -80,88 +83,99 @@ class Piecewise(expr.Expr):
 
     def _x(self, x):
         '''handle periodicity'''
-        p = self.is_periodic()
+        p = self.period()
         return x % p if p else x
 
-    def index(self, x):
-        '''return index of piece'''
-        return bisect.bisect_right(self.x, self._x(x)) - 1
-
-    def __call__(self, x):
-        '''returns value of Expr at point x '''
+    def __call__(self, x:float)->Expr:
+        '''returns evaluated Expr at point x '''
         if itertools2.isiterable(x):
             return [self(x) for x in x]
+        x=self._x(x)
+        (x,y)=self.xy.find_le(x)
+        return y(x)
+    
+    def index(self, x:float)->int:
+        '''returns index of the piece containing x'''
+        x=self._x(x)
+        try:
+            return self.xy.index(self.xy.find_le(x))
+        except ValueError:
+            return len(self.xy)
 
-        i = self.index(x)
-        xx = self._x(x)
-        return self.y[i](xx)
-
-    def insort(self, x, v=None):
-        '''insert a point (or returns it if it already exists)
-        note : method name follows bisect.insort convention
-        '''
+    def insert(self, x, y=None):
+        '''insert a point (or returns it if it already exists)'''
         x = self._x(x)
-        i = bisect.bisect_left(self.x, x)  # do not use self.index here !
-        if i < len(self) and x == self.x[i]:
-            return i
-        # insert either the v value, or copy the current value at x
-        # note : we might have consecutive tuples with the same y value
-        if v is not None:
-            self.y.insert(i, expr.Expr(v))
-        else:  # split the piece at x
-            self.y.insert(i, self.y[i - 1])
-        self.x.insert(i, x)
-        return i
-
+        if y is None:
+            try:
+                y=self.xy.find_le(x)[1]
+            except ValueError:
+                y=self.xy[-1][1] # last value
+        y=Expr(y) # to make sure
+        try:
+            self.xy.find(x) #just to test if exists
+            self.xy[x]=(x,y)
+            return (x,y)
+        except ValueError:
+            pass
+        self.xy.insert_right((x,y))
+        return (x,y)
+    
+    def __len__(self):
+        return len(self.xy)
+    
     def __iter__(self):
         '''iterators through discontinuities. take the opportunity to delete redundant tuples'''
         prev = None
-        i = 0
-        while i < len(self):
-            x, y = self.x[i], self.y[i]
-            if y == prev:  # simplify
-                self.y.pop(i)
-                self.x.pop(i)
+        for (x,y) in self.xy:
+            if prev is not None and y == prev:  # simplify
+                self.xy.remove((x,y))
             else:
-                yield x, y
+                yield x,y
                 prev = y
-                i += 1
 
-    def append(self, x, y=None):
+    def append(self, x, y=None)->'Piecewise':
         '''appends a (x,y) piece. In fact inserts it at correct position'''
         if y is None:
             (x, y) = x
-        x = self._x(x)
-        i = self.insort(x, y)
+        self.insert(x, y)
         return self  # to allow chained calls
 
-    def extend(self, iterable):
+    def extend(self, it:Iterable[PieceType]):
         '''appends an iterable of (x,y) values'''
-        for p in iterable:
-            self.append(p)
+        for part in it:
+            self.append(part)
 
     def iapply(self, f, right):
         '''apply function to self'''
         if not right:  # monadic . apply to each expr
-            self.y = [v.apply(f) for v in self.y]
-        elif isinstance(right, Piecewise):  # combine each piece of right with self
-            for i, p in enumerate(right):
-                try:
-                    self.iapply(f, (p[0], p[1], right[i + 1][0]))
-                except:
-                    self.iapply(f, (p[0], p[1]))
-        else:  # assume a triplet (start,value,end) as called above
-            i = self.insort(right[0])
-            try:
-                j = self.insort(right[2])
-                if j < i:
-                    i, j = j, i
-            except:
-                j = len(self)
+            for i,xy in enumerate(self.xy):
+                self.xy[i]=(xy[0], xy[1].apply(f))
+            return self
+        if isinstance(right, tuple):  # assume a triplet 
+            (start,value,end)=right
+            if end<start:
+                start,end=end,start
+            self.insert(start)
+            i = self.index(start)
+            if end<math.inf:
+                self.insert(end)
+                j = self.index(end)
+            else:
+                j=len(self)
 
             for k in range(i, j):
-                self.y[k] = self.y[k].apply(f, right[1])  # calls Expr.apply
-        return self
+                (x,y)=self.xy[k]
+                self.xy[k] = (x,Expr(y).apply(f, value))
+            return self
+        else:
+            right=Piecewise(right)
+            for i, p in enumerate(right):
+                try:
+                    end=right[i + 1][0]
+                except IndexError:
+                    end=math.inf
+                self.iapply(f, (p[0], p[1], end))
+            return self
 
     def apply(self, f, right=None):
         '''apply function to copy of self'''
@@ -169,8 +183,7 @@ class Piecewise(expr.Expr):
 
     def applx(self, f):
         ''' apply a function to each x value '''
-        self.x = [f(x) for x in self.x]
-        self.y = [y.applx(f) for y in self.y]
+        self.xy = SortedCollection([(f(x), y.applx(f)) for x, y in self.xy], key=itemgetter(0))
         return self
 
     def __lshift__(self, dx):
@@ -182,7 +195,7 @@ class Piecewise(expr.Expr):
     def _switch_points(self, xmin, xmax):
         prevy = None
         firstpoint, lastpoint = False, False
-        for x, y in self:
+        for (x, y) in self.xy:
             y = y(x)
             if x < xmin:
                 if firstpoint:
@@ -203,13 +216,17 @@ class Piecewise(expr.Expr):
         ''':return: x,y lists of float : points for a line plot'''
         resx = []
         resy = []
-
-        dx = self.x[-1] - self.x[1]
-        p = self.is_periodic()
+        last=self.xy[-1]
+        try:
+            first=self.xy[1] # [0] gives the default value from -inf
+        except IndexError:
+            first=last
+        dx = last[0] - first[0]
+        p = self.period()
 
         if xmin is None:
             # by default we extend the range by 10%
-            xmin = min(0, self.x[1] - dx * .1)
+            xmin = min(0, first[0] - dx * .1)
 
         if xmax is None:
             if p:
@@ -217,7 +234,7 @@ class Piecewise(expr.Expr):
                 xmax = xmin + p * 2.5
             else:
                 # by default we extend the range by 10%
-                xmax = self.x[-1] + dx * .1
+                xmax = last[0] + dx * .1
 
         for x, y in self._switch_points(xmin, xmax):
             resx.append(x)
@@ -232,3 +249,12 @@ class Piecewise(expr.Expr):
         '''plots function'''
         (x, y) = self.points(xmax=xmax)
         return super(Piecewise, self)._plot(ax, x, y, **kwargs)
+    
+    def __eq__(self, right):
+        right=Piecewise(right)
+        if len(self)!=len(right.xy):
+            return False
+        for xy1,xy2 in zip(self.xy,right.xy):
+            if xy1!=xy2:
+                return False
+        return True

@@ -139,8 +139,9 @@ class SortedCollection(object):
     def __getitem__(self, i):
         return self._items[i]
     
-    def __setitem__(self, i, item):
-        assert i == self.index(item)
+    def __setitem__(self, _, item):
+        k = self._key(item)
+        i = bisect_left(self._keys, k)
         self._items[i] = item
 
     def __iter__(self):

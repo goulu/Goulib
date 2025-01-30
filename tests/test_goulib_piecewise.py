@@ -10,7 +10,6 @@ import os
 path = os.path.dirname(os.path.abspath(__file__))
 results = path+'/results/piecewise/'  # path for results
 
-
 class TestPiecewise:
     @classmethod
     def setup_class(self):
@@ -20,7 +19,7 @@ class TestPiecewise:
 
         self.p2 += (2.5, 1, 6.5)
         self.p2 += (1.5, 1, 3.5)
-        assert self.p2(range(8)) == [1, 1, 2, 3, 2, 2, 2, 1]
+        
 
         # boolean
         self.b0 = Piecewise([], False)
@@ -34,7 +33,15 @@ class TestPiecewise:
         self.f = Piecewise().append(0, cos).append(1, lambda x: x*x)
 
     def test___init__(self):
-        pass  # tested above
+        assert self.p1 == Piecewise([(4, 4), (3, 3.0), (1, 1), (5, 0)])
+
+    def test_append(self):
+        # f was created by appends in setup_class
+        assert self.f(range(-1,5)) == [0, 1, 1, 4, 9, 16]
+
+    def test_repr(self):
+        res=repr(self.p1) 
+        assert res == '[(-inf, 0), (1, 1), (3, 3), (4, 4), (5, 0)]'
 
     def test___call__(self):
         y = [self.p1(x) for x in range(6)]
@@ -56,25 +63,24 @@ class TestPiecewise:
                                           4, 4, 5, 5, 6], [0, 0, 1, 1, 3, 3, 4, 4, 0, 0])
         assert self.b2.points(0, 3) == ([0, 1, 1, 2, 2, 3, 3], [
             False, False, True, True, False, False, True])
+        assert len(self.f) == 3
+        assert self.f.points(-1,4)==([-1,0,0,1,4], [0, 0, 1, 1, 16])
 
-    def test_append(self):
-        pass  # tested by most other tests
+
 
     def test_extend(self):
-        pass  # tested at __init__
+        pytest.skip("tested at __init__")
 
     def test_index(self):
-        pass  # tested by most other tests
+        pytest.skip("tested by most other tests")
 
     def test___getitem__(self):
-        pass  # tested by most other tests
+        pytest.skip("tested by most other tests")
 
     def test___len__(self):
-        pass  # tested by most other tests
+        assert len(self.p1) == 5
 
     def test___add__(self):
-        pass  # += tested in setup
-
         p = self.p1+self.p2
         assert p(range(8)) == [1, 2, 3, 6, 6, 2, 2, 1]
 
@@ -84,7 +90,9 @@ class TestPiecewise:
         assert y == [-1, 0, -1, 0, 2, -2, -2, -1]
 
     def test___neg__(self):
-        assert (-self.p1) == [(-inf, 0), (1, -1), (3, -3.0), (4, -4), (5, 0)]
+        n=-self.p1
+        assert n == [(-inf, 0), (1, -1), (3, -3), (4, -4), (5, 0)]
+        assert n == Piecewise([(-inf, 0), (1, -1), (3, -3), (4, -4), (5, 0)])
 
     def test___mul__(self):
         p = self.p1*self.p2
@@ -103,12 +111,13 @@ class TestPiecewise:
 
     def test_plot(self):
         save([self.p1], results+'p1.png')
+        save([self.p2], results+'p2.png')
         save([self.pb], results+'pb.png')
         save([self.f], results+'f.png')
 
     def test___iter__(self):
-        xy = itertools2.take(6, self.pb)
-        # assert_equal(xy,[(0, False),(1, True),(2, False),(3, True),(4, False),(5, True)])
+        xy = list(self.pb)
+        assert xy==[(0, False),(1, True),(2, False),(3, True),(4, False),(5, True)]
 
     def test___invert__(self):
         assert ~self.b2 == [(-inf, True), (1, False), (2, True), (3, False)]
@@ -134,15 +143,15 @@ class TestPiecewise:
         assert b == [(-inf, False), (1, True), (3, False)]
 
     def test_applx(self):
-        pass  # tested in shift operators
+        pytest.skip("tested in shift operators")
 
     def test_apply(self):
-        pass  # tested in most operators
+        pytest.skip("tested in most operators")
 
     def test_iapply(self):
         # piecewise = Piecewise(init, default, start)
         # assert_equal(expected, piecewise.iapply(f, right, name))
-        pytest.skip("not yet implemented")  # TODO: implement
+        pytest.skip("implicitely tested elsewhere") 
 
     def test_save(self):
         self.p2.save(path+'/results/piecewise.p2.png', xmax=7, ylim=(-1, 5))
