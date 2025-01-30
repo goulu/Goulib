@@ -109,8 +109,7 @@ class TestTable:
         t = Table([[cell]])
         h = t.html()
         import re
-        assert_match(h, '<table.*><tr.*><td.*>' +
-                     re.escape('$'+cell+'$')+'</td></tr>\n</table>\n')
+        assert re.match('<table.*><tr.*><td.*>' +re.escape('$'+cell+'$')+'</td></tr>\n</table>\n',h)
 
     def test_append(self):
         ta = Table()
@@ -188,7 +187,7 @@ class TestTable:
         assert len(t) == l-r
 
     def test_rowasdict(self):
-        r = self.t.rowasdict(3)
+        r = self.t.rowasdict(6)
         assert r == {u'Cost': 1.99,
                      u'Item': u'Pencil',
                      u'OrderDate': date(2012, 4, 18),

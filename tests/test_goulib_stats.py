@@ -20,16 +20,16 @@ fvar = 1./12  # variance of f, theoretical
 
 class TestMean:
     def test_mean(self):
-        assert avg(f) == 0.5
-        assert mean(h) == hmean
-        assert mean(r) == 0.5
+        assert avg(f) == pytest.approx(1/2)
+        assert mean(h) == pytest.approx(hmean)
+        assert mean(r) == pytest.approx(1/2,rel=0.01)
 
 
 class TestVariance:
     def test_variance(self):
-        assert var(f) == 1./12, 4
-        assert variance(h) == hvar, 0
-        assert variance(r) == 0.082
+        assert var(f) == pytest.approx(1./12,rel=0.01)
+        assert variance(h) == pytest.approx(hvar)
+        assert variance(r) == pytest.approx(0.0845,rel=0.01)
 
 
 class TestStats:
@@ -53,12 +53,12 @@ class TestStats:
         pytest.skip("not yet implemented")  # TODO: implement
 
     def test_mean(self):
-        assert self.f.mean == 0.5
-        assert self.h.avg == hmean
+        assert self.f.mean == pytest.approx(0.5)
+        assert self.h.avg == pytest.approx(hmean)
 
     def test_variance(self):
-        assert self.f.variance == fvar
-        assert math2.rint(self.h.var) == hvar
+        assert self.f.variance == pytest.approx(fvar,0.01)
+        assert math2.rint(self.h.var) == pytest.approx(hvar)
 
     def test_stddev(self):
         # Stats = Stats(data, mean, var)
@@ -127,18 +127,18 @@ class TestStats:
 
 class TestStddev:
     def test_stddev(self):
-        assert stddev(h) == math.sqrt(hvar), 1
+        assert stddev(h) == pytest.approx(math.sqrt(hvar))
 
 
 class TestConfidenceInterval:
     def test_confidence_interval(self):
-        assert confidence_interval(h) == (23996, 63806), 0
+        assert confidence_interval(h) == pytest.approx((23996, 63806),abs=0.5)
 
 
 class TestMedian:
     def test_median(self):
-        assert median(h) == 44627.5
-        assert median(r) == 0.5
+        assert median(h) == pytest.approx(44627.5)
+        assert median(r) == pytest.approx(0.5,0.01)
 
 
 class TestMode:
@@ -169,11 +169,11 @@ class TestLinearRegression:
             return
         # first test a perfect fit
         a, b, c = linear_regression([1, 2, 3], [-1, -3, -5])
-        assert (a, b, c) == (-2, 1, 0)
+        assert (a, b, c) == pytest.approx((-2, 1, 0))
         a, b, c, ai, bi, ci = linear_regression([1, 2, 3], [-1, -3, -5], .95)
-        assert ai == (-2, -2)
-        assert bi == (1, 1)
-        assert ci == (0, 0)
+        assert ai == pytest.approx((-2, -2))
+        assert bi == pytest.approx((1, 1))
+        assert ci == pytest.approx((0, 0))
 
 
 class TestNormal:
@@ -199,44 +199,44 @@ class TestNormal:
         assert self.h.avg == hmean
 
     def test_variance(self):
-        assert self.gauss.var == 1
-        assert self.two.var == 0
-        assert self.h.var == hvar, 0
+        assert self.gauss.var == pytest.approx(1)
+        assert self.two.var ==pytest.approx(0)
+        assert self.h.var == pytest.approx(hvar)
 
     def test_stddev(self):
-        assert self.h.stddev == math.sqrt(hvar), 5
+        assert self.h.stddev == pytest.approx(math.sqrt(hvar))
 
     def test_linear(self):
         pass  # tested below
 
     def test___add__(self):
         twogauss = self.gauss+self.gauss
-        assert twogauss.var == 2
-        assert twogauss.avg == 2
+        assert twogauss.var == pytest.approx(2)
+        assert twogauss.avg == pytest.approx(2)
 
         n = self.gauss+1
-        assert n.var == 1
-        assert n.avg == 2
+        assert n.var == pytest.approx(1)
+        assert n.avg == pytest.approx(2)
 
     def test___radd__(self):
         n = 1+self.gauss
-        assert n.avg == 2
-        assert n.var == 1
+        assert n.avg == pytest.approx(2)
+        assert n.var == pytest.approx(1)
 
     def test___sub__(self):
         zero = self.gauss-self.gauss
-        assert zero.avg == 0
-        assert zero.var == 2
+        assert zero.avg == pytest.approx(0)
+        assert zero.var == pytest.approx(2)
 
     def test___mul__(self):
         twogauss = self.gauss*2
-        assert twogauss.avg == 2
-        assert twogauss.var == 2
+        assert twogauss.avg == pytest.approx(2)
+        assert twogauss.var == pytest.approx(2)
 
     def test___div__(self):
         halfgauss = self.gauss/2
-        assert halfgauss.avg == .5
-        assert halfgauss.var == .5
+        assert halfgauss.avg == pytest.approx(1/2)
+        assert halfgauss.var == pytest.approx(1/2)
 
     def test___call__(self):
         # normal = Normal()

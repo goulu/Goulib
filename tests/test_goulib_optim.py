@@ -31,7 +31,7 @@ class TestBinDict:
 
     def test___repr__(self):
         assert repr(self.bin) == 'BinDict(0.4/1)'
-        # assert_equal(repr(self.alpha),"BinDict(set(['a', 'e', 'h', 'l', 'o', 'p'])/10)")  # TODO find a test working under Python2 and Python3
+        assert repr(self.alpha) == "BinDict(['a', 'e', 'h', 'l', 'o', 'p']/10)"
 
     def test_fits(self):
         assert self.bin.fits(0.6)
@@ -51,10 +51,12 @@ class TestBinDict:
         assert self.alpha.size() == 1
 
     def test___setitem2__(self):
-        self.bin[0.61] = 0.61
+        with pytest.raises(OverflowError):
+            self.bin[0.61] = 0.61
 
     def test___setitem3__(self):
-        self.alpha['whisky'] = 'whisky'
+        with pytest.raises(OverflowError):
+            self.alpha['whisky'] = 'whisky'
 
     def test___delitem__(self):
         # bin = Bin(capacity, items, f)
@@ -135,10 +137,12 @@ class TestBinList:
         pass  # tested above
 
     def test___setitem2__(self):
-        self.bin.append(0.61)
+        with pytest.raises(OverflowError):
+            self.bin.append(0.61)
 
     def test___setitem3__(self):
-        self.alpha.append('whisky')
+        with pytest.raises(OverflowError):
+            self.alpha.append('whisky')
 
     def test_remove(self):
         # bin = Bin(capacity, items, f)

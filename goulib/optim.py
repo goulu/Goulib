@@ -146,7 +146,7 @@ def nelder_mead(f, x_start,
 class _Bin():
     def __init__(self, capacity, f=lambda x: x):
         """a container with a limited capacity
-        :param capacity: int,flot,tuple of whatever defines the capacity of the Bin
+        :param capacity: int,float,tuple of whatever defines the capacity of the Bin
         :param f: function f(x) returning the capacity used by item x. Must return the empty capacity when f(0) is called
         """
         self._capacity = capacity
@@ -154,7 +154,11 @@ class _Bin():
         self._used = f(0)
 
     def __repr__(self):
-        return '%s(%s/%s)' % (self.__class__.__name__, self._used, self._capacity)
+        try:
+            used=sorted(self._used)
+        except TypeError:
+            used=self._used
+        return '%s(%s/%s)' % (self.__class__.__name__, used, self._capacity)
 
     def _add(self, value, tot=None):
         """update sum when item is added"""

@@ -130,7 +130,9 @@ class Context:
         :param node: ast.AST to evaluate
         :return: number or expression string
         '''
-        if isinstance(node, ast.Name):
+        if isinstance(node, ast.Constant):
+            return node
+        elif isinstance(node, ast.Name):
             value=self.variables.get(node.id)
             return ast.Constant(value) if value is not None else node
         elif isinstance(node, ast.Attribute):
@@ -179,7 +181,10 @@ class Context:
                     left=right
             if res is True:
                 return ast.Constant(True)
-        return node
+            else:
+                return node
+        else:
+            raise ValueError('unsupported node %s' % node)
 
     def __init__(self):
         self.add_module(math)
@@ -300,14 +305,15 @@ class Expr(plot.Plot):
 
     @property
     def isNum(self):
-        return isinstance(self.body, ast.Constant)
+        res = self()
+        return isinstance(res, (int, float, complex))
 
     @property
     def isconstant(self):
         ''':return: True if Expr evaluates to a constant number or bool'''
         res = self()
-        return isinstance(res.body, ast.Constant)
-
+        return isinstance(res, (int, float, complex,bool))
+    
     def __call__(self, x=None, **kwargs)->"Expr":
         '''evaluate the Expr at x OR compose self(x())'''
         if isinstance(x, Expr):  # composition
@@ -320,14 +326,17 @@ class Expr(plot.Plot):
         self.context.variables = kwargs
         try:
             res = self.context.eval(self.body)
-        except Exception as error:  # ZeroDivisionError, OverflowError
+        except (ZeroDivisionError, OverflowError) as error:
             return None
-        if res==self.body:
+        if isinstance(res, ast.Constant):
+            return res.value
+        if res==self.body: #avoid creating a new Expr
             return self
         return Expr(res)
 
     def __float__(self):
-        return self()
+        v = self()
+        return float(v)
 
     def __repr__(self):
         return TextVisitor(_dialect_python,self.context).visit(self.body)
@@ -375,7 +384,7 @@ class Expr(plot.Plot):
             ax.plot(x, y, **kwargs)
         return ax
 
-    def apply(self, f, right=None) -> 'Expr':
+    def apply(self, f, right=None)->'Expr':
         '''function composition self o f = f(self(x))'''
 
         if right is None:
@@ -413,7 +422,8 @@ class Expr(plot.Plot):
         return Expr(Subst().visit(node), self.context)
     
     def __eq__(self, right):
-        return self.apply(ast.Eq(), right)
+        res=self.apply(ast.Eq(), right)
+        return res
 
     def __ne__(self, right):
         return self.apply(ast.NotEq(), right)

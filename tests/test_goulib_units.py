@@ -1,6 +1,7 @@
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.units import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
+import collections
 
 class Tests:
     def test_append_col(self):
@@ -59,7 +60,7 @@ class Tests:
         t = Table('test cell', [], [])
         t.setCell(('speed', 'km/hour'), 'car', V(100, 'mph'))
         t.setCell('speed', 'bus', V(100, 'km/hour'))
-        assert (t['speed']['car'])('km/hour') == 160.93439999999998
+        assert (t['speed']['car'])('km/hour') == pytest.approx(160.9344)
         t.setCell('acceleration', 'car', V(1, 'm/s^2'))
         logging.info(t._repr_html_())
 

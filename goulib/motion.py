@@ -76,7 +76,8 @@ class Segment(PVA):
         :params resolution: the time resolution in sec"""
         # brute force and stupid!!!
         for t in itertools2.arange(self.t0, self.t1, resolution):
-            if self(t)[0] >= pos:
+            p= self(t)[0]
+            if p >= pos:
                 break
         return t
 
@@ -294,7 +295,7 @@ def trapeze(dp, vmax, a, v0=0, v2=0):
     return t1, p1, v1, t1 + t2, dp - p2, t1 + t2 + t3
 
 
-def Segment2ndDegree(t0, t1, start, end=(None)):
+def Segment2ndDegree(t0, t1, start, end=(None))->SegmentPoly:
     """calculates a constant acceleration Segment between start and end
     
     :param t0,t1: float start,end time. one of both may be None for undefined
