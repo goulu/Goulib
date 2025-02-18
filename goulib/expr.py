@@ -314,12 +314,10 @@ class Expr(plot.Plot):
         res = self()
         return isinstance(res, (int, float, complex,bool))
     
-    def __call__(self, x=None, **kwargs)->"Expr":
+    def eval(self, x=None, **kwargs)->"Expr":
         '''evaluate the Expr at x OR compose self(x())'''
         if isinstance(x, Expr):  # composition
             return self.applx(x)
-        if itertools2.isiterable(x):
-            return [self(x) for x in x]  # return a displayable list
         if x is not None:
             kwargs['x'] = x
         kwargs['self'] = self  # allows to call methods such as in Stats module
@@ -328,12 +326,18 @@ class Expr(plot.Plot):
             res = self.context.eval(self.body)
         except (ZeroDivisionError, OverflowError) as error:
             return None
-        if isinstance(res, ast.Constant):
-            return res.value
-        if res==self.body: #avoid creating a new Expr
-            return self
-        return Expr(res)
-
+        if res==self.body:
+            return self #avoid creating a new Expr (is this right?)
+        return Expr(res, self.context)
+    
+    def __call__(self, x=None, **kwargs):
+        if itertools2.isiterable(x):
+            return [self(x) for x in x]  # return a displayable list
+        res=self.eval(x, **kwargs)
+        if not res is None:
+            if isinstance(res.body, ast.Constant):
+                return res.body.value
+        return res
     def __float__(self):
         v = self()
         return float(v)
@@ -356,7 +360,8 @@ class Expr(plot.Plot):
         return r'${%s}$' % self.latex()
 
     def points(self, xmin=-1, xmax=1, step=0.1):
-        ''':return: x,y lists of float : points for a line plot'''
+        ''':return: x,y lists of float : points for a line plot
+        overriden in derived classes'''
         if self.isconstant:
             return [xmin, xmax], [self(xmin), self(xmax)]
         x = list(itertools2.arange(xmin, xmax, step))
@@ -385,7 +390,9 @@ class Expr(plot.Plot):
         return ax
 
     def apply(self, f, right=None)->'Expr':
-        '''function composition self o f = f(self(x))'''
+        '''function composition self o f = f(self(x))
+        override in derived classes
+        '''
 
         if right is None:
             if isinstance(f, ast.unaryop):
@@ -407,7 +414,8 @@ class Expr(plot.Plot):
         return Expr(node, self.context)() # eval to simplify
 
     def applx(self, f, var='x') -> 'Expr':
-        '''function composition f o self = self(f(x))'''
+        '''function composition f o self = self(f(x))
+        override in derived classes'''
         if isinstance(f, Expr):
             f = f.body
 
@@ -422,8 +430,7 @@ class Expr(plot.Plot):
         return Expr(Subst().visit(node), self.context)
     
     def __eq__(self, right):
-        res=self.apply(ast.Eq(), right)
-        return res
+        return self.apply(ast.Eq(), right)
 
     def __ne__(self, right):
         return self.apply(ast.NotEq(), right)
