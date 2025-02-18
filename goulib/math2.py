@@ -151,7 +151,7 @@ def is_integer(x, rel_tol=0, abs_tol=0):
         if rel_tol + abs_tol == 0:
             return x == rint(x)
         return isclose(x, round(x), rel_tol=rel_tol, abs_tol=abs_tol)
-    except TypeError:  # for complex
+    except (TypeError, ValueError):  # for complex, NaN, inf etc.
         return False
 
 
