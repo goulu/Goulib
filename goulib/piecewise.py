@@ -10,7 +10,7 @@ import math
 from typing import Iterable
 from operator import itemgetter
 
-from goulib import  math2, itertools2
+from . import  math2, itertools2
 from .expr import Expr
 from .containers import SortedCollection
 
@@ -20,21 +20,17 @@ class Piecewise(Expr):
     piecewise function defined by a sorted list of (startx, Expr)
     '''
     xy:SortedCollection # of [PieceType]
-    _period:tuple[float,float]
-    def __init__(self, init=[], default=0, period=(-math2.inf, +math2.inf)):
+
+    def __init__(self, init=[], default=0):
         '''constructor
         :param init: can be a list of (x,y) tuples or a Piecewise object
         :param default: default value for x < first x
-        :param period: tuple (start, end) for periodicity'''
-        if math2.is_number(period):
-            period = (0, period)
-        try:  # copy constructor ?
+        '''
+        try:  # copy constructor 
             self.xy=SortedCollection(init.xy, key=itemgetter(0))
-            self._period = period or init._period  # allow to force different periodicity
         except AttributeError:
             self.xy=SortedCollection([], key=itemgetter(0))
-            self._period = period
-            self.append(period[0], default)
+            self.append(-math2.inf, default)
             self.extend(init)
 
         # to initialize context and such stuff
@@ -47,20 +43,10 @@ class Piecewise(Expr):
     def __getitem__(self, i)->PieceType:
         return self.xy[i]
 
-    def period(self)->float:
-        if math.isinf(self._period[1]):
-            return 0
-        return self._period[1] - self._period[0]
-
-    def _str_period(self):
-        p = self.period()
-        return ", period=%s" % p if p else ""
-
     def __str__(self):
-        return str(self.xy._items) + self._str_period()
-
+        return str(self.xy._items) 
     def __repr__(self):
-        return repr(self.xy._items) + self._str_period()
+        return repr(self.xy._items) 
 
     def latex(self):
         ''':return: string LaTex formula'''
@@ -81,22 +67,16 @@ class Piecewise(Expr):
         l = [f[1].latex() + '&' + condition(i) for i, f in enumerate(self)]
         return r'\begin{cases}' + r'\\'.join(l) + r'\end{cases}'
 
-    def _x(self, x):
-        '''handle periodicity'''
-        p = self.period()
-        return x % p if p else x
-
     def __call__(self, x:float)->Expr:
         '''returns evaluated Expr at point x '''
         if itertools2.isiterable(x):
             return [self(x) for x in x]
-        x=self._x(x)
-        (x,y)=self.xy.find_le(x)
+        (_,y)=self.xy.find_le(x)
+        y=Expr(y) # to make sure
         return y(x)
     
     def index(self, x:float)->int:
         '''returns index of the piece containing x'''
-        x=self._x(x)
         try:
             return self.xy.index(self.xy.find_le(x))
         except ValueError:
@@ -104,7 +84,6 @@ class Piecewise(Expr):
 
     def insert(self, x, y=None):
         '''insert a point (or returns it if it already exists)'''
-        x = self._x(x)
         if y is None:
             try:
                 y=self.xy.find_le(x)[1]
@@ -125,9 +104,9 @@ class Piecewise(Expr):
     
     def __iter__(self):
         '''iterators through discontinuities. take the opportunity to delete redundant tuples'''
-        prev = None
+        prev = Expr(math.nan)
         for (x,y) in self.xy:
-            if prev is not None and y == prev:  # simplify
+            if prev==y:  # simplify
                 self.xy.remove((x,y))
             else:
                 yield x,y
@@ -165,19 +144,20 @@ class Piecewise(Expr):
 
             for k in range(i, j):
                 (x,y)=self.xy[k]
-                self.xy[k] = (x,Expr(y).apply(f, value))
+                y=Expr(y).apply(f, value)
+                self.xy[k] = (x,y)
             return self
         else:
-            right=Piecewise(right)
-            for i, p in enumerate(right):
+            # right=Piecewise(right)
+            for i, (start,y) in enumerate(right):
                 try:
                     end=right[i + 1][0]
                 except IndexError:
                     end=math.inf
-                self.iapply(f, (p[0], p[1], end))
+                self.iapply(f, (start, y, end))
             return self
 
-    def apply(self, f, right=None):
+    def apply(self, f, right=None)->'Piecewise':
         '''apply function to copy of self'''
         return Piecewise(self).iapply(f, right)
 
@@ -196,7 +176,7 @@ class Piecewise(Expr):
         prevy = None
         firstpoint, lastpoint = False, False
         for (x, y) in self.xy:
-            y = y(x)
+            y = Expr(y)(x)
             if x < xmin:
                 if firstpoint:
                     continue
@@ -222,19 +202,14 @@ class Piecewise(Expr):
         except IndexError:
             first=last
         dx = last[0] - first[0]
-        p = self.period()
 
         if xmin is None:
             # by default we extend the range by 10%
             xmin = min(0, first[0] - dx * .1)
 
         if xmax is None:
-            if p:
-                # by default we show 2.5 periods
-                xmax = xmin + p * 2.5
-            else:
-                # by default we extend the range by 10%
-                xmax = last[0] + dx * .1
+            # by default we extend the range by 10%
+            xmax = last[0] + dx * .1
 
         for x, y in self._switch_points(xmin, xmax):
             resx.append(x)

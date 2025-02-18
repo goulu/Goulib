@@ -26,9 +26,6 @@ class TestPiecewise:
         self.b1 = Piecewise([(2, True)], False)
         self.b2 = Piecewise([(1, True), (2, False), (3, True)], False)
 
-        # periodic function
-        self.pb = Piecewise([(1, True)], False, period=2)
-
         # simple function
         self.f = Piecewise().append(0, cos).append(1, lambda x: x*x)
 
@@ -47,14 +44,9 @@ class TestPiecewise:
         y = [self.p1(x) for x in range(6)]
         assert y == [0, 1, 1, 3, 4, 0]
 
-        # periodic function
-        assert self.pb(.5) == self.pb(10.5)
-
-        return  # below does'nt work yet...
-
         # test function of Expr
-        y = self.f(arange(0., 2., .1))
-        assert y == [0, 1, 1, 3, 4, 0]
+        y = self.f(arange(0., 2.1, .1))
+        assert pytest.approx(y, abs=0.001) == [1, 0.995, 0.980, 0.955, 0.9210, 0.878, 0.825, 0.764, 0.697, 0.622, 0.540, 1.21, 1.44, 1.69, 1.96, 2.25, 2.56, 2.89, 3.24, 3.61, 4]
 
     def test_points(self):
         assert self.p1.points(0, 5) == (
@@ -106,18 +98,16 @@ class TestPiecewise:
 
     def test___str__(self):
         assert str(self.p1) == '[(-inf, 0), (1, 1), (3, 3), (4, 4), (5, 0)]'
-        assert str(self.pb) == '[(0, False), (1, True)], period=2'
         assert str(self.f) == '[(-inf, 0), (0, cos(x)), (1, x*x)]'
 
     def test_plot(self):
-        save([self.p1], results+'p1.png')
-        save([self.p2], results+'p2.png')
-        save([self.pb], results+'pb.png')
-        save([self.f], results+'f.png')
+        save([self.p1], results+'plot_p1.png')
+        save([self.p2], results+'plot_p2.png')
+        save([self.f], results+'plot_f.png')
 
     def test___iter__(self):
-        xy = list(self.pb)
-        assert xy==[(0, False),(1, True),(2, False),(3, True),(4, False),(5, True)]
+        xy = list(self.p1+self.p2)
+        assert xy==[(-inf, 1), (1, 2), (1.5, 3), (2.5, 4), (3, 6), (3.5, 5), (4, 6), (5, 2), (6.5, 1)]
 
     def test___invert__(self):
         assert ~self.b2 == [(-inf, True), (1, False), (2, True), (3, False)]
@@ -154,9 +144,9 @@ class TestPiecewise:
         pytest.skip("implicitely tested elsewhere") 
 
     def test_save(self):
-        self.p2.save(path+'/results/piecewise.p2.png', xmax=7, ylim=(-1, 5))
+        self.p2.save(results+'save_p2.png', xmax=7, ylim=(-1, 5))
 
     def test_svg(self):
         svg = self.p2._repr_svg_(xmax=7, ylim=(-1, 5))  # return IPython object
-        with open(path+'/results/piecewise.p2.svg', 'wb') as f:
+        with open(results+'p2.svg', 'wb') as f:
             f.write(svg.encode('utf-8'))
