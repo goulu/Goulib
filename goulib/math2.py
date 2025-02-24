@@ -32,17 +32,18 @@ try:
 except AttributeError:
     nan = float('nan')  # Not a Number
 
-    
+
 def longint(mantissa, exponent):
     ''' :return: int equivalent to int(mantissa*10^exponent) without rounding errors
     '''
     s = str(mantissa)
-    if 'E' in s: raise ValueError
+    if 'E' in s:
+        raise ValueError
     p = 0
     try:
         p = s.index('.')
         s = s.replace('.', '', 1)
-        p=len(s)-p
+        p = len(s)-p
     except ValueError:
         pass
     p = exponent - p
@@ -51,7 +52,7 @@ def longint(mantissa, exponent):
     if p > 0:
         s = s + '0' * p
     return int(s)
-    
+
 
 def cmp(x, y):
     '''Compare the two objects x and y and return an integer according to the outcome.
@@ -91,9 +92,7 @@ except AttributeError:
             return False
         diff = abs(b - a)
 
-        return (((diff <= abs(rel_tol * b)) or
-                 (diff <= abs(rel_tol * a))) or
-                (diff <= abs_tol))
+        return (((diff <= abs(rel_tol * b)) or (diff <= abs(rel_tol * a))) or (diff <= abs_tol))
 
 
 def allclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -599,12 +598,12 @@ def minimum(m):
 
 def vecadd(a, b, fillvalue=0):
     '''addition of vectors of inequal lengths'''
-    return [l[0] + l[1] for l in itertools.zip_longest(a, b, fillvalue=fillvalue)]
+    return [c[0] + c[1] for c in itertools.zip_longest(a, b, fillvalue=fillvalue)]
 
 
 def vecsub(a, b, fillvalue=0):
     '''substraction of vectors of inequal lengths'''
-    return [l[0] - l[1] for l in itertools.zip_longest(a, b, fillvalue=fillvalue)]
+    return [c[0] - c[1] for c in itertools.zip_longest(a, b, fillvalue=fillvalue)]
 
 
 def vecneg(a):
@@ -618,14 +617,14 @@ def vecmul(a, b):
         return [x * a for x in b]
     if isinstance(b, (int, float)):
         return [x * b for x in a]
-    return [functools.reduce(operator.mul, l) for l in zip(a, b)]
+    return [functools.reduce(operator.mul, c) for c in zip(a, b)]
 
 
 def vecdiv(a, b):
     '''quotient of vectors of inequal lengths'''
     if isinstance(b, (int, float)):
         return [float(x) / b for x in a]
-    return [functools.reduce(operator.truediv, l) for l in zip(a, b)]
+    return [functools.reduce(operator.truediv, c) for c in zip(a, b)]
 
 
 def veccompare(a, b):
@@ -764,11 +763,11 @@ def recurrence(factors, values, cst=0, max=None, mod=0):
         if mod:
             n = n % mod
         yield n
-        values.pop(0);
+        values.pop(0)
         values.append(n)
 
 
-# https://en.wikipedia.org/wiki/Lucas_sequence        
+# https://en.wikipedia.org/wiki/Lucas_sequence
 def lucasU(p, q):
     return recurrence([-q, p], [0, 1])
 
@@ -822,12 +821,12 @@ def pisano_cycle(mod):
     if mod < 2:
         return [0]
     seq = [0, 1]
-    l = len(seq)
+    k = len(seq)
     s = []
     for i, n in enumerate(fibonacci_gen(mod=mod)):
         s.append(n)
-        if i > l and s[-l:] == seq:
-            return s[:-l]
+        if i > k and s[-k:] == seq:
+            return s[:-k]
 
 
 def pisano_period(mod):
@@ -937,8 +936,9 @@ def triples():
     sorted by hypotenuse z, then longest side y
     '''
     prim = []  # list of primitive triples up to now
-    
-    def key(x): return (x[2], x[1])
+
+    def key(x):
+        return (x[2], x[1])
 
     from sortedcontainers import SortedListWithKey
     samez = SortedListWithKey(key=key)  # temp triplets with same z
@@ -1012,11 +1012,11 @@ class Sieve:
         return (i for i, v in enumerate(self._) if v)
 
     def resize(self, n):
-        l = len(self) - 1
-        if n <= l:
+        k = len(self) - 1
+        if n <= k:
             return
         n = int(n)  # to tolerate n=1E9, which is float
-        self._.extend([True] * (n - l))
+        self._.extend([True] * (n - k))
         for i in self(n):
             if i == 2:
                 i2, s = 4, 2
@@ -1326,7 +1326,8 @@ def factorize(n):
 def factors(n):
     for (p, e) in factorize(n):
         yield p ** e
-        
+
+
 def sigma(n):
     return sum(divisors(n))
 
@@ -1521,7 +1522,8 @@ def digsum(num, f=None, base=10):
     if is_number(f):
         p = f
 
-        def f(x): return pow(x, p)
+        def f(x):
+            return pow(x, p)
 
     try:
         return sum(map(f, d))
@@ -1573,9 +1575,9 @@ def powertrain(n):
     :see: http://oeis.org/A133500
     '''
     s = str(n)
-    l = len(s)
-    m = int(s[-1]) if l % 2 else 1
-    for i in range(0, l - 1, 2):
+    k = len(s)
+    m = int(s[-1]) if k % 2 else 1
+    for i in range(0, k - 1, 2):
         m *= int(s[i]) ** int(s[i + 1])
     return m
 
@@ -1989,16 +1991,42 @@ def partitionsQ(n, d=0):
     return sum(partitionsQ(n - k, n - 2 * k + 1) for k in range(1, n - d + 1))
 
 
-def get_cardinal_name(num):
+numbers_en = {
+    0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+    6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+    11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen",
+    15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
+    19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty",
+    50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety",
+    100: "hundred",
+    1000: "thousand",
+    1000000: "million",
+    1000000000: "billion",
+
+}
+
+numbers_fr = {
+    0: "zero", 1: "un", 2: "deux", 3: "trois", 4: "quatre", 5: "cinq",
+    6: "six", 7: "sept", 8: "huit", 9: "neuf", 10: "dix",
+    11: "onze", 12: "douze", 13: "treize", 14: "quatorze",
+    15: "quinze", 16: "seize", 17: "dix-sept", 18: "dix-huit",
+    19: "dix-neuf", 20: "vingt", 30: "trente", 40: "quarante",
+    50: "cinquante", 60: "soixante", 70: "soixante-dix", 80: "quatre-vingt", 90: "quatre-vingt-dix",
+    100: "cent",
+    1000: "mille",
+    1000000: "million",
+    1000000000: "milliard",
+}
+
+numbers_ch = numbers_fr
+numbers_ch.update({70: "septante", 80: "huitante", 90: "nonante"})
+
+
+def get_cardinal_name(num, numbers=numbers_en):
     '''Get cardinal name for number (0 to 1 million)'''
-    numbers = {
-        0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
-        6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
-        11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen",
-        15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
-        19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty",
-        50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety",
-    }
+
+    if num in numbers:
+        return numbers[num]
 
     def _get_tens(n):
         a, b = divmod(n, 10)
@@ -2009,14 +2037,14 @@ def get_cardinal_name(num):
         hundreds = (n // 100) % 10
         return filter(bool, [
             hundreds > 0 and numbers[hundreds],
-            hundreds > 0 and "hundred",
+            hundreds > 0 and numbers[100],
             hundreds > 0 and tens and "and",
             (not hundreds or tens > 0) and _get_tens(tens),
         ])
 
     blocks = digits(num, 1000, rev=True)  # group by 1000
     res = ''
-    for hdu, word in zip(blocks, ['', ' thousand ', ' million ', ' billion ']):
+    for hdu, word in zip(blocks, ['', ' '+numbers[1000]+' ', ' '+numbers[1000000]+' ', ' ' + numbers[1000000000]+' ']):
         if hdu == 0:
             continue  # skip
         try:
@@ -2122,6 +2150,79 @@ def factorial_gen(f=lambda x: x):
         yield last
 
 
+def log_factorial(n):
+    '''
+    :return: float approximation of ln(n!) by Ramanujan formula
+    '''
+    return n * math.log(n) - n + (math.log(n * (1 + 4 * n * (1 + 2 * n)))) / 6 + math.log(math.pi) / 2
+
+
+gamma = math.gamma  # didn't knew it was there...
+
+# inverse gamma function from https://mathoverflow.net/a/98267/88768
+
+
+def lambertW(z):
+    """
+    Lambert W function, principal branch.
+    See http://en.wikipedia.org/wiki/Lambert_W_function
+    Code taken from http://keithbriggs.info/software.html
+    """
+    eps = 4.0e-16
+    em1 = 0.3678794411714423215955237701614608
+    assert z >= -em1, 'lambertW: bad argument %g, exiting.' % z
+    if 0.0 == z:
+        return 0.0
+    if z < -em1+1e-4:
+        q = z+em1
+        r = math.sqrt(q)
+        q2 = q*q
+        q3 = q2*q
+        return\
+            -1.0\
+            + 2.331643981597124203363536062168*r\
+            - 1.812187885639363490240191647568*q\
+            + 1.936631114492359755363277457668*r*q\
+            - 2.353551201881614516821543561516*q2\
+            + 3.066858901050631912893148922704*r*q2\
+            - 4.175335600258177138854984177460*q3\
+            + 5.858023729874774148815053846119*r*q3\
+            - 8.401032217523977370984161688514*q3*q
+    if z < 1.0:
+        p = math.sqrt(2.0*(2.7182818284590452353602874713526625*z+1.0))
+        w = -1.0+p*(1.0+p*(-0.333333333333333333333
+                           + p*0.152777777777777777777777))
+    else:
+        w = math.log(z)
+    if z > 3.0:
+        w -= math.log(w)
+    for i in range(10):
+        e = math.exp(w)
+        t = w*e-z
+        p = w+1.0
+        t /= e*p-0.5*(p+1.0)*t/p
+        w -= t
+        if abs(t) < eps*(1.0+abs(w)):
+            return w
+    raise AssertionError('Unhandled value %1.2f' % z)
+
+
+def gamma_inverse(x):
+    """
+    Inverse the gamma function.
+    http://mathoverflow.net/questions/12828/inverse-gamma-function
+    """
+    k = 1.461632  # the positive zero of the digamma function, scipy.special.psi
+    assert (
+        x >= k, 'gamma(x) is strictly increasing for x >= k, k=%1.2f, x=%1.2f' % (
+            k, x)
+    )
+    C = math.sqrt(2*math.pi)/math.e - gamma(k)  # approximately 0.036534
+    L = math.log((x+C)/sqrt(2*math.pi))
+    gamma_inv = 0.5+L/lambertW(L/math.e)
+    return gamma_inv
+
+
 def binomial(n, k):
     '''binomial coefficient "n choose k"
     :param: n, k int
@@ -2159,13 +2260,6 @@ def binomial_exponent(n, k, p):
     return min(binomial_exponent(n, k, a) // b for a, b in factorize(p))
 
 
-def log_factorial(n):
-    '''
-    :return: float approximation of ln(n!) by Ramanujan formula
-    '''
-    return n * math.log(n) - n + (math.log(n * (1 + 4 * n * (1 + 2 * n)))) / 6 + math.log(math.pi) / 2
-
-
 def log_binomial(n, k):
     '''
     :return: float approximation of ln(binomial(n,k))
@@ -2183,11 +2277,11 @@ def ilog(a, b, upper_bound=False):
     '''
     # TODO: implement using baby_step_giant_step or http://anh.cs.luc.edu/331/code/PohligHellman.py or similar
     # for now it's brute force...
-    l = 0
+    i = 0
     while a >= b:
         a //= b
-        l += 1
-    return l
+        i += 1
+    return i
 
     p = 1
     for x in itertools.count():
@@ -2340,6 +2434,7 @@ def de_bruijn(k, n):
 
     db(1, 1)
     return "".join(alphabet[i] for i in sequence)
+
 
 '''modular arithmetic
 initial motivation: https://www.hackerrank.com/challenges/ncr
@@ -2569,11 +2664,13 @@ def pi_digits_gen():
     # code from http://davidbau.com/archives/2010/03/14/python_pipy_spigot.html
     q, r, t, j = 1, 180, 60, 2
     while True:
-        u, y = 3 * (3 * j + 1) * (3 * j + 2), (q * 
-                                               (27 * j - 12) + 5 * r) // (5 * t)
+        u, y = 3 * (3 * j + 1) * (3 * j + 2), \
+            (q * (27 * j - 12) + 5 * r) // (5 * t)
         yield y
-        q, r, t, j = 10 * q * j * (2 * j - 1), 10 * \
-            u * (q * (5 * j - 2) + r - y * t), t * u, j + 1
+        q, r, t, j = 10 * q * j * (2 * j - 1), \
+            10 * u * (q * (5 * j - 2) + r - y * t), \
+            t * u, \
+            j + 1
 
 
 def lucky_gen():
@@ -2837,7 +2934,7 @@ def factor_ecm(n, B1=10, B2=20):
             seed = random.randrange(6, n)
             u, v = (seed ** 2 - 5) % n, 4 * seed % n
             p = pow(u, 3, n)
-            Q, C = (pow(v - u, 3, n) * (3 * u + v) % 
+            Q, C = (pow(v - u, 3, n) * (3 * u + v) %
                     n, 4 * p * v % n), (p, pow(v, 3, n))
             pg = primes_gen()
             p = next(pg)

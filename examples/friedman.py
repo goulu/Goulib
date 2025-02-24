@@ -17,7 +17,7 @@ from sortedcontainers import SortedDict
 
 import math
 import ast
-from goulib import math2, expr
+from Goulib import math2, expr
 
 # "safe" operators
 context = expr.Context()
@@ -138,6 +138,7 @@ class ExprDict(SortedDict):
 
 
 class Monadic(ExprDict):
+
     def __init__(self, n, ops, levels=1):
         super(Monadic, self).__init__(int=False, max=1E100, improve=True)
         self.ops = ops
@@ -195,19 +196,23 @@ class Monadic(ExprDict):
     def items(self):
         return list(self.iteritems())
 
-
 # supported operators with precedence and text + LaTeX repr
 # precedence as in https://docs.python.org/2/reference/expressions.html#operator-precedence
 #
 
+
 def concat(left, right):
-    if left.isNum and right.isNum and left > 0 and right >= 0:
-        return Expr(str(left) + str(right))
-    else:
-        return None
+    try:
+        if left.isNum and right.isNum and left > 0:
+            return Expr(str(left) + str(right))
+    except AttributeError:
+        pass
+    return None
 
 
 def _diadic(left, op, right):
+    if (left is None) or (right is None):
+        return
     if op == '+':
         return left + right
     if op == '-':
@@ -229,18 +234,21 @@ def _monadic(op, e):
         return e
     if op == '-':
         return -e
+    if op == '!':
+        return -e
     if op == 's':
         return Expr(math.sqrt)(e)
 
 
-def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
+def gen(digits, monadic='-s', diadic='-+*/^_', permut=True):
     """
     generate all possible Expr using digits and specified operators
     """
+
     if isinstance(digits, int):
         digits = str(digits)
     if isinstance(digits, str):
-        digits = list(digits)
+        digits = tuple(digits)
     if permut:
         for d in permutations(digits):
             for x in gen(d, monadic, diadic, False):
@@ -263,7 +271,9 @@ def gen(digits, monadic='-', diadic='-+*/^_', permut=True):
                 diadic,
                 gen(digits[i:], monadic, diadic, permut),
         ):
-            yield _diadic(*x)
+            res = _diadic(*x)
+            if res is not None:
+                yield res
 
 
 def seq(digits, monadic, diadic, permut):
@@ -306,34 +316,38 @@ def friedman(num):
             pass
 
 
+def column(t, n, monadic='-s!', dyadic='+-*/^_', permut=False, max=100):
+    t.addcol(n)
+    col = len(t.titles) - 1
+    for e in seq(n, monadic, dyadic, permut):
+        n = int(e[0])
+        # h(e[0],'=',e[1])
+        if n <= max:
+            e = e[1]
+            old = t.get(n, col)
+            if old is None or old.complexity() > e.complexity():
+                print(n, '=', e)
+                t.set(n, col, e)
+
+    def row(i, e):
+        try:
+            return '[math]%d=%s[/math]' % (i, e.latex())
+        except:
+            return '[math]%d=?[/math]' % (i)
+
+    return '\n'.join(row(i, t.get(i, col)) for i in range(max+1))
+
+
 if __name__ == "__main__":
-    n = list(range(1, 30, 2))
-    for e in seq(n, [], '+', False):
-        print(e)
-
-    exit()
-
-    from goulib.table import Table
-
+    from Goulib.table import Table
     max = 100
-    t = Table(range(max+1), titles=['n'])
-
-    def column(n, monadic='-s', dyadic='+-*/^_', permut=False):
-        t.addcol(n)
-        col = len(t.titles)-1
-        for e in seq(n, monadic, dyadic, permut):
-            n = int(e[0])
-            # h(e[0],'=',e[1])
-            if n <= max:
-                e = e[1]
-                old = t.get(n, col)
-                if old is None or old.complexity() > e.complexity():
-                    t.set(n, col, e)
-
-    column(2018, permut=True)  # yeargame
-    column(2019, permut=True)  # yeargame
-    column(4444)  # four-four
-    column(123456789)
-    column(999)  # 999 clock
+    t = Table(range(max + 1), titles=['n'])
+    print('start')
+    print(column(t, 1489, permut=True))  # yeargame
+    # column(t,2018, permut=True)  # yeargame
+    # column(t,2019,permut=True) #yeargame
+    # column(t,4444) # four-four
+    # column(t,123456789)
+    # column(t,999) # 999 clock
 
     t.save('friedman.htm')

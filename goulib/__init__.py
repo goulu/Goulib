@@ -9,7 +9,7 @@ for various projects
 Project location : https://github.com/goulu/goulib
 """
 
-__version__ = '2.1.0'
+__version__ = '3.0.0'
 
 __all__ = [
     'colors',
@@ -29,6 +29,7 @@ __all__ = [
     'motion',
     'notebook',
     'optim',
+    'periodic',
     'piecewise',
     'plot',
     'polynomial',
