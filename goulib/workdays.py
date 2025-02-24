@@ -14,8 +14,8 @@ import typing  # collections
 import logging
 
 from datetime import time, date, timedelta
-from goulib.datetime2 import timef, datef, datetimef, oneday, timedelta0, timedelta_div, timedelta_mul
-from goulib.interval import in_interval, intersection, intersectlen
+from .datetime2 import timef, datef, datetimef, oneday, timedelta0, timedelta_div, timedelta_mul
+from .interval import in_interval, intersection, intersectlen
 
 
 class WorkCalendar(object):

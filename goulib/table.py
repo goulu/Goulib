@@ -8,17 +8,14 @@ __credits__ = []
 __license__ = "LGPL"
 
 
-import logging
-
 import csv
 import itertools
-import codecs
 import json
 from typing import OrderedDict
 
 from datetime import datetime, date, time, timedelta
 
-from goulib import itertools2, markup, datetime2
+from . import itertools2, markup, datetime2
 
 from lxml import etree as ElementTree
 defaultparser = ElementTree.HTMLParser

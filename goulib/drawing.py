@@ -22,9 +22,9 @@ import logging
 import base64
 import io
 
-from goulib.geom import *       # pylint: disable=wildcard-import, unused-wildcard-import
-from goulib.interval import Box
-from goulib.math2 import rint, isclose
+from .geom import *       # pylint: disable=wildcard-import, unused-wildcard-import
+from .interval import Box
+from .math2 import rint, isclose
 from goulib import colors, itertools2
 
 from goulib import plot  # sets matplotlib backend

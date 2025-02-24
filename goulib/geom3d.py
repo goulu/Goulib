@@ -18,7 +18,7 @@ import operator
 from math import pi, sin, cos, tan, acos, asin, atan2, sqrt
 import goulib.math2 as math2
 
-from goulib.geom import Geometry, copy
+from .geom import Geometry, copy
 
 # 3D Geometry
 # -------------------------------------------------------------------------
