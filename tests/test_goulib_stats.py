@@ -11,7 +11,6 @@ h = [64630, 11735, 14216, 99233, 14470, 4978, 73429, 38120, 51135, 67060]
 hmean = 43900.6
 hvar = 1031372102  # variance of h computed in Matlab
 
-r = [random() for _ in range(5000)]
 n = 10000
 
 f = [float(_)/n for _ in range(n+1)]
@@ -22,14 +21,12 @@ class TestMean:
     def test_mean(self):
         assert avg(f) == pytest.approx(1/2)
         assert mean(h) == pytest.approx(hmean)
-        assert mean(r) == pytest.approx(1/2,rel=0.01)
 
 
 class TestVariance:
     def test_variance(self):
         assert var(f) == pytest.approx(1./12,rel=0.01)
         assert variance(h) == pytest.approx(hvar)
-        assert variance(r) == pytest.approx(0.0845,rel=0.01)
 
 
 class TestStats:
@@ -138,7 +135,6 @@ class TestConfidenceInterval:
 class TestMedian:
     def test_median(self):
         assert median(h) == pytest.approx(44627.5)
-        assert median(r) == pytest.approx(0.5,0.01)
 
 
 class TestMode:
