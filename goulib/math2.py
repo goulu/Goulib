@@ -2213,10 +2213,8 @@ def gamma_inverse(x):
     http://mathoverflow.net/questions/12828/inverse-gamma-function
     """
     k = 1.461632  # the positive zero of the digamma function, scipy.special.psi
-    assert (
-        x >= k, 'gamma(x) is strictly increasing for x >= k, k=%1.2f, x=%1.2f' % (
-            k, x)
-    )
+    assert x >= k, 'gamma(x) is strictly increasing for x >= k, k=%1.2f, x=%1.2f' % (k, x)
+    
     C = math.sqrt(2*math.pi)/math.e - gamma(k)  # approximately 0.036534
     L = math.log((x+C)/sqrt(2*math.pi))
     gamma_inv = 0.5+L/lambertW(L/math.e)

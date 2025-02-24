@@ -58,11 +58,8 @@ def h(*args):
     return display(HTML(html(args)))
 
 #redefine "print" for notebooks ...
-try: #http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
-    get_ipython # type: ignore #is defined from within IPython (notebook)
-except:
-    pass
-else:
+#http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+if 'get_ipython' in globals():
     print = h # allowed in Python 3
 
 def hinfo(*args):
