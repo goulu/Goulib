@@ -59,12 +59,11 @@ def h(*args):
 
 #redefine "print" for notebooks ...
 try: #http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
-    get_ipython #is defined from within IPython (notebook)
+    get_ipython # type: ignore #is defined from within IPython (notebook)
 except:
     pass
 else:
-    pass #for pythoscope
-    # print = h # this is ok in Python 3, but not before
+    print = h # allowed in Python 3
 
 def hinfo(*args):
     return display(HTML(tag('div',html(args),style="background-color:#337ab7;color:#ffffff")))

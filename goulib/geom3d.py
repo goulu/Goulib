@@ -739,7 +739,7 @@ class Sphere(Geometry):
     def __repr__(self):
         return '%s(%s,%g)' % (self.__class__.__name__, self.c, self.r)
 
-    def __contains__(self, pt):
+    def __contains__(self, pt, precision=0):
         ":return: True if pt is ON or IN the sphere"
         return self.c.distance(pt) <= self.r + precision
 

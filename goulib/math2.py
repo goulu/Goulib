@@ -2680,8 +2680,8 @@ def pollardRho_brent(n):
         return n
     g = n
     while g == n:
-        y, c, m, g, r, q = randrange(1, n), randrange(
-            1, n), randrange(1, n), 1, 1, 1
+        y, c, m, g, r, q = random.randrange(1, n), random.randrange(
+            1, n), random.randrange(1, n), 1, 1, 1
         while g == 1:
             x, k = y, 0
             for i in range(r):
