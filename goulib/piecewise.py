@@ -142,10 +142,15 @@ class Piecewise(Expr):
             else:
                 j=len(self)
 
+            delete=[]
             for k in range(i, j):
                 (x,y)=self.xy[k]
                 y=Expr(y).apply(f, value)
                 self.xy[k] = (x,y)
+                if k>0 and y==self.xy[k-1][1]: # remove consecutive duplicates
+                    delete.append((x,y))
+            for xy in delete:
+                self.xy.remove(xy)
             return self
         else:
             # right=Piecewise(right)
