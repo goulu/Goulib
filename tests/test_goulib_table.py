@@ -13,24 +13,27 @@ class TestTable:
 
         # test reading an Excel file
         # from http://www.contextures.com/xlSampleData01.html
-        self.t = Table(self.path+'/data/test.xls')
-        assert self.t.titles == [
-            'OrderDate', u'Région', 'Rep', 'Item', u'Unités', 'Cost', 'Total']
+        self.table = Table(self.path+'/data/test.xls')
+        assert self.table.titles == ['OrderDate', 'Région', 'Rep', 'Item', 'Unités', 'Cost', 'Total']
 
         # format some columns
-        self.t.applyf('Cost', float)
-        self.t.applyf('Total', lambda x: float(x) if isinstance(
+        self.table.applyf('Cost', float)
+        self.table.applyf('Total', lambda x: float(x) if isinstance(
             x, (int, float)) else float(x.replace(',', '')))
 
         # converts using fmts in sequence
-        self.t.to_date('OrderDate', fmt=['%m/%d/%Y', 'Excel'])
-        assert self.t[0][0] == datetime.date(2012, 6, 1)
-        assert self.t[1][0] == datetime.date(2012, 1, 23)
+        self.table.to_date('OrderDate', fmt=['%m/%d/%Y', 'Excel'])
+        assert self.table[0][0] == datetime.date(2012, 6, 1)
+        assert self.table[1][0] == datetime.date(2012, 1, 23)
 
         # add a column to test timedeltas
-        d = self.t.col('OrderDate')
+        d = self.table.col('OrderDate')
         d = list(map(operator.sub, d, [d[0]]+d[:-1]))
-        self.t.addcol('timedelta', d)
+        self.table.addcol('timedelta', d)
+
+    def setup_method(self):
+        # reset table to initial state
+        self.t=Table(self.table)
 
     def test___init__(self):
         # most tests are above, but some more are here:
@@ -45,13 +48,12 @@ class TestTable:
         assert Table((i for i in range(10))) == Table((range(10)))
 
     def test___repr__(self):
-        pass  # tested in setup
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test___str__(self):
-        pass  # tested in setup
-
+        pytest.skip("not yet implemented")  # TODO: implement
     def test_applyf(self):
-        pass  # tested in setup
+        pytest.skip("not yet implemented")  # TODO: implement
 
     def test_read_csv(self):
         # test that t can be written to csv, then re-read in t2 without loss
@@ -75,16 +77,16 @@ class TestTable:
         assert t == self.t
 
     def test_read_xls(self):
-        pass  # tested in setup
+        pytest.skip("tested in setup")
 
     def test_write_xlsx(self):
         self.t.save(self.path+'/results/table/test.xlsx')
 
     def test_to_date(self):
-        pass  # tested in setup and test_html
+        pytest.skip("tested in setup and test_html")
 
     def test_to_datetime(self):
-        pass  # tested in setup
+        pytest.skip("tested in setup")
 
     def test_html(self):
 
@@ -148,7 +150,7 @@ class TestTable:
         assert self.t.get(-1, 'Total') == 139.72
 
     def test_groupby(self):
-        d = self.t.groupby(u'Région')
+        d = self.t.groupby('Région')
         assert sum([len(d[k]) for k in d]) == len(self.t)
         assert len(d['East']) == 13
 
@@ -188,14 +190,14 @@ class TestTable:
 
     def test_rowasdict(self):
         r = self.t.rowasdict(6)
-        assert r == {u'Cost': 1.99,
-                     u'Item': u'Pencil',
-                     u'OrderDate': date(2012, 4, 18),
-                     u'Rep': u'Andrews',
-                     u'Région': u'Central',
-                     u'Total': 149.25,
-                     u'Unités': 75,
-                     u'timedelta': timedelta(days=105)}
+        assert r == {'Cost': 1.99,
+                     'Item': 'Pencil',
+                     'OrderDate': date(2012, 4, 18),
+                     'Rep': 'Andrews',
+                     'Région': 'Central',
+                     'Total': 149.25,
+                     'Unités': 75,
+                     'timedelta': timedelta(days=105)}
 
     def test_set(self):
         # table = Table(filename, titles, data, **kwargs)
@@ -214,7 +216,7 @@ class TestTable:
 
     def test_transpose(self):
         t = self.t.transpose()
-        assert t[1, 1] == 'Smith'
+        assert t[1, 1] == 'Jones'
 
     def test___getitem__(self):
         # table = Table(data, **kwargs)
