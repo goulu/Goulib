@@ -16,3 +16,5 @@ docs/_build
 .idea/
 __pycache__/
 *.noseids
+/docs/modules/
+/.pytest_cache/

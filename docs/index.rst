@@ -65,10 +65,10 @@ Modules
     math2
     motion
     optim
+    periodic
     piecewise
     plot
     polynomial
-    statemachine
     stats
     table
     tests

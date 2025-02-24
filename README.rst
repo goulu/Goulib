@@ -63,6 +63,8 @@ Modules
 	motion simulation (kinematics)
 **optim**
 	optimization algorithms : knapsack, traveling salesman, simulated annealing
+**periodic**
+	periodic functions (WIP)
 **piecewise**
 	piecewise-defined functions
 **plot**
@@ -82,6 +84,4 @@ Modules
 Requirements
 ------------
 
-goulib uses lazy requirements.
-Many modules and functions do not require any other packages,
-packages listed in requirements.txt are needed only by some goulib classes or functions
+quite a lot of packages are needed for the full functionality of goulib, but most modules need only a small subset with lazy import when possible.
