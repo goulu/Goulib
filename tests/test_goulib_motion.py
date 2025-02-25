@@ -312,7 +312,8 @@ class TestSegmentTrapezoidalSpeed:
 
 
 class TestSegment4thDegree:
-    def setup(self):
+    @classmethod
+    def setup_class(self):
         self.t0, self.t1 = 1, 2
         self.p0, self.v0, self.a0 = -1, 1, 0
         self.start = (self.p0, self.v0, self.a0, 0)
@@ -321,9 +322,9 @@ class TestSegment4thDegree:
 
     def test_segment4th_degree(self):
         seg = Segment4thDegree(self.t0, self.t1, self.start, self.end)
-        assert seg.start()[:3] == self.start[:3]  # ignore jerk
-        assert seg.end()[:3] == self.end[:3]  # ignore jerk
-        assert seg((self.t0+self.t1)/2.) == (-0.3125, 2.0, 3.0, 0.0)  # truediv
+        assert seg.start()[:3] == pytest.approx(self.start[:3])  # ignore jerk
+        assert seg.end()[:3] == pytest.approx(self.end[:3])  # ignore jerk
+        assert seg((self.t0+self.t1)/2.) == pytest.approx((-0.3125, 2.0, 3.0, 0.0))  # truediv
 
 
 class TestSegmentsTrapezoidalSpeed:

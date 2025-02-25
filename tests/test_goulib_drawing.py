@@ -262,7 +262,7 @@ class TestGroup:
         g2 = Trans(scale=2, offset=(10, 1), rotation=30)*self.group
         g2.color = 'blue'
         Drawing([self.group, g2]).save(results+'drawing.Group.distance.png')
-        assert self.group.distance(g2) == 2.026833782163534
+        assert self.group.distance(g2) == pytest.approx(2.026833782163534)
 
     def test_append(self):
         # group = Group()
