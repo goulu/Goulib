@@ -15,8 +15,7 @@ class TestNelderMead:
 
 
 class TestBinDict:
-
-    def setup(self):
+    def setup_method(self):
         # this is run once before each test below
         self.bin = BinDict(1)  # simplest Bin
         self.bin[0.1] = 0.1
@@ -75,7 +74,7 @@ class TestBinDict:
 
 
 class TestBinList:
-    def setup(self):
+    def setup_method(self):
         # this is run once before each test below
         self.bin = BinList(1)  # simplest Bin
         self.bin.extend([0.1, 0.3])
