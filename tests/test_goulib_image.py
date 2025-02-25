@@ -52,7 +52,7 @@ class TestImage(TestCase):
         a = [[-x*x+y*y for x in range(128)] for y in range(128)]
         a = normalize(a)
         assert_image(Image(a), 'generated.png')
-        assert_image(Image(a, colormap=matplotlib.cmap['nipy_spectral']),
+        assert_image(Image(a, colormap=matplotlib.colormaps['nipy_spectral']),
                      'gen_colormap.png', True)
 
     def test___hash__(self):
