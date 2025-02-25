@@ -234,7 +234,7 @@ def parse_string(s):
     """
     s = s.replace('$', '').replace(
         '*', '')  # remove LateX marks and optional * mul symbols
-    termpat = re.compile('([-+]?\s*\d*\.?\d*)(x?\^?\d?)')
+    termpat = re.compile(r'([-+]?\s*\d*\.?\d*)(x?\^?\d?)')
     # print "Parsing string: ",str
     # print termpat.findall(str)
     res_dict = {}
@@ -267,7 +267,7 @@ def _parse_n(str):
 
 def _parse_p(str):
     "Parse the power part of a polynomial string term"
-    pat = re.compile('x\^?(\d)?')
+    pat = re.compile(r'x\^?(\d)?')
     if not str:
         return 0
     res = pat.findall(str)[0]

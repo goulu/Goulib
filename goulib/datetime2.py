@@ -14,7 +14,6 @@ import datetime as dt
 
 # classes extending builtin
 
-
 class datetime2(dt.datetime):
     def __init__(self, *args, **kwargs):
         super(datetime2, self).__init__(*args, **kwargs)
@@ -57,11 +56,11 @@ midnight = time()
 # regexes
 # https://stackoverflow.com/a/40309602/1395973
 # https://regex101.com/r/NUZS1Z/2
-rdatesep = '[^\w\d\r\n:]'
-ryear = '(\d{4}|\d{2})'
-rmonth = '(0?[1-9]|1[0-2])'
-rday = '(0?[1-9]|[12]\d|30|31)'
-rdateany = '(\b'+rday+rdatesep+rmonth+rdatesep+ryear + \
+rdatesep = r'[^\w\d\r\n:]'
+ryear = r'(\d{4}|\d{2})'
+rmonth = r'(0?[1-9]|1[0-2])'
+rday = r'(0?[1-9]|[12]\d|30|31)'
+rdateany = r'(\b'+rday+rdatesep+rmonth+rdatesep+ryear + \
     '\b)|(\b'+rmonth+rdatesep+rday+rdatesep+ryear+'\b)'
 
 
@@ -128,10 +127,10 @@ def fmt2regex(fmt):
     :return: compiled regex
     """
 
-    expr = fmt.replace('%D', '(?P<days>-?[0-9]\d*)')
-    expr = expr.replace('%H', '(?P<hours>-?[0-9]\d*)')
-    expr = expr.replace('%M', '(?P<minutes>\d+)')
-    expr = expr.replace('%S', '(?P<seconds>\d+(\.\d+)?)')
+    expr = fmt.replace('%D', r'(?P<days>-?[0-9]\d*)')
+    expr = expr.replace('%H', r'(?P<hours>-?[0-9]\d*)')
+    expr = expr.replace('%M', r'(?P<minutes>\d+)')
+    expr = expr.replace('%S', r'(?P<seconds>\d+(\.\d+)?)')
     return re.compile(expr)
 
 
