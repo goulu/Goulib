@@ -1,7 +1,7 @@
 from goulib.tests import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from goulib.colors import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-from matplotlib import cm
+import matplotlib
 
 import os
 path = os.path.dirname(os.path.abspath(__file__))
@@ -201,7 +201,7 @@ class TestPalette:
 
     @classmethod
     def setup_class(self):
-        self.palette = Palette(cm.get_cmap('nipy_spectral'))
+        self.palette = Palette(matplotlib.colormaps['nipy_spectral'])
         # indexed by letters
         self.cmyk = Palette(['cyan', 'magenta', 'yellow', 'black'], 'CMYK')
         self.cmyk_int = Palette(
