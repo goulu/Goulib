@@ -128,7 +128,6 @@ class TestGeoGraph:
 
         assert g.number_of_nodes() == 7
         assert g.number_of_edges() == 9
-        return g
 
     def test_closest_edges(self):
         close, d = self.cube.closest_edges((0, 0, 0))
