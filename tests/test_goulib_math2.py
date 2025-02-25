@@ -620,21 +620,21 @@ class TestTriangularRepartition:
 
         ref = [0.01, 0.03, 0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19]
         res = triangular_repartition(1, 10)
-        assert sum(res) == 1
+        assert sum(res) == pytest.approx(1)
         assert dist(res, ref) < 1E-6
         ref.reverse()
         res = triangular_repartition(0, 10)
-        assert sum(res) == 1
+        assert sum(res) == pytest.approx(1)
         assert dist(res, ref) < 1E-6
 
         ref = [0.02, 0.06, 0.1, 0.14, 0.18, 0.18, 0.14, 0.1, 0.06, 0.02]
         res = triangular_repartition(.5, 10)
-        assert sum(res) == 1
+        assert sum(res) == pytest.approx(1)
         assert dist(res, ref) < 1E-6
 
         ref = [0.08, 0.24, 0.36, 0.24, 0.08]
         res = triangular_repartition(.5, 5)  # center value is top of triangle
-        assert sum(res) == 1
+        assert sum(res) == pytest.approx(1)
         assert dist(res, ref) < 1E-6
 
 
