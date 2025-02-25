@@ -92,7 +92,7 @@ def to_networkx_graph(data, create_using=None, multigraph_input=False):
     then this attribute will be used to rename nodes as (x,y,...) tuples suitable for GeoGraph.
 
     """
-    if isinstance(data, scipy.spatial.qhull.Delaunay):
+    if isinstance(data, scipy.spatial.Delaunay):
         create_using.delauney = data
         triangles = data.points[data.simplices]
         for point in triangles:
