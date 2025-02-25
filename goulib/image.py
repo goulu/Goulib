@@ -777,7 +777,7 @@ class Image(plot.Plot):
 
     @adapt_rgb
     def shift(self, dx, dy, **kwargs):
-        from scipy.ndimage.interpolation import shift as shift2
+        from scipy.ndimage import shift as shift2
         a = shift2(self.array, (dy, dx), **kwargs)
         return Image(a, self.mode)
 
