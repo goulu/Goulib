@@ -252,12 +252,10 @@ class TestMatrix3:
     def test_new_identity(self):
         mat = Matrix3.new_identity()
         assert mat == Matrix3()
-        return mat
 
     def test_new_scale(self):
         mat = Matrix3.new_scale(2, 3)
         assert mat == Matrix3(2, 0, 0, 0, 3, 0, 0, 0, 1)
-        return mat
 
     def test_new_rotate(self):
         mat = Matrix3.new_rotate(radians(60))
@@ -265,7 +263,6 @@ class TestMatrix3:
         # warning : .new takes columnwise elements
         res = Matrix3(0.5, +s32, 0, -s32, 0.5, 0, 0, 0, 1)
         assert mat == res
-        return mat
 
     def test_new_translate(self):
         # matrix3 = Matrix3()
