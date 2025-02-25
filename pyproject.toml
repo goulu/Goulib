@@ -10,7 +10,7 @@ authors = [
 ]
 description = "library of useful Python code for scientific + technical applications"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ["math", "geometry", "graph", "optimization", "drawing"]
 license = {file = "LICENSE.TXT"}
 classifiers = [
@@ -20,7 +20,7 @@ classifiers = [
         "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Multimedia :: Graphics :: Graphics Conversion",
