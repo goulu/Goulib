@@ -384,8 +384,14 @@ class TestNumFromDigits:
         assert num_from_digits('1234') == 1234
         assert num_from_digits('11111011110', 2) == 2014
         assert num_from_digits([1, 2, 3, 4]) == 1234
-        assert num_from_digits(
-            [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0], 2) == 2014
+        assert num_from_digits([1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0], 2) == 2014
+        assert num_from_digits('ABCD', 16) == 43981
+        assert num_from_digits([10,11,12,13], 16) == 43981
+        with pytest.raises(ValueError):
+            num_from_digits([10,11,12,13], 10)
+        with pytest.raises(ValueError):
+            num_from_digits('G', 16)
+
 
 
 class TestNumberOfDigits:

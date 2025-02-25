@@ -1619,7 +1619,7 @@ def int_base(num, base):
     return int(str_base(num, base))
 
 
-def num_from_digits(digits, base=10):
+def num_from_digits(digits, base=10)->int:
     '''
     :param digits: string or list of digits representing a number in given base
     :param base: int base, 10 by default
@@ -1629,7 +1629,9 @@ def num_from_digits(digits, base=10):
         return int(digits, base)
     res, f = 0, 1
     for x in reversed(list(digits)):
-        res = res + int(x * f)
+        if x>=base:
+            raise ValueError(f"digit {x} is not in base {base}")
+        res += x*f
         f = f * base
     return res
 
