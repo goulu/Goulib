@@ -1589,13 +1589,12 @@ def str_base(num, base=10, numerals='0123456789abcdefghijklmnopqrstuvwxyz'):
     :param base: int base, 10 by default
     :param numerals: string with all chars representing numbers in base base. chars after the base-th are ignored
     '''
+    if base < 2 or base > len(numerals):
+        raise ValueError("str_base: base must be between 2 and %d" % len(numerals))
     if base == 10 and numerals[:10] == '0123456789':
         return str(num)
     if base == 2 and numerals[:2] == '01':
         return "{0:b}".format(int(num))
-    if base < 2 or base > len(numerals):
-        raise ValueError(
-            "str_base: base must be between 2 and %d" % len(numerals))
 
     if num < 0:
         sign = '-'
@@ -1619,22 +1618,22 @@ def int_base(num, base):
     return int(str_base(num, base))
 
 
-def num_from_digits(digits, base=10)->int:
+def num_from_digits(digits, base=10):
     '''
     :param digits: string or list of digits representing a number in given base
     :param base: int base, 10 by default
     :return: int number
     '''
-    if isinstance(digits, str):
-        return int(digits, base)
-    res, f = 0, 1
-    for x in reversed(list(digits)):
-        if x>=base:
-            raise ValueError(f"digit {x} is not in base {base}")
-        res += x*f
-        f = f * base
-    return res
 
+    if isinstance(digits, str):
+        string=digits
+    else:
+        string=''
+        for x in digits:
+            if x>=base:
+                raise ValueError("num_from_digits: digit %d is greater than base %d" % (x, base))
+            string+=str_base(x,base) 
+    return int(string, base)
 
 def reverse(i):
     return int(str(i)[::-1])
