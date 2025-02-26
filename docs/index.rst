@@ -35,9 +35,7 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/goulib/blob/
 Requirements
 ------------
 
-goulib uses "lazy" requirements.
-Many modules and functions do not require any other packages,
-packages listed in requirements.txt are needed only by some classes or functions
+quite a lot of packages are needed for the full functionality of goulib, but most modules need only a small subset with lazy import when possible.
 
 `Sphinx <http://sphinx-doc.org/>`_ is needed to generate this documentation,
 
@@ -50,7 +48,7 @@ Modules
     :toctree: modules
 
     colors
-    container
+    containers
     datetime2
     decorators
     drawing
@@ -64,6 +62,7 @@ Modules
     markup
     math2
     motion
+    notebook
     optim
     periodic
     piecewise
@@ -72,6 +71,7 @@ Modules
     stats
     table
     tests
+    units
     workdays
    
 Classes
@@ -79,7 +79,7 @@ Classes
 
 .. inheritance-diagram::
     colors
-    container
+    containers
     datetime2
     decorators
     drawing
@@ -92,14 +92,16 @@ Classes
     itertools2
     math2
     motion
+    notebook
     optim
+    periodic
     piecewise
     plot
     polynomial
-    statemachine
     stats
     table
     tests
+    units
     workdays
     :parts: 2
 

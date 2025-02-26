@@ -1,8 +1,9 @@
 cls -C
+call pip install sphinx sphinx_rtd_theme
 cd docs
 call sphinx-apidoc ..\goulib -eo modules 
 del modules\goulib.rst
-del _build\html\index.html
+del build\html\index.html
 call make html
-start _build\html\index.html
+start build\html\index.html
 cd ..

@@ -78,8 +78,6 @@ class Table():
     in the future, the label could be replaced by a dictionary having more properties like 
     {'label':<label>, 'comment':<comment>....}
 
-
-    ---------
     internally, the rows are represented as
     {'<the label>':{'col1':<value>, 'col2':<value> ....},
      '<the next label>'         

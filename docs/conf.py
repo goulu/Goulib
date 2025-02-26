@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# BESTIAL documentation build configuration file, created by
+# documentation build configuration file, created by
 # sphinx-quickstart on Thu Apr 05 09:30:07 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -17,19 +17,6 @@ import sys, os
 
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-""" not required anymore
-if on_rtd:
-    import mock
-    mock.Mock.__all__ = []
-    MOCK_MODULES = [
-        'numpy', 'scipy', 'matplotlib','matplotlib.pyplot',
-        'xlrd','lxml','dxfgrabber','dxfwrite',
-        'svg.path','pdfminer.six','pillow',
-    ]
-    for mod_name in MOCK_MODULES:
-        sys.modules[mod_name] = mock.Mock()
-"""
 
 def read(*parts):
     return open(os.path.join(os.path.dirname(__file__), *parts)).read()
@@ -65,12 +52,14 @@ extensions = [
     'sphinx.ext.intersphinx',
 #    'sphinx.ext.napoleon',
     ]
-    
+
+graphviz_output_format = 'svg'
+
 napoleon_include_special_with_doc = False
 
 autosummary_generate = True
 
-inheritance_graph_attrs = dict(size='""')
+inheritance_graph_attrs = dict(rankdir="LR", size='""', fontsize=24, ratio='expand')
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -85,7 +74,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'goulib'
-copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/goulib'
+copyright = u'2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib'
 
 #autodoc options:
 autodoc_member_order = 'bysource'
@@ -154,7 +143,7 @@ intersphinx_mapping = {
     'networkx': ('http://networkx.github.io/documentation/latest','http://networkx.github.io/documentation/latest/objects.inv'),
     'numpy': ('http://docs.scipy.org/doc/numpy','http://docs.scipy.org/doc/numpy/objects.inv'),
     'scipy' : ('http://docs.scipy.org/doc/scipy/reference','http://docs.scipy.org/doc/scipy/reference/objects.inv'),
-    'matplotlib': ('http://matplotlib.sourceforge.net/', None),
+    'matplotlib': ('http://matplotlib.org/stable', None)
 }
 
 # -- Options for HTML output ---------------------------------------------------

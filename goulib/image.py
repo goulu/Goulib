@@ -2,10 +2,12 @@
 image processing with PIL's ease and skimage's power
 
 :requires:
+
 * `scikit-image <http://scikit-image.org/>`_
 * `PIL or Pillow <http://pypi.python.org/pypi/pillow/>`_
 
 :optional:
+
 * `pdfminer.six <http://pypi.python.org/pypi/pdfminer.six/>`_ for pdf input
 
 """
