@@ -130,11 +130,12 @@ class TestGeoGraph:
         assert g.number_of_edges() == 9
 
     def test_closest_edges(self):
-        close, d = self.cube.closest_edges((0, 0, 0))
+        g = self.cube.copy()
+        close, d = g.closest_edges((0, 0, 0))
         assert d == 0
         assert len(list(close)) == 3
 
-        g = self.test_remove_node()
+        g.remove_node((0, 0, 0)) # tested above
         close, d = g.closest_edges((0, 0, 0))
         assert d == 1
         assert len(list(close)) == 6
