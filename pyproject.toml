@@ -46,8 +46,5 @@ dependencies = [
     "bitarray",
     "pint",
     "pillow",
-    "matplotlib",
-    "pytest",
-    "pytest-cov",
-    "sphinx",
+    "matplotlib"
 ]
