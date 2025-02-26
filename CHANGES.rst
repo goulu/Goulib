@@ -1,5 +1,5 @@
 v2.0.0, 2018-12-18
-* dropped 2.7 and six : Goulib now optimal for Python 3.x
+* dropped 2.7 and six : goulib now optimal for Python 3.x
 
 
 v1.6.1, 2013-12-11

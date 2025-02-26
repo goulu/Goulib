@@ -35,7 +35,7 @@ def read(*parts):
     return open(os.path.join(os.path.dirname(__file__), *parts)).read()
 
 def get_version():
-    f = open('../Goulib/__init__.py')
+    f = open('../goulib/__init__.py')
     try:
         for line in f:
             if line.startswith('__version__'):
@@ -84,8 +84,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Goulib'
-copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/Goulib'
+project = u'goulib'
+copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/goulib'
 
 #autodoc options:
 autodoc_member_order = 'bysource'
@@ -238,7 +238,7 @@ html_show_copyright = True
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Goulibdoc'
+htmlhelp_basename = 'goulibdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -257,8 +257,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Goulib.tex', u'Goulib Documentation',
-   u'Ph. Guglielmetti, https://github.com/goulu/Goulib', 'manual'),
+  ('index', 'goulib.tex', u'goulib Documentation',
+   u'Ph. Guglielmetti, https://github.com/goulu/goulib', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -287,8 +287,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'Goulib', u'Goulib Documentation',
-     [u'Ph. Guglielmetti, https://github.com/goulu/Goulib'], 1)
+    ('index', 'goulib', u'goulib Documentation',
+     [u'Ph. Guglielmetti, https://github.com/goulu/goulib'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -301,8 +301,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Goulib', u'Goulib Documentation',
-   u'PPh. Guglielmetti, https://github.com/goulu/Goulib', 'Goulib', 'One line description of project.',
+  ('index', 'goulib', u'goulib Documentation',
+   u'PPh. Guglielmetti, https://github.com/goulu/goulib', 'goulib', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -319,10 +319,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Goulib'
-epub_author = u'Ph. Guglielmetti, https://github.com/goulu/Goulib'
-epub_publisher = u'Ph. Guglielmetti, https://github.com/goulu/Goulib'
-epub_copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/Goulib'
+epub_title = u'goulib'
+epub_author = u'Ph. Guglielmetti, https://github.com/goulu/goulib'
+epub_publisher = u'Ph. Guglielmetti, https://github.com/goulu/goulib'
+epub_copyright = u'2015, Ph. Guglielmetti, https://github.com/goulu/goulib'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
