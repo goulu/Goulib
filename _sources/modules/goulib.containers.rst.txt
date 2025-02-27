@@ -1,13 +1,8 @@
-goulib.containers
+﻿goulib.containers
 =================
 
 .. automodule:: goulib.containers
 
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -15,9 +10,4 @@ goulib.containers
    
       Record
       SortedCollection
-   
-   
-
-   
-   
    

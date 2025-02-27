@@ -1,9 +1,8 @@
-goulib.decorators
+﻿goulib.decorators
 =================
 
 .. automodule:: goulib.decorators
 
-   
    
    .. rubric:: Functions
 
@@ -18,18 +17,9 @@ goulib.decorators
       timeit
       timeout
    
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
    
       MultiMethod
-   
-   
-
-   
-   
    

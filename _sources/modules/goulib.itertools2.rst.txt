@@ -1,9 +1,8 @@
-goulib.itertools2
+﻿goulib.itertools2
 =================
 
 .. automodule:: goulib.itertools2
 
-   
    
    .. rubric:: Functions
 
@@ -85,10 +84,6 @@ goulib.itertools2
       tee
       unique
    
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -96,14 +91,9 @@ goulib.itertools2
       iter2
       keep
    
-   
-
-   
-   
    .. rubric:: Exceptions
 
    .. autosummary::
    
       SortingError
-   
    

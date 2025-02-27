@@ -1,9 +1,8 @@
-goulib.markup
+﻿goulib.markup
 =============
 
 .. automodule:: goulib.markup
 
-   
    
    .. rubric:: Functions
 
@@ -19,10 +18,6 @@ goulib.markup
       tag
       unescape
    
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -32,10 +27,6 @@ goulib.markup
       element
       page
       russell
-   
-   
-
-   
    
    .. rubric:: Exceptions
 
@@ -49,5 +40,4 @@ goulib.markup
       MarkupError
       ModeError
       OpeningError
-   
    

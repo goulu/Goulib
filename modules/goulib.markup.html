@@ -1,23 +1,22 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>goulib.markup &#8212; goulib 3.0.0 documentation</title>
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="goulib.itertools2" href="goulib.itertools2.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -29,51 +28,24 @@
         <li class="right" >
           <a href="goulib.itertools2.html" title="goulib.itertools2"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.markup</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="goulib.itertools2.html"
-                        title="previous chapter">goulib.itertools2</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/goulib.markup.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-goulib.markup">
-<span id="goulib-markup"></span><h1>goulib.markup<a class="headerlink" href="#module-goulib.markup" title="Permalink to this headline">¶</a></h1>
+  <section id="module-goulib.markup">
+<span id="goulib-markup"></span><h1>goulib.markup<a class="headerlink" href="#module-goulib.markup" title="Link to this heading">¶</a></h1>
 <p>simple HTML/XML generation (forked from <a class="reference external" href="http://pypi.python.org/pypi/markup/">markup</a>)</p>
 <p># This code is in the public domain, it comes
 # with absolutely no warranty and you can do
 # absolutely whatever you want with it.</p>
 <p class="rubric">Functions</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_argsdicts</span></code>(args, mydict)</p></td>
 <td><p>A utility generator that pads argument list and dictionary values, will only be called with len( args ) = 0, 1.</p></td>
@@ -84,489 +56,111 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_totuple</span></code>(x)</p></td>
 <td><p>Utility stuff to convert string, int, long, float, None or anything to a usable tuple.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.cgiprint" title="goulib.markup.cgiprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cgiprint</span></code></a>([line, unbuff, line_end])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cgiprint</span></code>([line, unbuff, line_end])</p></td>
 <td><p>Print to the stdout.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.escape" title="goulib.markup.escape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">escape</span></code></a>(text[, newline])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">escape</span></code>(text[, newline])</p></td>
 <td><p>Escape special html characters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.style_dict2str" title="goulib.markup.style_dict2str"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_dict2str</span></code></a>(style)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_dict2str</span></code>(style)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.style_str2dict" title="goulib.markup.style_str2dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_str2dict</span></code></a>(style)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_str2dict</span></code>(style)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.tag" title="goulib.markup.tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tag</span></code></a>(tag, between, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tag</span></code>(tag, between, **kwargs)</p></td>
 <td><p>generate full tag.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.unescape" title="goulib.markup.unescape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unescape</span></code></a>(text)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unescape</span></code>(text)</p></td>
 <td><p>Inverse of escape.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Classes</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_oneliner</span></code>([case])</p></td>
 <td><p>An instance of oneliner returns a string corresponding to one element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.dummy" title="goulib.markup.dummy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dummy</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dummy</span></code>()</p></td>
 <td><p>A dummy class for attaching attributes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.element" title="goulib.markup.element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">element</span></code></a>(tag[, case, parent])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">element</span></code>(tag[, case, parent])</p></td>
 <td><p>This class handles the addition of a new element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.page" title="goulib.markup.page"><code class="xref py py-obj docutils literal notranslate"><span class="pre">page</span></code></a>([mode, case, onetags, twotags, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">page</span></code>([mode, case, onetags, twotags, ...])</p></td>
 <td><p>This is our main class representing a document.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.russell" title="goulib.markup.russell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">russell</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">russell</span></code>()</p></td>
 <td><p>A dummy class that contains anything.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Exceptions</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.ArgumentError" title="goulib.markup.ArgumentError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArgumentError</span></code></a>(tag)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArgumentError</span></code>(tag)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.ClosingError" title="goulib.markup.ClosingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClosingError</span></code></a>(tag)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClosingError</span></code>(tag)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.CustomizationError" title="goulib.markup.CustomizationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomizationError</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomizationError</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.DeprecationError" title="goulib.markup.DeprecationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeprecationError</span></code></a>(tag)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeprecationError</span></code>(tag)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.InvalidElementError" title="goulib.markup.InvalidElementError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidElementError</span></code></a>(tag, mode)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidElementError</span></code>(tag, mode)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MarkupError</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MarkupError</span></code></p></td>
 <td><p>All our exceptions subclass this.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.markup.ModeError" title="goulib.markup.ModeError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModeError</span></code></a>(mode)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModeError</span></code>(mode)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#goulib.markup.OpeningError" title="goulib.markup.OpeningError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpeningError</span></code></a>(tag)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpeningError</span></code>(tag)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="function">
-<dt id="goulib.markup.cgiprint">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">cgiprint</code><span class="sig-paren">(</span><em class="sig-param">line=''</em>, <em class="sig-param">unbuff=True</em>, <em class="sig-param">line_end='\r\n'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#cgiprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.cgiprint" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Print to the stdout.
-:param line: string to print, followed by line_end
-:param unbuff: boolean, True to flush the buffer after every write.
-:param line_end: string to print after each line. By default this is</p>
-</div></blockquote>
-<p>, which is the standard specified by the RFC for http headers.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="goulib.markup.style_dict2str">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">style_dict2str</code><span class="sig-paren">(</span><em class="sig-param">style</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#style_dict2str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.style_dict2str" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="goulib.markup.style_str2dict">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">style_str2dict</code><span class="sig-paren">(</span><em class="sig-param">style</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#style_str2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.style_str2dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="goulib.markup.tag">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">tag</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">between</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>generate full tag.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="goulib.markup.element">
-<em class="property">class </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">element</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">case='lower'</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>This class handles the addition of a new element.</p>
-<dl class="method">
-<dt id="goulib.markup.element.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">case='lower'</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.element.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call self as a function.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.element.render">
-<code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">single</em>, <em class="sig-param">args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element.render" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append the actual tags to content.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.element.close">
-<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append a closing tag unless element has only opening tag.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.element.open">
-<code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#element.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.element.open" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append an opening tag.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="goulib.markup.page">
-<em class="property">class </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">page</code><span class="sig-paren">(</span><em class="sig-param">mode='strict_html'</em>, <em class="sig-param">case='lower'</em>, <em class="sig-param">onetags=None</em>, <em class="sig-param">twotags=None</em>, <em class="sig-param">separator='n'</em>, <em class="sig-param">class_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>This is our main class representing a document. Elements are added
-as attributes of an instance of this class.</p>
-<p>Stuff that effects the whole document.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mode</strong> – string. can be either:</p>
-</dd>
-</dl>
-<ul class="simple">
-<li><p>‘strict_html’   for HTML 4.01 (default)</p></li>
-<li><p>‘html’          alias for ‘strict_html’</p></li>
-<li><p>‘loose_html’    to allow some deprecated elements</p></li>
-<li><p>‘xml’           to allow arbitrary elements</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>case</strong> – string. can be either:</p>
-</dd>
-</dl>
-<ul class="simple">
-<li><p>‘lower’         element names will be printed in lower case (default)</p></li>
-<li><p>‘upper’         they will be printed in upper case</p></li>
-<li><p>‘given’         element names will be printed as they are given</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>onetags</strong> – list or tuple of valid elements with opening tags only</p></li>
-<li><p><strong>twotags</strong> – list or tuple of valid elements with both opening and closing tags</p></li>
-</ul>
-</dd>
-</dl>
-<p>these two keyword arguments may be used to select the set of valid elements in ‘xml’ mode
-invalid elements will raise appropriate exceptions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>separator</strong> – string to place between added elements, defaults to newline</p></li>
-<li><p><strong>class</strong> – a class that will be added to every element if defined</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="method">
-<dt id="goulib.markup.page.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">mode='strict_html'</em>, <em class="sig-param">case='lower'</em>, <em class="sig-param">onetags=None</em>, <em class="sig-param">twotags=None</em>, <em class="sig-param">separator='\n'</em>, <em class="sig-param">class_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stuff that effects the whole document.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mode</strong> – string. can be either:</p>
-</dd>
-</dl>
-<ul class="simple">
-<li><p>‘strict_html’   for HTML 4.01 (default)</p></li>
-<li><p>‘html’          alias for ‘strict_html’</p></li>
-<li><p>‘loose_html’    to allow some deprecated elements</p></li>
-<li><p>‘xml’           to allow arbitrary elements</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>case</strong> – string. can be either:</p>
-</dd>
-</dl>
-<ul class="simple">
-<li><p>‘lower’         element names will be printed in lower case (default)</p></li>
-<li><p>‘upper’         they will be printed in upper case</p></li>
-<li><p>‘given’         element names will be printed as they are given</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>onetags</strong> – list or tuple of valid elements with opening tags only</p></li>
-<li><p><strong>twotags</strong> – list or tuple of valid elements with both opening and closing tags</p></li>
-</ul>
-</dd>
-</dl>
-<p>these two keyword arguments may be used to select the set of valid elements in ‘xml’ mode
-invalid elements will raise appropriate exceptions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>separator</strong> – string to place between added elements, defaults to newline</p></li>
-<li><p><strong>class</strong> – a class that will be added to every element if defined</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.__getattr__">
-<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">attr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.__getattr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.__getattr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.__str__">
-<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">escape=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the document as a string.</p>
-<dl class="simple">
-<dt>escape –   False   print normally</dt><dd><dl class="simple">
-<dt>True    replace &lt; and &gt; by &amp;lt; and &amp;gt;</dt><dd><p>the default escape sequences in most browsers</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is an alias to addcontent.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.addfooter">
-<code class="sig-name descname">addfooter</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.addfooter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.addfooter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add some text to the bottom of the document</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.addheader">
-<code class="sig-name descname">addheader</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.addheader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.addheader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add some text to the top of the document</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.addcontent">
-<code class="sig-name descname">addcontent</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.addcontent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.addcontent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add some text to the main part of the document</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.init">
-<code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">lang='en'</em>, <em class="sig-param">css=None</em>, <em class="sig-param">metainfo=None</em>, <em class="sig-param">title=None</em>, <em class="sig-param">header=None</em>, <em class="sig-param">footer=None</em>, <em class="sig-param">charset=None</em>, <em class="sig-param">encoding=None</em>, <em class="sig-param">doctype=None</em>, <em class="sig-param">bodyattrs=None</em>, <em class="sig-param">script=None</em>, <em class="sig-param">base=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method is used for complete documents with appropriate
-doctype, encoding, title, etc information. For an /XML snippet
-omit this method.</p>
-<dl class="simple">
-<dt>lang –     language, usually a two character string, will appear</dt><dd><p>as &lt;html lang=’en’&gt; in html mode (ignored in xml mode)</p>
-</dd>
-<dt>css –      Cascading Style Sheet filename as a string or a list of</dt><dd><p>strings for multiple css files (ignored in xml mode)</p>
-</dd>
-<dt>metainfo – a dictionary in the form { ‘name’:’content’ } to be inserted</dt><dd><p>into meta element(s) as &lt;meta name=’name’ content=’content’&gt;
-(ignored in xml mode)</p>
-</dd>
-</dl>
-<p>base     – set the &lt;base href=”…”&gt; tag in &lt;head&gt;</p>
-<dl class="simple">
-<dt>bodyattrs –a dictionary in the form { ‘key’:’value’, … } which will be added</dt><dd><p>as attributes of the &lt;body&gt; element as &lt;body key=’value’ … &gt;
-(ignored in xml mode)</p>
-</dd>
-<dt>script –   dictionary containing src:type pairs, &lt;script type=’text/type’ src=src&gt;&lt;/script&gt;</dt><dd><p>or a list of [ ‘src1’, ‘src2’, … ] in which case ‘javascript’ is assumed for all</p>
-</dd>
-<dt>title –    the title of the document as a string to be inserted into</dt><dd><p>a title element as &lt;title&gt;my title&lt;/title&gt; (ignored in xml mode)</p>
-</dd>
-<dt>header –   some text to be inserted right after the &lt;body&gt; element</dt><dd><p>(ignored in xml mode)</p>
-</dd>
-<dt>footer –   some text to be inserted right before the &lt;/body&gt; element</dt><dd><p>(ignored in xml mode)</p>
-</dd>
-<dt>charset –  a string defining the character set, will be inserted into a</dt><dd><p>&lt;meta http-equiv=’Content-Type’ content=’text/html; charset=myset’&gt;
-element (ignored in xml mode)</p>
-</dd>
-<dt>encoding – a string defining the encoding, will be put into to first line of</dt><dd><p>the document as &lt;?xml version=’1.0’ encoding=’myencoding’ ?&gt; in
-xml mode (ignored in html mode)</p>
-</dd>
-<dt>doctype –  the document type string, defaults to</dt><dd><p>&lt;!DOCTYPE HTML PUBLIC ‘-//W3C//DTD HTML 4.01 Transitional//EN’&gt;
-in html mode (ignored in xml mode)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.css">
-<code class="sig-name descname">css</code><span class="sig-paren">(</span><em class="sig-param">filelist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.css"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.css" title="Permalink to this definition">¶</a></dt>
-<dd><p>This convenience function is only useful for html.
-It adds css stylesheet(s) to the document via the &lt;link&gt; element.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.metainfo">
-<code class="sig-name descname">metainfo</code><span class="sig-paren">(</span><em class="sig-param">mydict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.metainfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.metainfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>This convenience function is only useful for html.
-It adds meta information via the &lt;meta&gt; element, the argument is
-a dictionary of the form { ‘name’:’content’ }.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="goulib.markup.page.scripts">
-<code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param">mydict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#page.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.page.scripts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Only useful in html, mydict is dictionary of src:type pairs or a list
-of script sources [ ‘src1’, ‘src2’, … ] in which case ‘javascript’ is assumed for type.
-Will be rendered as &lt;script type=’text/type’ src=src&gt;&lt;/script&gt;</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="goulib.markup.escape">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">escape</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">newline=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#escape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.escape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Escape special html characters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="goulib.markup.unescape">
-<code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">unescape</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#unescape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.unescape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inverse of escape.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="goulib.markup.dummy">
-<em class="property">class </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">dummy</code><a class="reference internal" href="../_modules/goulib/markup.html#dummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.dummy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A dummy class for attaching attributes.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="goulib.markup.russell">
-<em class="property">class </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">russell</code><a class="reference internal" href="../_modules/goulib/markup.html#russell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.russell" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A dummy class that contains anything.</p>
-<dl class="method">
-<dt id="goulib.markup.russell.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#russell.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.russell.__contains__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.MarkupError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">MarkupError</code><a class="reference internal" href="../_modules/goulib/markup.html#MarkupError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.MarkupError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
-<p>All our exceptions subclass this.</p>
-<dl class="method">
-<dt id="goulib.markup.MarkupError.__str__">
-<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#MarkupError.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.MarkupError.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.ClosingError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">ClosingError</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ClosingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ClosingError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.ClosingError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ClosingError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ClosingError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.OpeningError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">OpeningError</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#OpeningError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.OpeningError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.OpeningError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#OpeningError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.OpeningError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.ArgumentError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">ArgumentError</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ArgumentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ArgumentError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.ArgumentError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ArgumentError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ArgumentError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.InvalidElementError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">InvalidElementError</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">mode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#InvalidElementError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.InvalidElementError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.InvalidElementError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">mode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#InvalidElementError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.InvalidElementError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.DeprecationError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">DeprecationError</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#DeprecationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.DeprecationError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.DeprecationError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#DeprecationError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.DeprecationError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.ModeError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">ModeError</code><span class="sig-paren">(</span><em class="sig-param">mode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ModeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ModeError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.ModeError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">mode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#ModeError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.ModeError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="goulib.markup.CustomizationError">
-<em class="property">exception </em><code class="sig-prename descclassname">goulib.markup.</code><code class="sig-name descname">CustomizationError</code><a class="reference internal" href="../_modules/goulib/markup.html#CustomizationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.CustomizationError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#goulib.markup.MarkupError" title="goulib.markup.MarkupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">goulib.markup.MarkupError</span></code></a></p>
-<dl class="method">
-<dt id="goulib.markup.CustomizationError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/markup.html#CustomizationError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.markup.CustomizationError.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="goulib.itertools2.html"
+                          title="previous chapter">goulib.itertools2</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.markup.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -578,13 +172,14 @@ Will be rendered as &lt;script type=’text/type’ src=src&gt;&lt;/script&gt;</
         <li class="right" >
           <a href="goulib.itertools2.html" title="goulib.itertools2"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.markup</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+    &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
       Last updated on Feb 27, 2025.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     </div>
   </body>
 </html>
