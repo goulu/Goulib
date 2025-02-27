@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>goulib.containers &#8212; goulib 3.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="goulib.decorators" href="goulib.decorators.html" />
+    <link rel="prev" title="goulib" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.decorators.html" title="goulib.decorators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="goulib"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">goulib</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="goulib.decorators.html"
+                        title="next chapter">goulib.decorators</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.containers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-goulib.containers">
+<span id="goulib-containers"></span><h1>goulib.containers<a class="headerlink" href="#module-goulib.containers" title="Permalink to this headline">¶</a></h1>
+<p>advanced containers : 
+- Record (struct) 
+- INFINITE Sequence has been moved to OEIS project</p>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#goulib.containers.Record" title="goulib.containers.Record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Record</span></code></a>(*args, **kwargs)</p></td>
+<td><p>mimics a Pascal record or a C struct</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#goulib.containers.SortedCollection" title="goulib.containers.SortedCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SortedCollection</span></code></a>([iterable, key])</p></td>
+<td><p>Sequence sorted by a key function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="goulib.containers.Record">
+<em class="property">class </em><code class="sig-prename descclassname">goulib.containers.</code><code class="sig-name descname">Record</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#Record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.Record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/collections.html#collections.OrderedDict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a></p>
+<p>mimics a Pascal record or a C struct</p>
+<dl class="method">
+<dt id="goulib.containers.Record.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#Record.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.Record.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.Record.__getattr__">
+<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#Record.__getattr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.Record.__getattr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.Record.__setattr__">
+<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#Record.__setattr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.Record.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement setattr(self, name, value).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.Record.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#Record.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.Record.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="goulib.containers.SortedCollection">
+<em class="property">class </em><code class="sig-prename descclassname">goulib.containers.</code><code class="sig-name descname">SortedCollection</code><span class="sig-paren">(</span><em class="sig-param">iterable=()</em>, <em class="sig-param">key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Sequence sorted by a key function.</p>
+<p>SortedCollection() is much easier to work with than using bisect() directly.
+It supports key functions like those use in sorted(), min(), and max().
+The result of the key function call is saved so that keys can be searched
+efficiently.</p>
+<p>Instead of returning an insertion-point which can be hard to interpret, the
+five find-methods return a specific item in the sequence. They can scan for
+exact matches, the last item less-than-or-equal to a key, or the first item
+greater-than-or-equal to a key.</p>
+<p>Once found, an item’s ordinal position can be located with the index() method.
+New items can be added with the insert() and insert_right() methods.
+Old items can be deleted with the remove() method.</p>
+<p>The usual sequence methods are provided to support indexing, slicing,
+length lookup, clearing, copying, forward and reverse iteration, contains
+checking, item counts, item removal, and a nice looking repr.</p>
+<p>Finding and indexing are O(log n) operations while iteration and insertion
+are O(n).  The initial sort is O(n log n).</p>
+<p>The key function is stored in the ‘key’ attibute for easy introspection or
+so that you can assign a new key function (triggering an automatic re-sort).</p>
+<p>In short, the class was designed to handle all of the common use cases for
+bisect but with a simpler API and support for key functions.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">SortedCollection</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;roger&#39;</span><span class="p">,</span> <span class="s1">&#39;young&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;angela&#39;</span><span class="p">,</span> <span class="s1">&#39;jones&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;bill&#39;</span><span class="p">,</span> <span class="s1">&#39;smith&#39;</span><span class="p">,</span> <span class="mi">22</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;david&#39;</span><span class="p">,</span> <span class="s1">&#39;thomas&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]:</span>
+<span class="gp">... </span>    <span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>         <span class="c1"># show records sorted by age</span>
+<span class="go">[(&#39;bill&#39;, &#39;smith&#39;, 22),</span>
+<span class="go"> (&#39;angela&#39;, &#39;jones&#39;, 28),</span>
+<span class="go"> (&#39;roger&#39;, &#39;young&#39;, 30),</span>
+<span class="go"> (&#39;david&#39;, &#39;thomas&#39;, 32)]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_le</span><span class="p">(</span><span class="mi">29</span><span class="p">)</span>           <span class="c1"># find oldest person aged 29 or younger</span>
+<span class="go">(&#39;angela&#39;, &#39;jones&#39;, 28)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_lt</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>           <span class="c1"># find oldest person under 28</span>
+<span class="go">(&#39;bill&#39;, &#39;smith&#39;, 22)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_gt</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>           <span class="c1"># find youngest person over 28</span>
+<span class="go">(&#39;roger&#39;, &#39;young&#39;, 30)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">find_ge</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>       <span class="c1"># find youngest person aged 32 or older</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>              <span class="c1"># get the index of their record</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>                    <span class="c1"># fetch the record at that index</span>
+<span class="go">(&#39;david&#39;, &#39;thomas&#39;, 32)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># now sort by first name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="go">[(&#39;angela&#39;, &#39;jones&#39;, 28),</span>
+<span class="go"> (&#39;bill&#39;, &#39;smith&#39;, 22),</span>
+<span class="go"> (&#39;david&#39;, &#39;thomas&#39;, 32),</span>
+<span class="go"> (&#39;roger&#39;, &#39;young&#39;, 30)]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">iterable=()</em>, <em class="sig-param">key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.key">
+<em class="property">property </em><code class="sig-name descname">key</code><a class="headerlink" href="#goulib.containers.SortedCollection.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>key function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__setitem__">
+<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param">_</em>, <em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__iter__">
+<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__reversed__">
+<code class="sig-name descname">__reversed__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__reversed__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__reduce__">
+<code class="sig-name descname">__reduce__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__reduce__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for pickle.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.__contains__">
+<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.index">
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the position of an item.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.count">
+<code class="sig-name descname">count</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return number of occurrences of item</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new item.  If equal keys are found, add to the left</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.insert_right">
+<code class="sig-name descname">insert_right</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.insert_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.insert_right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new item.  If equal keys are found, add to the right</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.remove">
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove first occurence of item.  Raise ValueError if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.find">
+<code class="sig-name descname">find</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key == k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.find_le">
+<code class="sig-name descname">find_le</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.find_le"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.find_le" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return last item with a key &lt;= k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.find_lt">
+<code class="sig-name descname">find_lt</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.find_lt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.find_lt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return last item with a key &lt; k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.find_ge">
+<code class="sig-name descname">find_ge</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.find_ge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.find_ge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key &gt;= equal to k.  Raise ValueError if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="goulib.containers.SortedCollection.find_gt">
+<code class="sig-name descname">find_gt</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/goulib/containers.html#SortedCollection.find_gt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#goulib.containers.SortedCollection.find_gt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key &gt; k.  Raise ValueError if not found</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.decorators.html" title="goulib.decorators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="goulib"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+      Last updated on Feb 27, 2025.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
