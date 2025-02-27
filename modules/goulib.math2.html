@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>goulib.math2 &#8212; goulib 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="goulib.motion" href="goulib.motion.html" />
+    <link rel="prev" title="goulib.markup" href="goulib.markup.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.motion.html" title="goulib.motion"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="goulib.markup.html" title="goulib.markup"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.math2</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-goulib.math2">
+<span id="goulib-math2"></span><h1>goulib.math2<a class="headerlink" href="#module-goulib.math2" title="Link to this heading">¶</a></h1>
+<p>more math than <a class="reference external" href="http://docs.python.org/2.7/library/math.html#module-math" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code></a> standard library, without numpy</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_count</span></code>(n, p)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">abundance</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">accsum</span></code>(it)</p></td>
+<td><p>Yield accumulated sums of iterable: accsum(count(1)) -&gt; 1,3,6,10,...</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">allclose</span></code>(a, b[, rel_tol, abs_tol])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">angle</span></code>(u, v[, unit])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">baby_step_giant_step</span></code>(y, a, n)</p></td>
+<td><p>solves Discrete Logarithm Problem (DLP) y = a**x mod n</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bernouilli</span></code>(n[, init])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bernouilli_gen</span></code>([init])</p></td>
+<td><p>generator of Bernouilli numbers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bigomega</span></code>(n)</p></td>
+<td><p>Number of prime divisors of n counted with multiplicity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">binomial</span></code>(n, k)</p></td>
+<td><p>binomial coefficient &quot;n choose k&quot; :param: n, k int :return: int, number of ways to chose n items in k, unordered</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">binomial_exponent</span></code>(n, k, p)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bouncy</span></code>(n[, up, down])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">carmichael</span></code>(n)</p></td>
+<td><p>Carmichael function :return : int smallest positive integer m such that a^m mod n = 1 for every integer a between 1 and n that is coprime to n.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">carries</span></code>(a, b[, base, pos])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalan</span></code>(n)</p></td>
+<td><p>Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalan_gen</span></code>()</p></td>
+<td><p>Generate Catalan numbers: C(n) = binomial(2n,n)/(n+1) = (2n)!/(n!(n+1)!).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ceildiv</span></code>(a, b)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chakravala</span></code>(n)</p></td>
+<td><p>solves x^2 - n*y^2 = 1 for x,y integers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chinese_remainder</span></code>(m, a)</p></td>
+<td><p><a class="reference external" href="http://en.wikipedia.org/wiki/Chinese_remainder_theorem">http://en.wikipedia.org/wiki/Chinese_remainder_theorem</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose</span></code>(n, k)</p></td>
+<td><p>binomial coefficient &quot;n choose k&quot; :param: n, k int :return: int, number of ways to chose n items in k, unordered</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmp</span></code>(x, y)</p></td>
+<td><p>Compare the two objects x and y and return an integer according to the outcome.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collatz</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collatz_gen</span></code>([n])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collatz_period</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">coprime</span></code>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">coprimes_gen</span></code>(limit)</p></td>
+<td><p>generates coprime pairs using Farey sequence</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cousin_primes</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumsum</span></code>(it)</p></td>
+<td><p>Yield accumulated sums of iterable: accsum(count(1)) -&gt; 1,3,6,10,...</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">de_bruijn</span></code>(k, n)</p></td>
+<td><p>De Bruijn sequence for alphabet k and subsequences of length n.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">diag</span></code>(v)</p></td>
+<td><p>Create a two-dimensional array with the flattened input as a diagonal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">digits</span></code>(num[, base, rev])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">digits_gen</span></code>(num[, base])</p></td>
+<td><p>generates int digits of num in base BACKWARDS</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">digsum</span></code>(num[, f, base])</p></td>
+<td><p>sum of digits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>(a, b[, norm])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">divisors</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot</span></code>(a, b[, default])</p></td>
+<td><p>dot product</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot_mm</span></code>(a, b[, default])</p></td>
+<td><p>dot product for matrices</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot_mv</span></code>(a, b[, default])</p></td>
+<td><p>dot product for vectors</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot_vv</span></code>(a, b[, default])</p></td>
+<td><p>dot product for vectors</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ecadd</span></code>(p1, p2, p0, n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ecdub</span></code>(p, A, n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ecmul</span></code>(m, p, A, n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">erathostene</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">euclid_gen</span></code>()</p></td>
+<td><p>generates Euclid numbers: 1 + product of the first n primes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">euler_phi</span></code>(n)</p></td>
+<td><p>Euler totient function</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eye</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factor_ecm</span></code>(n[, B1, B2])</p></td>
+<td><p>Factors n using the elliptic curve method, using Montgomery curves and an algorithm analogous to the two-phase variant of Pollard’s p-1 method.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factorial2</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factorial_gen</span></code>([f])</p></td>
+<td><p>Generator of factorial :param f: optional function to apply at each step</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factorialk</span></code>(n, k)</p></td>
+<td><p>Multifactorial of n of order k, n(!!...!).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factorize</span></code>(n)</p></td>
+<td><p>find the prime factors of n along with their frequencies.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">factors</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">faulhaber</span></code>(n, p)</p></td>
+<td><p>sum of the p-th powers of the first n positive integers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fibonacci</span></code>(n[, mod])</p></td>
+<td><p>fibonacci series n-th element :param n: int can be extremely high, like 1e19 ! :param mod: int optional modulo</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fibonacci_gen</span></code>([max, mod])</p></td>
+<td><p>Generate fibonacci serie (k=2)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code>(x[, decimals])</p></td>
+<td><p>formats a float with given number of decimals, but not an int</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma_inverse</span></code>(x)</p></td>
+<td><p>Inverse the gamma function.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gcd</span></code>(*args)</p></td>
+<td><p>greatest common divisor of an arbitrary number of args</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cardinal_name</span></code>(num[, numbers])</p></td>
+<td><p>Get cardinal name for number (0 to 1 million)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gpf</span></code>(n)</p></td>
+<td><p>greatest prime factor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code>(s1, s2)</p></td>
+<td><p>Calculate the Hamming distance between two iterables</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">heptagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hexagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">icbrt</span></code>(n)</p></td>
+<td><p>integer cubic root</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">identity</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ilog</span></code>(a, b[, upper_bound])</p></td>
+<td><p>discrete logarithm x such that b^x=a</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_base</span></code>(num, base)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_or_float</span></code>(x[, rel_tol, abs_tol])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">integer_exponent</span></code>(a[, b])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">introot</span></code>(n[, r])</p></td>
+<td><p>integer r-th root</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipow</span></code>(x, y[, z])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_anagram</span></code>(num1, num2[, base])</p></td>
+<td><p>Check if 'num1' and 'num2' have the same digits in base</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_complex</span></code>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_fibonacci</span></code>(n)</p></td>
+<td><p>returns True if n is in Fibonacci series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_happy</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_heptagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_hexagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_integer</span></code>(x[, rel_tol, abs_tol])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_lychrel</span></code>(n[, limit])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_multiple</span></code>(n, factors)</p></td>
+<td><p>return True if n has ONLY factors as prime factors</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_number</span></code>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_octagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_palindromic</span></code>(num[, base])</p></td>
+<td><p>Check if 'num' in base 'base' is a palindrome, that's it, if it can be read equally from left to right and right to left.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_pandigital</span></code>(num[, base])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_pentagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_perfect</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_power</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_prime</span></code>(n[, oneisprime, tb, eb, mrb])</p></td>
+<td><p>main primality test.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_prime_euler</span></code>(n[, eb])</p></td>
+<td><p>Euler's primality test</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_primitive_root</span></code>(x, m[, s])</p></td>
+<td><p>returns True if x is a primitive root of m</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_pythagorean_triple</span></code>(a, b, c)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_real</span></code>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_square</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_triangle</span></code>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_triangular</span></code>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isqrt</span></code>(n)</p></td>
+<td><p>integer square root</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jacobi</span></code>(a, p)</p></td>
+<td><p>Computes the Jacobi symbol (a|p), where p is a positive odd number.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kempner</span></code>(n)</p></td>
+<td><p>&quot;Kempner function, also called Smarandache function</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kfibonacci</span></code>(k[, mod])</p></td>
+<td><p>k-fibonacci series n-th element</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kfibonacci_gen</span></code>(k[, init, max, mod])</p></td>
+<td><p>Generate k-fibonacci serie</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lambertW</span></code>(z)</p></td>
+<td><p>Lambert W function, principal branch.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lcm</span></code>(*args)</p></td>
+<td><p>least common multiple of any number of integers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">legendre</span></code>(a, p)</p></td>
+<td><p>Functions to comptue the Legendre symbol (a|p).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">legendre2</span></code>(a, p)</p></td>
+<td><p>Functions to comptue the Legendre symbol (a|p).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">levenshtein</span></code>(seq1, seq2)</p></td>
+<td><p>levenshtein distance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_binomial</span></code>(n, k)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_factorial</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">longint</span></code>(mantissa, exponent)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lpf</span></code>(n)</p></td>
+<td><p>greatest prime factor</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lucasU</span></code>(p, q)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lucasV</span></code>(p, q)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lucas_lehmer</span></code>(p)</p></td>
+<td><p>Lucas Lehmer primality test for Mersenne exponent p</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lucky_gen</span></code>()</p></td>
+<td><p>generates lucky numbers :see: <a class="reference external" href="https://en.wikipedia.org/wiki/Lucky_number">https://en.wikipedia.org/wiki/Lucky_number</a> :see: <a class="reference external" href="https://oeis.org/A000959">https://oeis.org/A000959</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lychrel_count</span></code>(n[, limit])</p></td>
+<td><p>number of lychrel iterations before n becomes palindromic</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lychrel_seq</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix_power</span></code>(M, power[, mod])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximum</span></code>(m)</p></td>
+<td><p>Compare N arrays and returns a new array containing the element-wise maxima</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimum</span></code>(m)</p></td>
+<td><p>Compare N arrays and returns a new array containing the element-wise minima</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mlucas</span></code>(v, a, n)</p></td>
+<td><p>Helper function for williams_pp1().</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_binomial</span></code>(n, k, m[, q])</p></td>
+<td><p>calculates C(n,k) mod m for large n,k,m</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_div</span></code>(a, b, m)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_fac</span></code>(n, mod[, mod_is_prime])</p></td>
+<td><p>modular factorial : return n! % modulo if module is prime, use Wilson's theorem <a class="reference external" href="https://en.wikipedia.org/wiki/Wilson%27s_theorem">https://en.wikipedia.org/wiki/Wilson%27s_theorem</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_fact</span></code>(n, m)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_inv</span></code>(a, b)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_matmul</span></code>(A, B[, mod])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_matpow</span></code>(M, power[, mod])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mod_sqrt</span></code>(n, p)</p></td>
+<td><p>modular sqrt(n) mod p</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">moebius</span></code>(n)</p></td>
+<td><p>Möbius (or Moebius) function mu(n).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mul</span></code>(nums[, init])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiply</span></code>(x, y)</p></td>
+<td><p>Karatsuba fast multiplication algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncombinations</span></code>(n, k)</p></td>
+<td><p>binomial coefficient &quot;n choose k&quot; :param: n, k int :return: int, number of ways to chose n items in k, unordered</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextprime</span></code>(n)</p></td>
+<td><p>Determines, with some semblance of efficiency, the least prime number strictly greater than n.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm</span></code>(v[, order])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm_1</span></code>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm_2</span></code>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm_inf</span></code>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_from_digits</span></code>(digits[, base])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_digits</span></code>(num[, base])</p></td>
+<td><p>Return number of digits of num (expressed in base 'base')</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_divisors</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">octagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega</span></code>(n)</p></td>
+<td><p>Number of distinct primes dividing n</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition</span></code>(n)</p></td>
+<td><p>The partition function p(n)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partitionsQ</span></code>(n[, d])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pascal_gen</span></code>()</p></td>
+<td><p>Pascal's triangle read by rows: C(n,k) = binomial(n,k) = n!/(k!*(n-k)!), 0&lt;=k&lt;=n.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pentagonal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pfactor</span></code>(n)</p></td>
+<td><p>Helper function for sprp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pi_digits_gen</span></code>()</p></td>
+<td><p>generates pi digits as a sequence of INTEGERS ! using Jeremy Gibbons spigot generator</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pisano_cycle</span></code>(mod)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pisano_period</span></code>(mod)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pollardRho_brent</span></code>(n)</p></td>
+<td><p>Brent’s improvement on Pollard’s rho algorithm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pollard_pm1</span></code>(n[, B1, B2])</p></td>
+<td><p>Pollard’s p+1 algorithm, two-phase version.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">polygonal</span></code>(s, n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pow</span></code>(x, y[, z])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">power_tower</span></code>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">powertrain</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prevprime</span></code>(n)</p></td>
+<td><p>Determines, very inefficiently, the largest prime number strictly smaller than n.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prime_divisors</span></code>(num[, start])</p></td>
+<td><p>generates unique prime divisors (ordered) of num</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prime_factors</span></code>(num[, start])</p></td>
+<td><p>generates all prime factors (ordered) of num</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prime_ktuple</span></code>(constellation)</p></td>
+<td><p>generates tuples of primes with specified differences</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">primes</span></code>(n)</p></td>
+<td><p>memoized list of n first primes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">primes_gen</span></code>([start, stop])</p></td>
+<td><p>generate prime numbers from start</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">primitive_root_gen</span></code>(m)</p></td>
+<td><p>generate primitive roots modulo m</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">primitive_roots</span></code>(modulo)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">primitive_triples</span></code>()</p></td>
+<td><p>generates primitive Pythagorean triplets x&lt;y&lt;z</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proper_divisors</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proportional</span></code>(nseats, votes)</p></td>
+<td><p>assign n seats proportionaly to votes using the <a class="reference external" href="https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota">https://en.wikipedia.org/wiki/Hagenbach-Bischoff_quota</a> method</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyramidal</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quad</span></code>(a, b, c[, allow_complex])</p></td>
+<td><p>solves quadratic equations aX^2+bX+c=0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_prime</span></code>(bits)</p></td>
+<td><p>returns a random number of the specified bit length</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rational_cycle</span></code>(num, den)</p></td>
+<td><p>periodic part of the decimal expansion of num/den.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rational_form</span></code>(numerator, denominator)</p></td>
+<td><p>information about the decimal representation of a rational number.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rational_str</span></code>(n, d)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectangular_repartition</span></code>(x, n, h)</p></td>
+<td><p>divide 1 into n fractions such that:</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">recurrence</span></code>(factors, values[, cst, max, mod])</p></td>
+<td><p>general generator for recurrences</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">repunit</span></code>(n[, base, digit])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">repunit_gen</span></code>([base, digit])</p></td>
+<td><p>generate repunits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>(i)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rint</span></code>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sat</span></code>(x[, low, high])</p></td>
+<td><p>saturates x between low and high</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sets_dist</span></code>(a, b)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sets_levenshtein</span></code>(a, b)</p></td>
+<td><p>levenshtein distance on sets</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sexy_prime_quadruplets</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sexy_prime_triplets</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sexy_primes</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sieve</span></code>(n[, oneisprime])</p></td>
+<td><p>prime numbers from 2 to a prime &lt; n</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sign</span></code>(number)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sin_over_x</span></code>(x)</p></td>
+<td><p>numerically safe sin(x)/x</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">slerp</span></code>(u, v, t)</p></td>
+<td><p>spherical linear interpolation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sprp</span></code>(n, a[, s, d])</p></td>
+<td><p>Checks n for primality using the Strong Probable Primality Test to base a.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqrt</span></code>(n)</p></td>
+<td><p>square root :return: int, float or complex depending on n</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">square</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str_base</span></code>(num[, base, numerals])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum_of_cubes</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum_of_squares</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedral</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">totient</span></code>(n)</p></td>
+<td><p>Euler totient function</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trailing_zeros</span></code>(a[, b])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(m)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangular</span></code>(n)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangular_repartition</span></code>(x, n)</p></td>
+<td><p>divide 1 into n fractions such that:</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">triples</span></code>()</p></td>
+<td><p>generates all Pythagorean triplets triplets x&lt;y&lt;z sorted by hypotenuse z, then longest side y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">twin_primes</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecadd</span></code>(a, b[, fillvalue])</p></td>
+<td><p>addition of vectors of inequal lengths</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">veccompare</span></code>(a, b)</p></td>
+<td><p>compare values in 2 lists.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecdiv</span></code>(a, b)</p></td>
+<td><p>quotient of vectors of inequal lengths</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecmul</span></code>(a, b)</p></td>
+<td><p>product of vectors of inequal lengths</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecneg</span></code>(a)</p></td>
+<td><p>unary negation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecsub</span></code>(a, b[, fillvalue])</p></td>
+<td><p>substraction of vectors of inequal lengths</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vecunit</span></code>(v[, norm])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">williams_pp1</span></code>(n)</p></td>
+<td><p>Williams’ p+1 algorithm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">xgcd</span></code>(a, b)</p></td>
+<td><p>Extended GCD</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zeros</span></code>(shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sieve</span></code>(f, init)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="goulib.markup.html"
+                          title="previous chapter">goulib.markup</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="goulib.motion.html"
+                          title="next chapter">goulib.motion</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.math2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.motion.html" title="goulib.motion"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="goulib.markup.html" title="goulib.markup"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.math2</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+      Last updated on Feb 27, 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

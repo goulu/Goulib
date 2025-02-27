@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>goulib.polynomial &#8212; goulib 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="goulib.stats" href="goulib.stats.html" />
+    <link rel="prev" title="goulib.plot" href="goulib.plot.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.stats.html" title="goulib.stats"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="goulib.plot.html" title="goulib.plot"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.polynomial</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-goulib.polynomial">
+<span id="goulib-polynomial"></span><h1>goulib.polynomial<a class="headerlink" href="#module-goulib.polynomial" title="Link to this heading">¶</a></h1>
+<p>simple manipulation of polynomials (without SimPy)
+see <a class="reference external" href="http://docs.sympy.org/dev/modules/polys/reference.html">http://docs.sympy.org/dev/modules/polys/reference.html</a> if you need more …</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_parse_n</span></code>(str)</p></td>
+<td><p>Parse the number part of a polynomial string term</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_parse_p</span></code>(str)</p></td>
+<td><p>Parse the power part of a polynomial string term</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_strip_leading_zeros</span></code>(p)</p></td>
+<td><p>Remove the leading (in terms of high orders of x) zeros in the polynomial</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_tostring_term</span></code>(c, i, **kwargs)</p></td>
+<td><p>Convert a single coefficient c and power e to a string cx^i</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code>(p1, p2)</p></td>
+<td><p>Return a new plist corresponding to the sum of the two input plists.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">derivative</span></code>(plist)</p></td>
+<td><p>Return a new plist corresponding to the derivative of the input plist.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">integral</span></code>(plist)</p></td>
+<td><p>Return a new plist corresponding to the integral of the input plist.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mult_const</span></code>(p, c)</p></td>
+<td><p>Return a new plist corresponding to the input plist multplied by a const</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mult_one</span></code>(p, c, i)</p></td>
+<td><p>Return a new plist corresponding to the product of the input plist p with the single term c*x^i</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiply</span></code>(p1, p2)</p></td>
+<td><p>Return a new plist corresponding to the product of the two input plists</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_string</span></code>(s)</p></td>
+<td><p>Do very, very primitive parsing of a string into a plist.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">peval</span></code>(plist, x[, x2])</p></td>
+<td><p>Eval the plist at value x.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plist</span></code>(term)</p></td>
+<td><p>Force term to have the form of a polynomial list</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">power</span></code>(p, e)</p></td>
+<td><p>Return a new plist corresponding to the e-th power of the input plist p</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub</span></code>(p1, p2)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tostring</span></code>(p, **kwargs)</p></td>
+<td><p>Convert a plist into a string.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polynomial</span></code>(val)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="goulib.plot.html"
+                          title="previous chapter">goulib.plot</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="goulib.stats.html"
+                          title="next chapter">goulib.stats</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.polynomial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.stats.html" title="goulib.stats"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="goulib.plot.html" title="goulib.plot"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.polynomial</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+      Last updated on Feb 27, 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

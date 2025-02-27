@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>goulib.decorators &#8212; goulib 3.0.0 documentation</title>
+    <title>goulib.motion &#8212; goulib 3.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -14,8 +14,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="goulib.drawing" href="goulib.drawing.html" />
-    <link rel="prev" title="goulib.datetime2" href="goulib.datetime2.html" /> 
+    <link rel="next" title="goulib.notebook" href="goulib.notebook.html" />
+    <link rel="prev" title="goulib.math2" href="goulib.math2.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -27,13 +27,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="goulib.drawing.html" title="goulib.drawing"
+          <a href="goulib.notebook.html" title="goulib.notebook"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="goulib.datetime2.html" title="goulib.datetime2"
+          <a href="goulib.math2.html" title="goulib.math2"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">goulib.decorators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">goulib.motion</a></li> 
       </ul>
     </div>  
 
@@ -42,34 +42,31 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-goulib.decorators">
-<span id="goulib-decorators"></span><h1>goulib.decorators<a class="headerlink" href="#module-goulib.decorators" title="Link to this heading">¶</a></h1>
-<p>useful decorators</p>
+  <section id="module-goulib.motion">
+<span id="goulib-motion"></span><h1>goulib.motion<a class="headerlink" href="#module-goulib.motion" title="Link to this heading">¶</a></h1>
+<p>motion simulation (kinematics)</p>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug</span></code>(func)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segment2ndDegree</span></code>(t0, t1, start[, end])</p></td>
+<td><p>calculates a constant acceleration Segment between start and end</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segment4thDegree</span></code>(t0, t1, start, end)</p></td>
+<td><p>smooth trajectory from an initial position and initial speed (p0,v0) to a final position and speed (p1,v1) * if t1&lt;=t0, t1 is calculated</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SegmentsTrapezoidalSpeed</span></code>(t0, p0, p3, a[, T, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_thread_pool</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_delta</span></code>(x0, x1)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">itimeout</span></code>(iterable, timeout)</p></td>
-<td><p>timeout for loops :param iterable: any iterable :param timeout: float max running time in seconds  :yield: items in iterator until timeout occurs :raise: multiprocessing.TimeoutError if timeout occured</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoize</span></code>(obj)</p></td>
-<td><p>speed up repeated calls to a function by caching its results in a dict index by params :see: <a class="reference external" href="https://en.wikipedia.org/wiki/Memoization">https://en.wikipedia.org/wiki/Memoization</a></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">multimethod</span></code>(*types)</p></td>
-<td><p>allows to overload functions for various parameter types</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nodebug</span></code>(func)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pva</span></code>(val)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code>(method)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ramp</span></code>(dp, v0, v1, a)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code>(timeout)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trapeze</span></code>(dp, vmax, a[, v0, v2])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -77,8 +74,17 @@
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiMethod</span></code>(name)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PVA</span></code>(funcs)</p></td>
+<td><p>represents a function of time returning position, velocity, and acceleration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segment</span></code>(t0, t1, funcs)</p></td>
+<td><p>a PVA defined between 2 times, null elsewhere</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SegmentPoly</span></code>(t0, t1, p)</p></td>
+<td><p>a segment defined by a polynomial position law</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segments</span></code>([segments, label])</p></td>
+<td><p>can be initialized with a list of segment (that of course can also be a Segments) :param label: a label can be given</p></td>
 </tr>
 </tbody>
 </table>
@@ -93,18 +99,18 @@
         <div class="sphinxsidebarwrapper">
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="goulib.datetime2.html"
-                          title="previous chapter">goulib.datetime2</a></p>
+    <p class="topless"><a href="goulib.math2.html"
+                          title="previous chapter">goulib.math2</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="goulib.drawing.html"
-                          title="next chapter">goulib.drawing</a></p>
+    <p class="topless"><a href="goulib.notebook.html"
+                          title="next chapter">goulib.notebook</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/modules/goulib.decorators.rst.txt"
+      <li><a href="../_sources/modules/goulib.motion.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -132,13 +138,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="goulib.drawing.html" title="goulib.drawing"
+          <a href="goulib.notebook.html" title="goulib.notebook"
              >next</a> |</li>
         <li class="right" >
-          <a href="goulib.datetime2.html" title="goulib.datetime2"
+          <a href="goulib.math2.html" title="goulib.math2"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">goulib.decorators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">goulib.motion</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>goulib.image &#8212; goulib 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="goulib.interval" href="goulib.interval.html" />
+    <link rel="prev" title="goulib.graph" href="goulib.graph.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.interval.html" title="goulib.interval"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="goulib.graph.html" title="goulib.graph"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.image</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-goulib.image">
+<span id="goulib-image"></span><h1>goulib.image<a class="headerlink" href="#module-goulib.image" title="Link to this heading">¶</a></h1>
+<p>image processing with PIL’s ease and skimage’s power</p>
+<dl class="field-list simple">
+<dt class="field-odd">requires<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="http://scikit-image.org/">scikit-image</a></p></li>
+<li><p><a class="reference external" href="http://pypi.python.org/pypi/pillow/">PIL or Pillow</a></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">optional<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="http://pypi.python.org/pypi/pdfminer.six/">pdfminer.six</a> for pdf input</p></li>
+</ul>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adapt_rgb</span></code>(func)</p></td>
+<td><p>Decorator that adapts to RGB(A) images to a gray-scale filter. :param apply_to_rgb: function     Function that returns a filtered image from an image-filter and RGB     image. This will only be called if the image is RGB-like.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">alpha_composite</span></code>(front, back)</p></td>
+<td><p>Alpha composite two RGBA images.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">alpha_composite_with_color</span></code>(image[, color])</p></td>
+<td><p>Alpha composite an RGBA image with a single color image of the specified color and the same size as the original image.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool2gray</span></code>(im)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool2rgb</span></code>(im[, color0, color1])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmyk2rgb</span></code>(cmyk)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert</span></code>(a, source, target, **kwargs)</p></td>
+<td><p>convert an image between modes, eventually using intermediary steps :param a: nparray (x,y,n) containing image :param source: string : key of source image mode in modes :param target: string : key of target image mode in modes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_type</span></code>(data, type)</p></td>
+<td><p>convert inner format of image :param data: nparray (x,y,n) containing image :param type: target np.type :return: nparray (x,y,n) with new type replaces outdated skimage.util.dtype.convert using  <a class="reference external" href="https://scikit-image.org/docs/0.24.x/api/skimage.html#utility-functions">https://scikit-image.org/docs/0.24.x/api/skimage.html#utility-functions</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">disk</span></code>(radius[, antialias])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dither</span></code>(image[, method, N])</p></td>
+<td><p>Quantize a gray image, using dithering.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fig2img</span></code>(fig)</p></td>
+<td><p>Convert a Matplotlib figure to a PIL Image in RGBA format and return it</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fspecial</span></code>(name, **kwargs)</p></td>
+<td><p>mimics the Matlab image toolbox fspecial function <a class="reference external" href="http://www.mathworks.com/help/images/ref/fspecial.html?refresh=true">http://www.mathworks.com/help/images/ref/fspecial.html?refresh=true</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gray2bool</span></code>(image[, method, N])</p></td>
+<td><p>Quantize a gray image, using dithering.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gray2rgb</span></code>(im[, color0, color1])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">guessmode</span></code>(arr)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ind2any</span></code>(im, palette, dest)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ind2rgb</span></code>(im, palette)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lab2ind</span></code>(im[, colors])</p></td>
+<td><p>convert a Lab image to indexed colors :param a: nparray (x,y,n) containing image :param colors: int number of colors or predefined Palette :ref: <a class="reference external" href="http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html">http://scikit-learn.org/stable/auto_examples/cluster/plot_color_quantization.html</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nchannels</span></code>(arr)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code>(a[, newmax, newmin])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">palette</span></code>(im, ncolors[, tol])</p></td>
+<td><p>extract the color palette of image array (in its own colorspace.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pure_pil_alpha_to_color_v1</span></code>(image[, color])</p></td>
+<td><p>Alpha composite an RGBA Image with a specified color.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pure_pil_alpha_to_color_v2</span></code>(image[, color])</p></td>
+<td><p>Alpha composite an RGBA Image with a specified color.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantize</span></code>(image[, N, L])</p></td>
+<td><p>Quantize a gray image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomize</span></code>(image[, N, L])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_pdf</span></code>(filename, **kwargs)</p></td>
+<td><p>reads a bitmap graphics on a .pdf file only the first page is parsed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rgb2cmyk</span></code>(rgb)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rgb2rgba</span></code>(array)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ditherer</span></code>(name, method)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorDiffusion</span></code>(name, positions, weights[, wsum])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FloydSteinberg</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Image</span></code>([data, mode])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mode</span></code>(name, nchannels, type, min, max)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="goulib.graph.html"
+                          title="previous chapter">goulib.graph</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="goulib.interval.html"
+                          title="next chapter">goulib.interval</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.image.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.interval.html" title="goulib.interval"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="goulib.graph.html" title="goulib.graph"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.image</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+      Last updated on Feb 27, 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

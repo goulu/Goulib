@@ -11,8 +11,8 @@ see the `IPython notebook <http://nbviewer.ipython.org/github/Goulu/goulib/blob/
 .. image:: https://badge.fury.io/py/goulib.svg
     :target: https://pypi.python.org/pypi/goulib/
     :alt: Version
-.. image:: https://travis-ci.org/goulu/goulib.svg?branch=master
-    :target: https://travis-ci.org/goulu/goulib
+.. image:: https://github.com/goulu/Goulib/actions/workflows/build.yml/badge.svg
+    :target: https://github.com/goulu/Goulib/actions/workflows/build.yml
     :alt: Build
 .. image:: https://coveralls.io/repos/goulu/goulib/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/goulu/goulib?branch=master

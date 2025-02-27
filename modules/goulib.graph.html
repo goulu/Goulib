@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>goulib.graph &#8212; goulib 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="goulib.image" href="goulib.image.html" />
+    <link rel="prev" title="goulib.geom3d" href="goulib.geom3d.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.image.html" title="goulib.image"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="goulib.geom3d.html" title="goulib.geom3d"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.graph</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-goulib.graph">
+<span id="goulib-graph"></span><h1>goulib.graph<a class="headerlink" href="#module-goulib.graph" title="Link to this heading">¶</a></h1>
+<p>efficient Euclidian Graphs for <code class="xref py py-mod docutils literal notranslate"><span class="pre">networkx</span></code> and related algorithms</p>
+<dl class="field-list simple">
+<dt class="field-odd">requires<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="http://networkx.github.io/">networkx</a></p></li>
+<li><p><a class="reference external" href="http://pypi.python.org/pypi/matplotlib/">matplotlib</a></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">optional<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.scipy.org/">scipy</a> for delauney triangulation</p></li>
+<li><p><a class="reference external" href="http://toblerity.org/rtree/">rtree</a> for faster GeoGraph algorithms</p></li>
+</ul>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delauney_triangulation</span></code>(nodes[, ...])</p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Delaunay_triangulation">https://en.wikipedia.org/wiki/Delaunay_triangulation</a> :param nodes: _Geo graph or list of (x,y) or (x,y,z) node positions :param qhull_options: string passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">scipy.spatial.Delaunay()</span></code>, which passes it to Qhull ( <a class="reference external" href="http://www.qhull.org/">http://www.qhull.org/</a> ) <a href="#id1"><span class="problematic" id="id2">*</span></a>'Qt' ensures all points are connected <a href="#id3"><span class="problematic" id="id4">*</span></a>'Qz' required when nodes lie on a sphere <a href="#id5"><span class="problematic" id="id6">*</span></a>'QJ' solves some singularity situations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_networkx</span></code>(g[, pos])</p></td>
+<td><p>improves nx.draw_networkx :param g: NetworkX Graph :param pos: can be either :</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">euclidean_minimum_spanning_tree</span></code>(nodes, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">figure</span></code>(g[, box])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">points_on_sphere</span></code>(N)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_json</span></code>(filename[, directed, multigraph, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_drawing</span></code>(g[, d, edges])</p></td>
+<td><p>draws Graph to a <cite>Drawing</cite> :param g: <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> :param d: existing <code class="xref py py-class docutils literal notranslate"><span class="pre">Drawing</span></code> to draw onto, or None to create a new Drawing :param edges: iterable of edges (with data) that will be added, in the same order.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>(g, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_networkx_graph</span></code>(data[, create_using, ...])</p></td>
+<td><p>Make a NetworkX graph from a known data structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_dot</span></code>(g, filename)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_dxf</span></code>(g, filename)</p></td>
+<td><p>writes <a class="reference external" href="https://networkx.org/documentation/latest/reference/classes/graph.html#networkx.Graph" title="(in NetworkX v3.5rc0.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">networkx.Graph</span></code></a> in .dxf format</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_json</span></code>(g, filename, **kwargs)</p></td>
+<td><p>write a JSON file, suitable for D*.js representation</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AGraph</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DiGraph</span></code>([data, nodes])</p></td>
+<td><p>directed graph with nodes positions can be set to non multiedges anytime with attribute multi=False</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeoGraph</span></code>([data, nodes])</p></td>
+<td><p>Undirected graph with nodes positions can be set to non multiedges anytime with attribute multi=False</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_Geo</span></code>(parent[, data, nodes])</p></td>
+<td><p>base class for graph with nodes at specified positions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="goulib.geom3d.html"
+                          title="previous chapter">goulib.geom3d</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="goulib.image.html"
+                          title="next chapter">goulib.image</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/goulib.graph.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="goulib.image.html" title="goulib.image"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="goulib.geom3d.html" title="goulib.geom3d"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">goulib.graph</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015-2025, Ph. Guglielmetti, https://github.com/goulu/goulib.
+      Last updated on Feb 27, 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

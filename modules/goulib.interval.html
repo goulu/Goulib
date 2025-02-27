@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>goulib.decorators &#8212; goulib 3.0.0 documentation</title>
+    <title>goulib.interval &#8212; goulib 3.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -14,8 +14,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="goulib.drawing" href="goulib.drawing.html" />
-    <link rel="prev" title="goulib.datetime2" href="goulib.datetime2.html" /> 
+    <link rel="next" title="goulib.itertools2" href="goulib.itertools2.html" />
+    <link rel="prev" title="goulib.image" href="goulib.image.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -27,13 +27,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="goulib.drawing.html" title="goulib.drawing"
+          <a href="goulib.itertools2.html" title="goulib.itertools2"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="goulib.datetime2.html" title="goulib.datetime2"
+          <a href="goulib.image.html" title="goulib.image"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">goulib.decorators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">goulib.interval</a></li> 
       </ul>
     </div>  
 
@@ -42,34 +42,25 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-goulib.decorators">
-<span id="goulib-decorators"></span><h1>goulib.decorators<a class="headerlink" href="#module-goulib.decorators" title="Link to this heading">¶</a></h1>
-<p>useful decorators</p>
+  <section id="module-goulib.interval">
+<span id="goulib-interval"></span><h1>goulib.interval<a class="headerlink" href="#module-goulib.interval" title="Link to this heading">¶</a></h1>
+<p>operations on [a..b[ intervals</p>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug</span></code>(func)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_order</span></code>(interval)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_thread_pool</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_interval</span></code>(interval, x[, closed])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">itimeout</span></code>(iterable, timeout)</p></td>
-<td><p>timeout for loops :param iterable: any iterable :param timeout: float max running time in seconds  :yield: items in iterator until timeout occurs :raise: multiprocessing.TimeoutError if timeout occured</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">memoize</span></code>(obj)</p></td>
-<td><p>speed up repeated calls to a function by caching its results in a dict index by params :see: <a class="reference external" href="https://en.wikipedia.org/wiki/Memoization">https://en.wikipedia.org/wiki/Memoization</a></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">multimethod</span></code>(*types)</p></td>
-<td><p>allows to overload functions for various parameter types</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nodebug</span></code>(func)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersect</span></code>(t1, t2)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code>(method)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code>(t1, t2)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeout</span></code>(timeout)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersectlen</span></code>(t1, t2[, none])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -77,8 +68,14 @@
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiMethod</span></code>(name)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Box</span></code>(*args)</p></td>
+<td><p>a N dimensional rectangular box defined by a list of N Intervals</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interval</span></code>(start, end)</p></td>
+<td><p>Represents an interval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Intervals</span></code>([iterable, key])</p></td>
+<td><p>a list of intervals kept in ascending order</p></td>
 </tr>
 </tbody>
 </table>
@@ -93,18 +90,18 @@
         <div class="sphinxsidebarwrapper">
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="goulib.datetime2.html"
-                          title="previous chapter">goulib.datetime2</a></p>
+    <p class="topless"><a href="goulib.image.html"
+                          title="previous chapter">goulib.image</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="goulib.drawing.html"
-                          title="next chapter">goulib.drawing</a></p>
+    <p class="topless"><a href="goulib.itertools2.html"
+                          title="next chapter">goulib.itertools2</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/modules/goulib.decorators.rst.txt"
+      <li><a href="../_sources/modules/goulib.interval.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -132,13 +129,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="goulib.drawing.html" title="goulib.drawing"
+          <a href="goulib.itertools2.html" title="goulib.itertools2"
              >next</a> |</li>
         <li class="right" >
-          <a href="goulib.datetime2.html" title="goulib.datetime2"
+          <a href="goulib.image.html" title="goulib.image"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">goulib 3.0.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">goulib.decorators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">goulib.interval</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
